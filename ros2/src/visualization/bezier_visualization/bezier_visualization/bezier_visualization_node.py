@@ -8,8 +8,8 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
-from march_shared_msgs.msg import PointStampedList
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseArray
 
 NODE_NAME = "bezier_plotter"
 
@@ -43,7 +43,7 @@ class BezierCurve(Node):
         super().__init__(NODE_NAME)
 
         self.publish_points = self.create_publisher(
-            PointStampedList,
+            PoseArray,
             '/bezier_points',
             10
         )
@@ -150,9 +150,9 @@ class BezierCurve(Node):
         """
         self.dragging_point = None
         plt.ion()
-        msg = PointStampedList()
+        msg = PoseArray()
         for key in self.points:
-            p = PointStamped()
+            p = Pose()
             p.point.x = float(key)
             p.point.y = float(self.points[key])
             msg.points.append(p)

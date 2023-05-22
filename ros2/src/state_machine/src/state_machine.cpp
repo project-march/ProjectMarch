@@ -21,9 +21,11 @@ StateMachine::StateMachine()
     m_exo_transitions = {
         /*{CurrentState, PossibleStates}*/
         { exoState::Sit, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::Stand, { exoState::Sit, exoState::Walk, exoState::ForceUnknown, exoState::Error } },
+        { exoState::Stand,
+            { exoState::Sit, exoState::Walk, exoState::StepClose, exoState::ForceUnknown, exoState::Error } },
         { exoState::Walk, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::ForceUnknown, { exoState::Stand, exoState::Error } },
+        { exoState::StepClose, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
+        { exoState::ForceUnknown, { exoState::Stand, exoState::Sit, exoState::Error } },
 
     };
 }
@@ -74,5 +76,5 @@ bool StateMachine::isValidTransition(exoState desired_state)
  */
 int StateMachine::get_current_state()
 {
-    return static_cast<int>(m_current_state);
+    return (int)m_current_state;
 }

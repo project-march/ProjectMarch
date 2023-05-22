@@ -12,7 +12,7 @@ class FootstepGenerator : public rclcpp::Node {
 public:
     FootstepGenerator();
 
-    geometry_msgs::msg::PoseArray generate_foot_placements(int stance_leg);
+    geometry_msgs::msg::PoseArray generate_foot_placements(int stance_leg, int gait_type);
 
     int get_steps();
     double get_velocity_x();

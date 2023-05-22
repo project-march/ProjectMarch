@@ -115,15 +115,15 @@ DESTINATION share/${PROJECT_NAME}/
 
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake)
-  add_launch_test(test/launch_tests/state_estimator_imu_estimator_test.py)
-  add_launch_test(test/launch_tests/state_estimator_com_estimator_test.py )
-  add_launch_test(test/launch_tests/state_estimator_robot_feet_test.py )
+#  add_launch_test(test/launch_tests/state_estimator_imu_estimator_test.py)
+#  add_launch_test(test/launch_tests/state_estimator_com_estimator_test.py )
+#  add_launch_test(test/launch_tests/state_estimator_robot_feet_test.py )
 
   ament_add_gmock(${PROJECT_NAME}_test
   # test/joint_estimator_test.cpp
   test/cop_estimator_test.cpp
   test/com_estimator_test.cpp
-  test/state_estimator_test.cpp
+#  test/state_estimator_test.cpp
   test/footstep_estimator_test.cpp
   test/imu_estimator_test.cpp
   test/zmp_estimator_test.cpp

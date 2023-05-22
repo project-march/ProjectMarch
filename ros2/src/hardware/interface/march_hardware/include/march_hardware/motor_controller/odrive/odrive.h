@@ -51,6 +51,9 @@ public:
     void actuateTorque(float target_torque, float fuzzy_weight) override;
     void actuateRadians(float target_position, float fuzzy_weight) override;
 
+    void sendPID(
+        std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid) override;
+
     // Override reset function
     std::chrono::nanoseconds reset() override;
 

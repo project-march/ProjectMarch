@@ -1,6 +1,0 @@
-controller_manager:
-  ros__parameters:
-    update_rate: 60  # Hz
-    
-    march_pressure_sole_broadcaster:
-      type: march_pressure_sole_broadcaster::PressureSoleBroadcaster

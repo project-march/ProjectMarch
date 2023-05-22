@@ -1,0 +1,31 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 125  # Hz
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+march_motor_controller_state_broadcaster:
+  ros__parameters:
+    # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
+    possible_joints:
+      - rotational_joint
+
+joint_trajectory_controller:
+  ros__parameters:
+    update_rate: 125
+    joints:
+      - rotational_joint
+    command_interfaces:
+      - position
+      # - effort
+    state_interfaces:
+      - position
+      - velocity
+      - effort
+    gains:
+      rotational_joint: { p: 60, i: 0, d: 5, i_clamp: 100}
+  

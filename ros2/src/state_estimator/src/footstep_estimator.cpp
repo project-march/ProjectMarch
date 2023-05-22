@@ -3,23 +3,33 @@
 FootstepEstimator::FootstepEstimator()
 {
     foot_left.position.header.frame_id = "left_ankle";
+    foot_left.position.point.x = 0.0;
+    foot_left.position.point.y = 0.0;
+    foot_left.position.point.z = 0.0;
     foot_right.position.header.frame_id = "right_ankle";
+    foot_right.position.point.x = 0.0;
+    foot_right.position.point.y = 0.0;
+    foot_right.position.point.z = 0.0;
 }
 
-geometry_msgs::msg::PointStamped FootstepEstimator::get_foot_position(const char* prefix)
+geometry_msgs::msg::Pose FootstepEstimator::get_foot_position(const char* prefix)
 {
+    geometry_msgs::msg::Pose foot_pose;
+
     switch (*prefix) {
         case * "l":
-            return foot_left.position;
+            foot_pose.position = foot_left.position.point;
             break;
 
         case * "r":
-            return foot_right.position;
+            foot_pose.position = foot_right.position.point;
             break;
 
         default:
-            return geometry_msgs::msg::PointStamped();
+            return geometry_msgs::msg::Pose();
     }
+
+    return foot_pose;
 }
 
 void FootstepEstimator::set_foot_size(double width, double height, const char* prefix)
@@ -48,6 +58,7 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
             return foot_right.on_ground;
             break;
         default:
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
             return 0;
     }
 }
@@ -63,12 +74,20 @@ Foot* FootstepEstimator::get_foot(const char* prefix)
             return &foot_right;
             break;
         default:
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0.");
             return 0;
     }
 }
 
-void FootstepEstimator::update_feet(const std::vector<PressureSensor> sensors)
+void FootstepEstimator::update_feet(const std::vector<PressureSensor*>* sensors)
 {
-    foot_left.set_on_ground(sensors, "l");
     foot_right.set_on_ground(sensors, "r");
+    foot_left.set_on_ground(sensors, "l");
+}
+
+void FootstepEstimator::set_threshold(double threshold)
+{
+    m_threshold = threshold;
+    foot_left.threshold = threshold;
+    foot_right.threshold = threshold;
 }

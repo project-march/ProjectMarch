@@ -1,6 +1,6 @@
 """Author: Unknown."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from rclpy.time import Time
 
 from march_utility.gait.edge_position import UnknownEdgePosition
@@ -37,6 +37,7 @@ class HomeGait(GaitInterface):
         name: str,
         position: Dict[str, float],
         gait_type: str,
+        names: List[str] = get_joint_names_from_urdf(),
         duration: Duration = DEFAULT_HOMEGAIT_DURATION,
     ):
         """Initializes an executable home gait with given positions."""
@@ -49,7 +50,7 @@ class HomeGait(GaitInterface):
         self._end_time = None
         self._starting_position = UnknownEdgePosition()
         self._final_position = self._position
-        self._actuating_joint_names = get_joint_names_from_urdf()
+        self._actuating_joint_names = names
 
     @property
     def name(self):

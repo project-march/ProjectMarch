@@ -2,7 +2,6 @@
 // Created by rixt on 20-3-23.
 //
 
-
 #ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2022 Project March.
@@ -27,7 +26,8 @@ protected:
         imu_estimator = std::make_unique<ImuEstimator>();
     }
 
-    void createIMU(){
+    void createIMU()
+    {
         imu.name = "test_imu";
         imu.base_frame = "test_base_frame";
         sensor_msgs::msg::Imu data;
@@ -46,11 +46,11 @@ protected:
         la.z = 2.10;
 
         data.orientation = q;
-        data.orientation_covariance = {1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
+        data.orientation_covariance = { 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0 };
         data.angular_velocity = av;
-        data.angular_velocity_covariance = {2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0};
+        data.angular_velocity_covariance = { 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0 };
         data.linear_acceleration = la;
-        data.linear_acceleration_covariance = {3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0};
+        data.linear_acceleration_covariance = { 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0 };
 
         imu.data = data;
 
@@ -76,24 +76,23 @@ protected:
 
 TEST_F(ImuEstimatorTest, setIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
-    ASSERT_EQ(imu_estimator->get_imu(), imu);
+    ASSERT_EQ(imu_estimator->get_imu(0), imu);
 }
 
 TEST_F(ImuEstimatorTest, changeOrientationIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
     imu.data.linear_acceleration.x = 3.0;
 
-
-    ASSERT_FALSE(imu_estimator->get_imu() == imu);
+    ASSERT_FALSE(imu_estimator->get_imu(0) == imu);
 }
 
 TEST_F(ImuEstimatorTest, updateIMUTest)
 {
-    imu_estimator->set_imu(imu);
+    imu_estimator->set_imu(imu, 0);
 
     sensor_msgs::msg::Imu data_updated;
     geometry_msgs::msg::Quaternion q_updated;
@@ -111,23 +110,21 @@ TEST_F(ImuEstimatorTest, updateIMUTest)
     la_updated.z = 2.10;
 
     data_updated.orientation = q_updated;
-    data_updated.orientation_covariance = {1.0, 2.5, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
+    data_updated.orientation_covariance = { 1.0, 2.5, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0 };
     data_updated.angular_velocity = av_updated;
-    data_updated.angular_velocity_covariance = {2.0, 3.0, 1.0, 2.0, 3.5, 1.0, 2.0, 3.0, 1.0};
+    data_updated.angular_velocity_covariance = { 2.0, 3.0, 1.0, 2.0, 3.5, 1.0, 2.0, 3.0, 1.0 };
     data_updated.linear_acceleration = la_updated;
-    data_updated.linear_acceleration_covariance = {3.0, 1.5, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0};
+    data_updated.linear_acceleration_covariance = { 3.0, 1.5, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0 };
 
     IMU imu_copy = imu;
     imu_copy.data = data_updated;
 
-    ASSERT_FALSE(imu_estimator->get_imu() == imu_copy);
+    ASSERT_FALSE(imu_estimator->get_imu(0) == imu_copy);
 
-    imu_estimator->update_imu(data_updated);
+    imu_estimator->update_imu(data_updated, 0);
 
-
-    ASSERT_EQ(imu_estimator->get_imu(), imu_copy);
+    ASSERT_EQ(imu_estimator->get_imu(0), imu_copy);
 }
-
 
 // NOLINTEND
 #endif

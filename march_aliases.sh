@@ -1,5 +1,4 @@
 # Source ROS distribution
-alias snoe='source /opt/ros/noetic/local_setup.bash'
 alias sfox='source /opt/ros/foxy/local_setup.bash'
 alias svenv='source ~/march/.venv_march/bin/activate'
 
@@ -10,6 +9,9 @@ alias sros2='source ~/march/ros2/install/local_setup.bash'
 # Navigate to MARCH directory
 alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
+
+# Create xml needed for mujoco
+alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/ && python3 march8_v0_generate.py && python3 march7_v1_generate.py && cm2'
 
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
@@ -26,24 +28,14 @@ ros2bag rosbag2 rosbag2_compression rosbag2_compression_zstd rosbag2_cpp rosbag2
 rosbag2_storage rosbag2_storage_default_plugins rosbag2_test_common rosbag2_tests rosbag2_transport shared_queues_vendor \
 ros2controlcli soem transmission_interface velocity_controllers'
 
-#run tetst setup
-alias run_test_setup_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_rotational rviz:=false gait_directory:=test_joint_rotational_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_rotational_control.yaml'\'''
-alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_linear rviz:=false gait_directory:=test_joint_linear_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_linear_control.yaml'\'''
-
-# Build and run the bridge
-alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure --symlink-install && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
-alias march_run_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge parameter_bridge'
-
-
 # Shorter aliases
-alias mb1='march_build_ros1'
 alias mb2='march_build_ros2'
 alias mb='march_build'
 alias mba='march_build_all'
-alias sim1='march_run_ros1_sim'
 alias sim2='march_run_ros2_sim'
-alias sim='march_run_ros2_sim'
-alias mujoco='sim mujoco:=true model_to_load_mujoco:="march.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco_guus='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march7_v1.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
@@ -54,13 +46,8 @@ alias mbp='mba --packages-select'
 # Training aliases
 export URDF6='robot:=march6_three_cameras'
 
-alias cov1='march_run_ros1_sim point_finder:=true realsense_simulation:=true ground_gait:=true'
 alias cov2='march_run_ros2_sim realsense_simulation:=true ground_gait:=true use_imu_data:=false'
-
-alias ag1='march_run_ros1_airgait point_finder:=true ground_gait:=true use_imu_data:=true'
 alias ag2='march_run_ros2_training use_imu_data:=true wireless_ipd:=true'
-
-alias gg1='ag1 gain_tuning:=ground_gait'
 alias gg2='ag2'
 
 
@@ -68,7 +55,6 @@ alias gg2='ag2'
 alias march_run_monitor='sfox && sros2 && ros2 launch march_monitor monitor.launch.py'
 alias monitor="march_run_monitor"
 alias multiplot="sfox && sros2 && ros2 launch march_plotjuggler_launcher plotjuggler.launch.py"
-alias recon1="snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure"
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
 alias left="sfox && sros2 && ros2 topic echo /march/foot_position/left | grep -A 3 'displacement'"
 alias right="sfox && sros2 && ros2 topic echo /march/foot_position/right | grep -A 3 'displacement'"
@@ -79,6 +65,8 @@ alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_laun
 
 alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_pressure_sole rviz:=false realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'''
 
+alias m8_test_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=true'
+alias m8_test_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=false'
 
 # Clean march builds
 # script to ask for confirmation before cleaning ros
@@ -92,7 +80,6 @@ confirm() {
         echo "Cancelled by user"
     fi
 }
-alias march_clean_ros1='confirm rm -rf ~/march/ros1/build ~/march/ros1/log ~/march/ros1/install'
 alias march_clean_ros2='confirm rm -rf ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install'
 alias march_clean='find ~/march/ros2/build ~/march/ros2/log ~/march/ros2/install -maxdepth 1 -name "march*" -type d -print0 | xargs -0 rm -r --'
 
@@ -102,7 +89,6 @@ export RCUTILS_COLORIZED_OUTPUT=1
 
 
 # Install dependencies
-alias install_dep_ros1='cm1 && snoe && rosdep install --from-paths src --ignore-src -y --rosdistro noetic'
 alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-src -y --rosdistro foxy'
 
 
@@ -150,7 +136,6 @@ alias odrive='cd ~/projects/odrivepython && python main.py'
 
 # Sourcing ROS distributions on the Asrock
 alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.177:11311/'
-alias asrock_ros1="snoe && sros1 && export_asrock_master_uri"
 alias asrock_ros2="sfox && sros2 && export_asrock_master_uri"
 
 FASTRTPS_DEFAULT_PROFILES_FILE=~/march/.fastrtps-profile.xml

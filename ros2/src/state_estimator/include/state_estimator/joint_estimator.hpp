@@ -23,12 +23,14 @@ struct CenterOfMass {
     friend bool operator==(CenterOfMass a, CenterOfMass b)
     {
         return (a.position.point.x == b.position.point.x && a.position.point.y == b.position.point.y
-                && a.position.point.z == b.position.point.z && abs(a.mass - b.mass) < 1e-6 );
+            && a.position.point.z == b.position.point.z && abs(a.mass - b.mass) < 1e-6);
     };
 };
 
 struct JointContainer {
     std::string name;
+    std::string base_link_name;
+    double axis;
     geometry_msgs::msg::TransformStamped frame;
     CenterOfMass com;
     double length_x;

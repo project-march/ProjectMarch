@@ -22,16 +22,47 @@ StateMachineNode::StateMachineNode()
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_client = this->create_client<march_shared_msgs::srv::GaitCommand>("gait_command");
+    m_footstep_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+
+    m_gait_client = this->create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
 
     m_state_machine = StateMachine();
-
-    while (!m_client->wait_for_service(1s)) {
+    m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
+    m_gait_request = std::make_shared<march_shared_msgs::srv::RequestGait::Request>();
+    while (!m_gait_client->wait_for_service(1s)) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service not available, waiting again...");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service connected");
+
+    while (!m_footstep_client->wait_for_service(1s)) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service not available, waiting again...");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service connected");
+}
+
+/**
+ * Response callback listens to see if a response from the server is received, on the request.
+ * If this is the case, it is logged that the request was successful.
+ *
+ * If something went wrong this is also logged and the safety node should be notified.
+ * @param response
+ */
+void StateMachineNode::response_footstep_callback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
+{
+    RCLCPP_INFO(this->get_logger(), "response_footstep_callback");
+    if (future.get()->status) {
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Request received successful!");
+    } else {
+        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Request was not a success!");
     }
 }
 
@@ -42,13 +73,14 @@ StateMachineNode::StateMachineNode()
  * If something went wrong this is also logged and the safety node should be notified.
  * @param response
  */
-void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::GaitCommand>::SharedFuture response)
+void StateMachineNode::response_gait_callback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future)
 {
-    if (response.get()->success) {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Request received successful!");
+    RCLCPP_INFO(this->get_logger(), "response_gait_callback");
+    if (future.get()->status) {
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Request received successful!");
     } else {
-        RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "Request was not a success!");
-        // do ERROR STUFF
+        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Request was not a success!");
     }
 }
 
@@ -58,11 +90,27 @@ void StateMachineNode::response_callback(rclcpp::Client<march_shared_msgs::srv::
  * @param desired_state
  * @return succes of failure
  */
-bool StateMachineNode::send_request(exoState desired_state)
+void StateMachineNode::send_request(exoState desired_state)
 {
-    m_request->gait_type = (int)desired_state;
-    m_future = m_client->async_send_request(m_request, std::bind(&StateMachineNode::response_callback, this, _1));
-    return m_future.get()->success;
+    RCLCPP_INFO(this->get_logger(), "send_request");
+    int requested_gait = (int)desired_state;
+    int cur_st = this->m_state_machine.get_current_state();
+    RCLCPP_INFO(this->get_logger(), "current state in send_request is: %d", cur_st);
+    if (m_state_machine.get_current_state() == 0 && requested_gait == 1) {
+        m_gait_request->gait_type = 1;
+        RCLCPP_INFO(this->get_logger(), "send_request with stand_up");
+        m_gait_future = m_gait_client->async_send_request(
+            m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
+    }
+    if (requested_gait == 0) {
+        m_gait_request->gait_type = 0;
+        m_gait_future = m_gait_client->async_send_request(
+            m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
+    } else {
+        m_footstep_request->gait_type = requested_gait;
+        m_footstep_future = m_footstep_client->async_send_request(
+            m_footstep_request, std::bind(&StateMachineNode::response_footstep_callback, this, _1));
+    }
 }
 
 /**
@@ -73,10 +121,11 @@ bool StateMachineNode::send_request(exoState desired_state)
 void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
     auto response_msg = march_shared_msgs::msg::GaitResponse();
-    if (m_state_machine.performTransition((exoState)msg->gait_type)) {
+    if (m_state_machine.isValidTransition((exoState)msg->gait_type)) {
         response_msg.gait_type = msg->gait_type;
         m_gait_response_publisher->publish(response_msg);
-        send_request((exoState)m_state_machine.get_current_state());
+        send_request((exoState)msg->gait_type);
+        m_state_machine.performTransition((exoState)msg->gait_type);
     } else {
         response_msg.gait_type = m_state_machine.get_current_state();
         m_gait_response_publisher->publish(response_msg);

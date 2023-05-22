@@ -18,7 +18,7 @@ class LowLvlController():
         # Define the amount of controllable joints based on
         # the generalized coordinates generated within Mujoco
         self.actuator_amount = model.nu
-        self.joint_desired = []
+        self.joint_desired = [0] * 8
         self.e_prev = []
         for _i in range(self.actuator_amount):
             self.e_prev.append(0)

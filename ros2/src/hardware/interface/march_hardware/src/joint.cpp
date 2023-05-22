@@ -14,11 +14,14 @@
 
 namespace march {
 Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
+    , position_pid(std::move(position_pid))
+    , torque_pid(std::move(torque_pid))
     , logger_(std::move(logger))
 
 {
@@ -29,11 +32,14 @@ Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> 
 }
 
 Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
     std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name))
     , net_number_(net_number)
     , last_read_time_(std::chrono::steady_clock::now())
     , motor_controller_(std::move(motor_controller))
+    , position_pid(std::move(position_pid))
+    , torque_pid(std::move(torque_pid))
     , temperature_ges_(std::move(temperature_ges))
     , logger_(std::move(logger))
 {
@@ -101,6 +107,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
+        logger_->warn(logger_->fstring("get absolute pos: %f", initial_absolute_position_));
 
         position_ = initial_absolute_position_;
         if (operational_check && !isWithinHardLimits()) {
@@ -155,8 +162,7 @@ void Joint::readEncoders()
          *  If the absolute encoder of the joint is more precise, then we should
          * use that value This would give us a new joint position of 0.25
          */
-        if (name_ != "left_hip_aa" && name_ != "right_hip_aa" && name_ != "left_ankle" && name_ != "right_ankle" && motor_controller_->isIncrementalEncoderMorePrecise()) {
-        // if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+        if (motor_controller_->isIncrementalEncoderMorePrecise()) {
             double new_incremental_position = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
         } else {
@@ -177,6 +183,11 @@ void Joint::readEncoders()
                     this->name_.c_str(), time_between_last_update.count()));
         }
     }
+}
+
+void Joint::sendPID()
+{
+    this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
 }
 
 double Joint::getPosition() const

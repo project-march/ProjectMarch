@@ -1,8 +1,7 @@
 #ifndef __clang_analyzer__
 // NOLINTBEGIN
 // Copyright 2022 Project March.
-// #include "footstep_generator/footstep_generator.cpp"
-#include "footstep_generator.hpp"
+#include "footstep_generator/footstep_generator.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include <cmath>
@@ -40,7 +39,7 @@ TEST_F(FootstepGeneratorTest, getWalkedDistanceTest)
     double expected_dist_y = this->footstep_gen->get_steps() * this->footstep_gen->get_velocity_y();
     const double margin = 0.5;
 
-    geometry_msgs::msg::PoseArray footsteps = this->footstep_gen->generate_foot_placements(1);
+    geometry_msgs::msg::PoseArray footsteps = this->footstep_gen->generate_foot_placements(1, 3);
     double footstep_x = footsteps.poses[this->footstep_gen->get_steps() - 1].position.x;
     double footstep_y = footsteps.poses[this->footstep_gen->get_steps() - 1].position.y;
 
@@ -50,7 +49,7 @@ TEST_F(FootstepGeneratorTest, getWalkedDistanceTest)
 
 TEST_F(FootstepGeneratorTest, getAMountOfStepsTest)
 {
-    geometry_msgs::msg::PoseArray footsteps = this->footstep_gen->generate_foot_placements(1);
+    geometry_msgs::msg::PoseArray footsteps = this->footstep_gen->generate_foot_placements(1, 3);
     ASSERT_LT(sizeof(footsteps.poses) / sizeof(geometry_msgs::msg::Pose),
         static_cast<double>(this->footstep_gen->get_steps()));
 }

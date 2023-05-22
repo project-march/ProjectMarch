@@ -20,29 +20,30 @@ protected:
     void SetUp() override
     {
         footstep_estimator = std::make_unique<FootstepEstimator>();
-
     }
     std::unique_ptr<FootstepEstimator> footstep_estimator;
 };
 
 TEST_F(FootstepEstimatorTest, feetOnGroundTest)
 {
-    std::vector<PressureSensor> sensors;
-
-    CenterOfPressure cop;
-    cop.pressure = 20;
+    auto* sensors = new std::vector<PressureSensor*>();
 
     const char prefixR = 'r';
-    PressureSensor mock_sensor_r;
-    mock_sensor_r.name = "r";
-    mock_sensor_r.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor_r);
+    auto* mock_sensor_r = new PressureSensor();
+    mock_sensor_r->name = "r";
+    mock_sensor_r->pressure = 20;
+    sensors->push_back(mock_sensor_r);
 
     const char prefixL = 'l';
-    PressureSensor mock_sensor_l;
-    mock_sensor_l.name = "l";
-    mock_sensor_l.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor_l);
+    PressureSensor* mock_sensor_l = new PressureSensor();
+    mock_sensor_l->name = "l";
+    mock_sensor_l->pressure = 20;
+    sensors->push_back(mock_sensor_l);
+
+    const char* l_prefix = "l";
+    const char* r_prefix = "r";
+    footstep_estimator->get_foot(l_prefix)->threshold = 0.5;
+    footstep_estimator->get_foot(r_prefix)->threshold = 0.5;
 
     footstep_estimator->update_feet(sensors);
     ASSERT_TRUE(footstep_estimator->get_foot_on_ground(&prefixR));
@@ -51,22 +52,24 @@ TEST_F(FootstepEstimatorTest, feetOnGroundTest)
 
 TEST_F(FootstepEstimatorTest, feetOffGroundTest)
 {
-    std::vector<PressureSensor> sensors;
-
-    CenterOfPressure cop;
-    cop.pressure = 2;
+    auto* sensors = new std::vector<PressureSensor*>();
 
     const char prefixR = 'r';
-    PressureSensor mock_sensor_r;
-    mock_sensor_r.name = "r";
-    mock_sensor_r.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor_r);
+    auto* mock_sensor_r = new PressureSensor();
+    mock_sensor_r->name = "r_";
+    mock_sensor_r->pressure = 2;
+    sensors->push_back(mock_sensor_r);
 
     const char prefixL = 'l';
-    PressureSensor mock_sensor_l;
-    mock_sensor_l.name = "l";
-    mock_sensor_l.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor_l);
+    PressureSensor* mock_sensor_l;
+    mock_sensor_l->name = "l_";
+    mock_sensor_l->pressure = 2;
+    sensors->push_back(mock_sensor_l);
+
+    const char* l_prefix = "l";
+    const char* r_prefix = "r";
+    footstep_estimator->get_foot(l_prefix)->threshold = 0.5;
+    footstep_estimator->get_foot(r_prefix)->threshold = 0.5;
 
     footstep_estimator->update_feet(sensors);
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
@@ -75,16 +78,13 @@ TEST_F(FootstepEstimatorTest, feetOffGroundTest)
 
 TEST_F(FootstepEstimatorTest, updateFaultySensorTest)
 {
-    std::vector<PressureSensor> sensors;
-
-    CenterOfPressure cop;
-    cop.pressure = 20;
+    auto* sensors = new std::vector<PressureSensor*>();
 
     const char prefixR = 'r';
-    PressureSensor mock_sensor_faulty;
-    mock_sensor_faulty.name = "faulty";
-    mock_sensor_faulty.centre_of_pressure = cop;
-    sensors.push_back(mock_sensor_faulty);
+    auto* mock_sensor_faulty = new PressureSensor();
+    mock_sensor_faulty->name = "faulty";
+    mock_sensor_faulty->pressure = 20;
+    sensors->push_back(mock_sensor_faulty);
 
     footstep_estimator->update_feet(sensors);
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
@@ -92,13 +92,11 @@ TEST_F(FootstepEstimatorTest, updateFaultySensorTest)
 
 TEST_F(FootstepEstimatorTest, unknownFootTest)
 {
-    std::vector<PressureSensor> sensors;
+    auto* sensors = new std::vector<PressureSensor*>();
     const char prefixU = 'q';
     footstep_estimator->update_feet(sensors);
     ASSERT_EQ(footstep_estimator->get_foot_on_ground(&prefixU), 0);
 }
-
-
 
 TEST_F(FootstepEstimatorTest, getFeetPositionTest)
 {
@@ -119,12 +117,12 @@ TEST_F(FootstepEstimatorTest, getFeetPositionTest)
     rightF->position = right_position;
     leftF->position = left_position;
 
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.x, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.y, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).point.z, 0);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.x, 1);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.y, 1);
-    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).point.z, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.x, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.y, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixR).position.z, 0);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.x, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.y, 1);
+    ASSERT_EQ(footstep_estimator->get_foot_position(&prefixL).position.z, 1);
 }
 
 TEST_F(FootstepEstimatorTest, setFootSizeTest)

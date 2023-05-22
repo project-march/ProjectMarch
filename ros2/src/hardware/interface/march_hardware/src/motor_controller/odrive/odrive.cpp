@@ -29,7 +29,6 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
     , index_found_(index_found)
     , torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
 {
-    this->is_incremental_encoder_more_precise_ = true;
 }
 
 std::chrono::nanoseconds ODrive::reset()
@@ -56,7 +55,7 @@ void ODrive::enableActuation()
 
     // TODO: Check if this is needed.
     // Reset target torque
-//    actuateTorque(/*target_effort=*/0.0);
+    //    actuateTorque(/*target_effort=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -115,6 +114,25 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
+}
+
+void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
+{
+    auto offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
+    for (double& i : *pos_pid.get()) {
+        bit32 write_value {};
+        write_value.f = static_cast<float>(i);
+        this->write32(offset, write_value);
+        offset += 4;
+    }
+
+    offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_); // TODO:fix this with ODrivePDOMap.
+    for (double& i : *tor_pid.get()) {
+        bit32 write_value {};
+        write_value.f = static_cast<float>(i);
+        this->write32(offset, write_value);
+        offset += 4;
+    }
 }
 
 int ODrive::getActuationModeNumber() const

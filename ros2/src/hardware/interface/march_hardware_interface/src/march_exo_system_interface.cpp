@@ -130,13 +130,12 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*motor_controller_data=*/march::ODriveState(),
         /*position=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
-//        /*position_command=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
+            /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
@@ -221,6 +220,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
+        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
@@ -256,7 +256,13 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
         // Read the first encoder values for each joint
         for (JointInfo& jointInfo : joints_info_) {
+            // Send PID values to the joints to initialize them
+            jointInfo.joint.sendPID();
+            RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
+
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+            jointInfo.target_position = (float)jointInfo.joint.getPosition();
+            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 1, 0);
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
@@ -340,6 +346,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
         /*logger=*/(*logger_), /*joints=*/joints);
 
     // Tell every joint to enable actuation.
+    // TODO: Check if this needs be done for every joint or the non operational once.
     RCLCPP_INFO((*logger_), "Enabling every joint for actuation");
     for (auto joint : joints) {
         joint->enableActuation();
@@ -367,10 +374,10 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
 hardware_interface::return_type MarchExoSystemInterface::stop()
 {
     // Stopping ethercat cycle in the hardware
-    RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
+    RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        jointInfo.joint.actuate(/*target=*/0, (float)jointInfo.position, 1, 0);
+        jointInfo.joint.actuate(/*torque=*/0, (float)jointInfo.position, 1, 0);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -402,8 +409,8 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     //  }
     //  RCLCPP_INFO_THROTTLE((*logger_), clock_, 7000, "Current is %g.", pdb_current);
 
-    pdb_read();
-    pressure_sole_read();
+    // pdb_read();
+    // pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
@@ -463,7 +470,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
-            return hardware_interface::return_type::ERROR;
         }
 
         /*MARCH 7 code can be removed later */
@@ -484,7 +490,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //                converted_effort);
         //        }
         //        jointInfo.effort_command_converted = converted_effort;
-        //                jointInfo.joint.actuate((float)joijointInfontInfo.effort_command_converted);
+        //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
         // DEBUG LINE
 //        if(){
