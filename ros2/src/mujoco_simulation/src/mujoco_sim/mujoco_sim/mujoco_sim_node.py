@@ -168,7 +168,6 @@ class MujocoSimNode(Node):
         try:
             msg = self.msg_queue.get_nowait()
             joint_pos = msg
-            # self.get_logger().info("new joint_pos: " + str(msg))
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
