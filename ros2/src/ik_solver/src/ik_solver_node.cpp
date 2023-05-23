@@ -171,6 +171,9 @@ void IkSolverNode::timer_callback()
         Eigen::VectorXd solution_position
             = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
 
+        publish_joint_states(
+            std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
+
         // RCLCPP_INFO(this->get_logger(), "Solved for Position");
         if (m_swing_trajectory_index > m_swing_trajectory_container->velocity.size()) {
             RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Reached end of swing trajectory");
@@ -183,9 +186,6 @@ void IkSolverNode::timer_callback()
         } else {
             m_com_trajectory_index++;
         }
-
-        publish_joint_states(
-            std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 
         // RCLCPP_INFO(this->get_logger(), "Published trajectory");
     }
