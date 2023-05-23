@@ -113,20 +113,28 @@ void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 
 void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
-    // RESET 0-> SWING LEG
-    // RESET 1-> STANCE LEG
-    // RESET 2-> BOTH
-    if (msg->data == 0) {
+    // RESET -1-> RESET TRAJECTORIES
+    // RESET  1-> Send 0 Trajectories
+    if (msg->data == -1) {
         m_swing_trajectory_container = nullptr;
+        m_com_trajectory_container = nullptr;
     }
 
     if (msg->data == 1) {
-        m_com_trajectory_container = nullptr;
-    }
+        geometry_msgs::msg::Point point_container;
+        point_container.x = 0.0;
+        point_container.y = 0.0;
+        point_container.z = 0.0;
 
-    if (msg->data == 2) {
-        m_swing_trajectory_container = nullptr;
-        m_com_trajectory_container = nullptr;
+        m_com_trajectory_container = std::make_shared<march_shared_msgs::msg::IkSolverCommand>();
+        m_com_trajectory_container->velocity.push_back(point_container);
+        m_com_trajectory_container->velocity.push_back(point_container);
+        m_com_trajectory_index = 0;
+
+        m_swing_trajectory_container = std::make_shared<march_shared_msgs::msg::IkSolverCommand>();
+        m_swing_trajectory_container->velocity.push_back(point_container);
+        m_swing_trajectory_container->velocity.push_back(point_container);
+        m_swing_trajectory_index = 0;
     }
 }
 
