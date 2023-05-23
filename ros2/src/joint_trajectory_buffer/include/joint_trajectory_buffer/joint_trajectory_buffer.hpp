@@ -4,6 +4,7 @@
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include <queue>
 
 class TrajectoryBufferNode : public rclcpp::Node {
 public:
@@ -19,11 +20,11 @@ private:
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_publisher;
 
-    trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr m_torque_buffer;
-    trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr m_position_buffer;
+    std::queue<trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr> m_torque_buffer;
+    std::queue<trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr> m_position_buffer;
 
     // {position, torque}
-    std::tuple<trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr, trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr> current = {NULL, NULL};
+    std::tuple<trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr, trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr> current;
 };
 
 #endif
