@@ -70,6 +70,7 @@ private:
     int m_current_shooting_node;
     double m_timing_value;
 
+    int current_count;
     int m_current_stance_foot;
     int m_previous_stance_foot;
     int step_counter;

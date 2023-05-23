@@ -27,6 +27,7 @@ struct Foot {
     double width;
     double height;
     double threshold;
+    double total_pressure;
     bool on_ground;
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor*>* sensors, const char* prefix)
@@ -39,7 +40,7 @@ struct Foot {
             }
         }
         // we have 8 sensors, so we divide by 1
-
+        total_pressure = measured_foot_pressure;
         on_ground = (measured_foot_pressure / 8 >= threshold);
     };
 };

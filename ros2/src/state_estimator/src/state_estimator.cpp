@@ -269,10 +269,12 @@ void StateEstimator::publish_robot_frames()
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
             m_current_stance_foot = m_current_stance_foot;
-        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
+        } else if (m_footstep_estimator.get_foot("r")->total_pressure
+                > m_footstep_estimator.get_foot("l")->total_pressure
             && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
-        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+        } else if (m_footstep_estimator.get_foot("r")->total_pressure
+                < m_footstep_estimator.get_foot("l")->total_pressure
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
         }
