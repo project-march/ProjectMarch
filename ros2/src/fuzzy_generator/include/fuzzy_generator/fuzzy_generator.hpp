@@ -17,7 +17,7 @@ enum Status {Stance, Swing};
 struct Leg {
     Status status = Stance;
 
-    double foot_height = 0;
+    double foot_height = 0; // by default both feet are on the ground
 
     float torque_weight = 0; // holds the weight for the torque
     float position_weight = 1; // holds the weight for the position
@@ -53,8 +53,8 @@ private:
     // above full_position height we use 100% position control
     // below full_torque height we use 100% torque control
     // and linearly decrease/increase in between
-    double full_position;
-    double full_torque;
+    double full_position = 30; //TODO: add actual value
+    double full_torque = 12; //TODO: add actual value
 
     Leg left_leg;
     Leg right_leg;

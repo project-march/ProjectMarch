@@ -9,7 +9,7 @@ FuzzyGenerator::FuzzyGenerator(){
 
 void FuzzyGenerator::updateWeights(Leg* leg){
     //TODO: differentiate between logic for stance -> swing and swing -> stance
-    leg->position_weight = (1 / full_torque) * leg->getFootHeight() - full_position;
+    leg->position_weight = std::max(0.0, std::min(1.0, (leg->getFootHeight() - full_torque) / (full_position - full_torque)));//(1 / full_torque) * leg->getFootHeight() - full_position;
     leg->torque_weight = 1 - leg->position_weight;
 };
 
