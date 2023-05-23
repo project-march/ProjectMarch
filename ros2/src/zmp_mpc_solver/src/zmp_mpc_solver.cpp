@@ -41,6 +41,11 @@ double ZmpSolver::get_com_height()
     return m_com_height;
 }
 
+void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
+{
+    m_current_shooting_node = current_shooting_node;
+}
+
 int ZmpSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
@@ -140,7 +145,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_com_current[0] = x;
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -154,7 +159,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
@@ -326,6 +331,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
+    // check footstep planner references
     //  std::cout << "Vector elements: ";
     //  for (const auto& element : m_reference_stepsize_x) {
     //      printf("element x is %f\n", element);

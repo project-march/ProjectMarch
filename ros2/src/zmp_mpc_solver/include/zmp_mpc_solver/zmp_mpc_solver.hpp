@@ -44,6 +44,7 @@ public:
     void update_current_shooting_node();
     std::vector<double> get_real_time_com_trajectory_x();
     std::vector<double> get_real_time_com_trajectory_y();
+    void set_m_current_shooting_node(int);
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);

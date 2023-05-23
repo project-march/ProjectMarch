@@ -82,7 +82,12 @@ void SolverNode::timer_callback()
 {
     if (!(desired_footsteps)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
+        // printf("prev des%i\n", prev_des_footsteps);
     } else {
+        if (*desired_footsteps != prev_des_footsteps) {
+            m_zmp_solver.set_m_current_shooting_node(100);
+        }
+        prev_des_footsteps = *desired_footsteps;
         m_zmp_solver.update_current_foot();
         m_zmp_solver.set_current_state();
         int solver_status = m_zmp_solver.solve_step();
