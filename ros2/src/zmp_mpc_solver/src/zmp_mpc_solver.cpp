@@ -18,6 +18,7 @@ ZmpSolver::ZmpSolver()
     , m_reference_stepsize_y(20, 0.0)
     , m_real_time_com_trajectory_x()
     , m_real_time_com_trajectory_y()
+    , current_count(-1)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -317,7 +318,6 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
-    double count = m_current_stance_foot;
 
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
@@ -347,10 +347,16 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
     printf("step_counter %i\n", step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
-    printf("current stance foot is %i\n", m_previous_stance_foot);
+    printf("previous stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
+
+    // only change the initial count when a new footstep has to be set
+    if (m_current_shooting_node == 0) {
+        current_count = m_current_stance_foot;
+    }
+    int count = current_count;
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
         && m_current_shooting_node < ((N - 1)) / m_number_of_footsteps) {
@@ -539,8 +545,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // printf("\n--- xtraj ---\n");
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
