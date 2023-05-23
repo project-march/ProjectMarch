@@ -75,7 +75,7 @@ class GaitSelectionNode(Node):
         return response
 
     def _execute_gait(self, trajectory):
-        """
+        """Execute the gait with the action server of the joint trajectory controller.
 
         :param trajectory:
         :return:
