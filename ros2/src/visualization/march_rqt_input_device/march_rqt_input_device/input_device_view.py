@@ -60,9 +60,9 @@ class InputDeviceView(QWidget):
         self._update_possible_gaits()
         self._controller.update_eeg_on_off(data)
 
-    def publish_gait(self, gait_type: int):
+    def publish_gait(self, gait_type: int, control_type):
         """Publish gait to state_machine."""
-        self._controller.publish_gait(gait_type)
+        self._controller.publish_gait(gait_type, control_type)
         self._update_possible_gaits()
 
     def _update_possible_gaits(self) -> None:
@@ -160,13 +160,10 @@ class InputDeviceView(QWidget):
 
         if callback is not None:
             if callable(callback):
-                self._controller.get_node().get_logger().info(name + "'s callback " + callback + "  is callable")
                 qt_button.clicked.connect(callback)
             else:
-                self._controller.get_node().get_logger().info(name + "'s callback " + callback + "  is NOT callable")
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            self._controller.get_node().get_logger().info(name + "'s callback is none")
             qt_button.clicked.connect(lambda: self.publish_gait(gait_type, control_type))
 
         return qt_button

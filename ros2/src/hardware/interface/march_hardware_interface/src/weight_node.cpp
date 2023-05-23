@@ -17,10 +17,10 @@ WeightNode::WeightNode()
             "fuzzy_weight", 10, std::bind(&WeightNode::fuzzy_weight_callback, this, _1));
 
     m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
-            "weight_control_type", 10, std::bind(&WeightNode::control_type_callback, this, _1));
+            "/march/weight_control_type", 10, std::bind(&WeightNode::control_type_callback, this, _1));
 
     m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
-            "direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
+            "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
 
     this->declare_parameter("allowed_control_type", "fuzzy");
 }

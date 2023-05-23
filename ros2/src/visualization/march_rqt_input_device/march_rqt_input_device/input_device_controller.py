@@ -5,7 +5,7 @@ import socket
 from std_msgs.msg import Header, Bool
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
 from rclpy import Future
-from std_msgs.msg import Header, String, Bool, Int32
+from std_msgs.msg import Header, String, Bool, Float32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
@@ -78,7 +78,7 @@ class InputDeviceController:
             qos_profile=10,
         )
         self.direct_torque_pub = self._node.create_publisher(
-            msg_type=Int32,
+            msg_type=Float32,
             topic="direct_torque",
             qos_profile=10,
         )
@@ -113,6 +113,7 @@ class InputDeviceController:
     def publish_gait(self, gait_type: int, control_type) -> None:
         """Publish a message on `/march/gait_request` to publish the gait."""
         self._node.get_logger().debug("Mock Input Device published gait: " + str(gait_type))
+        self._node.get_logger().info("publishing gait: " + str(gait_type))
         self._current_gait = gait_type
         msg = GaitRequest(
             header=Header(stamp=self._node.get_clock().now().to_msg()),
@@ -157,11 +158,13 @@ class InputDeviceController:
         """Define the node."""
         return self._node
 
-    def publish_direct_torque(self, torque) -> None:
+    def publish_direct_torque(self) -> None:
         """Publish a message on `direct_torque` to publish the torque."""
-        self._node.get_logger().debug("Publishing direct torque " + torque)
+        self.publish_control_type("torque")
+        torque = 0.0005 #TODO: change to reasonable value
+        self._node.get_logger().info("Publishing direct torque " + str(torque))
         self.direct_torque_pub.publish(
-            Int32(
+            Float32(
                 data = torque
             )
         )
@@ -169,4 +172,5 @@ class InputDeviceController:
 
     def publish_control_type(self, control_type) -> None:
         """Sets the allowed control type depending on the gait"""
+        self._node.get_logger().info("Publishing control type " + control_type)
         self._set_gait_control_type.publish(String(data=control_type))
