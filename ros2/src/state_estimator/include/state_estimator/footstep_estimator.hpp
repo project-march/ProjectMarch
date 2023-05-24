@@ -26,7 +26,7 @@ struct Foot {
     geometry_msgs::msg::PointStamped position;
     double width;
     double height;
-    double foot_threshold;
+    double foot_threshold = 0.0;
     double toes_threshold = 0.0;
     double middle_threshold = 0.0;
     double heel_threshold = 0.0;
@@ -64,10 +64,12 @@ struct Foot {
         }
         // we have 8 sensors, so we divide by 1
 
-        on_ground = ((measured_foot_pressure / foot_sensor_amount) >= foot_threshold ||
-                    (measured_toes_pressure / toes_sensor_amount) >= toes_threshold ||
-                    (measured_middle_pressure / middle_sensor_amount) >= middle_threshold ||
-                    (measured_heel_pressure / heel_sensor_amount) >= heel_threshold);
+        foot_threshold = 0.0;
+
+        on_ground = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
+                    (measured_toes_pressure / toes_sensor_amount) <= toes_threshold ||
+                    (measured_middle_pressure / middle_sensor_amount) <= middle_threshold ||
+                    (measured_heel_pressure / heel_sensor_amount) <= heel_threshold);
     };
 };
 
