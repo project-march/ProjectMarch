@@ -34,6 +34,8 @@ public:
     void set_current_zmp(double, double);
     void set_current_stance_foot(int);
     void initialize_mpc_params();
+    void set_right_foot_on_gound(bool);
+    void set_left_foot_on_gound(bool);
     void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
     void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
     const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const
@@ -67,14 +69,17 @@ private:
     // Constraints for the ZMP MPC
     int m_number_of_footsteps;
 
+    bool m_right_foot_on_ground;
+    bool m_left_foot_on_ground;
+
     double m_switch;
     int m_current_shooting_node;
     double m_timing_value;
 
-    int current_count;
+    int m_current_count;
     int m_current_stance_foot;
     int m_previous_stance_foot;
-    int step_counter;
+    int m_step_counter;
 
     double m_admissible_region_x;
     double m_admissible_region_y;

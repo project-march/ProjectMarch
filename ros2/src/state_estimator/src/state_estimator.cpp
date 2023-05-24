@@ -35,6 +35,11 @@ StateEstimator::StateEstimator()
 
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
 
+    m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
+
+    m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
+
+
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
 
@@ -293,6 +298,12 @@ void StateEstimator::publish_robot_frames()
     stance_foot_msg.data = m_current_stance_foot;
     m_stance_foot_publisher->publish(stance_foot_msg);
 
+    std_msgs::msg::Bool right_foot_on_ground; 
+    std_msgs::msg::Bool left_foot_on_ground; 
+    right_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("r");
+    left_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("l");
+    m_right_foot_on_ground_publisher->publish(right_foot_on_ground);
+    m_left_foot_on_ground_publisher->publish(left_foot_on_ground);
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
     feet_height_msg.header.frame_id = "map";

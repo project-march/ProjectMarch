@@ -11,14 +11,14 @@ ZmpSolver::ZmpSolver()
     , m_timing_value(0)
     , m_current_stance_foot(-1)
     , m_previous_stance_foot(-1)
-    , step_counter(0) // How many steps are actually set based on the state estimation
+    , m_step_counter(0) // How many steps are actually set based on the state estimation
     , m_gravity_const(9.81)
     , m_candidate_footsteps()
     , m_reference_stepsize_x(20, 0.0)
     , m_reference_stepsize_y(20, 0.0)
     , m_real_time_com_trajectory_x()
     , m_real_time_com_trajectory_y()
-    , current_count(-1)
+    , m_current_count(-1)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -115,6 +115,16 @@ void ZmpSolver::update_current_foot()
 {
     m_pos_foot_current[0] = m_x_trajectory[6];
     m_pos_foot_current[1] = m_x_trajectory[8];
+}
+
+void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
+{
+    m_right_foot_on_ground = foot_on_ground;
+}
+
+void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
+{
+    m_left_foot_on_ground = foot_on_ground;
 }
 
 void ZmpSolver::set_previous_foot(double x, double y)
@@ -348,21 +358,30 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
         || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-        step_counter++;
+        m_step_counter++;
         m_previous_stance_foot = m_current_stance_foot;
     }
-    printf("step_counter %i\n", step_counter);
+    printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
     printf("previous stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
 
+    // check if swing leg is done for left foot as stance leg and right leg as swing leg
+    if (m_current_shooting_node == step_duration*(((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1 && m_right_foot_on_ground) {
+        ;
+    } else if (m_current_shooting_node == step_duration*(((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == 1 && m_left_foot_on_ground) {
+        ;
+    } else {
+        m_current_shooting_node -= 1;
+    }
+
     // only change the initial count when a new footstep has to be set
     if (m_current_shooting_node == 0) {
-        current_count = m_current_stance_foot;
+        m_current_count = m_current_stance_foot;
     }
-    int count = current_count;
+    int count = m_current_count;
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
         && m_current_shooting_node < ((N - 1)) / m_number_of_footsteps) {
@@ -404,8 +423,8 @@ inline int ZmpSolver::solve_zmp_mpc(
             count = -count;
             m_timing_value = 1;
 
-            p[0] = m_reference_stepsize_x[step_number + step_counter] / dt;
-            p[1] = m_reference_stepsize_y[step_number + step_counter] / dt;
+            p[0] = m_reference_stepsize_x[step_number + m_step_counter] / dt;
+            p[1] = m_reference_stepsize_y[step_number + m_step_counter] / dt;
             p[2] = m_switch;
             p[3] = m_timing_value;
             p[4] = 0;
@@ -563,7 +582,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
-        // step_counter = 0;
+        // m_step_counter = 0;
     }
 
     // here, we copy our array into the std::array
