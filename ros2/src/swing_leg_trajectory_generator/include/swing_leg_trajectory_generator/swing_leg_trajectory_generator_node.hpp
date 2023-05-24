@@ -35,6 +35,7 @@ private:
     void stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg);
     void final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg);
     void com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg);
+    void publish_zero_swing();
 
     void publish_path_visualization();
     SwingLegTrajectoryGenerator m_swing_leg_generator;
