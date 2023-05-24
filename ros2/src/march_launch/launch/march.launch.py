@@ -7,6 +7,7 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 
 from march_utility.utilities.utility_functions import (
     get_lengths_robot_from_urdf_for_inverse_kinematics,
@@ -580,7 +581,13 @@ def generate_launch_description() -> LaunchDescription:
         camera_aligned_frame_pub_node,
         back_sense_node,
         record_rosbags_action,
-        imu_nodes
+        imu_nodes,
+        Node(
+            package='state_machine',
+            namespace='',
+            executable='state_machine_node',
+            name='state_machine',
+        ),
     ]
 
     return LaunchDescription(declared_arguments + nodes)

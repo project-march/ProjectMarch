@@ -27,9 +27,8 @@ struct Foot {
     double width;
     double height;
     double foot_threshold = 0.0;
-    double toes_threshold = 0.0;
-    double middle_threshold = 0.0;
-    double heel_threshold = 0.0;
+    double toes_middle_threshold = 2.74;
+    double heel_middle_threshold = 2.55;
     bool on_ground;
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor*>* sensors, const char* prefix)
@@ -39,37 +38,39 @@ struct Foot {
         std::vector<std::string> toes = {"toes",  "hallux"};
         std::vector<std::string> middle = {"met1",  "met3", "met5", "arch"};
         std::vector<std::string> heel = {"heel_right", "heel_left"};
-        double measured_toes_pressure = 0.0;
-        double measured_middle_pressure = 0.0;
-        double measured_heel_pressure = 0.0;
+        double measured_toes_middle_pressure = 0.0;
+        double measured_heel_middle_pressure = 0.0;
         int foot_sensor_amount = 0;
-        int toes_sensor_amount = 0;
-        int middle_sensor_amount = 0;
-        int heel_sensor_amount = 0;
+        int toes_middle_sensor_amount = 0;
+        int heel_middle_sensor_amount = 0;
         for (auto i : *sensors) {
             if (i->name[0] == *prefix) {
                 foot_sensor_amount ++;
                 measured_foot_pressure += i->pressure;
                 // We only take substring 2 to end because index 0 and 1 are the prefix with underscore.
                 if (std::find(toes.begin(), toes.end(), i->name.substr (2,i->name.size())) != toes.end()){
-                    measured_toes_pressure += i->pressure;
+                    measured_toes_middle_pressure += i->pressure;
+                    toes_middle_sensor_amount ++;
                 }
                 if (std::find(middle.begin(), middle.end(), i->name.substr (2,i->name.size())) != middle.end()){
-                    measured_middle_pressure += i->pressure;
+                    measured_toes_middle_pressure += i->pressure;
+                    measured_heel_middle_pressure += i->pressure;
+                    toes_middle_sensor_amount ++;
+                    heel_middle_sensor_amount ++;
                 }
                 if (std::find(heel.begin(), heel.end(), i->name.substr (2,i->name.size())) != heel.end()){
-                    measured_heel_pressure += i->pressure;
+                    measured_heel_middle_pressure += i->pressure;
+                    heel_middle_sensor_amount ++;
                 }
             }
         }
         // we have 8 sensors, so we divide by 1
 
-        foot_threshold = 0.0;
+        foot_threshold = 2.7;
 
         on_ground = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
-                    (measured_toes_pressure / toes_sensor_amount) <= toes_threshold ||
-                    (measured_middle_pressure / middle_sensor_amount) <= middle_threshold ||
-                    (measured_heel_pressure / heel_sensor_amount) <= heel_threshold);
+                    (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_sensor_amount ||
+                    (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
     };
 };
 
