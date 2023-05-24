@@ -94,6 +94,17 @@ def generate_launch_description():
         condition=UnlessCondition(simulation),
     )
 
+    pressure_sole_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=[
+            "pressure_sole_broadcaster",
+            "-t",
+            "pressure_sole_broadcaster/PressureSoleBroadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
     motor_controller_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
@@ -109,10 +120,11 @@ def generate_launch_description():
     # endregion
 
     nodes = [
-        joint_state_broadcaster_spawner,
-        joint_trajectory_controller_spawner,
-        pdb_state_broadcaster_spawner,
-        motor_controller_state_broadcaster_spawner,
+        # joint_state_broadcaster_spawner,
+        # joint_trajectory_controller_spawner,
+        # pdb_state_broadcaster_spawner,
+        # motor_controller_state_broadcaster_spawner,
+        pressure_sole_state_broadcaster_spawner,        
     ]
 
     # region Launch Controller manager, Extra configuration if simulation is `false`

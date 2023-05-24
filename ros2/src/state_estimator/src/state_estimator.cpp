@@ -266,6 +266,12 @@ void StateEstimator::publish_robot_frames()
 
     // double stance
     m_current_stance_foot = 0;
+
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get foot on ground left: %d",
+        m_footstep_estimator.get_foot_on_ground("l"));
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get foot on ground right: %d",
+        m_footstep_estimator.get_foot_on_ground("r"));
+
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
@@ -273,7 +279,7 @@ void StateEstimator::publish_robot_frames()
         } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
             && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
-        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+        } else if (foot_positions.poses[0].position.x <= foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
         }
