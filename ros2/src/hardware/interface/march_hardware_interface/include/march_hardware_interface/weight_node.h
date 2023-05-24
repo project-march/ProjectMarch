@@ -2,6 +2,8 @@
 // Created by rixt on 14-4-23.
 //
 
+#pragma once
+
 #ifndef MARCH_WEIGHT_NODE_H
 #define MARCH_WEIGHT_NODE_H
 #include "rclcpp/rclcpp.hpp"
@@ -13,6 +15,8 @@
 class WeightNode : public rclcpp::Node {
 public:
     WeightNode();
+
+    march_hardware_interface::MarchExoSystemInterface* m_hardware_interface;
 
 private:
     rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_fuzzy_weight_subscription;
@@ -28,7 +32,5 @@ private:
     void direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg);
 
     void setJointsWeight(std::string leg, float position_weight, float torque_weight);
-
-    march_hardware_interface::MarchExoSystemInterface* m_hardware_interface;
 };
 #endif //MARCH_WEIGHT_NODE_H

@@ -109,6 +109,11 @@ void WeightNode::setJointsWeight(std::string leg, float position_weight, float t
         RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
         return;
     }
+    RCLCPP_INFO(this->get_logger(), "Setting weights of %s leg", leg);
+    if(m_hardware_interface == NULL ){
+        RCLCPP_INFO(this->get_logger(), "No hwi initialized");
+    }
+
 
     // apply to all the joints of that leg
     std::vector<march_hardware_interface::JointInfo>* joints_info_ = m_hardware_interface->getJointsInfo();

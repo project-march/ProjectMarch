@@ -2,6 +2,8 @@
 // Created by george on 13-6-22.
 //
 
+#pragma once
+
 #ifndef MARCH_HARDWARE_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
 #define MARCH_HARDWARE_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
 
@@ -23,6 +25,8 @@
 #include <march_hardware/march_robot.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <rclcpp/clock.hpp>
+
+class WeightNode;
 
 namespace march_hardware_interface {
 struct JointLimit {
@@ -88,7 +92,11 @@ public:
     hardware_interface::return_type write() override;
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
-    std::vector<JointInfo>* getJointsInfo(){ return &joints_info_ ;};
+    std::vector<JointInfo>* getJointsInfo(){
+        RCLCPP_INFO((*logger_), "getting the joints here...");
+        RCLCPP_INFO((*logger_), "number of joints is: ", joints_info_.size());
+        return &joints_info_ ;
+    };
 
 private:
     void pdb_read();
@@ -108,6 +116,7 @@ private:
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
     rclcpp::Clock clock_;
+    WeightNode* m_weight_node_;
 };
 
 } // namespace march_hardware_interface

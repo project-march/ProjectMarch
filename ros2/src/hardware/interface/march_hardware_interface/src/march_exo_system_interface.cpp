@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "march_hardware_interface/march_exo_system_interface.hpp"
+#include "march_hardware_interface/weight_node.h"
 
 #include <cassert>
 #include <chrono>
@@ -38,7 +39,11 @@ namespace march_hardware_interface {
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
+    , m_weight_node_()
 {
+    RCLCPP_INFO((*logger_), "creating Hardware Interface...");
+    m_weight_node_->m_hardware_interface = this;
+    RCLCPP_INFO((*logger_), "should've assigned the hwi to the weightnode now...");
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
 }
 

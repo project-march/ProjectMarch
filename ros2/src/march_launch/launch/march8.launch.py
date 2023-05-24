@@ -135,8 +135,8 @@ def generate_launch_description() -> LaunchDescription:
         Node(
             package='torque_converter',
             namespace='',
-            executable='torque_converter',
-            name='torque_converter'
+            executable='torque_converter_node',
+            name='torque_converter_node'
         ),
         Node(
             package='fuzzy_generator',
@@ -185,6 +185,6 @@ def generate_launch_description() -> LaunchDescription:
         mujoco_node,
         rqt_input_device,
         march_control,
-        record_rosbags_action,
-        weight_node
+        record_rosbags_action
+        # weight_node
     ])
