@@ -141,6 +141,31 @@ void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr
     }
 }
 
+bool ZmpSolver::check_zmp_on_foot()
+{
+    bool x_check;
+    bool y_check;
+    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * 1.01
+        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * 1.01) {
+        x_check = true;
+    } else {
+        x_check = false;
+    }
+
+    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * 1.01
+        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * 1.01) {
+        y_check = true;
+    } else {
+        y_check = false;
+    }
+
+    if (x_check == true && y_check == true) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
 {
     m_reference_stepsize_y.clear();
@@ -351,16 +376,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     //  }
     //  std::cout << std::endl;
 
-    // if (m_current_shooting_node != 0 && ((N-1)/m_number_of_footsteps)+((N-1)/m_number_of_footsteps) <
-    // m_current_shooting_node < (((N-1))/(m_number_of_footsteps))) {
-
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
-    if ((m_previous_stance_foot == -1 && m_current_stance_foot == 1)
-        || (m_previous_stance_foot == 1 && m_current_stance_foot == -1)) {
-        m_step_counter++;
-        m_previous_stance_foot = m_current_stance_foot;
-    }
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
     printf("previous stance foot is %i\n", m_previous_stance_foot);
@@ -377,13 +394,28 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("passed the left foot on ground check \n");
     } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
         printf("did not pass the foot on ground check \n");
-        m_current_shooting_node -= 1;
+        m_current_shooting_node--;
     }
 
-    // only change the initial count when a new footstep has to be set
-    if (m_current_shooting_node == 0) {
+    // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
+    // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
+
+    // m_zmp_current[0] = m_pos_foot_current[0];
+    // m_zmp_current[1] = m_pos_foot_current[1];
+    // m_current_stance_foot = 1;
+
+    printf("ZMP check on foot is %d\n", check_zmp_on_foot());
+    if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
+            && check_zmp_on_foot() == true
+        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1
+            && check_zmp_on_foot() == true) {
         m_current_count = m_current_stance_foot;
+        m_step_counter++;
+        printf("weight shift is complete \n");
+    } else if (m_current_shooting_node == 0) {
+        m_current_shooting_node--;
     }
+
     int count = m_current_count;
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
