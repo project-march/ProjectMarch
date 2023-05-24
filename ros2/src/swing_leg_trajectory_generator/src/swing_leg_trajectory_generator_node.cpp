@@ -37,6 +37,18 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
     publish_path_visualization();
 }
 
+void SwingLegTrajectoryGeneratorNode::publish_zero_swing()
+{
+    geometry_msgs::msg::PoseArray empty_poses;
+    geometry_msgs::msg::Pose empty_pose;
+    empty_pose.position.x = 0.0;
+    empty_pose.position.y = 0.0;
+    empty_pose.position.z = 0.0;
+    empty_poses.poses.push_back(empty_pose);
+    empty_poses.poses.push_back(empty_pose);
+    m_publish_curve->publish(empty_poses);
+}
+
 // void SwingLegTrajectoryGeneratorNode::stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg)
 //{
 //    m_swing_leg_generator.generate_trajectory();

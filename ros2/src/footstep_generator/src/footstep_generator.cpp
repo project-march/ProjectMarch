@@ -13,6 +13,8 @@ FootstepGenerator::FootstepGenerator()
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
+    m_swing_trajectory_command_publisher
+        = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
 }
 
 void FootstepGenerator::publish_foot_placements(
@@ -20,7 +22,12 @@ void FootstepGenerator::publish_foot_placements(
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
-
+    // ADD THE EMPTY REQUEST HERE
+    if (request->gait_type == 3) {
+        std_msgs::msg::Int32 msg;
+        msg.data = 0;
+        m_swing_trajectory_command_publisher->publish(msg);
+    }
     m_publisher->publish(footsteps);
     response->status = true;
 }
