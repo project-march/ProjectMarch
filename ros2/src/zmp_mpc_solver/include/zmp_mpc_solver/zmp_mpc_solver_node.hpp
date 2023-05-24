@@ -21,11 +21,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-#include "std_msgs/msg/bool.hpp"
-
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -47,7 +46,6 @@ private:
     void right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
     void left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
 
-
     geometry_msgs::msg::PoseArray::SharedPtr desired_footsteps;
     geometry_msgs::msg::PoseArray prev_des_footsteps;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
@@ -56,7 +54,6 @@ private:
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_com_visualizer_publisher;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_zmp_visualizer_publisher;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
-
 
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_subscriber;

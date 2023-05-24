@@ -12,6 +12,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2/LinearMath/Transform.h"
@@ -21,7 +22,6 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 #include "visualization_msgs/msg/marker.hpp"
-#include "std_msgs/msg/bool.hpp"
 #include "zmp_estimator.hpp"
 #include <array>
 #include <chrono>

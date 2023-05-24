@@ -30,7 +30,7 @@ SolverNode::SolverNode()
         "/current_stance_foot", 10, std::bind(&SolverNode::stance_foot_callback, this, _1));
     m_right_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
         "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
-    m_left_foot_on_ground_subscriber= this->create_subscription<std_msgs::msg::Bool>(
+    m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
         "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
 
     // timer_callback();
