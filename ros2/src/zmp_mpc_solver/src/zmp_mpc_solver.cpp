@@ -370,12 +370,13 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // check if swing leg is done for left foot as stance leg and right leg as swing leg
     if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
-        && m_right_foot_on_ground) {
+        && m_right_foot_on_ground == true) {
         printf("passed the right foot on ground check \n");
     } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
-        && m_current_count == 1 && m_left_foot_on_ground) {
+        && m_current_count == 1 && m_left_foot_on_ground == true) {
         printf("passed the left foot on ground check \n");
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) + 1 / (m_number_of_footsteps))) {
+    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
+        printf("did not pass the foot on ground check \n");
         m_current_shooting_node -= 1;
     }
 
