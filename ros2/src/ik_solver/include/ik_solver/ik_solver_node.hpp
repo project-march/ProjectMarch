@@ -24,6 +24,7 @@ private:
     void swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr);
     void joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr);
     void foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
+    void reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void publish_joint_states(std::vector<double>);
 
@@ -32,6 +33,8 @@ private:
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_foot_positions;
     rclcpp::Subscription<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_com_trajectory_subscriber;
     rclcpp::Subscription<march_shared_msgs::msg::IkSolverCommand>::SharedPtr m_swing_trajectory_subscriber;
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_reset_subscriber;
+
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;

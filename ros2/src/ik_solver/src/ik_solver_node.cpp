@@ -30,6 +30,9 @@ IkSolverNode::IkSolverNode()
     m_joint_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
+    m_reset_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+        "/trajectory_reset_gate", 10, std::bind(&IkSolverNode::reset_subscriber_callback, this, _1));
+
     // Initializing the IK solver
     declare_parameter("robot_description", std::string(""));
     auto robot_description = this->get_parameter("robot_description").as_string();
@@ -106,6 +109,33 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_stance_foot = msg->data;
+}
+
+void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
+{
+    // RESET -1-> RESET TRAJECTORIES
+    // RESET  1-> Send 0 Trajectories
+    if (msg->data == -1) {
+        m_swing_trajectory_container = nullptr;
+        m_com_trajectory_container = nullptr;
+    }
+
+    if (msg->data == 1) {
+        geometry_msgs::msg::Point point_container;
+        point_container.x = 0.0;
+        point_container.y = 0.0;
+        point_container.z = 0.0;
+
+        m_com_trajectory_container = std::make_shared<march_shared_msgs::msg::IkSolverCommand>();
+        m_com_trajectory_container->velocity.push_back(point_container);
+        m_com_trajectory_container->velocity.push_back(point_container);
+        m_com_trajectory_index = 0;
+
+        m_swing_trajectory_container = std::make_shared<march_shared_msgs::msg::IkSolverCommand>();
+        m_swing_trajectory_container->velocity.push_back(point_container);
+        m_swing_trajectory_container->velocity.push_back(point_container);
+        m_swing_trajectory_index = 0;
+    }
 }
 
 void IkSolverNode::timer_callback()
