@@ -565,15 +565,6 @@ def generate_launch_description() -> LaunchDescription:
         ),
     )
 
-    weight_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_hardware_interface"),
-                "weight.launch.py",
-            )
-        ),
-    )
-
     fuzzy_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -599,7 +590,6 @@ def generate_launch_description() -> LaunchDescription:
         back_sense_node,
         record_rosbags_action,
         imu_nodes,
-        weight_node,
         fuzzy_node
     ]
 

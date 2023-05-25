@@ -16,14 +16,6 @@ def generate_launch_description() -> LaunchDescription:
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     rosbags = LaunchConfiguration("rosbags", default='true')
 
-    weight_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_hardware_interface"),
-                "weight.launch.py",
-            )
-        ),
-    )
     DeclareLaunchArgument(
         name="rosbags",
         default_value="true",
@@ -186,5 +178,4 @@ def generate_launch_description() -> LaunchDescription:
         rqt_input_device,
         march_control,
         record_rosbags_action
-        # weight_node
     ])

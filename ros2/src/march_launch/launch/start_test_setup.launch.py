@@ -14,17 +14,6 @@ def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     test_rotational = LaunchConfiguration("test_rotational", default='true')
 
-    # region launch weight control
-
-    weight_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_hardware_interface"),
-                "weight.launch.py",
-            )
-        ),
-    )
-
     # region Launch march control
     march_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -85,7 +74,6 @@ def generate_launch_description() -> LaunchDescription:
             name='joint_trajectory_buffer_node',
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
-        weight_node,
         rqt_input_device,
         march_control,
     ])

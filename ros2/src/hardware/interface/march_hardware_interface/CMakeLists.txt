@@ -20,8 +20,6 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_utility REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(march_shared_msgs REQUIRED)
-
 
 add_library(
         ${PROJECT_NAME}
@@ -30,8 +28,6 @@ add_library(
         include/march_hardware_interface/march_mock_system_interface.hpp
         src/march_exo_system_interface.cpp
         include/march_hardware_interface/hwi_util.h
-        src/weight_node.cpp
-        include/march_hardware_interface/weight_node.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -49,25 +45,9 @@ ament_target_dependencies(
         yaml-cpp
         march_utility
         sensor_msgs
-        march_shared_msgs
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
-
-add_executable(weight_node src/weight_node.cpp include/${PROJECT_NAME}/weight_node.h)
-ament_target_dependencies(
-        weight_node
-        hardware_interface
-        pluginlib
-        rclcpp
-        march_hardware
-        march_hardware_builder
-        march_logger_cpp
-        yaml-cpp
-        march_utility
-        sensor_msgs
-        march_shared_msgs
-)
 
 # EXPORT
 # These must be above the two installs otherwise can't be recognized by other packages.
@@ -82,7 +62,6 @@ ament_export_dependencies(
         yaml-cpp
         march_utility
         sensor_msg
-        march_shared_msgs
 )
 
 install(
@@ -91,21 +70,13 @@ install(
 )
 
 install(
-        DIRECTORY launch/
-        DESTINATION share/${PROJECT_NAME}/
-)
-
-install(
         TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}Targets
-        LIBRARY DESTINATION lib/${PROJECT_NAME}
-        ARCHIVE DESTINATION lib/${PROJECT_NAME}
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
 )
-
-install(TARGETS weight_node
-        RUNTIME DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)

@@ -103,7 +103,13 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
  */
 void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     std::string allowed_control_type = msg->data;
-    RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
+
+    if(allowed_control_type != "fuzzy" && allowed_control_type != "torque" && allowed_control_type != "position"){
+        RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
+    }
+    else{
+        RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
+    }
 
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
 

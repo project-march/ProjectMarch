@@ -73,6 +73,8 @@ struct JointInfo {
 
             m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
                     "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
+
+            RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
 
         /**
