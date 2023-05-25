@@ -12,11 +12,17 @@ FuzzyNode::FuzzyNode()
         : Node("fuzzy_node")
         , m_fuzzy_generator()
 {
-    m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
-            "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
     m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
             "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
-    m_publish_weight = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10); //TODO: connect to HWI
+    m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
+            "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
+
+    m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
+            "/march/weight_control_type", 10, std::bind(&FuzzyNode::control_type_callback, this, _1));
+
+    m_weight_publisher = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10);
+
+    this->declare_parameter("allowed_control_type", "fuzzy");
 }
 
 /**
@@ -39,7 +45,7 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
     left_weights.torque_weight = left_leg->getTorqueWeight();
     left_weights.position_weight = left_leg->getPositionWeight();
     left_weights.leg = 'l';
-    m_publish_weight->publish(left_weights);
+    publish_weights(left_weights);
 
     // update the weights for the right leg
     Leg* right_leg = m_fuzzy_generator.getRightLeg();
@@ -50,7 +56,7 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
     right_weights.torque_weight = right_leg->getTorqueWeight();
     right_weights.position_weight = right_leg->getPositionWeight();
     right_weights.leg = 'r';
-    m_publish_weight->publish(right_weights);
+    publish_weights(right_weights);
 }
 
 /**
@@ -74,7 +80,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     left_weights.position_weight = left_leg->getPositionWeight();
     left_weights.leg = 'l';
     left_weights.header.frame_id = this->get_name();
-    m_publish_weight->publish(left_weights);
+    publish_weights(left_weights);
 
     // update the weights for the right leg
     Leg* right_leg = m_fuzzy_generator.getRightLeg();
@@ -86,8 +92,47 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     right_weights.position_weight = right_leg->getPositionWeight();
     right_weights.leg = 'r';
     right_weights.header.frame_id = this->get_name();
-    m_publish_weight->publish(right_weights);
+    publish_weights(right_weights);
 }
+
+/**
+ * Sets the allowed type of weights for torque and position
+ *
+ * @param msg Message that contains the control type: Position, Torque, or Fuzzy
+ * @return
+ */
+void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
+    std::string allowed_control_type = msg->data;
+    RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
+
+    this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
+
+}
+
+void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
+    std::string leg = msg.leg;
+
+    std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
+    RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
+
+    if(allowed_control_type == "position"){
+        msg.position_weight = 1;
+        msg.torque_weight = 0;
+        m_weight_publisher->publish(msg);
+    }
+    else if(allowed_control_type == "torque"){
+        msg.position_weight = 0;
+        msg.torque_weight = 1;
+        m_weight_publisher->publish(msg);
+    }
+    else if(allowed_control_type == "fuzzy"){
+        m_weight_publisher->publish(msg);
+    }
+    else{
+        RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
+    }
+}
+
 
 /**
  * Main function to run the node.

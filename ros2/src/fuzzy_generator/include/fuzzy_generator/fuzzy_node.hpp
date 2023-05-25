@@ -12,19 +12,25 @@
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include <std_msgs/msg/string.hpp>
+
 
 class FuzzyNode : public rclcpp::Node {
 public:
     FuzzyNode();
 
 private:
-    rclcpp::Subscription<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_foot_height_subscription;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_leg_subscription;
+    rclcpp::Subscription<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_foot_height_subscription;
 
-    rclcpp::Publisher<march_shared_msgs::msg::WeightStamped>::SharedPtr m_publish_weight; //TODO: connect to HWI
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_control_type_subscription;
+
+    rclcpp::Publisher<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_publisher;
 
     void stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg);
     void height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg);
+    void control_type_callback(std_msgs::msg::String::SharedPtr msg);
+    void publish_weights(march_shared_msgs::msg::WeightStamped msg);
 
     FuzzyGenerator m_fuzzy_generator;
 };

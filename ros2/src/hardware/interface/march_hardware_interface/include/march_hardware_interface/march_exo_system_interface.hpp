@@ -21,12 +21,17 @@
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include "visibility_control.h"
 #include "rclcpp/macros.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
 #include <rclcpp/clock.hpp>
+#include "march_shared_msgs/msg/weight_stamped.hpp"
+#include <std_msgs/msg/float32.hpp>
 
-class WeightNode;
+
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 namespace march_hardware_interface {
 struct JointLimit {
@@ -57,6 +62,91 @@ struct JointInfo {
 
     JointLimit limit;
 };
+
+    class WeightNode : public rclcpp::Node {
+    public:
+        explicit WeightNode()
+                : Node("weight_node")
+        {
+            m_weight_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
+                    "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
+
+            m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
+                    "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
+        }
+
+        /**
+         * Processes the weights sent from the fuzzy generator
+         *
+         * @param msg Message that contains the weights for both torque and position
+         * @return
+         */
+        void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
+        {
+            setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
+        }
+
+        /**
+         * This is a temporary method: it immediately sends out torque
+         *
+         * @param msg Message that contains the weights for both torque and position
+         * @return
+         */
+        void direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
+        {
+            float torque = msg->data;
+
+            // We are setting the torque immediately
+            RCLCPP_INFO(rclcpp::get_logger("weight_node"), "We are setting the torque directly to: %f", torque);
+
+            for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+                if(jointInfo.torque_weight != 1.0 || jointInfo.position_weight != 0.0){
+                    RCLCPP_WARN(rclcpp::get_logger("weight_node"), "We seem to be not completely in torque control: pos weight %f, torque weight %f",
+                                jointInfo.position_weight,
+                                jointInfo.torque_weight);
+                }
+                jointInfo.torque = torque;
+            }
+        }
+
+        /**
+         * Applies torque and position weights to all JointInfo objects in the hardware interface
+         *
+         * @param leg Either "l" or "r" to indicate left or right leg
+         * @param position_weight A float between 0 and 1 to apply to joints
+         * @param torque_weight A float between 0 and 1 to apply to joints
+         * @return
+         */
+        void setJointsWeight(std::string leg, float position_weight, float torque_weight){
+
+            // check the leg choice
+            if(leg != "l" and leg != "r"){
+                RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
+                return;
+            }
+            RCLCPP_INFO(this->get_logger(), "Setting weights of %s leg", leg);
+
+            for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+                if(leg == "l" and jointInfo.name.find("left") != std::string::npos){
+                    jointInfo.torque_weight = torque_weight;
+                    jointInfo.position_weight = position_weight;
+                }
+                else if(leg == "r" and jointInfo.name.find("right") != std::string::npos){
+                    jointInfo.torque_weight = torque_weight;
+                    jointInfo.position_weight = position_weight;
+                }
+                else{
+                    RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg...", jointInfo.name);
+                }
+            }
+        }
+
+    private:
+        rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
+        rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
+        std::vector<JointInfo>* joints_info_;
+
+    };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
 public:
@@ -98,7 +188,10 @@ public:
         return &joints_info_ ;
     };
 
+    std::shared_ptr<WeightNode> weight_node;
+
 private:
+    rclcpp::executors::SingleThreadedExecutor executor_; // Executor needed to subscriber
     void pdb_read();
     void pressure_sole_read();
     bool is_joint_in_valid_state(JointInfo& jointInfo);
@@ -116,7 +209,6 @@ private:
     std::vector<JointInfo> joints_info_;
     bool joints_ready_for_actuation_ = false;
     rclcpp::Clock clock_;
-    WeightNode* m_weight_node_;
 };
 
 } // namespace march_hardware_interface
