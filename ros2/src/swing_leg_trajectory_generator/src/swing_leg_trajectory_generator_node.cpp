@@ -14,8 +14,8 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
     m_points_subscription = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "bezier_points", 10, std::bind(&SwingLegTrajectoryGeneratorNode::subscriber_callback, this, _1));
 
-    // m_weight_shift_subscriber = this->create_subscription<std_msgs::msg::Int32>(
-    // "publish_swing_leg_command", 10, std::bind(&SwingLegTrajectoryGeneratorNode::weight_shift_callback, this, _1));
+    m_weight_shift_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+        "publish_swing_leg_command", 10, std::bind(&SwingLegTrajectoryGeneratorNode::weight_shift_callback, this, _1));
 
     m_final_feet_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "final_feet_position", 10, std::bind(&SwingLegTrajectoryGeneratorNode::final_feet_callback, this, _1));
@@ -26,6 +26,11 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
 
     m_path_publisher = this->create_publisher<nav_msgs::msg::Path>("path_visualization", 10);
 }
+
+void SwingLegTrajectoryGeneratorNode::weight_shift_callback(std_msgs::msg::Int32::SharedPtr msg)
+{
+    publish_zero_swing();
+};
 
 void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {

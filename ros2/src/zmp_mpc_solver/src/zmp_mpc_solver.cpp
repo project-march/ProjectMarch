@@ -552,7 +552,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
     printf("current_shooting node is %i\n", m_current_shooting_node);
-
+    RCLCPP_INFO(rclcpp::get_logger(""), "Current shooting node is %i", m_current_shooting_node);
     // Set terminal and initial constraints
 
     //

@@ -76,16 +76,17 @@ void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::Ik
     m_com_trajectory_index = 0;
     // Update desired state
     m_com_trajectory_container = msg;
+    // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
 }
 
 void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
-
     // Reset the timer
     // m_solving_timer->reset();
     m_swing_trajectory_index = 0;
     // Update desired state
     m_swing_trajectory_container = msg;
+    // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
 }
 
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
@@ -198,6 +199,11 @@ void IkSolverNode::timer_callback()
             m_ik_solver.get_state(), m_desired_state, static_cast<double>(m_timestep) / 1000.0, m_stance_foot);
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
+        std::stringstream ss;
+        ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
+        RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
+        ss.clear();
+        ss.str("");
         Eigen::VectorXd solution_position
             = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
 

@@ -2,7 +2,7 @@
 import getpass
 import socket
 
-from std_msgs.msg import Header, Bool
+from std_msgs.msg import Header, Bool, Int32
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
 from rclpy.node import Node
 
@@ -53,6 +53,11 @@ class InputDeviceController:
             topic="/march/gait_request",
             qos_profile=10,
         )
+        self._swing_leg_command_pub = self._node.create_publisher(
+            msg_type=Int32,
+            topic="/publish_swing_leg_command",
+            qos_profile=10,
+        )
         self._gait_response_subscriber = self._node.create_subscription(
             msg_type=GaitResponse,
             topic="/march/gait_response",
@@ -93,6 +98,9 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._send_gait_request.publish(msg)
+        if gait_type==2:
+            int_msg = Int32(data = 0)
+            self._swing_leg_command_pub.publish(int_msg)
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""
