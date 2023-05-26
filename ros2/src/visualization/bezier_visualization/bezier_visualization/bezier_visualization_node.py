@@ -55,9 +55,20 @@ class BezierCurve(Node):
         self.figure = plt.figure("Bezier Curve")
         # TODO: if these points have good values
         self.points = {1: 0, 25: 50, 75: 50, 99: 0}
+
+        msg = PoseArray()
+        for key in sorted(self.points):
+            p = Pose()
+            p.position.x = float(key)
+            p.position.y = float(self.points[key])
+            p.position.z = 0.0
+            msg.poses.append(p)
+        self.publish_points.publish(msg)
+        self.get_logger().info("Published Bezier points at startup")
+
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
-
+        
     def _init_plot(self):
         """Start the plotting of the curve in matplotlib."""
         # Set the initial figure with the axes
@@ -84,6 +95,8 @@ class BezierCurve(Node):
         # Show the plot
         self.figure.canvas.draw()
         plt.show()
+    
+        
 
     def _on_click(self, event):
         """Callback method for mouse click event.

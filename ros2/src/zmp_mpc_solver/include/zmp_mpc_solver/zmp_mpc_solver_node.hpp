@@ -42,8 +42,13 @@ private:
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void timer_callback();
     void visualize_trajectory();
+    bool is_weight_shift_done();
 
     geometry_msgs::msg::PoseArray::SharedPtr desired_footsteps;
+    geometry_msgs::msg::PoseArray prev_des_footsteps;
+
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_weight_shift_publisher;
+    
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_publisher;

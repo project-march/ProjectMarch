@@ -18,6 +18,7 @@ ZmpSolver::ZmpSolver()
     , m_reference_stepsize_y(20, 0.0)
     , m_real_time_com_trajectory_x()
     , m_real_time_com_trajectory_y()
+    , current_count(-1)
 {
     initialize_mpc_params();
     m_x_current.fill(0);
@@ -38,6 +39,11 @@ ZmpSolver::ZmpSolver()
 double ZmpSolver::get_com_height()
 {
     return m_com_height;
+}
+
+void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
+{
+    m_current_shooting_node = current_shooting_node;
 }
 
 int ZmpSolver::solve_step()
@@ -139,7 +145,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_com_current[0] = x;
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -153,7 +159,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.0559; // correction factor because the x CoM is not at 0.0
+    m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
@@ -317,7 +323,6 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
-    double count = m_current_stance_foot;
 
     m_timing_value = 0.0;
     m_switch = 1.0 / dt;
@@ -326,6 +331,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
+    // check footstep planner references
     //  std::cout << "Vector elements: ";
     //  for (const auto& element : m_reference_stepsize_x) {
     //      printf("element x is %f\n", element);
@@ -347,10 +353,19 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
     printf("step_counter %i\n", step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
-    printf("current stance foot is %i\n", m_previous_stance_foot);
+    printf("previous stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
+
+    // only change the initial count when a new footstep has to be set
+    if (m_current_shooting_node == 0) {
+        current_count = m_current_stance_foot;
+        m_is_weight_shift_done = true;
+        // printf("hello weight shift check");
+        // m_weight_shift_publisher->publish(1); 
+    }
+    int count = current_count;
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
         && m_current_shooting_node < ((N - 1)) / m_number_of_footsteps) {
@@ -539,8 +554,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // printf("\n--- xtraj ---\n");
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
@@ -549,24 +564,32 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     if (status == ACADOS_SUCCESS) {
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
+        for (int ii = 0; ii < nlp_dims->N; ii++) {
+            u_current[ii] = utraj[ii];
+        }
+
+        for (int ii = 0; ii < NX; ii++) {
+            x_init_input[ii] = xtraj[NX + ii];
+        }
+        std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
         // step_counter = 0;
     }
 
     // here, we copy our array into the std::array
-    for (int ii = 0; ii < nlp_dims->N; ii++) {
-        u_current[ii] = utraj[ii];
-    }
+   
+    // for (int ii = 0; ii < nlp_dims->N; ii++) {
+    //         u_current[ii] = utraj[ii];
+    //     }
 
-    for (int ii = 0; ii < NX; ii++) {
-        x_init_input[ii] = xtraj[NX + ii];
-    }
-
+    // for (int ii = 0; ii < NX; ii++) {
+    //        x_init_input[ii] = xtraj[NX + ii];
+    //     }
     // Take solution from trajectory for visualization
     // m_real_time_com_trajectory_x.empty();
     // m_real_time_com_trajectory_y.empty();
-    std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
+    // std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     // for (int ii = 0; ii < NX * (N + 1); ii += NX) {
     // m_x_trajectory[ii] = xtraj[ii];
     // m_real_time_com_trajectory_x.push_back(xtraj[ii]);
