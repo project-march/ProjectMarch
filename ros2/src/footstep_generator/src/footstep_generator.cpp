@@ -13,6 +13,8 @@ FootstepGenerator::FootstepGenerator()
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
+    m_swing_trajectory_command_publisher
+        = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
 }
 
 void FootstepGenerator::publish_foot_placements(
@@ -20,7 +22,12 @@ void FootstepGenerator::publish_foot_placements(
     std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
-
+    // ADD THE EMPTY REQUEST HERE
+    if (request->gait_type == 3) {
+        std_msgs::msg::Int32 msg;
+        msg.data = 0;
+        m_swing_trajectory_command_publisher->publish(msg);
+    }
     m_publisher->publish(footsteps);
     response->status = true;
 }
@@ -42,12 +49,10 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 
     switch (gait_type) {
         case 1:
-
-            for (int i = 0; i < 1; i++) {
+            y = 0;
+            for (int i = 0; i < m_steps * 5; i++) {
                 x += 0;
-                y = -stance_leg * m_l;
-                stance_leg = -stance_leg;
-
+                y = (1 - ((y > 0) - (y < 0))) * m_l;
                 footstep.position.x = x;
                 footstep.position.y = y;
                 footstep.position.z = 0;
@@ -82,14 +87,43 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
-                printf("stance_leg %i\n", stance_leg);
+                // printf("stance_leg %i\n", stance_leg);
             }
             break;
 
         case 3:
-            for (int i = 0; i < m_steps; i++) {
-                x += m_vx * 1.0;
-                y += m_vy * 1.0 - stance_leg * m_l;
+            // for (int i = 0; i < 1; i++) {
+            //     x += m_vx * 1.0;
+            //     y += m_vy * 1.0 - stance_leg * m_l;
+            //     stance_leg = -stance_leg;
+
+            //     footstep.position.x = x;
+            //     footstep.position.y = y;
+            //     footstep.position.z = 0;
+
+            //     footstep_array.poses.push_back(footstep);
+            // }
+
+            // starting step
+            x = 0.0;
+            y = y;
+            footstep.position.x = x;
+            footstep.position.y = y;
+            footstep.position.z = 0;
+            footstep_array.poses.push_back(footstep);
+
+            x = 0.0;
+            y += m_vy * 1.0 + stance_leg * m_l;
+            footstep.position.x = x;
+            footstep.position.y = y;
+            footstep.position.z = 0;
+            footstep_array.poses.push_back(footstep);
+            stance_leg = -stance_leg;
+            // Then, add the closing steps that stay on 0
+
+            for (int i = 2; i < m_steps * 5; i++) {
+                x = m_vx * 1.0;
+                y += m_vy * 1.0 + stance_leg * m_l;
                 stance_leg = -stance_leg;
 
                 footstep.position.x = x;
@@ -97,16 +131,8 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
+                // printf("stance_leg %i\n", stance_leg);
             }
-            // Then, add the closing step
-            y += m_vy * 1.0 - stance_leg * m_l;
-            stance_leg = -stance_leg;
-
-            footstep.position.x = x;
-            footstep.position.y = y;
-            footstep.position.z = 0;
-
-            footstep_array.poses.push_back(footstep);
             break;
     }
 

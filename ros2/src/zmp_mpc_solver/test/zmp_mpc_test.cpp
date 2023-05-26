@@ -21,7 +21,7 @@ private:
 TEST_F(ZmpSolverTest, setterGetterTest)
 {
     // NX = 0;
-    std::array<double, NX> test_state = { -0.0559, 2, 3.9441, 1, 3, 5, 6, 8, 7, 9, 0, 0 };
+    std::array<double, NX> test_state = { 0, 2, 4, 1, 3, 5, 6, 8, 7, 9, 0, 0 };
 
     this->zmp_solver->set_current_com(0, 1, 2, 3);
     this->zmp_solver->set_current_zmp(4, 5);

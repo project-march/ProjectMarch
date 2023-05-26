@@ -114,7 +114,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # declare parameters
     # in ms
-    trajectory_dt = 8
+    trajectory_dt = 25
 
     return LaunchDescription([
         Node(

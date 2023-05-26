@@ -35,6 +35,10 @@ StateEstimator::StateEstimator()
 
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
 
+    m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
+
+    m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
+
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
 
@@ -269,10 +273,12 @@ void StateEstimator::publish_robot_frames()
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
             m_current_stance_foot = m_current_stance_foot;
-        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
+        } else if (m_footstep_estimator.get_foot("r")->total_pressure
+                > m_footstep_estimator.get_foot("l")->total_pressure
             && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
-        } else if (foot_positions.poses[0].position.x < foot_positions.poses[1].position.x
+        } else if (m_footstep_estimator.get_foot("r")->total_pressure
+                < m_footstep_estimator.get_foot("l")->total_pressure
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
         }
@@ -291,6 +297,12 @@ void StateEstimator::publish_robot_frames()
     stance_foot_msg.data = m_current_stance_foot;
     m_stance_foot_publisher->publish(stance_foot_msg);
 
+    std_msgs::msg::Bool right_foot_on_ground;
+    std_msgs::msg::Bool left_foot_on_ground;
+    right_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("r");
+    left_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("l");
+    m_right_foot_on_ground_publisher->publish(right_foot_on_ground);
+    m_left_foot_on_ground_publisher->publish(left_foot_on_ground);
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
     feet_height_msg.header.frame_id = "map";

@@ -83,6 +83,13 @@ void BufferNode::publish_com_trajectory()
 
     set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
 
+    // Add a final 0 point
+    geometry_msgs::msg::Point p;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    ik_command_to_send.velocity.push_back(p);
+
     m_com_trajectory_publisher->publish(ik_command_to_send);
 
     // Reset all the pointers
@@ -103,10 +110,15 @@ void BufferNode::publish_swing_trajectory()
     }
 
     set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity);
-    set_velocity(ik_mock_com.trajectory, ik_mock_com.velocity);
+
+    // Add a final 0 point
+    geometry_msgs::msg::Point p;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    ik_command_to_send.velocity.push_back(p);
 
     m_swing_trajectory_publisher->publish(ik_command_to_send);
-    m_com_trajectory_publisher->publish(ik_mock_com);
 
     // Reset all the pointers
     m_latest_swing_trajectory.reset();

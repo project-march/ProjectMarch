@@ -29,6 +29,10 @@ SolverNode::SolverNode()
         "/robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_stance_foot", 10, std::bind(&SolverNode::stance_foot_callback, this, _1));
+    m_right_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
+        "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
+    m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
+        "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
 
     // timer_callback();
 
@@ -71,6 +75,15 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
     m_zmp_solver.set_current_stance_foot(msg->data);
 }
 
+void SolverNode::right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
+{
+    m_zmp_solver.set_right_foot_on_gound(msg->data);
+}
+
+void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
+{
+    m_zmp_solver.set_left_foot_on_gound(msg->data);
+}
 // void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
 // {
 //    // int status = solve_step(x_current, u_current); // solve the mpc problem
