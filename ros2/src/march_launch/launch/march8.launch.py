@@ -86,6 +86,11 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
+    footstep_generator_launch_dir = os.path.join(
+        get_package_share_directory('footstep_generator'),
+        'launch'
+    )
+
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
@@ -116,6 +121,11 @@ def generate_launch_description() -> LaunchDescription:
     # in ms
     trajectory_dt = 25
 
+    # region footstep_generation parameters
+    n_footsteps = 20
+    step_length = 0.2
+    # endregion
+
     return LaunchDescription([
         Node(
             package='bezier_visualization',
@@ -123,16 +133,10 @@ def generate_launch_description() -> LaunchDescription:
             name='bezier_visualization',
         ),
         Node(
-            package='footstep_generator',
-            namespace='',
-            executable='footstep_generator_node',
-            name='footstep_generator'
-        ),
-        Node(
             package='swing_leg_trajectory_generator',
             namespace='',
             executable='swing_leg_trajectory_generator_node',
-            name='swing_leg_generator'
+            name='swing_leg_generator',
         ),
         Node(
             package='zmp_mpc_solver',
@@ -165,6 +169,10 @@ def generate_launch_description() -> LaunchDescription:
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator_launch.py']),
+            launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
         ),
         mujoco_node,
         rqt_input_device,
