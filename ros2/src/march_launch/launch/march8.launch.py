@@ -164,7 +164,7 @@ def generate_launch_description() -> LaunchDescription:
         #     PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         # ),
         # mujoco_node,
-        rqt_input_device,
+        # rqt_input_device,
         march_control,
         record_rosbags_action,
     ])
