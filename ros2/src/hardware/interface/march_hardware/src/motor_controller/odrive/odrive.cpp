@@ -105,7 +105,7 @@ void ODrive::actuateRadians(float target_position)
         && !this->absolute_encoder_->isValidTargetIU(
             this->getAbsolutePositionIU(), this->absolute_encoder_->positionRadiansToIU(target_position))) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
-            "The requested position is outside the limits, for requested position %f: ", target_position);
+            "Error in Odrive %i \nThe requested position is outside the limits, for requested position %f: ", this->getSlaveIndex(),target_position);
     }
 
     bit32 write_position {};
