@@ -68,7 +68,7 @@ class BezierCurve(Node):
 
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
-        
+
     def _init_plot(self):
         """Start the plotting of the curve in matplotlib."""
         # Set the initial figure with the axes
@@ -95,8 +95,6 @@ class BezierCurve(Node):
         # Show the plot
         self.figure.canvas.draw()
         plt.show()
-    
-        
 
     def _on_click(self, event):
         """Callback method for mouse click event.

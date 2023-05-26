@@ -19,7 +19,7 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
 
     m_final_feet_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "final_feet_position", 10, std::bind(&SwingLegTrajectoryGeneratorNode::final_feet_callback, this, _1));
-    
+
     //    m_stance_feet_subscriber = this->create_subscription<std_msgs::msg::Int32>(
     //        "current_stance_foot", 10, std::bind(&SwingLegTrajectoryGeneratorNode::stance_feet_callback, this, _1));
     m_swing_leg_generator = SwingLegTrajectoryGenerator();
@@ -36,9 +36,9 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
     }
     m_swing_leg_generator.set_points(points);
     for (const auto& point : m_swing_leg_generator.get_curve().points) {
-            RCLCPP_INFO(rclcpp::get_logger("bezier callback"), "Point AAAA: x=%f, y=%f, z=%f",point.x, point.y, point.z);
+        RCLCPP_INFO(rclcpp::get_logger("bezier callback"), "Point AAAA: x=%f, y=%f, z=%f", point.x, point.y, point.z);
     }
-    
+
     publish_path_visualization();
 }
 
@@ -47,10 +47,9 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
 //     if (msg->data == 1){
 //         m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory); // publish  when mpc tells you to
 //     }
-    // if (msg->data == 0){
-    // publish_zero_swing()   } 
+// if (msg->data == 0){
+// publish_zero_swing()   }
 // }
- 
 
 // void SwingLegTrajectoryGeneratorNode::stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg)
 //{
@@ -61,9 +60,10 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
 void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     for (const auto& point : m_swing_leg_generator.get_curve().points) {
-            RCLCPP_INFO(rclcpp::get_logger("final feet"), "Point final feet callback: x=%f, y=%f, z=%f",point.x, point.y, point.z);
-        }
-    
+        RCLCPP_INFO(
+            rclcpp::get_logger("final feet"), "Point final feet callback: x=%f, y=%f, z=%f", point.x, point.y, point.z);
+    }
+
     auto steps = msg->poses;
     auto begin_foot = steps.at(0);
     auto end_foot = steps.at(2);

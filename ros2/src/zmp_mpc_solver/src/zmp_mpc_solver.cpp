@@ -363,7 +363,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         current_count = m_current_stance_foot;
         m_is_weight_shift_done = true;
         // printf("hello weight shift check");
-        // m_weight_shift_publisher->publish(1); 
+        // m_weight_shift_publisher->publish(1);
     }
     int count = current_count;
 
@@ -578,7 +578,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
 
     // here, we copy our array into the std::array
-   
+
     // for (int ii = 0; ii < nlp_dims->N; ii++) {
     //         u_current[ii] = utraj[ii];
     //     }

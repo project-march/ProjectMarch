@@ -81,7 +81,7 @@ Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t
 
 void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, double step_length)
 {
-        double scalar = step_length / points.back().x;
+    double scalar = step_length / points.back().x;
     RCLCPP_INFO(rclcpp::get_logger("step_length"), "step_length = %f ", step_length);
     RCLCPP_INFO(rclcpp::get_logger("points"), "point = %f ", points.back().x);
     for (auto& p : points) {

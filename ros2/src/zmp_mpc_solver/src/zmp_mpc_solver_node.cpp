@@ -15,7 +15,8 @@ SolverNode::SolverNode()
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("com_visualization_trajectory", 10);
     m_zmp_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("zmp_visualization_trajectory", 10);
-    m__footstep_visualizer_publisher = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
+    m__footstep_visualizer_publisher
+        = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
     m_weight_shift_publisher = this->create_publisher<std_msgs::msg::Int32>("publish_swing_leg_command", 10);
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
@@ -78,13 +79,13 @@ void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 //    // }
 // }
 
-bool SolverNode::is_weight_shift_done(){
-    if(m_zmp_solver.m_is_weight_shift_done==true){
-        m_zmp_solver.m_is_weight_shift_done=false; 
-    return true;
-        }
-    else{
-    return false;
+bool SolverNode::is_weight_shift_done()
+{
+    if (m_zmp_solver.m_is_weight_shift_done == true) {
+        m_zmp_solver.m_is_weight_shift_done = false;
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -103,16 +104,15 @@ void SolverNode::timer_callback()
         int solver_status = m_zmp_solver.solve_step();
         // bool weight_shift_done_node = m_zmp_solver.m_is_weight_shift_done;
 
-        if (is_weight_shift_done()){
+        if (is_weight_shift_done()) {
             std_msgs::msg::Int32 i;
-            i.data=1;
+            i.data = 1;
             m_weight_shift_publisher->publish(i);
-            RCLCPP_INFO(rclcpp::get_logger("zmp node"),"publishes to weight shift state");
+            RCLCPP_INFO(rclcpp::get_logger("zmp node"), "publishes to weight shift state");
         }
         if (solver_status != 0) {
             RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
-        }
-        else {
+        } else {
             auto com_msg = geometry_msgs::msg::PoseArray();
             com_msg.header.stamp = this->get_clock()->now();
             com_msg.header.frame_id = "map";
@@ -230,11 +230,12 @@ void SolverNode::timer_callback()
             m_zmp_visualizer_publisher->publish(zmp_path);
             m_com_trajectory_publisher->publish(com_msg);
 
-            if (abs(foot_msg.poses[0].position.x) > 1e-4){     //only publish when foot is moving
+            if (abs(foot_msg.poses[0].position.x) > 1e-4) { // only publish when foot is moving
                 m_final_feet_publisher->publish(foot_msg);
-            } 
-            
-            m_zmp_solver.update_current_shooting_node();}
+            }
+
+            m_zmp_solver.update_current_shooting_node();
+        }
     }
 }
 
