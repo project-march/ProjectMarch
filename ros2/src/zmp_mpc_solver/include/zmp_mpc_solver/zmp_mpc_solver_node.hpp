@@ -21,6 +21,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
@@ -42,6 +43,8 @@ private:
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void timer_callback();
     void visualize_trajectory();
+    void right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
+    void left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
 
     geometry_msgs::msg::PoseArray::SharedPtr desired_footsteps;
     geometry_msgs::msg::PoseArray prev_des_footsteps;
@@ -52,6 +55,8 @@ private:
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_zmp_visualizer_publisher;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
 
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_subscriber;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
     rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
