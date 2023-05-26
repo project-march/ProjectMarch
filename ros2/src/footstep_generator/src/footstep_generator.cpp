@@ -15,7 +15,7 @@ FootstepGenerator::FootstepGenerator()
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
     m_swing_trajectory_command_publisher
         = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
-    declare_parameter("n_footsteps", 0);
+    declare_parameter("n_footsteps", 20);
     declare_parameter("step_length", 0.2);
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();
