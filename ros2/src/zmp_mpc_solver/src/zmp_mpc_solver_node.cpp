@@ -17,7 +17,6 @@ SolverNode::SolverNode()
     m_zmp_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("zmp_visualization_trajectory", 10);
     m__footstep_visualizer_publisher
         = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
-    m_weight_shift_publisher = this->create_publisher<std_msgs::msg::Int32>("publish_swing_leg_command", 10);
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
@@ -92,16 +91,6 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 //    // }
 // }
 
-bool SolverNode::is_weight_shift_done()
-{
-    if (m_zmp_solver.m_is_weight_shift_done == true) {
-        m_zmp_solver.m_is_weight_shift_done = false;
-        return true;
-    } else {
-        return false;
-    }
-}
-
 void SolverNode::timer_callback()
 {
     if (!(desired_footsteps)) {
@@ -117,12 +106,6 @@ void SolverNode::timer_callback()
         int solver_status = m_zmp_solver.solve_step();
         // bool weight_shift_done_node = m_zmp_solver.m_is_weight_shift_done;
 
-        if (is_weight_shift_done()) {
-            std_msgs::msg::Int32 i;
-            i.data = 1;
-            m_weight_shift_publisher->publish(i);
-            RCLCPP_INFO(rclcpp::get_logger("zmp node"), "publishes to weight shift state");
-        }
         if (solver_status != 0) {
             RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
         } else {
