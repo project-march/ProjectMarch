@@ -31,8 +31,8 @@ private:
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
 
     int m_steps;
-    const double m_vx;
-    const double m_vy;
+    double m_vx;
+    double m_vy;
     double m_l;
 };
 

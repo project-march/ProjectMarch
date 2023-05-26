@@ -74,4 +74,10 @@ if(BUILD_TESTING)
     "march_shared_msgs")
 endif()
 
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
+
 ament_package()
