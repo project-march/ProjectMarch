@@ -51,7 +51,7 @@
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
       <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
-      <param name="robot">pressure_soles</param>
+      <param name="robot">march7</param>
     </xacro:if>
   </hardware>
 

@@ -88,7 +88,7 @@ void StateMachineNode::send_request(exoState desired_state)
     int requested_gait = (int)desired_state;
     int cur_st = this->m_state_machine.get_current_state();
     RCLCPP_INFO(this->get_logger(), "current state in send_request is: %d", cur_st);
-    if (m_state_machine.get_current_state() == 0 && requested_gait == 1) {
+    if (requested_gait == 1) {
         m_gait_request->gait_type = 1;
         RCLCPP_INFO(this->get_logger(), "send_request with stand_up");
         m_gait_future = m_gait_client->async_send_request(

@@ -29,9 +29,7 @@ def generate_launch_description() -> LaunchDescription:
         description="The controller yaml file to use loaded in through the controller manager "
                     "(not used if gazebo control is used). Must be in: `march_control/config/`.",
     )
-    DeclareLaunchArgument(
-        name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
-    )
+    
     DeclareLaunchArgument(
         name="simulation",
         default_value="false",
@@ -60,7 +58,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch rqt input device if not rqt_input:=false
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -117,36 +114,36 @@ def generate_launch_description() -> LaunchDescription:
     trajectory_dt = 25
 
     return LaunchDescription([
-        Node(
-            package='bezier_visualization',
-            executable='bezier_visualization_node',
-            name='bezier_visualization',
-        ),
+        # Node(
+        #     package='bezier_visualization',
+        #     executable='bezier_visualization_node',
+        #     name='bezier_visualization',
+        # ),
         Node(
             package='footstep_generator',
             namespace='',
             executable='footstep_generator_node',
             name='footstep_generator'
         ),
-        Node(
-            package='swing_leg_trajectory_generator',
-            namespace='',
-            executable='swing_leg_trajectory_generator_node',
-            name='swing_leg_generator'
-        ),
-        Node(
-            package='zmp_mpc_solver',
-            namespace='',
-            executable='zmp_mpc_solver',
-            name='zmp_mpc_solver',
-        ),
-        Node(
-            package='ik_solver_buffer',
-            namespace='',
-            executable='ik_solver_buffer_node',
-            name='ik_solver_buffer',
-            parameters=[('timestep', str(trajectory_dt))],
-        ),
+        # Node(
+        #     package='swing_leg_trajectory_generator',
+        #     namespace='',
+        #     executable='swing_leg_trajectory_generator_node',
+        #     name='swing_leg_generator'
+        # ),
+        # Node(
+        #     package='zmp_mpc_solver',
+        #     namespace='',
+        #     executable='zmp_mpc_solver',
+        #     name='zmp_mpc_solver',
+        # ),
+        # Node(
+        #     package='ik_solver_buffer',
+        #     namespace='',
+        #     executable='ik_solver_buffer_node',
+        #     name='ik_solver_buffer',
+        #     parameters=[('timestep', str(trajectory_dt))],
+        # ),
         Node(
             package='state_machine',
             namespace='',
@@ -159,14 +156,14 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_selection_node',
             name='gait_selection'
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
-            launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
-        ),
-        mujoco_node,
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
+        #     launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+        # ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+        # ),
+        # mujoco_node,
         rqt_input_device,
         march_control,
         record_rosbags_action,

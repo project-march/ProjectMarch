@@ -22,15 +22,15 @@ def generate_launch_description():
     # Whether the exoskeleton is ran physically or in simulation.
     simulation = LaunchConfiguration("simulation")
     start_broadcasters = LaunchConfiguration("start_broadcasters")
-    control_type = LaunchConfiguration("control_type")
+    control_type = LaunchConfiguration("control_type", default="effort")
     # region Launch Controller manager, Extra configuration if simulation is `false`
 
-    control_yaml = LaunchConfiguration("control_yaml")
+    control_yaml = LaunchConfiguration("control_yaml", default="effort_control/march8_control.yaml")
 
     declared_arguments = [
         DeclareLaunchArgument(
             name="simulation",
-            default_value="true",
+            default_value="false",
             description="Whether the exoskeleton is ran physically or in simulation.",
             choices=["true", "false"],
         ),
@@ -49,29 +49,12 @@ def generate_launch_description():
             description="Decides which controller is being used. "
                         "'Effort' when you are running the real exo",
             choices=["simulation", "effort"],
-            condition=UnlessCondition(simulation),
-        ),
-        DeclareLaunchArgument(
-            name="control_type",
-            default_value="simulation",
-            description="Decides which controller is being used. "
-                        "'simulation' when you are running the simulation",
-            choices=["simulation", "effort"],
-            condition=IfCondition(simulation),
         ),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/march7_control.yaml",
+            default_value="effort_control/march8_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
                         "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-            condition=UnlessCondition(simulation),
-        ),
-        DeclareLaunchArgument(
-            name="control_yaml",
-            default_value="mujoco/march7_control.yaml",
-            description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-            condition=IfCondition(simulation),
         ),
         # endregion
     ]
@@ -81,7 +64,6 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner.py",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
-        condition=UnlessCondition(start_broadcasters),
     )
 
     joint_trajectory_controller_spawner = Node(
@@ -102,7 +84,6 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
     )
 
     motor_controller_state_broadcaster_spawner = Node(
@@ -115,7 +96,6 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
     )
 
     pressure_sole_state_broadcaster_spawner = Node(
@@ -128,16 +108,15 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
     )
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
-        pdb_state_broadcaster_spawner,
+        # pdb_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
-        pressure_sole_state_broadcaster_spawner,
+        # pressure_sole_state_broadcaster_spawner,
     ]
 
     robot_desc_xacro = Command(

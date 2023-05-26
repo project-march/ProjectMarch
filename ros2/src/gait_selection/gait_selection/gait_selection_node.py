@@ -37,9 +37,6 @@ class GaitSelectionNode(Node):
         self.reset_publisher = self.create_publisher(Int32, "/trajectory_reset_gate", 10)
         self.sim_reset_publisher = self.create_publisher(Bool, "/mujoco_reset_trajectory", 10)
         self.actual_joint_state = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.joint_names = [
-            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
         self.get_logger().info(str(self.gait_loader.loaded_gaits))
         self._gait_executed = None
@@ -102,7 +99,7 @@ class GaitSelectionNode(Node):
         """
         gait_executor_response_goal_handle: ClientGoalHandle = future.result()
         if not gait_executor_response_goal_handle.accepted:
-            self.get_logger.warning(
+            self.get_logger().warning(
                 "Goal message to execute gait was not accepted by the Action server."
                 f"Goal: {gait_executor_response_goal_handle}"
             )

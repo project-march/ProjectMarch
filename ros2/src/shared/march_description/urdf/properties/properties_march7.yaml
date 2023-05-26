@@ -93,9 +93,9 @@ joint_limits:
     resolution: 20
   right_hfe:
     unit: iu
-    lower_limit: 426704
-    upper_limit: 798624
-    zero_position: 497904
+    lower_limit: 295500
+    upper_limit: 666956
+    zero_position: 411030
     resolution: 20
   left_ankle:
     unit: iu
