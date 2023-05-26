@@ -121,10 +121,10 @@ def generate_launch_description() -> LaunchDescription:
     # in ms
     trajectory_dt = 25
 
-    #region footstep_generation parameters
+    # region footstep_generation parameters
     n_footsteps = 20
     step_length = 0.2
-    #endregion
+    # endregion
 
     return LaunchDescription([
         Node(
