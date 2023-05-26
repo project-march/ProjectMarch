@@ -610,24 +610,32 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     if (status == ACADOS_SUCCESS) {
         printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
+        for (int ii = 0; ii < nlp_dims->N; ii++) {
+            u_current[ii] = utraj[ii];
+        }
+
+        for (int ii = 0; ii < NX; ii++) {
+            x_init_input[ii] = xtraj[NX + ii];
+        }
+        std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
         // m_step_counter = 0;
     }
 
     // here, we copy our array into the std::array
-    for (int ii = 0; ii < nlp_dims->N; ii++) {
-        u_current[ii] = utraj[ii];
-    }
 
-    for (int ii = 0; ii < NX; ii++) {
-        x_init_input[ii] = xtraj[NX + ii];
-    }
+    // for (int ii = 0; ii < nlp_dims->N; ii++) {
+    //         u_current[ii] = utraj[ii];
+    //     }
 
+    // for (int ii = 0; ii < NX; ii++) {
+    //        x_init_input[ii] = xtraj[NX + ii];
+    //     }
     // Take solution from trajectory for visualization
     // m_real_time_com_trajectory_x.empty();
     // m_real_time_com_trajectory_y.empty();
-    std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
+    // std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     // for (int ii = 0; ii < NX * (N + 1); ii += NX) {
     // m_x_trajectory[ii] = xtraj[ii];
     // m_real_time_com_trajectory_x.push_back(xtraj[ii]);

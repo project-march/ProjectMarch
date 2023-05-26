@@ -19,6 +19,7 @@ class ZmpSolver {
 public:
     ZmpSolver();
     double m_time_horizon;
+    bool m_is_weight_shift_done;
     void set_current_state();
     int solve_step();
     int get_current_stance_foot();

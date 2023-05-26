@@ -26,12 +26,14 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_publish_curve;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_points_subscription;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_subscriber;
-    rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
+    // rclcpp::Subscription<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_feet_subscriber;
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_weight_shift_subscriber;
 
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_path_publisher;
 
     void subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg);
+    void weight_shift_callback(std_msgs::msg::Int32::SharedPtr msg);
     void stance_feet_callback(std_msgs::msg::Int32::SharedPtr msg);
     void final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg);
     void com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg);
