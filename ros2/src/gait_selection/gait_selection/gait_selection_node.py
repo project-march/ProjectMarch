@@ -26,6 +26,7 @@ class GaitSelectionNode(Node):
         super().__init__('gait_selection_node')
         self.gait_package = "gait_files"
         self.directory_name = "airgait_vi"
+        self.joint_names = ["left_hip_fe", "left_knee", "right_hip_fe", "right_knee"]
         self.gait_loader = GaitLoader(self)
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
 

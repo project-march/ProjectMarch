@@ -28,12 +28,8 @@ march_motor_controller_state_broadcaster:
   ros__parameters:
     # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
     possible_joints:
-      - left_ankle
-      - left_hip_aa
       - left_hip_fe
       - left_knee
-      - right_ankle
-      - right_hip_aa
       - right_hip_fe
       - right_knee
 
@@ -41,12 +37,8 @@ joint_trajectory_controller:
   ros__parameters:
     update_rate: 125
     joints:
-      - left_ankle
-      - left_hip_aa
       - left_hip_fe
       - left_knee
-      - right_ankle
-      - right_hip_aa
       - right_hip_fe
       - right_knee
     interface_name: position
