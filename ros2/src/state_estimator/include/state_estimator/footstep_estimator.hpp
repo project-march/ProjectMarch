@@ -30,6 +30,7 @@ struct Foot {
     double toes_middle_threshold = 2.74;
     double heel_middle_threshold = 2.55;
     bool on_ground;
+    bool impact_ground;
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor*>* sensors, const char* prefix)
     {
@@ -40,6 +41,9 @@ struct Foot {
         std::vector<std::string> heel = {"heel_right", "heel_left"};
         double measured_toes_middle_pressure = 0.0;
         double measured_heel_middle_pressure = 0.0;
+        double previous_foot_pressure = 0.0;
+        double delta_pressure = 0.0;
+        double measured_foot_pressure_derivative = 0.0;
         int foot_sensor_amount = 0;
         int toes_middle_sensor_amount = 0;
         int heel_middle_sensor_amount = 0;
@@ -61,16 +65,22 @@ struct Foot {
                 if (std::find(heel.begin(), heel.end(), i->name.substr (2,i->name.size())) != heel.end()){
                     measured_heel_middle_pressure += i->pressure;
                     heel_middle_sensor_amount ++;
+                }    
+                if (foot.previous_foot_pressure != 0.0) {
+                delta_pressure = i->pressure - foot.previous_foot_pressure;
+                measured_foot_pressure_derivative += delta_pressure;
                 }
             }
         }
         // we have 8 sensors, so we divide by 1
 
         foot_threshold = 2.7;
+        derivative_treshold = -0.1;
 
         on_ground = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
                     (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_sensor_amount ||
                     (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
+        impact_ground = (measured_foot_pressure_derivative <= derivative_treshold);
     };
 };
 
