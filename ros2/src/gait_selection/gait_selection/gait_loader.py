@@ -33,9 +33,7 @@ class GaitLoader:
         """Init the gait loader for the gait_selection."""
         self._node = node
         self._logger = node.get_logger().get_child(__class__.__name__)
-        self._actuating_joint_names = [
-            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
+        self._actuating_joint_names = self._node.joint_names
 
         package_path = get_package_share_directory(self._node.gait_package)
         self._gait_directory = os.path.join(package_path, self._node.directory_name)
@@ -50,7 +48,7 @@ class GaitLoader:
         self._load_gaits()
 
     @property
-    def joint_names(self) -> List[str]:
+    def get_joint_names(self) -> List[str]:
         """Return a list containing joint names."""
         return self._actuating_joint_names
 
@@ -98,7 +96,7 @@ class GaitLoader:
             if isinstance(position, UnknownEdgePosition):
                 continue
             name = self._named_positions[position]
-            home_gait = HomeGait(name, position, "")
+            home_gait = HomeGait(name, position, "", self._actuating_joint_names)
             self.gaits[home_gait.name] = home_gait
 
     def _load_sit_and_stand_gaits(self) -> None:

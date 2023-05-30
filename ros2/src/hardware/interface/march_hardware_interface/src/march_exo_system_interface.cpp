@@ -254,18 +254,22 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
         // Read the first encoder values for each joint
         for (JointInfo& jointInfo : joints_info_) {
-            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
-
             // Send PID values to the joints to initialize them
             jointInfo.joint.sendPID();
+            RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
+
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+            jointInfo.target_position = (float)jointInfo.joint.getPosition();
+            jointInfo.joint.actuate(jointInfo.target_position);
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;
-            jointInfo.torque = jointInfo.joint.getTorque();
+            // jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
+
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
         throw;
@@ -368,7 +372,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        jointInfo.joint.actuate(/*target=*/0, (float)jointInfo.position, 1, 0);
+        jointInfo.joint.actuate((float)jointInfo.position);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -392,14 +396,14 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    pdb_read();
-    pressure_sole_read();
+    // pdb_read();
+    // pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
-        jointInfo.torque = jointInfo.joint.getTorque();
+        // jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }
@@ -476,8 +480,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
-        jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
-            (float)jointInfo.fuzzy_torque, (float)jointInfo.fuzzy_position);
+        jointInfo.joint.actuate((float)jointInfo.target_position);
     }
 
     return hardware_interface::return_type::OK;

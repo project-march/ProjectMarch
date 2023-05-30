@@ -29,9 +29,7 @@ def generate_launch_description() -> LaunchDescription:
         description="The controller yaml file to use loaded in through the controller manager "
                     "(not used if gazebo control is used). Must be in: `march_control/config/`.",
     )
-    DeclareLaunchArgument(
-        name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
-    )
+
     DeclareLaunchArgument(
         name="simulation",
         default_value="false",
@@ -60,7 +58,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch rqt input device if not rqt_input:=false
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -133,10 +130,16 @@ def generate_launch_description() -> LaunchDescription:
             name='bezier_visualization',
         ),
         Node(
+            package='footstep_generator',
+            namespace='',
+            executable='footstep_generator_node',
+            name='footstep_generator'
+        ),
+        Node(
             package='swing_leg_trajectory_generator',
             namespace='',
             executable='swing_leg_trajectory_generator_node',
-            name='swing_leg_generator',
+            name='swing_leg_generator'
         ),
         Node(
             package='zmp_mpc_solver',

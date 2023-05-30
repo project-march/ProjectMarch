@@ -1,6 +1,6 @@
 """Author: Unknown."""
 
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from rclpy.time import Time
 
 from march_utility.gait.edge_position import UnknownEdgePosition
@@ -14,7 +14,7 @@ DEFAULT_HOMEGAIT_DURATION = Duration(seconds=3)
 ZERO_DURATION = Duration(seconds=0)
 
 
-class HomeGait():
+class HomeGait:
     """A standard gait that goes from the unknown state to an idle position.
 
     Args:
@@ -35,6 +35,7 @@ class HomeGait():
             name: str,
             position: Dict[str, float],
             gait_type: str,
+            joint_names: List[str],
             duration: Duration = DEFAULT_HOMEGAIT_DURATION,
     ):
         """Initializes an executable home gait with given positions."""
@@ -47,8 +48,7 @@ class HomeGait():
         self._end_time = None
         self._starting_position = UnknownEdgePosition()
         self._final_position = self._position
-        self._actuating_joint_names = ["left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-                                       "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
+        self._actuating_joint_names = joint_names
 
     @property
     def name(self):

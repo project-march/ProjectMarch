@@ -269,6 +269,7 @@ void StateEstimator::publish_robot_frames()
     // Otherwise the current stance foot value is going to constantly update in double stance.
 
     // double stance
+    m_current_stance_foot = 0;
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
