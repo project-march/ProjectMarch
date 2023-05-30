@@ -62,6 +62,18 @@ def generate_launch_description() -> LaunchDescription:
                 {"test_rotational": test_rotational}
             ],
         ),
+        Node(
+            package='fuzzy_generator',
+            executable='fuzzy_node',
+            name='fuzzy_node',
+            # arguments=['--ros-args', '--log-level', 'debug']
+        ),
+        Node(
+            package='joint_trajectory_buffer',
+            executable='joint_trajectory_buffer_node',
+            name='joint_trajectory_buffer_node',
+            # arguments=['--ros-args', '--log-level', 'debug']
+        ),
         rqt_input_device,
         march_control,
     ])

@@ -31,6 +31,8 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
+#define DEBUG
+
 using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
@@ -505,8 +507,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
         // DEBUG LINE
-//            RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f", LColor::GREEN);
-//            return hardware_interface::return_type::ERROR;
+        #ifdef DEBUG
+        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f", LColor::GREEN);
+        return hardware_interface::return_type::ERROR;
+        #endif
 
         // Comment out for debugging:
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
