@@ -9,7 +9,8 @@ testsetup:
           actuationMode: torque
           slaveIndex: 1
           axis: 1
-          motorKV: 355
+          motorKV: 210
+          useIncrementalEncoder: true
           absoluteEncoder:
             resolution: 14
             minPositionIU: 13770
@@ -17,10 +18,19 @@ testsetup:
             zeroPositionIU: 14500
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             direction: 1
           incrementalEncoder:
-            resolution: 13
-            transmission: 240
+            countsPerRotation: 6400
+            transmission: 314 
             direction: 1
+        pids:
+          position:
+            p: 10.0
+            i: 0.0
+            d: 0.2
+          torque:
+            p: 0.0
+            i: 0.0
+            d: 0.0

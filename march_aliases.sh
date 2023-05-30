@@ -148,3 +148,9 @@ alias joke='curl -H "Accept: text/plain" https://icanhazdadjoke.com/ && echo'
 alias kernel_devboard="sudo /sbin/modprobe ftdi_sio && echo 2639 0300 | sudo tee /sys/bus/usb-serial/drivers/ftdi_sio/new_id"
 alias dialout_grp="sudo usermod -G dialout -a $USER && newgrp dialout"
 
+alias static_port_rules='cf'
+cf() {
+  sudo su -c "echo 'ACTION==\"add\", ATTRS{idVendor}==\"2639\", ATTRS{idProduct}==\"0300\", ATTRS{serial}==\"DBZ05NEA\", SYMLINK+=\"lowerIMU\"' > /etc/udev/rules.d/98-imu.rules"
+  sudo su -c "echo 'ACTION==\"add\", ATTRS{idVendor}==\"2639\", ATTRS{idProduct}==\"0300\", ATTRS{serial}==\"DBZ03F66\", SYMLINK+=\"upperIMU\"' >> /etc/udev/rules.d/98-imu.rules"
+  sudo udevadm control --reload
+}

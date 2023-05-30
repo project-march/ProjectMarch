@@ -29,6 +29,7 @@ class TestSetupGaitSelectionNode(Node):
             self.joints = ["rotational_joint"]
 
         self.gait_loader = GaitLoader(self)
+        self.get_logger().info("Joint is: " + str(self.joints))
         self.get_logger().info("Possible gaits are: " + str(self.gait_loader.gaits))
         self.get_logger().info("Possible gaits are: " + str(self.gait_loader._named_positions.values()))
 
