@@ -85,7 +85,7 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.004
+        self.TIME_STEP_MJC = 0.0004
         self.model.opt.timestep = self.TIME_STEP_MJC
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()

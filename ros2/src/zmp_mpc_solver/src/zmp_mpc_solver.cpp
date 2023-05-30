@@ -77,6 +77,13 @@ std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
     return m_u_current;
 }
 
+std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
+{
+    std_msgs::msg::Int32 current_shooting_node;
+    current_shooting_node.data = m_current_shooting_node;
+    return current_shooting_node;
+}
+
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
@@ -409,6 +416,12 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("weight shift is complete \n");
     } else if (m_current_shooting_node == 0) {
         m_current_shooting_node--;
+    }
+
+    // correction so that current shooting node doesn't turn negative
+    if (m_current_shooting_node == -1)
+    {
+        m_current_shooting_node = 124;
     }
 
     int count = m_current_count;

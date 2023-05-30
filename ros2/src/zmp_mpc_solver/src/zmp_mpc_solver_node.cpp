@@ -17,6 +17,8 @@ SolverNode::SolverNode()
     m_zmp_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("zmp_visualization_trajectory", 10);
     m__footstep_visualizer_publisher
         = this->create_publisher<visualization_msgs::msg::Marker>("footsteps_visualization", 100);
+    m_current_shooting_node_publisher = this->create_publisher<std_msgs::msg::Int32>("current_shooting_node", 10);
+
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
         "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
@@ -32,6 +34,7 @@ SolverNode::SolverNode()
         "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
     m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
         "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
+
 
     // timer_callback();
 
@@ -101,6 +104,7 @@ void SolverNode::timer_callback()
             m_zmp_solver.set_m_current_shooting_node(100);
         }
         prev_des_footsteps = *desired_footsteps;
+        m_current_shooting_node_publisher->publish(m_zmp_solver.get_m_current_shooting_node());
         m_zmp_solver.update_current_foot();
         m_zmp_solver.set_current_state();
         int solver_status = m_zmp_solver.solve_step();

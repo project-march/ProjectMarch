@@ -197,16 +197,20 @@ void IkSolverNode::timer_callback()
         // RCLCPP_INFO(this->get_logger(), "Set desired com_vel");
         Eigen::VectorXd solution_velocity = m_ik_solver.solve_for_velocity(
             m_ik_solver.get_state(), m_desired_state, static_cast<double>(m_timestep) / 1000.0, m_stance_foot);
-
+        
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
         std::stringstream ss;
-        ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
+        // ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
+        // RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
+        // ss.clear();
+        // ss.str("");
+        Eigen::VectorXd solution_position
+            = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
+        ss << solution_position.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
         RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         ss.clear();
         ss.str("");
-        Eigen::VectorXd solution_position
-            = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
-
+        solution_position<< 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0;
         publish_joint_states(
             std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 
@@ -230,6 +234,7 @@ void IkSolverNode::timer_callback()
 void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 {
     trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
+    trajectory_msgs::msg::JointTrajectoryPoint point_prev;
     trajectory_msgs::msg::JointTrajectoryPoint point;
     trajectory.joint_names.push_back("left_ankle");
     trajectory.joint_names.push_back("left_hip_aa");
@@ -243,17 +248,21 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     pinocchio::JointIndex index = 0;
 
     pinocchio::Model pinocchio_model = m_ik_solver.get_model();
+    std::vector<double> previous_joint_positions = m_ik_solver.get_joint_pos();
 
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
         // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
+        point_prev.positions.push_back(previous_joint_positions[pinocchio_model.joints[index].idx_q()]);
         point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         // RCLCPP_INFO(this->get_logger(), "publishing position %f, which is equal to %f",
         // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
     }
 
     point.time_from_start.sec = 0;
-    point.time_from_start.nanosec = m_timestep * 1e9;
+    point.time_from_start.nanosec = 2 * m_timestep * 1e6;
+    point_prev.time_from_start.nanosec = m_timestep * 1e6;
+    trajectory.points.push_back(point_prev);
     trajectory.points.push_back(point);
     trajectory.header.stamp = this->get_clock()->now();
 
