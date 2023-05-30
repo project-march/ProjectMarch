@@ -392,17 +392,17 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
-    pdb_read();
+    // pdb_read();
     pressure_sole_read();
 
-    for (JointInfo& jointInfo : joints_info_) {
-        jointInfo.joint.readEncoders();
-        jointInfo.position = jointInfo.joint.getPosition();
-        jointInfo.velocity = jointInfo.joint.getVelocity();
-        jointInfo.torque = jointInfo.joint.getTorque();
-        jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
-        jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
-    }
+    // for (JointInfo& jointInfo : joints_info_) {
+    //     jointInfo.joint.readEncoders();
+    //     jointInfo.position = jointInfo.joint.getPosition();
+    //     jointInfo.velocity = jointInfo.joint.getVelocity();
+    //     jointInfo.torque = jointInfo.joint.getTorque();
+    //     jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
+    //     jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
+    // }
     return hardware_interface::return_type::OK;
 }
 

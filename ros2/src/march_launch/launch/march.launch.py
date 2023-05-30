@@ -139,7 +139,7 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/march7_control.yaml",
+            default_value="effort_control/presure_sole_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
             "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
@@ -530,9 +530,14 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[("simulation", "true"), ("control_yaml", "mujoco/march7_control.yaml"), ("rviz", rviz)],
+        launch_arguments=[("simulation", "false"), ("control_yaml", "effort_control/pressure_sole_control.yaml"), ("rviz", "false")],
     )
     # endregion
+
+    state_estimator_launch_dir = os.path.join(
+        get_package_share_directory('state_estimator'),
+        'launch'
+    )
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -556,15 +561,15 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    imu_nodes = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("bluespace_ai_xsens_mti_driver"),
-                "launch",
-                "imu_launch.launch.py",
-            )
-        ),
-    )
+    # imu_nodes = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("bluespace_ai_xsens_mti_driver"),
+    #             "launch",
+    #             "imu_launch.launch.py",
+    #         )
+    #     ),
+    # )
 
     nodes = [
         rqt_input_device,
@@ -581,12 +586,9 @@ def generate_launch_description() -> LaunchDescription:
         camera_aligned_frame_pub_node,
         back_sense_node,
         record_rosbags_action,
-        imu_nodes,
-        Node(
-            package='state_machine',
-            namespace='',
-            executable='state_machine_node',
-            name='state_machine',
+        # imu_nodes,
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
     ]
 
