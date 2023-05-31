@@ -1,8 +1,8 @@
 // standard
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "visualization_msgs/msg/marker.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include <array>
 #include <chrono>

@@ -56,7 +56,6 @@ private:
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_current_shooting_node_publisher;
 
-
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;

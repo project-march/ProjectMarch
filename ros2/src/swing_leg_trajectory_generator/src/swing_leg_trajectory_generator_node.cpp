@@ -30,7 +30,7 @@ SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
 void SwingLegTrajectoryGeneratorNode::weight_shift_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     publish_zero_swing();
-};
+}
 
 void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {

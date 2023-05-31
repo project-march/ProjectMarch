@@ -197,7 +197,7 @@ void IkSolverNode::timer_callback()
         // RCLCPP_INFO(this->get_logger(), "Set desired com_vel");
         Eigen::VectorXd solution_velocity = m_ik_solver.solve_for_velocity(
             m_ik_solver.get_state(), m_desired_state, static_cast<double>(m_timestep) / 1000.0, m_stance_foot);
-        
+
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
         std::stringstream ss;
         // ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
@@ -210,7 +210,7 @@ void IkSolverNode::timer_callback()
         RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         ss.clear();
         ss.str("");
-        solution_position<< 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0;
+        solution_position << 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0;
         publish_joint_states(
             std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 

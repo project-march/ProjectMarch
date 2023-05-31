@@ -419,8 +419,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
 
     // correction so that current shooting node doesn't turn negative
-    if (m_current_shooting_node == -1)
-    {
+    if (m_current_shooting_node == -1) {
         m_current_shooting_node = 124;
     }
 
