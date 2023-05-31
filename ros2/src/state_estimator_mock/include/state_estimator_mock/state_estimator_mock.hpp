@@ -5,8 +5,8 @@
 #ifndef STATE_ESTIMATOR_MOCK_HPP
 #define STATE_ESTIMATOR_MOCK_HPP
 #include "geometry_msgs/msg/point_stamped.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/float32.hpp"
@@ -29,6 +29,7 @@ private:
     int m_current_shooting_node;
     int m_current_stance_foot;
     int m_shooting_nodes_per_step;
+    int m_counter;
 
     double m_step_duration;
     double m_center_of_mass_height;

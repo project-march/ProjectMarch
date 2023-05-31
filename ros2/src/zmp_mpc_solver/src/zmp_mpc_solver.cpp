@@ -633,6 +633,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
         // m_step_counter = 0;
+        // m_current_count = -1;
     }
 
     // here, we copy our array into the std::array

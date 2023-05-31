@@ -11,6 +11,7 @@ StateEstimatorMock::StateEstimatorMock()
     , m_shooting_nodes_per_step(125)
     , m_center_of_mass_height(0.5454)
     , m_current_stance_foot(-1)
+    , m_counter(0)
 
 {
     set_current_shooting_node(100);
@@ -36,7 +37,7 @@ double StateEstimatorMock::gaussian_dist(int currentStep, double targetValue, do
 
 march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
-    double max_y_com = 0.2;
+    double max_y_com = 0.28;
     double min_y_com = 0.0;
     double max_x_com = 0.2;
     double min_x_com = 0.0;
@@ -53,43 +54,52 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         center_of_mass.position.y = max_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = 0;
-        center_of_mass.velocity.y = 0;
-        center_of_mass.velocity.z = 0;
+        center_of_mass.velocity.x = 0.0;
+        center_of_mass.velocity.y = 0.0;
+        center_of_mass.velocity.z = 0.0;
 
     } else if (m_current_stance_foot == -1 && m_current_shooting_node > swing_duration
         && m_current_shooting_node < m_shooting_nodes_per_step) {
-        double shift_progress = ((m_current_shooting_node - swing_duration) / weight_shift_duration);
-        center_of_mass.position.x = shift_progress * max_x_com;
-        center_of_mass.position.y = (1 - shift_progress) * max_y_com;
+        double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
+
+        RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
+        if (m_counter == 0) {
+            center_of_mass.position.x = 0;
+        } else {
+            center_of_mass.position.x = shift_progress * max_x_com;
+        }
+        center_of_mass.position.y = (1.0 - shift_progress) * max_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10);
-        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), -max_y_velocity, 10);
-        center_of_mass.velocity.z = 0;
+        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
+        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), -max_y_velocity, 10.0);
+        center_of_mass.velocity.z = 0.0;
 
     } else if (m_current_stance_foot == 1 && m_current_shooting_node < swing_duration) {
         center_of_mass.position.x = min_x_com;
         center_of_mass.position.y = min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = 0;
-        center_of_mass.velocity.y = 0;
-        center_of_mass.velocity.z = 0;
+        center_of_mass.velocity.x = 0.0;
+        center_of_mass.velocity.y = 0.0;
+        center_of_mass.velocity.z = 0.0;
 
     } else if (m_current_stance_foot == 1 && m_current_shooting_node > swing_duration
         && m_current_shooting_node < m_shooting_nodes_per_step) {
-        double shift_progress = ((m_current_shooting_node - swing_duration) / weight_shift_duration);
-        center_of_mass.position.x = shift_progress * max_x_com;
+        double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
+        if (m_counter == 0) {
+            center_of_mass.position.x = 0;
+        } else {
+            center_of_mass.position.x = shift_progress * max_x_com;
+        }        
         center_of_mass.position.y = shift_progress * max_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10);
-        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), max_y_velocity, 10);
-        center_of_mass.velocity.z = 0;
+        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
+        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), max_y_velocity, 10.0);
+        center_of_mass.velocity.z = 0.0;
     }
     return center_of_mass;
-
 }
 
 geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
@@ -98,7 +108,6 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
     double min_y_zmp = 0.0;
     double max_x_zmp = 0.2;
     double min_x_zmp = 0.0;
-
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
     int weight_shift_duration = m_shooting_nodes_per_step - swing_duration;
@@ -109,30 +118,36 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
     if (m_current_stance_foot == -1 && m_current_shooting_node < swing_duration) {
         zero_moment_point.point.x = min_x_zmp;
         zero_moment_point.point.y = max_y_zmp;
-        zero_moment_point.point.z = 0;
+        zero_moment_point.point.z = 0.0;
 
     } else if (m_current_stance_foot == -1 && m_current_shooting_node > swing_duration
         && m_current_shooting_node < m_shooting_nodes_per_step) {
-        double shift_progress = ((m_current_shooting_node - swing_duration) / weight_shift_duration);
-        zero_moment_point.point.x = shift_progress * max_x_zmp;
-        zero_moment_point.point.y = (1 - shift_progress) * max_y_zmp;
-        zero_moment_point.point.z = 0;
+        double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
+        if (m_counter == 0) {
+            zero_moment_point.point.x = 0;
+        } else {
+            zero_moment_point.point.x = shift_progress * max_x_zmp;
+        }
+        zero_moment_point.point.y = (1.0 - shift_progress) * max_y_zmp;
+        zero_moment_point.point.z = 0.0;
 
     } else if (m_current_stance_foot == 1 && m_current_shooting_node < swing_duration) {
         zero_moment_point.point.x = min_x_zmp;
         zero_moment_point.point.y = min_y_zmp;
-        zero_moment_point.point.z = 0;
+        zero_moment_point.point.z = 0.0;
 
     } else if (m_current_stance_foot == 1 && m_current_shooting_node > swing_duration
         && m_current_shooting_node < m_shooting_nodes_per_step) {
-        double shift_progress = ((m_current_shooting_node - swing_duration) / weight_shift_duration);
-        zero_moment_point.point.x = shift_progress * max_x_zmp;
+        double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
+        if (m_counter == 0) {
+            zero_moment_point.point.x = 0;
+        } else {
+            zero_moment_point.point.x = shift_progress * max_x_zmp;
+        }
         zero_moment_point.point.y = shift_progress * max_y_zmp;
-        zero_moment_point.point.z = 0;
-
+        zero_moment_point.point.z = 0.0;
     }
     return zero_moment_point;
-
 }
 
 geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
@@ -170,8 +185,7 @@ geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
 std_msgs::msg::Int32 StateEstimatorMock::get_current_stance_foot()
 {
     std_msgs::msg::Int32 msg_stance_foot;
-    if (m_current_shooting_node == 0) 
-    {
+    if (m_current_shooting_node == 124) {
         m_current_stance_foot = -m_current_stance_foot;
     }
     msg_stance_foot.data = m_current_stance_foot;
