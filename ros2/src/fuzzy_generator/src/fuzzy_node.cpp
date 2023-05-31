@@ -119,7 +119,7 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
     std::string leg = msg.leg;
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
-    RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
+    RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
 
     if(allowed_control_type == "position"){
         msg.position_weight = 1;

@@ -565,15 +565,6 @@ def generate_launch_description() -> LaunchDescription:
         ),
     )
 
-    fuzzy_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_hardware_interface"),
-                "fuzzy.launch.py",
-            )
-        ),
-    )
-
     nodes = [
         rqt_input_device,
         wireless_ipd_node,
@@ -589,8 +580,7 @@ def generate_launch_description() -> LaunchDescription:
         camera_aligned_frame_pub_node,
         back_sense_node,
         record_rosbags_action,
-        imu_nodes,
-        fuzzy_node
+        imu_nodes
     ]
 
     return LaunchDescription(declared_arguments + nodes)

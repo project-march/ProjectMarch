@@ -25,23 +25,23 @@ void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
         case -1:{
             left_leg.status = Stance;
             right_leg.status = Swing;
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
+            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
             break;
         }
         case 1:{
             left_leg.status = Swing;
             right_leg.status = Stance;
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
+            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
             break;
         }
         case 0:{ //this is the case when both feet are on the ground
             left_leg.status = Stance;
             right_leg.status = Stance;
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
+            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
             break;
         }
         default:{
-            RCLCPP_INFO(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
+            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
         }
     }
 }

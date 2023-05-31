@@ -510,8 +510,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         // DEBUG LINE
         #ifdef DEBUG
         RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
-        jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight,
-        LColor::GREEN);
+        jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
         return hardware_interface::return_type::ERROR;
         #endif
 
