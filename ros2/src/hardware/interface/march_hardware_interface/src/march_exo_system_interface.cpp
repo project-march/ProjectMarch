@@ -80,6 +80,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
                 hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
+        RCLCPP_FATAL((*logger_), "Joints do not have the right interface types");
         return hardware_interface::return_type::ERROR;
     }
 
@@ -508,14 +509,16 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // DEBUG LINE
         #ifdef DEBUG
-        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f", LColor::GREEN);
+        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
+        jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight,
+        LColor::GREEN);
         return hardware_interface::return_type::ERROR;
         #endif
 
         // Comment out for debugging:
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
-        jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
-            (float)jointInfo.torque_weight, (float)jointInfo.position_weight);
+        // jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
+        //     (float)jointInfo.torque_weight, (float)jointInfo.position_weight);
     }
 
     return hardware_interface::return_type::OK;

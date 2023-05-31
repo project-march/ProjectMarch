@@ -113,10 +113,14 @@ float MotorController::getIncrementalVelocity()
 float MotorController::getTorque()
 {
     if (!hasTorqueSensor()) {
-        throw error::HardwareException(
-            error::ErrorType::MISSING_ENCODER, "Cannot get torque, the motor controller has no torque sensor");
+        logger_->info("GetTorque: No torque sensor found, ignoring and returning 0 for now");
+        return 0.0f;
+        // throw error::HardwareException(
+        //     error::ErrorType::MISSING_ENCODER, "Cannot get torque, the motor controller has no torque sensor");
     }
-    return getTorqueUnchecked();
+    else{
+        return getTorqueUnchecked();
+    }
 }
 
 double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const
@@ -171,7 +175,8 @@ std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 std::unique_ptr<TorqueSensor>& MotorController::getTorqueSensor()
 {
     if (!hasTorqueSensor()) {
-        throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get torque sensor");
+        logger_->info("GetTorqueSensor: No torque sensor found, ignoring for now");
+        // throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get torque sensor");
     }
     return torque_sensor_;
 }

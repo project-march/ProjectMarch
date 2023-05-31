@@ -79,10 +79,14 @@ void Joint::enableActuation()
 void Joint::actuate(float target_position, float target_torque, float position_weight, float torque_weight)
 {
     float total_fuzzy = torque_weight + position_weight;
-    if (std::fabs(total_fuzzy - 1.0F) <= std::numeric_limits<float>::epsilon()) {
+    if (std::fabs(total_fuzzy - 1.0F) > std::numeric_limits<float>::epsilon()) {
         throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
-            "Total weight exceeds value of one for fuzzy position: %f and fuzzy torque: %f: ", position_weight,
+            "Total weight exceeds value of one. With fuzzy position: %f and fuzzy torque: %f: ", position_weight,
                                        torque_weight);
+    }
+    else {
+        logger_->info(logger_->fstring("[%s] Weights are okay: position weight: %f, torque weight:%f",
+         this->name_.c_str(), position_weight, torque_weight));
     }
     motor_controller_->actuateTorque(target_torque, torque_weight);
     motor_controller_->actuateRadians(target_position, position_weight);
@@ -169,18 +173,23 @@ void Joint::readEncoders()
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
-        torque_ = motor_controller_->getTorque();
-        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
-                motor_controller_->getTorqueSensor()->getMaxTorque());
+        if(motor_controller_->hasTorqueSensor()){
+            torque_ = motor_controller_->getTorque();
+            if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+                throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                    "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
+                    motor_controller_->getTorqueSensor()->getMaxTorque());
+            }
+        }
+        else{
+            // logger_->info(logger_->fstring("No reading the torque sensors"));
         }
     } else {
         if (time_between_last_update
             >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-            logger_->warn(
-                logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
-                    this->name_.c_str(), time_between_last_update.count()));
+            // logger_->warn(
+            //     logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
+            //         this->name_.c_str(), time_between_last_update.count()));
         }
     }
 }

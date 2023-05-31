@@ -50,7 +50,11 @@ std::chrono::nanoseconds ODrive::prepareActuation()
 void ODrive::enableActuation()
 {
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+        logger_->info("ODrive state from something else to closed loop control");
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+    }
+    else{
+        logger_->info("ODrive state already in closed loop control");
     }
 
     // TODO: Check if this is needed.
@@ -209,6 +213,7 @@ float ODrive::getOdriveTemperature()
 
 ODriveAxisState ODrive::getAxisState()
 {
+    logger_->info("Reading axis state");
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
