@@ -35,6 +35,8 @@ StateEstimator::StateEstimator()
 
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
 
+    m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("current_stance_foot", 100);
+
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
 
@@ -66,6 +68,15 @@ StateEstimator::StateEstimator()
     auto left_foot_size = this->get_parameter("footstep_estimator.left_foot.size").as_double_array();
     auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
     auto on_ground_threshold = this->get_parameter("footstep_estimator.on_ground_threshold").as_double();
+
+    for(auto sensor : *m_cop_estimator.get_sensors()){
+        if (sensor->name[0] == * "r"){
+            m_footstep_estimator.get_foot("r")->previous_foot_pressures.push_back(0.0);
+        }
+        if(sensor->name[0] == * "l"){
+            m_footstep_estimator.get_foot("l")->previous_foot_pressures.push_back(0.0);
+        }
+    }
     m_footstep_estimator.set_foot_size(left_foot_size[0], left_foot_size[1], "l");
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
@@ -297,6 +308,17 @@ void StateEstimator::publish_robot_frames()
     std_msgs::msg::Int32 stance_foot_msg;
     stance_foot_msg.data = m_current_stance_foot;
     m_stance_foot_publisher->publish(stance_foot_msg);
+
+    march_shared_msgs::msg::Feet impact_foot_msg;
+    impact_foot_msg.left_foot = 0;
+    impact_foot_msg.right_foot = 0;
+    if (m_footstep_estimator.get_foot("r")->impact_ground){
+        impact_foot_msg.right_foot = 1;
+    }
+    if(m_footstep_estimator.get_foot("l")->impact_ground){
+        impact_foot_msg.left_foot = 1;
+    }
+    m_foot_impact_publisher->publish(impact_foot_msg);
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;

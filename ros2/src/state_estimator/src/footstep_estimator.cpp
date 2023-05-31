@@ -63,11 +63,11 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
 {
     switch (*prefix) {
         case * "l":
-            return foot_left.on_ground;
+            return foot_left.weight_on_foot;
             break;
 
         case * "r":
-            return foot_right.on_ground;
+            return foot_right.weight_on_foot;
             break;
         default:
             RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
