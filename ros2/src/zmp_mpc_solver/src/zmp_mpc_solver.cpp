@@ -127,7 +127,6 @@ void ZmpSolver::update_current_foot()
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     }
-
 }
 
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
@@ -249,7 +248,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     int N = ZMP_PENDULUM_ODE_N;
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
-    printf("Shooting nodes: %i\n", N);  
+    printf("Shooting nodes: %i\n", N);
     // First, we do some checks so the mpc works
     if ((N - 1) % m_number_of_footsteps != 0) {
 
@@ -423,9 +422,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     // }
 
     if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
-            
-        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1
-            ) {
+
+        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1) {
         m_current_count = m_current_stance_foot;
         m_step_counter++;
         printf("weight shift is complete \n");
@@ -440,7 +438,7 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // correction so that current shooting node doesn't turn negative
     if (m_current_shooting_node == -1) {
-        m_current_shooting_node = (((N - 1)) / (m_number_of_footsteps))-1;
+        m_current_shooting_node = (((N - 1)) / (m_number_of_footsteps)) - 1;
     }
 
     int count = m_current_count;
@@ -660,7 +658,6 @@ inline int ZmpSolver::solve_zmp_mpc(
         std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     } else {
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
-
     }
 
     // here, we copy our array into the std::array

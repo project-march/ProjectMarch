@@ -36,7 +36,7 @@ double StateEstimatorMock::gaussian_dist(int currentStep, double targetValue, do
 
 march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
-    double max_y_com = 0.215;   // How much can the CoM move
+    double max_y_com = 0.215; // How much can the CoM move
     double min_y_com = 0.115;
     double max_x_com = 0.2;
     double min_x_com = 0.0;
@@ -184,10 +184,10 @@ geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
 std_msgs::msg::Int32 StateEstimatorMock::get_current_stance_foot()
 {
     std_msgs::msg::Int32 msg_stance_foot;
-    if (m_current_shooting_node == m_shooting_nodes_per_step-1) {
-        RCLCPP_INFO(rclcpp::get_logger("test stance foot"),"before %i", m_current_stance_foot);
+    if (m_current_shooting_node == m_shooting_nodes_per_step - 1) {
+        RCLCPP_INFO(rclcpp::get_logger("test stance foot"), "before %i", m_current_stance_foot);
         m_current_stance_foot = -m_current_stance_foot;
-        RCLCPP_INFO(rclcpp::get_logger("test stance foot"),"after %i", m_current_stance_foot);
+        RCLCPP_INFO(rclcpp::get_logger("test stance foot"), "after %i", m_current_stance_foot);
         m_counter++;
     }
     msg_stance_foot.data = m_current_stance_foot;

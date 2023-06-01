@@ -36,6 +36,5 @@ private:
     StateEstimatorMock m_state_estimator_mock;
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
-
 };
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_NODE_HPP
