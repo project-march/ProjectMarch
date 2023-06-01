@@ -38,7 +38,7 @@ double StateEstimatorMock::gaussian_dist(int currentStep, double targetValue, do
 march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
     double max_y_com = 0.28;
-    double min_y_com = 0.0;
+    double min_y_com = 0.14;
     double max_x_com = 0.2;
     double min_x_com = 0.0;
     double max_x_velocity = 0.1;
@@ -68,7 +68,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         } else {
             center_of_mass.position.x = shift_progress * max_x_com;
         }
-        center_of_mass.position.y = (1.0 - shift_progress) * max_y_com;
+        center_of_mass.position.y = (1.0 - shift_progress) * max_y_com + shift_progress * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
         center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
@@ -91,8 +91,8 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
             center_of_mass.position.x = 0;
         } else {
             center_of_mass.position.x = shift_progress * max_x_com;
-        }        
-        center_of_mass.position.y = shift_progress * max_y_com;
+        }
+        center_of_mass.position.y = shift_progress * max_y_com + (1 - shift_progress) * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
         center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
@@ -157,8 +157,8 @@ geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
     geometry_msgs::msg::Pose right_foot;
     geometry_msgs::msg::Pose left_foot;
 
-    if (m_current_stance_foot == -1) {
-        right_foot.position.x = 0.2;
+    if (m_current_stance_foot == -1 || m_current_stance_foot == 1 && m_current_shooting_node == 1) {
+        right_foot.position.x = 0.0;
         right_foot.position.y = 0.0;
         right_foot.position.z = 0.0;
         foot_positions.poses.push_back(right_foot);
@@ -168,13 +168,13 @@ geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
         left_foot.position.z = 0.0;
         foot_positions.poses.push_back(left_foot);
 
-    } else if (m_current_stance_foot == 1) {
+    } else if (m_current_stance_foot == 1 || m_current_stance_foot == -1 && m_current_shooting_node == 1) {
         right_foot.position.x = 0.0;
         right_foot.position.y = 0.0;
         right_foot.position.z = 0.0;
         foot_positions.poses.push_back(right_foot);
 
-        left_foot.position.x = 0.2;
+        left_foot.position.x = 0.0;
         left_foot.position.y = 0.33;
         left_foot.position.z = 0.0;
         foot_positions.poses.push_back(left_foot);

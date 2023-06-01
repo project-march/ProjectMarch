@@ -36,7 +36,7 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(8ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(150ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
@@ -63,9 +63,11 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    if (m_zmp_solver.get_current_stance_foot() == -1) {
+    if (m_zmp_solver.get_current_stance_foot() == -1
+        || m_zmp_solver.get_current_stance_foot() == 1 && m_zmp_solver.get_m_current_shooting_node().data == 1) {
         m_zmp_solver.set_previous_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    } else {
+    } else if (m_zmp_solver.get_current_stance_foot() == 1
+        || m_zmp_solver.get_current_stance_foot() == -1 && m_zmp_solver.get_m_current_shooting_node().data == 1) {
         m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
     }
 }

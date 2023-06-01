@@ -120,8 +120,8 @@ void ZmpSolver::set_current_foot(double x, double y)
 
 void ZmpSolver::update_current_foot()
 {
-    m_pos_foot_current[0] = m_x_trajectory[6];
-    m_pos_foot_current[1] = m_x_trajectory[8];
+    m_pos_foot_current[0] = m_x_trajectory[6 + 12];
+    m_pos_foot_current[1] = m_x_trajectory[8 + 12];
 }
 
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
@@ -385,24 +385,21 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
-    printf("step_counter %i\n", m_step_counter);
-    printf("current stance foot is %i\n", m_current_stance_foot);
-    printf("previous stance foot is %i\n", m_previous_stance_foot);
     // To decide what the timing value is depending on the current shooting node is
 
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
 
-    // check if swing leg is done for left foot as stance leg and right leg as swing leg
-    if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
-        && m_right_foot_on_ground == true) {
-        printf("passed the right foot on ground check \n");
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
-        && m_current_count == 1 && m_left_foot_on_ground == true) {
-        printf("passed the left foot on ground check \n");
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
-        printf("did not pass the foot on ground check \n");
-        m_current_shooting_node--;
-    }
+    // // check if swing leg is done for left foot as stance leg and right leg as swing leg
+    // if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
+    //     && m_right_foot_on_ground == true) {
+    //     printf("passed the right foot on ground check \n");
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
+    //     && m_current_count == 1 && m_left_foot_on_ground == true) {
+    //     printf("passed the left foot on ground check \n");
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
+    //     printf("did not pass the foot on ground check \n");
+    //     m_current_shooting_node--;
+    // }
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
@@ -414,9 +411,14 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_current_count = m_current_stance_foot;
         m_step_counter++;
         printf("weight shift is complete \n");
+        printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
         m_current_shooting_node--;
     }
+
+    printf("step_counter %i\n", m_step_counter);
+    printf("current stance foot is %i\n", m_current_stance_foot);
+    printf("current count is %i\n", m_current_count);
 
     // correction so that current shooting node doesn't turn negative
     if (m_current_shooting_node == -1) {
@@ -439,11 +441,13 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_timing_value = 0;
         count = -count;
         step_number += 1;
+        printf("now going into current_shooting node %i\n", m_current_shooting_node);
         printf("with timing value in else if %f\n", m_timing_value);
 
     } else {
         ;
     }
+    // printf("step number is %d\n", step_number);
 
     // ii is defined as the current stage
     for (int ii = 0; ii < N; ii++) {
@@ -563,8 +567,8 @@ inline int ZmpSolver::solve_zmp_mpc(
 
         // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
-    printf("current_shooting node is %i\n", m_current_shooting_node);
-    RCLCPP_INFO(rclcpp::get_logger(""), "Current shooting node is %i", m_current_shooting_node);
+    // printf("current_shooting node is %i\n", m_current_shooting_node);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "Current shooting node is %i", m_current_shooting_node);
     // Set terminal and initial constraints
 
     //
@@ -617,6 +621,11 @@ inline int ZmpSolver::solve_zmp_mpc(
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
+    printf("The current state is \n\n");
+
+    for (int i = 0; i < 12; i++) {
+        printf(" %f", xtraj[i]);
+    }
 
     printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
 
@@ -671,6 +680,8 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     ZMP_pendulum_ode_acados_print_stats(acados_ocp_capsule);
 
+    // printf("the solution x is %f\n:", m_x_trajectory[6+12]);
+    // printf("the solution y is %f\n:", m_x_trajectory[8+12]);
     printf("\nSolver info:\n");
     printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n", sqp_iter, NTIMINGS, min_time * 1000,
         kkt_norm_inf);

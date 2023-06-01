@@ -435,12 +435,12 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     double* lbx0 = lubx0;
     double* ubx0 = lubx0 + NBX0;
     // change only the non-zero elements:
-    lbx0[3] = 0.33;
-    ubx0[3] = 0.33;
-    lbx0[5] = 0.33;
-    ubx0[5] = 0.33;
-    lbx0[8] = 0.33;
-    ubx0[8] = 0.33;
+    lbx0[3] = 0.1;
+    ubx0[3] = 0.1;
+    lbx0[5] = 0.05;
+    ubx0[5] = 0.05;
+    lbx0[9] = 0.33;
+    ubx0[9] = 0.33;
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "idxbx", idxbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
@@ -474,13 +474,13 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
 
     lh[0] = -0.31;
     lh[1] = -0.01;
-    lh[2] = -0.025;
-    lh[3] = -0.04;
+    lh[2] = -0.05;
+    lh[3] = -0.15;
 
     uh[0] = 0.31;
     uh[1] = 0.01;
-    uh[2] = 0.025;
-    uh[3] = 0.04;
+    uh[2] = 0.05;
+    uh[3] = 0.15;
 
     for (int i = 0; i < N; i++) {
         // nonlinear constraints for stages 0 to N-1
@@ -630,9 +630,9 @@ void ZMP_pendulum_ode_acados_create_7_set_nlp_out(ZMP_pendulum_ode_solver_capsul
 
     // initialize with x0
 
-    x0[3] = 0.33;
-    x0[5] = 0.33;
-    x0[8] = 0.33;
+    x0[3] = 0.1;
+    x0[5] = 0.05;
+    x0[9] = 0.33;
 
     double* u0 = xu0 + NX;
 
