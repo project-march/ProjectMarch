@@ -36,7 +36,7 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(150ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(15ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
@@ -101,7 +101,7 @@ void SolverNode::timer_callback()
         // printf("prev des%i\n", prev_des_footsteps);
     } else {
         if (*desired_footsteps != prev_des_footsteps) {
-            m_zmp_solver.set_m_current_shooting_node(100);
+            m_zmp_solver.set_m_current_shooting_node(200);
         }
         prev_des_footsteps = *desired_footsteps;
         m_zmp_solver.update_current_foot();

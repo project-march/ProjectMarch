@@ -18,7 +18,6 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "nav_msgs/msg/path.hpp"
-#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/bool.hpp"

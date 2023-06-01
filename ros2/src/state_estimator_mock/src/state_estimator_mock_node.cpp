@@ -25,13 +25,15 @@ StateEstimatorMockNode::StateEstimatorMockNode()
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
     m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
+
+    m_solving_timer = this->create_wall_timer(15ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
 }
 
 void StateEstimatorMockNode::current_shooting_node_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_state_estimator_mock.set_current_shooting_node(msg->data);
     RCLCPP_INFO(rclcpp::get_logger(""), "fake shooting node is %i", m_state_estimator_mock.get_current_shooting_node());
-    publishtrajectories();
+    // publishtrajectories();
 }
 
 void StateEstimatorMockNode::publishtrajectories()
