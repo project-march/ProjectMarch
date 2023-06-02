@@ -32,6 +32,7 @@
 #include <csignal>
 
 #define DEBUG
+#define TORQUEDEBUG
 
 using namespace march_hardware_interface_util;
 
@@ -270,7 +271,16 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
+
+            // TORQUEDEBUG LINE - this will start up the HWI with a torque of 0, instead of the current position, and in full torque mode
+//            #ifdef TORQUEDEBUG
+//            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.0f, 1.0f);
+//            #endif
+
+            // TORQUEDEBUG LINE - comment out below for torque testing
             jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 1, 0);
+
+
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
@@ -507,8 +517,8 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        jointInfo.effort_command_converted = converted_effort;
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
-        // DEBUG LINE
-        #ifdef DEBUG
+        // TORQUEDEBUG LINE - this will stop ROS from actuating
+        #ifdef TORQUEDEBUG
         RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
         return hardware_interface::return_type::ERROR;

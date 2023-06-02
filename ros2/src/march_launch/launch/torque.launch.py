@@ -74,6 +74,12 @@ def generate_launch_description() -> LaunchDescription:
             name='joint_trajectory_buffer_node',
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
+        Node(
+            package='torque_converter',
+            executable='torque_converter_node',
+            name='torque_converter_node',
+            # arguments=['--ros-args', '--log-level', 'debug']
+        ),
         rqt_input_device,
         march_control,
     ])

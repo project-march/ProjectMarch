@@ -29,6 +29,8 @@
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include <std_msgs/msg/float32.hpp>
 
+#define TORQUEDEBUG
+
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -85,6 +87,10 @@ struct JointInfo {
          */
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
+            #ifdef TORQUEDEBUG
+            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            return;
+            #endif
             setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
         }
 
@@ -96,7 +102,12 @@ struct JointInfo {
          */
         void direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
         {
+
             float torque = msg->data;
+            #ifdef TORQUEDEBUG
+            RCLCPP_FATAL(this->get_logger(), "Direct torque called with: %f", torque);
+            return;
+            #endif
 
             // We are setting the torque immediately
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "We are setting the torque directly to: %f", torque);
@@ -138,7 +149,9 @@ struct JointInfo {
                     jointInfo.position_weight = position_weight;
                 }
                 else{
-                    RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg...", jointInfo.name);
+                    RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg... We are likely using the TSU", jointInfo.name);
+                    jointInfo.torque_weight = torque_weight;
+                    jointInfo.position_weight = position_weight;
                 }
             }
         }
@@ -185,8 +198,6 @@ public:
 
     MARCH_HARDWARE_INTERFACE_PUBLIC
     std::vector<JointInfo>* getJointsInfo(){
-        RCLCPP_INFO((*logger_), "getting the joints here...");
-        RCLCPP_INFO((*logger_), "number of joints is: ", joints_info_.size());
         return &joints_info_ ;
     };
 

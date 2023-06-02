@@ -161,7 +161,7 @@ class InputDeviceController:
     def publish_direct_torque(self) -> None:
         """Publish a message on `direct_torque` to publish the torque."""
         self.publish_control_type("torque")
-        torque = 5.0 #TODO: change to reasonable value
+        torque = 0.1 #TODO: change to reasonable value
         self._node.get_logger().info("Publishing direct torque " + str(torque))
         self.direct_torque_pub.publish(
             Float32(
