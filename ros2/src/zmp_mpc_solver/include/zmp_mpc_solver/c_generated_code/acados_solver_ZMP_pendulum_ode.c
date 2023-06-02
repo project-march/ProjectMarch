@@ -256,10 +256,7 @@ ocp_nlp_dims* ZMP_pendulum_ode_acados_create_2_create_and_set_dimensions(ZMP_pen
         ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nbxe", &nbxe[i]);
     }
 
-    for (int i = 0; i < N; i++) {
-        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nh", &nh[i]);
-        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nsh", &nsh[i]);
-    }
+    for (int i = 0; i < N; i++) { }
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nh", &nh[N]);
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nsh", &nsh[N]);
     free(intNp1mem);
@@ -288,19 +285,6 @@ void ZMP_pendulum_ode_acados_create_3_create_and_set_functions(ZMP_pendulum_ode_
         capsule->__CAPSULE_FNC__.casadi_work = &__MODEL_BASE_FNC__##_work;                                             \
         external_function_param_casadi_create(&capsule->__CAPSULE_FNC__, 5);                                           \
     } while (false)
-
-    // constraints.constr_type == "BGH" and dims.nh > 0
-    capsule->nl_constr_h_fun_jac = (external_function_param_casadi*)malloc(sizeof(external_function_param_casadi) * N);
-    for (int i = 0; i < N; i++) {
-        MAP_CASADI_FNC(nl_constr_h_fun_jac[i], ZMP_pendulum_ode_constr_h_fun_jac_uxt_zt);
-    }
-    capsule->nl_constr_h_fun = (external_function_param_casadi*)malloc(sizeof(external_function_param_casadi) * N);
-    for (int i = 0; i < N; i++) {
-        MAP_CASADI_FNC(nl_constr_h_fun[i], ZMP_pendulum_ode_constr_h_fun);
-    }
-
-    MAP_CASADI_FNC(nl_constr_h_e_fun_jac, ZMP_pendulum_ode_constr_h_e_fun_jac_uxt_zt);
-    MAP_CASADI_FNC(nl_constr_h_e_fun, ZMP_pendulum_ode_constr_h_e_fun);
 
     // explicit ode
     capsule->forw_vde_casadi = (external_function_param_casadi*)malloc(sizeof(external_function_param_casadi) * N);
@@ -386,7 +370,7 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     if (new_time_steps) {
         ZMP_pendulum_ode_acados_update_time_steps(capsule, N, new_time_steps);
     } else { // all time_steps are identical
-        double time_step = 0.00796812749003984;
+        double time_step = 0.011976047904191616;
         for (int i = 0; i < N; i++) {
             ocp_nlp_in_set(nlp_config, nlp_dims, nlp_in, i, "Ts", &time_step);
             ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "scaling", &time_step);
@@ -435,12 +419,14 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     double* lbx0 = lubx0;
     double* ubx0 = lubx0 + NBX0;
     // change only the non-zero elements:
-    lbx0[3] = 0.33;
-    ubx0[3] = 0.33;
-    lbx0[5] = 0.33;
-    ubx0[5] = 0.33;
-    lbx0[8] = 0.33;
-    ubx0[8] = 0.33;
+    lbx0[3] = 0.17;
+    ubx0[3] = 0.17;
+    lbx0[4] = -0.5;
+    ubx0[4] = -0.5;
+    lbx0[5] = 0.17;
+    ubx0[5] = 0.17;
+    lbx0[9] = 0.33;
+    ubx0[9] = 0.33;
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "idxbx", idxbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
@@ -467,52 +453,7 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
 
     /* constraints that are the same for initial and intermediate */
 
-    // set up nonlinear constraints for stage 0 to N-1
-    double* luh = calloc(2 * NH, sizeof(double));
-    double* lh = luh;
-    double* uh = luh + NH;
-
-    lh[0] = -0.31;
-    lh[1] = -0.01;
-    lh[2] = -0.025;
-    lh[3] = -0.04;
-
-    uh[0] = 0.31;
-    uh[1] = 0.01;
-    uh[2] = 0.025;
-    uh[3] = 0.04;
-
-    for (int i = 0; i < N; i++) {
-        // nonlinear constraints for stages 0 to N-1
-        ocp_nlp_constraints_model_set(
-            nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun_jac", &capsule->nl_constr_h_fun_jac[i]);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun", &capsule->nl_constr_h_fun[i]);
-
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lh", lh);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "uh", uh);
-    }
-    free(luh);
-
     /* terminal constraints */
-
-    // set up nonlinear constraints for last stage
-    double* luh_e = calloc(2 * NHN, sizeof(double));
-    double* lh_e = luh_e;
-    double* uh_e = luh_e + NHN;
-
-    lh_e[0] = -0.01;
-    lh_e[1] = -0.01;
-
-    uh_e[0] = 0.01;
-    uh_e[1] = 0.01;
-
-    ocp_nlp_constraints_model_set(
-        nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun_jac", &capsule->nl_constr_h_e_fun_jac);
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun", &capsule->nl_constr_h_e_fun);
-
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "lh", lh_e);
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "uh", uh_e);
-    free(luh_e);
 }
 
 /**
@@ -630,9 +571,10 @@ void ZMP_pendulum_ode_acados_create_7_set_nlp_out(ZMP_pendulum_ode_solver_capsul
 
     // initialize with x0
 
-    x0[3] = 0.33;
-    x0[5] = 0.33;
-    x0[8] = 0.33;
+    x0[3] = 0.17;
+    x0[4] = -0.5;
+    x0[5] = 0.17;
+    x0[9] = 0.33;
 
     double* u0 = xu0 + NX;
 
@@ -806,9 +748,6 @@ int ZMP_pendulum_ode_acados_update_params(ZMP_pendulum_ode_solver_capsule* capsu
 
         // constraints
 
-        capsule->nl_constr_h_fun_jac[stage].set_param(capsule->nl_constr_h_fun_jac + stage, p);
-        capsule->nl_constr_h_fun[stage].set_param(capsule->nl_constr_h_fun + stage, p);
-
         // cost
         if (stage == 0) {
             capsule->ext_cost_0_fun.set_param(&capsule->ext_cost_0_fun, p);
@@ -832,9 +771,6 @@ int ZMP_pendulum_ode_acados_update_params(ZMP_pendulum_ode_solver_capsule* capsu
         capsule->ext_cost_e_fun_jac_hess.set_param(&capsule->ext_cost_e_fun_jac_hess, p);
 
         // constraints
-
-        capsule->nl_constr_h_e_fun_jac.set_param(&capsule->nl_constr_h_e_fun_jac, p);
-        capsule->nl_constr_h_e_fun.set_param(&capsule->nl_constr_h_e_fun, p);
     }
 
     return solver_status;
@@ -868,9 +804,6 @@ int ZMP_pendulum_ode_acados_update_params_sparse(
 
         // constraints
 
-        capsule->nl_constr_h_fun_jac[stage].set_param_sparse(capsule->nl_constr_h_fun_jac + stage, n_update, idx, p);
-        capsule->nl_constr_h_fun[stage].set_param_sparse(capsule->nl_constr_h_fun + stage, n_update, idx, p);
-
         // cost
         if (stage == 0) {
             capsule->ext_cost_0_fun.set_param_sparse(&capsule->ext_cost_0_fun, n_update, idx, p);
@@ -896,9 +829,6 @@ int ZMP_pendulum_ode_acados_update_params_sparse(
         capsule->ext_cost_e_fun_jac_hess.set_param_sparse(&capsule->ext_cost_e_fun_jac_hess, n_update, idx, p);
 
         // constraints
-
-        capsule->nl_constr_h_e_fun_jac.set_param_sparse(&capsule->nl_constr_h_e_fun_jac, n_update, idx, p);
-        capsule->nl_constr_h_e_fun.set_param_sparse(&capsule->nl_constr_h_e_fun, n_update, idx, p);
     }
 
     return 0;
@@ -952,14 +882,6 @@ int ZMP_pendulum_ode_acados_free(ZMP_pendulum_ode_solver_capsule* capsule)
     external_function_param_casadi_free(&capsule->ext_cost_e_fun_jac_hess);
 
     // constraints
-    for (int i = 0; i < N; i++) {
-        external_function_param_casadi_free(&capsule->nl_constr_h_fun_jac[i]);
-        external_function_param_casadi_free(&capsule->nl_constr_h_fun[i]);
-    }
-    free(capsule->nl_constr_h_fun_jac);
-    free(capsule->nl_constr_h_fun);
-    external_function_param_casadi_free(&capsule->nl_constr_h_e_fun_jac);
-    external_function_param_casadi_free(&capsule->nl_constr_h_e_fun);
 
     return 0;
 }

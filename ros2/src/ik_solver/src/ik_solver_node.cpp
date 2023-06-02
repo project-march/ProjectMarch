@@ -40,7 +40,7 @@ IkSolverNode::IkSolverNode()
     m_ik_solver.initialize_solver();
 
     // Initializing the timestep
-    declare_parameter("timestep", 100);
+    declare_parameter("timestep", 8);
     m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer = this->create_wall_timer(
@@ -200,13 +200,16 @@ void IkSolverNode::timer_callback()
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
         std::stringstream ss;
-        ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
+        // ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
+        // RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
+        // ss.clear();
+        // ss.str("");
+        Eigen::VectorXd solution_position
+            = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
+        ss << solution_position.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
         RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         ss.clear();
         ss.str("");
-        Eigen::VectorXd solution_position
-            = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
-
         publish_joint_states(
             std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 
@@ -230,6 +233,7 @@ void IkSolverNode::timer_callback()
 void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 {
     trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
+    trajectory_msgs::msg::JointTrajectoryPoint point_prev;
     trajectory_msgs::msg::JointTrajectoryPoint point;
     trajectory.joint_names.push_back("left_ankle");
     trajectory.joint_names.push_back("left_hip_aa");
@@ -243,6 +247,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     pinocchio::JointIndex index = 0;
 
     pinocchio::Model pinocchio_model = m_ik_solver.get_model();
+    std::vector<double> previous_joint_positions = m_ik_solver.get_joint_pos();
 
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
@@ -252,11 +257,15 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
     }
 
+    point_prev = point_prev = point_prev_saved;
+    point_prev.time_from_start.sec = 0.0;
+    point_prev.time_from_start.nanosec = 0.0;
     point.time_from_start.sec = 0;
-    point.time_from_start.nanosec = m_timestep * 1e9;
+    point.time_from_start.nanosec = 1 * m_timestep * 1e6;
+    trajectory.points.push_back(point_prev);
     trajectory.points.push_back(point);
     trajectory.header.stamp = this->get_clock()->now();
-
+    point_prev_saved = point;
     // RCLCPP_INFO(this->get_logger(), "size is %i", msg.position.size());
 
     m_joint_trajectory_publisher->publish(trajectory);

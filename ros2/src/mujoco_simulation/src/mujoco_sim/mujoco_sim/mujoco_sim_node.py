@@ -151,7 +151,7 @@ class MujocoSimNode(Node):
         if qpos_init is None:
             return
 
-        self.data.qpos[7:] = qpos_init
+        self.data.qpos[-8:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):

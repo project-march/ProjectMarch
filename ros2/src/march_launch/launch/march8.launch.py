@@ -163,6 +163,12 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_selection_node',
             name='gait_selection'
         ),
+        Node(
+            package='state_estimator_mock',
+            namespace='',
+            executable='state_estimator_mock_node',
+            name='state_estimator_mock',
+        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
             launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
