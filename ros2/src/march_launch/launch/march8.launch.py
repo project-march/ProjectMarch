@@ -132,12 +132,12 @@ def generate_launch_description() -> LaunchDescription:
         #     executable='bezier_visualization_node',
         #     name='bezier_visualization',
         # ),
-        # Node(
-        #     package='footstep_generator',
-        #     namespace='',
-        #     executable='footstep_generator_node',
-        #     name='footstep_generator'
-        # ),
+        Node(
+            package='footstep_generator',
+            namespace='',
+            executable='footstep_generator_node',
+            name='footstep_generator'
+        ),
         # Node(
         #     package='swing_leg_trajectory_generator',
         #     namespace='',
