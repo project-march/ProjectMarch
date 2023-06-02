@@ -154,7 +154,6 @@ class MujocoSimNode(Node):
         self.data.qpos[-8:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
-    
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
 
