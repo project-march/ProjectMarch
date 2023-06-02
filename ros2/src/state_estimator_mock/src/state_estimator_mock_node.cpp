@@ -29,8 +29,7 @@ StateEstimatorMockNode::StateEstimatorMockNode()
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
     // m_joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("measured_joint_states", 100);
 
-
-    m_solving_timer = this->create_wall_timer(15ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
+    m_solving_timer = this->create_wall_timer(1ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
 }
 
 // void StateEstimatorMockNode::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
@@ -54,6 +53,7 @@ void StateEstimatorMockNode::current_shooting_node_callback(std_msgs::msg::Int32
 
 void StateEstimatorMockNode::publishtrajectories()
 {
+
     m_com_pos_publisher->publish(m_state_estimator_mock.get_current_com());
     m_zmp_pos_publisher->publish(m_state_estimator_mock.get_current_zmp());
     m_foot_pos_publisher->publish(m_state_estimator_mock.get_previous_foot());

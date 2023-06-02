@@ -30,6 +30,7 @@ private:
     int m_current_stance_foot;
     int m_shooting_nodes_per_step;
     int m_counter;
+    int m_previous_shooting_node;
 
     double m_step_duration;
     double m_center_of_mass_height;

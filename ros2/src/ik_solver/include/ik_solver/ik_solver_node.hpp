@@ -55,7 +55,6 @@ private:
 
     std::vector<std::string> m_joint_names;
     trajectory_msgs::msg::JointTrajectoryPoint point_prev_saved;
-
 };
 
 #endif
