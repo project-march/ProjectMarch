@@ -75,6 +75,22 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
     }
 }
 
+bool FootstepEstimator::get_foot_impact(const char* prefix)
+{
+    switch (*prefix) {
+        case * "l":
+            return foot_left.impact_ground;
+            break;
+
+        case * "r":
+            return foot_right.impact_ground;
+            break;
+        default:
+            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
+            return 0;
+    }
+}
+
 Foot* FootstepEstimator::get_foot(const char* prefix)
 {
     switch (*prefix) {

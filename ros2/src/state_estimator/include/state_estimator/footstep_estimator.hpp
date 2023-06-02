@@ -65,12 +65,14 @@ struct Foot {
                 }
                 if (std::find(heel.begin(), heel.end(), i->name.substr(2, i->name.size())) != heel.end()) {
                     measured_heel_middle_pressure += i->pressure;
-                    heel_middle_sensor_amount ++;
-                }    
+                    heel_middle_sensor_amount++;
+                }
                 if (previous_foot_pressure != 0.0) {
                     delta_pressure = i->pressure - previous_foot_pressures.at(foot_sensor_amount);
                     measured_foot_pressure_derivative += delta_pressure;
+                    previous_foot_pressures.at(foot_sensor_amount) = i->pressure;
                 }
+                previous_foot_pressures.at(foot_sensor_amount) = i->pressure;
                 foot_sensor_amount++;
             }
         }
@@ -78,25 +80,26 @@ struct Foot {
         // NOTE: There might be added 2 more derivatives for toes-middle and heel-middle.
 
         // Values for a KoenGait.
-        foot_threshold = 2.85;
-        derivative_treshold = -0.05;
-        toes_middle_threshold = 2.95;
-        heel_middle_threshold = 2.75;
+        // foot_threshold = 2.85;
+        // derivative_treshold = -0.05;
+        // toes_middle_threshold = 2.95;
+        // heel_middle_threshold = 2.75;
 
         // Values for a GroundGait. NOTE: these values are going to be changed.
-//        foot_threshold = 3.0;
-//        derivative_treshold = -0.05;
-//        toes_middle_threshold = 0.0;
-//        heel_middle_threshold = 0.0;
+        foot_threshold = 3.0;
+        derivative_treshold = -0.05;
+        toes_middle_threshold = 0.0;
+        heel_middle_threshold = 0.0;
 
         if (measured_foot_pressure <= 0.00001 || measured_foot_pressure > 10000) {
             weight_on_foot = false;
+            impact_ground = false;
             return;
         }
 
-        weight_on_foot = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
-                    (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_sensor_amount ||
-                    (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
+        weight_on_foot = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold
+            || (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_threshold
+            || (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
         impact_ground = (measured_foot_pressure_derivative / foot_sensor_amount <= derivative_treshold);
     };
 };
@@ -108,6 +111,7 @@ public:
     void set_foot_size(double, double, const char*);
     void update_feet(const std::vector<PressureSensor*>*);
     bool get_foot_on_ground(const char*);
+    bool get_foot_impact(const char*);
     void set_threshold(double);
     Foot* get_foot(const char*);
     void set_footstep_positions(geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec);

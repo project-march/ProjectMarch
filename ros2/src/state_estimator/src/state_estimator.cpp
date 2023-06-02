@@ -35,7 +35,7 @@ StateEstimator::StateEstimator()
 
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
 
-    m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("current_stance_foot", 100);
+    m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("foot_impact", 100);
 
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
@@ -69,11 +69,11 @@ StateEstimator::StateEstimator()
     auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
     auto on_ground_threshold = this->get_parameter("footstep_estimator.on_ground_threshold").as_double();
 
-    for(auto sensor : *m_cop_estimator.get_sensors()){
-        if (sensor->name[0] == * "r"){
+    for (auto sensor : *m_cop_estimator.get_sensors()) {
+        if (sensor->name[0] == *"r") {
             m_footstep_estimator.get_foot("r")->previous_foot_pressures.push_back(0.0);
         }
-        if(sensor->name[0] == * "l"){
+        if (sensor->name[0] == *"l") {
             m_footstep_estimator.get_foot("l")->previous_foot_pressures.push_back(0.0);
         }
     }
@@ -285,10 +285,10 @@ void StateEstimator::publish_robot_frames()
 
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
-            m_current_stance_foot = m_current_stance_foot;
-        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
-            && m_current_stance_foot != 1) {
+        // if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
+        //     m_current_stance_foot = m_current_stance_foot;
+        // }
+        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
         } else if (foot_positions.poses[0].position.x <= foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {
@@ -304,6 +304,8 @@ void StateEstimator::publish_robot_frames()
     else if (!m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")
         && m_current_stance_foot != 1) {
         m_current_stance_foot = 1;
+    } else if (!m_footstep_estimator.get_foot_on_ground("l") && !m_footstep_estimator.get_foot_on_ground("r")) {
+        m_current_stance_foot = 0;
     }
     std_msgs::msg::Int32 stance_foot_msg;
     stance_foot_msg.data = m_current_stance_foot;
@@ -312,10 +314,12 @@ void StateEstimator::publish_robot_frames()
     march_shared_msgs::msg::Feet impact_foot_msg;
     impact_foot_msg.left_foot = 0;
     impact_foot_msg.right_foot = 0;
-    if (m_footstep_estimator.get_foot("r")->impact_ground){
+    if (m_footstep_estimator.get_foot_impact("r")) {
+        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact right true");
         impact_foot_msg.right_foot = 1;
     }
-    if(m_footstep_estimator.get_foot("l")->impact_ground){
+    if (m_footstep_estimator.get_foot_impact("l")) {
+        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact left true");
         impact_foot_msg.left_foot = 1;
     }
     m_foot_impact_publisher->publish(impact_foot_msg);
