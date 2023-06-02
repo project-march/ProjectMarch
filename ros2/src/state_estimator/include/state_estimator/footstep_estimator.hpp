@@ -74,11 +74,20 @@ struct Foot {
                 foot_sensor_amount++;
             }
         }
-        // we have 8 sensors, so we divide by 1
-        foot_threshold = 2.7;
-        derivative_treshold = -0.1;
-        toes_middle_threshold = 2.74;
-        heel_middle_threshold = 2.55;
+
+        // NOTE: There might be added 2 more derivatives for toes-middle and heel-middle.
+
+        // Values for a KoenGait.
+        foot_threshold = 2.85;
+        derivative_treshold = -0.05;
+        toes_middle_threshold = 2.95;
+        heel_middle_threshold = 2.75;
+
+        // Values for a GroundGait. NOTE: these values are going to be changed.
+//        foot_threshold = 3.0;
+//        derivative_treshold = -0.05;
+//        toes_middle_threshold = 0.0;
+//        heel_middle_threshold = 0.0;
 
         if (measured_foot_pressure <= 0.00001 || measured_foot_pressure > 10000) {
             weight_on_foot = false;
