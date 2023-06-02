@@ -22,6 +22,7 @@ find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 # find_package(<dependency> REQUIRED)
 include_directories(include)
 
@@ -39,7 +40,7 @@ ament_target_dependencies(
         "march_shared_msgs"
         "geometry_msgs"
         "std_msgs"
-        
+        "sensor_msgs"
 )
 
 add_executable(state_estimator_mock_node src/state_estimator_mock_node.cpp src/state_estimator_mock.cpp
@@ -54,6 +55,7 @@ ament_target_dependencies(
         "march_shared_msgs"
         "geometry_msgs"
         "std_msgs"
+        "sensor_msgs"
 )
 
 # Install launch files.

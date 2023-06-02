@@ -85,7 +85,7 @@ class MujocoSimNode(Node):
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.0004
+        self.TIME_STEP_MJC = 0.004
         self.model.opt.timestep = self.TIME_STEP_MJC
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
@@ -151,9 +151,10 @@ class MujocoSimNode(Node):
         if qpos_init is None:
             return
 
-        self.data.qpos[7:] = qpos_init
+        self.data.qpos[-8:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
+    
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
 

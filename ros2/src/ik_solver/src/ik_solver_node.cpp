@@ -40,7 +40,7 @@ IkSolverNode::IkSolverNode()
     m_ik_solver.initialize_solver();
 
     // Initializing the timestep
-    declare_parameter("timestep", 100);
+    declare_parameter("timestep", 8);
     m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer = this->create_wall_timer(
@@ -210,7 +210,6 @@ void IkSolverNode::timer_callback()
         RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         ss.clear();
         ss.str("");
-        solution_position << 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0;
         publish_joint_states(
             std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 
@@ -253,19 +252,20 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
         // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
-        point_prev.positions.push_back(previous_joint_positions[pinocchio_model.joints[index].idx_q()]);
         point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         // RCLCPP_INFO(this->get_logger(), "publishing position %f, which is equal to %f",
         // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
     }
 
+    point_prev = point_prev = point_prev_saved;
+    point_prev.time_from_start.sec = 0.0;
+    point_prev.time_from_start.nanosec = 0.0;
     point.time_from_start.sec = 0;
-    point.time_from_start.nanosec = 2 * m_timestep * 1e6;
-    point_prev.time_from_start.nanosec = m_timestep * 1e6;
+    point.time_from_start.nanosec = 1 * m_timestep * 1e6;
     trajectory.points.push_back(point_prev);
     trajectory.points.push_back(point);
     trajectory.header.stamp = this->get_clock()->now();
-
+    point_prev_saved = point;
     // RCLCPP_INFO(this->get_logger(), "size is %i", msg.position.size());
 
     m_joint_trajectory_publisher->publish(trajectory);

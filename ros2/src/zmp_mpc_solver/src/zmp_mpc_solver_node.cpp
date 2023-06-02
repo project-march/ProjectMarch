@@ -33,6 +33,14 @@ SolverNode::SolverNode()
         "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
     m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
         "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
+    
+    geometry_msgs::msg::Pose prev_foot_pose_container;
+
+    m_prev_foot_msg.header.frame_id = "map";
+    prev_foot_pose_container.position.x = 0.0;
+    prev_foot_pose_container.position.y = 0.0;
+    prev_foot_pose_container.position.z = 0.0;
+    m_prev_foot_msg.poses.push_back(prev_foot_pose_container);
 
     // timer_callback();
 
@@ -55,21 +63,28 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
 {
     // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
     // OR SOMETHING FOR CURRENT FEET POSITIONS.
-    desired_footsteps = msg;
-    m_zmp_solver.set_candidate_footsteps(desired_footsteps);
+    m_desired_footsteps = msg;
+    m_zmp_solver.set_candidate_footsteps(m_desired_footsteps);
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
 
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    if (m_zmp_solver.get_current_stance_foot() == -1
-        || m_zmp_solver.get_current_stance_foot() == 1 && m_zmp_solver.get_m_current_shooting_node().data == 1) {
+    if ((m_zmp_solver.get_current_stance_foot() == -1)
+        || (m_zmp_solver.get_current_stance_foot() == 1 && m_zmp_solver.get_m_current_shooting_node().data == 1)) {
         m_zmp_solver.set_previous_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    } else if (m_zmp_solver.get_current_stance_foot() == 1
-        || m_zmp_solver.get_current_stance_foot() == -1 && m_zmp_solver.get_m_current_shooting_node().data == 1) {
+    } else if ((m_zmp_solver.get_current_stance_foot() == 1)
+        || (m_zmp_solver.get_current_stance_foot() == -1 && m_zmp_solver.get_m_current_shooting_node().data == 1)) {
         m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
     }
+
+    // double m_desired_previous_foot_x;
+    // double m_desired_previous_foot_y;
+    // if (m_desired_previous_foot_x)
+    // if (m_zmp_solver.get_current_stance_foot() == -1) {
+    //     m_zmp_solver.set_previous_foot(m_desired_previous_foot_x,m_desired_previous_foot_y);
+    // }
 }
 
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
@@ -96,14 +111,14 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 
 void SolverNode::timer_callback()
 {
-    if (!(desired_footsteps)) {
+    if (!(m_desired_footsteps)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
-        // printf("prev des%i\n", prev_des_footsteps);
+        // printf("prev des%i\n", m_prev_des_footsteps);
     } else {
-        if (*desired_footsteps != prev_des_footsteps) {
+        if (*m_desired_footsteps != m_prev_des_footsteps) {
             m_zmp_solver.set_m_current_shooting_node(200);
         }
-        prev_des_footsteps = *desired_footsteps;
+        m_prev_des_footsteps = *m_desired_footsteps;
         m_zmp_solver.update_current_foot();
         m_zmp_solver.set_current_state();
         int solver_status = m_zmp_solver.solve_step();
@@ -229,8 +244,10 @@ void SolverNode::timer_callback()
             m_zmp_visualizer_publisher->publish(zmp_path);
             m_com_trajectory_publisher->publish(com_msg);
 
-            if (abs(foot_msg.poses[0].position.x) > 1e-4) { // only publish when foot is moving
+
+            if (abs(foot_msg.poses[0].position.y - m_prev_foot_msg.poses[0].position.y) > 10e-2) { // only publish when foot is changing
                 m_final_feet_publisher->publish(foot_msg);
+                m_prev_foot_msg = foot_msg;
             }
             m_current_shooting_node_publisher->publish(m_zmp_solver.get_m_current_shooting_node());
             m_zmp_solver.update_current_shooting_node();
