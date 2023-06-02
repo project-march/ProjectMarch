@@ -35,12 +35,11 @@
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
     <!-- Include all macro files    -->
-    <xacro:include filename="macros/safety_limits.xacro"/>
-    <xacro:include filename="macros/pressure_sole.xacro"/>
-    <xacro:include filename="macros/frame_part.xacro"/>
-    <xacro:include filename="macros/joint.xacro"/>
-    <xacro:include filename="macros/configurable_joint.xacro"/>
-
+    <xacro:include filename="../macros/safety_limits.xacro"/>
+    <xacro:include filename="../macros/pressure_sole.xacro"/>
+    <xacro:include filename="../macros/frame_part.xacro"/>
+    <xacro:include filename="../macros/joint.xacro"/>
+    <xacro:include filename="../macros/configurable_joint.xacro"/>
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
@@ -455,7 +454,7 @@
         <origin xyz="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:include filename="camera/_d435.urdf.xacro"/>
+    <xacro:include filename="../camera/_d435.urdf.xacro"/>
 
     <xacro:sensor_d435 
             name="camera_front_right" 
