@@ -29,7 +29,7 @@ struct Foot {
     double foot_threshold = 0.0;
     double toes_middle_threshold = 2.74;
     double heel_middle_threshold = 2.55;
-    double derivative_treshold = -0.1;
+    double derivative_treshold = 0.0;
     double previous_foot_pressure;
     std::vector<double> previous_foot_pressures;
     bool weight_on_foot;
@@ -65,8 +65,8 @@ struct Foot {
                 }
                 if (std::find(heel.begin(), heel.end(), i->name.substr(2, i->name.size())) != heel.end()) {
                     measured_heel_middle_pressure += i->pressure;
-                    heel_middle_sensor_amount++;
-                }
+                    heel_middle_sensor_amount ++;
+                }    
                 if (previous_foot_pressure != 0.0) {
                     delta_pressure = i->pressure - previous_foot_pressures.at(foot_sensor_amount);
                     measured_foot_pressure_derivative += delta_pressure;
@@ -86,21 +86,21 @@ struct Foot {
         // heel_middle_threshold = 2.75;
 
         // Values for a GroundGait. NOTE: these values are going to be changed.
-        foot_threshold = 3.0;
-        derivative_treshold = -0.05;
-        toes_middle_threshold = 0.0;
-        heel_middle_threshold = 0.0;
+       foot_threshold = 3.0;
+       derivative_treshold = -0.05;
+       toes_middle_threshold = 0.0;
+       heel_middle_threshold = 0.0;
 
         if (measured_foot_pressure <= 0.00001 || measured_foot_pressure > 10000) {
             weight_on_foot = false;
-            impact_ground = false;
             return;
         }
+        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "average derivative is %f", measured_foot_pressure_derivative);
 
-        weight_on_foot = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold
-            || (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_threshold
-            || (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
-        impact_ground = (measured_foot_pressure_derivative / foot_sensor_amount <= derivative_treshold);
+        weight_on_foot = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
+                    (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_threshold ||
+                    (measured_toes_middle_pressure / toes_middle_sensor_amount) <= toes_middle_threshold);
+        impact_ground = (measured_foot_pressure_derivative <= derivative_treshold);
     };
 };
 
