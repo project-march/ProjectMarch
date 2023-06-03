@@ -41,5 +41,7 @@ private:
 
     void publish_path_visualization();
     SwingLegTrajectoryGenerator m_swing_leg_generator;
+
+    double prev_step_size;
 };
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_NODE_HPP

@@ -9,6 +9,7 @@ using namespace std::chrono_literals;
 
 SwingLegTrajectoryGeneratorNode::SwingLegTrajectoryGeneratorNode()
     : Node("swing_leg_trajectory_generator_node")
+    , prev_step_size(0.0)
 {
     m_publish_curve = this->create_publisher<geometry_msgs::msg::PoseArray>("bezier_trajectory", 10);
     m_points_subscription = this->create_subscription<geometry_msgs::msg::PoseArray>(
@@ -75,10 +76,11 @@ void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::Po
     auto steps = msg->poses;
     auto begin_foot = steps.at(0);
     auto end_foot = steps.at(2);
-    RCLCPP_INFO(rclcpp::get_logger("end_foot"), "end foot %f", end_foot.position.x);
-    m_swing_leg_generator.set_step_length(end_foot.position.x - begin_foot.position.x);
+    double step_size = prev_step_size + steps.at(0).position.x;
+    m_swing_leg_generator.set_step_length(step_size);
 
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
+    prev_step_size = steps.at(0).position.x;
 }
 
 void SwingLegTrajectoryGeneratorNode::publish_path_visualization()

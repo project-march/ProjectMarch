@@ -101,11 +101,11 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // WEIGHTS
     double left_weight = 0.1;
     double right_weight = 0.1;
-    double CoM_weight = 0.1;
+    double CoM_weight = 0.0;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
 
-    double CoM_gains = 1.0 / dt;
+    double CoM_gains = 0.0 / dt;
     double left_gains = 1.0 / dt;
     double right_gains = 1.0 / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
@@ -120,7 +120,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     right_foot_error.segment(3, 3)
         = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
-    // com_pos_error.segment(0,3) = state_desired.com_pos.segment(0,3) + m_body_com;
+    com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
 
     // Print the error vectors
     // std::stringstream ss;
@@ -173,20 +173,41 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // Add the constraints
     Eigen::MatrixXd constrained_joints = Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
-    // int free_joint_start = 0;
-    // for(int i=free_joint_start;i<free_joint_start+6;i++)
-    //     {
-    //         constrained_joints(i,i) = 0;
-    //     }
+    int free_joint_start = 0;
+    for (int i = free_joint_start; i < free_joint_start + 3; i++) {
+        // constrained_joints(i,i) = 0;
+    }
+
+    std::stringstream ss;
+    // ss << constrained_joints.format(Eigen::IOFormat(m_model.nv, 0, ", ", "\n", "", ""));
+    // RCLCPP_INFO(rclcpp::get_logger(""), "constraint matrix is :\n" + ss.str() + "\n");
+    // ss.clear();
+    // ss.str("");
 
     Eigen::VectorXd joint_upper_lim = (m_joint_lim_max.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
     Eigen::VectorXd joint_lower_lim = (m_joint_lim_min.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
-    joint_upper_lim.segment(0, 3) << 0.1 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(0, 3) << -0.1 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(0, 3) << 0.0001 * Eigen::VectorXd::Ones(3);
+    joint_lower_lim.segment(0, 3) << -0.0001 * Eigen::VectorXd::Ones(3);
 
     joint_upper_lim.segment(3, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
     joint_lower_lim.segment(3, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
     // RCLCPP_INFO(rclcpp::get_logger(""), "size is %i", m_joint_lim_max.size());
+
+    // ss << constrained_joints.format(Eigen::IOFormat(constrained_joints.size(), 0, ", ", "\n", "", ""));
+    // // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
+    // RCLCPP_INFO(rclcpp::get_logger(""), "Matrix joint lim is is :\n" + ss.str());
+    // ss.clear();
+    // ss.str("");
+    ss << joint_upper_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
+    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
+    // RCLCPP_INFO(rclcpp::get_logger(""), "upper joint lim is :\n" + ss.str());
+    ss.clear();
+    ss.str("");
+    ss << joint_lower_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
+    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
+    // RCLCPP_INFO(rclcpp::get_logger(""), "lower joint lim is :\n" + ss.str());
+    ss.clear();
+    ss.str("");
 
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized constraints");
 
@@ -201,9 +222,9 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // We now swap the dummy foot based on the fixed Jacobian.
     if (stance_foot == -1) {
-        A_dummy = J_left_foot;
+        // A_dummy = J_left_foot;
     } else {
-        A_dummy = J_right_foot;
+        // A_dummy = J_right_foot;
     }
 
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);
