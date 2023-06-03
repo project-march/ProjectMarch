@@ -33,7 +33,7 @@ SolverNode::SolverNode()
         "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
     m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
         "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
-    
+
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
     m_prev_foot_msg.header.frame_id = "map";
@@ -244,8 +244,8 @@ void SolverNode::timer_callback()
             m_zmp_visualizer_publisher->publish(zmp_path);
             m_com_trajectory_publisher->publish(com_msg);
 
-
-            if (abs(foot_msg.poses[0].position.y - m_prev_foot_msg.poses[0].position.y) > 10e-2) { // only publish when foot is changing
+            if (abs(foot_msg.poses[0].position.y - m_prev_foot_msg.poses[0].position.y)
+                > 10e-2) { // only publish when foot is changing
                 m_final_feet_publisher->publish(foot_msg);
                 m_prev_foot_msg = foot_msg;
             }
