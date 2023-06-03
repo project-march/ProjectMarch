@@ -272,13 +272,17 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
 
+            // Set the first weights
+            jointInfo.position_weight = 1.0f;
+            jointInfo.torque_weight = 0.0f;
+
             // TORQUEDEBUG LINE - this will start up the HWI with a torque of 0, instead of the current position, and in full torque mode
 //            #ifdef TORQUEDEBUG
 //            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.0f, 1.0f);
 //            #endif
 
             // TORQUEDEBUG LINE - comment out below for torque testing
-            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 1, 0);
+            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, position_weight, torque_weight);
 
 
 
@@ -288,9 +292,11 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
+
         }
 
         weight_node = std::make_shared<WeightNode>();
+        weight_node->joints_info_ = getJointsInfo();
         executor_.add_node(weight_node);
         std::thread([this]() {
             executor_.spin();
@@ -519,7 +525,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // TORQUEDEBUG LINE - this will stop ROS from actuating
         #ifdef TORQUEDEBUG
-        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
+        RCLCPP_FATAL_ONCE((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
         return hardware_interface::return_type::ERROR;
         #endif

@@ -30,6 +30,19 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch rqt input device if not rqt_input:=false
+    torque_converter = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("torque_converter"),
+                "launch",
+                "torque_converter_launch.py",
+            )
+        )
+    )
+    # endregion
+    
+    
+    # region Launch torque converter
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -45,6 +58,7 @@ def generate_launch_description() -> LaunchDescription:
             ("testing", "true"),
         ],
     )
+    # endregion
 
     return LaunchDescription([
         Node(
@@ -62,6 +76,19 @@ def generate_launch_description() -> LaunchDescription:
                 {"test_rotational": test_rotational}
             ],
         ),
+        Node(
+            package='fuzzy_generator',
+            executable='fuzzy_node',
+            name='fuzzy_node',
+            # arguments=['--ros-args', '--log-level', 'debug']
+        ),
+        Node(
+            package='joint_trajectory_buffer',
+            executable='joint_trajectory_buffer_node',
+            name='joint_trajectory_buffer_node',
+            # arguments=['--ros-args', '--log-level', 'debug']
+        ),
+        # torque_converter,
         rqt_input_device,
         march_control,
     ])
