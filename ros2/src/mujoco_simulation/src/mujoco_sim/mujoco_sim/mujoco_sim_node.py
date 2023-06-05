@@ -110,9 +110,12 @@ class MujocoSimNode(Node):
 
         self.set_init_joint_qpos(None)
 
+        joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
+        for index, name in enumerate(self.actuator_names):
+            joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
-                               f"set desired positions to {joint_val}")
+                               f"set desired positions to {joint_val_dict}")
 
         # This list of controllers contains all active controllers
         self.controller_mode = 0
@@ -124,7 +127,7 @@ class MujocoSimNode(Node):
                 self.get_parameter("position.P").value,
                 self.get_parameter("position.D").value,
                 self.get_parameter("position.I").value,
-                joint_desired=joint_val,
+                joint_desired=joint_val_dict,
             )
         )
         self.controller.append(
@@ -185,7 +188,10 @@ class MujocoSimNode(Node):
         """
         if msg.reset == 1:
             self.msg_queue = Queue()
-        self.msg_queue.put(msg.trajectory.desired.positions)
+        joint_pos_dict = {}
+        for i, name in enumerate(msg.trajectory.joint_names):
+            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        self.msg_queue.put(joint_pos_dict)
 
     def sim_step(self):
         """This function performs the simulation update.
