@@ -47,8 +47,8 @@ StateEstimatorMockNode::StateEstimatorMockNode()
 void StateEstimatorMockNode::current_shooting_node_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_state_estimator_mock.set_current_shooting_node(msg->data);
-    RCLCPP_INFO(rclcpp::get_logger(""), "fake shooting node is %i", m_state_estimator_mock.get_current_shooting_node());
-    // publishtrajectories();
+    // RCLCPP_INFO(rclcpp::get_logger(""), "fake shooting node is %i",
+    // m_state_estimator_mock.get_current_shooting_node()); publishtrajectories();
 }
 
 void StateEstimatorMockNode::publishtrajectories()

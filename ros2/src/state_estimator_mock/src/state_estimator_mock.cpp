@@ -52,7 +52,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         center_of_mass.position.x = min_x_com;
         center_of_mass.position.y = max_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
-        RCLCPP_INFO(rclcpp::get_logger(""), "pannenkoeks %f\n", center_of_mass.position.x);
+        // RCLCPP_INFO(rclcpp::get_logger(""), "pannenkoeks %f\n", center_of_mass.position.x);
 
         center_of_mass.velocity.x = 0.0;
         center_of_mass.velocity.y = 0.0;
@@ -62,7 +62,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         && (m_current_shooting_node <= m_shooting_nodes_per_step)) {
         double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
 
-        RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
+        // RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
         if (m_counter == 0) {
             center_of_mass.position.x = 0;
         } else {
@@ -79,7 +79,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         center_of_mass.position.x = min_x_com;
         center_of_mass.position.y = min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
-        RCLCPP_INFO(rclcpp::get_logger(""), "pannenkoeks %f\n", center_of_mass.position.x);
+        // RCLCPP_INFO(rclcpp::get_logger(""), "pannenkoeks %f\n", center_of_mass.position.x);
 
         center_of_mass.velocity.x = 0.0;
         center_of_mass.velocity.y = 0.0;
@@ -93,7 +93,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         } else {
             center_of_mass.position.x = shift_progress * max_x_com;
         }
-        RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
+        // RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
 
         center_of_mass.position.y = shift_progress * max_y_com + (1 - shift_progress) * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
@@ -193,7 +193,7 @@ std_msgs::msg::Int32 StateEstimatorMock::get_current_stance_foot()
         && m_previous_shooting_node != m_current_shooting_node) {
         m_counter++;
         m_current_stance_foot = -m_current_stance_foot;
-        RCLCPP_INFO(rclcpp::get_logger(""), "stance foot %i\n", m_current_stance_foot);
+        // RCLCPP_INFO(rclcpp::get_logger(""), "stance foot %i\n", m_current_stance_foot);
     }
     m_previous_shooting_node = m_current_shooting_node;
 

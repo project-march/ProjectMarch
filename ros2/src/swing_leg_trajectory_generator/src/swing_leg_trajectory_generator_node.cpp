@@ -44,8 +44,6 @@ void SwingLegTrajectoryGeneratorNode::subscriber_callback(geometry_msgs::msg::Po
     for (const auto& point : m_swing_leg_generator.get_curve().points) {
         RCLCPP_INFO(rclcpp::get_logger("bezier callback"), "Point AAAA: x=%f, y=%f, z=%f", point.x, point.y, point.z);
     }
-
-    publish_path_visualization();
 }
 
 void SwingLegTrajectoryGeneratorNode::publish_zero_swing()
@@ -81,6 +79,7 @@ void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::Po
 
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
     prev_step_size = steps.at(0).position.x;
+    publish_path_visualization();
 }
 
 void SwingLegTrajectoryGeneratorNode::publish_path_visualization()

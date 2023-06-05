@@ -101,11 +101,11 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // WEIGHTS
     double left_weight = 0.1;
     double right_weight = 0.1;
-    double CoM_weight = 0.0;
+    double CoM_weight = 1.0;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
 
-    double CoM_gains = 0.0 / dt;
+    double CoM_gains = 1.0 / dt;
     double left_gains = 1.0 / dt;
     double right_gains = 1.0 / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
@@ -186,8 +186,11 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     Eigen::VectorXd joint_upper_lim = (m_joint_lim_max.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
     Eigen::VectorXd joint_lower_lim = (m_joint_lim_min.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
-    joint_upper_lim.segment(0, 3) << 0.0001 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(0, 3) << -0.0001 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(0, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
+    joint_lower_lim.segment(0, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
+
+    joint_upper_lim.segment(0, 1) << 0.01;
+    joint_lower_lim.segment(0, 1) << -0.01;
 
     joint_upper_lim.segment(3, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
     joint_lower_lim.segment(3, 3) << -1e-10 * Eigen::VectorXd::Ones(3);

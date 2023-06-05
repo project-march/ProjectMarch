@@ -173,9 +173,9 @@ def generate_launch_description() -> LaunchDescription:
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
             launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
-        ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+        # ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator_launch.py']),
             launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),

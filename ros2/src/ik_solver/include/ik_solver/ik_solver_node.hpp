@@ -8,8 +8,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/int32.hpp"
-#include "trajectory_msgs//msg/joint_trajectory.hpp"
-#include "trajectory_msgs//msg/joint_trajectory_point.hpp"
+#include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include <chrono>
 #include <cstdio>
 
@@ -27,6 +28,7 @@ private:
     void reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void publish_joint_states(std::vector<double>);
+    void publish_ik_visualizations();
 
     void timer_callback();
 
@@ -40,6 +42,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_publisher;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_ik_visualizer;
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
 
