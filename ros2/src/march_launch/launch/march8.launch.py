@@ -3,7 +3,7 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -14,8 +14,9 @@ def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
-    simulation = LaunchConfiguration("simulation", default='false')
+    simulation = LaunchConfiguration("simulation", default='true')
     rosbags = LaunchConfiguration("rosbags", default='true')
+    airgait = LaunchConfiguration("airgait", default='true')
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -25,16 +26,10 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     DeclareLaunchArgument(
-        name="control_yaml",
-        default_value="effort_control/march7_control.yaml",
-        description="The controller yaml file to use loaded in through the controller manager "
-                    "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-    )
-
-    DeclareLaunchArgument(
-        name="simulation",
+        name="airgait",
         default_value="false",
-        description="Whether the exoskeleton is ran physically or in simulation.",
+        description="Whether we want to do an airgait or not",
+        choices=["true", "false"],
     )
 
     # region Launch Mujoco
@@ -127,36 +122,30 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     return LaunchDescription([
-        # Node(
-        #     package='bezier_visualization',
-        #     executable='bezier_visualization_node',
-        #     name='bezier_visualization',
-        # ),
         Node(
-            package='footstep_generator',
-            namespace='',
-            executable='footstep_generator_node',
-            name='footstep_generator'
+            package='bezier_visualization',
+            executable='bezier_visualization_node',
+            name='bezier_visualization',
         ),
-        # Node(
-        #     package='swing_leg_trajectory_generator',
-        #     namespace='',
-        #     executable='swing_leg_trajectory_generator_node',
-        #     name='swing_leg_generator'
-        # ),
-        # Node(
-        #     package='zmp_mpc_solver',
-        #     namespace='',
-        #     executable='zmp_mpc_solver',
-        #     name='zmp_mpc_solver',
-        # ),
-        # Node(
-        #     package='ik_solver_buffer',
-        #     namespace='',
-        #     executable='ik_solver_buffer_node',
-        #     name='ik_solver_buffer',
-        #     parameters=[('timestep', str(trajectory_dt))],
-        # ),
+        Node(
+            package='swing_leg_trajectory_generator',
+            namespace='',
+            executable='swing_leg_trajectory_generator_node',
+            name='swing_leg_generator',
+        ),
+        Node(
+            package='zmp_mpc_solver',
+            namespace='',
+            executable='zmp_mpc_solver',
+            name='zmp_mpc_solver',
+        ),
+        Node(
+            package='ik_solver_buffer',
+            namespace='',
+            executable='ik_solver_buffer_node',
+            name='ik_solver_buffer',
+            parameters=[('timestep', str(trajectory_dt))],
+        ),
         Node(
             package='state_machine',
             namespace='',
@@ -169,17 +158,26 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_selection_node',
             name='gait_selection'
         ),
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
-        #     launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
-        # ),
+        Node(
+            package='state_estimator_mock',
+            namespace='',
+            executable='state_estimator_mock_node',
+            name='state_estimator_mock',
+            condition=IfCondition(airgait),
+        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+            condition=UnlessCondition(airgait),
+
         ),
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator_launch.py']),
-        #     launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
-        # ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
+            launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator_launch.py']),
+            launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
+        ),
         mujoco_node,
         rqt_input_device,
         march_control,

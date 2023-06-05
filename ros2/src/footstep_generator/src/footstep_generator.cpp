@@ -27,15 +27,17 @@ void FootstepGenerator::publish_foot_placements(
 {
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();
-    auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
-    // ADD THE EMPTY REQUEST HERE
-    if (request->gait_type == 3) {
-        std_msgs::msg::Int32 msg;
-        msg.data = 0;
-        m_swing_trajectory_command_publisher->publish(msg);
+    if (request->gait_type != 1) {
+        auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
+        // ADD THE EMPTY REQUEST HERE
+        if (request->gait_type == 3) {
+            std_msgs::msg::Int32 msg;
+            msg.data = 0;
+            m_swing_trajectory_command_publisher->publish(msg);
+        }
+        m_publisher->publish(footsteps);
+        response->status = true;
     }
-    m_publisher->publish(footsteps);
-    response->status = true;
 }
 
 geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int stance_leg, int gait_type)
