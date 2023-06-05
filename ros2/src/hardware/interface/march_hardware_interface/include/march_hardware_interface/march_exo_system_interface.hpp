@@ -114,11 +114,16 @@ struct JointInfo {
 
             for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
                 if(jointInfo.torque_weight != 1.0 || jointInfo.position_weight != 0.0){
-                    RCLCPP_WARN(rclcpp::get_logger("weight_node"), "We seem to be not completely in torque control: pos weight %f, torque weight %f",
+                    RCLCPP_WARN(rclcpp::get_logger("weight_node"), "We seem to be not completely in torque control: pos weight %f, torque weight %f. \n so we will set it now to 0 pos and 1 torque",
                                 jointInfo.position_weight,
                                 jointInfo.torque_weight);
+                                                
+                // comment back in for correct torque control
+                jointInfo.position_weight = 0.0f;
+                jointInfo.torque_weight = 1.0f;
                 }
-                jointInfo.torque = torque;
+
+                jointInfo.target_torque = torque;
             }
         }
 

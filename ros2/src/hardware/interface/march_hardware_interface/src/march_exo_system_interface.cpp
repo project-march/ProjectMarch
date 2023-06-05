@@ -273,8 +273,8 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
 
             // Set the first weights
-            jointInfo.position_weight = 1.0f;
-            jointInfo.torque_weight = 0.0f;
+            // jointInfo.position_weight = 1.0f;
+            // jointInfo.torque_weight = 0.0f;
 
             // TORQUEDEBUG LINE - this will start up the HWI with a torque of 0, instead of the current position, and in full torque mode
 //            #ifdef TORQUEDEBUG
@@ -282,7 +282,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 //            #endif
 
             // TORQUEDEBUG LINE - comment out below for torque testing
-            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, position_weight, torque_weight);
+            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.9f, 0.1f);
 
 
 
@@ -525,15 +525,14 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // TORQUEDEBUG LINE - this will stop ROS from actuating
         #ifdef TORQUEDEBUG
-        RCLCPP_FATAL_ONCE((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
+        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
-        return hardware_interface::return_type::ERROR;
+        // return hardware_interface::return_type::ERROR;
         #endif
 
         // Comment out for debugging:
         // Here the assumption is that the value that is send to the joint trajectory controller is the right one
-        // jointInfo.joint.actuate((float)jointInfo.target_torque, (float)jointInfo.target_position,
-        //     (float)jointInfo.torque_weight, (float)jointInfo.position_weight);
+        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
     }
 
     return hardware_interface::return_type::OK;
