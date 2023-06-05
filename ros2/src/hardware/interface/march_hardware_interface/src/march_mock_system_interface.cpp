@@ -89,6 +89,10 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+            info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_state_info_[i].hw_velocity));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_state_info_[i].hw_effort));
 
         //      [TO DO] For now only a position state interface is created, later when more control types are added,
         //      this should be expanded.
@@ -120,8 +124,7 @@ std::vector<hardware_interface::CommandInterface> MarchMockSystemInterface::expo
 {
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (uint i = 0; i < info_.joints.size(); i++) {
-        command_interfaces.emplace_back(
-            hardware_interface::CommandInterface(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]));
+        command_interfaces.emplace_back(info_.joints[i].name, COMMAND_AND_STATE_TYPE, &hw_positions_[i]);
     }
     return command_interfaces;
 }
@@ -148,7 +151,15 @@ hardware_interface::return_type MarchMockSystemInterface::start()
             hw_info.hw_effort = 0;
         }
     }
+
+    comms = std::make_shared<SimCommunication>();
+    executor_.add_node(comms);
+    std::thread([this]() {
+        executor_.spin();
+    }).detach();
+
     status_ = hardware_interface::status::STARTED;
+
     RCLCPP_INFO((*logger_), "Mock System interface successfully started!, This should go well");
 
     return hardware_interface::return_type::OK;
@@ -169,6 +180,18 @@ hardware_interface::return_type MarchMockSystemInterface::stop()
  */
 hardware_interface::return_type MarchMockSystemInterface::read()
 {
+    auto new_pos = comms->get_pos();
+    for (size_t i = 0; i < new_pos.size(); i++) {
+        hw_state_info_[i].hw_position = new_pos.at(i);
+    }
+    auto new_vel = comms->get_pos();
+    for (size_t i = 0; i < new_pos.size(); i++) {
+        hw_state_info_[i].hw_velocity = new_pos.at(i);
+    }
+    auto new_eff = comms->get_pos();
+    for (size_t i = 0; i < new_pos.size(); i++) {
+        hw_state_info_[i].hw_effort = new_eff.at(i);
+    }
     return hardware_interface::return_type::OK;
 }
 

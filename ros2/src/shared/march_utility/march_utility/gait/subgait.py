@@ -9,7 +9,6 @@ import yaml
 from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContentError,
     SubgaitInterpolationError,
-    GaitError,
 )
 from march_utility.foot_classes.feet_state import FeetState
 from march_utility.utilities.duration import Duration
@@ -18,10 +17,8 @@ from march_utility.utilities.utility_functions import (
 )
 from march_utility.utilities.dimensions import InterpolationDimensions
 from trajectory_msgs import msg as trajectory_msg
-from urdf_parser_py import urdf
 
 from .joint_trajectory import JointTrajectory
-from .limits import Limits
 from .setpoint import Setpoint
 from ..exceptions.gait_exceptions import UnknownDimensionsError
 from ..utilities.dimensions import amount_of_subgaits, amount_of_parameters
@@ -43,7 +40,6 @@ class Subgait:
         subgait_name (:obj: str, optional): Name of the subgait, defaults to 'right_open'
         version (:obj: str, optional): Version of the subgait, defaults to 'First try'
         description (:obj: str, optional): Description of the subgait, defaults to 'Just a simple gait'
-        robot (:obj: urdf.Robot, optional): robot model to use, default is None
     Attributes:
         joints (List[JointTrajectory]): list containing joint trajectories for each joint
         duration (Duration): duration of the subgait
@@ -52,7 +48,6 @@ class Subgait:
         subgait_name (:obj: str, optional): Name of the subgait, defaults to 'right_open'
         version (:obj: str, optional): Version of the subgait, defaults to 'First try'
         description (:obj: str, optional): Description of the subgait, defaults to 'Just a simple gait'
-        robot (:obj: urdf.Robot, optional): robot model to use, default is None
     """
 
     joint_class = JointTrajectory
@@ -66,12 +61,10 @@ class Subgait:
         subgait_name: str = "right_open",
         version: str = "First try",
         description: str = "Just a simple gait",
-        robot: urdf.Robot = None,
     ) -> None:
         self.joints = joints
         self.gait_type = gait_type
         self.gait_name = gait_name
-        self.robot = robot
         self.subgait_name = subgait_name
         self.version = version
         self.description = str(description)
@@ -79,19 +72,14 @@ class Subgait:
 
     # region Create subgait
     @classmethod
-    def from_file(cls, robot: urdf.Robot, file_name: str) -> Subgait:
+    def from_file(cls, file_name: str) -> Subgait:
         """Extract sub gait data of the given yaml.
 
         Args:
-            robot (urdf.Robot): robot model to use
             file_name (str): name of the file
         Returns:
             Subgait: A populated Subgait object
-        Raises:
-            TypeError: if robot or file_name is not specified
         """
-        if robot is None:
-            raise TypeError("Robot is None, should be a valid urdf.Robot object")
         if file_name is None:
             raise TypeError("Filename is None, should be a string")
 
@@ -102,12 +90,11 @@ class Subgait:
         subgait_name = file_name.split("/")[-2]
         version = file_name.split("/")[-1].replace(SUBGAIT_SUFFIX, "")
 
-        return cls.from_dict(robot, subgait_dict, gait_name, subgait_name, version)
+        return cls.from_dict(subgait_dict, gait_name, subgait_name, version)
 
     @classmethod
     def from_name_and_version(
         cls,
-        robot: urdf.Robot,
         gait_dir: str,
         gait_name: str,
         subgait_name: str,
@@ -116,7 +103,6 @@ class Subgait:
         """Load subgait based from file(s) based on name and version.
 
         Args:
-            robot (urdf.Robot): The robot corresponding to the given subgait file
             gait_dir (str): The directory with all the gaits
             gait_name (str): The name of the corresponding gait
             subgait_name (str): The name of the subgait to load
@@ -129,11 +115,10 @@ class Subgait:
             base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
             base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
             if base_version == other_version:
-                return cls.from_file(robot, base_version_path)
+                return cls.from_file(base_version_path)
             else:
                 other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
                 return cls.from_two_files_interpolated(
-                    robot,
                     base_version_path,
                     other_version_path,
                     parameter,
@@ -150,7 +135,6 @@ class Subgait:
                     subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
                 )
             return cls.from_four_files_interpolated(
-                robot,
                 version_path_list,
                 parameter_list,
                 use_foot_position=True,
@@ -158,12 +142,11 @@ class Subgait:
 
         else:
             subgait_version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
-            return cls.from_file(robot, subgait_version_path)
+            return cls.from_file(subgait_version_path)
 
     @classmethod
     def from_four_files_interpolated(
         cls,
-        robot: urdf.Robot,
         version_path_list: List[str, str, str, str],
         parameter_list: List[float, float],
         use_foot_position: bool = False,
@@ -171,7 +154,6 @@ class Subgait:
         """Extract two subgaits from files and interpolate.
 
         Args:
-            robot (urdf.robot): The robot corresponding to the given subgait file
             version_path_list (List[str]): The .yaml file names of the subgaits to interpolate
             parameter_list (List[float]): The parameters to use for interpolation. Should all be between 0 and 1
             use_foot_position (:obj: bool, optional): Determine whether the interpolation should be done on the
@@ -181,7 +163,7 @@ class Subgait:
         """
         subgaits = []
         for i in range(4):
-            subgaits.append(cls.from_file(robot, version_path_list[i]))
+            subgaits.append(cls.from_file(version_path_list[i]))
         return cls.interpolate_four_subgaits(
             subgaits,
             parameter_list,
@@ -191,7 +173,6 @@ class Subgait:
     @classmethod
     def from_two_files_interpolated(
         cls,
-        robot: urdf.Robot,
         first_file_name: str,
         second_file_name: str,
         first_parameter: float,
@@ -200,7 +181,6 @@ class Subgait:
         """Extract two subgaits from files and interpolate.
 
          Args:
-            robot (urdf.robot): The robot corresponding to the given subgait file.
             first_file_name (str): The .yaml file name of the base subgait.
             second_file_name (str): The .yaml file name of the subgait.
             first_parameter (float): The parameter to use for interpolation. Should be 0 <= parameter <= 1.
@@ -210,14 +190,13 @@ class Subgait:
         Returns:
             Subgait: A populated Subgait object.
         """
-        base_subgait = cls.from_file(robot, first_file_name)
-        other_subgait = cls.from_file(robot, second_file_name)
+        base_subgait = cls.from_file(first_file_name)
+        other_subgait = cls.from_file(second_file_name)
         return cls.interpolate_subgaits(base_subgait, other_subgait, first_parameter, use_foot_position)
 
     @classmethod
     def from_dict(
         cls,
-        robot: urdf.Robot,
         subgait_dict: dict,
         gait_name: str,
         subgait_name: str,
@@ -226,7 +205,6 @@ class Subgait:
         """List parameters from the yaml file in organized lists.
 
         Args:
-            robot (urdf.Robot): The robot corresponding to the given subgait file
             subgait_dict (dict): The dictionary extracted from the yaml file
             gait_name (str): Name of the parent gait
             subgait_name (str): Name of the child (sub)gait
@@ -234,17 +212,10 @@ class Subgait:
         Returns:
             Subgait: A populated Subgait object
         """
-        if robot is None:
-            raise GaitError("Cannot create gait without a loaded robot.")
-
         duration = Duration(nanoseconds=subgait_dict["duration"])
         joint_list = []
         for name, points in sorted(subgait_dict["joints"].items(), key=lambda item: item[0]):
-            urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
-            if urdf_joint is None or urdf_joint.type == "fixed":
-                continue
-            limits = Limits.from_urdf_joint(urdf_joint)
-            joint_list.append(cls.joint_class.from_setpoint_dict(name, limits, points, duration))
+            joint_list.append(cls.joint_class.from_setpoint_dict(name, points, duration))
         subgait_type = subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
         subgait_description = subgait_dict["description"] if subgait_dict.get("description") else ""
 
@@ -255,8 +226,7 @@ class Subgait:
             gait_name,
             subgait_name,
             version,
-            subgait_description,
-            robot,
+            subgait_description
         )
 
     # endregion

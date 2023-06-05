@@ -8,8 +8,8 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
-from march_shared_msgs.msg import PointStampedList
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseArray
 
 NODE_NAME = "bezier_plotter"
 
@@ -43,7 +43,7 @@ class BezierCurve(Node):
         super().__init__(NODE_NAME)
 
         self.publish_points = self.create_publisher(
-            PointStampedList,
+            PoseArray,
             '/bezier_points',
             10
         )
@@ -55,6 +55,17 @@ class BezierCurve(Node):
         self.figure = plt.figure("Bezier Curve")
         # TODO: if these points have good values
         self.points = {1: 0, 25: 50, 75: 50, 99: 0}
+
+        msg = PoseArray()
+        for key in sorted(self.points):
+            p = Pose()
+            p.position.x = float(key)
+            p.position.y = float(self.points[key])
+            p.position.z = 0.0
+            msg.poses.append(p)
+        self.publish_points.publish(msg)
+        self.get_logger().info("Published Bezier points at startup")
+
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
 
@@ -91,8 +102,6 @@ class BezierCurve(Node):
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
-
-        self.get_logger().info("click")
         if event.button == 1 and event.inaxes in [self.axes]:
             # Check if the click is close to a point
             distance_threshold = 2.0
@@ -150,12 +159,14 @@ class BezierCurve(Node):
         """
         self.dragging_point = None
         plt.ion()
-        msg = PointStampedList()
-        for key in self.points:
-            p = PointStamped()
-            p.point.x = float(key)
-            p.point.y = float(self.points[key])
-            msg.points.append(p)
+        msg = PoseArray()
+        for key in sorted(self.points):
+            p = Pose()
+            p.position.x = float(key)
+            p.position.y = float(self.points[key])
+            p.position.z = 0.0
+            msg.poses.append(p)
+        self.get_logger().info("Publish new Bezier points")
         self.publish_points.publish(msg)
         plt.ioff()
 

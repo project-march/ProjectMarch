@@ -10,6 +10,9 @@ alias sros2='source ~/march/ros2/install/local_setup.bash'
 alias cm='cd ~/march/'
 alias cm2='cd ~/march/ros2/'
 
+# Create xml needed for mujoco
+alias parse_xml='cd ~/march/ros2/src/shared/march_description/urdf/ && python3 march8_v0_generate.py && python3 march7_v1_generate.py && cm2'
+
 # Build and run ROS2
 alias march_build_ros2='sfox && cm2 && colcon build --symlink-install'
 alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simulation.launch.py'
@@ -30,8 +33,9 @@ alias mb2='march_build_ros2'
 alias mb='march_build'
 alias mba='march_build_all'
 alias sim2='march_run_ros2_sim'
-alias sim='march_run_ros2_sim'
-alias mujoco='sim mujoco:=true model_to_load_mujoco:="march.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias mujoco_guus='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march7_v1.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
+alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
@@ -54,6 +58,12 @@ alias multiplot="sfox && sros2 && ros2 launch march_plotjuggler_launcher plotjug
 alias recon2="sfox && sros2 && ros2 run rqt_reconfigure rqt_reconfigure"
 alias left="sfox && sros2 && ros2 topic echo /march/foot_position/left | grep -A 3 'displacement'"
 alias right="sfox && sros2 && ros2 topic echo /march/foot_position/right | grep -A 3 'displacement'"
+
+# run tetst setup
+alias run_test_setup_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_rotational rviz:=false gait_directory:=test_joint_rotational_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_rotational_control.yaml'\'''
+alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_linear rviz:=false gait_directory:=test_joint_linear_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_linear_control.yaml'\'''
+
+alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_pressure_sole rviz:=false realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'''
 
 
 # Clean march builds

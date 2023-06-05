@@ -32,7 +32,6 @@ def generate_launch_description() -> LaunchDescription:
         - "[march_fake_covid]/launch/march_fake_covid.launch.py"
         - "[march_safety]/launch/march_safety.launch.py"
         - "[march_robot_information]/launch/robot_information.launch.py"
-        - "[march_fake_sensor_data]/launch/march_fake_sensor_data.launch.py"
 
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
@@ -48,7 +47,6 @@ def generate_launch_description() -> LaunchDescription:
     # General arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
-    control_yaml = LaunchConfiguration("control_yaml")
     gazebo_control_yaml = LaunchConfiguration("gazebo_control_yaml")
     rosbags = LaunchConfiguration("rosbags")
     rviz = LaunchConfiguration("rviz")
@@ -78,7 +76,7 @@ def generate_launch_description() -> LaunchDescription:
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march.xml')
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation_arguments = [
         DeclareLaunchArgument(
@@ -105,7 +103,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="model_to_load_mujoco",
-            default_value="march.xml",
+            default_value="march8_v0.xml",
             description="What model mujoco should load",
         ),
     ]
@@ -128,12 +126,6 @@ def generate_launch_description() -> LaunchDescription:
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
     timer_period = LaunchConfiguration("timer_period")
-
-    # Fake sensor data
-    fake_sensor_data = LaunchConfiguration("fake_sensor_data")
-    minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
-    maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
-    # endregion
 
     declared_arguments = simulation_arguments + [
         # GENERAL ARGUMENTS
@@ -158,7 +150,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="true",
+            default_value="false",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
         ),
@@ -249,7 +241,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument(
             name="gait_directory",
-            default_value="airgait_vi",
+            default_value="sit_stand_m8",
             description="The directory in which the gait files to use are located, " "relative to the gait_package.",
         ),
         DeclareLaunchArgument(
@@ -509,23 +501,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch Fake temperature sensor data node
-    fake_sensor_data_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_fake_sensor_data"),
-                "launch",
-                "march_fake_sensor_data.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("minimum_fake_temperature", minimum_fake_temperature),
-            ("maximum_fake_temperature", maximum_fake_temperature),
-        ],
-        condition=IfCondition(fake_sensor_data),
-    )
-    # endregion
-
     # region Launch Gazebo
     gazebo_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -554,7 +529,7 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[("simulation", simulation), ("control_yaml", control_yaml), ("rviz", rviz)],
+        launch_arguments=[("simulation", "true"), ("control_yaml", "mujoco/march7_control.yaml"), ("rviz", rviz)],
     )
     # endregion
 
@@ -598,7 +573,6 @@ def generate_launch_description() -> LaunchDescription:
         gait_preprocessor_node,
         safety_node,
         robot_information_node,
-        fake_sensor_data_node,
         gazebo_node,
         mujoco_node,
         march_control,

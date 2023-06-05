@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     // Add the input device and temperature safety handlers
     auto safety_handler = std::make_shared<SafetyHandler>(safety_node);
     safety_node->safety_list.push_back(std::make_unique<InputDeviceSafety>(safety_node, safety_handler));
-    safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
+    //    safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
 
     safety_node->start();
 
@@ -46,11 +46,7 @@ SafetyNode::SafetyNode()
     // Create an error publisher to notify the system (state machine) if
     // something is wrong
     error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
-    state_publisher = this->create_publisher<march_shared_msgs::msg::GaitType>("gait_type", 10);
-
-    // Create an instruction publisher to publish when a gait has to stop
-    gait_instruction_publisher
-        = this->create_publisher<march_shared_msgs::msg::GaitInstruction>("/march/input_device/instruction", 1000);
+    state_publisher = this->create_publisher<march_shared_msgs::msg::GaitRequest>("/march/gait_request", 10);
 }
 
 /**

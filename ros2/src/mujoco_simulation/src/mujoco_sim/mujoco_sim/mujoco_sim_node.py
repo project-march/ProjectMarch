@@ -1,5 +1,4 @@
 """Author: MVIII."""
-
 import mujoco
 import rclpy
 from ament_index_python.packages import get_package_share_directory
@@ -70,7 +69,7 @@ class MujocoSimNode(Node):
         super().__init__("mujoco_sim")
         self.declare_parameter("model_toload")
 
-        self.SIM_TIMESTEP_ROS = 0.1
+        self.SIM_TIMESTEP_ROS = 0.008
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -79,16 +78,17 @@ class MujocoSimNode(Node):
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
-        self.model = mujoco.MjModel.from_xml_path(self.file_path)
+        self.model: mujoco.MjModel = mujoco.MjModel.from_xml_path(self.file_path)
 
         self.data = mujoco.MjData(self.model)
 
         self.actuator_names = get_actuator_names(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.001
+        self.TIME_STEP_MJC = 0.004
         self.model.opt.timestep = self.TIME_STEP_MJC
-
+        # We need these options to compare mujoco and ros time, so they have the same reference starting point
+        self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
 
@@ -98,16 +98,36 @@ class MujocoSimNode(Node):
             parameters=[
                 ("position.P", None),
                 ("position.D", None),
+                ("position.I", None),
                 ("torque.P", None),
                 ("torque.D", None),
             ],
         )
+
+        # Create an instance of that data extractor.
+        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+                                                           self.model.sensor_adr)
+
+        self.set_init_joint_qpos(None)
+
+        joint_val_dict = {}
+        joint_val = self.sensor_data_extraction.get_joint_pos()
+        for index, name in enumerate(self.actuator_names):
+            joint_val_dict[name] = joint_val[index]
+        self.get_logger().info(f"Keeping initial joint positions, "
+                               f"set desired positions to {joint_val_dict}")
+
         # This list of controllers contains all active controllers
         self.controller_mode = 0
         self.controller = []
         self.controller.append(
             PositionController(
-                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+                self,
+                self.model,
+                self.get_parameter("position.P").value,
+                self.get_parameter("position.D").value,
+                self.get_parameter("position.I").value,
+                joint_desired=joint_val_dict,
             )
         )
         self.controller.append(
@@ -116,10 +136,6 @@ class MujocoSimNode(Node):
             )
         )
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
-
-        # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
-                                                           self.model.sensor_adr)
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
@@ -130,8 +146,16 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.01
+        self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
+
+    def set_init_joint_qpos(self, qpos_init):
+        """Set initial qpos to make eo not falling over in sim."""
+        if qpos_init is None:
+            return
+
+        self.data.qpos[-8:] = qpos_init
+        mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
@@ -148,12 +172,12 @@ class MujocoSimNode(Node):
         """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = msg.desired.positions
+            joint_pos = msg
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
         except Empty:
-            self.get_logger().warn("NO NEW TRAJECTORY FOUND")
+            self.get_logger().debug("NO NEW TRAJECTORY FOUND")
 
     def writer_callback(self, msg):
         """Callback function for the writing service.
@@ -164,7 +188,10 @@ class MujocoSimNode(Node):
         """
         if msg.reset == 1:
             self.msg_queue = Queue()
-        self.msg_queue.put(msg.trajectory)
+        joint_pos_dict = {}
+        for i, name in enumerate(msg.trajectory.joint_names):
+            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        self.msg_queue.put(joint_pos_dict)
 
     def sim_step(self):
         """This function performs the simulation update.
@@ -175,12 +202,11 @@ class MujocoSimNode(Node):
         vs the time in ROS, so we can update the control inputs on time
         """
         time_current = self.get_clock().now()
-        time_difference = (time_current - self.time_last_updated).to_msg()
-        mj_time_current = self.data.time
+        time_shifted = (time_current - self.ros_first_updated).to_msg()
 
-        time_difference_withseconds = time_difference.nanosec / 1e9 + time_difference.sec
+        time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        while self.data.time - mj_time_current <= time_difference_withseconds:
+        while self.data.time <= time_difference_withseconds:
             mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
@@ -218,7 +244,6 @@ class MujocoSimNode(Node):
         state_msg.position = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
-        self.get_logger().info(str(state_msg))
 
         sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
 

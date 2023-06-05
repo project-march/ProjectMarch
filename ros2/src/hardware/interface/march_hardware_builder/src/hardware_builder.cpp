@@ -104,11 +104,27 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
 
     auto motor_controller = HardwareBuilder::createMotorController(*logger, joint_config["motor_controller"]);
 
+    std::array<double, 3> position_pid;
+    auto pos_pids = joint_config["pids"]["position"];
+    position_pid[0] = pos_pids["p"].as<double>();
+    position_pid[1] = pos_pids["i"].as<double>();
+    position_pid[2] = pos_pids["d"].as<double>();
+
+    std::array<double, 3> torque_pid;
+    auto tor_pids = joint_config["pids"]["torque"];
+    torque_pid[0] = tor_pids["p"].as<double>();
+    torque_pid[1] = tor_pids["i"].as<double>();
+    torque_pid[2] = tor_pids["d"].as<double>();
+
     if (joint_config["temperatureges"]) {
         auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
-        return { joint_name, net_number, std::move(motor_controller), std::move(ges), logger };
+        return { joint_name, net_number, std::move(motor_controller),
+            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
+            std::move(ges), logger };
     } else {
-        return { joint_name, net_number, std::move(motor_controller), logger };
+        return { joint_name, net_number, std::move(motor_controller),
+            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
+            logger };
     }
 }
 
@@ -322,6 +338,7 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
 
 std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML::Node& pressure_soles_config) const
 {
+    logger_->info("Createing pressure solesssss");
     std::vector<march::PressureSole> pressure_soles;
     if (!pressure_soles_config) {
         return pressure_soles;
@@ -335,6 +352,7 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML
 
 march::PressureSole HardwareBuilder::createPressureSole(const YAML::Node& pressure_sole_config) const
 {
+    logger_->info("Creating pressure soleeeee");
     HardwareBuilder::validateRequiredKeysExist(
         pressure_sole_config, HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
 

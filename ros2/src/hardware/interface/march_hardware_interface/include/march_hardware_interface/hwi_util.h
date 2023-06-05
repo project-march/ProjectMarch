@@ -137,13 +137,19 @@ inline void repeat_function_on_joints_until_timeout(const string& function_goal,
     const optional<std::function<void(march::Joint&)>>& function_when_timeout = nullopt,
     const chrono::nanoseconds sleep_between_tries = std::chrono::seconds(1), const unsigned maximum_tries = 5)
 {
+    // RCLCPP_INFO((logger), "repeat_function_on_joints_until_timeout");
     vector<bool> is_ok;
     unsigned int amount_ok = 0;
     unsigned int amount_of_joints = joints.size();
-    is_ok.resize(amount_of_joints, /*__x=*/false);
-    RCLCPP_INFO(logger, "Trying to perform %s'%s'%s on joints: '%s' in %i tries. %sMight take %f seconds.",
-        LColor::BOLD, function_goal.c_str(), LColor::END, joint_vector_to_string(joints).c_str(), maximum_tries,
-        LColor::WARNING, sleep_between_tries.count() / 1000000000.0 * maximum_tries);
+    RCLCPP_INFO(logger, "There are %d joints to wait on", amount_of_joints);
+    if (amount_of_joints != 0) {
+        RCLCPP_INFO(logger, "There are %d joints to wait on", amount_of_joints);
+        is_ok.resize(amount_of_joints, /*__x=*/false);
+    }
+
+    // RCLCPP_INFO(logger, "Trying to perform %s'%s'%s on joints: '%s' in %i tries. %sMight take %f seconds.",
+    //     LColor::BOLD, function_goal.c_str(), LColor::END, joint_vector_to_string(joints).c_str(), maximum_tries,
+    //     LColor::WARNING, sleep_between_tries.count() / 1000000000.0 * maximum_tries);
     unsigned int num_tries = 0;
     for (; num_tries < maximum_tries; num_tries++) {
         for (unsigned int i = 0; i < amount_of_joints; i++) {

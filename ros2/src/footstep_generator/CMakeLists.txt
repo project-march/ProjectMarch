@@ -27,7 +27,7 @@ include_directories(include)
 add_library(${PROJECT_NAME}
   STATIC
   include/${PROJECT_NAME}/footstep_generator.hpp
-  include/${PROJECT_NAME}/footstep_generator.cpp
+  src/footstep_generator.cpp
 )
 
 ament_target_dependencies(
@@ -38,7 +38,7 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
-add_executable(footstep_generator_node src/footstep_generator_node.cpp include/${PROJECT_NAME}/footstep_generator.cpp include/${PROJECT_NAME}/footstep_generator.hpp)
+add_executable(footstep_generator_node src/footstep_generator_node.cpp src/footstep_generator.cpp include/${PROJECT_NAME}/footstep_generator.hpp)
 target_include_directories(footstep_generator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
@@ -73,5 +73,11 @@ if(BUILD_TESTING)
     "geometry_msgs" 
     "march_shared_msgs")
 endif()
+
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()

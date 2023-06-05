@@ -30,7 +30,7 @@ class MujocoWriterNode(Node):
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.
         self.reset_subscription = self.create_subscription(
-            Bool, "/march/mujoco_reset_trajectory", self.reset_callback, 10
+            Bool, "/mujoco_reset_trajectory", self.reset_callback, 10
         )
         self.reset = False
         # self.subscription  # prevent unused variable warning
@@ -40,20 +40,22 @@ class MujocoWriterNode(Node):
 
         This callback is just a simple passthrough to keep the flow clear.
         """
-        msg_tosend = MujocoInput()
+        msg_to_send = MujocoInput()
         skip = False
+        if len(msg.desired.positions) == 0:
+            skip = True
         for i, x in enumerate(msg.desired.positions):
             if x != x:
                 skip = True
                 break
             else:
-                msg.desired.positions[i] *= -1
+                msg.desired.positions[i] *= 1
         if not skip:
-            msg_tosend.trajectory = msg
+            msg_to_send.trajectory = msg
             if self.reset:
-                msg_tosend.reset = 1
+                msg_to_send.reset = 1
                 self.reset = False
-            self.publisher.publish(msg_tosend)
+            self.publisher.publish(msg_to_send)
 
     def reset_callback(self, msg):
         """Set the reset flag when a message is received with data True."""

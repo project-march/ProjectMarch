@@ -36,10 +36,29 @@ enum class ODriveObjectName {
     MotorTemperature,
     ShadowCount,
     Torque,
+    Heel_right,
+    Heel_left,
+    Met1,
+    Hallux,
+    Met3,
+    Toes,
+    Met5,
+    Arch,
+    Rfix,
 
     // Write objects
     TargetTorque,
+    TargetPosition,
+    FuzzyTorque,
+    FuzzyPosition,
+    PositionP,
+    PositionI,
+    PositionD,
+    TorqueP,
+    TorqueI,
+    TorqueD,
     RequestedState
+
 };
 
 class ODrivePDOmap {

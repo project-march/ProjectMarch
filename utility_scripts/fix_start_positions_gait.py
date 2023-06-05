@@ -113,8 +113,8 @@ amount_of_start_positions_set = 0
 amount_of_end_positions_set = 0
 paths_that_failed = []
 for path in [
-    Path("ros2/src/gaits/march_gait_files/airgait_vi/sit/prepare_sit_down/MVI_prepare_sit_down_v6.subgait"),
-    Path("ros2/src/gaits/march_gait_files/airgait_vi/stand/stand_home/MVI_stand_home_v7.subgait"),
+    Path("ros2/src/gaits/march_gait_files/sit_stand_m8/sit/prepare_sit_down/prepare_sit_down_v6.subgait"),
+    Path("ros2/src/gaits/march_gait_files/sit_stand_m8/stand/stand_home/stand_home_v7.subgait"),
 ]:
     try:
         with open(path, "r") as subgait_file:
