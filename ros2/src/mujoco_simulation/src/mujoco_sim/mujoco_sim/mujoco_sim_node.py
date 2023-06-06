@@ -76,7 +76,7 @@ class MujocoSimNode(Node):
         # The model can be found in the robot_description package.
         self.model_name = self.get_parameter("model_toload")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model: mujoco.MjModel = mujoco.MjModel.from_xml_path(self.file_path)
 

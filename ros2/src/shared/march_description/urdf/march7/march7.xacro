@@ -35,16 +35,15 @@
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
     <!-- Include all macro files    -->
-    <xacro:include filename="macros/safety_limits.xacro"/>
-    <xacro:include filename="macros/pressure_sole.xacro"/>
-    <xacro:include filename="macros/frame_part.xacro"/>
-    <xacro:include filename="macros/joint.xacro"/>
-    <xacro:include filename="macros/configurable_joint.xacro"/>
-
+    <xacro:include filename="../macros/safety_limits.xacro"/>
+    <xacro:include filename="../macros/pressure_sole.xacro"/>
+    <xacro:include filename="../macros/frame_part.xacro"/>
+    <xacro:include filename="../macros/joint.xacro"/>
+    <xacro:include filename="../macros/configurable_joint.xacro"/>
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
-                    value="properties/properties_march6.yaml"/>
+                    value="properties/properties_march7.yaml"/>
     <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
     <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
     <xacro:property name="safety_values"
@@ -102,6 +101,8 @@
                     value="${dimensions['ankle_plate']['length'] - width}"/>
     <xacro:property name="ankle_plate_offset"
                     value="${dimensions['ankle_plate']['offset']}"/>
+    <xacro:property name="ankle_plate_collision_offset"
+                value="${dimensions['ankle_plate']['collision_offset']}"/>
 
     <xacro:property name="foot_height_forward"
                     value="${dimensions['foot']['height_forward']}"/>
@@ -147,8 +148,9 @@
     <xacro:property name="foot_com_z"
                     value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/>
 
+
     <material name="visuals_material">
-        <color rgba="0.163 0.476 0.718 1"/>
+        <color rgba="1.0 1.0 1.0 1"/>
     </material>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
@@ -161,9 +163,9 @@
                       reflect="1"
                       length="${hip_base_height}"
                       direction="y"
-                      visual_origin="${hip_aa_frame_width} ${-width/2} ${-width/2}"
+                      visual_origin="0 0 0"
                       collision_origin="0 0 0"
-                      mesh="march6/HipBase.stl"
+                      mesh="march7/HipBase.stl"
                       com="${hip_base_com_x} ${hip_base_com_y} ${hip_base_com_z}"
                       mass="${dimensions['hip_base']['mass']}"
                       inertia="${inertia['hip_base']}"
@@ -180,8 +182,8 @@
                       length="${hip_aa_frame_height}"
                       direction="y"
                       collision_origin="0 ${-hip_aa_frame_height/2} 0"
-                      visual_origin="${width/2} ${width/2 - 0.032} ${-width}"
-                      mesh="march6/HipLeft.stl"
+                      visual_origin="0 0 0"
+                      mesh="march7/HipLeft.stl"
                       visual_rpy="0 0 0"
     />
 
@@ -202,11 +204,12 @@
                       length="${upper_leg_height}"
                       direction="z"
                       collision_origin="0 0 ${-upper_leg_height/2}"
-                      visual_origin="-0.01 -0.032 ${-upper_leg_height - width - 0.02}"
-                      mesh="march6/UpperLegLeft.stl"
+                      visual_origin="0 0 0"
+                      mesh="march7/UpperLegLeft.stl"
                       com="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z}"
                       mass="${upper_leg_mass}"
                       inertia="${inertia['upper_leg']}"
+                      visual_rpy="0 0 0"
     />
 
     <xacro:frame_part name="lower_leg_left"
@@ -214,11 +217,12 @@
                       length="${lower_leg_height}"
                       direction="z"
                       collision_origin="0 0 ${-lower_leg_height/2}"
-                      visual_origin="${width/2-0.02} -0.032 ${-lower_leg_height-width/2 - 0.01}"
-                      mesh="march6/LowerLegLeft.stl"
+                      visual_origin="0 0 0"
+                      mesh="march7/LowerLegLeft.stl"
                       com="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
                       inertia="${inertia['lower_leg']}"
+                      visual_rpy="0 0 0"
     />
 
 <!-- Left Foot -->
@@ -226,10 +230,10 @@
                       reflect="-1"
                       length="${ankle_plate_height}"
                       direction="z"
-                      mesh="march6/FootLeft.stl"
-                      visual_origin="${-foot_height_forward+0.005} ${-ankle_plate_offset+knee_offset-width/2 - 0.02} ${-ankle_plate_height-width+0.01}"
-                      collision_origin="0 0 ${-ankle_plate_height/2}"
-                      visual_rpy="0 0 ${pi}"
+                      mesh="march7/FootLeft.stl"
+                      visual_origin="0 0 0"
+                      collision_origin="0 ${ankle_plate_collision_offset} ${-ankle_plate_height/2}"
+                      visual_rpy="0 0 0"
     />
 
     <xacro:frame_part name="foot_left"
@@ -249,10 +253,10 @@
                       reflect="1"
                       direction="y"
                       length="${hip_aa_frame_height}"
-                      visual_origin="${-width/2-hip_aa_frame_width - 0.007} ${-width/2 + 0.032} ${-width}"
+                      visual_origin="0 0 0"
                       collision_origin="0 ${hip_aa_frame_height/2} 0"
-                      mesh="march6/HipRight.stl"
-                      visual_rpy="0 0 ${pi}"
+                      mesh="march7/HipRight.stl"
+                      visual_rpy="0 0 0"
     />
 
     <xacro:frame_part name="hip_aa_frame_right_front"
@@ -271,8 +275,8 @@
                       direction="z"
                       length="${upper_leg_height}"
                       collision_origin="0 0 ${-upper_leg_height/2}"
-                      visual_origin="-0.01 0.032 ${-upper_leg_height - width - 0.02}"
-                      mesh="march6/UpperLegRight.stl"
+                      visual_origin="0 0 0"
+                      mesh="march7/UpperLegRight.stl"
                       com="${upper_leg_com_x} ${upper_leg_com_y} ${upper_leg_com_z}"
                       inertia="${inertia['upper_leg']}"
                       mass="${upper_leg_mass}"
@@ -283,8 +287,8 @@
                       reflect="1"
                       length="${lower_leg_height}"
                       direction="z"
-                      visual_origin="${width/2-0.025} 0.032 ${-lower_leg_height-width/2-0.01}"
-                      mesh="march6/LowerLegRight.stl"
+                      visual_origin="0 0 0"
+                      mesh="march7/LowerLegRight.stl"
                       com="${lower_leg_com_x} ${lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
                       inertia="${inertia['lower_leg']}"
@@ -298,9 +302,9 @@
                       reflect="1"
                       length="${ankle_plate_height}"
                       direction="z"
-                      mesh="march6/FootRight.stl"
-                      visual_origin="0 ${ankle_plate_offset-knee_offset+width/2 + 0.02} ${-ankle_plate_height-width+0.01}"
-                      collision_origin="0 0 ${-ankle_plate_height/2}"
+                      mesh="march7/FootRight.stl"
+                      visual_origin="0 0 0"
+                      collision_origin="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height/2}"
                       visual_rpy="0 0 0"
     />
 
@@ -391,7 +395,7 @@
     <joint name="left_foot_angle" type="fixed">
         <parent link="ankle_plate_left"/>
         <child link="foot_left"/>
-        <origin xyz="0 0 ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
+        <origin xyz="0 ${ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
     <xacro:march_configurable_joint
@@ -447,24 +451,31 @@
     <joint name="right_foot_angle" type="fixed">
         <parent link="ankle_plate_right"/>
         <child link="foot_right"/>
-        <origin xyz="0 0 ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
+        <origin xyz="0 ${-ankle_plate_collision_offset} ${-ankle_plate_height-width/2}" rpy="0 0 0"/>
     </joint>
 
+    <xacro:include filename="../camera/_d435.urdf.xacro"/>
 
-    <xacro:include filename="camera/_d435.urdf.xacro"/>
-
-    <xacro:sensor_d435 name="camera_back" topics_ns="camera_back" parent="hip_aa_frame_right_side"
-                       plugin="$(arg realsense_simulation)">
-        <origin xyz="0 0.06725 0" rpy="0 ${75/180 * pi} 0"/>
+    <xacro:sensor_d435 
+            name="camera_front_right" 
+            topics_ns="camera_front_right"
+            parent="upper_leg_right"
+            plugin="$(arg realsense_simulation)">
+        <origin xyz="-0.07 -0.011 -0.007 " rpy="${0 * pi} ${54/180 * pi} ${pi}"/>
     </xacro:sensor_d435>
-    <xacro:sensor_d435 name="camera_front" topics_ns="camera_front"
-                       parent="hip_base"
-                       plugin="$(arg realsense_simulation)">
-        <!--    Attached to the hip_base, since this is most comparable to the backpack -->
-        <!--    in amount of movement, the distance from hip base is based on first design.-->
-        <origin xyz="-0.32 0.20 0.20" rpy="${0.5 * pi} ${48/180 * pi} ${pi}"/>
-        <!-- Rotate to be vertical and pointing down 48 degrees -->
+    <xacro:sensor_d435 
+            name="camera_front_left"
+            topics_ns="camera_front_left"
+            parent="upper_leg_left"
+            plugin="$(arg realsense_simulation)">
+        <origin xyz="-0.094 0.011 0.005 " rpy="${0 * pi} ${(180 - 54) / 180 * pi} ${0 * pi}"/>
     </xacro:sensor_d435>
-
+    <xacro:sensor_d435 
+            name="camera_back"
+            topics_ns="camera_back"
+            parent="hip_aa_frame_right_side"
+            plugin="$(arg realsense_simulation)">
+        <origin xyz="0.018 0.126 -0.018" rpy="0 ${75/180 * pi} 0"/>
+    </xacro:sensor_d435>
 
 </robot>

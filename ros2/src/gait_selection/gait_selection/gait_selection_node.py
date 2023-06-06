@@ -40,7 +40,7 @@ class GaitSelectionNode(Node):
             "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
             "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
-        self.get_logger().info(str(self.gait_loader.loaded_gaits))
+        self.get_logger().info("Loaded gaits: " + str([*self.gait_loader.loaded_gaits]))
         self._gait_executed = None
 
         self.service = self.create_service(RequestGait, "gait_selection", self.service_callback)
@@ -53,15 +53,14 @@ class GaitSelectionNode(Node):
         reset_msg = Int32()
 
         if requested_gait == 0:
-            self.get_logger().warn("sit gait called!")
-
+            self.get_logger().info("sit gait called!")
             gait = self.gait_loader.loaded_gaits.get("home_sit")
             trajectory = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
             self._execute_gait(trajectory)
             reset_msg.data = -1
             self.reset_publisher.publish(reset_msg)
         elif requested_gait == 1:
-            self.get_logger().warn("stand gait called!")
+            self.get_logger().info("stand gait called!")
             gait = self.gait_loader.loaded_gaits["home_stand"]
             trajectory = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
             self._execute_gait(trajectory)
@@ -83,7 +82,6 @@ class GaitSelectionNode(Node):
         self._gait_executed = False
         goal_msg = FollowJointTrajectory.Goal()
         goal_msg.trajectory = trajectory
-        self.get_logger().info(str(goal_msg.trajectory))
         goal_future: Future = self._action_client_to_controller.send_goal_async(goal_msg)
         goal_future.add_done_callback(self._send_goal_callback)
 
@@ -106,7 +104,6 @@ class GaitSelectionNode(Node):
                 f"Goal: {gait_executor_response_goal_handle}"
             )
             return
-        self._logger.info("Goal message to execute gait is accepted.")
         gait_execution_result_future: Future = gait_executor_response_goal_handle.get_result_async()
         gait_execution_result_future.add_done_callback(self._get_result_callback)
 
@@ -125,7 +122,6 @@ class GaitSelectionNode(Node):
                 "Failed to execute trajectory:" + str(future.result().result.error_code.error_string))
             self._gait_executed = True
         else:
-            self.get_logger().info("Trajectory executed correctly.")
             self._gait_executed = True
 
 

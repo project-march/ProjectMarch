@@ -1,23 +1,6 @@
-<!-- 
-Copyright (C) 2023. Stichting Moving Bird 
-Joy Brand, joy.brand@projectmarch.nl 
-Thijn Hoekstra, thijn.hoekstra@projectmarch.nl 
-
-This program is free software: you can redistribute it and/or modify 
-it under the terms of the GNU General Public License as published by 
-the Free Software Foundation, either version 3 of the License, or 
-(at your option) any later version. 
-
-This program is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-GNU General Public License for more details. 
-
-See <https://www.gnu.org/licenses/>.
--->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="obj-files/march8" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
 
@@ -57,19 +40,19 @@ See <https://www.gnu.org/licenses/>.
       </default>
     </default>
     <default class="HAA_joint">
-      <joint damping="107.692308"
-              armature="5.4"
-             frictionloss="0" stiffness="0"/>
+      <joint damping="${joints/HAA/max_torque / ./max_angvel}"
+              armature="${joints/HAA/inertia}"
+             frictionloss="${joints/HAA/frictionloss}" stiffness="0"/>
     </default>
     <default class="ADPF_joint">
-      <joint damping="43.658537"
-              armature="2.2"
-             frictionloss="0" stiffness="0"/>
+      <joint damping="${joints/ADPF/max_torque / ./max_angvel}"
+              armature="${joints/ADPF/inertia}"
+             frictionloss="${joints/ADPF/frictionloss}" stiffness="0"/>
     </default>
     <default class="rotational_joint">
-      <joint damping="63.451777"
-              armature="9.98"
-             frictionloss="0" stiffness="0"/>
+      <joint damping="${joints/HFE/max_torque / ./max_angvel}"
+              armature="${joints/HFE/inertia}"
+             frictionloss="${joints/HFE/frictionloss}" stiffness="0"/>
     </default>
   </default>
 
@@ -86,101 +69,101 @@ See <https://www.gnu.org/licenses/>.
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="0 0 1.2"
+          pos="${phys/backpack/origin/x ./y ./z}"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
       <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
-      <site name='imu_backpack' size='0.01' pos="0 0 0"/>
-      <inertial pos="0.171 -0.006 0.342" mass="57.096"
-                fullinertia="2.931 2.492 1.522 0.023 -0.1 0.025"/>
-      <!-- <freejoint/> -->
+      <site name='imu_backpack' size='0.01' pos="${sensors/imus/backpack/pos/x ./y ./z}"/>
+      <inertial pos="${phys/backpack/com/x ./y ./z}" mass="${phys/backpack/mass}"
+                fullinertia="${phys/backpack/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
+      <freejoint/>
       <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
-            size="0.051 0.189 0.165"
-            pos="-0.02 0 0.13" class="collision"/>
+            size="${phys/backpack/geom/size/x ./y ./z}"
+            pos="${phys/backpack/geom/pos/x ./y ./z}" class="collision"/>
 
-    <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
+    <site name="imu_torso" size='0.01' pos="${sensors/imus/torso/pos/x ./y ./z}"/>
 
       <!--  LEFT LEG -->
-      <body name="L_hip" pos="-0.021 0.08 0.025">
-        <inertial pos="0.05 0.109 0.033" mass="1.849"
-                  fullinertia="0.012 0.013 0.012 -0.004 0.002 0"/>
-        <joint name="L_HAA" axis="-1 0 0" range="-15 10" class="HAA_joint"/>
+      <body name="L_hip" pos="${phys/L_hip/origin/x ./y ./z}">
+        <inertial pos="${phys/L_hip/com/x ./y ./z}" mass="${phys/L_hip/mass}"
+                  fullinertia="${phys/L_hip/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
+        <joint name="L_HAA" axis="-1 0 0" range="${joints/HAA/limits/min ./max}" class="HAA_joint"/>
         <geom type="mesh" mesh="L_hip" />
-        <geom name="L_hip" fromto="0 0 0 0.182 0.182 0"
-              size="0.032" class="L_collision"/>
+        <geom name="L_hip" fromto="0 0 0 ${phys/L_UL/origin/x ./y ./z}"
+              size="${phys/L_hip/geom/size}" class="L_collision"/>
         <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
-        <body name="L_UL" pos="0.182 0.182 0">
-        <inertial pos="0.012 -0.098 -0.151" mass="26.104"
-                  fullinertia="0.859 0.733 0.23 0.021 -0.025 0.055"/>
-          <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
+        <body name="L_UL" pos="${phys/L_UL/origin/x ./y ./z}">
+        <inertial pos="${phys/L_UL/com/x ./y ./z}" mass="${phys/L_UL/mass}"
+                  fullinertia="${phys/L_UL/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
+          <joint name="L_HFE" axis="0 -1 0" range="${joints/HFE/limits/min ./max}" class="rotational_joint"/>
           <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
-          <geom name="L_UL" fromto="0 0 0 0 -0.06 -0.413"
-              size="0.069" class="L_collision"/>
+          <geom name="L_UL" fromto="0 0 0 ${phys/L_LL/origin/x ./y ./z}"
+              size="${phys/L_UL/geom/size}" class="L_collision"/>
           <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
-          <body name="L_LL" pos="0 -0.06 -0.413">
-            <inertial pos="-0.021 -0.079 -0.157" mass="7.061"
-                  fullinertia="0.12 0.117 0.034 0.003 -0.008 0.012"/>
-            <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
+          <body name="L_LL" pos="${phys/L_LL/origin/x ./y ./z}">
+            <inertial pos="${phys/L_LL/com/x ./y ./z}" mass="${phys/L_LL/mass}"
+                  fullinertia="${phys/L_LL/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
+            <joint name="L_KFE" axis="0 1 0" range="${joints/KFE/limits/min ./max}" class="rotational_joint"/>
             <geom type="mesh" mesh="L_shin"/>
-            <geom name="L_LL" fromto="0 0 0 0.0 -0.037 -0.414"
-              size="0.047" class="L_collision"/>
+            <geom name="L_LL" fromto="0 0 0 ${phys/L_foot/origin/x ./y ./z}"
+              size="${phys/L_LL/geom/size}" class="L_collision"/>
             <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
 
-            <body name="L_foot" pos="0.0 -0.037 -0.414">
-              <inertial pos="0.007 -0.054 -0.035" mass="2.964"
-                  fullinertia="0.023 0.031 0.019 0.004 0.011 -0.004"/>
-              <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+            <body name="L_foot" pos="${phys/L_foot/origin/x ./y ./z}">
+              <inertial pos="${phys/L_foot/com/x ./y ./z}" mass="${phys/L_foot/mass}"
+                  fullinertia="${phys/L_foot/inertia/xx ./yy ./zz ./xy ./xz ./yz}"/>
+              <joint name="L_ADPF" axis="0 -1 0" range="${joints/ADPF/limits/min ./max}" class="ADPF_joint"/>
               <geom type="mesh" mesh="L_foot"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
-              <geom name="L_foot" type="box" size="0.159 0.057 0.007"
-                  pos="0.069 -0.086 -0.118"  class="L_collision"
-                  friction="0.33"/>
+              <geom name="L_foot" type="box" size="${phys/L_foot/geom/size/x ./y ./z}"
+                  pos="${phys/L_foot/geom/pos/x ./y ./z}"  class="L_collision"
+                  friction="${phys/L_foot/friction}"/>
 
               <!-- Pressure sole  -->
-             <body name="pres_L_0" pos="-0.045 -0.072 -0.138">
+             <body name="pres_L_0" pos="${phys/L_foot/pads/L_0/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_0" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_0"/>
               </body>
-              <body name="pres_L_1" pos="-0.045 -0.072 -0.138">
+              <body name="pres_L_1" pos="${phys/L_foot/pads/L_1/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_1" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_1"/>
               </body>
-              <body name="pres_L_2" pos="0.05 -0.061 -0.138">
+              <body name="pres_L_2" pos="${phys/L_foot/pads/L_2/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_2" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_2"/>
               </body>
-              <body name="pres_L_3" pos="0.118 -0.05 -0.138">
+              <body name="pres_L_3" pos="${phys/L_foot/pads/L_3/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_3" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_3"/>
               </body>
-              <body name="pres_L_4" pos="0.13 -0.083 -0.138">
+              <body name="pres_L_4" pos="${phys/L_foot/pads/L_4/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_4" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_4"/>
               </body>
-              <body name="pres_L_5" pos="0.137 -0.115 -0.138">
+              <body name="pres_L_5" pos="${phys/L_foot/pads/L_5/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_5" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_5"/>
               </body>
-              <body name="pres_L_6" pos="0.174 -0.07 -0.138">
+              <body name="pres_L_6" pos="${phys/L_foot/pads/L_6/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_6" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_6"/>
               </body>
-              <body name="pres_L_7" pos="0.184 -0.105 -0.138">
+              <body name="pres_L_7" pos="${phys/L_foot/pads/L_7/pos/x ./y phys/L_foot/pads/global/z}">
                 <geom name="pres_L_7" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_L_7"/>
               </body>
             </body>
@@ -189,84 +172,84 @@ See <https://www.gnu.org/licenses/>.
       </body>
 
       <!--  RIGHT LEG -->
-      <body name="R_hip" pos="-0.021 -0.08 0.025">
-        <inertial pos="0.05 -0.109 0.033" mass="1.849"
-                  fullinertia="0.012 0.013 0.012 0.004 0.002 -0"/>
-        <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint"/>
+      <body name="R_hip" pos="${phys/L_hip/origin/x -./y ./z}">
+        <inertial pos="${phys/L_hip/com/x -./y ./z}" mass="${phys/L_hip/mass}"
+                  fullinertia="${phys/L_hip/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
+        <joint name="R_HAA" axis="1 0 0" range="${joints/HAA/limits/min ./max}" class="HAA_joint"/>
         <geom type="mesh" mesh="R_hip" />
-        <geom name="R_hip" fromto="0 0 0 0.182 -0.182 0"
-              size="0.032" class="R_collision"/>
+        <geom name="R_hip" fromto="0 0 0 ${phys/L_UL/origin/x -./y ./z}"
+              size="${phys/L_hip/geom/size}" class="R_collision"/>
         <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
-        <body name="R_UL" pos="0.182 -0.182 0">
-          <inertial pos="0.012 0.098 -0.151" mass="26.104"
-                  fullinertia="0.859 0.733 0.23 -0.021 -0.025 -0.055"/>
-          <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
+        <body name="R_UL" pos="${phys/L_UL/origin/x -./y ./z}">
+          <inertial pos="${phys/L_UL/com/x -./y ./z}" mass="${phys/L_UL/mass}"
+                  fullinertia="${phys/L_UL/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
+          <joint name="R_HFE" axis="0 -1 0" range="${joints/HFE/limits/min ./max}" class="rotational_joint"/>
           <geom type="mesh" mesh="R_thigh"/>
-          <geom name="R_UL" fromto="0 0 0 0 0.06 -0.413"
-              size="0.069" class="R_collision"/>
+          <geom name="R_UL" fromto="0 0 0 ${phys/L_LL/origin/x -./y ./z}"
+              size="${phys/L_UL/geom/size}" class="R_collision"/>
           <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
-          <body name="R_LL" pos="0 0.06 -0.413">
-            <inertial pos="-0.021 0.079 -0.157" mass="7.061"
-                  fullinertia="0.12 0.117 0.034 -0.003 -0.008 -0.012"/>
-            <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
+          <body name="R_LL" pos="${phys/L_LL/origin/x -./y ./z}">
+            <inertial pos="${phys/L_LL/com/x -./y ./z}" mass="${phys/L_LL/mass}"
+                  fullinertia="${phys/L_LL/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
+            <joint name="R_KFE" axis="0 1 0" range="${joints/KFE/limits/min ./max}" class="rotational_joint"/>
             <geom type="mesh" mesh="R_shin"/>
-            <geom name="R_LL" fromto="0 0 0 0.0 0.037 -0.414"
-              size="0.047" class="R_collision"/>
+            <geom name="R_LL" fromto="0 0 0 ${phys/L_foot/origin/x -./y ./z}"
+              size="${phys/L_LL/geom/size}" class="R_collision"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
-            <body name="R_foot" pos="0.0 0.037 -0.414">
-              <inertial pos="0.007 0.054 -0.035" mass="2.964"
-                  fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+            <body name="R_foot" pos="${phys/L_foot/origin/x -./y ./z}">
+              <inertial pos="${phys/L_foot/com/x -./y ./z}" mass="${phys/L_foot/mass}"
+                  fullinertia="${phys/L_foot/inertia/xx ./yy ./zz -./xy ./xz -./yz}"/>
+              <joint name="R_ADPF" axis="0 -1 0" range="${joints/ADPF/limits/min ./max}" class="ADPF_joint"/>
               <geom type="mesh" mesh="R_foot"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
-              <geom name="R_foot" type="box" size="0.159 0.057 0.007"
-                  pos="0.069 0.086 -0.118"  class="R_collision"
-                  friction="0.33"/>
+              <geom name="R_foot" type="box" size="${phys/L_foot/geom/size/x ./y ./z}"
+                  pos="${phys/L_foot/geom/pos/x -./y ./z}"  class="R_collision"
+                  friction="${phys/L_foot/friction}"/>
 
                   <!-- Pressure sole  -->
-              <body name="pres_R_0" pos="-0.045 0.072 -0.138">
+              <body name="pres_R_0" pos="${phys/L_foot/pads/L_0/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_0" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_0"/>
               </body>
-              <body name="pres_R_1" pos="-0.045 0.072 -0.138">
+              <body name="pres_R_1" pos="${phys/L_foot/pads/L_1/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_1" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_1"/>
               </body>
-              <body name="pres_R_2" pos="0.05 0.061 -0.138">
+              <body name="pres_R_2" pos="${phys/L_foot/pads/L_2/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_2" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_2"/>
               </body>
-              <body name="pres_R_3" pos="0.118 0.05 -0.138">
+              <body name="pres_R_3" pos="${phys/L_foot/pads/L_3/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_3" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_3"/>
               </body>
-              <body name="pres_R_4" pos="0.13 0.083 -0.138">
+              <body name="pres_R_4" pos="${phys/L_foot/pads/L_4/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_4" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_4"/>
               </body>
-              <body name="pres_R_5" pos="0.137 0.115 -0.138">
+              <body name="pres_R_5" pos="${phys/L_foot/pads/L_5/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_5" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_5"/>
               </body>
-              <body name="pres_R_6" pos="0.174 0.07 -0.138">
+              <body name="pres_R_6" pos="${phys/L_foot/pads/L_6/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_6" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_6"/>
               </body>
-              <body name="pres_R_7" pos="0.184 0.105 -0.138">
+              <body name="pres_R_7" pos="${phys/L_foot/pads/L_7/pos/x -./y phys/L_foot/pads/global/z}">
                 <geom name="pres_R_7" type="sphere" pos="0 0 0"
-                      size="0.01" class="L_collision"  friction="0.33"/>
+                      size="${phys/L_foot/pads/global/size}" class="L_collision"  friction="${phys/L_foot/friction}"/>
                 <site name="pres_R_7"/>
               </body>
             </body>
@@ -279,14 +262,14 @@ See <https://www.gnu.org/licenses/>.
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="left_ankle"    gear="179"  joint="L_ADPF"  />
-    <motor name="left_hip_aa"     gear="280"  joint="L_HAA"  />
-    <motor name="left_hip_fe"     gear="250" joint="L_HFE"   />
-    <motor name="left_knee"     gear="250"  joint="L_KFE"   />
-    <motor name="right_ankle"    gear="179"  joint="R_ADPF"  />
-    <motor name="right_hip_aa"     gear="280"  joint="R_HAA"  />
-    <motor name="right_hip_fe"     gear="250" joint="R_HFE"   />
-    <motor name="right_knee"     gear="250"  joint="R_KFE" />
+    <motor name="left_ankle"    gear="${joints/ADPF/max_torque}"  joint="L_ADPF"  />
+    <motor name="left_hip_aa"     gear="${joints/HAA/max_torque}"  joint="L_HAA"  />
+    <motor name="left_hip_fe"     gear="${joints/HFE/max_torque}" joint="L_HFE"   />
+    <motor name="left_knee"     gear="${joints/KFE/max_torque}"  joint="L_KFE"   />
+    <motor name="right_ankle"    gear="${joints/ADPF/max_torque}"  joint="R_ADPF"  />
+    <motor name="right_hip_aa"     gear="${joints/HAA/max_torque}"  joint="R_HAA"  />
+    <motor name="right_hip_fe"     gear="${joints/HFE/max_torque}" joint="R_HFE"   />
+    <motor name="right_knee"     gear="${joints/KFE/max_torque}"  joint="R_KFE" />
   </actuator>
 
   <sensor>

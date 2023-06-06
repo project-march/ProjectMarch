@@ -20,14 +20,14 @@ install(DIRECTORY urdf
         )
 
 set(XACRO_FILES
-    urdf/march3.xacro
-    urdf/march4.xacro
-    urdf/march6.xacro
-    urdf/march4_with_koen_lengths.xacro
-    urdf/test_joint_linear.xacro
-    urdf/test_joint_rotational.xacro
-    urdf/march6_three_cameras.xacro
-    urdf/march7.xacro
+        urdf/test_xacros/test_joint_linear.xacro
+        urdf/test_xacros/test_joint_rotational.xacro
+        urdf/march3/march3.xacro
+        urdf/march4/march4.xacro
+        urdf/march4/march4_with_koen_lengths.xacro
+        urdf/march6/march6.xacro
+        urdf/march6/march6_three_cameras.xacro
+        urdf/march7/march7.xacro
 )
 
 # Without this the package link of stl files in gazebo doesn't work

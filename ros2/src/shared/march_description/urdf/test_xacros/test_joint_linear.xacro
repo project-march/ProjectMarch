@@ -1,11 +1,17 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- Switch between airgaiting or standing on the ground-->
+    <!--Value set to 'world' fixes the robot to the world-->
+    <!--Value set to 'base_link' makes the robot stand on the ground-->
+    <!--Important note when changing value make sure rviz fixed frame is set to the same value (moveit.rviz)-->
+
     <!-- Constants for robot dimensions -->
+    <xacro:property name="PI" value="3.1415926535897931"/>
     <xacro:property name="joint_base_mass" value="1"/> <!-- arbitrary value for joint_base_mass -->
     <xacro:property name="joint_base_width" value="0.05"/> <!-- Cube dimensions (width x width x width) of joint base -->
 
-    <xacro:property name="bar_length" value="0.39"/>
+    <xacro:property name="bar_length" value="${0.39}"/>
     <xacro:property name="bar_mass" value="1.080"/>
     <xacro:property name="bar_width" value="0.05"/>
 
@@ -15,11 +21,11 @@
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
     <!-- Include all macro files    -->
-    <xacro:include filename="macros/safety_limits.xacro"/>
-    <xacro:include filename="macros/pressure_sole.xacro"/>
-    <xacro:include filename="macros/frame_part.xacro"/>
-    <xacro:include filename="macros/joint.xacro"/>
-    <xacro:include filename="macros/configurable_joint.xacro"/>
+    <xacro:include filename="../macros/safety_limits.xacro"/>
+    <xacro:include filename="../macros/pressure_sole.xacro"/>
+    <xacro:include filename="../macros/frame_part.xacro"/>
+    <xacro:include filename="../macros/joint.xacro"/>
+    <xacro:include filename="../macros/configurable_joint.xacro"/>
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"
@@ -32,7 +38,7 @@
     <xacro:property name="dimensions" value="${properties['dimensions']}"/>
 
     <!-- Harmonic Drive: 101, Belt: 1,2-->
-    <xacro:property name="rotary_reduction" value="${101 * 1.2}"/>
+    <xacro:property name="linear_reduction" value="236"/>
 
     <xacro:property name="actuating_joints" value="${(properties['actuating_joints'])}"/>
 
@@ -46,14 +52,14 @@
     </joint>
 
     <xacro:march_configurable_joint
-            name="rotational_joint"
+            name="linear_joint"
             parent="joint_base"
             child="bar"
-            safety="${safety_values['rotational_joint']}"
+            safety="${safety_values['linear_joint']}"
             origin="0 ${-joint_base_width} 0"
             axis="0 1 0"
-            reduction="${rotary_reduction}"
-            limits="${joint_limits['rotational_joint']}"
+            reduction="${linear_reduction}"
+            limits="${joint_limits['linear_joint']}"
     />
 
     <!-- give colors to some links in gazebo -->
@@ -78,6 +84,7 @@
                     ixx="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}" ixy="0.0" ixz="0.0"
                     iyy="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}" iyz="0.0"
                     izz="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}"/>
+            <!--(joint_base_width*joint_base_width + joint_base_width*joint_base_width)-->
         </inertial>
     </link>
 
