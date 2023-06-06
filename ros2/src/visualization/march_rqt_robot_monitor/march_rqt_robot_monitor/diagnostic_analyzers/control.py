@@ -37,12 +37,10 @@ class CheckJointValues:
 
         :param joint  Joint dict to get limits from.
         """
-        try:
+        with contextlib.suppress(AttributeError):
             for name in joint.keys():
                 self._lower_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
                 self._upper_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
-        except contextlib.suppress(AttributeError):
-            pass
 
     def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""
