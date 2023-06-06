@@ -94,10 +94,10 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
 
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    // m_joint_names = msg->name;
-    // m_ik_solver.set_joint_configuration(msg);
-    // m_ik_solver.set_current_state();
-    // m_ik_solver.set_jacobian();
+    m_joint_names = msg->name;
+    m_ik_solver.set_joint_configuration(msg);
+    m_ik_solver.set_current_state();
+    m_ik_solver.set_jacobian();
 }
 
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
