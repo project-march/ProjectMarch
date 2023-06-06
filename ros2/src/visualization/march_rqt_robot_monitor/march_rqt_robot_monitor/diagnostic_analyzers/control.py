@@ -1,5 +1,5 @@
 """The module control.py contains the CheckJointValues Class."""
-
+import contextlib
 from typing import Optional, List
 
 from diagnostic_msgs.msg import DiagnosticStatus
@@ -41,7 +41,7 @@ class CheckJointValues:
             for name in joint.keys():
                 self._lower_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
                 self._upper_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
-        except AttributeError:
+        except contextlib.suppress(AttributeError):
             pass
 
     def cb(self, msg: JointState):

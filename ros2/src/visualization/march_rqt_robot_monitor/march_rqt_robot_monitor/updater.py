@@ -2,7 +2,6 @@
 
 import diagnostic_updater
 import rclpy
-from march_utility.utilities.node_utils import get_joint_names_from_service
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
