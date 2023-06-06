@@ -54,7 +54,8 @@ class PositionController(LowLvlController):
         try:
             joint_val = self.node.sensor_data_extraction.get_joint_pos()
             for index in range(self.actuator_amount):
-                e = self.joint_desired[index] - joint_val[index]
+                joint_name = self.joint_names[index]
+                e = self.joint_desired.get(joint_name) - joint_val[index]
                 de_prev = (e - self.e_prev[index]) / dt
                 ie_prev = (e - self.e_prev[index]) * dt
 

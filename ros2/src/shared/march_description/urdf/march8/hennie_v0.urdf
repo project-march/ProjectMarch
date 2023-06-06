@@ -194,14 +194,14 @@
 	<!--                         -->
 	<joint name="left_hip_aa" type="revolute">
 		<origin rpy="0 0 0" xyz="-0.021 0.08 0.025"/>
-		<axis xyz="1 0 0"/>
+		<axis xyz="-1 0 0"/>
 		<parent link="backpack"/>
 		<child link="L_hip"/>
 		<limit effort="280" lower="-0.2618" upper="0.174533" velocity="2.6"/>
 	</joint>
 	<joint name="left_hip_fe" type="revolute">
 		<origin rpy="0 0 0.0" xyz="0.182 0.182 0"/>
-		<axis xyz="0 1 0"/>
+		<axis xyz="0 -1 0"/>
 		<parent link="L_hip"/>
 		<child link="L_UL"/>
 		<limit effort="250" lower="-2.00713" upper="0.20944" velocity="3.94"/>
@@ -215,7 +215,7 @@
 	</joint>
 	<joint name="left_ankle" type="revolute">
 		<origin rpy="0 0 0" xyz="0 -0.037 -0.414"/>
-		<axis xyz="0 1 0"/>
+		<axis xyz="0 -1 0"/>
 		<parent link="L_LL"/>
 		<child link="L_foot"/>
 		<limit effort="0.9" lower="-0.0174533" upper="0.436332" velocity="4.1"/>
@@ -229,7 +229,7 @@
 	</joint>
 	<joint name="right_hip_fe" type="revolute">
 		<origin rpy="0 0 0.0" xyz="0.182 -0.182 0"/>
-		<axis xyz="0 1 0"/>
+		<axis xyz="0 -1 0"/>
 		<parent link="R_hip"/>
 		<child link="R_UL"/>
 		<limit effort="12.2" lower="-2.00713" upper="0.20944" velocity="3.94"/>
@@ -243,7 +243,7 @@
 	</joint>
 	<joint name="right_ankle" type="revolute">
 		<origin rpy="0 0 0" xyz="0 0.037 -0.414"/>
-		<axis xyz="0 1 0"/>
+		<axis xyz="0 -1 0"/>
 		<parent link="R_LL"/>
 		<child link="R_foot"/>
 		<limit effort="0.9" lower="-0.0174533" upper="0.436332" velocity="4.1"/>

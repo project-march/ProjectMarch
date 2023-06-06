@@ -1,6 +1,7 @@
 // standard
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
 #include <array>
@@ -49,6 +50,7 @@ public:
     std::vector<double> get_real_time_com_trajectory_x();
     std::vector<double> get_real_time_com_trajectory_y();
     void set_m_current_shooting_node(int);
+    std_msgs::msg::Int32 get_m_current_shooting_node();
     bool check_zmp_on_foot();
 
 private:

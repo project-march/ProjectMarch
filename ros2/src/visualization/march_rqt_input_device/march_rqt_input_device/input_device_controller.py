@@ -98,8 +98,8 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._send_gait_request.publish(msg)
-        if gait_type==2:
-            int_msg = Int32(data = 0)
+        if gait_type == 2:
+            int_msg = Int32(data=0)
             self._swing_leg_command_pub.publish(int_msg)
 
     def publish_eeg_on_off(self) -> None:

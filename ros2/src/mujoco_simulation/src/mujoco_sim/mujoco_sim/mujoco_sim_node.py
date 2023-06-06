@@ -110,9 +110,12 @@ class MujocoSimNode(Node):
 
         self.set_init_joint_qpos(None)
 
+        joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
+        for index, name in enumerate(self.actuator_names):
+            joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
-                               f"set desired positions to {joint_val}")
+                               f"set desired positions to {joint_val_dict}")
 
         # This list of controllers contains all active controllers
         self.controller_mode = 0
@@ -124,7 +127,7 @@ class MujocoSimNode(Node):
                 self.get_parameter("position.P").value,
                 self.get_parameter("position.D").value,
                 self.get_parameter("position.I").value,
-                joint_desired=joint_val,
+                joint_desired=joint_val_dict,
             )
         )
         self.controller.append(
@@ -143,7 +146,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.0329
+        self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
 
     def set_init_joint_qpos(self, qpos_init):
@@ -151,7 +154,7 @@ class MujocoSimNode(Node):
         if qpos_init is None:
             return
 
-        self.data.qpos[7:] = qpos_init
+        self.data.qpos[-8:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
@@ -185,7 +188,10 @@ class MujocoSimNode(Node):
         """
         if msg.reset == 1:
             self.msg_queue = Queue()
-        self.msg_queue.put(msg.trajectory.desired.positions)
+        joint_pos_dict = {}
+        for i, name in enumerate(msg.trajectory.joint_names):
+            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        self.msg_queue.put(joint_pos_dict)
 
     def sim_step(self):
         """This function performs the simulation update.

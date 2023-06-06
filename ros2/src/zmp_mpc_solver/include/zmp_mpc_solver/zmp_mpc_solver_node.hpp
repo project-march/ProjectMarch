@@ -18,7 +18,6 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "nav_msgs/msg/path.hpp"
-#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/bool.hpp"
@@ -46,14 +45,20 @@ private:
     void right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
     void left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
 
-    geometry_msgs::msg::PoseArray::SharedPtr desired_footsteps;
-    geometry_msgs::msg::PoseArray prev_des_footsteps;
+    double m_desired_previous_foot_x;
+    double m_desired_previous_foot_y;
+
+    geometry_msgs::msg::PoseArray::SharedPtr m_desired_footsteps;
+    geometry_msgs::msg::PoseArray m_prev_des_footsteps;
+    geometry_msgs::msg::PoseArray m_prev_foot_msg;
+
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_publisher;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_com_visualizer_publisher;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr m_zmp_visualizer_publisher;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_current_shooting_node_publisher;
 
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_subscriber;
