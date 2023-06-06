@@ -11,6 +11,7 @@
 #include "march_shared_msgs/srv/request_gait.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "state_machine/state_machine.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include <chrono>
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
@@ -28,6 +29,7 @@ private:
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void response_gait_callback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
 
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_reset_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
     rclcpp::Subscription<march_shared_msgs::msg::GaitRequest>::SharedPtr m_gait_request_subscriber;
     rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_footstep_client;

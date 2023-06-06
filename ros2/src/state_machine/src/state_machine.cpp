@@ -43,7 +43,6 @@ StateMachine::StateMachine()
 bool StateMachine::performTransition(exoState desired_state)
 {
     if (isValidTransition(desired_state)) {
-        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Exo state transition succeeded!");
         m_current_state = desired_state;
         return true;
     } else {

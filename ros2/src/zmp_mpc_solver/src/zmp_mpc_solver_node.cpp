@@ -132,7 +132,7 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 void SolverNode::timer_callback()
 {
     if (!(m_desired_footsteps)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input from footstep planner");
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input from footstep planner");
         // printf("prev des%i\n", m_prev_des_footsteps);
     } else {
         if (*m_desired_footsteps != m_prev_des_footsteps) {

@@ -73,36 +73,44 @@ IkSolverNode::IkSolverNode()
 
 void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
-    // Reset the timer
-    // m_solving_timer->reset();
-    m_com_trajectory_index = 0;
-    // Update desired state
-    m_com_trajectory_container = msg;
-    // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
+    if (this->m_reset != -1) {
+        // Reset the timer
+        // m_solving_timer->reset();
+        m_com_trajectory_index = 0;
+        // Update desired state
+        m_com_trajectory_container = msg;
+        // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
+    }
 }
 
 void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
-    // Reset the timer
-    // m_solving_timer->reset();
-    m_swing_trajectory_index = 0;
-    // Update desired state
-    m_swing_trajectory_container = msg;
-    // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
-    // m_stance_foot = -m_stance_foot;
+    if (this->m_reset != -1) {
+        // Reset the timer
+        // m_solving_timer->reset();
+        m_swing_trajectory_index = 0;
+        // Update desired state
+        m_swing_trajectory_container = msg;
+        // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
+        // m_stance_foot = -m_stance_foot;
+    }
 }
 
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    // m_joint_names = msg->name;
-    // m_ik_solver.set_joint_configuration(msg);
-    // m_ik_solver.set_current_state();
-    // m_ik_solver.set_jacobian();
+    if (this->m_reset != -1) {
+        // m_joint_names = msg->name;
+        // m_ik_solver.set_joint_configuration(msg);
+        // m_ik_solver.set_current_state();
+        // m_ik_solver.set_jacobian();
+    }
 }
 
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    set_foot_placement(msg);
+    if (this->m_reset != -1) {
+        set_foot_placement(msg);
+    }
 }
 
 void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr setter)
@@ -112,7 +120,9 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
-    m_stance_foot = msg->data;
+    if (this->m_reset != -1) {
+        m_stance_foot = msg->data;
+    }
 }
 
 void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
@@ -140,6 +150,7 @@ void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg
         m_swing_trajectory_container->velocity.push_back(point_container);
         m_swing_trajectory_index = 0;
     }
+    this->m_reset = msg->data;
 }
 
 void IkSolverNode::timer_callback()
@@ -148,7 +159,7 @@ void IkSolverNode::timer_callback()
 
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input");
         return;
     } else {
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
@@ -223,13 +234,13 @@ void IkSolverNode::timer_callback()
 
         // RCLCPP_INFO(this->get_logger(), "Solved for Position");
         if (m_swing_trajectory_index >= m_swing_trajectory_container->velocity.size()) {
-            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Reached end of swing trajectory");
+            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Reached end of swing trajectory");
         } else {
             m_swing_trajectory_index++;
         }
 
         if (m_com_trajectory_index >= m_com_trajectory_container->velocity.size()) {
-            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Reached end of swing trajectory");
+            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Reached end of com trajectory");
         } else {
             m_com_trajectory_index++;
         }

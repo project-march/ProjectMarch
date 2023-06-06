@@ -18,6 +18,7 @@ using namespace std::chrono_literals;
 StateMachineNode::StateMachineNode()
     : Node("state_machine_node")
 {
+    m_reset_publisher = this->create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
     m_gait_response_publisher
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
@@ -50,11 +51,10 @@ StateMachineNode::StateMachineNode()
 void StateMachineNode::response_footstep_callback(
     const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
 {
-    RCLCPP_INFO(this->get_logger(), "response_footstep_callback");
     if (future.get()->status) {
-        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Request received successful!");
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Footstep request received successful!");
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Request was not a success!");
+        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Footstep request was not a success!");
     }
 }
 
@@ -68,11 +68,10 @@ void StateMachineNode::response_footstep_callback(
 void StateMachineNode::response_gait_callback(
     const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future)
 {
-    RCLCPP_INFO(this->get_logger(), "response_footstep_callback");
     if (future.get()->status) {
-        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Request received successful!");
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Gait request received successful!");
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Request was not a success!");
+        RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Gait request was not a success!");
     }
 }
 
@@ -84,21 +83,24 @@ void StateMachineNode::response_gait_callback(
  */
 void StateMachineNode::send_request(exoState desired_state)
 {
-    RCLCPP_INFO(this->get_logger(), "send_request");
     int requested_gait = (int)desired_state;
     int cur_st = this->m_state_machine.get_current_state();
-    RCLCPP_INFO(this->get_logger(), "current state in send_request is: %d", cur_st);
-    if (m_state_machine.get_current_state() == 0 && requested_gait == 1) {
+    auto reset_msg = std_msgs::msg::Int32();
+    if (requested_gait == 1) {
+        reset_msg.data = -1;
+        m_reset_publisher->publish(reset_msg);
         m_gait_request->gait_type = 1;
-        RCLCPP_INFO(this->get_logger(), "send_request with stand_up");
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
-    }
-    if (requested_gait == 0) {
+    } else if (requested_gait == 0) {
+        reset_msg.data = -1;
+        m_reset_publisher->publish(reset_msg);
         m_gait_request->gait_type = 0;
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
     } else {
+        //        reset_msg.data = 1;
+        m_reset_publisher->publish(reset_msg);
         m_footstep_request->gait_type = requested_gait;
         m_footstep_future = m_footstep_client->async_send_request(
             m_footstep_request, std::bind(&StateMachineNode::response_footstep_callback, this, _1));
