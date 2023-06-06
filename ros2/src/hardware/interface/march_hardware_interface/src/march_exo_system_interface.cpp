@@ -408,7 +408,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        jointInfo.joint.actuate(/*torque=*/0, (float)jointInfo.position, 1, 0);
+        jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0, 1, 0);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
