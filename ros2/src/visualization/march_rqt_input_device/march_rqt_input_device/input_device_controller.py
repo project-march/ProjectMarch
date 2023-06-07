@@ -1,6 +1,7 @@
 """Author: Katja Schmal, MVI & Marco Bak, MVIII."""
 import getpass
 import socket
+import time
 
 from std_msgs.msg import Header, Bool
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
@@ -170,21 +171,19 @@ class InputDeviceController:
         )
 
         # wait for a few seconds
-        time = 3 #in seconds
-        rate = self._node.create_rate(time)
-        rate.sleep()
+        # time = 3 # seconds
+        # rate = self._node.create_rate(time)
+        # rate.sleep()
+        time.sleep(3)
 
-        # then send 0 torque
-        torque = 0.0 #TODO: change to reasonable value
-        self._node.get_logger().info("Resetting direct torque " + str(torque))
+        # then reset the torque to 0
+        torque = 0.0
+        self._node.get_logger().info("Resetting direct torque to " + str(torque))
         self.direct_torque_pub.publish(
             Float32(
                 data = torque
             )
         )
-
-
-
 
 def publish_control_type(self, control_type) -> None:
         """Sets the allowed control type depending on the gait"""

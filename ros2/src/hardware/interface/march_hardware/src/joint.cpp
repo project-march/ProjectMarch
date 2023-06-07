@@ -123,10 +123,10 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasTorqueSensor()) {
         initial_torque_ = motor_controller_->getTorque();
-        if (initial_torque_ != 0) {
-            throw error::HardwareException(error::ErrorType::INITIAL_TORQUE_NOT_ZERO,
-                "Joint %s has an initial torque of %d, while initial torque should be 0", name_.c_str(),
-                initial_torque_);
+        if (initial_torque_ > motor_controller_->getTorqueSensor()->getMaxTorque()) {
+            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                "Joint %s has an initial torque of %d, while initial torque can at most be ", name_.c_str(),
+                initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
         }
     }
     logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));

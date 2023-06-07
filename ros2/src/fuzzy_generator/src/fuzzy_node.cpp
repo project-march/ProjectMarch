@@ -44,7 +44,7 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
     march_shared_msgs::msg::WeightStamped left_weights;
     left_weights.torque_weight = left_leg->getTorqueWeight();
     left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = 'l';
+    left_weights.leg = "l";
     publish_weights(left_weights);
 
     // update the weights for the right leg
@@ -55,7 +55,7 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
     march_shared_msgs::msg::WeightStamped right_weights;
     right_weights.torque_weight = right_leg->getTorqueWeight();
     right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = 'r';
+    right_weights.leg = "r";
     publish_weights(right_weights);
 }
 
@@ -78,7 +78,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     march_shared_msgs::msg::WeightStamped left_weights;
     left_weights.torque_weight = left_leg->getTorqueWeight();
     left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = 'l';
+    left_weights.leg = "l";
     left_weights.header.frame_id = this->get_name();
     publish_weights(left_weights);
 
@@ -90,7 +90,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     march_shared_msgs::msg::WeightStamped right_weights;
     right_weights.torque_weight = right_leg->getTorqueWeight();
     right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = 'r';
+    right_weights.leg = "r";
     right_weights.header.frame_id = this->get_name();
     publish_weights(right_weights);
 }
@@ -132,6 +132,7 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
         m_weight_publisher->publish(msg);
     }
     else if(allowed_control_type == "fuzzy"){
+        RCLCPP_INFO_STREAM(this->get_logger(), "we have leg: " << leg);
         m_weight_publisher->publish(msg);
     }
     else{

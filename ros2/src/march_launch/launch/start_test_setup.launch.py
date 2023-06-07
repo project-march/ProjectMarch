@@ -29,7 +29,7 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch torque converter
+    # region Launch rqt input device if not rqt_input:=false
     torque_converter = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -41,7 +41,8 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch rqt input device if not rqt_input:=false
+
+    # region Launch torque converter
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -57,6 +58,7 @@ def generate_launch_description() -> LaunchDescription:
             ("testing", "true"),
         ],
     )
+    # endregion
 
     return LaunchDescription([
         Node(
@@ -86,7 +88,7 @@ def generate_launch_description() -> LaunchDescription:
             name='joint_trajectory_buffer_node',
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
-        torque_converter,
+        # torque_converter,
         rqt_input_device,
         march_control,
     ])

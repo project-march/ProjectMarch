@@ -213,7 +213,7 @@ float ODrive::getOdriveTemperature()
 
 ODriveAxisState ODrive::getAxisState()
 {
-    logger_->info("Reading axis state");
+    // logger_->info("Reading axis state");
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
