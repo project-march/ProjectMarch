@@ -245,13 +245,6 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
 hardware_interface::return_type MarchExoSystemInterface::start()
 {
     try {
-        weight_node = std::make_shared<WeightNode>();
-        weight_node->joints_info_ = getJointsInfo();
-        executor_.add_node(weight_node);
-        std::thread([this]() {
-            executor_.spin();
-        }).detach();
-
         // Start ethercat cycle in the hardware
         RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
         march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
@@ -293,7 +286,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             // jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
             // TORQUEDEBUG LINE - comment out below for torque testing
-            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.9f, 0.1f);
+            jointInfo.joint.actuate(jointInfo.target_position, 0.08f, 0.9f, 0.1f);
 
 
             // Set the first target as the current position
@@ -304,6 +297,13 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.effort_command = 0;
 
         }
+        weight_node = std::make_shared<WeightNode>();
+        weight_node->joints_info_ = getJointsInfo();
+        executor_.add_node(weight_node);
+        std::thread([this]() {
+            executor_.spin();
+        }).detach();
+
 
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
@@ -530,7 +530,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         #ifdef TORQUEDEBUG
         RCLCPP_FATAL((*logger_), "The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
-        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
+        // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
         // return hardware_interface::return_type::ERROR;
         #endif
 
