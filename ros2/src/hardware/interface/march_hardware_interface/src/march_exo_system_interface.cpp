@@ -245,6 +245,13 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
 hardware_interface::return_type MarchExoSystemInterface::start()
 {
     try {
+        weight_node = std::make_shared<WeightNode>();
+        weight_node->joints_info_ = getJointsInfo();
+        executor_.add_node(weight_node);
+        std::thread([this]() {
+            executor_.spin();
+        }).detach();
+
         // Start ethercat cycle in the hardware
         RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
         march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
@@ -272,18 +279,21 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
 
-            // Set the first weights
-            // jointInfo.position_weight = 1.0f;
-            // jointInfo.torque_weight = 0.0f;
+            // ACTUAL TORQUE LINES
+            // jointInfo.target_torque = (float)jointInfo.joint.getTorque();
 
-            // TORQUEDEBUG LINE - this will start up the HWI with a torque of 0, instead of the current position, and in full torque mode
-//            #ifdef TORQUEDEBUG
-//            jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.0f, 1.0f);
-//            #endif
+            // // if no weight has been assigned, we start in position control
+            // if(!jointInfo.torque_weight){
+            //     jointInfo.torque_weight = 0.0f;
+            // }
+            // if(!jointInfo.position_weight){
+            //     jointInfo.position_weight = 0.0f;
+            // }
+
+            // jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
             // TORQUEDEBUG LINE - comment out below for torque testing
             jointInfo.joint.actuate(jointInfo.target_position, 0.0f, 0.9f, 0.1f);
-
 
 
             // Set the first target as the current position
@@ -294,13 +304,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.effort_command = 0;
 
         }
-
-        weight_node = std::make_shared<WeightNode>();
-        weight_node->joints_info_ = getJointsInfo();
-        executor_.add_node(weight_node);
-        std::thread([this]() {
-            executor_.spin();
-        }).detach();
 
     } catch (const std::exception& e) {
         RCLCPP_FATAL((*logger_), e.what());
@@ -523,16 +526,16 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        jointInfo.effort_command_converted = converted_effort;
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
-        // TORQUEDEBUG LINE - this will stop ROS from actuating
+        // TORQUEDEBUG LINE - this will send hardcoded values to the joint
         #ifdef TORQUEDEBUG
-        RCLCPP_FATAL((*logger_), "STOPPING THE COMMUNICATION. The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
+        RCLCPP_FATAL((*logger_), "The fuzzy values are as follows: \n position: %f \n position weight: %f \n torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque_weight);
+        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
         // return hardware_interface::return_type::ERROR;
         #endif
 
-        // Comment out for debugging:
-        // Here the assumption is that the value that is send to the joint trajectory controller is the right one
-        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
+        // ACTUAL TORQUE LINE
+        // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
 
     return hardware_interface::return_type::OK;

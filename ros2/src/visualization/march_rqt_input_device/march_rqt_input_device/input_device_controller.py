@@ -171,9 +171,6 @@ class InputDeviceController:
         )
 
         # wait for a few seconds
-        # time = 3 # seconds
-        # rate = self._node.create_rate(time)
-        # rate.sleep()
         time.sleep(3)
 
         # then reset the torque to 0
@@ -185,7 +182,7 @@ class InputDeviceController:
             )
         )
 
-def publish_control_type(self, control_type) -> None:
-        """Sets the allowed control type depending on the gait"""
-        self._node.get_logger().info("Publishing control type " + control_type)
-        self._set_gait_control_type.publish(String(data=control_type))
+    def publish_control_type(self, control_type) -> None:
+            """Sets the allowed control type depending on the gait"""
+            self._node.get_logger().info("Publishing control type " + control_type)
+            self._set_gait_control_type.publish(String(data=control_type))
