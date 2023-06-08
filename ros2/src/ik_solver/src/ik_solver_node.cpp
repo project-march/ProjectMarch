@@ -44,7 +44,7 @@ IkSolverNode::IkSolverNode()
     publish_ik_visualizations();
 
     // Initializing the timestep
-    declare_parameter("timestep", 12);
+    declare_parameter("timestep", 50);
     m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer = this->create_wall_timer(
@@ -99,7 +99,6 @@ void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState:
     // m_ik_solver.set_current_state();
     // m_ik_solver.set_jacobian();
     // RCLCPP_INFO(this->get_logger(), "obtained joint trajectory");
-    
 }
 
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -159,9 +158,9 @@ void IkSolverNode::timer_callback()
             m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x*0.3,
+            m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * 0.5,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z*0.3, 0.0, 0.0, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * 0.5, 0.0, 0.0, 0.0;
 
             // m_desired_state.left_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             // m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -176,9 +175,9 @@ void IkSolverNode::timer_callback()
 
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x*0.3,
+            m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * 0.5,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z*0.3, 0.0, 0.0, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * 0.5, 0.0, 0.0, 0.0;
 
             // m_desired_state.right_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             //     m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -189,7 +188,7 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x*5.0*0.3,
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * 13.0 * 0.5,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y,
             m_com_trajectory_container->velocity[m_com_trajectory_index].z, 0.0, 0.0, 0.0;
         // m_desired_state.com_pos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -203,7 +202,7 @@ void IkSolverNode::timer_callback()
             m_ik_solver.get_state(), m_desired_state, static_cast<double>(m_timestep) / 1000.0, m_stance_foot);
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
-        
+
         // ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
         // RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         // ss.clear();
@@ -256,10 +255,10 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
         // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
-        if ((i.compare("right_ankle")==0) or (i.compare("left_ankle")==0)){
+        if ((i.compare("right_ankle") == 0) or (i.compare("left_ankle") == 0)) {
             point.positions.push_back(0.0);
-        }else{
-        point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+        } else {
+            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         }
         // RCLCPP_INFO(this->get_logger(), "publishing position %f, which is equal to %f",
         // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
@@ -270,7 +269,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     point_prev.time_from_start.nanosec = 0.0;
     point.time_from_start.sec = 0;
     point.time_from_start.nanosec = m_timestep * 1e6;
-    if (point_prev_saved.positions.size()>0){
+    if (point_prev_saved.positions.size() > 0) {
         trajectory.points.push_back(point_prev);
     }
     trajectory.points.push_back(point);

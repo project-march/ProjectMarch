@@ -29,7 +29,7 @@ StateEstimatorMockNode::StateEstimatorMockNode()
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
     m_joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("measured_joint_states", 100);
 
-    m_solving_timer = this->create_wall_timer(1ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
+    m_solving_timer = this->create_wall_timer(50ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
 }
 
 void StateEstimatorMockNode::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)

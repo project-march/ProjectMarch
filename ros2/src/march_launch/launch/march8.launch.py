@@ -114,7 +114,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # declare parameters
     # in ms
-    trajectory_dt = 12
+    trajectory_dt = 50
 
     # region footstep_generation parameters
     n_footsteps = 20
