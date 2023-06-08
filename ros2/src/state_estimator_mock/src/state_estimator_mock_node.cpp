@@ -17,8 +17,8 @@ StateEstimatorMockNode::StateEstimatorMockNode()
     // subscribers
     m_current_shooting_node_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/current_shooting_node", 10, std::bind(&StateEstimatorMockNode::current_shooting_node_callback, this, _1));
-    // m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-    //     "/joint_states", 10, std::bind(&StateEstimatorMockNode::state_callback, this, _1));
+    m_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+        "/joint_states", 10, std::bind(&StateEstimatorMockNode::state_callback, this, _1));
 
     // publishers
     m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
@@ -27,22 +27,22 @@ StateEstimatorMockNode::StateEstimatorMockNode()
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
     m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
-    // m_joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("measured_joint_states", 100);
+    m_joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("measured_joint_states", 100);
 
     m_solving_timer = this->create_wall_timer(1ms, std::bind(&StateEstimatorMockNode::publishtrajectories, this));
 }
 
-// void StateEstimatorMockNode::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
-// {
-//     // for(auto& i : msg->position){
-//     //     if (i == 0.0){
-//     //         return;
-//     //     }
-//     // }
-//     // this->m_joint_estimator.set_joint_states(msg);
-//     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
-//     m_joint_state_publisher->publish(*msg);
-// }
+void StateEstimatorMockNode::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
+{
+    // for(auto& i : msg->position){
+    //     if (i == 0.0){
+    //         return;
+    //     }
+    // }
+    // this->m_joint_estimator.set_joint_states(msg);
+    // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
+    m_joint_state_publisher->publish(*msg);
+}
 
 void StateEstimatorMockNode::current_shooting_node_callback(std_msgs::msg::Int32::SharedPtr msg)
 {

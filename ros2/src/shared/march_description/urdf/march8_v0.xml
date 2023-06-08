@@ -68,7 +68,7 @@ See <https://www.gnu.org/licenses/>.
     </default>
     <default class="rotational_joint">
       <joint damping="63.451777"
-              armature="9.98"
+              armature="6.0"
              frictionloss="0" stiffness="0"/>
     </default>
   </default>

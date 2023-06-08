@@ -99,15 +99,15 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 {
     // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 0.8;
-    double right_weight = 0.8;
-    double CoM_weight = 0.5;
+    double left_weight = 1.0;
+    double right_weight = 1.0;
+    double CoM_weight = 0.8;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
 
-    double CoM_gains = 1.0 / dt;
-    double left_gains = 1.0 / dt;
-    double right_gains = 1.0 / dt;
+    double CoM_gains = 1.0;// / dt;
+    double left_gains = 1.0;// / dt;
+    double right_gains = 1.0;// / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
 
     // Get the error vectors
@@ -154,13 +154,13 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // NOTE::: CONSIDER ADDING THE SINGULARITY ROBUST REGULARIZATION TERM
     // [NOTE]: ADD THE ILNEAR TERM USING COM VELOCITIES
     cost_H += left_weight
-        * (J_left_foot.transpose() * J_left_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.001);
+        * (J_left_foot.transpose() * J_left_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the quadratic left_foot cost");
     cost_F += -left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_gains * left_foot_error);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the linear left_foot cost");
 
     cost_H += right_weight
-        * (J_right_foot.transpose() * J_right_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.001);
+        * (J_right_foot.transpose() * J_right_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the quadratic right_foot cost");
     cost_F
         += -right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_gains * right_foot_error);
@@ -178,40 +178,17 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         // constrained_joints(i,i) = 0;
     }
 
-    std::stringstream ss;
-    // ss << constrained_joints.format(Eigen::IOFormat(m_model.nv, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(rclcpp::get_logger(""), "constraint matrix is :\n" + ss.str() + "\n");
-    // ss.clear();
-    // ss.str("");
-
     Eigen::VectorXd joint_upper_lim = (m_joint_lim_max.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
     Eigen::VectorXd joint_lower_lim = (m_joint_lim_min.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
-    joint_upper_lim.segment(0, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(0, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(0, 3) << 1e-4 * Eigen::VectorXd::Ones(3);
+    joint_lower_lim.segment(0, 3) << -1e-4 * Eigen::VectorXd::Ones(3);
 
-    joint_upper_lim.segment(0, 1) << 0.01;
-    joint_lower_lim.segment(0, 1) << -0.01;
+    joint_upper_lim.segment(0, 1) << 1;
+    joint_lower_lim.segment(0, 1) << -1;
 
-    joint_upper_lim.segment(3, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(3, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(3, 4) << 1e-2 * Eigen::VectorXd::Ones(4);
+    joint_lower_lim.segment(3, 4) << -1e-2 * Eigen::VectorXd::Ones(4);
     // RCLCPP_INFO(rclcpp::get_logger(""), "size is %i", m_joint_lim_max.size());
-
-    // ss << constrained_joints.format(Eigen::IOFormat(constrained_joints.size(), 0, ", ", "\n", "", ""));
-    // // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Matrix joint lim is is :\n" + ss.str());
-    // ss.clear();
-    // ss.str("");
-    ss << joint_upper_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "upper joint lim is :\n" + ss.str());
-    ss.clear();
-    ss.str("");
-    ss << joint_lower_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "lower joint lim is :\n" + ss.str());
-    ss.clear();
-    ss.str("");
-
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized constraints");
 
     // dummy equality constraint
@@ -225,9 +202,9 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // We now swap the dummy foot based on the fixed Jacobian.
     if (stance_foot == -1) {
-        // A_dummy = J_left_foot;
+        A_dummy = J_left_foot;
     } else {
-        // A_dummy = J_right_foot;
+        A_dummy = J_right_foot;
     }
 
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);

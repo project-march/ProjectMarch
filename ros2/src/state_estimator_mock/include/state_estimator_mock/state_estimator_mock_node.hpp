@@ -22,7 +22,7 @@ class StateEstimatorMockNode : public rclcpp::Node {
 public:
     StateEstimatorMockNode();
     void publishtrajectories();
-    // void state_callback(sensor_msgs::msg::JointState::SharedPtr msg);
+    void state_callback(sensor_msgs::msg::JointState::SharedPtr msg);
 
 private:
     rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_pos_publisher;
@@ -31,10 +31,10 @@ private:
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_stance_foot_publisher;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_publisher;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_publisher;
-    // rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;
 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_current_shooting_node_subscriber;
-    // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     void current_shooting_node_callback(std_msgs::msg::Int32::SharedPtr msg);
     StateEstimatorMock m_state_estimator_mock;
