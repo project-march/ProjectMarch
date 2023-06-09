@@ -179,7 +179,7 @@ def generate_launch_description() -> LaunchDescription:
             launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
         ),
         mujoco_node,
-        rqt_input_device,
+        # rqt_input_device,
         march_control,
         record_rosbags_action,
     ])
