@@ -25,7 +25,7 @@ class GaitSelectionNode(Node):
     def __init__(self):
         super().__init__('gait_selection_node')
         self.gait_package = "gait_files"
-        self.directory_name = "airgait_vi"
+        self.directory_name = "march8_gaits"
         self.gait_loader = GaitLoader(self)
         self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
 
@@ -54,15 +54,16 @@ class GaitSelectionNode(Node):
 
         if requested_gait == 0:
             self.get_logger().info("sit gait called!")
-            gait = self.gait_loader.loaded_gaits.get("home_sit")
-            trajectory = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
+            gait = self.gait_loader.loaded_gaits.get("sit")
+            trajectory = gait
             self._execute_gait(trajectory)
             reset_msg.data = -1
             self.reset_publisher.publish(reset_msg)
         elif requested_gait == 1:
             self.get_logger().info("stand gait called!")
-            gait = self.gait_loader.loaded_gaits["home_stand"]
-            trajectory = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
+            gait = self.gait_loader.loaded_gaits.get("stand_up")
+            self.get_logger().info(str(gait))
+            trajectory = gait
             self._execute_gait(trajectory)
 
         # Used to make sure the sim plans the gaits in time.
@@ -99,7 +100,7 @@ class GaitSelectionNode(Node):
         """
         gait_executor_response_goal_handle: ClientGoalHandle = future.result()
         if not gait_executor_response_goal_handle.accepted:
-            self.get_logger.warning(
+            self.get_logger().warning(
                 "Goal message to execute gait was not accepted by the Action server."
                 f"Goal: {gait_executor_response_goal_handle}"
             )

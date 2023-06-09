@@ -3,13 +3,12 @@
 import os
 import yaml
 
-from typing import List, Dict
+from typing import List
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
+from rclpy.duration import Duration
 
-from gait_selection.setpoints_gait import SetpointsGait
-from gait_selection.home_gait import HomeGait
-from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
 class GaitLoader:
@@ -19,11 +18,7 @@ class GaitLoader:
         node (rclpy.Node): the gait node
     Attributes:
         _node (rclpy.Node): the gait node
-        _logger (rclpy.Logger): used to log to the terminal
-        _gait_directory (str): path to the directory that contains the gait files
         _default_yaml (str): path to the yaml that contains the named positions
-        _loaded_gaits (Dict[str, Gait]): dictionary containing the name and instance of each loaded gait class
-        _named_positions (Dict[EdgePosition, str]): dictionary containing the EdgePosition and name of each named pos
     """
 
     def __init__(
@@ -32,22 +27,15 @@ class GaitLoader:
     ):
         """Init the gait loader for the gait_selection."""
         self._node = node
-        self._logger = node.get_logger().get_child(__class__.__name__)
         self._actuating_joint_names = [
             "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
             "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
 
-        package_path = get_package_share_directory(self._node.gait_package)
-        self._gait_directory = os.path.join(package_path, self._node.directory_name)
-        self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
+        package_path = get_package_share_directory(self._node.gait_package) + "/" + self._node.directory_name
+        self._default_yaml = os.path.join(package_path, "gaits.yaml")
         self.loaded_gaits = {}
-        self._named_positions = {}
-        self.gait_positions = {}
 
-        self.gait_duration = 3.0
-        self.num_trajectory_points = 4
-
-        self._load_gaits()
+        self._load_gaits_from_yaml(self._default_yaml)
 
     @property
     def joint_names(self) -> List[str]:
@@ -59,50 +47,27 @@ class GaitLoader:
         """Return a dictionary containing the loaded gaits."""
         return self.loaded_gaits
 
-    @property
-    def positions(self) -> Dict[EdgePosition, str]:
-        """Returns the named idle positions."""
-        return self._named_positions
+    def _load_gaits_from_yaml(self, yaml_location):
+        with open(yaml_location, "r") as gait_file:
+            try:
+                gait_yaml = yaml.safe_load(gait_file)
+            except yaml.YAMLError as exc:
+                self._node.get_logger().error(str(exc))
 
-    def _load_gaits(self) -> None:
-        """Load all gaits."""
-        self._load_named_positions()
-        self._load_home_gaits()
-        self._load_sit_and_stand_gaits()
-
-    def _load_named_positions(self) -> None:
-        """Load the named positions from default.yaml."""
-        with open(self._default_yaml, "r") as default_yaml_file:
-            default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
-
-        self._gait_version_map = default_config["gaits"]
-
-        for position_name, position_values in default_config["positions"].items():
-            edge_position = StaticEdgePosition(
-                [position_values["joints"][joint_name] for joint_name in self._actuating_joint_names]
-            )
-            self.gait_positions[position_name] = edge_position
-            if edge_position not in self._named_positions:
-                self._named_positions[edge_position] = position_name
-            else:
-                self._logger.error(
-                    f"Position '{position_name}' with joint values {position_values} cannot be added because it will "
-                    f"overwrite position '{self._named_positions[edge_position]}'. "
-                    f"Each named position should be unique."
-                )
-
-    def _load_home_gaits(self) -> None:
-        """Create the home gaits based on the named positions."""
-        for position in self._named_positions:
-            if isinstance(position, UnknownEdgePosition):
-                continue
-            name = self._named_positions[position]
-            home_gait = HomeGait(name, position, "")
-            self.gaits[home_gait.name] = home_gait
-
-    def _load_sit_and_stand_gaits(self) -> None:
-        """Loads the sit and stand gaits."""
-        for gait in self._gait_version_map:
-            self.loaded_gaits[gait] = SetpointsGait.from_file(
-                gait, self._gait_directory, self._gait_version_map
-            )
+        gaits = gait_yaml["gaits"].items()
+        for gait in gaits:
+            trajectory = JointTrajectory()
+            gait_name = gait[0]
+            gait_points = gait[1]["points"]
+            point_amount = gait[1]["amount_of_points"]
+            trajectory.joint_names = gait[1]["joint_names"]
+            for i in range(point_amount):
+                point = JointTrajectoryPoint()
+                point.time_from_start = Duration(seconds=gait_points["time_from_start"][i][0],
+                                                 nanoseconds=gait_points["time_from_start"][i][1]).to_msg()
+                point.positions = gait_points["positions"][i]
+                point.velocities = gait_points["velocities"][i]
+                point.accelerations = []
+                point.effort = []
+                trajectory.points.append(point)
+            self.loaded_gaits[gait_name] = trajectory
