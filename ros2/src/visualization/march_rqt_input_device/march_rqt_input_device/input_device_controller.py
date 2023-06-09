@@ -45,7 +45,7 @@ class InputDeviceController:
         )
         self._error_pub = self._node.create_publisher(
             msg_type=Error,
-            topic="/march/error",
+            topic="/march/input_device/error",
             qos_profile=10
         )
         self._send_gait_request = self._node.create_publisher(
@@ -98,9 +98,11 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._send_gait_request.publish(msg)
-        if gait_type == 2:
-            int_msg = Int32(data=0)
-            self._swing_leg_command_pub.publish(int_msg)
+        if gait_type == 5:
+            error_msg = Error()
+            error_msg.error_message = "Error button clicked on IPD"
+            error_msg.type = 0
+            self._error_pub.publish(error_msg)
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""

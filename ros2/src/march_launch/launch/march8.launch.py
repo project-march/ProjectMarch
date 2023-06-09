@@ -68,6 +68,20 @@ def generate_launch_description() -> LaunchDescription:
             ("layout", "training"),
         ],
     )
+    # endregion
+
+    # region Launch Safety
+    safety_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_safety"),
+                "launch",
+                "march_safety.launch.py",
+            )
+        ),
+        launch_arguments=[("simulation", "true")],
+    )
+    # endregion
 
     ik_solver_launch_dir = os.path.join(
         get_package_share_directory('ik_solver'),
@@ -181,4 +195,5 @@ def generate_launch_description() -> LaunchDescription:
         rqt_input_device,
         march_control,
         record_rosbags_action,
+        safety_node,
     ])

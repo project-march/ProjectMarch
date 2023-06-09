@@ -110,6 +110,9 @@ void StateMachineNode::send_request(exoState desired_state)
         m_gait_request->gait_type = 0;
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
+    } else if (requested_gait == 5){
+        // NOTE: Make sure that everything of hte high level control and the gait selection stops.
+        return;
     } else {
         //        reset_msg.data = 1;
         m_reset_publisher->publish(reset_msg);

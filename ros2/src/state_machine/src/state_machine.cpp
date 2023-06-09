@@ -26,6 +26,7 @@ StateMachine::StateMachine()
         { exoState::Walk, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
         { exoState::StepClose, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
         { exoState::ForceUnknown, { exoState::Stand, exoState::Sit, exoState::Error } },
+        { exoState::Error, {} },
 
     };
 }
