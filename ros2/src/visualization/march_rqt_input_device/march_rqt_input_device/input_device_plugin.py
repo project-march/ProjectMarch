@@ -40,8 +40,10 @@ class InputDevicePlugin(Plugin):
         # using march_monitor), the ipd always sends alive pings to the safety node
         self._node.declare_parameter("ping_safety_node", True)
         self._node.declare_parameter("layout_file")
+        self._node.declare_parameter("testing")
         layout_file = self._node.get_parameter("layout_file").get_parameter_value().string_value
-        self._controller = InputDeviceController(self._node)
+        testing = self._node.get_parameter("testing").get_parameter_value().bool_value
+        self._controller = InputDeviceController(self._node, testing)
         self._widget = InputDeviceView(ui_file, layout_file, self._controller, self._node.get_logger())
         context.add_widget(self._widget)
 

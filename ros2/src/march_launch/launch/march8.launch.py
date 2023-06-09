@@ -66,6 +66,7 @@ def generate_launch_description() -> LaunchDescription:
             ("ping_safety_node", "true"),
             ("use_sim_time", "false"),
             ("layout", "training"),
+            ("testing", "false"),
         ],
     )
     # endregion
