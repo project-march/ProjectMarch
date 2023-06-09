@@ -55,8 +55,8 @@ int IkSolver::set_jacobian()
     try {
         m_body_com = pinocchio::centerOfMass(m_model, m_model_data, m_joint_pos);
 
-        pinocchio::JointIndex left_foot_index = m_model.getFrameId("L_foot");
-        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
+        pinocchio::JointIndex left_foot_index = m_model.getFrameId("L_toe");
+        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_toe");
         pinocchio::getJointJacobian(m_model, m_model_data, m_model.frames[left_foot_index].parent,
             pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED, J_left_foot);
         pinocchio::getJointJacobian(m_model, m_model_data, m_model.frames[right_foot_index].parent,
@@ -186,8 +186,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     joint_upper_lim.segment(0, 1) << 1;
     joint_lower_lim.segment(0, 1) << -1;
 
-    joint_upper_lim.segment(3, 4) << 1e-2 * Eigen::VectorXd::Ones(4);
-    joint_lower_lim.segment(3, 4) << -1e-2 * Eigen::VectorXd::Ones(4);
+    joint_upper_lim.segment(3, 4) << 1e-4 * Eigen::VectorXd::Ones(4);
+    joint_lower_lim.segment(3, 4) << -1e-4 * Eigen::VectorXd::Ones(4);
     // RCLCPP_INFO(rclcpp::get_logger(""), "size is %i", m_joint_lim_max.size());
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized constraints");
 
@@ -267,8 +267,8 @@ void IkSolver::set_current_state()
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
-    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
-    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
+    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_toe");
+    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_toe");
 
     m_current_state.left_foot_pose << m_model_data.oMf[left_foot_index].translation(),
         pinocchio::rpy::matrixToRpy(m_model_data.oMf[left_foot_index].rotation());
