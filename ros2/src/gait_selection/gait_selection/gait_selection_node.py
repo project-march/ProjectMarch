@@ -48,22 +48,24 @@ class GaitSelectionNode(Node):
     def service_callback(self, request, response):
         """The callback that sends the requested gait to the joint_trajectory_controller/joint_trajectory topic."""
         requested_gait = request.gait_type
+        home_gait = request.home
 
         gait = None
         reset_msg = Int32()
 
         if requested_gait == 0:
+            if home_gait:
+                trajectory = self.gait_loader.loaded_gaits.get("home_sit")
+            else:
+                trajectory = self.gait_loader.loaded_gaits.get("sit_down")
             self.get_logger().info("sit gait called!")
-            gait = self.gait_loader.loaded_gaits.get("sit")
-            trajectory = gait
             self._execute_gait(trajectory)
-            reset_msg.data = -1
-            self.reset_publisher.publish(reset_msg)
+
         elif requested_gait == 1:
-            self.get_logger().info("stand gait called!")
-            gait = self.gait_loader.loaded_gaits.get("stand_up")
-            self.get_logger().info(str(gait))
-            trajectory = gait
+            if home_gait:
+                trajectory = self.gait_loader.loaded_gaits.get("home_stand")
+            else:
+                trajectory = self.gait_loader.loaded_gaits.get("stand_up")
             self._execute_gait(trajectory)
 
         # Used to make sure the sim plans the gaits in time.

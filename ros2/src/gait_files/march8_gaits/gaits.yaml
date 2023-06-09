@@ -1,4 +1,4 @@
-gait_names: ["home_sit", "home_stand", "sit", "stand_up"]
+gait_names: ["home_sit", "home_stand", "sit_down", "stand_up"]
 gaits:
   home_sit:
     amount_of_points: 1
@@ -20,7 +20,7 @@ gaits:
           - [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         time_from_start:
           - [3, 0]
-  sit:
+  sit_down:
     amount_of_points: 5
     joint_names: ["left_ankle", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
     points:
