@@ -81,7 +81,6 @@ void Joint::actuate(float target_position)
     motor_controller_->actuateRadians(target_position);
 }
 
-
 void Joint::readFirstEncoderValues(bool operational_check)
 {
     logger_->info(logger_->fstring("[%s] Reading first values", this->name_.c_str()));

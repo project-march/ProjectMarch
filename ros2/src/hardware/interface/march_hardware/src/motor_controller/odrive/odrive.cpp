@@ -105,7 +105,8 @@ void ODrive::actuateRadians(float target_position)
         && !this->absolute_encoder_->isValidTargetIU(
             this->getAbsolutePositionIU(), this->absolute_encoder_->positionRadiansToIU(target_position))) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
-            "Error in Odrive %i \nThe requested position is outside the limits, for requested position %f: ", this->getSlaveIndex(),target_position);
+            "Error in Odrive %i \nThe requested position is outside the limits, for requested position %f: ",
+            this->getSlaveIndex(), target_position);
     }
 
     bit32 write_position {};
@@ -120,11 +121,11 @@ void ODrive::actuateRadians(float target_position)
 
 void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid)
 {
-    auto offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
+    auto offset
+        = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
     for (double& i : *pos_pid.get()) {
         bit32 write_value {};
-        logger_->info(logger_->fstring(
-        "Sending PID value %f, with offset %d, to the exo.", i, offset));
+        logger_->info(logger_->fstring("Sending PID value %f, with offset %d, to the exo.", i, offset));
         write_value.f = static_cast<float>(i);
         this->write32(offset, write_value);
         offset += 4;
