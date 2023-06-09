@@ -4,7 +4,6 @@ These functions are not a part of any specific part of the code, but will be use
 for general use cases.
 """
 import os
-from copy import copy
 from typing import List, Optional
 
 from ament_index_python.packages import get_package_share_directory
@@ -235,40 +234,3 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
         joint_names = [name for name in joint_names if robot.joint_map[name].type != "fixed"]
 
     return sorted(joint_names)
-
-
-# def get_position_from_yaml(position: str):
-#     """Gets a dictionary for default joint angles and given positions.
-#
-#     Note:
-#         Gets the position from the 'default.yaml` located in the "march_gait_files" package in "sit_stand_m8".
-#
-#     Args:
-#         position (str): Name of the position, e.g. "stand", for home stand.
-#
-#     Returns:
-#         dict[str, float]. The str is the joint name and the float is the joint angle in radians.
-#     """
-#     try:
-#         with open(
-#             os.path.join(
-#                 get_package_share_directory("gait_files"),
-#                 "airgait_vi",
-#                 "default.yaml",
-#             ),
-#             MODE_READING,
-#         ) as yaml_file:
-#             try:
-#                 return yaml.safe_load(yaml_file)["positions"][position]["joints"]
-#             except KeyError as e:
-#                 raise KeyError(f"No position found with name {e}")
-#     except FileNotFoundError as e:
-#         Node("march_utility").get_logger().error(e)
-
-
-# STEPPING_STONES_END_POSITION_RIGHT = get_position_from_yaml("stand")
-# STEPPING_STONES_END_POSITION_RIGHT = dict.fromkeys(STEPPING_STONES_END_POSITION_RIGHT, 0)
-# STEPPING_STONES_END_POSITION_LEFT = copy(STEPPING_STONES_END_POSITION_RIGHT)
-#
-# STEPPING_STONES_END_POSITION_RIGHT["right_knee"] = 1
-# STEPPING_STONES_END_POSITION_LEFT["left_knee"] = 1

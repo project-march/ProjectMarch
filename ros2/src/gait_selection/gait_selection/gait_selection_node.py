@@ -50,9 +50,6 @@ class GaitSelectionNode(Node):
         requested_gait = request.gait_type
         home_gait = request.home
 
-        gait = None
-        reset_msg = Int32()
-
         if requested_gait == 0:
             if home_gait:
                 trajectory = self.gait_loader.loaded_gaits.get("home_sit")
