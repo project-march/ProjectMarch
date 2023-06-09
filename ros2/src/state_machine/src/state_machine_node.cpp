@@ -87,10 +87,9 @@ void StateMachineNode::send_request(exoState desired_state)
     int cur_st = this->m_state_machine.get_current_state();
     auto reset_msg = std_msgs::msg::Int32();
     if (requested_gait == 1) {
-        if (this->m_state_machine.get_current_state() == 0){
+        if (this->m_state_machine.get_current_state() == 0) {
             m_gait_request->home = false;
-        }
-        else {
+        } else {
             m_gait_request->home = true;
         }
         reset_msg.data = -1;
@@ -99,10 +98,9 @@ void StateMachineNode::send_request(exoState desired_state)
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
     } else if (requested_gait == 0) {
-        if (this->m_state_machine.get_current_state() == 0){
+        if (this->m_state_machine.get_current_state() == 0) {
             m_gait_request->home = true;
-        }
-        else {
+        } else {
             m_gait_request->home = false;
         }
         reset_msg.data = -1;
@@ -110,7 +108,7 @@ void StateMachineNode::send_request(exoState desired_state)
         m_gait_request->gait_type = 0;
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
-    } else if (requested_gait == 5){
+    } else if (requested_gait == 5) {
         // NOTE: Make sure that everything of hte high level control and the gait selection stops.
         return;
     } else {
