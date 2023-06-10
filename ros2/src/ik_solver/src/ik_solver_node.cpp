@@ -152,15 +152,17 @@ void IkSolverNode::timer_callback()
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for input");
         return;
     } else {
+        float swing_z_factor = 3.0;
+        float swing_x_factor = 1.0;
+
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
             m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-
-            m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
+            m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * swing_x_factor,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * 1.5, 0.0, 0.0, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.0, 0.0;
 
             // m_desired_state.left_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             // m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -175,9 +177,9 @@ void IkSolverNode::timer_callback()
 
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-            m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
+            m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * swing_x_factor,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * 1.5, 0.0, 0.0, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.0, 0.0;
 
             // m_desired_state.right_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             //     m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -188,7 +190,7 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * 14.0,
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * 1.0,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y,
             m_com_trajectory_container->velocity[m_com_trajectory_index].z, 0.0, 0.0, 0.0;
         // m_desired_state.com_pos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
