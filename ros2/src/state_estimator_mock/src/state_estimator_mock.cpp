@@ -28,7 +28,7 @@ int StateEstimatorMock::get_current_shooting_node()
 
 double StateEstimatorMock::gaussian_dist(int currentStep, double targetValue, double sigma)
 {
-    double mean = 25.0; // in the middle of the weight shift, the highest speed has to be reached
+    double mean = 50.0; // in the middle of the weight shift, the highest speed has to be reached
     double amplitude = targetValue;
     double weightingFactor = amplitude * exp(-pow(currentStep - mean, 2) / (2 * pow(sigma, 2)));
     return weightingFactor;
@@ -38,7 +38,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
     double max_y_com = 0.215; // How much can the CoM move
     double min_y_com = 0.115;
-    double max_x_com = 0.2;
+    double max_x_com = 0.1;
     double min_x_com = 0.0;
     double max_x_velocity = 0.1;
     double max_y_velocity = 0.1;
@@ -110,7 +110,7 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
 {
     double max_y_zmp = 0.33;
     double min_y_zmp = 0.0;
-    double max_x_zmp = 0.2;
+    double max_x_zmp = 0.1;
     double min_x_zmp = 0.0;
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
