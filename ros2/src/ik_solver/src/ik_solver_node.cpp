@@ -257,11 +257,11 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
         // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
-        // if ((i.compare("right_hip_aa") == 0) or (i.compare("left_hip_aa") == 0)){
-            // point.positions.push_back(-0.07);
-        // }else{
+        if ((i.compare("right_hip_aa") == 0) or (i.compare("left_hip_aa") == 0)){
+            point.positions.push_back(-0.07); // has to be minus in hennie, plus in sim
+        }else{
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
-        //}
+        }
         // RCLCPP_INFO(this->get_logger(), "publishing position %f, which is equal to %f",
         // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
     }
