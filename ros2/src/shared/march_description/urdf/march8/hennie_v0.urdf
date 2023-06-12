@@ -186,6 +186,10 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="R_toe">
+	</link>
+	<link name="L_toe">
+	</link>
 	<link name="L_ground">
 	</link>
 	<link name="R_ground">
@@ -263,6 +267,18 @@
 		<origin xyz="0 0 -0.126"/>
 		<parent link="R_foot"/>
 		<child link="R_ground"/>
+	</joint>
+
+	<joint name="right_toe" type="fixed">
+		<origin xyz="0.184 0.085 0"/>
+		<parent link="R_ground"/>
+		<child link="R_toe"/>
+	</joint>
+
+	<joint name="left_toe" type="fixed">
+		<origin xyz="0.184 -0.085 0"/>
+		<parent link="L_ground"/>
+		<child link="L_toe"/>
 	</joint>
 
 	<!-- Robot Transmission Definitions -->

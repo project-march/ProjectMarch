@@ -21,11 +21,11 @@
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
     <!-- Include all macro files    -->
-    <xacro:include filename="../macros/safety_limits.xacro"/>
-    <xacro:include filename="../macros/pressure_sole.xacro"/>
-    <xacro:include filename="../macros/frame_part.xacro"/>
-    <xacro:include filename="../macros/joint.xacro"/>
-    <xacro:include filename="../macros/configurable_joint.xacro"/>
+    <xacro:include filename="macros/safety_limits.xacro"/>
+    <xacro:include filename="macros/pressure_sole.xacro"/>
+    <xacro:include filename="macros/frame_part.xacro"/>
+    <xacro:include filename="macros/joint.xacro"/>
+    <xacro:include filename="macros/configurable_joint.xacro"/>
 
     <!-- Add yaml files with properties -->
     <xacro:property name="config_yaml_file"

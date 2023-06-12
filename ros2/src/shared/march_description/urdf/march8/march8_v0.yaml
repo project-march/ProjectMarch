@@ -182,7 +182,7 @@ joints:
     limits:
       min: 0
       max: 125
-    inertia: 6.0
+    inertia: 9.98
     frictionloss: 0
   ADPF:
     max_torque: 179
