@@ -89,6 +89,7 @@ def generate_launch_description() -> LaunchDescription:
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
+        'march8',
         'hennie_v0.urdf'
     )
 
@@ -179,7 +180,7 @@ def generate_launch_description() -> LaunchDescription:
             launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
         ),
         mujoco_node,
-        # rqt_input_device,
+        rqt_input_device,
         march_control,
         record_rosbags_action,
     ])

@@ -31,10 +31,10 @@
     <xacro:property name="configuration" value="$(arg configuration)"/>
 
     <!-- Include all macro files    -->
-    <xacro:include filename="macros/safety_limits.xacro"/>
-    <xacro:include filename="macros/pressure_sole.xacro"/>
-    <xacro:include filename="macros/frame_part.xacro"/>
-    <xacro:include filename="macros/joint.xacro"/>
+    <xacro:include filename="../macros/safety_limits.xacro"/>
+    <xacro:include filename="../macros/pressure_sole.xacro"/>
+    <xacro:include filename="../macros/frame_part.xacro"/>
+    <xacro:include filename="../macros/joint.xacro"/>
 
 
     <!-- Add yaml files with properties -->
@@ -418,7 +418,7 @@
     </joint>
 
 
-    <xacro:include filename="camera/_d435.urdf.xacro"/>
+    <xacro:include filename="../camera/_d435.urdf.xacro"/>
     <xacro:sensor_d435 name="camera_front" topics_ns="camera_front" parent="hip_base"
                        plugin="$(arg realsense_simulation)">
         <!--    Attached to the hip_base, since this is most comparable to the backpack -->
