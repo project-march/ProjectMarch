@@ -123,11 +123,12 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasTorqueSensor()) {
         initial_torque_ = motor_controller_->getTorque();
-        if (initial_torque_ > motor_controller_->getTorqueSensor()->getMaxTorque()) {
-            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an initial torque of %d, while initial torque can at most be ", name_.c_str(),
-                initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
-        }
+        // Comment back in after debugging
+        // if (initial_torque_ > motor_controller_->getTorqueSensor()->getMaxTorque()) {
+        //     throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+        //         "Joint %s has an initial torque of %d, while initial torque can at most be ", name_.c_str(),
+        //         initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
+        // }
     }
     logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
 }
@@ -175,11 +176,12 @@ void Joint::readEncoders()
         velocity_ = motor_controller_->getVelocity();
         if(motor_controller_->hasTorqueSensor()){
             torque_ = motor_controller_->getTorque();
-            if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-                throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                    "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
-                    motor_controller_->getTorqueSensor()->getMaxTorque());
-            }
+            // Comment back in after debugging
+            // if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+            //     throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+            //         "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
+            //         motor_controller_->getTorqueSensor()->getMaxTorque());
+            // }
         }
         else{
             // logger_->info(logger_->fstring("No reading the torque sensors"));
@@ -187,9 +189,9 @@ void Joint::readEncoders()
     } else {
         if (time_between_last_update
             >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-            // logger_->warn(
-            //     logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
-            //         this->name_.c_str(), time_between_last_update.count()));
+            logger_->warn(
+                logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
+                    this->name_.c_str(), time_between_last_update.count()));
         }
     }
 }

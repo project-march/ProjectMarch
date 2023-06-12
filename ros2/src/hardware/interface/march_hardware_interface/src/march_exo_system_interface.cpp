@@ -273,20 +273,20 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
 
             // ACTUAL TORQUE LINES
-            // jointInfo.target_torque = (float)jointInfo.joint.getTorque();
+            jointInfo.target_torque = (float)jointInfo.joint.getTorque();
 
-            // // if no weight has been assigned, we start in position control
-            // if(!jointInfo.torque_weight){
-            //     jointInfo.torque_weight = 0.0f;
-            // }
-            // if(!jointInfo.position_weight){
-            //     jointInfo.position_weight = 0.0f;
-            // }
+            RCLCPP_INFO((*logger_), "The first read torque value is %s", jointInfo.target_torque);
 
-            // jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
+            // if no weight has been assigned, we start in position control
+            if(!jointInfo.torque_weight || !jointInfo.position_weight){
+                jointInfo.torque_weight = 0.0f;
+                jointInfo.position_weight = 1.0f;
+            }
+
+            jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
             // TORQUEDEBUG LINE - comment out below for torque testing
-            jointInfo.joint.actuate(jointInfo.target_position, 0.08f, 0.9f, 0.1f);
+            // jointInfo.joint.actuate(jointInfo.target_position, 0.08f, 0.9f, 0.1f);
 
 
             // Set the first target as the current position
