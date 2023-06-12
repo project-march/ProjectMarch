@@ -3,7 +3,6 @@
 import os
 import yaml
 
-import rclpy
 from typing import List
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node

@@ -36,7 +36,7 @@ def generate_launch_description() -> LaunchDescription:
         name="robot",
         default_value="march7",
         description="The name of the yaml that will be used for retrieving info about the exo."
-    ),
+    )
 
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
