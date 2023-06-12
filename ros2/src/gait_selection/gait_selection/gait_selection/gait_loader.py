@@ -3,6 +3,7 @@
 import os
 import yaml
 
+import rclpy
 from typing import List
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
@@ -27,9 +28,19 @@ class GaitLoader:
     ):
         """Init the gait loader for the gait_selection."""
         self._node = node
-        self._actuating_joint_names = [
-            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
+
+        self._node.declare_parameter('robot', 'march7')
+        robot = self._node.get_parameter('robot').get_parameter_value().string_value
+
+        robot_path = get_package_share_directory('march_hardware_builder') + '/robots/' + robot + '.yaml'
+        with open(robot_path) as file:
+            document = yaml.full_load(file)
+
+        self._actuating_joint_names = []
+        robot_name = list(document.keys())[0]
+        for joint in document[robot_name]["joints"]:
+            for name in joint:
+                self._actuating_joint_names.append(name)
 
         package_path = get_package_share_directory(self._node.gait_package) + "/" + self._node.directory_name
         self._default_yaml = os.path.join(package_path, "gaits.yaml")

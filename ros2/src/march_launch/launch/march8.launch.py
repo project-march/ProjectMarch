@@ -16,6 +16,7 @@ def generate_launch_description() -> LaunchDescription:
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     rosbags = LaunchConfiguration("rosbags", default='true')
     airgait = LaunchConfiguration("airgait", default='false')
+    robot = LaunchConfiguration("robot")
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -30,6 +31,12 @@ def generate_launch_description() -> LaunchDescription:
         description="Whether we want to do an airgait or not",
         choices=["true", "false"],
     )
+
+    DeclareLaunchArgument(
+        name="robot",
+        default_value="march7",
+        description="The name of the yaml that will be used for retrieving info about the exo."
+    ),
 
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
@@ -170,7 +177,8 @@ def generate_launch_description() -> LaunchDescription:
             package='gait_selection',
             namespace='',
             executable='gait_selection_node',
-            name='gait_selection'
+            name='gait_selection',
+            parameters=[('robot', str(robot))],
         ),
         Node(
             package='state_estimator_mock',

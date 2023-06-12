@@ -33,14 +33,13 @@ class DiagnosticUpdater(Node):
         self.updater.setHardwareID(HARDWARE_ID)
 
         robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march7.yaml'
-        self.get_logger().info(str(robot_path))
         with open(robot_path) as file:
             document = yaml.full_load(file)
-        self.joints = document["march7"]["joints"]
 
         self.joint_names = []
-        for joint in self.joints:
-            for name in joint.keys():
+        robot_name = list(document.keys())[0]
+        for joint in document[robot_name]["joints"]:
+            for name in joint:
                 self.joint_names.append(name)
 
         # Frequency checks

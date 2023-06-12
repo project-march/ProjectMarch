@@ -27,7 +27,7 @@ class GaitLoader:
     ):
         """Init the gait loader for the gait_selection."""
         self._node = node
-        self._actuating_joint_names = ["rotational_joint"]
+        self._actuating_joint_names = self._node.joints
 
         package_path = get_package_share_directory(self._node.gait_package) + "/" + self._node.directory_name
         self._default_yaml = os.path.join(package_path, "gaits.yaml")
