@@ -25,8 +25,18 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
     // Initialize the model
     m_joint_pos = pinocchio::neutral(m_model);
+
     m_joint_vel.resize(m_model.nv);
-    pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
+
+    for (int i = 1; i < m_model.names.size(); i++) {
+        pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
+        if ((m_model.names[i].compare("right_knee") == 0) or (m_model.names[i].compare("left_knee") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.2;
+        }
+    }
+
+    pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
+    pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
 
     m_joint_lim_min = m_model.lowerPositionLimit;
@@ -37,6 +47,7 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
 void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+
     // We also update our map here
     for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::JointIndex index = m_model.getJointId(msg->name[i]);
@@ -183,8 +194,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     joint_upper_lim.segment(0, 3) << 1e-4 * Eigen::VectorXd::Ones(3);
     joint_lower_lim.segment(0, 3) << -1e-4 * Eigen::VectorXd::Ones(3);
 
-    joint_upper_lim.segment(0, 1) << 1;
-    joint_lower_lim.segment(0, 1) << -1;
+    joint_upper_lim.segment(0, 1) << 0.5;
+    joint_lower_lim.segment(0, 1) << -0.005;
 
     joint_upper_lim.segment(3, 4) << 1e-4 * Eigen::VectorXd::Ones(4);
     joint_lower_lim.segment(3, 4) << -1e-4 * Eigen::VectorXd::Ones(4);
@@ -220,12 +231,10 @@ Eigen::VectorXd IkSolver::velocity_to_pos(Eigen::VectorXd& velocity, const doubl
 
     pinocchio::JointIndex index = 0;
     // RCLCPP_INFO(rclcpp::get_logger("velocity_to_pos"), "size is %i", velocity.size());
-    for (int i = 0; i < m_model.names.size(); i++) {
-        it = m_pinocchio_to_march_joint_map.find(m_model.names[i]);
+    for (int i = 1; i < m_model.names.size(); i++) {
         // RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "Looking for Joint:  %s", m_model.names[i].c_str());
-        if (it != m_pinocchio_to_march_joint_map.end()) {
-            index = m_model.getJointId(m_model.names[i]);
-            // RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "found key! with qindex (%i) and vindex %i",
+        index = m_model.getJointId(m_model.names[i]);
+        if (index < m_model.nv) {
             // m_model.joints[index].idx_q(), m_model.joints[index].idx_v()); RCLCPP_INFO(rclcpp::get_logger(""), "joint
             // index %i", i.id_impl());
             new_position[m_model.joints[index].idx_q()]
@@ -254,7 +263,11 @@ const pinocchio::Data IkSolver::get_data()
 
 std::vector<double> IkSolver::get_joint_pos()
 {
-    return std::vector<double>(m_joint_pos.data(), m_joint_pos.data() + m_joint_pos.size());
+    std::vector<double> to_return;
+    for (int i = 0; i < m_joint_pos.size(); i++) {
+        to_return.push_back(m_joint_pos(i));
+    }
+    return to_return;
 }
 
 std::vector<double> IkSolver::get_joint_vel()
