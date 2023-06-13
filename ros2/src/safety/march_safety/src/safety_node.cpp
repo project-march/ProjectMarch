@@ -37,11 +37,7 @@ int main(int argc, char** argv)
 }
 
 SafetyNode::SafetyNode()
-    : Node("safety_node", "march",
-        rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
-            /*automatically_declare_parameters_from_overrides=*/true))
-    , joint_names(node_utils::get_joint_names(*this))
-    , effort_warner_(EffortWarner(*this, joint_names))
+    : Node("safety_node", "march")
 {
     // Create an error publisher to notify the system (state machine) if
     // something is wrong

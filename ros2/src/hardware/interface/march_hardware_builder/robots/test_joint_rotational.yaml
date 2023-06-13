@@ -10,12 +10,27 @@ testsetup:
           slaveIndex: 1
           axis: 1
           motorKV: 95
+          useIncrementalEncoder: true
           absoluteEncoder:
             resolution: 20
+            direction: 1
             minPositionIU: 294481
             maxPositionIU: 565958
-            direction: 1
+            zeroPositionIU: 357489
+            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             resolution: 12
             transmission: 121
             direction: 1
+        pids:
+          position:
+            p: 0.0
+            i: 0.0
+            d: 0.0
+          torque:
+            p: 0.0
+            i: 0.0
+            d: 0.0

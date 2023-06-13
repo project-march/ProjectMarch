@@ -1,23 +1,22 @@
 """The module control.py contains the CheckJointValues Class."""
-
+import contextlib
 from typing import Optional, List
 
 from diagnostic_msgs.msg import DiagnosticStatus
 from rclpy.node import Node
 
-from march_utility.utilities.node_utils import on_urdf_online
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
-from urdf_parser_py import urdf
-
 WARN_PERCENTAGE = 5
 
 
 class CheckJointValues:
     """Base class to diagnose the joint movement values."""
 
-    def __init__(self, node: Node, topic: str, msg_type: type):
+    def __init__(self, node: Node, joints, topic: str, msg_type: type):
         node.create_subscription(msg_type, topic, self.cb, qos_profile=10)
+        self.node = node
+        self.joints = joints
 
         # callback variables
         self._timestamp: Optional[Time] = None
@@ -29,27 +28,19 @@ class CheckJointValues:
         # robot properties
         self._lower_soft_limits = {}
         self._upper_soft_limits = {}
-        self._velocity_limits = {}
-        self._effort_limits = {}
 
-        def update_joint_limits(robot):
-            for joint in robot.joints:
-                self.set_joint_limits(joint)
+        for joint in self.joints:
+            self.set_joint_limits(joint)
 
-        on_urdf_online(node, update_joint_limits)
-
-    def set_joint_limits(self, joint: urdf.Joint):
+    def set_joint_limits(self, joint):
         """Set the joint limits for a joint.
 
-        :param joint Joint urdf to get limits from.
+        :param joint  Joint dict to get limits from.
         """
-        try:
-            self._lower_soft_limits[joint.name] = joint.safety_controller.soft_lower_limit
-            self._upper_soft_limits[joint.name] = joint.safety_controller.soft_upper_limit
-            self._velocity_limits[joint.name] = joint.limit.velocity
-            self._effort_limits[joint.name] = joint.limit.effort
-        except AttributeError:
-            pass
+        with contextlib.suppress(AttributeError):
+            for name in joint.keys():
+                self._lower_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
+                self._upper_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
 
     def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""

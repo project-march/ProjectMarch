@@ -79,6 +79,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(
             const YAML::Node joint_config = entry.second;
             joints.push_back(HardwareBuilder::createJoint(joint_name, joint_config));
             ss << joint_name << ", ";
+
+            RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating joint.");
         }
     }
     logger_->info(logger_->fstring("Sorted actuating joints are: [%s]", ss.str().c_str()));
@@ -104,6 +106,7 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
 
     auto motor_controller = HardwareBuilder::createMotorController(*logger, joint_config["motor_controller"]);
 
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating Motor controllers.");
     std::array<double, 3> position_pid;
     auto pos_pids = joint_config["pids"]["position"];
     position_pid[0] = pos_pids["p"].as<double>();
@@ -116,12 +119,16 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
     torque_pid[1] = tor_pids["i"].as<double>();
     torque_pid[2] = tor_pids["d"].as<double>();
 
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done setting pids.");
     if (joint_config["temperatureges"]) {
         auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
         return { joint_name, net_number, std::move(motor_controller),
             std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
             std::move(ges), logger };
     } else {
+        return { joint_name, net_number, std::move(motor_controller),
+            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
+            logger };
         return { joint_name, net_number, std::move(motor_controller),
             std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
             logger };
@@ -178,6 +185,8 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
     } else if (type == "odrive") {
         logger_->info("Creating Odrive.");
         motor_controller = createODrive(logger, config, mode);
+
+        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating ODrives.");
     } else {
         throw march::error::HardwareException(
             march::error::ErrorType::INVALID_MOTOR_CONTROLLER, "Motorcontroller %s not valid", type);
@@ -192,7 +201,10 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
         return nullptr;
     }
 
+    logger_->info("ODrive not null");
+
     HardwareBuilder::validateRequiredKeysExist(odrive_config, HardwareBuilder::ODRIVE_REQUIRED_KEYS, "odrive");
+    logger_->info("ODrive has all required keys");
 
     YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
     int slave_index = odrive_config["slaveIndex"].as<int>();
@@ -208,6 +220,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     //    auto incremental_encoder =
     //    std::unique_ptr<march::AbsoluteEncoder>* absolute_encoder = nullptr;
     auto loggerPtr = std::shared_ptr<march_logger::BaseLogger>(logger.get_logger_append_suffix(".Odrive"));
+    logger_->info("Starting to create and return encoders.");
     if (odrive_config["absoluteEncoder"]) {
         YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
         return std::make_unique<march::ODrive>(
@@ -240,12 +253,15 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config, const march::MotorControllerType motor_controller_type)
 {
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "Creating absoluteEncoder.");
     if (!absolute_encoder_config) {
         return nullptr;
     }
 
     HardwareBuilder::validateRequiredKeysExist(
         absolute_encoder_config, HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
+
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "absoluteEncoder has required keys.");
 
     const auto counts_per_rotation = validate_and_get_counts_per_rotation(absolute_encoder_config);
     const auto min_position = absolute_encoder_config["minPositionIU"].as<int32_t>();
@@ -255,6 +271,8 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const auto upper_soft_limit_margin = absolute_encoder_config["upperSoftLimitMarginRad"].as<double>();
     const auto lower_error_soft_limit_margin = absolute_encoder_config["lowerErrorSoftLimitMarginRad"].as<double>();
     const auto upper_error_soft_limit_margin = absolute_encoder_config["upperErrorSoftLimitMarginRad"].as<double>();
+
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "absoluteEncoder has retrieved all values");
 
     return std::make_unique<march::AbsoluteEncoder>(
         /*counts_per_rotation=*/counts_per_rotation,
@@ -272,6 +290,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
 std::unique_ptr<march::IncrementalEncoder> HardwareBuilder::createIncrementalEncoder(
     const YAML::Node& incremental_encoder_config, const march::MotorControllerType motor_controller_type)
 {
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "Creating IncrementalEncoder.");
     if (!incremental_encoder_config) {
         return nullptr;
     }
@@ -281,6 +300,9 @@ std::unique_ptr<march::IncrementalEncoder> HardwareBuilder::createIncrementalEnc
 
     const auto counts_per_rotation = validate_and_get_counts_per_rotation(incremental_encoder_config);
     const auto transmission = incremental_encoder_config["transmission"].as<double>();
+
+    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "IncrementalEncoder has retrieved all values");
+
     return std::make_unique<march::IncrementalEncoder>(
         /*counts_per_rotation=*/counts_per_rotation,
         /*motor_controller_type=*/motor_controller_type,
@@ -291,6 +313,7 @@ std::unique_ptr<march::IncrementalEncoder> HardwareBuilder::createIncrementalEnc
 march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node& encoder_config)
 {
     if (encoder_config["direction"]) {
+        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "determining encodr direction.");
         switch (encoder_config["direction"].as<int>()) {
             case 1:
                 return march::Encoder::Direction::Positive;

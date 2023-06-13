@@ -45,7 +45,6 @@ public:
 
 private:
     rclcpp::TimerBase::SharedPtr timer;
-    const EffortWarner effort_warner_;
 };
 
 #endif // MARCH_SAFETY_SAFETY_NODE_H

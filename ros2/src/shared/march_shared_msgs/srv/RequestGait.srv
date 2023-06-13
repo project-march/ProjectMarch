@@ -4,5 +4,9 @@ int32 STAND = 1
 #
 # The type of instruction.
 int32 gait_type
+
+# if we need a home gait or not
+bool home
+
 ---
 bool status

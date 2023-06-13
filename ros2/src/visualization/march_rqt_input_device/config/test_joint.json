@@ -1,28 +1,29 @@
 [
    [
       {
-         "name": "home_setup"
+         "name": "home_setup",
+         "gait_type": 0
       },
       {
-         "name": "test_joint_gait"
+         "name": "test_joint_gait",
+         "gait_type": 1
       },
       {
          "name": "test_joint_gait_continuous"
       },
       {
          "name":"stop",
-         "callback":"publish_stop",
-         "always_enabled":true
+         "gait_type": 0
       },
       {
          "name":"error",
-         "callback":"publish_error",
-         "always_enabled":true
+         "gait_type": 5,
+         "always_enabled": true
       },
       {
          "name":"force unknown",
-         "callback":"publish_sm_to_unknown",
-         "always_enabled":true
+         "gait_type": 4,
+         "always_enabled": true
       }
    ]
 ]

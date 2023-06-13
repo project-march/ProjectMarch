@@ -16,6 +16,7 @@ def generate_launch_description() -> LaunchDescription:
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     rosbags = LaunchConfiguration("rosbags", default='true')
     airgait = LaunchConfiguration("airgait", default='false')
+    robot = LaunchConfiguration("robot")
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -29,6 +30,12 @@ def generate_launch_description() -> LaunchDescription:
         default_value="false",
         description="Whether we want to do an airgait or not",
         choices=["true", "false"],
+    )
+
+    DeclareLaunchArgument(
+        name="robot",
+        default_value="march7",
+        description="The name of the yaml that will be used for retrieving info about the exo."
     )
 
     # region Launch Mujoco
@@ -66,8 +73,23 @@ def generate_launch_description() -> LaunchDescription:
             ("ping_safety_node", "true"),
             ("use_sim_time", "false"),
             ("layout", "training"),
+            ("testing", "false"),
         ],
     )
+    # endregion
+
+    # region Launch Safety
+    safety_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_safety"),
+                "launch",
+                "march_safety.launch.py",
+            )
+        ),
+        launch_arguments=[("simulation", "true")],
+    )
+    # endregion
 
     ik_solver_launch_dir = os.path.join(
         get_package_share_directory('ik_solver'),
@@ -87,6 +109,7 @@ def generate_launch_description() -> LaunchDescription:
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
+        "march8",
         'hennie_v0.urdf'
     )
 
@@ -154,7 +177,8 @@ def generate_launch_description() -> LaunchDescription:
             package='gait_selection',
             namespace='',
             executable='gait_selection_node',
-            name='gait_selection'
+            name='gait_selection',
+            parameters=[('robot', str(robot))],
         ),
         Node(
             package='state_estimator_mock',
@@ -180,4 +204,5 @@ def generate_launch_description() -> LaunchDescription:
         rqt_input_device,
         march_control,
         record_rosbags_action,
+        safety_node,
     ])
