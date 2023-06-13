@@ -117,8 +117,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // double base_weight = 1;
 
     double CoM_gains = 1.0; // / dt;
-    double left_gains = 1.0; // / dt;
-    double right_gains = 1.0; // / dt;
+    double left_gains = 5.0; // / dt;
+    double right_gains = 5.0; // / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
 
     // Get the error vectors
@@ -129,7 +129,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
     right_foot_error.segment(3, 3)
-        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+        = angleSignedDistance(state_desired.right_foot_pose.segment(3, 3), state_current.right_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
 
