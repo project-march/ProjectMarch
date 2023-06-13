@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 125  # Hz
+    update_rate: 50  # Hz
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -34,7 +34,7 @@ march_motor_controller_state_broadcaster:
 
 joint_trajectory_controller:
   ros__parameters:
-    update_rate: 125
+    update_rate: 50
     joints:
       - left_ankle
       - left_hip_aa

@@ -229,6 +229,16 @@ march7:
             transmission: 121
           torqueSensor:
             maxTorque: 10
-  power_distribution_board:
-    slaveIndex: 5
-    byteOffset: 0
+  # power_distribution_board:
+  #   slaveIndex: 5
+  #   byteOffset: 0
+  pressure_soles:
+  - left_side:
+      slaveIndex: 1
+      byteOffset: 4
+      side: 'left'
+  - right_side:
+      slaveIndex: 4
+      byteOffset: 4
+      side: "right"
+
