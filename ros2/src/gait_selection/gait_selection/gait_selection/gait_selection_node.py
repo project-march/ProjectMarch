@@ -35,7 +35,6 @@ class GaitSelectionNode(Node):
 
         self.reset_publisher = self.create_publisher(Int32, "/trajectory_reset_gate", 10)
         self.sim_reset_publisher = self.create_publisher(Bool, "/mujoco_reset_trajectory", 10)
-        self.joint_names = ["rotational_joint"]
 
         self.get_logger().info("Loaded gaits: " + str([*self.gait_loader.loaded_gaits]))
         self._gait_executed = None

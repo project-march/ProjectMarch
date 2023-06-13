@@ -19,7 +19,7 @@ BufferNode::BufferNode()
     m_swing_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/bezier_trajectory", 10, std::bind(&BufferNode::swing_subscriber_callback, this, _1));
     // Initializing the timestep in ms
-    declare_parameter("timestep", 1000);
+    declare_parameter("timestep", 50);
     m_timestep = this->get_parameter("timestep").as_int();
 }
 

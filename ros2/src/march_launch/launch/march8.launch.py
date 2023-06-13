@@ -14,6 +14,7 @@ def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
+    simulation = LaunchConfiguration("simulation", default='true')
     rosbags = LaunchConfiguration("rosbags", default='true')
     airgait = LaunchConfiguration("airgait", default='false')
     robot = LaunchConfiguration("robot")
@@ -45,6 +46,7 @@ def generate_launch_description() -> LaunchDescription:
         ),
         launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution(
             [get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
+        condition=IfCondition(simulation),
     )
     # endregion
 
@@ -57,10 +59,10 @@ def generate_launch_description() -> LaunchDescription:
                 "march8_controllers.launch.py",
             )
         ),
+        launch_arguments=[("simulation", simulation)],
     )
     # endregion
 
-    # region Launch rqt input device if not rqt_input:=false
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -135,7 +137,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # declare parameters
     # in ms
-    trajectory_dt = 25
+    trajectory_dt = 50
 
     # region footstep_generation parameters
     n_footsteps = 20

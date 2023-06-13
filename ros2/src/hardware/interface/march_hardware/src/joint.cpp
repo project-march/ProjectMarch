@@ -76,16 +76,9 @@ void Joint::enableActuation()
  * @param fuzzy_position
  * @param fuzzy_torque
  */
-void Joint::actuate(float target_position, float target_torque, float fuzzy_position, float fuzzy_torque)
+void Joint::actuate(float target_position)
 {
-    float total_fuzzy = fuzzy_torque + fuzzy_torque;
-    if (std::fabs(total_fuzzy - 1.0F) <= std::numeric_limits<float>::epsilon()) {
-        throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
-            "Total fuzzy exceeds value of one for fuzzy position: %f and fuzzy torque: %f: ", fuzzy_position,
-            fuzzy_torque);
-    }
-    motor_controller_->actuateTorque(target_torque, fuzzy_torque);
-    motor_controller_->actuateRadians(target_position, fuzzy_position);
+    motor_controller_->actuateRadians(target_position);
 }
 
 void Joint::readFirstEncoderValues(bool operational_check)
@@ -116,14 +109,14 @@ void Joint::readFirstEncoderValues(bool operational_check)
                 motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
     }
-    if (motor_controller_->hasTorqueSensor()) {
-        initial_torque_ = motor_controller_->getTorque();
-        if (initial_torque_ != 0) {
-            throw error::HardwareException(error::ErrorType::INITIAL_TORQUE_NOT_ZERO,
-                "Joint %s has an initial torque of %d, while initial torque should be 0", name_.c_str(),
-                initial_torque_);
-        }
-    }
+    // if (motor_controller_->hasTorqueSensor()) {
+    //     initial_torque_ = motor_controller_->getTorque();
+    //     if (initial_torque_ != 0) {
+    //         throw error::HardwareException(error::ErrorType::INITIAL_TORQUE_NOT_ZERO,
+    //             "Joint %s has an initial torque of %d, while initial torque should be 0", name_.c_str(),
+    //             initial_torque_);
+    //     }
+    // }
     logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
 }
 
@@ -168,12 +161,12 @@ void Joint::readEncoders()
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
-        torque_ = motor_controller_->getTorque();
-        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
-                motor_controller_->getTorqueSensor()->getMaxTorque());
-        }
+        // torque_ = motor_controller_->getTorque();
+        // if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+        //     throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+        //         "Joint %s has an torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
+        //         motor_controller_->getTorqueSensor()->getMaxTorque());
+        // }
     } else {
         if (time_between_last_update
             >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
@@ -186,7 +179,7 @@ void Joint::readEncoders()
 
 void Joint::sendPID()
 {
-    this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
+    this->motor_controller_->sendPID(std::move(this->position_pid));
 }
 
 double Joint::getPosition() const

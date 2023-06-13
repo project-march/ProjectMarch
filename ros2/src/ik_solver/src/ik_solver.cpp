@@ -25,8 +25,18 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
     // Initialize the model
     m_joint_pos = pinocchio::neutral(m_model);
+
     m_joint_vel.resize(m_model.nv);
-    pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos);
+
+    for (int i = 1; i < m_model.names.size(); i++) {
+        pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
+        if ((m_model.names[i].compare("right_knee") == 0) or (m_model.names[i].compare("left_knee") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.2;
+        }
+    }
+
+    pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
+    pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
 
     m_joint_lim_min = m_model.lowerPositionLimit;
@@ -37,6 +47,7 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
 void IkSolver::set_joint_configuration(sensor_msgs::msg::JointState::SharedPtr msg)
 {
+
     // We also update our map here
     for (long unsigned int i = 0; i < msg->name.size(); i++) {
         pinocchio::JointIndex index = m_model.getJointId(msg->name[i]);
@@ -55,8 +66,8 @@ int IkSolver::set_jacobian()
     try {
         m_body_com = pinocchio::centerOfMass(m_model, m_model_data, m_joint_pos);
 
-        pinocchio::JointIndex left_foot_index = m_model.getFrameId("L_foot");
-        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
+        pinocchio::JointIndex left_foot_index = m_model.getFrameId("L_toe");
+        pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_toe");
         pinocchio::getJointJacobian(m_model, m_model_data, m_model.frames[left_foot_index].parent,
             pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED, J_left_foot);
         pinocchio::getJointJacobian(m_model, m_model_data, m_model.frames[right_foot_index].parent,
@@ -99,15 +110,15 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 {
     // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 0.1;
-    double right_weight = 0.1;
-    double CoM_weight = 1.0;
+    double left_weight = 1.0;
+    double right_weight = 1.0;
+    double CoM_weight = 0.8;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
 
-    double CoM_gains = 1.0 / dt;
-    double left_gains = 1.0 / dt;
-    double right_gains = 1.0 / dt;
+    double CoM_gains = 1.0; // / dt;
+    double left_gains = 1.0; // / dt;
+    double right_gains = 1.0; // / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
 
     // Get the error vectors
@@ -118,7 +129,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
     right_foot_error.segment(3, 3)
-        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+        = angleSignedDistance(state_desired.right_foot_pose.segment(3, 3), state_current.right_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
 
@@ -154,13 +165,13 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // NOTE::: CONSIDER ADDING THE SINGULARITY ROBUST REGULARIZATION TERM
     // [NOTE]: ADD THE ILNEAR TERM USING COM VELOCITIES
     cost_H += left_weight
-        * (J_left_foot.transpose() * J_left_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.001);
+        * (J_left_foot.transpose() * J_left_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the quadratic left_foot cost");
     cost_F += -left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_gains * left_foot_error);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the linear left_foot cost");
 
     cost_H += right_weight
-        * (J_right_foot.transpose() * J_right_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.001);
+        * (J_right_foot.transpose() * J_right_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the quadratic right_foot cost");
     cost_F
         += -right_weight * J_right_foot.transpose() * (state_desired.right_foot_vel + right_gains * right_foot_error);
@@ -178,40 +189,17 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         // constrained_joints(i,i) = 0;
     }
 
-    std::stringstream ss;
-    // ss << constrained_joints.format(Eigen::IOFormat(m_model.nv, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(rclcpp::get_logger(""), "constraint matrix is :\n" + ss.str() + "\n");
-    // ss.clear();
-    // ss.str("");
-
     Eigen::VectorXd joint_upper_lim = (m_joint_lim_max.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
     Eigen::VectorXd joint_lower_lim = (m_joint_lim_min.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
-    joint_upper_lim.segment(0, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(0, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(0, 3) << 1e-4 * Eigen::VectorXd::Ones(3);
+    joint_lower_lim.segment(0, 3) << -1e-4 * Eigen::VectorXd::Ones(3);
 
-    joint_upper_lim.segment(0, 1) << 0.01;
-    joint_lower_lim.segment(0, 1) << -0.01;
+    joint_upper_lim.segment(0, 1) << 1;
+    joint_lower_lim.segment(0, 1) << -1;
 
-    joint_upper_lim.segment(3, 3) << 1e-10 * Eigen::VectorXd::Ones(3);
-    joint_lower_lim.segment(3, 3) << -1e-10 * Eigen::VectorXd::Ones(3);
+    joint_upper_lim.segment(3, 4) << 1e-4 * Eigen::VectorXd::Ones(4);
+    joint_lower_lim.segment(3, 4) << -1e-4 * Eigen::VectorXd::Ones(4);
     // RCLCPP_INFO(rclcpp::get_logger(""), "size is %i", m_joint_lim_max.size());
-
-    // ss << constrained_joints.format(Eigen::IOFormat(constrained_joints.size(), 0, ", ", "\n", "", ""));
-    // // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Matrix joint lim is is :\n" + ss.str());
-    // ss.clear();
-    // ss.str("");
-    ss << joint_upper_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "upper joint lim is :\n" + ss.str());
-    ss.clear();
-    ss.str("");
-    ss << joint_lower_lim.format(Eigen::IOFormat(m_joint_lim_max.size(), 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(rclcpp::get_logger(""), "lower joint lim is :\n" + ss.str());
-    ss.clear();
-    ss.str("");
-
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized constraints");
 
     // dummy equality constraint
@@ -225,9 +213,9 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 
     // We now swap the dummy foot based on the fixed Jacobian.
     if (stance_foot == -1) {
-        // A_dummy = J_left_foot;
+        A_dummy = J_left_foot;
     } else {
-        // A_dummy = J_right_foot;
+        A_dummy = J_right_foot;
     }
 
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);
@@ -243,12 +231,10 @@ Eigen::VectorXd IkSolver::velocity_to_pos(Eigen::VectorXd& velocity, const doubl
 
     pinocchio::JointIndex index = 0;
     // RCLCPP_INFO(rclcpp::get_logger("velocity_to_pos"), "size is %i", velocity.size());
-    for (int i = 0; i < m_model.names.size(); i++) {
-        it = m_pinocchio_to_march_joint_map.find(m_model.names[i]);
+    for (int i = 1; i < m_model.names.size(); i++) {
         // RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "Looking for Joint:  %s", m_model.names[i].c_str());
-        if (it != m_pinocchio_to_march_joint_map.end()) {
-            index = m_model.getJointId(m_model.names[i]);
-            // RCLCPP_INFO(rclcpp::get_logger("ik_solver"), "found key! with qindex (%i) and vindex %i",
+        index = m_model.getJointId(m_model.names[i]);
+        if (index < m_model.nv) {
             // m_model.joints[index].idx_q(), m_model.joints[index].idx_v()); RCLCPP_INFO(rclcpp::get_logger(""), "joint
             // index %i", i.id_impl());
             new_position[m_model.joints[index].idx_q()]
@@ -277,7 +263,11 @@ const pinocchio::Data IkSolver::get_data()
 
 std::vector<double> IkSolver::get_joint_pos()
 {
-    return std::vector<double>(m_joint_pos.data(), m_joint_pos.data() + m_joint_pos.size());
+    std::vector<double> to_return;
+    for (int i = 0; i < m_joint_pos.size(); i++) {
+        to_return.push_back(m_joint_pos(i));
+    }
+    return to_return;
 }
 
 std::vector<double> IkSolver::get_joint_vel()
@@ -290,8 +280,8 @@ void IkSolver::set_current_state()
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
-    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_foot");
-    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_foot");
+    pinocchio::FrameIndex left_foot_index = m_model.getFrameId("L_toe");
+    pinocchio::FrameIndex right_foot_index = m_model.getFrameId("R_toe");
 
     m_current_state.left_foot_pose << m_model_data.oMf[left_foot_index].translation(),
         pinocchio::rpy::matrixToRpy(m_model_data.oMf[left_foot_index].rotation());
