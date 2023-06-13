@@ -397,7 +397,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     this->march_robot_->waitForPdo();
 
     // pdb_read();
-    // pressure_sole_read();
+    pressure_sole_read();
 
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
