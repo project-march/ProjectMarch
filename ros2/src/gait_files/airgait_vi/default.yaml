@@ -13,14 +13,14 @@ positions:
     # use v6 for sit and v7 for stand
     gait_type: walk_like
     joints:
-      left_ankle: 0.1
-      left_hip_aa: 0.0
+      left_ankle: 0.13
+      left_hip_aa: -0.05
       left_hip_fe: 0.1
-      left_knee: 0.2
-      right_ankle: 0.1
-      right_hip_aa: 0.0
+      left_knee: 0.1
+      right_ankle: 0.13
+      right_hip_aa: -0.05
       right_hip_fe: 0.1
-      right_knee: 0.2
+      right_knee: 0.1
   # stand_hfe_zero_degrees:
   #   # Easier for checking whether hfe's are aligned
   #   gait_type: walk_like
