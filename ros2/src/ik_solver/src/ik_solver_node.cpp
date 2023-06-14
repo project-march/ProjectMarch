@@ -162,7 +162,7 @@ void IkSolverNode::timer_callback()
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input");
         return;
     } else {
-        float swing_z_factor = 3.0;
+        float swing_z_factor = 2.0;
         float swing_x_factor = 0.4;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
