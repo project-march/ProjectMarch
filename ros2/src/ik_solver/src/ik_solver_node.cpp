@@ -162,7 +162,7 @@ void IkSolverNode::timer_callback()
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input");
         return;
     } else {
-        float swing_z_factor = 1.0;
+        float swing_z_factor = 2.0;
         float swing_x_factor = 0.4;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
@@ -273,7 +273,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         index = pinocchio_model.getJointId(i);
         // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
         if ((i.compare("right_hip_aa") == 0) or (i.compare("left_hip_aa") == 0)) {
-            point.positions.push_back(-0.07); // has to be minus in hennie, plus in sim
+            point.positions.push_back(-0.05); // has to be minus in hennie, plus in sim
         } else {
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         }

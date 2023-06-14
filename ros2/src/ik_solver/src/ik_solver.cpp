@@ -33,6 +33,12 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
         if ((m_model.names[i].compare("right_knee") == 0) or (m_model.names[i].compare("left_knee") == 0)) {
             m_joint_pos(m_model.joints[index].idx_q()) = 0.2;
         }
+        if ((m_model.names[i].compare("right_ankle") == 0) or (m_model.names[i].compare("left_ankle") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
+        }
+        if ((m_model.names[i].compare("right_hip_fe") == 0) or (m_model.names[i].compare("left_hip_fe") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
+        }
     }
 
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
