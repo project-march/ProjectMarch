@@ -18,7 +18,9 @@
 
 class InputDeviceSafety : public SafetyType {
     using AliveMsg = march_shared_msgs::msg::Alive;
+    using ErrorMsg = march_shared_msgs::msg::Error;
     using AliveSubscription = rclcpp::Subscription<AliveMsg>::SharedPtr;
+    using ErrorSubscription = rclcpp::Subscription<ErrorMsg>::SharedPtr;
 
 public:
     InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler);
@@ -30,6 +32,7 @@ private:
     // Callback for when the input device publishes on the
     // /march/input_device/alive topic
     void inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg);
+    void ipd_error_callback(const ErrorMsg::SharedPtr msg);
 
     // Check the last alive stamp of an input device.
     void check_last_alive_stamp(const std::string& id, const rclcpp::Time& last_alive);
@@ -42,6 +45,7 @@ private:
 
     // Subscription for the /march/input_device/alive topic
     AliveSubscription subscriber_input_device_alive_;
+    ErrorSubscription ipd_error_subscriber;
 
     // Time to wait before a connection is considered timed out
     rclcpp::Duration connection_timeout_;

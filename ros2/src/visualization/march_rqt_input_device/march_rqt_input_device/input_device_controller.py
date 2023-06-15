@@ -24,7 +24,7 @@ class InputDeviceController:
     ID_FORMAT = "rqt@{machine}@{user}ros2"
 
     # Valid transition that can be made from the current state
-    POSSIBLE_TRANSITIONS = {
+    POSSIBLE_GAIT_TRANSITIONS = {
         GaitRequest.SIT: ["stand"],
         GaitRequest.STAND: ["sit", "walk", "step_and_close", "stop"],
         GaitRequest.WALK: ["stop"],
@@ -33,7 +33,15 @@ class InputDeviceController:
         GaitRequest.ERROR: []
     }
 
-    def __init__(self, node: Node):
+    # Valid transition that can be made from the current state
+    POSSIBLE_TEST_TRANSITIONS = {
+        0: ["home_setup", "test_joint_gait", "stop"],
+        1: ["home_setup"],
+        GaitRequest.FORCE_UNKNOWN: ["home_setup", "stop"],
+        GaitRequest.ERROR: []
+    }
+
+    def __init__(self, node: Node, testing: Bool):
         self._node = node
 
         self._ping = self._node.get_parameter("ping_safety_node").get_parameter_value().bool_value
@@ -45,7 +53,7 @@ class InputDeviceController:
         )
         self._error_pub = self._node.create_publisher(
             msg_type=Error,
-            topic="/march/error",
+            topic="/march/input_device/error",
             qos_profile=10
         )
         self._send_gait_request = self._node.create_publisher(
@@ -75,6 +83,10 @@ class InputDeviceController:
                 callback=self._timer_callback,
                 clock=self._node.get_clock(),
             )
+        self.POSSIBLE_TRANSITIONS = self.POSSIBLE_GAIT_TRANSITIONS
+        if testing:
+            self.POSSIBLE_TRANSITIONS = self.POSSIBLE_TEST_TRANSITIONS
+
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
         self.eeg = False
         self._current_gait = GaitRequest.FORCE_UNKNOWN
@@ -98,9 +110,11 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._send_gait_request.publish(msg)
-        if gait_type == 2:
-            int_msg = Int32(data=0)
-            self._swing_leg_command_pub.publish(int_msg)
+        if gait_type == 5:
+            error_msg = Error()
+            error_msg.error_message = "Error button clicked on IPD"
+            error_msg.type = 0
+            self._error_pub.publish(error_msg)
 
     def publish_eeg_on_off(self) -> None:
         """Publish eeg on if its off and off if it is on."""

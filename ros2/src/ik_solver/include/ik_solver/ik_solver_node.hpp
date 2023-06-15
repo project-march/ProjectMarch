@@ -55,6 +55,7 @@ private:
     int m_com_trajectory_index;
     int m_stance_foot;
     int m_timestep;
+    int m_reset;
 
     std::vector<std::string> m_joint_names;
     trajectory_msgs::msg::JointTrajectoryPoint point_prev_saved;

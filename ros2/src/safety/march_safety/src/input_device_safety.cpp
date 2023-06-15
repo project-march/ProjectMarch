@@ -8,7 +8,7 @@
 
 #include <chrono>
 #include <utility>
-
+using std::placeholders::_1;
 using namespace std::chrono_literals;
 
 const float THROTTLE_DURATION_MS { 5000.0 };
@@ -36,6 +36,8 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shar
         inputDeviceAliveCallback(msg);
     };
     subscriber_input_device_alive_ = node_->create_subscription<AliveMsg>("/march/input_device/alive", 10, callback);
+    ipd_error_subscriber = node_->create_subscription<ErrorMsg>(
+        "/march/input_device/error", 10, std::bind(&InputDeviceSafety::ipd_error_callback, this, _1));
 }
 
 /**
@@ -46,6 +48,16 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shar
 void InputDeviceSafety::inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg)
 {
     last_alive_stamps_[msg->id] = msg->stamp;
+}
+
+void InputDeviceSafety::ipd_error_callback(const ErrorMsg::SharedPtr msg)
+{
+    if (msg->type == 0) {
+        safety_handler_->publishFatal(msg->error_message);
+    }
+    if (msg->type == 1) {
+        safety_handler_->publishNonFatal(msg->error_message);
+    }
 }
 
 /**
