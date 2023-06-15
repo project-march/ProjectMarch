@@ -172,6 +172,7 @@ void StateEstimator::update_foot_frames()
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
         // roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
+        m_joint_estimator.set_individual_joint_state("right_origin_roll", fmod(6.28 - roll, 6.28));
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
@@ -269,7 +270,7 @@ void StateEstimator::publish_robot_frames()
     // Otherwise the current stance foot value is going to constantly update in double stance.
 
     // double stance
-    m_current_stance_foot = 0;
+    // m_current_stance_foot = 0;
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
         if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
