@@ -124,8 +124,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 {
     // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 1.0;
-    double right_weight = 1.0;
+    double left_weight = 0.5;
+    double right_weight = 0.5;
     double CoM_weight = 1.0;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
@@ -133,6 +133,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     double CoM_gains = 0.5; // / dt;
     double left_gains = 1.0; // / dt;
     double right_gains = 1.0; // / dt;
+
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
 
     // Get the error vectors

@@ -65,14 +65,17 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         // RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
         if (m_counter == 0) {
             center_of_mass.position.x = 0;
+            center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), 0, 10.0);
+            center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), -max_y_velocity/2, 10.0);
+
         } else {
             center_of_mass.position.x = (1.0 - shift_progress) * min_x_com + shift_progress * max_x_com;
+            center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
+            center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), -max_y_velocity, 10.0);
         }
         center_of_mass.position.y = (1.0 - shift_progress) * max_y_com + shift_progress * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
-        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), -max_y_velocity, 10.0);
         center_of_mass.velocity.z = 0.0;
 
     } else if (m_current_stance_foot == 1 && m_current_shooting_node <= swing_duration) {
@@ -90,16 +93,19 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         double shift_progress = static_cast<double>(m_current_shooting_node - swing_duration) / weight_shift_duration;
         if (m_counter == 0) {
             center_of_mass.position.x = 0;
+            center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), 0, 10.0);
+            center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), max_y_velocity/2, 10.0);
+
         } else {
             center_of_mass.position.x = shift_progress * max_x_com;
+            center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
+            center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), max_y_velocity, 10.0);
         }
         // RCLCPP_INFO(rclcpp::get_logger(""), "shift progress is %f\n", shift_progress);
 
         center_of_mass.position.y = shift_progress * max_y_com + (1 - shift_progress) * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
 
-        center_of_mass.velocity.x = gaussian_dist((m_current_shooting_node - swing_duration), max_x_velocity, 10.0);
-        center_of_mass.velocity.y = gaussian_dist((m_current_shooting_node - swing_duration), max_y_velocity, 10.0);
         center_of_mass.velocity.z = 0.0;
     }
 

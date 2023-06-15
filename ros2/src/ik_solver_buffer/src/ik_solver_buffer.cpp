@@ -18,6 +18,8 @@ BufferNode::BufferNode()
         "/com_trajectory", 10, std::bind(&BufferNode::com_subscriber_callback, this, _1));
     m_swing_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/bezier_trajectory", 10, std::bind(&BufferNode::swing_subscriber_callback, this, _1));
+    m_swing_leg_command_subscriber = this->create_subscription<std_msgs::msg::Int32>(
+        "/publish_swing_leg_command", 10, std::bind(&BufferNode::swing_command_subscriber_callback, this, _1));
     // Initializing the timestep in ms
     declare_parameter("timestep", 50);
     m_timestep = this->get_parameter("timestep").as_int();
@@ -32,6 +34,19 @@ void BufferNode::com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPt
 void BufferNode::swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_swing_trajectory(msg);
+    publish_swing_trajectory();
+}
+
+void BufferNode::swing_command_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
+{
+    geometry_msgs::msg::PoseArray::SharedPtr zero_swing_msg = std::make_shared<geometry_msgs::msg::PoseArray>(geometry_msgs::msg::PoseArray());
+    geometry_msgs::msg::Pose pose_container;
+    pose_container.position.x = 0.0;
+    pose_container.position.y = 0.0;
+    pose_container.position.z = 0.0;
+    zero_swing_msg->poses.push_back(pose_container);
+    zero_swing_msg->poses.push_back(pose_container);
+    set_swing_trajectory(zero_swing_msg);
     publish_swing_trajectory();
 }
 

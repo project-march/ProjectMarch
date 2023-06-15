@@ -110,6 +110,11 @@ class InputDeviceController:
             id=str(self._id),
         )
         self._send_gait_request.publish(msg)
+        if (gait_type == 2) or (gait_type == 3):
+            zero_swing_msg = Int32()
+            zero_swing_msg.data = 0
+            self._swing_leg_command_pub.publish(zero_swing_msg)
+        
         if gait_type == 5:
             error_msg = Error()
             error_msg.error_message = "Error button clicked on IPD"

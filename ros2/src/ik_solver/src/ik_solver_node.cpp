@@ -163,8 +163,8 @@ void IkSolverNode::timer_callback()
             , (m_com_trajectory_container)?"true":"false", (m_swing_trajectory_container)?"true":"false", m_stance_foot);
         return;
     } else {
-        float swing_z_factor = 2.0;
-        float swing_x_factor = 0.4;
+        float swing_z_factor = 3.0;
+        float swing_x_factor = 0.5;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -290,7 +290,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         // point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         double xdif;
         if (i.compare("left_hip_aa") == 0) {
-            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.14)
+            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.15)
                 * 1.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
             if (abs(m_previous_xdif - xdif) > 0.10){
             xdif = m_previous_xdif;
@@ -304,7 +304,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 
 
         } else if (i.compare("right_hip_aa") == 0) {
-            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.14)
+            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.15)
                 * 1.2; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
             
             if (abs(m_previous_rxdif - xdif) > 0.10){
