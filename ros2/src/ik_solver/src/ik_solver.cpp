@@ -137,7 +137,6 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     left_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
     // angleSignedDistance(state_desired.left_foot_pose.segment(3,
     // 3), state_current.left_foot_pose.segment(3, 3));
-    
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
     right_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
     // angleSignedDistance(state_desired.right_foot_pose.segment(3,
