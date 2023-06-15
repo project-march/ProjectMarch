@@ -41,6 +41,7 @@ public:
     void set_left_foot_on_gound(bool);
     void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
     void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
+    void reset_to_double_stance();
     const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const
     {
         return m_candidate_footsteps;

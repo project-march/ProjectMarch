@@ -38,10 +38,10 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
     double max_y_com = 0.215; // How much can the CoM move
     double min_y_com = 0.115;
-    double max_x_com = 0.1;
+    double max_x_com = 0.10;
     double min_x_com = 0.0;
     double max_x_velocity = 0.1;
-    double max_y_velocity = 0.1;
+    double max_y_velocity = 0.1;                                                                
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
     int weight_shift_duration = m_shooting_nodes_per_step - swing_duration;
@@ -66,7 +66,7 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
         if (m_counter == 0) {
             center_of_mass.position.x = 0;
         } else {
-            center_of_mass.position.x = shift_progress * max_x_com;
+            center_of_mass.position.x = (1.0 - shift_progress) * min_x_com + shift_progress * max_x_com;
         }
         center_of_mass.position.y = (1.0 - shift_progress) * max_y_com + shift_progress * min_y_com;
         center_of_mass.position.z = m_center_of_mass_height;
@@ -130,7 +130,7 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
         if (m_counter == 0) {
             zero_moment_point.point.x = 0;
         } else {
-            zero_moment_point.point.x = shift_progress * max_x_zmp;
+            zero_moment_point.point.x = (1.0 - shift_progress) * min_x_zmp + shift_progress * max_x_zmp;
         }
         zero_moment_point.point.y = (1.0 - shift_progress) * max_y_zmp;
         zero_moment_point.point.z = 0.0;

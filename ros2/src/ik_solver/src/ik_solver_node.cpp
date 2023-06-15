@@ -159,11 +159,12 @@ void IkSolverNode::timer_callback()
     publish_ik_visualizations();
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input");
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n"
+            , (m_com_trajectory_container)?"true":"false", (m_swing_trajectory_container)?"true":"false", m_stance_foot);
         return;
     } else {
-        float swing_z_factor = 1.0;
-        float swing_x_factor = 0.4;
+        float swing_z_factor = 3.0;
+        float swing_x_factor = 0.5;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -201,7 +202,9 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * 0.5,
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
+        // RCLCPP_INFO(this->get_logger(), "Desired CoM X %f", m_desired_state.com_pos);
+
             m_com_trajectory_container->velocity[m_com_trajectory_index].y, 0.0, 0.0, 0.0, 0.0;
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity\n\n");
@@ -269,16 +272,58 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 
     pinocchio::Model pinocchio_model = m_ik_solver.get_model();
     std::vector<double> previous_joint_positions = m_ik_solver.get_joint_pos();
+    // for (auto& i : trajectory.joint_names) {
+    //     index = pinocchio_model.getJointId(i);
+    //     // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
+    //     if ((i.compare("right_hip_aa") == 0) or (i.compare("left_hip_aa") == 0)) {
+    //         point.positions.push_back(-0.0); // has to be minus in hennie, plus in sim
+    //     } else {
+    //         point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+    //     }
+    //     // RCLCPP_INFO(this->get_logger(), "publishing position %f",
+    //     // joint_positions[pinocchio_model.joints[index].idx_q()]);
+    // }
+
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
-        // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
-        if ((i.compare("right_hip_aa") == 0) or (i.compare("left_hip_aa") == 0)) {
-            point.positions.push_back(-0.0); // has to be minus in hennie, plus in sim
+        // point_prev.positions.push_back(previous_joint_positions[pinocchio_model.joints[index].idx_q()]);
+        // point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+        double xdif;
+        if (i.compare("left_hip_aa") == 0) {
+            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.14)
+                * 1.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            RCLCPP_INFO(this->get_logger(), "Xdif is %f", xdif);
+            if (abs(m_previous_xdif - xdif) > 0.10){
+            xdif = m_previous_xdif;
+            }
+            else {
+                m_previous_xdif = xdif;
+            }
+            // xdif=0.07;
+        
+            point.positions.push_back(xdif);
+
+
+        } else if (i.compare("right_hip_aa") == 0) {
+            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.14)
+                * 1.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            
+            if (abs(m_previous_rxdif - xdif) > 0.10){
+            xdif = m_previous_rxdif;
+            }
+            else {
+                m_previous_rxdif = xdif;
+            }
+            // xdif=-0.07;
+            point.positions.push_back(xdif);
+            RCLCPP_INFO(this->get_logger(), "Xdif is %f", xdif);
+
         } else {
+
+            // point.positions.push_back(0.0);
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         }
-        // RCLCPP_INFO(this->get_logger(), "publishing position %f",
-        // joint_positions[pinocchio_model.joints[index].idx_q()]);
+        // point.positions.push_back(0.0);
     }
 
     point_prev = point_prev_saved;

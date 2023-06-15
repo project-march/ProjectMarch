@@ -15,7 +15,7 @@ gaits:
     joint_names: ["left_ankle", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
     points:
         positions:
-          - [0.14, -0.025, 0.09, 0.0, 0.14, -0.025, 0.09, 0.0]
+          - [0.1, 0.0, 0.0, 0.2, 0.1, 0.0, 0.0, 0.2]
         velocities:
           - [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         time_from_start:

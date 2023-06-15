@@ -28,12 +28,17 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
     m_joint_vel.resize(m_model.nv);
 
+
     for (int i = 1; i < m_model.names.size(); i++) {
-        pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
+    pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
         if ((m_model.names[i].compare("right_knee") == 0) or (m_model.names[i].compare("left_knee") == 0)) {
             m_joint_pos(m_model.joints[index].idx_q()) = 0.2;
         }
+        if ((m_model.names[i].compare("right_ankle") == 0) or (m_model.names[i].compare("left_ankle") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
+        }
     }
+
 
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
@@ -110,13 +115,13 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 {
     // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 1.0;
-    double right_weight = 1.0;
-    double CoM_weight = 0.8;
+    double left_weight = 0.2;
+    double right_weight = 0.2;
+    double CoM_weight = 1.0;
     double qdot_weight = 1e-6;
     // double base_weight = 1;
 
-    double CoM_gains = 1.0; // / dt;
+    double CoM_gains = 0.5; // / dt;
     double left_gains = 1.0; // / dt;
     double right_gains = 1.0; // / dt;
     // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
@@ -125,14 +130,14 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // Here, we assume the jacobians have already been set
     // The error is equal to the desired state, as we express them in local coordinates
     Eigen::VectorXd left_foot_error = state_desired.left_foot_pose;
-    left_foot_error.segment(3, 3)
-        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+    left_foot_error.segment(3, 3)  = Eigen::VectorXd::Zero(3);
+        // = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
-    right_foot_error.segment(3, 3)
-        = angleSignedDistance(state_desired.right_foot_pose.segment(3, 3), state_current.right_foot_pose.segment(3, 3));
+    right_foot_error.segment(3, 3)  = Eigen::VectorXd::Zero(3);
+        // = angleSignedDistance(state_desired.right_foot_pose.segment(3, 3), state_current.right_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
-
+    
     // Print the error vectors
     // std::stringstream ss;
     // ss << J_left_foot.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));

@@ -57,6 +57,10 @@ private:
     int m_timestep;
     int m_reset;
 
+    double m_previous_xdif;
+    double m_previous_rxdif;
+
+
     std::vector<std::string> m_joint_names;
     trajectory_msgs::msg::JointTrajectoryPoint point_prev_saved;
 };
