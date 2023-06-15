@@ -177,8 +177,8 @@ class BezierCurve(Node):
         for key in sorted(self.points):
             p = Pose()
             p.position.x = float(key)
-            p.position.y = float(self.points[key])
-            p.position.z = 0.0
+            p.position.y = 0.0
+            p.position.z = float(self.points[key])
             msg.poses.append(p)
             points_list.append([key, self.points[key]])
         self.publish_points.publish(msg)
