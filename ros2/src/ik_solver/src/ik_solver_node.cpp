@@ -73,42 +73,42 @@ IkSolverNode::IkSolverNode()
 void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-        // Reset the timer
-        // m_solving_timer->reset();
-        m_com_trajectory_index = 0;
-        // Update desired state
-        m_com_trajectory_container = msg;
-        // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
+    // Reset the timer
+    // m_solving_timer->reset();
+    m_com_trajectory_index = 0;
+    // Update desired state
+    m_com_trajectory_container = msg;
+    // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
     // }
 }
 
 void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-        // Reset the timer
-        // m_solving_timer->reset();
-        m_swing_trajectory_index = 0;
-        // Update desired state
-        m_swing_trajectory_container = msg;
-        // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
-        // m_stance_foot = -m_stance_foot;
+    // Reset the timer
+    // m_solving_timer->reset();
+    m_swing_trajectory_index = 0;
+    // Update desired state
+    m_swing_trajectory_container = msg;
+    // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
+    // m_stance_foot = -m_stance_foot;
     // }
 }
 
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-        // m_joint_names = msg->name;
-        // m_ik_solver.set_joint_configuration(msg);
-        // m_ik_solver.set_current_state();
-        // m_ik_solver.set_jacobian();
+    // m_joint_names = msg->name;
+    // m_ik_solver.set_joint_configuration(msg);
+    // m_ik_solver.set_current_state();
+    // m_ik_solver.set_jacobian();
     // }
 }
 
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-        set_foot_placement(msg);
+    set_foot_placement(msg);
     // }
 }
 
@@ -120,7 +120,7 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-        m_stance_foot = msg->data;
+    m_stance_foot = msg->data;
     // }
 }
 
