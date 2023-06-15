@@ -3,7 +3,7 @@
 //
 
 #include "swing_leg_trajectory_generator/swing_leg_trajectory_generator.hpp"
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <fstream>
 #include <math.h>
 
 using Point = geometry_msgs::msg::Point;
@@ -12,43 +12,8 @@ using Pose = geometry_msgs::msg::Pose;
 SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 {
     m_curve = BezierCurve();
-//    auto start_point = Point();
-//    start_point.x = 0.0;
-//    start_point.y = 0.0;
-//    start_point.z = 0.0;
-//
-//    auto left_point = Point();
-//    left_point.x = 0.05;
-//    left_point.y = 0.0;
-//    left_point.z = 0.1;
-//
-//    auto right_point = Point();
-//    right_point.x = 0.15;
-//    right_point.y = 0.0;
-//    right_point.z = 0.1;
-//
-//    auto end_point = Point();
-//    end_point.x = 0.2;
-//    end_point.y = 0.0;
-//    end_point.z = 0.0;
-
-//    m_curve.points.push_back(start_point);
-//    m_curve.points.push_back(left_point);
-//    m_curve.points.push_back(right_point);
-//    m_curve.points.push_back(end_point);
-    std::string config_file_path = ament_index_cpp::get_package_share_directory("swing_leg_trajectory_generator")
-                                    + "/config/bezier_points.yaml";
-    m_curve.points = read_points(config_file_path);
-
     m_curve.point_amount = 75; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
     m_step_length = 0.2;
-
-    RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "step_length = %f ", m_step_length);
-    for (size_t i = 0; i < m_curve.points.size(); i++) {
-        RCLCPP_INFO(rclcpp::get_logger("swnglegtrj"), "point %d with x: %f, y: %f, z: %f", i, m_curve.points.at(i).x,
-            m_curve.points.at(i).y, m_curve.points.at(i).z);
-    }
-
     // Generate the trajectory for the first time
     generate_trajectory();
 }
@@ -94,32 +59,7 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
     }
     m_curve.points = points;
     m_step_length = step_length;
-    write_points(points);
     generate_trajectory();
-}
-
-std::vector<Point> SwingLegTrajectoryGenerator::read_points(std::string config_file_path)
-{
-    std::vector<Point> points;
-    auto bezier_config = YAML::LoadFile(config_file_path);
-    auto points_config = bezier_config["points"];
-    for (const auto& point_config : points_config){
-        Point point;
-        const auto point_vec = point_config.as<std::vector<double>>();
-        point.x = point_vec.at(0);
-        point.y = point_vec.at(1);
-        point.z = point_vec.at(2);
-
-    }
-    
-
-    return points;
-
-}
-
-void SwingLegTrajectoryGenerator::write_points(std::vector<Point> points)
-{
-
 }
 
 BezierCurve SwingLegTrajectoryGenerator::get_curve()

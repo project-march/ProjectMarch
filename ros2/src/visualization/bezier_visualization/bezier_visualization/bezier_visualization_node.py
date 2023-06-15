@@ -1,7 +1,9 @@
 """Author Marco Bak - M8."""
 import sys
+import os
 import rclpy
 from rclpy.node import Node
+import yaml
 
 import math
 from matplotlib.path import Path
@@ -10,7 +12,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
-
 NODE_NAME = "bezier_plotter"
 
 
@@ -39,6 +40,7 @@ class BezierCurve(Node):
 
     When the points are changed, the swing-leg is updated through the publisher.
     """
+
     def __init__(self):
         super().__init__(NODE_NAME)
 
@@ -53,8 +55,19 @@ class BezierCurve(Node):
 
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
-        # TODO: if these points have good values
-        self.points = {1: 0, 25: 50, 75: 50, 99: 0}
+
+        self.points = {}
+        self.point_config_location = os.path.join(os.path.dirname(__file__), '..', 'config', 'bezier_points.yaml')
+        with open(self.point_config_location, 'r') as points_file:
+            try:
+                points_yaml = yaml.safe_load(points_file)
+            except yaml.YAMLError as exc:
+                self.get_logger().error(str(exc))
+
+        points_list_yaml = points_yaml["points"]
+
+        for i in points_list_yaml:
+            self.points[i[0]] = i[1]
 
         msg = PoseArray()
         for key in sorted(self.points):
@@ -159,6 +172,7 @@ class BezierCurve(Node):
         """
         self.dragging_point = None
         plt.ion()
+        points_list = []
         msg = PoseArray()
         for key in sorted(self.points):
             p = Pose()
@@ -166,13 +180,20 @@ class BezierCurve(Node):
             p.position.y = float(self.points[key])
             p.position.z = 0.0
             msg.poses.append(p)
-        self.get_logger().info("Publish new Bezier points")
+            points_list.append([key, self.points[key]])
         self.publish_points.publish(msg)
+
+        points_dict = {"points": points_list}
+        with open(self.point_config_location, 'w') as points_file:
+            try:
+                yaml.dump(points_dict, points_file)
+            except yaml.YAMLError as exc:
+                self.get_logger().error(str(exc))
+
         plt.ioff()
 
     def listener_callback(self, msg):
         """Callback for subscriber, not used for now, probably not needed."""
-        self.get_logger().info("Callback")
         self.plot_x = []
         self.plot_y = []
 

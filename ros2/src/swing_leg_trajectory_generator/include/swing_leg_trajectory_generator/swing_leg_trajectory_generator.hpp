@@ -9,7 +9,6 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include <yaml-cpp/yaml.h>
 using Point = geometry_msgs::msg::Point;
 using Pose = geometry_msgs::msg::Pose;
 
@@ -51,10 +50,8 @@ public:
     void update_points(std::vector<Point> points, double step_length);
 
 private:
-    std::vector<Point> read_points(std::string config_file_path);
-    void write_points(std::vector<Point> points);
-
     BezierCurve m_curve;
     double m_step_length;
+    std::string m_config_file_path;
 };
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
