@@ -305,7 +305,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 
         } else if (i.compare("right_hip_aa") == 0) {
             xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.14)
-                * 1.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+                * 1.2; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
             
             if (abs(m_previous_rxdif - xdif) > 0.10){
             xdif = m_previous_rxdif;

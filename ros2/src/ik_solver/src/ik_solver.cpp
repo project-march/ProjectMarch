@@ -43,8 +43,8 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
         if ((m_model.names[i].compare("right_hip_aa") == 0) or (m_model.names[i].compare("left_hip_aa") == 0)) {
             m_joint_pos(m_model.joints[index].idx_q()) = -0.05;
         }
-        if ((m_model.names[i].compare("right_ankle") == 0) or (m_model.names[i].compare("left_ankle") == 0)) {
-            m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
+        if ((m_model.names[i].compare("left_ankle") == 0) or (m_model.names[i].compare("left_ankle") == 0)) {
+            m_joint_pos(m_model.joints[index].idx_q()) = 0.13;
         }
     }
 
