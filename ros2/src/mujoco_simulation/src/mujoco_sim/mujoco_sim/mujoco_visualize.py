@@ -36,9 +36,7 @@ class MujocoVisualizer:
         self.cam.azimuth = 90.0
         self.cam.trackbodyid = 1
         self.cam.elevation = 0
-        self.cam.lookat[2]+=0.1
-
-
+        self.cam.lookat[2] += 0.1
 
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
