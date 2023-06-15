@@ -52,5 +52,5 @@ public:
 private:
     BezierCurve m_curve;
     double m_step_length;
-
+};
 #endif // BUILD_SWING_LEG_TRAJECTORY_GENERATOR_HPP
