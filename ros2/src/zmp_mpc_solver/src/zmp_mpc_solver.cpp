@@ -67,6 +67,14 @@ std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
     return m_real_time_com_trajectory_y;
 }
 
+void ZmpSolver::reset_to_double_stance()
+{
+    m_current_shooting_node = 200;
+    m_step_counter = 0;
+    m_current_count = -1;
+    
+}
+
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
 {
     return &m_x_trajectory;
@@ -157,15 +165,16 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * 1.01
-        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * 1.01) {
+    float zmp_check_margin = 0.5;
+    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin
+        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin) {
         x_check = true;
     } else {
         x_check = false;
     }
 
-    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * 1.01
-        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * 1.01) {
+    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin
+        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin) {
         y_check = true;
     } else {
         y_check = false;
@@ -215,8 +224,8 @@ void ZmpSolver::initialize_mpc_params()
     // Later, change this to read from a yaml
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
-    m_foot_width_x = 0.1;
-    m_foot_width_y = 0.3;
+    m_foot_width_x = 0.3;
+    m_foot_width_y = 0.1;
     m_step_size_x = 0.2;
     m_step_size_y = 0.33;
 
