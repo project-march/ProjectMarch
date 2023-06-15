@@ -105,6 +105,12 @@ void StateMachineNode::send_request(exoState desired_state)
         m_gait_request->gait_type = 1;
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
+
+        m_reset_publisher->publish(reset_msg);
+        m_footstep_request->gait_type = requested_gait;
+        m_footstep_future = m_footstep_client->async_send_request(
+            m_footstep_request, std::bind(&StateMachineNode::response_footstep_callback, this, _1));
+
     } else if (requested_gait == 0) {
         if (current_state == 0 || current_state == 4) {
             m_gait_request->home = true;
