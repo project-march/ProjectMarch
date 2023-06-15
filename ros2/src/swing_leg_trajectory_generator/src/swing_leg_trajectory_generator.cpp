@@ -3,7 +3,6 @@
 //
 
 #include "swing_leg_trajectory_generator/swing_leg_trajectory_generator.hpp"
-#include <fstream>
 #include <math.h>
 
 using Point = geometry_msgs::msg::Point;
