@@ -159,8 +159,10 @@ void IkSolverNode::timer_callback()
     publish_ik_visualizations();
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n"
-            , (m_com_trajectory_container)?"true":"false", (m_swing_trajectory_container)?"true":"false", m_stance_foot);
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+            "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n",
+            (m_com_trajectory_container) ? "true" : "false", (m_swing_trajectory_container) ? "true" : "false",
+            m_stance_foot);
         return;
     } else {
         float swing_z_factor = 2.0;
