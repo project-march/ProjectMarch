@@ -72,6 +72,14 @@ class InputDeviceController:
             callback=self._gait_response_callback,
             qos_profile=10,
         )
+
+        self._eeg_input_subscriber = self._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
+        )
+
         if self._ping:
             self._alive_pub = self._node.create_publisher(
                 Alive,
@@ -93,12 +101,19 @@ class InputDeviceController:
 
     def update_possible_gaits(self):
         """Update the possible gait that can be selected by the IPD."""
-        return self.POSSIBLE_TRANSITIONS[self._current_gait]
+        if self.eeg:
+            return ["stop"]
+        else:
+            return self.POSSIBLE_TRANSITIONS[self._current_gait]
 
     def _gait_response_callback(self, msg: GaitResponse):
         """Update current node from the state machine."""
         self._node.get_logger().debug("Received new gait from other IPD.")
         self._current_gait = msg.gait_type
+
+    def _eeg_gait_request_callback(self, msg: Int32):
+        self.get_node().get_logger().info("EEG requested a gait!!!!!!!!!!!!!")
+        self.publish_gait(msg.data)
 
     def publish_gait(self, gait_type: int) -> None:
         """Publish a message on `/march/gait_request` to publish the gait."""

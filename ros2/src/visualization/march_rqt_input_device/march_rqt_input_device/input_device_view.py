@@ -35,11 +35,11 @@ class InputDeviceView(QWidget):
         super(InputDeviceView, self).__init__()
         self._controller = controller
 
-        self._controller.node.create_subscription(
+        self._eeg_alive_subscriber = self._controller._node.create_subscription(
             msg_type=Bool,
-            topic="/march/eeg/on_off",
-            callback=self._eeg_cb,
-            qos_profile=1,
+            topic="/eeg_alive",
+            callback=self._eeg_alive_callback,
+            qos_profile=10,
         )
 
         self._always_enabled_buttons = []
@@ -55,10 +55,14 @@ class InputDeviceView(QWidget):
         self._create_buttons()
         self._update_possible_gaits()
 
-    def _eeg_cb(self, data) -> None:
+    def _eeg_alive_callback(self, msg: Bool) -> None:
         """Update the possible gaits when eeg is turned on or off."""
+        self._controller.eeg = msg.data
+        if msg.data:
+            self._controller.get_node().get_logger().info("EEG is alive!!!!!!!")
+        else:
+            self._controller.get_node().get_logger().warn("EEG disconnected!!!!!!!")
         self._update_possible_gaits()
-        self._controller.update_eeg_on_off(data)
 
     def publish_gait(self, gait_type: int):
         """Publish gait to state_machine."""
