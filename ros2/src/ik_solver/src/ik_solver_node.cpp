@@ -43,7 +43,7 @@ IkSolverNode::IkSolverNode()
     // publish_ik_visualizations();
 
     // Initializing the timestep
-    declare_parameter("timestep", 50);
+    declare_parameter("timestep", 6);
     m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer = this->create_wall_timer(
@@ -163,8 +163,8 @@ void IkSolverNode::timer_callback()
             , (m_com_trajectory_container)?"true":"false", (m_swing_trajectory_container)?"true":"false", m_stance_foot);
         return;
     } else {
-        float swing_z_factor = 3.0;
-        float swing_x_factor = 0.5;
+        float swing_z_factor = 1.0;
+        float swing_x_factor = 1.0;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -289,33 +289,33 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         // point_prev.positions.push_back(previous_joint_positions[pinocchio_model.joints[index].idx_q()]);
         // point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         double xdif;
+        double next_joint_pos_weight = 0.7;
         if (i.compare("left_hip_aa") == 0) {
-            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.15)
-                * 1.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
+                * 2.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
             if (abs(m_previous_xdif - xdif) > 0.10){
             xdif = m_previous_xdif;
             }
             else {
                 m_previous_xdif = xdif;
             }
-            // xdif=0.07;
-        
-            point.positions.push_back(xdif);
-
+            // point.positions.push_back(xdif);
+            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]*next_joint_pos_weight + xdif*(1-next_joint_pos_weight));
 
         } else if (i.compare("right_hip_aa") == 0) {
-            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.15)
-                * 1.2; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
-            
-            if (abs(m_previous_rxdif - xdif) > 0.10){
+            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
+                * 2.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
+
+            if (abs(m_previous_rxdif - xdif) > 0.8){
             xdif = m_previous_rxdif;
             }
             else {
                 m_previous_rxdif = xdif;
             }
-            // xdif=-0.07;
-            point.positions.push_back(xdif);
-
+            // point.positions.push_back(xdif);
+            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]*next_joint_pos_weight + xdif*(1-next_joint_pos_weight));
         } else {
 
             // point.positions.push_back(0.0);

@@ -8,7 +8,7 @@ using std::placeholders::_1;
 SolverNode::SolverNode()
     : Node("mpc_solver_node")
     , m_zmp_solver()
-    , m_desired_previous_foot_x(0)
+    , m_desired_previous_foot_x(0.11)
     , m_desired_previous_foot_y(0.33)
 {
     //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
@@ -46,7 +46,7 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(50ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(24ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
@@ -104,6 +104,7 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
             m_desired_previous_foot_y = msg->poses[0].position.y;
         }
     }
+    // RCLCPP_INFO(this->get_logger(), "desired x foot prev position %f",m_desired_previous_foot_x);
     m_zmp_solver.set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
 }
 

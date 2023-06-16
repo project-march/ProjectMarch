@@ -41,7 +41,7 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
             m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
         }
         if ((m_model.names[i].compare("right_hip_aa") == 0) or (m_model.names[i].compare("left_hip_aa") == 0)) {
-            m_joint_pos(m_model.joints[index].idx_q()) = -0.05;
+            m_joint_pos(m_model.joints[index].idx_q()) = -0.0;
         }
         if ((m_model.names[i].compare("left_ankle") == 0) or (m_model.names[i].compare("left_ankle") == 0)) {
             m_joint_pos(m_model.joints[index].idx_q()) = 0.13;
@@ -124,8 +124,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
 {
     // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 0.3;
-    double right_weight = 0.3;
+    double left_weight = 0.1;
+    double right_weight = 0.1;
     double CoM_weight = 1.0;
     double qdot_weight = 1e-6;
     // double base_weight = 1;

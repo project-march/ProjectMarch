@@ -3,11 +3,11 @@
 #include <iostream>
 
 ZmpSolver::ZmpSolver()
-    : m_time_horizon(6.0)
+    : m_time_horizon(2.0)
     , m_x_current()
     , m_u_current()
     , m_switch(0)
-    , m_current_shooting_node(0)
+    , m_current_shooting_node(200)
     , m_timing_value(0)
     , m_current_stance_foot(-1)
     , m_previous_stance_foot(-1)
@@ -31,8 +31,8 @@ ZmpSolver::ZmpSolver()
     // set_previous_foot(0.0, 0.0);
     set_current_com(0.0, 0.17, 0.0, 0.0);
     set_current_zmp(0.0, 0.17);
-    set_current_foot(0.0, 0.0);
-    set_previous_foot(0.0, 0.33);
+    set_current_foot(0.11, 0.0);
+    set_previous_foot(0.11, 0.33);
     set_current_state();
 }
 
@@ -129,7 +129,8 @@ void ZmpSolver::set_current_foot(double x, double y)
 void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
-        m_pos_foot_current[0] = m_x_trajectory[6 + NX];
+        // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
+        m_pos_foot_current[0] = 0.15; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
@@ -139,12 +140,16 @@ void ZmpSolver::update_current_foot()
 
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
 {
-    m_right_foot_on_ground = foot_on_ground;
+    if (foot_on_ground) {
+        m_right_foot_on_ground = true;
+    }
 }
 
 void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
 {
-    m_left_foot_on_ground = foot_on_ground;
+    if (foot_on_ground) {
+        m_left_foot_on_ground = true;
+    }
 }
 
 void ZmpSolver::set_previous_foot(double x, double y)
@@ -165,7 +170,7 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    float zmp_check_margin = 0.5;
+    float zmp_check_margin = 1.5;
     if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin
         && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin) {
         x_check = true;
@@ -407,9 +412,11 @@ inline int ZmpSolver::solve_zmp_mpc(
     if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
         && m_right_foot_on_ground == true) {
         printf("passed the right foot on ground check \n");
+        m_right_foot_on_ground = false;
     } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
         && m_current_count == 1 && m_left_foot_on_ground == true) {
         printf("passed the left foot on ground check \n");
+        m_left_foot_on_ground = false;
     } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
         printf("did not pass the foot on ground check \n");
         m_current_shooting_node--;
@@ -417,18 +424,6 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
-
-    // if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
-    //         && check_zmp_on_foot() == true
-    //     || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1
-    //         && check_zmp_on_foot() == true) {
-    //     m_current_count = m_current_stance_foot;
-    //     m_step_counter++;
-    //     printf("weight shift is complete \n");
-    //     printf("now going into current_shooting node %i\n", m_current_shooting_node);
-    // } else if (m_current_shooting_node == 0) {
-    //     m_current_shooting_node--;
-    // }
 
     if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
 
@@ -454,7 +449,6 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
         && m_current_shooting_node < ((N - 1)) / m_number_of_footsteps) {
-        // m_timing_value = m_current_shooting_node*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
         m_timing_value = (m_current_shooting_node - step_duration * ((N - 1) / m_number_of_footsteps))
             * (1 / (1 - step_duration)) / (((N - 1)) / (m_number_of_footsteps));
         count = -count;
@@ -472,7 +466,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     } else {
         ;
     }
-    // printf("step number is %d\n", step_number);
 
     // ii is defined as the current stage
     for (int ii = 0; ii < N; ii++) {

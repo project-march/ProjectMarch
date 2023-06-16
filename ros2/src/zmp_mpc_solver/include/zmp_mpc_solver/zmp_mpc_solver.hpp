@@ -77,6 +77,7 @@ private:
 
     bool m_right_foot_on_ground;
     bool m_left_foot_on_ground;
+    
 
     double m_switch;
     int m_current_shooting_node;

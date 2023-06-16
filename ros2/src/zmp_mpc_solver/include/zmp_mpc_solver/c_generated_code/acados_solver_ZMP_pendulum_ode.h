@@ -63,7 +63,7 @@
 #define ZMP_PENDULUM_ODE_NY0    0
 #define ZMP_PENDULUM_ODE_NY     0
 #define ZMP_PENDULUM_ODE_NYN    0
-#define ZMP_PENDULUM_ODE_N      501
+#define ZMP_PENDULUM_ODE_N      167
 #define ZMP_PENDULUM_ODE_NH     0
 #define ZMP_PENDULUM_ODE_NPHI   0
 #define ZMP_PENDULUM_ODE_NHN    0
