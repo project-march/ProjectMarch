@@ -38,8 +38,8 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
     double max_y_com = 0.215; // How much can the CoM move
     double min_y_com = 0.115;
-    double max_x_com = 0.31;
-    double min_x_com = 0.11;
+    double max_x_com = 0.2;
+    double min_x_com = 0.0;
     double max_x_velocity = 0.1;
     double max_y_velocity = 0.1;
 
@@ -119,8 +119,8 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
 {
     double max_y_zmp = 0.33;
     double min_y_zmp = 0.0;
-    double max_x_zmp = 0.31;
-    double min_x_zmp = 0.11;
+    double max_x_zmp = 0.2;
+    double min_x_zmp = 0.0;
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
     int weight_shift_duration = m_shooting_nodes_per_step - swing_duration;
@@ -171,23 +171,23 @@ geometry_msgs::msg::PoseArray StateEstimatorMock::get_previous_foot()
     geometry_msgs::msg::Pose left_foot;
 
     if (m_current_stance_foot == -1) {
-        right_foot.position.x = 0.11;
+        right_foot.position.x = 0.0;
         right_foot.position.y = 0.0;
         right_foot.position.z = 0.0;
         foot_positions.poses.push_back(right_foot);
 
-        left_foot.position.x = 0.11;
+        left_foot.position.x = 0.0;
         left_foot.position.y = 0.33;
         left_foot.position.z = 0.0;
         foot_positions.poses.push_back(left_foot);
 
     } else if (m_current_stance_foot == 1) {
-        right_foot.position.x = 0.11;
+        right_foot.position.x = 0.0;
         right_foot.position.y = 0.0;
         right_foot.position.z = 0.0;
         foot_positions.poses.push_back(right_foot);
 
-        left_foot.position.x = 0.11;
+        left_foot.position.x = 0.0;
         left_foot.position.y = 0.33;
         left_foot.position.z = 0.0;
         foot_positions.poses.push_back(left_foot);

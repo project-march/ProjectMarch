@@ -166,7 +166,7 @@ void IkSolverNode::timer_callback()
         return;
     } else {
         float swing_z_factor = 1.0;
-        float swing_x_factor = 0.4;
+        float swing_x_factor = 0.2;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -204,9 +204,7 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
-            // RCLCPP_INFO(this->get_logger(), "Desired CoM X %f", m_desired_state.com_pos);
-
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * swing_x_factor,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y, 0.0, 0.0, 0.0, 0.0;
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity\n\n");

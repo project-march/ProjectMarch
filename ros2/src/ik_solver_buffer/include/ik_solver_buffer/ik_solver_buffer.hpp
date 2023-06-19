@@ -22,7 +22,7 @@ private:
     void com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void swing_command_subscriber_callback(std_msgs::msg::Int32::SharedPtr);
-    void set_velocity(std::vector<geometry_msgs::msg::Point>&, std::vector<geometry_msgs::msg::Point>&);
+    void set_velocity(std::vector<geometry_msgs::msg::Point>&, std::vector<geometry_msgs::msg::Point>&, int);
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr m_latest_swing_trajectory;
 

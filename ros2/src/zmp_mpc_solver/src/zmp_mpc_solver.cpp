@@ -7,7 +7,7 @@ ZmpSolver::ZmpSolver()
     , m_x_current()
     , m_u_current()
     , m_switch(0)
-    , m_current_shooting_node(200)
+    , m_current_shooting_node(100)
     , m_timing_value(0)
     , m_current_stance_foot(-1)
     , m_previous_stance_foot(-1)
@@ -69,7 +69,7 @@ std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
 
 void ZmpSolver::reset_to_double_stance()
 {
-    m_current_shooting_node = 200;
+    m_current_shooting_node = 100;
     m_step_counter = 0;
     m_current_count = -1;
 }
@@ -94,7 +94,7 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
-    m_x_current[0] = m_com_current[0];
+    m_x_current[0] = m_com_current[0]; // - 0.11; when using real state estimator
     m_x_current[1] = m_com_vel_current[0];
 
     m_x_current[2] = m_zmp_current[0];
@@ -129,8 +129,8 @@ void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
         // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
-        m_pos_foot_current[0] = 0.11; // at the start, the CoM is about 0.11 meters in the positive direction, because
-                                      // the 0 is from the right ankle
+        m_pos_foot_current[0] = 0.0; // at the start, the CoM is about 0.11 meters in the positive direction, because
+                                     // the 0 is from the right ankle
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
@@ -231,14 +231,14 @@ void ZmpSolver::initialize_mpc_params()
     m_admissible_region_y = 0.10;
     m_foot_width_x = 0.3;
     m_foot_width_y = 0.1;
-    m_step_size_x = 0.1;
+    m_step_size_x = 0.2;
     m_step_size_y = 0.33;
 
     m_com_height = 0.6; // Load this from the com position
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 200;
+    m_current_shooting_node = 100;
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
@@ -260,7 +260,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
-    RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "N = %i", N);
 
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
