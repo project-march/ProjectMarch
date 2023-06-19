@@ -108,16 +108,14 @@ class InputDeviceController:
 
     def _gait_response_callback(self, msg: GaitResponse):
         """Update current node from the state machine."""
-        self._node.get_logger().debug("Received new gait from other IPD.")
         self._current_gait = msg.gait_type
 
     def _eeg_gait_request_callback(self, msg: Int32):
-        self.get_node().get_logger().info("EEG requested a gait!!!!!!!!!!!!!")
+        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
         self.publish_gait(msg.data)
 
     def publish_gait(self, gait_type: int) -> None:
         """Publish a message on `/march/gait_request` to publish the gait."""
-        self._node.get_logger().debug("Mock Input Device published gait: " + str(gait_type))
         self._current_gait = gait_type
         msg = GaitRequest(
             header=Header(stamp=self._node.get_clock().now().to_msg()),
@@ -130,14 +128,6 @@ class InputDeviceController:
             error_msg.error_message = "Error button clicked on IPD"
             error_msg.type = 0
             self._error_pub.publish(error_msg)
-
-    def publish_eeg_on_off(self) -> None:
-        """Publish eeg on if its off and off if it is on."""
-        self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
-
-    def update_eeg_on_off(self, msg: Bool) -> None:
-        """Update eeg value for when it is changed in the state machine."""
-        self.eeg = msg.data
 
     def _timer_callback(self) -> None:
         """Callback to send out an alive message."""

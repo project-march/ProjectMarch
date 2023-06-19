@@ -59,9 +59,9 @@ class InputDeviceView(QWidget):
         """Update the possible gaits when eeg is turned on or off."""
         self._controller.eeg = msg.data
         if msg.data:
-            self._controller.get_node().get_logger().info("EEG is alive!!!!!!!")
+            self._controller.get_node().get_logger().info("EEG is alive.")
         else:
-            self._controller.get_node().get_logger().warn("EEG disconnected!!!!!!!")
+            self._controller.get_node().get_logger().warn("EEG disconnected.")
         self._update_possible_gaits()
 
     def publish_gait(self, gait_type: int):
