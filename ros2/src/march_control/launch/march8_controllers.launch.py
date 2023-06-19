@@ -61,14 +61,14 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/march7_control.yaml",
+            default_value="effort_control/march8_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
                         "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=UnlessCondition(simulation),
         ),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="mujoco/march7_control.yaml",
+            default_value="mujoco/march8_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
                         "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=IfCondition(simulation),

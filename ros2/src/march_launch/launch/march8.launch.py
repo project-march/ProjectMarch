@@ -34,7 +34,7 @@ def generate_launch_description() -> LaunchDescription:
 
     DeclareLaunchArgument(
         name="robot",
-        default_value="march7",
+        default_value="march8",
         description="The name of the yaml that will be used for retrieving info about the exo."
     )
 
