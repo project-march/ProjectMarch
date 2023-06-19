@@ -49,53 +49,46 @@ IkSolverNode::IkSolverNode()
 
     m_solving_timer = this->create_wall_timer(
         std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
-
-    // pinocchio::Model test_model = m_ik_solver.get_model();
-    // for (int i = 0; i < test_model.names.size(); i++) {
-    //     RCLCPP_INFO(this->get_logger(), test_model.names[i]);
-    // }
-
-    // for (pinocchio::FrameIndex i = 0; i < static_cast<pinocchio::FrameIndex>(test_model.nframes); i++) {
-    //     RCLCPP_INFO(this->get_logger(), test_model.frames[i].name);
-    // }
-
-    // auto jacobian = m_ik_solver.get_model_jacobian();
-    // std::stringstream ss;
-    // ss << jacobian.format(Eigen::IOFormat(4, 0, ", ", "\n", "", ""));
-    // // RCLCPP_INFO(this->get_logger(), "Jacobian size: [%ix%i]", jacobian.rows(), jacobian.cols());
-    // RCLCPP_INFO(this->get_logger(), "Jacobian is :\n" + ss.str());
-
-    // Eigen::VectorXd test_sol = m_ik_solver.solve_for_velocity(m_ik_solver.get_state(), m_ik_solver.get_state());
-    // std::stringstream ss2;
-    // ss2 << test_sol.format(Eigen::IOFormat(8, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(this->get_logger(), "solution is :\n" + ss2.str());
 }
 
+/**
+ * This callback updates the com_trajectory that the exo needs to follow, and for which the IK solver calculates the
+ * trajectory for. When the reset flag is -1, the gait selection node is used so the callback should not update
+ * anything.
+ * @param msg the message received from the zmp-mpc with the com trajectory.
+ */
 void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     if (this->m_reset != -1) {
         // Reset the timer
-        // m_solving_timer->reset();
         m_com_trajectory_index = 0;
         // Update desired state
         m_com_trajectory_container = msg;
-        // RCLCPP_INFO(this->get_logger(), "obtained com trajectory");
     }
 }
 
+/**
+ * This callback is activated when a new swing-leg trajectory is received.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg the message received from the sing-leg trajectory generator.
+ */
 void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     if (this->m_reset != -1) {
         // Reset the timer
-        // m_solving_timer->reset();
         m_swing_trajectory_index = 0;
         // Update desired state
         m_swing_trajectory_container = msg;
-        // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
-        // m_stance_foot = -m_stance_foot;
     }
 }
 
+/**
+ * This callback receives the updates of the joint states from the state estimator.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
     if (this->m_reset != -1) {
@@ -106,6 +99,12 @@ void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState:
     }
 }
 
+/**
+ * Callback that updates the current foot positions of the ex.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     if (this->m_reset != -1) {
@@ -113,11 +112,21 @@ void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::Share
     }
 }
 
+/**
+ * set the foot positions to the last received foot positions.
+ * @param setter the foot positions to which the state should be set.
+ */
 void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr setter)
 {
     m_latest_foot_positions = setter;
 }
 
+/**
+ * This callback updates the stance foot of the ik with the stance foot determined by the state esstimator.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     if (this->m_reset != -1) {
@@ -125,6 +134,12 @@ void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
     }
 }
 
+/**
+ * When the reset flag is -1, the gait selection node is used.
+ * This means that the trajectories should be set to null pointers to stop the IK from solving.
+ * If the IK does not stop solving, the trajectories will conflict with those of the gait selection node.
+ * @param msg
+ */
 void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // RESET -1-> RESET TRAJECTORIES
@@ -153,10 +168,13 @@ void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg
     this->m_reset = msg->data;
 }
 
+/**
+ * The timer callback starts the solving cycle.
+ * It makes sure that every time interval the IK solves ands sends a trajectory to the ros2 control.
+ */
 void IkSolverNode::timer_callback()
 {
     // Construct the state
-
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input");
@@ -164,23 +182,14 @@ void IkSolverNode::timer_callback()
     } else {
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
-            // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
             m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
-
-            // m_desired_state.left_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
-            // m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-            // m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
-
-            // m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-            // m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
         }
         if (m_stance_foot == -1) {
-            // RCLCPP_INFO(this->get_logger(), "Stance foot is left");
             m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -188,40 +197,20 @@ void IkSolverNode::timer_callback()
             m_desired_state.right_foot_pose << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
-
-            // m_desired_state.right_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
-            //     m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-            //     m_swing_trajectory_container->velocity[m_swing_trajectory_index].z, 0.0, 0.0, 0.0;
-
-            // m_desired_state.right_foot_pose << 0.01, 0.0, 0.00, 0.0, 0.0, 0.0;
-            // m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
         }
-        // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
         m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y,
             m_com_trajectory_container->velocity[m_com_trajectory_index].z, 0.0, 0.0, 0.0;
-        // m_desired_state.com_pos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-        // RCLCPP_INFO(this->get_logger(), "Stance foot is %i", m_stance_foot);
-
-        // m_desired_state.com_pos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-
-        // RCLCPP_INFO(this->get_logger(), "Set desired com_vel");
         Eigen::VectorXd solution_velocity = m_ik_solver.solve_for_velocity(
             m_ik_solver.get_state(), m_desired_state, static_cast<double>(m_timestep) / 1000.0, m_stance_foot);
 
-        // RCLCPP_INFO(this->get_logger(), "Solved for velocity");
         std::stringstream ss;
-        // ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
-        // RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
-        // ss.clear();
-        // ss.str("");
         Eigen::VectorXd solution_position
             = m_ik_solver.velocity_to_pos(solution_velocity, static_cast<double>(m_timestep) / 1000.0);
         ss << solution_velocity.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
 
-        // RCLCPP_INFO(rclcpp::get_logger(""), "Solution is :\n" + ss.str() + "\n");
         ss.clear();
         ss.str("");
         publish_ik_visualizations();
@@ -232,7 +221,6 @@ void IkSolverNode::timer_callback()
         publish_joint_states(
             std::vector<double>(solution_position.data(), solution_position.data() + solution_position.size()));
 
-        // RCLCPP_INFO(this->get_logger(), "Solved for Position");
         if (m_swing_trajectory_index >= m_swing_trajectory_container->velocity.size()) {
             RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Reached end of swing trajectory");
         } else {
@@ -244,11 +232,13 @@ void IkSolverNode::timer_callback()
         } else {
             m_com_trajectory_index++;
         }
-
-        // RCLCPP_INFO(this->get_logger(), "Published trajectory");
     }
 }
 
+/**
+ * Publish the calculated trajectory to the ros2 control.
+ * @param joint_positions
+ */
 void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 {
     trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
@@ -270,10 +260,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 
     for (auto& i : trajectory.joint_names) {
         index = pinocchio_model.getJointId(i);
-        // RCLCPP_INFO(this->get_logger(), "Joint id of %s is %i", i.c_str(), index);
         point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
-        // RCLCPP_INFO(this->get_logger(), "publishing position %f, which is equal to %f",
-        // joint_positions[pinocchio_model.joints[index].idx_q()], msg.position.end());
     }
 
     point_prev = point_prev_saved;
@@ -285,8 +272,6 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     trajectory.points.push_back(point);
     trajectory.header.stamp = this->get_clock()->now();
     point_prev_saved = point;
-    // RCLCPP_INFO(this->get_logger(), "size is %i", msg.position.size());
-
     m_joint_trajectory_publisher->publish(trajectory);
 
     sensor_msgs::msg::JointState::SharedPtr internal_state = std::make_shared<sensor_msgs::msg::JointState>();
@@ -297,10 +282,14 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     m_ik_solver.set_jacobian();
 }
 
+/**
+ * An extra method to visualize the ik movements in RVIZ. This makes it easier to verify and test the IK solver.
+ */
 void IkSolverNode::publish_ik_visualizations()
 {
     pinocchio::Model vis_model = m_ik_solver.get_model();
     pinocchio::Data vis_data = m_ik_solver.get_data();
+
     // Publish the joint visualizations
     visualization_msgs::msg::Marker ik_markers;
     ik_markers.type = 7;
@@ -317,7 +306,7 @@ void IkSolverNode::publish_ik_visualizations()
         marker_container.z = frame_transform[2];
         ik_markers.points.push_back(marker_container);
     }
-    // RCLCPP_INFO(this->get_logger(), "Published %i markers", ik_markers.points.size());
+
     ik_markers.action = 0;
     ik_markers.frame_locked = 1;
     ik_markers.scale.x = 0.1;
