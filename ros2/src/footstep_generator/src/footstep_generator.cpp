@@ -111,6 +111,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
+                // printf("stance_leg %i\n", stance_leg);
             }
             break;
 
@@ -142,6 +143,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
                 footstep.position.z = 0;
 
                 footstep_array.poses.push_back(footstep);
+                // printf("stance_leg %i\n", stance_leg);
             }
             break;
         default:
