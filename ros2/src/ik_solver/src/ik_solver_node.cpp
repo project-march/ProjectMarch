@@ -292,8 +292,8 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         double next_joint_pos_weight = 0.7;
         if (i.compare("left_hip_aa") == 0) {
             xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
-                * 2.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
-            RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
+                * 2.1; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
             if (abs(m_previous_xdif - xdif) > 0.10){
             xdif = m_previous_xdif;
             }
@@ -305,8 +305,8 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 
         } else if (i.compare("right_hip_aa") == 0) {
             xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
-                * 2.0; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
-            RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
+                * 2.1; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
 
             if (abs(m_previous_rxdif - xdif) > 0.8){
             xdif = m_previous_rxdif;

@@ -37,7 +37,7 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
     m_curve.points.push_back(right_point);
     m_curve.points.push_back(end_point);
 
-    m_curve.point_amount = 100; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
+    m_curve.point_amount = 75; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
     m_step_length = 0.2;
 
     // Generate the trajectory for the first time

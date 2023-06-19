@@ -130,7 +130,7 @@ void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
         // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
-        m_pos_foot_current[0] = 0.15; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
+        m_pos_foot_current[0] = 0.11; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
@@ -430,7 +430,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1) {
         m_current_count = m_current_stance_foot;
         m_step_counter++;
-        printf("weight shift is complete \n");
+        RCLCPP_INFO(rclcpp::get_logger("Jack stinkt"), "weight shift is complete \n");
         printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
         m_current_shooting_node--;
