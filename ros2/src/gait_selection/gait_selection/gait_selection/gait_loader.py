@@ -28,7 +28,7 @@ class GaitLoader:
         """Init the gait loader for the gait_selection."""
         self._node = node
 
-        self._node.declare_parameter('robot', 'march7')
+        self._node.declare_parameter('robot', 'march8')
         robot = self._node.get_parameter('robot').get_parameter_value().string_value
 
         robot_path = get_package_share_directory('march_hardware_builder') + '/robots/' + robot + '.yaml'
