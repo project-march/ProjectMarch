@@ -39,7 +39,8 @@ void BufferNode::swing_subscriber_callback(geometry_msgs::msg::PoseArray::Shared
 
 void BufferNode::swing_command_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
-    geometry_msgs::msg::PoseArray::SharedPtr zero_swing_msg = std::make_shared<geometry_msgs::msg::PoseArray>(geometry_msgs::msg::PoseArray());
+    geometry_msgs::msg::PoseArray::SharedPtr zero_swing_msg
+        = std::make_shared<geometry_msgs::msg::PoseArray>(geometry_msgs::msg::PoseArray());
     geometry_msgs::msg::Pose pose_container;
     pose_container.position.x = 0.0;
     pose_container.position.y = 0.0;

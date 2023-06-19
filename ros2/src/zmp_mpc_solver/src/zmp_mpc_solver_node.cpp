@@ -46,7 +46,7 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(16ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(50ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 

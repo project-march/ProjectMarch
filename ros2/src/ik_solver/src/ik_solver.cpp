@@ -28,9 +28,8 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
 
     m_joint_vel.resize(m_model.nv);
 
-
     for (int i = 1; i < m_model.names.size(); i++) {
-    pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
+        pinocchio::JointIndex index = m_model.getJointId(m_model.names[i]);
         if ((m_model.names[i].compare("right_knee") == 0) or (m_model.names[i].compare("left_knee") == 0)) {
             m_joint_pos(m_model.joints[index].idx_q()) = 0.1;
         }
@@ -47,7 +46,6 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
             m_joint_pos(m_model.joints[index].idx_q()) = 0.13;
         }
     }
-
 
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
@@ -149,7 +147,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // 3), state_current.right_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
-    
+
     // Print the error vectors
     // std::stringstream ss;
     // ss << J_left_foot.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));

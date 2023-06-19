@@ -5,8 +5,8 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/msg/ik_solver_command.hpp"
-#include "std_msgs/msg/int32.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/int32.hpp"
 
 class BufferNode : public rclcpp::Node {
 public:

@@ -43,7 +43,7 @@ IkSolverNode::IkSolverNode()
     // publish_ik_visualizations();
 
     // Initializing the timestep
-    declare_parameter("timestep", 6);
+    declare_parameter("timestep", 50);
     m_timestep = this->get_parameter("timestep").as_int();
 
     m_solving_timer = this->create_wall_timer(
@@ -159,12 +159,14 @@ void IkSolverNode::timer_callback()
     publish_ik_visualizations();
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n"
-            , (m_com_trajectory_container)?"true":"false", (m_swing_trajectory_container)?"true":"false", m_stance_foot);
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+            "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n",
+            (m_com_trajectory_container) ? "true" : "false", (m_swing_trajectory_container) ? "true" : "false",
+            m_stance_foot);
         return;
     } else {
         float swing_z_factor = 1.0;
-        float swing_x_factor = 1.0;
+        float swing_x_factor = 0.4;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -203,7 +205,7 @@ void IkSolverNode::timer_callback()
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
         m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
-        // RCLCPP_INFO(this->get_logger(), "Desired CoM X %f", m_desired_state.com_pos);
+            // RCLCPP_INFO(this->get_logger(), "Desired CoM X %f", m_desired_state.com_pos);
 
             m_com_trajectory_container->velocity[m_com_trajectory_index].y, 0.0, 0.0, 0.0, 0.0;
 
@@ -291,31 +293,31 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         double xdif;
         double next_joint_pos_weight = 0.7;
         if (i.compare("left_hip_aa") == 0) {
-            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
+            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
                 * 2.1; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
             // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
-            if (abs(m_previous_xdif - xdif) > 0.10){
-            xdif = m_previous_xdif;
-            }
-            else {
+            if (abs(m_previous_xdif - xdif) > 0.10) {
+                xdif = m_previous_xdif;
+            } else {
                 m_previous_xdif = xdif;
             }
             // point.positions.push_back(xdif);
-            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]*next_joint_pos_weight + xdif*(1-next_joint_pos_weight));
+            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()] * next_joint_pos_weight
+                + xdif * (1 - next_joint_pos_weight));
 
         } else if (i.compare("right_hip_aa") == 0) {
-            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33/2)
+            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
                 * 2.1; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
             // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
 
-            if (abs(m_previous_rxdif - xdif) > 0.8){
-            xdif = m_previous_rxdif;
-            }
-            else {
+            if (abs(m_previous_rxdif - xdif) > 0.8) {
+                xdif = m_previous_rxdif;
+            } else {
                 m_previous_rxdif = xdif;
             }
             // point.positions.push_back(xdif);
-            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]*next_joint_pos_weight + xdif*(1-next_joint_pos_weight));
+            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()] * next_joint_pos_weight
+                + xdif * (1 - next_joint_pos_weight));
         } else {
 
             // point.positions.push_back(0.0);

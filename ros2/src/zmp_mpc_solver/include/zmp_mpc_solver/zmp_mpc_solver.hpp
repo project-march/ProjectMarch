@@ -4,7 +4,6 @@
 #include "std_msgs/msg/int32.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "zmp_mpc_solver/c_generated_code/main_ZMP_pendulum_ode.cpp"
-#include "rclcpp/rclcpp.hpp"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -78,7 +77,6 @@ private:
 
     bool m_right_foot_on_ground;
     bool m_left_foot_on_ground;
-    
 
     double m_switch;
     int m_current_shooting_node;

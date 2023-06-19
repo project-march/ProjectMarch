@@ -29,8 +29,8 @@ ZmpSolver::ZmpSolver()
     // set_current_zmp(0.0, 0.33);
     // set_current_foot(0.0, 0.33);
     // set_previous_foot(0.0, 0.0);
-    set_current_com(0.0, 0.17, 0.0, 0.0);
-    set_current_zmp(0.0, 0.17);
+    set_current_com(0.11, 0.17, 0.0, 0.0);
+    set_current_zmp(0.11, 0.17);
     set_current_foot(0.11, 0.0);
     set_previous_foot(0.11, 0.33);
     set_current_state();
@@ -72,7 +72,6 @@ void ZmpSolver::reset_to_double_stance()
     m_current_shooting_node = 200;
     m_step_counter = 0;
     m_current_count = -1;
-    
 }
 
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
@@ -130,7 +129,8 @@ void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
         // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
-        m_pos_foot_current[0] = 0.11; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
+        m_pos_foot_current[0] = 0.11; // at the start, the CoM is about 0.11 meters in the positive direction, because
+                                      // the 0 is from the right ankle
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
@@ -231,7 +231,7 @@ void ZmpSolver::initialize_mpc_params()
     m_admissible_region_y = 0.10;
     m_foot_width_x = 0.3;
     m_foot_width_y = 0.1;
-    m_step_size_x = 0.2;
+    m_step_size_x = 0.1;
     m_step_size_y = 0.33;
 
     m_com_height = 0.6; // Load this from the com position
@@ -260,6 +260,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
+    RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "N = %i", N);
+
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
     printf("Shooting nodes: %i\n", N);
