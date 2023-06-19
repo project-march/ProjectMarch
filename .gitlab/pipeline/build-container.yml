@@ -19,7 +19,7 @@
   script:
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
-    - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup --context=dir://$CI_PROJECT_DIR
+      - /kaniko/executor --cache=$CACHE --dockerfile $CI_PROJECT_DIR/$DOCKER_FILE --destination $REGISTRY_IMAGE:$TAG --cleanup --context=dir://$CI_PROJECT_DIR
 
 .ros_container_builder:
   variables:
