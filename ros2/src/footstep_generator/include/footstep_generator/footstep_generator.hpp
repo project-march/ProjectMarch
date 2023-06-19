@@ -24,6 +24,8 @@ private:
     void publish_foot_placements(const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
         std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response);
 
+    void publish_footsteps(geometry_msgs::msg::PoseArray footsteps);
+
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_publisher;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_swing_trajectory_command_publisher;
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
