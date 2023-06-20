@@ -301,7 +301,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
             }
             // point.positions.push_back(xdif);
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()] * next_joint_pos_weight
-                + xdif * (1 - next_joint_pos_weight));
+                + (xdif-0.05) * (1 - next_joint_pos_weight));
 
         } else if (i.compare("right_hip_aa") == 0) {
             xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
@@ -315,7 +315,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
             }
             // point.positions.push_back(xdif);
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()] * next_joint_pos_weight
-                + xdif * (1 - next_joint_pos_weight));
+                + (xdif -0.05) * (1 - next_joint_pos_weight));
         } else {
 
             // point.positions.push_back(0.0);
