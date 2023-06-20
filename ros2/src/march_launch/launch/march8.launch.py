@@ -93,6 +93,18 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch IMU
+    imu_nodes = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("bluespace_ai_xsens_mti_driver"),
+                "launch",
+                "imu_launch.launch.py",
+            )
+        ),
+    )
+    # endregion
+
     ik_solver_launch_dir = os.path.join(
         get_package_share_directory('ik_solver'),
         'launch'
@@ -207,4 +219,5 @@ def generate_launch_description() -> LaunchDescription:
         march_control,
         record_rosbags_action,
         safety_node,
+        imu_nodes,
     ])
