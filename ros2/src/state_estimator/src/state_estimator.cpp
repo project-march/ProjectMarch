@@ -81,37 +81,49 @@ StateEstimator::StateEstimator()
     initialize_imus();
 }
 
+/**
+ * Callback when IMU data is updated
+ * @param msg message containing hte new imu data.
+ */
 void StateEstimator::lower_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu_estimator.update_imu(*msg, LOWER);
 }
 
+/**
+ * Callback for the upper IMU in the fixture
+ * @param msg
+ */
 void StateEstimator::upper_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu_estimator.update_imu(*msg, UPPER);
 }
 
+/**
+ * Callback for the Joint states broadcaster.
+ * @param msg
+ */
 void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    // for(auto& i : msg->position){
-    //     if (i == 0.0){
-    //         return;
-    //     }
-    // }
     this->m_joint_estimator.set_joint_states(msg);
-    // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
 }
 
+/**
+ * Callback for the pressure sole data from the pressure sole broadcaster.
+ * @param msg
+ */
 void StateEstimator::pressure_sole_callback(march_shared_msgs::msg::PressureSolesData::SharedPtr msg)
 {
-
     this->m_cop_estimator.update_pressure_sensors(update_pressure_sensors_data(msg->names, msg->pressure_values));
     auto cop_msg = this->m_cop_estimator.get_cop();
     cop_msg.header.frame_id = "map";
     this->m_cop_pos_publisher->publish(cop_msg);
 }
 
+/**
+ * Create he IMU's from the state estimator config file.
+ */
 void StateEstimator::initialize_imus()
 {
     IMU imu_to_set;
@@ -143,11 +155,13 @@ void StateEstimator::initialize_imus()
     m_imu_estimator.set_imu(imu_to_set, UPPER);
 }
 
+/**
+ * Update the foot frames with new states and pitch.
+ */
 void StateEstimator::update_foot_frames()
 {
     // This script assumes the base foot frames are named LEFT_ORIGIN and RIGHT_ORIGIN;
     // obtain the origin joint
-    // IMU& imu = m_imu_estimator.get_imu(LOWER);
     try {
         geometry_msgs::msg::TransformStamped measured_hip_base_angle
             = m_tf_buffer->lookupTransform("lowerIMU", "map", tf2::TimePointZero);
@@ -164,19 +178,19 @@ void StateEstimator::update_foot_frames()
         tf2_angle_difference.normalize();
         geometry_msgs::msg::Quaternion angle_difference;
         tf2::convert(tf2_angle_difference, angle_difference);
-        // testing
+
         tf2::Matrix3x3 m(tf2_measured_hip_base_angle);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
-
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
-        // roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
 }
 
+/**
+ * Determine and publish the com frame.
+ */
 void StateEstimator::publish_com_frame()
 {
     geometry_msgs::msg::TransformStamped com_transform;
@@ -205,6 +219,9 @@ void StateEstimator::publish_com_frame()
     m_com_pos_publisher->publish(center_of_mass);
 }
 
+/**
+ * Publish all the frames of the robot, this includes: the joints, feet zmp an com.
+ */
 void StateEstimator::publish_robot_frames()
 {
     // publish IMU frames
@@ -258,9 +275,6 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
-    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y
-    // %f",foot_positions.poses[0].position.y); RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot
-    // position y %f",foot_positions.poses[1].position.y);
 
     m_foot_pos_publisher->publish(foot_positions);
 
@@ -312,6 +326,12 @@ void StateEstimator::publish_robot_frames()
     visualize_joints();
 }
 
+/**
+ * Get a specified frame transformation
+ * @param target_frame The frame of which we want to know the transformation
+ * @param source_frame The frame to which we want to know the transform.
+ * @return
+ */
 geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     const std::string& target_frame, const std::string& source_frame)
 {
@@ -327,6 +347,10 @@ geometry_msgs::msg::TransformStamped StateEstimator::get_frame_transform(
     }
 }
 
+/**
+ * Create the pressure sole objects from the state estimator config files.
+ * @return A vector with the created pressure sensors.
+ */
 std::vector<PressureSensor*> StateEstimator::create_pressure_sensors()
 {
 
@@ -366,6 +390,12 @@ std::vector<PressureSensor*> StateEstimator::create_pressure_sensors()
     return sensors;
 }
 
+/**
+ * Update the data of the pressure sole objects with the incoming data
+ * @param names the names of the pressure sensors
+ * @param pressure_values the new values to update the sensors with
+ * @return
+ */
 std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
     std::vector<std::string> names, std::vector<double> pressure_values)
 {
@@ -376,6 +406,10 @@ std::map<std::string, double> StateEstimator::update_pressure_sensors_data(
     return pressure_values_map;
 }
 
+/**
+ * A helper function that allows thee joint transformations to be visualized in RVIZ. with this we can validate if the
+ * state estimator actually represents the exo state well.
+ */
 void StateEstimator::visualize_joints()
 {
     // Publish the joint visualizations

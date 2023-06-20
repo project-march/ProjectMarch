@@ -5,6 +5,10 @@ ComEstimator::ComEstimator()
 {
 }
 
+/**
+ * Calculates abs sets the com position of the exo.
+ * @param mass_list
+ */
 void ComEstimator::set_com_state(std::vector<CenterOfMass> mass_list)
 {
     m_center_of_mass.mass = 0;

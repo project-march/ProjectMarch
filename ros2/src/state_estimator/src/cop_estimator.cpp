@@ -46,18 +46,27 @@ void CopEstimator::set_cop(
         m_center_of_pressure.point.z = m_center_of_pressure.point.z / total_pressure;
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("cop_estimator"), "All pressure sensors have pressure 0.");
-        //        throw std::runtime_error("ERROR: The total measured pressure is 0.\n");
     }
 }
 
+/**
+ * Updates the values of the pressure sensors map, matches name to pressure value.
+ * Make use of a function that sets the individual sensor to the correct value.
+ * @param pressure_values_map
+ */
 void CopEstimator::update_pressure_sensors(std::map<std::string, double> pressure_values_map)
 {
     for (auto& x : pressure_values_map) {
         update_individual_pressure_sensor(x.first, x.second);
     }
-    //    set_cop_state(m_sensors);
 }
 
+/**
+ * Sets the new pressure vlue of an individual pressure sensor.
+ * It looks for the name in the sensor array and updates the pressure value of the sensor
+ * @param name The name of the sensor to update
+ * @param pressure The new pressure value.
+ */
 void CopEstimator::update_individual_pressure_sensor(std::string name, double pressure)
 {
     for (auto x : m_sensors) {
@@ -77,6 +86,10 @@ geometry_msgs::msg::PointStamped CopEstimator::get_cop()
     return m_center_of_pressure;
 }
 
+/**
+ * Returns the pressure sensors.
+ * @return
+ */
 std::vector<PressureSensor*>* CopEstimator::get_sensors()
 {
     return &m_sensors;
