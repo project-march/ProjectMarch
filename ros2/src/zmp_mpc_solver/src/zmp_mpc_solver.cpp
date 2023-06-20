@@ -29,10 +29,10 @@ ZmpSolver::ZmpSolver()
     // set_current_zmp(0.0, 0.33);
     // set_current_foot(0.0, 0.33);
     // set_previous_foot(0.0, 0.0);
-    set_current_com(0.11, 0.17, 0.0, 0.0);
-    set_current_zmp(0.11, 0.17);
-    set_current_foot(0.11, 0.0);
-    set_previous_foot(0.11, 0.33);
+    set_current_com(0.0, 0.17, 0.0, 0.0);
+    set_current_zmp(0.0, 0.17);
+    set_current_foot(0.0, 0.0);
+    set_previous_foot(0.0, 0.33);
     set_current_state();
 }
 
@@ -170,7 +170,7 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    float zmp_check_margin = 1.5;
+    float zmp_check_margin = 1.8;
     if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin
         && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin) {
         x_check = true;
@@ -206,7 +206,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x;
+    m_com_current[0] = x - 0.11;
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -220,7 +220,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x;
+    m_zmp_current[0] = x - 0.11;
     m_zmp_current[1] = y;
 }
 

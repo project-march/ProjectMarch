@@ -8,7 +8,7 @@ using std::placeholders::_1;
 SolverNode::SolverNode()
     : Node("mpc_solver_node")
     , m_zmp_solver()
-    , m_desired_previous_foot_x(0.11)
+    , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
 {
     //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
