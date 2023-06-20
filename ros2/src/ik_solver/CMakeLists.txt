@@ -127,7 +127,7 @@ ament_export_dependencies(Eigen3)
 if(BUILD_TESTING)
 file(COPY test/urdf/march_test_urdf.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/urdf)
   ament_add_gmock(${PROJECT_NAME}_test
-#  test/ik_solver_test.cpp
+  test/ik_solver_test.cpp
   test/test_runner.cpp
   # include
   )
