@@ -226,7 +226,7 @@
 		<parent link="L_LL"/>
 		<child link="L_foot"/>
 		<!-- <limit effort="0.9" lower="-0.0174533" upper="0.436332" velocity="4.1"/> -->
-		<limit effort="179" lower="-0.436332313" upper="0.1645329252" velocity="4.1"/>
+		<limit effort="179" lower="-0.436332313" upper="0.155000" velocity="4.1"/>
 	</joint>
 	<joint name="right_hip_aa" type="revolute">
 		<origin rpy="0 0 0" xyz="-0.021 -0.08 0.025"/>
@@ -256,7 +256,7 @@
 		<parent link="R_LL"/>
 		<child link="R_foot"/>
 		<!-- <limit effort="0.9" lower="-0.0174533" upper="0.436332" velocity="4.1"/> -->
-		<limit effort="179" lower="-0.436332313" upper="0.1645329252" velocity="4.1"/>
+		<limit effort="179" lower="-0.436332313" upper="0.155000" velocity="4.1"/>
 	</joint> 
 	<joint name="L_ground" type="fixed">
 		<origin xyz="0 0 -0.126"/>
