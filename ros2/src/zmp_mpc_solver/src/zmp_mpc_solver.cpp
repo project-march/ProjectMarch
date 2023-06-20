@@ -36,47 +36,82 @@ ZmpSolver::ZmpSolver()
     set_current_state();
 }
 
+/**
+ * Get the com height
+ * @return
+ */
 double ZmpSolver::get_com_height()
 {
     return m_com_height;
 }
 
+/**
+ * Update the current shooting node to a newer one.
+ * @param current_shooting_node
+ */
 void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
 {
     m_current_shooting_node = current_shooting_node;
 }
 
+/**
+ * Call the solving step of the zmp mpc
+ * @return The return status of the solver.
+ */
 int ZmpSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
-    // return 1;
 }
 
+/**
+ * Get the current state of the solver
+ * @return
+ */
 std::array<double, NX> ZmpSolver::get_state()
 {
     return m_x_current;
 }
 
+/**
+ * Get the real time x coordinates of the com trajectory.
+ * @return
+ */
 std::vector<double> ZmpSolver::get_real_time_com_trajectory_x()
 {
     return m_real_time_com_trajectory_x;
 }
 
+/**
+ * return the real time y coordinate of the com trajectory
+ * @return
+ */
 std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
 {
     return m_real_time_com_trajectory_y;
 }
 
+/**
+ * Get the state trajectory of the mpc solver.
+ * @return
+ */
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
 {
     return &m_x_trajectory;
 }
 
+/**
+ * Get the input trajectory that is used by the solver.
+ * @return
+ */
 std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
 {
     return m_u_current;
 }
 
+/**
+ * Get the current shooting node that the mpc is solving for.
+ * @return The number of the shooting node the solver is on.
+ */
 std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 {
     std_msgs::msg::Int32 current_shooting_node;
@@ -84,6 +119,11 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
     return current_shooting_node;
 }
 
+/**
+ * Set the state of the mpc.
+ * Here we take all the latest outputs of the state estimator, to set the start state of the MPC.
+ * This state is the starting point from which the mpc wil start solving and optimizing trajectories.
+ */
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
@@ -107,17 +147,30 @@ void ZmpSolver::set_current_state()
     m_x_current[11] = 0;
 }
 
+/**
+ * Get the current stance foot that the mpc uses.
+ * @return The number representing the stance foot.
+ */
 int ZmpSolver::get_current_stance_foot()
 {
     return m_current_stance_foot;
 }
 
+/**
+ * Set the current foot.
+ * @param x the x coordinate of the foot
+ * @param y the y coordinate of the foot
+ */
 void ZmpSolver::set_current_foot(double x, double y)
 {
     m_pos_foot_current[0] = x;
     m_pos_foot_current[1] = y;
 }
 
+/**
+ * change the footstep.
+ * If a step is completed, the foot switches from left to right, or vice versa, depending on the previous foot.
+ */
 void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
@@ -129,22 +182,39 @@ void ZmpSolver::update_current_foot()
     }
 }
 
+/**
+ * Set the right foot on ground or not.
+ * @param foot_on_ground True if foot is on the ground, False in foot is not on ground.
+ */
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
 {
     m_right_foot_on_ground = foot_on_ground;
 }
 
+/**
+ * Set the left foot on ground or not.
+ * @param foot_on_ground True if foot is on the ground, False in foot is not on ground.
+ */
 void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
 {
     m_left_foot_on_ground = foot_on_ground;
 }
 
+/**
+ * Set the position of the previous foot.
+ * @param x The x coordinate of the previous foot position
+ * @param y The y coordinate of the previous foot position
+ */
 void ZmpSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
 }
 
+/**
+ * Set the new footsteps which the mpc will place during the walk.
+ * @param footsteps
+ */
 void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
 {
     m_candidate_footsteps.clear();
@@ -153,6 +223,11 @@ void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr
     }
 }
 
+/**
+ * Check if the zmp of the exo state is above the foot.
+ * When this is the case, the weight shift is done.
+ * @return True if the zmp is above the foot, false otherwise
+ */
 bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
@@ -178,6 +253,10 @@ bool ZmpSolver::check_zmp_on_foot()
     }
 }
 
+/**
+ * Set the step size that will be used in the solving step
+ * @param m_candidate_footsteps The footstep from where the step size will be derived.
+ */
 void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
 {
     m_reference_stepsize_y.clear();
@@ -190,6 +269,13 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
     }
 }
 
+/**
+ * Set the current position and velocities of the com of the mpc state.
+ * @param x the x position of the CoM
+ * @param y the y position of the CoM
+ * @param dx the x velocity of the CoM
+ * @param dy the y velocity of the CoM
+ */
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
     m_com_current[0] = x;
@@ -199,17 +285,30 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
     m_com_vel_current[1] = dy;
 }
 
+/**
+ * Set the height of the com state
+ * @param height the height of the new CoM
+ */
 void ZmpSolver::set_com_height(double height)
 {
     m_com_height = height;
 }
 
+/**
+ * Set the new position of the zmp of the mpc state
+ * @param x the x position of the zmp
+ * @param y the y position of the zmp
+ */
 void ZmpSolver::set_current_zmp(double x, double y)
 {
     m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
+/**
+ * Initialize all the standard parameters the MPC needs to solve.
+ * Some of there parameters are: foot width, foot height, step size etc.
+ */
 void ZmpSolver::initialize_mpc_params()
 {
     // Later, change this to read from a yaml
@@ -230,16 +329,29 @@ void ZmpSolver::initialize_mpc_params()
     m_number_of_footsteps = 2;
 }
 
+/**
+ * Set the current stance foot.
+ * @param stance_foot
+ */
 void ZmpSolver::set_current_stance_foot(int stance_foot)
 {
     m_current_stance_foot = stance_foot;
 }
 
+/**
+ * Update the current shooting node by upping it by one.
+ */
 void ZmpSolver::update_current_shooting_node()
 {
     m_current_shooting_node += 1;
 }
 
+/**
+ * The actual solving step of the MPC
+ * @param x_init_input Initial input
+ * @param u_current current state
+ * @return succes / error code.
+ */
 inline int ZmpSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {

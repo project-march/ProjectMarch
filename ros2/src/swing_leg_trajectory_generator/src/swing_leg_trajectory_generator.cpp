@@ -15,6 +15,10 @@ SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
     m_step_length = 0.2;
 }
 
+/**
+ * Generate the swing leg trajectory.
+ * This recursive algorithm creates the bezier trajectory that should be followed by the swing leg of the exo.
+ */
 void SwingLegTrajectoryGenerator::generate_trajectory()
 {
     geometry_msgs::msg::PoseArray trajectory;
@@ -28,6 +32,12 @@ void SwingLegTrajectoryGenerator::generate_trajectory()
     m_curve.trajectory = trajectory;
 }
 
+/**
+ * Get a specific point from the curve for a specified t between 0 and 1.
+ * @param points The points with which the bezier curve is calculated
+ * @param t The t for which we want to calculate the point on the curve, has range 0.0 to 1.0
+ * @return The calculated point.
+ */
 Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t)
 {
     Point point;
@@ -44,6 +54,13 @@ Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t
     }
 }
 
+/**
+ * Update the four points on which the bezier curve is based.
+ * Because the bezier visualization uses a different scale then the swing leg trajectory generator, here the points are
+ * updated with a scalar.
+ * @param points The new points which needs to be updated
+ * @param step_length The step length for which the points need to be updated
+ */
 void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, double step_length)
 {
     double scalar = step_length / points.back().x;
@@ -57,21 +74,39 @@ void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, doubl
     generate_trajectory();
 }
 
+/**
+ * Return the bezier curve that is generated.
+ * @return
+ */
 BezierCurve SwingLegTrajectoryGenerator::get_curve()
 {
     return m_curve;
 }
 
+/**
+ * Get the step length that is used to base the curve on.
+ * @return
+ */
 double SwingLegTrajectoryGenerator::get_step_length()
 {
     return m_step_length;
 }
 
+/**
+ * Set new points for the bezier curve.
+ * These new points have to be scaled with the step length in the update points function.
+ * @param points
+ */
 void SwingLegTrajectoryGenerator::set_points(std::vector<Point> points)
 {
     update_points(points, m_step_length);
 }
 
+/**
+ * Set a new step length to the bezier curve.
+ * This step length should also be used to scale the points again with the update points function.
+ * @param step_length
+ */
 void SwingLegTrajectoryGenerator::set_step_length(double step_length)
 {
     update_points(m_curve.points, step_length);
