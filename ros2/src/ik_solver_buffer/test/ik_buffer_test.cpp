@@ -31,7 +31,7 @@ protected:
     std::unique_ptr<BufferNode> ik_buffer;
 };
 
-TEST_F(IkBufferTest, checkForReadyTest)
+TEST_F(IkBufferTest, checkForReadyComTest)
 {
     geometry_msgs::msg::PoseArray::SharedPtr mock_com_trajectory;
     geometry_msgs::msg::PoseArray::SharedPtr mock_swing_trajectory;
@@ -51,7 +51,27 @@ TEST_F(IkBufferTest, checkForReadyTest)
     ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
 }
 
-TEST_F(IkBufferTest, FilledVelTrajecoryTest)
+TEST_F(IkBufferTest, checkForReadySwingTest)
+{
+    geometry_msgs::msg::PoseArray::SharedPtr mock_com_trajectory;
+    geometry_msgs::msg::PoseArray::SharedPtr mock_swing_trajectory;
+
+    mock_com_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
+    mock_swing_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
+
+    // before the setters, the check should return false
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
+
+    this->ik_buffer->set_com_trajectory(mock_com_trajectory);
+    this->ik_buffer->set_swing_trajectory(mock_swing_trajectory);
+
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), true);
+    // The check should fail after publishing, so we assert the false statement
+    this->ik_buffer->publish_swing_trajectory();
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
+}
+
+TEST_F(IkBufferTest, FilledVelSwingTrajecoryTest)
 {
     auto mock_com_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
     auto mock_swing_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
@@ -78,6 +98,36 @@ TEST_F(IkBufferTest, FilledVelTrajecoryTest)
     ASSERT_EQ(this->ik_buffer->check_if_ready(), true);
     // The check should fail after publishing, so we assert the false statement
     this->ik_buffer->publish_swing_trajectory();
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
+}
+
+TEST_F(IkBufferTest, FilledVelComTrajecoryTest)
+{
+    auto mock_com_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
+    auto mock_swing_trajectory = std::make_shared<geometry_msgs::msg::PoseArray>();
+
+    geometry_msgs::msg::Pose p1;
+    p1.position.x = 1;
+    p1.position.y = 0;
+    p1.position.z = 0;
+    mock_com_trajectory->poses.push_back(p1);
+    mock_swing_trajectory->poses.push_back(p1);
+    geometry_msgs::msg::Pose p2;
+    p2.position.x = 1;
+    p2.position.y = 0;
+    p2.position.z = 0;
+    mock_com_trajectory->poses.push_back(p2);
+    mock_swing_trajectory->poses.push_back(p2);
+
+    // before the setters, the check should return false
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
+
+    this->ik_buffer->set_com_trajectory(mock_com_trajectory);
+    this->ik_buffer->set_swing_trajectory(mock_swing_trajectory);
+
+    ASSERT_EQ(this->ik_buffer->check_if_ready(), true);
+    // The check should fail after publishing, so we assert the false statement
+    this->ik_buffer->publish_com_trajectory();
     ASSERT_EQ(this->ik_buffer->check_if_ready(), false);
 }
 
