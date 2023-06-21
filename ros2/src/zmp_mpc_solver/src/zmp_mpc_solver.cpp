@@ -420,7 +420,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_left_foot_on_ground = false;
     } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
         printf("did not pass the foot on ground check \n");
-        m_current_shooting_node--;
+        // m_current_shooting_node--;
     }
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
