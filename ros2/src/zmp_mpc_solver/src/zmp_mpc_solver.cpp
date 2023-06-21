@@ -273,7 +273,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
-    RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
+    // RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
 
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;

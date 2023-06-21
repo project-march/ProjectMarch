@@ -42,7 +42,7 @@ struct Foot {
         }
         // we have 8 sensors, so we divide by 1
         total_pressure = measured_foot_pressure;
-        RCLCPP_INFO(rclcpp::get_logger("feet on ground"), "total pressure is: %f", total_pressure);
+        // RCLCPP_INFO(rclcpp::get_logger("feet on ground"), "total pressure is: %f", total_pressure);
         on_ground = (total_pressure / 8 <= threshold);
     };
 };
