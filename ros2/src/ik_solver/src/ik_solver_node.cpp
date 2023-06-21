@@ -10,7 +10,7 @@ IkSolverNode::IkSolverNode()
     , m_right_foot_on_ground(true)
     , m_swing_trajectory_index(0)
     , m_com_trajectory_index(0)
-    , m_stance_foot(1)
+    , m_stance_foot(-1)
     , hip_aa_upper_limit(0.1705329252)
     , hip_aa_lower_limit(-0.23617993878)
 {
