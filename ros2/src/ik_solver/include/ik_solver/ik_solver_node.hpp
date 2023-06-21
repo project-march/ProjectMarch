@@ -57,6 +57,8 @@ private:
     int m_timestep;
     int m_reset;
 
+    double hip_aa_upper_limit;
+    double hip_aa_lower_limit;
     double m_previous_xdif;
     double m_previous_rxdif;
 

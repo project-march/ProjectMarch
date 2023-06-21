@@ -47,8 +47,6 @@ void IkSolver::load_urdf_model(std::string urdf_filename)
         }
     }
 
-
-
     pinocchio::forwardKinematics(m_model, m_model_data, m_joint_pos, m_joint_vel);
     pinocchio::computeJointJacobians(m_model, m_model_data, m_joint_pos);
     pinocchio::updateFramePlacements(m_model, m_model_data);
