@@ -171,7 +171,7 @@ bool ZmpSolver::check_zmp_on_foot()
     bool x_check;
     bool y_check;
     float zmp_check_margin_y = 1.3;
-    float zmp_check_margin_x = 0.6;
+    float zmp_check_margin_x = 1.3;
 
     if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
         && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x) {
@@ -440,16 +440,16 @@ inline int ZmpSolver::solve_zmp_mpc(
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
 
-    if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
+    // if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
 
-        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
-        m_current_count = m_current_stance_foot;
-        m_step_counter++;
-        RCLCPP_INFO(rclcpp::get_logger("Jack stinkt"), "weight shift is complete \n");
-        printf("now going into current_shooting node %i\n", m_current_shooting_node);
-    } else if (m_current_shooting_node == 0) {
-        m_current_shooting_node--;
-    }
+    //     || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
+    //     m_current_count = m_current_stance_foot;
+    //     m_step_counter++;
+    //     RCLCPP_INFO(rclcpp::get_logger("Jack stinkt"), "weight shift is complete \n");
+    //     printf("now going into current_shooting node %i\n", m_current_shooting_node);
+    // } else if (m_current_shooting_node == 0) {
+    //     m_current_shooting_node--;
+    // }
 
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
