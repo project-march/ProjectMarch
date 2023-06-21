@@ -11,8 +11,8 @@ IkSolverNode::IkSolverNode()
     , m_swing_trajectory_index(0)
     , m_com_trajectory_index(0)
     , m_stance_foot(1)
-    , hip_aa_upper_limit(0.1745329252)
-    , hip_aa_lower_limit(-0.2617993878)
+    , hip_aa_upper_limit(0.1705329252)
+    , hip_aa_lower_limit(-0.23617993878)
 {
     m_com_trajectory_subscriber = this->create_subscription<march_shared_msgs::msg::IkSolverCommand>(
         "/ik_solver_com_input", 10, std::bind(&IkSolverNode::com_trajectory_subscriber_callback, this, _1));
