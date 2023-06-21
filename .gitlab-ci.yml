@@ -71,4 +71,4 @@ include:
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
     - local: /.gitlab/pipeline/test-code.yml
-#    - local: /.gitlab/pipeline/static-analysis.yml
+    - local: /.gitlab/pipeline/static-analysis.yml
