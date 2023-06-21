@@ -1,6 +1,7 @@
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/encoder/incremental_encoder.h"
+#include "march_hardware/torque_sensor/torque_sensor.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/motor_controller/actuation_mode.h"
@@ -10,11 +11,12 @@
 
 namespace march {
 MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode,
-    bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
+    std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
+    ActuationMode actuation_mode, bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
+    , torque_sensor_(std::move(torque_sensor))
     , actuation_mode_(actuation_mode)
     , is_incremental_encoder_more_precise_(is_incremental_encoder_more_precise)
     , logger_(std::move(logger))
@@ -34,17 +36,15 @@ MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEnc
     }
 }
 
-MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
     ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(slave, std::move(absolute_encoder), nullptr, actuation_mode,
-        /*is_incremental_encoder_more_precise=*/false, std::move(logger))
+    : MotorController(slave, std::move(absolute_encoder), nullptr, std::move(torque_sensor), actuation_mode, /*is_incremental_encoder_more_precise=*/false, std::move(logger))
 {
 }
 
-MotorController::MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
+MotorController::MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
     ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(slave, nullptr, std::move(incremental_encoder), actuation_mode,
-        /*is_incremental_encoder_more_precise=*/true, std::move(logger))
+    : MotorController(slave, nullptr, std::move(incremental_encoder), std::move(torque_sensor), actuation_mode, /*is_incremental_encoder_more_precise=*/true, std::move(logger))
 {
 }
 

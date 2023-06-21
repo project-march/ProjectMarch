@@ -25,6 +25,8 @@ testsetup:
             countsPerRotation: 6400
             transmission: 314 
             direction: 1
+          torqueSensor:
+            maxTorque: 1
         pids:
           position:
             p: 10.0

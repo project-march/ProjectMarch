@@ -25,6 +25,8 @@ testsetup:
             resolution: 12
             transmission: 121
             direction: 1
+          torqueSensor:
+            maxTorque: 1
         pids:
           position:
             p: 1.0

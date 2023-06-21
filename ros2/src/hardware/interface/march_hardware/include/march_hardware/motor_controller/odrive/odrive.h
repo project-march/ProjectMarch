@@ -5,6 +5,7 @@
 
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/encoder/incremental_encoder.h"
+#include "march_hardware/torque_sensor/torque_sensor.h"
 #include "march_hardware/ethercat/odrive_pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
@@ -32,6 +33,7 @@ public:
      * @param slave slave of the ODrive.
      * @param absolute_encoder pointer to absolute encoder, required so cannot be nullptr.
      * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr.
+     * @param torque_sensor pointer to the torque sensor, required so cannot be nullptr.
      * @param actuation_mode actuation mode in which the ODrive must operate.
      * @param is_incremental_encoder_more_precise whether to use the incremental or absolute encoder at every 'relative'
      * update.
@@ -39,7 +41,7 @@ public:
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode, bool index_found,
+        std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode, bool index_found,
         unsigned int motor_kv, bool is_incremental_encoder_more_precise,
         std::shared_ptr<march_logger::BaseLogger> logger);
 

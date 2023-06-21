@@ -207,6 +207,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
     logger_->info("ODrive has all required keys");
 
     YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
+    YAML::Node torque_sensor_config = odrive_config["torqueSensor"];
     int slave_index = odrive_config["slaveIndex"].as<int>();
 
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
@@ -230,6 +231,8 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, march::MotorControllerType::ODrive),
             /*incremental_encoder=*/
             HardwareBuilder::createIncrementalEncoder(incremental_encoder_config, march::MotorControllerType::ODrive),
+            /*torque_sensor=*/
+            HardwareBuilder::createTorqueSensor(torque_sensor_config, march::MotorControllerType::ODrive),
             /*actuation_mode=*/mode,
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
@@ -242,6 +245,8 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(
             /*absolute_encoder=*/nullptr,
             /*incremental_encoder=*/
             HardwareBuilder::createIncrementalEncoder(incremental_encoder_config, march::MotorControllerType::ODrive),
+            /*torque_sensor=*/
+            HardwareBuilder::createTorqueSensor(torque_sensor_config, march::MotorControllerType::ODrive),
             /*actuation_mode=*/mode,
             /*index_found=*/index_found,
             /*motor_kv=*/motor_kv,
