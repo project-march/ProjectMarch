@@ -170,9 +170,11 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    float zmp_check_margin = 1.8;
-    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin
-        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin) {
+    float zmp_check_margin_y = 1.0;
+    float zmp_check_margin_x = 0.6;
+
+    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
+        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x) {
         x_check = true;
         RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check true \n");
     } else {
@@ -181,8 +183,8 @@ bool ZmpSolver::check_zmp_on_foot()
 
     }
 
-    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin
-        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin) {
+    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
+        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
         y_check = true;
         RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
 
@@ -217,7 +219,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.11;
+    m_com_current[0] = x - 0.15;
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -231,7 +233,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.11;
+    m_zmp_current[0] = x - 0.15;
     m_zmp_current[1] = y;
 }
 
@@ -271,6 +273,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
+    RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
 
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
@@ -421,18 +424,18 @@ inline int ZmpSolver::solve_zmp_mpc(
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
 
     // // check if swing leg is done for left foot as stance leg and right leg as swing leg
-    if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
-        && m_right_foot_on_ground == true) {
-        printf("passed the right foot on ground check \n");
-        m_right_foot_on_ground = false;
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
-        && m_current_count == 1 && m_left_foot_on_ground == true) {
-        printf("passed the left foot on ground check \n");
-        m_left_foot_on_ground = false;
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
-        printf("did not pass the foot on ground check \n");
+    // if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
+    //     && m_right_foot_on_ground == true) {
+    //     printf("passed the right foot on ground check \n");
+    //     m_right_foot_on_ground = false;
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
+    //     && m_current_count == 1 && m_left_foot_on_ground == true) {
+    //     printf("passed the left foot on ground check \n");
+    //     m_left_foot_on_ground = false;
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
+    //     printf("did not pass the foot on ground check \n");
         // m_current_shooting_node--;
-    }
+    // }
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
