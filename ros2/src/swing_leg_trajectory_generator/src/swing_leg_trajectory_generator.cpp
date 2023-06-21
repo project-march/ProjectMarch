@@ -3,7 +3,7 @@
 //
 
 #include "swing_leg_trajectory_generator/swing_leg_trajectory_generator.hpp"
-#include <math.h>
+#include <cmath>
 
 using Point = geometry_msgs::msg::Point;
 using Pose = geometry_msgs::msg::Pose;
@@ -23,10 +23,11 @@ void SwingLegTrajectoryGenerator::generate_trajectory()
 {
     geometry_msgs::msg::PoseArray trajectory;
     double step_size = 1.0 / m_curve.point_amount;
-    for (double i = 0.0; i <= 1.0; i += step_size) {
+    for (int i = 0; i <= m_curve.point_amount; i++) {
+        double t = step_size * static_cast<double>(i);
         geometry_msgs::msg::Pose pose;
         auto points = m_curve.points;
-        pose.position = get_point(points, i);
+        pose.position = get_point(points, t);
         trajectory.poses.push_back(pose);
     }
     m_curve.trajectory = trajectory;
@@ -42,7 +43,7 @@ Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t
 {
     Point point;
     if (points.size() == 1) {
-        return points.at(0);
+        return points.at(/*__n=*/0);
     } else {
         auto point1 = get_point({ points.begin(), points.end() - 1 }, t);
         auto point2 = get_point({ points.begin() + 1, points.end() }, t);

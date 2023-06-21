@@ -64,9 +64,9 @@ void SwingLegTrajectoryGeneratorNode::publish_zero_swing()
 void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     auto steps = msg->poses;
-    auto begin_foot = steps.at(0);
-    auto end_foot = steps.at(2);
-    double step_size = prev_step_size + steps.at(0).position.x;
+    auto begin_foot = steps.at(/*__n=*/0);
+    auto end_foot = steps.at(/*__n=*/2);
+    double step_size = prev_step_size + steps.at(/*__n=*/0).position.x;
     m_swing_leg_generator.set_step_length(step_size);
 
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
