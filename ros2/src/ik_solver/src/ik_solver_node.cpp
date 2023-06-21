@@ -124,7 +124,7 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-    m_stance_foot = msg->data;
+//    m_stance_foot = msg->data;
     // }
 }
 
