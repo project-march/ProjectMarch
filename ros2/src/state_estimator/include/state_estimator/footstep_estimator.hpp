@@ -32,7 +32,7 @@ struct Foot {
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor*>* sensors, const char* prefix)
     {
-        threshold = 2.9;
+        threshold = 3.0;
         double measured_foot_pressure = 0.0;
         // look for the right pressure sensors specific to the foot
         for (auto i : *sensors) {
