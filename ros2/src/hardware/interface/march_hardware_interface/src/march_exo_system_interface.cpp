@@ -87,10 +87,10 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
 
-    march::PressureSoleData left_sole;
+    march::PressureSoleData left_sole = march::PressureSoleData();
     left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
-    march::PressureSoleData right_sole;
+    march::PressureSoleData right_sole = march::PressureSoleData();
     right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
 
@@ -368,7 +368,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        jointInfo.joint.actuate(/*target=*/0, (float)jointInfo.position, 1, 0);
+        jointInfo.joint.actuate((float)jointInfo.position, 0,0, 1);
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();

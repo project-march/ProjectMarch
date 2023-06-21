@@ -107,13 +107,13 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
     auto motor_controller = HardwareBuilder::createMotorController(*logger, joint_config["motor_controller"]);
 
     RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating Motor controllers.");
-    std::array<double, 3> position_pid;
+    std::array<double, 3> position_pid = std::array<double, 3>();
     auto pos_pids = joint_config["pids"]["position"];
     position_pid[0] = pos_pids["p"].as<double>();
     position_pid[1] = pos_pids["i"].as<double>();
     position_pid[2] = pos_pids["d"].as<double>();
 
-    std::array<double, 3> torque_pid;
+    std::array<double, 3> torque_pid = std::array<double, 3>();
     auto tor_pids = joint_config["pids"]["torque"];
     torque_pid[0] = tor_pids["p"].as<double>();
     torque_pid[1] = tor_pids["i"].as<double>();
