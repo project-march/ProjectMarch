@@ -151,9 +151,7 @@ bool MotorController::hasIncrementalEncoder() const
 
 bool MotorController::hasTorqueSensor() const
 {
-    // Debug statement: will make ros think it definitely has a torque sensor for reading torque from the odrive
-    return true;
-    // return torque_sensor_ != nullptr;
+    return torque_sensor_ != nullptr;
 }
 
 std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
@@ -175,8 +173,7 @@ std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 std::unique_ptr<TorqueSensor>& MotorController::getTorqueSensor()
 {
     if (!hasTorqueSensor()) {
-        logger_->info("GetTorqueSensor: No torque sensor found, ignoring for now");
-        // throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get torque sensor");
+        throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get torque sensor");
     }
     return torque_sensor_;
 }

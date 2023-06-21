@@ -176,15 +176,14 @@ void Joint::readEncoders()
         velocity_ = motor_controller_->getVelocity();
         if(motor_controller_->hasTorqueSensor()){
             torque_ = motor_controller_->getTorque();
-            // Comment back in after debugging
-            // if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-            //     throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-            //         "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
-            //         motor_controller_->getTorqueSensor()->getMaxTorque());
-            // }
+            if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+                throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                    "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), initial_torque_,
+                    motor_controller_->getTorqueSensor()->getMaxTorque());
+            }
         }
         else{
-            // logger_->info(logger_->fstring("No reading the torque sensors"));
+            logger_->info(logger_->fstring("No reading the torque sensors"));
         }
     } else {
         if (time_between_last_update

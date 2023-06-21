@@ -21,7 +21,7 @@ joint_trajectory_controller:
       - linear_joint
     command_interfaces:
       - position
-      # - effort
+      - effort
     state_interfaces:
       - position
       - velocity

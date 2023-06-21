@@ -50,7 +50,6 @@ std::chrono::nanoseconds ODrive::prepareActuation()
 void ODrive::enableActuation()
 {
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        logger_->info("ODrive state from something else to closed loop control");
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
     }
     else{
