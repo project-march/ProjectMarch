@@ -203,3 +203,5 @@ codequality.json
 *.MUJOCO_LOG.TXT
 MUJOCO_LOG.TXT
 ros2/src/hardware/install/*
+
+ros2/log_lower.mtb
