@@ -97,7 +97,7 @@ struct Foot {
             weight_on_foot = false;
             return;
         }
-        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "average derivative is %f", measured_foot_pressure_derivative);
+        // RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "average derivative is %f", measured_foot_pressure_derivative);
 
         weight_on_foot = ((measured_foot_pressure / foot_sensor_amount) <= foot_threshold ||
                     (measured_heel_middle_pressure / heel_middle_sensor_amount) <= heel_middle_threshold ||

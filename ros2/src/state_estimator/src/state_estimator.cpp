@@ -179,7 +179,7 @@ void StateEstimator::update_foot_frames()
         tf2::Matrix3x3 m(tf2_measured_hip_base_angle);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
-        
+
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
         m_joint_estimator.set_individual_joint_state("right_origin_roll", fmod(6.28 - roll, 6.28));
     } catch (const tf2::TransformException& ex) {
@@ -310,11 +310,11 @@ void StateEstimator::publish_robot_frames()
     impact_foot_msg.left_foot = 0;
     impact_foot_msg.right_foot = 0;
     if (m_footstep_estimator.get_foot_impact("r")) {
-        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact right true");
+        // RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact right true");
         impact_foot_msg.right_foot = 1;
     }
     if (m_footstep_estimator.get_foot_impact("l")) {
-        RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact left true");
+        // RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get_foot_impact left true");
         impact_foot_msg.left_foot = 1;
     }
     m_foot_impact_publisher->publish(impact_foot_msg);
