@@ -170,7 +170,7 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    float zmp_check_margin_y = 1.0;
+    float zmp_check_margin_y = 1.3;
     float zmp_check_margin_x = 0.6;
 
     if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
