@@ -16,7 +16,7 @@ Checks:     -*,
             -performance-unnecessary-value-param
             -hicpp-member-init
             -clang-diagnostic-*
-            -clang-diagnostic-error
+            -*clang-diagnostic-error
 #WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
