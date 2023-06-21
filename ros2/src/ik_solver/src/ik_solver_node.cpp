@@ -92,6 +92,8 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
     m_swing_trajectory_index = 0;
     // Update desired state
     m_swing_trajectory_container = msg;
+
+    m_stance_foot=-m_stance_foot;
     // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
     // m_stance_foot = -m_stance_foot;
     // }
