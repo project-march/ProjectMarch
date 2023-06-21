@@ -179,9 +179,7 @@ void StateEstimator::update_foot_frames()
         tf2::Matrix3x3 m(tf2_measured_hip_base_angle);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
-
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
-        // roll, pitch, yaw);
+        
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
         m_joint_estimator.set_individual_joint_state("right_origin_roll", fmod(6.28 - roll, 6.28));
     } catch (const tf2::TransformException& ex) {
@@ -270,9 +268,6 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
-    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y
-    // %f",foot_positions.poses[0].position.y); RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot
-    // position y %f",foot_positions.poses[1].position.y);
 
     m_foot_pos_publisher->publish(foot_positions);
 
@@ -283,17 +278,12 @@ void StateEstimator::publish_robot_frames()
     // double stance
     m_current_stance_foot = 0;
 
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get foot on ground left: %d",
-        m_footstep_estimator.get_foot_on_ground("l"));
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "get foot on ground right: %d",
-        m_footstep_estimator.get_foot_on_ground("r"));
-
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
-        // if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
-        //     m_current_stance_foot = m_current_stance_foot;
-        // }
-        if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x && m_current_stance_foot != 1) {
+        if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
+            m_current_stance_foot = m_current_stance_foot;
+        } else if (foot_positions.poses[0].position.x > foot_positions.poses[1].position.x
+            && m_current_stance_foot != 1) {
             m_current_stance_foot = 1;
         } else if (foot_positions.poses[0].position.x <= foot_positions.poses[1].position.x
             && m_current_stance_foot != -1) {

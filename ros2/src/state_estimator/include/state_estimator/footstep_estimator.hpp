@@ -69,8 +69,10 @@ struct Foot {
                 }    
                 if (previous_foot_pressure != 0.0) {
                     delta_pressure = i->pressure - previous_foot_pressures.at(foot_sensor_amount);
-                    measured_foot_pressure_derivative += delta_pressure;
-                    previous_foot_pressures.at(foot_sensor_amount) = i->pressure;
+                    if (std::abs(delta_pressure) <= 1){
+                        measured_foot_pressure_derivative += delta_pressure;
+                        previous_foot_pressures.at(foot_sensor_amount) = i->pressure;
+                    }
                 }
                 previous_foot_pressures.at(foot_sensor_amount) = i->pressure;
                 foot_sensor_amount++;
@@ -88,8 +90,8 @@ struct Foot {
         // Values for a GroundGait. NOTE: these values are going to be changed.
        foot_threshold = 3.0;
        derivative_treshold = -0.05;
-       toes_middle_threshold = 0.0;
-       heel_middle_threshold = 0.0;
+    //    toes_middle_threshold = 0.0;
+    //    heel_middle_threshold = 0.0;
 
         if (measured_foot_pressure <= 0.00001 || measured_foot_pressure > 10000) {
             weight_on_foot = false;
