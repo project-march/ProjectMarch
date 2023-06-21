@@ -42,8 +42,8 @@ TEST_F(FootstepEstimatorTest, feetOnGroundTest)
 
     const char* l_prefix = "l";
     const char* r_prefix = "r";
-    footstep_estimator->get_foot(l_prefix)->foot_threshold = 0.5;
-    footstep_estimator->get_foot(r_prefix)->foot_threshold = 0.5;
+    footstep_estimator->get_foot(l_prefix)->threshold = 0.5;
+    footstep_estimator->get_foot(r_prefix)->threshold = 0.5;
 
     footstep_estimator->update_feet(sensors);
     ASSERT_TRUE(footstep_estimator->get_foot_on_ground(&prefixR));
@@ -68,8 +68,8 @@ TEST_F(FootstepEstimatorTest, feetOffGroundTest)
 
     const char* l_prefix = "l";
     const char* r_prefix = "r";
-    footstep_estimator->get_foot(l_prefix)->foot_threshold = 0.5;
-    footstep_estimator->get_foot(r_prefix)->foot_threshold = 0.5;
+    footstep_estimator->get_foot(l_prefix)->threshold = 0.5;
+    footstep_estimator->get_foot(r_prefix)->threshold = 0.5;
 
     footstep_estimator->update_feet(sensors);
     ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));

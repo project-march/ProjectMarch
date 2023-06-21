@@ -15,11 +15,11 @@ FootstepEstimator::FootstepEstimator()
 void FootstepEstimator::set_footstep_positions(
     geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec)
 {
-    foot_right.position.point.x = right_foot_vec.x;                
+    foot_right.position.point.x = right_foot_vec.x; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
     foot_right.position.point.y = right_foot_vec.y;
     foot_right.position.point.z = right_foot_vec.z;
 
-    foot_left.position.point.x = left_foot_vec.x; 
+    foot_left.position.point.x = left_foot_vec.x; // at the start, the CoM is about 0.11 meters in the positive direction, because the 0 is from the right ankle 
     foot_left.position.point.y = left_foot_vec.y;
     foot_left.position.point.z = left_foot_vec.z;
 }
@@ -63,27 +63,11 @@ bool FootstepEstimator::get_foot_on_ground(const char* prefix)
 {
     switch (*prefix) {
         case * "l":
-            return foot_left.weight_on_foot;
+            return foot_left.on_ground;
             break;
 
         case * "r":
-            return foot_right.weight_on_foot;
-            break;
-        default:
-            RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
-            return 0;
-    }
-}
-
-bool FootstepEstimator::get_foot_impact(const char* prefix)
-{
-    switch (*prefix) {
-        case * "l":
-            return foot_left.impact_ground;
-            break;
-
-        case * "r":
-            return foot_right.impact_ground;
+            return foot_right.on_ground;
             break;
         default:
             RCLCPP_ERROR(rclcpp::get_logger("feet_estimator"), "get foot returns 0");
@@ -116,6 +100,6 @@ void FootstepEstimator::update_feet(const std::vector<PressureSensor*>* sensors)
 void FootstepEstimator::set_threshold(double threshold)
 {
     m_threshold = threshold;
-    foot_left.foot_threshold = threshold;
-    foot_right.foot_threshold = threshold;
+    foot_left.threshold = threshold;
+    foot_right.threshold = threshold;
 }
