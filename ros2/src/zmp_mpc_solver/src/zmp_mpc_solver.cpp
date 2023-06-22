@@ -450,10 +450,15 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_current_count = m_current_stance_foot;
         m_step_counter++;
         RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
-        printf("now going into current_shooting node %i\n", m_current_shooting_node);
+        // printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
-        m_current_shooting_node--;
+        // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg manually and 
+                                        // increment the step counter still
+        m_current_count = -m_current_count;
+        m_step_counter++;
     }
+    RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
+
 
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
