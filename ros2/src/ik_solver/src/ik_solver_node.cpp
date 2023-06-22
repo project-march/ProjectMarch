@@ -208,7 +208,7 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * swing_x_factor * 20.0,
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * swing_x_factor * 10.0,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y, 0.0, 0.0, 0.0, 0.0;
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity\n\n");
