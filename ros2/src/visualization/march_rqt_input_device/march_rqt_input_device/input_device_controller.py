@@ -162,25 +162,40 @@ class InputDeviceController:
     def publish_direct_torque(self) -> None:
         """Publish a message on `direct_torque` to publish the torque."""
         self.publish_control_type("torque")
-        torque = 0.1 #TODO: change to reasonable value
-        self._node.get_logger().info("Publishing direct torque " + str(torque))
+        
+        delta = 3.5; #This is the value at which the Rotational Joint actuates without extra pushes
+        self._node.get_logger().info("Publishing direct torque " + str(delta))
         self.direct_torque_pub.publish(
             Float32(
-                data = torque
+                data = delta
             )
         )
 
         # wait for a few seconds
         time.sleep(3)
-
-        # then reset the torque to 0
-        torque = 0.0
-        self._node.get_logger().info("Resetting direct torque to " + str(torque))
+        
+        # then reset the delta to 0
+        delta = 0.0
+        self._node.get_logger().info("Resetting direct torque to " + str(delta))
         self.direct_torque_pub.publish(
             Float32(
-                data = torque
+                data = delta
             )
         )
+
+    
+    def switch_to_torque(self) -> None:
+        """switches between torque and position control"""
+        
+        self._node.get_logger().info("Publishing control type torque")
+        self._set_gait_control_type.publish(String(data="torque"))
+        
+    def switch_to_position(self) -> None:
+        """switches between torque and position control"""
+        
+        self._node.get_logger().info("Publishing control type position")
+        self._set_gait_control_type.publish(String(data="position"))
+
 
     def publish_control_type(self, control_type) -> None:
             """Sets the allowed control type depending on the gait"""

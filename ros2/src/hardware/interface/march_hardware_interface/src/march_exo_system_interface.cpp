@@ -526,9 +526,24 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         //        jointInfo.effort_command_converted = converted_effort;
         //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
 
+        if(weight_node->delta.has_value()){
+            if(weight_node->delta.value() > 0.00){
+                float c = cos(jointInfo.position);
+                RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
+
+                float t = jointInfo.torque + (weight_node->delta.value() * c);
+                jointInfo.target_torque = t;
+            }
+            else{
+                jointInfo.target_torque = jointInfo.torque;
+                weight_node->delta.reset();
+            }
+
+        }
+
         // TORQUEDEBUG LINE - this will send hardcoded values to the joint
         #ifdef TORQUEDEBUG
-        RCLCPP_INFO((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
+        RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
         // return hardware_interface::return_type::ERROR;

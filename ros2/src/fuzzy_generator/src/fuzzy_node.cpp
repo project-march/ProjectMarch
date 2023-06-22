@@ -104,6 +104,12 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
 void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     std::string allowed_control_type = msg->data;
 
+    std::string prev_allowed_control_type = this->get_parameter("allowed_control_type").as_string();
+    if((prev_allowed_control_type == "position" && allowed_control_type == "torque") || (prev_allowed_control_type == "torque" && allowed_control_type == "position")){
+        RCLCPP_FATAL_STREAM(this->get_logger(), "switching from position to torque causes shooting!");
+        throw(std::invalid_argument("SHOULD NOT YET SWITCH BETWEEN POSITION AND CONTROL!"));
+    }
+
     if(allowed_control_type != "fuzzy" && allowed_control_type != "torque" && allowed_control_type != "position"){
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
     }
@@ -113,6 +119,12 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
 
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
 
+    // dummy message to make sure that the fuzzy node publishes weights after setting a control type
+    march_shared_msgs::msg::WeightStamped weights;
+    weights.torque_weight = 0;
+    weights.position_weight = 0;
+    weights.leg = "";
+    publish_weights(weights);
 }
 
 void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){

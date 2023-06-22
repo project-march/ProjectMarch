@@ -24,6 +24,18 @@
          "always_enabled": true
       },
       {
+         "name": "switch_to_torque",
+         "callback": "switch_to_torque",
+         "control_type": "torque",
+         "always_enabled": true
+      },
+      {
+         "name": "switch_to_position",
+         "callback": "switch_to_position",
+         "control_type": "position",
+         "always_enabled": true
+      },
+      {
          "name": "test_joint_gait_continuous",
          "control_type": "position",
          "always_enabled": true
