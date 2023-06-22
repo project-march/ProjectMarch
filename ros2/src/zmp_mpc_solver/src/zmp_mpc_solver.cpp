@@ -183,6 +183,8 @@ bool ZmpSolver::check_zmp_on_foot()
 
     }
 
+    x_check=true;
+
     if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
         && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
         y_check = true;
