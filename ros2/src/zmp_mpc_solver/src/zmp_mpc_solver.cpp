@@ -180,7 +180,6 @@ bool ZmpSolver::check_zmp_on_foot()
     } else {
         x_check = false;
         RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check false \n");
-
     }
 
     x_check=true;
