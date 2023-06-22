@@ -69,7 +69,7 @@ march7:
             maxTorque: 10
         pids:
           position:
-            p: 40.0
+            p: 60.0
             i: 0.0
             d: 0.5
           torque:
@@ -209,7 +209,7 @@ march7:
             maxTorque: 10
         pids:
           position:
-            p: 40.0
+            p: 60.0
             i: 0.0
             d: 0.5
           torque:
