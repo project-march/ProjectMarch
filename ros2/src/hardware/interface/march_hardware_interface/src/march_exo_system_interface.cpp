@@ -528,7 +528,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         if(weight_node->delta.has_value()){
             if(weight_node->delta.value() > 0.00){
-                float c = cos(jointInfo.position);
+                float c = cos(jointInfo.position*0.75);
                 RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
 
                 float t = jointInfo.torque + (weight_node->delta.value() * c);
