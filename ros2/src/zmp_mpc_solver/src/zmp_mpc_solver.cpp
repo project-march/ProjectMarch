@@ -184,15 +184,16 @@ bool ZmpSolver::check_zmp_on_foot()
     }
 
     x_check=true;
+    RCLCPP_INFO(rclcpp::get_logger("zmp check"), "Difference for y is %f \nmargin is %f", m_pos_foot_current[1] - m_zmp_current[1],m_foot_width_y*zmp_check_margin_y);
 
     if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
         && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
         y_check = true;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
+        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
 
     } else {
         y_check = false;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
+        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
 
     }
 
