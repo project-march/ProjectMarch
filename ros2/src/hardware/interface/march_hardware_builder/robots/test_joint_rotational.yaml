@@ -29,9 +29,9 @@ testsetup:
             maxTorque: 20
         pids:
           position:
-            p: 1.0
-            i: 1.0
-            d: 1.0
+            p: 5.0
+            i: 0.0
+            d: 0.1
           torque:
             p: 0.1
             i: 0.0
