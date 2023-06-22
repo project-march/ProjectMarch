@@ -246,7 +246,7 @@ void ZmpSolver::initialize_mpc_params()
     m_admissible_region_y = 0.10;
     m_foot_width_x = 0.3;
     m_foot_width_y = 0.1;
-    m_step_size_x = 0.2;
+    m_step_size_x = 0.1;
     m_step_size_y = 0.33;
 
     m_com_height = 0.6; // Load this from the com position

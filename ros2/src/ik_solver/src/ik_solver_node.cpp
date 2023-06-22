@@ -10,7 +10,7 @@ IkSolverNode::IkSolverNode()
     , m_right_foot_on_ground(true)
     , m_swing_trajectory_index(0)
     , m_com_trajectory_index(0)
-    , m_stance_foot(-1)
+    , m_stance_foot(1)
     , hip_aa_upper_limit(0.1705329252)
     , hip_aa_lower_limit(-0.23617993878)
 {
@@ -93,7 +93,7 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
     // Update desired state
     m_swing_trajectory_container = msg;
 
-    m_stance_foot=-m_stance_foot;
+    // m_stance_foot=-m_stance_foot;
     // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
     // m_stance_foot = -m_stance_foot;
     // }
@@ -124,7 +124,7 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-//    m_stance_foot = msg->data;
+   m_stance_foot = msg->data;
     // }
 }
 
@@ -170,7 +170,7 @@ void IkSolverNode::timer_callback()
         return;
     } else {
         float swing_z_factor = 1.0;
-        float swing_x_factor = 0.4;
+        float swing_x_factor = 1.0;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
@@ -325,7 +325,6 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
                         + (xdif - 0.05) * (1 - next_joint_pos_weight),
                     hip_aa_upper_limit)));
         } else {
-
             // point.positions.push_back(0.0);
             point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         }

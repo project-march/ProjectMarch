@@ -86,7 +86,7 @@ See <https://www.gnu.org/licenses/>.
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
     <body name="backpack"
-          pos="0 0 0.95"
+          pos="0 0 1.20"
           childclass="exoskeleton">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -94,7 +94,7 @@ See <https://www.gnu.org/licenses/>.
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
       <inertial pos="0.171 -0.006 0.342" mass="57.096"
                 fullinertia="2.931 2.492 1.522 0.023 -0.1 0.025"/>
-      <freejoint/>
+      <!-- <freejoint/> -->
       <geom type="mesh" mesh="backpack" />
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
