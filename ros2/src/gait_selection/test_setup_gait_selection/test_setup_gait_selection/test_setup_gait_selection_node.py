@@ -52,6 +52,7 @@ class TestSetupGaitSelectionNode(Node):
         msg = gait.start(self.get_clock().now()).new_trajectory_command.trajectory
         self.get_logger().info(str(msg))
         self.publisher_.publish(msg)
+        response.status = True
         return response
 
     def footstep_service_callback(self, request, response):
