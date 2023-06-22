@@ -38,10 +38,10 @@ march_shared_msgs::msg::CenterOfMass StateEstimatorMock::get_current_com()
 {
     double max_y_com = 0.215; // How much can the CoM move
     double min_y_com = 0.115;
-    double max_x_com = 0.1;
+    double max_x_com = 0.15;
     double min_x_com = 0.0;
-    double max_x_velocity = 0.1;
-    double max_y_velocity = 0.1;
+    double max_x_velocity = 0.25;
+    double max_y_velocity = 0.25;
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
     int weight_shift_duration = m_shooting_nodes_per_step - swing_duration;
@@ -119,7 +119,7 @@ geometry_msgs::msg::PointStamped StateEstimatorMock::get_current_zmp()
 {
     double max_y_zmp = 0.33;
     double min_y_zmp = 0.0;
-    double max_x_zmp = 0.1;
+    double max_x_zmp = 0.15;
     double min_x_zmp = 0.0;
 
     int swing_duration = m_step_duration * m_shooting_nodes_per_step;
