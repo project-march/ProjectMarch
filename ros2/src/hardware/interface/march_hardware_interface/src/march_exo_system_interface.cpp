@@ -271,17 +271,18 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
-            jointInfo.target_torque = (float)jointInfo.joint.getTorque();
+            jointInfo.target_torque = jointInfo.joint.getTorque();
 
-            RCLCPP_INFO((*logger_), "The first read torque value is %s", jointInfo.target_torque);
+            RCLCPP_INFO((*logger_), "The first read pos value is %f", jointInfo.target_position);
+            RCLCPP_INFO((*logger_), "The first read torque value is %f", jointInfo.target_torque);
 
             // if no weight has been assigned, we start in position control
-            // if(!jointInfo.torque_weight || !jointInfo.position_weight){
+            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
             //     jointInfo.torque_weight = 0.0f;
             //     jointInfo.position_weight = 1.0f;
             // }
             // if no weight has been assigned, we start in torque control
-            if(!jointInfo.torque_weight || !jointInfo.position_weight){
+            if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
                 jointInfo.torque_weight = 1.0f;
                 jointInfo.position_weight = 0.0f;
             }
@@ -527,14 +528,14 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // TORQUEDEBUG LINE - this will send hardcoded values to the joint
         #ifdef TORQUEDEBUG
-        RCLCPP_FATAL((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
+        RCLCPP_INFO((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
         // return hardware_interface::return_type::ERROR;
         #endif
 
         // ACTUAL TORQUE LINE
-        // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
 
     return hardware_interface::return_type::OK;
