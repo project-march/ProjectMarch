@@ -10,7 +10,7 @@ IkSolverNode::IkSolverNode()
     , m_right_foot_on_ground(true)
     , m_swing_trajectory_index(0)
     , m_com_trajectory_index(0)
-    , m_stance_foot(1)
+    , m_stance_foot(-1)
     , hip_aa_upper_limit(0.1705329252)
     , hip_aa_lower_limit(-0.23617993878)
 {
@@ -95,7 +95,7 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
 
     // m_stance_foot=-m_stance_foot;
     // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
-    // m_stance_foot = -m_stance_foot;
+    m_stance_foot = -m_stance_foot;
     // }
 }
 
@@ -124,7 +124,7 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-   m_stance_foot = msg->data;
+//    m_stance_foot = msg->data;
     // }
 }
 
