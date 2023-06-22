@@ -441,9 +441,9 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
-    RCLCPP_INFO(rclcpp::get_logger(""), "x zmp is %f", m_zmp_current[0]);
-    RCLCPP_INFO(rclcpp::get_logger(""), "y zmp is %f", m_zmp_current[1]);
-    RCLCPP_INFO(rclcpp::get_logger(""), "Stance foot is %d", m_current_stance_foot);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "x zmp is %f", m_zmp_current[0]);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "y zmp is %f", m_zmp_current[1]);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "Stance foot is %d", m_current_stance_foot);
     if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
 
         || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
