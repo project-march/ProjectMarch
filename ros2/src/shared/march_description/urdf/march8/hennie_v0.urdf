@@ -218,7 +218,7 @@
 		<axis xyz="0 1 0"/>
 		<parent link="L_UL"/>
 		<child link="L_LL"/>
-		<limit effort="250" lower="0.05" upper="2.131661565" velocity="3.94"/>
+		<limit effort="250" lower="0.08" upper="2.131661565" velocity="3.94"/>
 	</joint>
 	<joint name="left_ankle" type="revolute">
 		<origin rpy="0 0 0" xyz="0 -0.037 -0.414"/>
@@ -248,7 +248,7 @@
 		<axis xyz="0 1 0"/>
 		<parent link="R_UL"/>
 		<child link="R_LL"/>
-		<limit effort="250" lower="0.05" upper="2.131661565" velocity="3.94"/>
+		<limit effort="250" lower="0.08" upper="2.131661565" velocity="3.94"/>
 	</joint>
 	<joint name="right_ankle" type="revolute">
 		<origin rpy="0 0 0" xyz="0 0.037 -0.414"/>
