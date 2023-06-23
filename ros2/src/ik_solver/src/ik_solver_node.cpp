@@ -326,8 +326,8 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
                     hip_aa_upper_limit)));
         } else {
             // point.positions.push_back(0.0);
-            if ((i.compare("right_ankle") == 0) or (i.compare("left_ankle") == 0)){
-                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.001]);
+            if ((i.compare("right_ankle") == 0) || (i.compare("left_ankle") == 0)){
+                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.002]);
             }else{
                 point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
             }
