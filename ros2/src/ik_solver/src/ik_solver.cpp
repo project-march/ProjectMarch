@@ -233,6 +233,8 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         A_dummy = J_right_foot;
     }
 
+    b_dummy.segment(0,1) << -state_desired.com_pos(0);
+
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);
     Eigen::VectorXd velocity_trajectory = m_qp_solver_ptr->get_solution();
 

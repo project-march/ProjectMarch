@@ -457,7 +457,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         m_current_count = -m_current_count;
         m_step_counter++;
     }
-    RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
+    // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
 
 
     printf("step_counter %i\n", m_step_counter);
