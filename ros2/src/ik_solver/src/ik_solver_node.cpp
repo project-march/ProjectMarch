@@ -326,7 +326,11 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
                     hip_aa_upper_limit)));
         } else {
             // point.positions.push_back(0.0);
-            point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+            if ((i.compare("right_ankle") == 0) or (i.compare("left_ankle") == 0)){
+                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.0005]);
+            }else{
+                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+            }
         }
         // point.positions.push_back(0.0);
     }
