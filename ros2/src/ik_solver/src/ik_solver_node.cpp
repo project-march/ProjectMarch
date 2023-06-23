@@ -170,7 +170,7 @@ void IkSolverNode::timer_callback()
         return;
     } else {
         float swing_z_factor = 3.0;
-        float swing_x_factor = 0.6;
+        float swing_x_factor = 0.4;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
