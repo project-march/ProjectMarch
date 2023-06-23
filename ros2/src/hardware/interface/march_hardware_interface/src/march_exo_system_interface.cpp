@@ -506,26 +506,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-        /*MARCH 7 code can be removed later */
-        //        auto converted_effort
-        //            =
-        //            jointInfo.joint.getMotorController()->getMotorControllerSpecificEffort(jointInfo.effort_command);
-        //        auto effort_diff_with_previous = converted_effort - jointInfo.effort_command_converted;
-        //        if (abs(effort_diff_with_previous) > jointInfo.limit.max_effort_differance) {
-        //            // TODO: Change to better sign value.
-        //            converted_effort = jointInfo.effort_command_converted
-        //                + std::clamp(effort_diff_with_previous, -jointInfo.limit.max_effort_differance,
-        //                    jointInfo.limit.max_effort_differance);
-        //            RCLCPP_WARN((*logger_),
-        //                "Effort is increased with %g effort for %s, "
-        //                "which is more than %g effort in one iteration. "
-        //                "Clamped the effort difference. New total effort will be %g.",
-        //                effort_diff_with_previous, jointInfo.name.c_str(), jointInfo.limit.max_effort_differance,
-        //                converted_effort);
-        //        }
-        //        jointInfo.effort_command_converted = converted_effort;
-        //                jointInfo.joint.actuate((float)jointInfo.effort_command_converted);
-
+        // function used for only the direct torque method
         if(weight_node->delta.has_value()){
             if(weight_node->delta.value() > 0.00){
                 float c = cos(jointInfo.position*0.75);
@@ -541,12 +522,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         }
 
-        // TORQUEDEBUG LINE - this will send hardcoded values to the joint
+        // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
-        // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 0.8f, 0.2f);
-        // return hardware_interface::return_type::ERROR;
         #endif
 
         // ACTUAL TORQUE LINE

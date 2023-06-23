@@ -95,49 +95,14 @@ struct JointInfo {
         }
 
         /**
-         * This is a temporary method: it immediately sends out torque
+         * This is a temporary method: it immediately sends out torque using a delta
          *
          * @param msg Message that contains the weights for both torque and position
          * @return
          */
         void direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
         {
-
             delta = msg->data;
-            // #ifdef TORQUEDEBUG
-            // RCLCPP_FATAL(this->get_logger(), "Direct torque called with a delta of: %f", delta);
-            // // return;
-            // #endif
-            //
-            // for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-            //     if(jointInfo.name == "rotational_joint" || jointInfo.name == "linear_joint"){
-            //         // auto p = jointInfo.joint.getMotorController()->getAbsoluteEncoder()->getTotalPositions(); //*jointInfo.joint.getMotorController()->getAbsoluteEncoder()->getRadiansPerIU();
-            //         // RCLCPP_INFO_STREAM(this->get_logger(), "Measured position: " << jointInfo.position << "p: " << p);
-            // 
-            //         // float c = cos(jointInfo.position);
-            //         // RCLCPP_INFO(this->get_logger(), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, delta, c);
-            // 
-            //         // float torque = jointInfo.torque + (delta * c);
-            //
-            //         // We are setting the torque immediately
-            //         // RCLCPP_INFO(this->get_logger(), "We are setting the torque directly to %f for %s", torque, jointInfo.name);
-            //         // if(jointInfo.torque_weight != 1.0 || jointInfo.position_weight != 0.0){
-            //         //     RCLCPP_WARN(rclcpp::get_logger("weight_node"), "We seem to be not completely in torque control: pos weight %f, torque weight %f. \n so we will set it now to 0 pos and 1 torque",
-            //         //                 jointInfo.position_weight,
-            //         //                 jointInfo.torque_weight);
-            //                                        
-            //         // // comment back in for correct torque control
-            //         // jointInfo.position_weight = 0.0f;
-            //         // jointInfo.torque_weight = 1.0f;
-            //         // }
-            //
-            //         // jointInfo.target_torque = torque;
-            //         // RCLCPP_INFO(this->get_logger(), "Target torque: %f \n ", jointInfo.target_torque);
-            //     }
-            //     else{
-            //         RCLCPP_INFO_STREAM(this->get_logger(), "It is not wise to use the direct torque button in Hennie! " << jointInfo.name);
-            //     }
-            // }
         }
 
         /**
@@ -153,12 +118,11 @@ struct JointInfo {
             // check the leg choice
             if(leg != "l" and leg != "r"){
                 RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
-                // return;
             }
             RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of" << leg);
 
             for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-                RCLCPP_INFO_STREAM(this->get_logger(), "joint name is" << jointInfo.name);
+                RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
                 if(leg == "l" and jointInfo.name.find("left") != std::string::npos){
                     jointInfo.torque_weight = torque_weight;
                     jointInfo.position_weight = position_weight;
@@ -177,7 +141,6 @@ struct JointInfo {
 
         std::vector<JointInfo>* joints_info_;
         std::optional<float> delta;
-        float c = 0.0f;
 
     private:
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
