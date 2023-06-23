@@ -138,13 +138,13 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     // Here, we assume the jacobians have already been set
     // The error is equal to the desired state, as we express them in local coordinates
     Eigen::VectorXd left_foot_error = state_desired.left_foot_pose;
-    left_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
-    // angleSignedDistance(state_desired.left_foot_pose.segment(3,
-    // 3), state_current.left_foot_pose.segment(3, 3));
+    left_foot_error.segment(3, 3) = //Eigen::VectorXd::Zero(3);
+    angleSignedDistance(state_desired.left_foot_pose.segment(3,
+    3), state_current.left_foot_pose.segment(3, 3));
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
-    right_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
-    // angleSignedDistance(state_desired.right_foot_pose.segment(3,
-    // 3), state_current.right_foot_pose.segment(3, 3));
+    right_foot_error.segment(3, 3) = //Eigen::VectorXd::Zero(3);
+    angleSignedDistance(state_desired.right_foot_pose.segment(3,
+    3), state_current.right_foot_pose.segment(3, 3));
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
 
