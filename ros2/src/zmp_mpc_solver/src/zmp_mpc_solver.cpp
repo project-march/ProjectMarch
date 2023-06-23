@@ -447,15 +447,15 @@ inline int ZmpSolver::solve_zmp_mpc(
     if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
 
         || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
-        m_current_count = m_current_stance_foot;
-        m_step_counter++;
-        RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
+        // m_current_count = m_current_stance_foot;
+        // m_step_counter++;
+        // RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
         // printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
         // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg manually and 
                                         // increment the step counter still
-        m_current_count = -m_current_count;
-        m_step_counter++;
+        m_current_count = -m_current_count; // turn off if pressure sole on
+        m_step_counter++; // turn off if pressure sole on
     }
     // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
 
