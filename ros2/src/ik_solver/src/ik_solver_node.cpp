@@ -327,7 +327,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         } else {
             // point.positions.push_back(0.0);
             if ((i.compare("right_ankle") == 0) or (i.compare("left_ankle") == 0)){
-                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.0005]);
+                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.001]);
             }else{
                 point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
             }
