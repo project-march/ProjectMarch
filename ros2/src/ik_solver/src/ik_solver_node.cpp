@@ -169,7 +169,7 @@ void IkSolverNode::timer_callback()
             m_stance_foot);
         return;
     } else {
-        float swing_z_factor = 1.5;
+        float swing_z_factor = 1.7;
         float swing_x_factor = 0.4;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
@@ -327,7 +327,7 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         } else {
             // point.positions.push_back(0.0);
             if ((i.compare("right_ankle") == 0) || (i.compare("left_ankle") == 0)){
-                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.002]);
+                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.0025]);
             }else{
                 point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
             }
