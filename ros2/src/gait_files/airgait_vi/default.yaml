@@ -15,7 +15,7 @@ positions:
     joints:
       left_ankle: 0.1219
       left_hip_aa: -0.05
-      left_hip_fe: 0.2094
+      left_hip_fe: 0.165775
       left_knee: 0.1745
       right_ankle: 0.1219
       right_hip_aa: -0.05
