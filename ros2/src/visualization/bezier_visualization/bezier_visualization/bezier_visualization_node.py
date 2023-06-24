@@ -54,7 +54,7 @@ class BezierCurve(Node):
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
         # TODO: if these points have good values
-        self.points = {1: 0, 20: 50, 75: 50, 99: 0}
+        self.points = {1: 0, 20: 60, 50: 50, 99: 0}
 
         msg = PoseArray()
         for key in sorted(self.points):
