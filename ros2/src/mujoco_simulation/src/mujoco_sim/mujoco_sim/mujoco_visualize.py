@@ -38,7 +38,6 @@ class MujocoVisualizer:
         self.cam.elevation = 0
         self.cam.lookat[2] += 0.1
 
-
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
         # Collect the time when the simulation has been started
