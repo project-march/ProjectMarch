@@ -67,8 +67,11 @@ void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::Po
     auto begin_foot = steps.at(0);
     auto end_foot = steps.at(2);
     double step_size = prev_step_size + steps.at(0).position.x;
+    if (step_size <= 0.00001) {
+        return;
+    }
     m_swing_leg_generator.set_step_length(step_size);
-
+    // RCLCPP_WARN(this->get_logger(), "Step size is %f \n\n\n\n\n", step_size);
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
     prev_step_size = steps.at(0).position.x;
     publish_path_visualization();

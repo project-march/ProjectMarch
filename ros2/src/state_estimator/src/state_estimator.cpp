@@ -39,6 +39,8 @@ StateEstimator::StateEstimator()
 
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
 
+    m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("foot_impact", 100);
+
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
 
@@ -70,6 +72,15 @@ StateEstimator::StateEstimator()
     auto left_foot_size = this->get_parameter("footstep_estimator.left_foot.size").as_double_array();
     auto right_foot_size = this->get_parameter("footstep_estimator.right_foot.size").as_double_array();
     auto on_ground_threshold = this->get_parameter("footstep_estimator.on_ground_threshold").as_double();
+
+    // for (auto sensor : *m_cop_estimator.get_sensors()) {
+    //     if (sensor->name[0] == *"r") {
+    //         m_footstep_estimator.get_foot("r")->previous_foot_pressures.push_back(0.0);
+    //     }
+    //     if (sensor->name[0] == *"l") {
+    //         m_footstep_estimator.get_foot("l")->previous_foot_pressures.push_back(0.0);
+    //     }
+    // }
     m_footstep_estimator.set_foot_size(left_foot_size[0], left_foot_size[1], "l");
     m_footstep_estimator.set_foot_size(right_foot_size[0], right_foot_size[1], "r");
     m_footstep_estimator.set_threshold(on_ground_threshold);
@@ -169,9 +180,8 @@ void StateEstimator::update_foot_frames()
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "The difference in angle is %f, %f, %f",
-        // roll, pitch, yaw);
         m_joint_estimator.set_individual_joint_state("right_origin", pitch);
+        m_joint_estimator.set_individual_joint_state("right_origin_roll", fmod(6.28 - roll, 6.28));
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
@@ -258,9 +268,6 @@ void StateEstimator::publish_robot_frames()
     foot_positions.header.frame_id = "map";
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("r"));
     foot_positions.poses.push_back(m_footstep_estimator.get_foot_position("l"));
-    // RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Right foot position y
-    // %f",foot_positions.poses[0].position.y); RCLCPP_INFO(rclcpp::get_logger("test for foot positions"), "Left foot
-    // position y %f",foot_positions.poses[1].position.y);
 
     m_foot_pos_publisher->publish(foot_positions);
 
@@ -269,18 +276,16 @@ void StateEstimator::publish_robot_frames()
     // Otherwise the current stance foot value is going to constantly update in double stance.
 
     // double stance
+    // m_current_stance_foot = 0;
     if (m_footstep_estimator.get_foot_on_ground("l") && m_footstep_estimator.get_foot_on_ground("r")) {
         // We always take the front foot as the stance foot :)
-        if (foot_positions.poses[0].position.x - foot_positions.poses[1].position.x < feet_diff_threshold) {
-            m_current_stance_foot = m_current_stance_foot;
-        } else if (m_footstep_estimator.get_foot("r")->total_pressure
-                > m_footstep_estimator.get_foot("l")->total_pressure
-            && m_current_stance_foot != 1) {
-            m_current_stance_foot = 1;
-        } else if (m_footstep_estimator.get_foot("r")->total_pressure
-                < m_footstep_estimator.get_foot("l")->total_pressure
+        if (m_footstep_estimator.get_foot("r")->total_pressure > m_footstep_estimator.get_foot("l")->total_pressure
             && m_current_stance_foot != -1) {
             m_current_stance_foot = -1;
+        } else if (m_footstep_estimator.get_foot("r")->total_pressure
+                < m_footstep_estimator.get_foot("l")->total_pressure
+            && m_current_stance_foot != 1) {
+            m_current_stance_foot = 1;
         }
     }
     // left
@@ -297,12 +302,6 @@ void StateEstimator::publish_robot_frames()
     stance_foot_msg.data = m_current_stance_foot;
     m_stance_foot_publisher->publish(stance_foot_msg);
 
-    std_msgs::msg::Bool right_foot_on_ground;
-    std_msgs::msg::Bool left_foot_on_ground;
-    right_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("r");
-    left_foot_on_ground.data = m_footstep_estimator.get_foot_on_ground("l");
-    m_right_foot_on_ground_publisher->publish(right_foot_on_ground);
-    m_left_foot_on_ground_publisher->publish(left_foot_on_ground);
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
     feet_height_msg.header.frame_id = "map";

@@ -21,7 +21,6 @@ def generate_launch_description():
     """Launch file to start up the controllers, controller_manager, hardware_interface and simulation."""
     # Whether the exoskeleton is ran physically or in simulation.
     simulation = LaunchConfiguration("simulation")
-    start_broadcasters = LaunchConfiguration("start_broadcasters")
     control_type = LaunchConfiguration("control_type")
     # region Launch Controller manager, Extra configuration if simulation is `false`
 
@@ -30,13 +29,6 @@ def generate_launch_description():
     declared_arguments = [
         DeclareLaunchArgument(
             name="simulation",
-            default_value="true",
-            description="Whether the exoskeleton is ran physically or in simulation.",
-            choices=["true", "false"],
-        ),
-
-        DeclareLaunchArgument(
-            name="start_broadcasters",
             default_value="true",
             description="Whether the exoskeleton is ran physically or in simulation.",
             choices=["true", "false"],
@@ -81,7 +73,6 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner.py",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
-        condition=UnlessCondition(start_broadcasters),
     )
 
     joint_trajectory_controller_spawner = Node(
@@ -102,7 +93,7 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
+        condition=UnlessCondition(simulation),
     )
 
     motor_controller_state_broadcaster_spawner = Node(
@@ -115,7 +106,7 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
+        condition=UnlessCondition(simulation),
     )
 
     pressure_sole_state_broadcaster_spawner = Node(
@@ -128,7 +119,7 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(start_broadcasters),
+        condition=UnlessCondition(simulation),
     )
     # endregion
 

@@ -8,7 +8,7 @@ using std::placeholders::_1;
 SolverNode::SolverNode()
     : Node("mpc_solver_node")
     , m_zmp_solver()
-    , m_desired_previous_foot_x(0)
+    , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
 {
     //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
@@ -46,7 +46,7 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(12ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(50ms, std::bind(&SolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
@@ -104,6 +104,7 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
             m_desired_previous_foot_y = msg->poses[0].position.y;
         }
     }
+    // RCLCPP_INFO(this->get_logger(), "desired x foot prev position %f",m_desired_previous_foot_x);
     m_zmp_solver.set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
 }
 
@@ -121,13 +122,6 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_left_foot_on_gound(msg->data);
 }
-// void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
-// {
-//    // int status = solve_step(x_current, u_current); // solve the mpc problem
-//    // if (status == 0) {
-//    // publish_control_msg();
-//    // }
-// }
 
 void SolverNode::timer_callback()
 {
@@ -136,7 +130,7 @@ void SolverNode::timer_callback()
         // printf("prev des%i\n", m_prev_des_footsteps);
     } else {
         if (*m_desired_footsteps != m_prev_des_footsteps) {
-            m_zmp_solver.set_m_current_shooting_node(200);
+            m_zmp_solver.reset_to_double_stance();
         }
         m_prev_des_footsteps = *m_desired_footsteps;
         m_zmp_solver.update_current_foot();

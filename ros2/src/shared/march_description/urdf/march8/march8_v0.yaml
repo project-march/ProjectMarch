@@ -120,7 +120,7 @@ phys:
       xy: 0.004
       xz: 0.011
       yz: -0.004
-    friction: 0.33
+    friction: 3.0
     pads: # Left pressure sole
       global:
         z: -0.138

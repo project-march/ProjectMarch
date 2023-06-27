@@ -3,11 +3,11 @@
 #include <iostream>
 
 ZmpSolver::ZmpSolver()
-    : m_time_horizon(6.0)
+    : m_time_horizon(2.0)
     , m_x_current()
     , m_u_current()
     , m_switch(0)
-    , m_current_shooting_node(0)
+    , m_current_shooting_node(100)
     , m_timing_value(0)
     , m_current_stance_foot(-1)
     , m_previous_stance_foot(-1)
@@ -67,6 +67,13 @@ std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
     return m_real_time_com_trajectory_y;
 }
 
+void ZmpSolver::reset_to_double_stance()
+{
+    m_current_shooting_node = 100;
+    m_step_counter = 0;
+    m_current_count = -1;
+}
+
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
 {
     return &m_x_trajectory;
@@ -87,7 +94,7 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
-    m_x_current[0] = m_com_current[0];
+    m_x_current[0] = m_com_current[0]; // - 0.11; when using real state estimator
     m_x_current[1] = m_com_vel_current[0];
 
     m_x_current[2] = m_zmp_current[0];
@@ -121,7 +128,9 @@ void ZmpSolver::set_current_foot(double x, double y)
 void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
-        m_pos_foot_current[0] = m_x_trajectory[6 + NX];
+        // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
+        m_pos_foot_current[0] = 0.0; // at the start, the CoM is about 0.11 meters in the positive direction, because
+                                     // the 0 is from the right ankle
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
@@ -131,12 +140,16 @@ void ZmpSolver::update_current_foot()
 
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
 {
-    m_right_foot_on_ground = foot_on_ground;
+    if (foot_on_ground) {
+        m_right_foot_on_ground = true;
+    }
 }
 
 void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
 {
-    m_left_foot_on_ground = foot_on_ground;
+    if (foot_on_ground) {
+        m_left_foot_on_ground = true;
+    }
 }
 
 void ZmpSolver::set_previous_foot(double x, double y)
@@ -157,24 +170,39 @@ bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
-    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * 1.01
-        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * 1.01) {
+    float zmp_check_margin_y = 1.3;
+    float zmp_check_margin_x = 1.3;
+
+    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
+        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x) {
         x_check = true;
+        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check true \n");
     } else {
         x_check = false;
+        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check false \n");
     }
 
-    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * 1.01
-        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * 1.01) {
+    x_check = true;
+    RCLCPP_INFO(rclcpp::get_logger("zmp check"), "Difference for y is %f \nmargin is %f",
+        m_pos_foot_current[1] - m_zmp_current[1], m_foot_width_y * zmp_check_margin_y);
+
+    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
+        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
         y_check = true;
+        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
+
     } else {
         y_check = false;
+        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
     }
 
     if (x_check == true && y_check == true) {
         return true;
+        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "both check true \n");
+
     } else {
         return false;
+        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "both check false \n");
     }
 }
 
@@ -215,16 +243,16 @@ void ZmpSolver::initialize_mpc_params()
     // Later, change this to read from a yaml
     m_admissible_region_x = 0.62;
     m_admissible_region_y = 0.10;
-    m_foot_width_x = 0.1;
-    m_foot_width_y = 0.3;
-    m_step_size_x = 0.2;
+    m_foot_width_x = 0.3;
+    m_foot_width_y = 0.1;
+    m_step_size_x = 0.1;
     m_step_size_y = 0.33;
 
     m_com_height = 0.6; // Load this from the com position
     m_first_admissible_region_y = 0.01;
 
     m_switch = 1.0;
-    m_current_shooting_node = 200;
+    m_current_shooting_node = 100;
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
@@ -246,6 +274,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
+    // RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
+
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
     printf("Shooting nodes: %i\n", N);
@@ -395,42 +425,38 @@ inline int ZmpSolver::solve_zmp_mpc(
     m_current_shooting_node = m_current_shooting_node % (((N - 1)) / (m_number_of_footsteps));
 
     // // check if swing leg is done for left foot as stance leg and right leg as swing leg
-    if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
-        && m_right_foot_on_ground == true) {
-        printf("passed the right foot on ground check \n");
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
-        && m_current_count == 1 && m_left_foot_on_ground == true) {
-        printf("passed the left foot on ground check \n");
-    } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
-        printf("did not pass the foot on ground check \n");
-        m_current_shooting_node--;
-    }
+    // if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1 && m_current_count == -1
+    //     && m_right_foot_on_ground == true) {
+    //     printf("passed the right foot on ground check \n");
+    //     m_right_foot_on_ground = false;
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1
+    //     && m_current_count == 1 && m_left_foot_on_ground == true) {
+    //     printf("passed the left foot on ground check \n");
+    //     m_left_foot_on_ground = false;
+    // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
+    //     printf("did not pass the foot on ground check \n");
+    // m_current_shooting_node--;
+    // }
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
+    // RCLCPP_INFO(rclcpp::get_logger(""), "x zmp is %f", m_zmp_current[0]);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "y zmp is %f", m_zmp_current[1]);
+    // RCLCPP_INFO(rclcpp::get_logger(""), "Stance foot is %d", m_current_stance_foot);
+    if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
 
-    // if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
-    //         && check_zmp_on_foot() == true
-    //     || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1
-    //         && check_zmp_on_foot() == true) {
-    //     m_current_count = m_current_stance_foot;
-    //     m_step_counter++;
-    //     printf("weight shift is complete \n");
-    //     printf("now going into current_shooting node %i\n", m_current_shooting_node);
-    // } else if (m_current_shooting_node == 0) {
-    //     m_current_shooting_node--;
-    // }
-
-    if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1
-
-        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1) {
-        m_current_count = m_current_stance_foot;
-        m_step_counter++;
-        printf("weight shift is complete \n");
-        printf("now going into current_shooting node %i\n", m_current_shooting_node);
+        || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
+        // m_current_count = m_current_stance_foot;
+        // m_step_counter++;
+        // RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
+        // printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
-        m_current_shooting_node--;
+        // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg
+        // manually and increment the step counter still
+        m_current_count = -m_current_count; // turn off if pressure sole on
+        m_step_counter++; // turn off if pressure sole on
     }
+    // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
 
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
@@ -445,7 +471,6 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     if (m_current_shooting_node != 0 && step_duration * ((N - 1) / m_number_of_footsteps) < m_current_shooting_node
         && m_current_shooting_node < ((N - 1)) / m_number_of_footsteps) {
-        // m_timing_value = m_current_shooting_node*(1/(1-step_duration))/(((N-1))/(m_number_of_footsteps));
         m_timing_value = (m_current_shooting_node - step_duration * ((N - 1) / m_number_of_footsteps))
             * (1 / (1 - step_duration)) / (((N - 1)) / (m_number_of_footsteps));
         count = -count;
@@ -463,7 +488,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     } else {
         ;
     }
-    // printf("step number is %d\n", step_number);
 
     // ii is defined as the current stage
     for (int ii = 0; ii < N; ii++) {

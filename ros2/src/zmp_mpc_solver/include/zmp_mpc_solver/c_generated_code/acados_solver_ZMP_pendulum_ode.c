@@ -370,7 +370,7 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     if (new_time_steps) {
         ZMP_pendulum_ode_acados_update_time_steps(capsule, N, new_time_steps);
     } else { // all time_steps are identical
-        double time_step = 0.011976047904191616;
+        double time_step = 0.00796812749003984;
         for (int i = 0; i < N; i++) {
             ocp_nlp_in_set(nlp_config, nlp_dims, nlp_in, i, "Ts", &time_step);
             ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "scaling", &time_step);
@@ -419,12 +419,10 @@ void ZMP_pendulum_ode_acados_create_5_set_nlp_in(
     double* lbx0 = lubx0;
     double* ubx0 = lubx0 + NBX0;
     // change only the non-zero elements:
-    lbx0[3] = 0.17;
-    ubx0[3] = 0.17;
-    lbx0[4] = -0.5;
-    ubx0[4] = -0.5;
-    lbx0[5] = 0.17;
-    ubx0[5] = 0.17;
+    lbx0[3] = 0.165;
+    ubx0[3] = 0.165;
+    lbx0[5] = 0.165;
+    ubx0[5] = 0.165;
     lbx0[9] = 0.33;
     ubx0[9] = 0.33;
 
@@ -571,9 +569,8 @@ void ZMP_pendulum_ode_acados_create_7_set_nlp_out(ZMP_pendulum_ode_solver_capsul
 
     // initialize with x0
 
-    x0[3] = 0.17;
-    x0[4] = -0.5;
-    x0[5] = 0.17;
+    x0[3] = 0.165;
+    x0[5] = 0.165;
     x0[9] = 0.33;
 
     double* u0 = xu0 + NX;

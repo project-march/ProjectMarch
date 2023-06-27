@@ -29,6 +29,8 @@ private:
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void publish_joint_states(std::vector<double>);
     void publish_ik_visualizations();
+    void publish_ik_path();
+    void publish_com_path();
 
     void timer_callback();
 
@@ -56,6 +58,11 @@ private:
     int m_stance_foot;
     int m_timestep;
     int m_reset;
+
+    double hip_aa_upper_limit;
+    double hip_aa_lower_limit;
+    double m_previous_xdif;
+    double m_previous_rxdif;
 
     std::vector<std::string> m_joint_names;
     trajectory_msgs::msg::JointTrajectoryPoint point_prev_saved;
