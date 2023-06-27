@@ -45,8 +45,7 @@
   ],
   [
     {
-      "name": "eeg",
-      "callback": "publish_eeg_on_off"
+      "name": "eeg"
     }
   ]
 ]

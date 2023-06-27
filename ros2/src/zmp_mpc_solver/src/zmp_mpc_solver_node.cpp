@@ -122,13 +122,6 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_left_foot_on_gound(msg->data);
 }
-// void SolverNode::robot_state_callback(march_shared_msgs::msg::RobotState::SharedPtr msg)
-// {
-//    // int status = solve_step(x_current, u_current); // solve the mpc problem
-//    // if (status == 0) {
-//    // publish_control_msg();
-//    // }
-// }
 
 void SolverNode::timer_callback()
 {
