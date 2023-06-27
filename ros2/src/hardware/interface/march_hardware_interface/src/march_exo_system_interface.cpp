@@ -277,15 +277,15 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             RCLCPP_INFO((*logger_), "The first read torque value is %f", jointInfo.target_torque);
 
             // if no weight has been assigned, we start in position control
-            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
-            //     jointInfo.torque_weight = 0.0f;
-            //     jointInfo.position_weight = 1.0f;
-            // }
-            // if no weight has been assigned, we start in torque control
             if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
-                jointInfo.torque_weight = 1.0f;
-                jointInfo.position_weight = 0.0f;
+                jointInfo.torque_weight = 0.0f;
+                jointInfo.position_weight = 1.0f;
             }
+            // if no weight has been assigned, we start in torque control
+            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
+            //     jointInfo.torque_weight = 1.0f;
+            //     jointInfo.position_weight = 0.0f;
+            // }
 
             jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
@@ -506,6 +506,9 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
+        // TORQUEDEBUG LINE
+        #ifdef TORQUEDEBUG
+
         // function used for only the direct torque method
         if(weight_node->delta.has_value()){
             if(weight_node->delta.value() > 0.00){
@@ -522,8 +525,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         }
 
-        // TORQUEDEBUG LINE
-        #ifdef TORQUEDEBUG
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif

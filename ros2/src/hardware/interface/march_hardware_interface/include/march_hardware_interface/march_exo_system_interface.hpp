@@ -88,10 +88,11 @@ struct JointInfo {
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
             #ifdef TORQUEDEBUG
-            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            // RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
             // return;
             #endif
-            setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
+            RCLCPP_INFO(this->get_logger(), "Ignoring calculated weight: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            // setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
         }
 
         /**
