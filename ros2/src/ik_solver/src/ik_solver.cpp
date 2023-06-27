@@ -120,62 +120,34 @@ void IkSolver::initialize_solver()
 
 Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_desired, const double dt, int stance_foot)
 {
-    // We put the weights here, but of course we can remove them later
     // WEIGHTS
-    double left_weight = 1.0;
-    double right_weight = 1.0;
-    double CoM_weight = 2.0;
+    double left_weight = 0.1;
+    double right_weight = 0.1;
+    double CoM_weight = 1.0;
     double qdot_weight = 1e-6;
-    // double base_weight = 1;
 
-    double CoM_gains = 1.0; // / dt;
-    double left_gains = 1.0; // / dt;
-    double right_gains = 1.0; // / dt;
+    double CoM_gains = 1.0;
+    double left_gains = 1.0;
+    double right_gains = 1.0;
 
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all weights and gains");
+    //    set_jacobian();
 
     // Get the error vectors
     // Here, we assume the jacobians have already been set
     // The error is equal to the desired state, as we express them in local coordinates
     Eigen::VectorXd left_foot_error = state_desired.left_foot_pose;
-    left_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
-    //-angleSignedDistance(state_desired.left_foot_pose.segment(3,
-    //3), state_current.left_foot_pose.segment(3, 3));
+    left_foot_error.segment(3, 3)
+        = angleSignedDistance(state_desired.left_foot_pose.segment(3, 3), state_current.left_foot_pose.segment(3, 3));
+
     Eigen::VectorXd right_foot_error = state_desired.right_foot_pose;
-    right_foot_error.segment(3, 3) = Eigen::VectorXd::Zero(3);
-    // -angleSignedDistance(state_desired.right_foot_pose.segment(3,
-    // 3), state_current.right_foot_pose.segment(3, 3));
+    right_foot_error.segment(3, 3)
+        = angleSignedDistance(state_desired.right_foot_pose.segment(3, 3), state_current.right_foot_pose.segment(3, 3));
+
     Eigen::VectorXd com_pos_error = state_desired.com_pos;
     com_pos_error.segment(0, 3) = state_desired.com_pos.segment(0, 3); // - m_body_com;
 
-    // Print the error vectors
-    // std::stringstream ss;
-    // ss << J_left_foot.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Left foot error is :\n" + ss.str() + "\n");
-    // ss.clear();
-    // ss.str("");
-    // ss << J_right_foot.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Right foot error is :\n" + ss.str() + "\n");
-    // ss.clear();
-    // ss.str("");
-
-    // ss << com_pos_error.format(Eigen::IOFormat(6, 0, ", ", "\n", "", ""));
-    // RCLCPP_INFO(rclcpp::get_logger(""), "com error is :\n" + ss.str() + "\n");
-    // ss.clear();
-    // ss.str("");
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized all error vectors");
-    // Set up the cost function
-    // H: The quadratic term of the cost function
-    // F: The linear term of the cost function
-    // We should see this as a^2 + 2ab + b^2
-    // where:
-    // a^2 + b^2 is the quadratic term
-    // 2ab is the linear term
-    // We ignore b^2 as it is a constant value. Thus, it has no impact on an optimization problem.
     Eigen::MatrixXd cost_H = qdot_weight * Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
     Eigen::VectorXd cost_F = Eigen::VectorXd::Zero(m_model.nv);
-
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Size is (%ix%i)", m_model.nv, m_model.nv);
 
     // NOTE::: CONSIDER ADDING THE SINGULARITY ROBUST REGULARIZATION TERM
     // [NOTE]: ADD THE ILNEAR TERM USING COM VELOCITIES
@@ -183,7 +155,6 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
         * (J_left_foot.transpose() * J_left_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
     // RCLCPP_INFO(rclcpp::get_logger(""), "Added the quadratic left_foot cost");
     cost_F += -left_weight * J_left_foot.transpose() * (state_desired.left_foot_vel + left_gains * left_foot_error);
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Added the linear left_foot cost");
 
     cost_H += right_weight
         * (J_right_foot.transpose() * J_right_foot + Eigen::MatrixXd::Identity(m_model.nv, m_model.nv) * 0.0001);
@@ -201,7 +172,7 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     Eigen::MatrixXd constrained_joints = Eigen::MatrixXd::Identity(m_model.nv, m_model.nv);
     int free_joint_start = 0;
     for (int i = free_joint_start; i < free_joint_start + 3; i++) {
-        // constrained_joints(i,i) = 0;
+        constrained_joints(i, i) = 0;
     }
 
     Eigen::VectorXd joint_upper_lim = (m_joint_lim_max.tail(m_model.nv) - m_joint_pos.tail(m_model.nv)) / dt;
@@ -224,16 +195,12 @@ Eigen::VectorXd IkSolver::solve_for_velocity(state state_current, state state_de
     Eigen::MatrixXd A_dummy = Eigen::MatrixXd::Zero(6, m_model.nv);
     Eigen::VectorXd b_dummy = Eigen::VectorXd::Zero(6);
 
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Initialized dummy equality constraints");
-
     // We now swap the dummy foot based on the fixed Jacobian.
     if (stance_foot == -1) {
         A_dummy = J_left_foot;
     } else {
         A_dummy = J_right_foot;
     }
-
-    b_dummy.segment(0,1) << -state_desired.com_pos(0);
 
     m_qp_solver_ptr->solve(cost_H, cost_F, A_dummy, b_dummy, constrained_joints, joint_lower_lim, joint_upper_lim);
     Eigen::VectorXd velocity_trajectory = m_qp_solver_ptr->get_solution();

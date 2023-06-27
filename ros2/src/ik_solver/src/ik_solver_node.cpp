@@ -45,11 +45,11 @@ IkSolverNode::IkSolverNode()
     // publish_ik_visualizations();
 
     // Initializing the timestep
-    declare_parameter("timestep", 50);
+    declare_parameter("timestep", 8);
     m_timestep = this->get_parameter("timestep").as_int();
 
-    m_solving_timer = this->create_wall_timer(
-        std::chrono::milliseconds(m_timestep), std::bind(&IkSolverNode::timer_callback, this));
+    m_solving_timer
+        = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&IkSolverNode::timer_callback, this));
 
     // pinocchio::Model test_model = m_ik_solver.get_model();
     // for (int i = 0; i < test_model.names.size(); i++) {
@@ -95,7 +95,7 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
 
     // m_stance_foot=-m_stance_foot;
     // RCLCPP_INFO(this->get_logger(), "obtained swing trajectory");
-    m_stance_foot = -m_stance_foot;
+    //    m_stance_foot = -m_stance_foot;
     // }
 }
 
@@ -124,7 +124,7 @@ void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr s
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // if (this->m_reset != -1) {
-//    m_stance_foot = msg->data;
+    m_stance_foot = msg->data;
     // }
 }
 
@@ -169,17 +169,17 @@ void IkSolverNode::timer_callback()
             m_stance_foot);
         return;
     } else {
-        float swing_z_factor = 1.7;
-        float swing_x_factor = 0.4;
+        float swing_z_factor = 1.0;
+        float swing_x_factor = 0.5;
         // IN THE POSE ARRAY, INDEX 1 IS RIGHT AND INDEX -1 IS LEFT
         if (m_stance_foot == 1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is right");
-            m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.12, 0.0;
+            m_desired_state.right_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.right_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.left_foot_pose
                 << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * swing_x_factor,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.1219, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.0, 0.0;
 
             // m_desired_state.left_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             // m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -190,14 +190,13 @@ void IkSolverNode::timer_callback()
         }
         if (m_stance_foot == -1) {
             // RCLCPP_INFO(this->get_logger(), "Stance foot is left");
-            m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.1219, 0.0;
-
+            m_desired_state.left_foot_pose << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             m_desired_state.left_foot_vel << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
             m_desired_state.right_foot_pose
                 << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x * swing_x_factor,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
-                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.1219, 0.0;
+                m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.0, 0.0;
 
             // m_desired_state.right_foot_vel << m_swing_trajectory_container->velocity[m_swing_trajectory_index].x,
             //     m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
@@ -208,7 +207,7 @@ void IkSolverNode::timer_callback()
         }
         // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
-        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x * swing_x_factor * 25.0,
+        m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x,
             m_com_trajectory_container->velocity[m_com_trajectory_index].y, 0.0, 0.0, 0.0, 0.0;
 
         // RCLCPP_INFO(this->get_logger(), "Solved for velocity\n\n");
@@ -255,6 +254,8 @@ void IkSolverNode::timer_callback()
         }
 
         // RCLCPP_INFO(this->get_logger(), "Published trajectory");
+        publish_ik_path();
+        publish_com_path();
     }
 }
 
@@ -294,44 +295,44 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
         // point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
         double xdif;
         double next_joint_pos_weight = 0.8;
-        if (i.compare("left_hip_aa") == 0) {
-            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
-                * 2.5; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
-            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
-            if (abs(m_previous_xdif - xdif) > 0.10) {
-                xdif = m_previous_xdif;
-            } else {
-                m_previous_xdif = xdif;
-            }
-            // point.positions.push_back(xdif);
-            point.positions.push_back(std::max(hip_aa_lower_limit,
-                std::min(joint_positions[pinocchio_model.joints[index].idx_q()] * (1 - next_joint_pos_weight)
-                        + (xdif - 0.05) * next_joint_pos_weight,
-                    hip_aa_upper_limit)));
-
-        } else if (i.compare("right_hip_aa") == 0) {
-            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
-                * 2.5; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
-            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
-
-            if (abs(m_previous_rxdif - xdif) > 0.8) {
-                xdif = m_previous_rxdif;
-            } else {
-                m_previous_rxdif = xdif;
-            }
-            // point.positions.push_back(xdif);
-            point.positions.push_back(std::max(hip_aa_lower_limit,
-                std::min(joint_positions[pinocchio_model.joints[index].idx_q()] * (1 - next_joint_pos_weight)
-                        + (xdif - 0.05) * next_joint_pos_weight,
-                    hip_aa_upper_limit)));
-        } else {
-            // point.positions.push_back(0.0);
-            if ((i.compare("right_ankle") == 0) || (i.compare("left_ankle") == 0)){
-                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.004]);
-            }else{
-                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
-            }
-        }
+        //        if (i.compare("left_hip_aa") == 0) {
+        //            xdif = (m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
+        //                * 2.5; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+        //            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
+        //            if (abs(m_previous_xdif - xdif) > 0.10) {
+        //                xdif = m_previous_xdif;
+        //            } else {
+        //                m_previous_xdif = xdif;
+        //            }
+        //            // point.positions.push_back(xdif);
+        //            point.positions.push_back(std::max(hip_aa_lower_limit,
+        //                std::min(joint_positions[pinocchio_model.joints[index].idx_q()] * (1 - next_joint_pos_weight)
+        //                        + (xdif - 0.05) * next_joint_pos_weight,
+        //                    hip_aa_upper_limit)));
+        //
+        //        } else if (i.compare("right_hip_aa") == 0) {
+        //            xdif = -(m_com_trajectory_container->trajectory[m_com_trajectory_index].y - 0.33 / 2)
+        //                * 2.5; //*4 - previous_joint_positions[pinocchio_model.joints[index].idx_q()];
+        //            // RCLCPP_INFO(this->get_logger(),"xdif is %f", xdif);
+        //
+        //            if (abs(m_previous_rxdif - xdif) > 0.8) {
+        //                xdif = m_previous_rxdif;
+        //            } else {
+        //                m_previous_rxdif = xdif;
+        //            }
+        //            // point.positions.push_back(xdif);
+        //            point.positions.push_back(std::max(hip_aa_lower_limit,
+        //                std::min(joint_positions[pinocchio_model.joints[index].idx_q()] * (1 - next_joint_pos_weight)
+        //                        + (xdif - 0.05) * next_joint_pos_weight,
+        //                    hip_aa_upper_limit)));
+        //        } else {
+        //            // point.positions.push_back(0.0);
+        //            if ((i.compare("right_ankle") == 0) || (i.compare("left_ankle") == 0)){
+        //                point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()+0.004]);
+        //            }else{
+        point.positions.push_back(joint_positions[pinocchio_model.joints[index].idx_q()]);
+        //            }
+        //        }
         // point.positions.push_back(0.0);
     }
 
@@ -396,6 +397,101 @@ void IkSolverNode::publish_ik_visualizations()
     ik_markers.color.a = 1.0;
     ik_markers.color.b = 0.5;
     ik_markers.color.g = 0.7;
+    m_ik_visualizer->publish(ik_markers);
+}
+
+void IkSolverNode::publish_ik_path()
+{
+    pinocchio::Model vis_model = m_ik_solver.get_model();
+    pinocchio::Data vis_data = m_ik_solver.get_data();
+    // Publish the joint visualizations
+    visualization_msgs::msg::Marker ik_markers;
+    ik_markers.type = 7;
+    ik_markers.header.frame_id = "map";
+    ik_markers.id = 1;
+    pinocchio::FrameIndex right_foot_index;
+    if (m_stance_foot == -1) {
+        right_foot_index = vis_model.getFrameId("R_toe");
+    } else {
+        right_foot_index = vis_model.getFrameId("L_toe");
+    }
+    Eigen::Matrix<double, 3, 1> frame_transform;
+    geometry_msgs::msg::Point marker_container;
+    frame_transform = vis_data.oMf[right_foot_index].translation();
+    marker_container.x = frame_transform[0];
+    marker_container.y = frame_transform[1];
+    marker_container.z = frame_transform[2];
+
+    for (int i = m_swing_trajectory_index; i < m_swing_trajectory_container->velocity.size(); i++) {
+        marker_container.x += m_swing_trajectory_container->velocity[i].x * 8 * 1e-3;
+        marker_container.y += m_swing_trajectory_container->velocity[i].y * 8 * 1e-3;
+        marker_container.z += m_swing_trajectory_container->velocity[i].z * 8 * 1e-3;
+        ik_markers.points.push_back(marker_container);
+    }
+
+    // RCLCPP_INFO(this->get_logger(), "Published %i markers", ik_markers.points.size());
+    ik_markers.action = 0;
+    ik_markers.frame_locked = 1;
+    ik_markers.scale.x = 0.05;
+    ik_markers.scale.y = 0.05;
+    ik_markers.scale.z = 0.05;
+    ik_markers.pose.position.x = 0.0;
+    ik_markers.pose.position.y = 0.0;
+    ik_markers.pose.position.z = 0.0;
+    ik_markers.pose.orientation.x = 0.0;
+    ik_markers.pose.orientation.y = 0.0;
+    ik_markers.pose.orientation.z = 0.0;
+    ik_markers.pose.orientation.w = 1.0;
+    ik_markers.ns = "exo_joint_visualization";
+    ik_markers.lifetime.sec = 0;
+    ik_markers.color.a = 0.5;
+    ik_markers.color.r = 0.7;
+    ik_markers.color.g = 0.7;
+    ik_markers.color.b = 0.6;
+    m_ik_visualizer->publish(ik_markers);
+}
+
+void IkSolverNode::publish_com_path()
+{
+    pinocchio::Model vis_model = m_ik_solver.get_model();
+    pinocchio::Data vis_data = m_ik_solver.get_data();
+    // Publish the joint visualizations
+    visualization_msgs::msg::Marker ik_markers;
+    ik_markers.type = 7;
+    ik_markers.header.frame_id = "map";
+    ik_markers.id = 2;
+
+    geometry_msgs::msg::Point marker_container;
+    Eigen::VectorXd com_pos = m_ik_solver.get_state().com_pos;
+    marker_container.x = com_pos(0);
+    marker_container.y = com_pos(1);
+    marker_container.z = com_pos(2);
+
+    for (int i = m_com_trajectory_index; i < m_com_trajectory_container->velocity.size(); i++) {
+        marker_container.x += m_com_trajectory_container->velocity[i].x * 8 * 1e-3;
+        marker_container.y += m_com_trajectory_container->velocity[i].y * 8 * 1e-3;
+        marker_container.z += m_com_trajectory_container->velocity[i].z * 8 * 1e-3;
+        ik_markers.points.push_back(marker_container);
+    }
+    // RCLCPP_INFO(this->get_logger(), "Published %i markers", ik_markers.points.size());
+    ik_markers.action = 0;
+    ik_markers.frame_locked = 1;
+    ik_markers.scale.x = 0.05;
+    ik_markers.scale.y = 0.05;
+    ik_markers.scale.z = 0.05;
+    ik_markers.pose.position.x = 0.0;
+    ik_markers.pose.position.y = 0.0;
+    ik_markers.pose.position.z = 0.0;
+    ik_markers.pose.orientation.x = 0.0;
+    ik_markers.pose.orientation.y = 0.0;
+    ik_markers.pose.orientation.z = 0.0;
+    ik_markers.pose.orientation.w = 1.0;
+    ik_markers.ns = "exo_joint_visualization";
+    ik_markers.lifetime.sec = 0;
+    ik_markers.color.a = 0.6;
+    ik_markers.color.r = 0.4;
+    ik_markers.color.g = 0.6;
+    ik_markers.color.b = 0.9;
     m_ik_visualizer->publish(ik_markers);
 }
 

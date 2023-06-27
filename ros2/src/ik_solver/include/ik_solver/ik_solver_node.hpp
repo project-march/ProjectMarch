@@ -29,6 +29,8 @@ private:
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
     void publish_joint_states(std::vector<double>);
     void publish_ik_visualizations();
+    void publish_ik_path();
+    void publish_com_path();
 
     void timer_callback();
 

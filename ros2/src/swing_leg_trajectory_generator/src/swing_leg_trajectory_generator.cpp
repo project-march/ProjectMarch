@@ -76,10 +76,16 @@ Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t
 void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, double step_length)
 {
     double scalar = step_length / points.back().x;
+    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "step_length is: %f", step_length);
+    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "points.back().x is: %f", points.back().x);
+    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "scalar is: %f", scalar);
     for (auto& p : points) {
         p.x *= scalar;
         p.y *= scalar;
         p.z *= scalar;
+        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.x is: %f", p.x);
+        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.y is: %f", p.y);
+        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.z is: %f", p.z);
     }
     m_curve.points = points;
     m_step_length = step_length;
@@ -106,5 +112,6 @@ void SwingLegTrajectoryGenerator::set_points(std::vector<Point> points)
 
 void SwingLegTrajectoryGenerator::set_step_length(double step_length)
 {
+    RCLCPP_INFO(rclcpp::get_logger("Is set_step_length nan?"), "step_length: %f", step_length);
     update_points(m_curve.points, step_length);
 }

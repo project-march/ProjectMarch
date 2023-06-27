@@ -21,7 +21,7 @@ BufferNode::BufferNode()
     m_swing_leg_command_subscriber = this->create_subscription<std_msgs::msg::Int32>(
         "/publish_swing_leg_command", 10, std::bind(&BufferNode::swing_command_subscriber_callback, this, _1));
     // Initializing the timestep in ms
-    declare_parameter("timestep", 50);
+    declare_parameter("timestep", 8);
     m_timestep = this->get_parameter("timestep").as_int();
 }
 
@@ -65,9 +65,9 @@ void BufferNode::set_velocity(std::vector<geometry_msgs::msg::Point>& position_v
         geometry_msgs::msg::Point point_prev = position_vector[0];
 
         for (auto it = std::begin(position_vector) + 1; it != std::end(position_vector); it++) {
-            point_container.x = (it->x - point_prev.x) / (base_time_delay * 1e-3);
-            point_container.y = (it->y - point_prev.y) / (base_time_delay * 1e-3);
-            point_container.z = (it->z - point_prev.z) / (base_time_delay * 1e-3);
+            point_container.x = (it->x - point_prev.x) * base_time_delay;
+            point_container.y = (it->y - point_prev.y) * base_time_delay;
+            point_container.z = (it->z - point_prev.z) * base_time_delay;
             output_vector.push_back(point_container);
             point_prev.x = it->x;
             point_prev.y = it->y;
@@ -97,7 +97,7 @@ void BufferNode::publish_com_trajectory()
         ik_command_to_send.trajectory.push_back(i.position);
     }
 
-    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity, 1 / (8 * 1e-6) * 8 * 1e-3);
+    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity, 1e3 / 8);
 
     // Add a final 0 point
     geometry_msgs::msg::Point p;
@@ -125,7 +125,7 @@ void BufferNode::publish_swing_trajectory()
         ik_mock_com.trajectory.push_back(p);
     }
 
-    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity, m_timestep);
+    set_velocity(ik_command_to_send.trajectory, ik_command_to_send.velocity, 1e3 / 8);
 
     // Add a final 0 point
     geometry_msgs::msg::Point p;

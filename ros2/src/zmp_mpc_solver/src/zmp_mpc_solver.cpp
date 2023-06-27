@@ -172,7 +172,7 @@ bool ZmpSolver::check_zmp_on_foot()
     bool y_check;
     float zmp_check_margin_y = 1.3;
     float zmp_check_margin_x = 1.3;
-    
+
     if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
         && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x) {
         x_check = true;
@@ -182,8 +182,9 @@ bool ZmpSolver::check_zmp_on_foot()
         RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check false \n");
     }
 
-    x_check=true;
-    RCLCPP_INFO(rclcpp::get_logger("zmp check"), "Difference for y is %f \nmargin is %f", m_pos_foot_current[1] - m_zmp_current[1],m_foot_width_y*zmp_check_margin_y);
+    x_check = true;
+    RCLCPP_INFO(rclcpp::get_logger("zmp check"), "Difference for y is %f \nmargin is %f",
+        m_pos_foot_current[1] - m_zmp_current[1], m_foot_width_y * zmp_check_margin_y);
 
     if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
         && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
@@ -193,7 +194,6 @@ bool ZmpSolver::check_zmp_on_foot()
     } else {
         y_check = false;
         // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
-
     }
 
     if (x_check == true && y_check == true) {
@@ -203,7 +203,6 @@ bool ZmpSolver::check_zmp_on_foot()
     } else {
         return false;
         RCLCPP_INFO(rclcpp::get_logger("zmp check"), "both check false \n");
-
     }
 }
 
@@ -221,7 +220,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
 
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
-    m_com_current[0] = x - 0.15;
+    m_com_current[0] = x;
     m_com_current[1] = y;
 
     m_com_vel_current[0] = dx;
@@ -235,7 +234,7 @@ void ZmpSolver::set_com_height(double height)
 
 void ZmpSolver::set_current_zmp(double x, double y)
 {
-    m_zmp_current[0] = x - 0.15;
+    m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
@@ -436,7 +435,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     //     m_left_foot_on_ground = false;
     // } else if (m_current_shooting_node == step_duration * (((N - 1)) / (m_number_of_footsteps)) + 1) {
     //     printf("did not pass the foot on ground check \n");
-        // m_current_shooting_node--;
+    // m_current_shooting_node--;
     // }
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
@@ -452,13 +451,12 @@ inline int ZmpSolver::solve_zmp_mpc(
         // RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
         // printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
-        // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg manually and 
-                                        // increment the step counter still
+        // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg
+        // manually and increment the step counter still
         m_current_count = -m_current_count; // turn off if pressure sole on
         m_step_counter++; // turn off if pressure sole on
     }
     // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
-
 
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
