@@ -10,38 +10,9 @@ using Pose = geometry_msgs::msg::Pose;
 
 SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 {
-    // TODO: Check if these points are correct for the ik-solver, or if they have to be altered for a realistic step.
     m_curve = BezierCurve();
-    auto start_point = Point();
-    start_point.x = 0.0;
-    start_point.y = 0.0;
-    start_point.z = 0.0;
-
-    auto left_point = Point();
-    left_point.x = 0.025;
-    left_point.y = 0.0;
-    left_point.z = 0.1;
-
-    auto right_point = Point();
-    right_point.x = 0.075;
-    right_point.y = 0.0;
-    right_point.z = 0.1;
-
-    auto end_point = Point();
-    end_point.x = 0.1;
-    end_point.y = 0.0;
-    end_point.z = 0.0;
-
-    m_curve.points.push_back(start_point);
-    m_curve.points.push_back(left_point);
-    m_curve.points.push_back(right_point);
-    m_curve.points.push_back(end_point);
-
-    m_curve.point_amount = 50; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
-    m_step_length = 0.1;
-
-    // Generate the trajectory for the first time
-    generate_trajectory();
+    m_curve.point_amount = 75; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
+    m_step_length = 0.2;
 }
 
 void SwingLegTrajectoryGenerator::generate_trajectory()
@@ -76,16 +47,10 @@ Point SwingLegTrajectoryGenerator::get_point(std::vector<Point> points, double t
 void SwingLegTrajectoryGenerator::update_points(std::vector<Point> points, double step_length)
 {
     double scalar = step_length / points.back().x;
-    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "step_length is: %f", step_length);
-    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "points.back().x is: %f", points.back().x);
-    RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "scalar is: %f", scalar);
     for (auto& p : points) {
         p.x *= scalar;
         p.y *= scalar;
         p.z *= scalar;
-        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.x is: %f", p.x);
-        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.y is: %f", p.y);
-        RCLCPP_INFO(rclcpp::get_logger("Is this nan?"), "p.z is: %f", p.z);
     }
     m_curve.points = points;
     m_step_length = step_length;
@@ -104,14 +69,10 @@ double SwingLegTrajectoryGenerator::get_step_length()
 
 void SwingLegTrajectoryGenerator::set_points(std::vector<Point> points)
 {
-    for (auto& point : points) {
-        std::swap(point.y, point.z);
-    }
     update_points(points, m_step_length);
 }
 
 void SwingLegTrajectoryGenerator::set_step_length(double step_length)
 {
-    RCLCPP_INFO(rclcpp::get_logger("Is set_step_length nan?"), "step_length: %f", step_length);
     update_points(m_curve.points, step_length);
 }

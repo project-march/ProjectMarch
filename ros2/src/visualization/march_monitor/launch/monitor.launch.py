@@ -19,7 +19,7 @@ def generate_launch_description() -> LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="perspective",
-                default_value="march7",
+                default_value="march8",
                 description="Which perspective file to use.",
             ),
             Node(

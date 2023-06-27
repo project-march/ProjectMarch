@@ -16,6 +16,33 @@ private:
     void SetUp() override
     {
         swing_leg_generator = std::make_unique<SwingLegTrajectoryGenerator>();
+
+        auto points = std::vector<Point>();
+        auto start_point = Point();
+        start_point.x = 0.0;
+        start_point.y = 0.0;
+        start_point.z = 0.0;
+
+        auto left_point = Point();
+        left_point.x = 0.05;
+        left_point.y = 0.0;
+        left_point.z = 0.1;
+
+        auto right_point = Point();
+        right_point.x = 0.15;
+        right_point.y = 0.0;
+        right_point.z = 0.1;
+
+        auto end_point = Point();
+        end_point.x = 0.2;
+        end_point.y = 0.0;
+        end_point.z = 0.0;
+
+        points.push_back(start_point);
+        points.push_back(left_point);
+        points.push_back(right_point);
+        points.push_back(end_point);
+        swing_leg_generator->set_points(points);
     }
 };
 
@@ -213,8 +240,8 @@ TEST_F(SwingLegTrajectoryGeneratorTest, setPointsScalingTest)
     ASSERT_EQ(expected.size(), actual.size());
     for (size_t i = 0; i < expected.size(); i++) {
         ASSERT_EQ(expected.at(i).x / 500, actual.at(i).x);
-        ASSERT_EQ(expected.at(i).z / 500, actual.at(i).y);
-        ASSERT_EQ(expected.at(i).y / 500, actual.at(i).z);
+        ASSERT_EQ(expected.at(i).y / 500, actual.at(i).y);
+        ASSERT_EQ(expected.at(i).z / 500, actual.at(i).z);
     }
 }
 
