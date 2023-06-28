@@ -4,54 +4,66 @@
 
 #include "fuzzy_generator/fuzzy_generator.hpp"
 
-FuzzyGenerator::FuzzyGenerator(){
+FuzzyGenerator::FuzzyGenerator()
+{
+
+    //TODO: implement
+    // auto yaml_location = 'joints.yaml'
+
+    // YAML::Node config_ = YAML::LoadFile("joints.yaml");
+    // const auto bounds = config_.begin()->first.as<std::string>();
+    
+    // lower_bound = config["range"]["lower_bound"].as<double>();
+    // upper_bound = config["range"]["upper_bound"].as<double>();
 };
 
-void FuzzyGenerator::updateWeights(Leg* leg){
-    //TODO: differentiate between logic for stance -> swing and swing -> stance
-    leg->position_weight = std::max(0.0, std::min(1.0, (leg->getFootHeight() - full_torque) / (full_position - full_torque)));//(1 / full_torque) * leg->getFootHeight() - full_position;
-    leg->torque_weight = 1 - leg->position_weight;
-};
 
-// setters
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeights(std::string leg, float foot_height){
+    
+    // calculate far the foot is in the 'fuzzy shifting range'
+    float total_range = upper_bound - lower_bound;
+    float actual_range = upper_bound - foot_height;
+    float torque_percentage = actual_range/total_range;
 
-void FuzzyGenerator::setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg){
-    left_leg.foot_height = msg.heights[0];
-    right_leg.foot_height = msg.heights[1];
-};
+    // get the joints, with their torque ranges from the yaml
+    std::vector<std::tuple<std::string, float, float>> torque_ranges = getTorqueRanges(leg);
+    std::vector<std::tuple<std::string, float, float>>  joints;
 
-void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
-    switch(msg.data){
-        case -1:{
-            left_leg.status = Stance;
-            right_leg.status = Swing;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
-            break;
-        }
-        case 1:{
-            left_leg.status = Swing;
-            right_leg.status = Stance;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
-            break;
-        }
-        case 0:{ //this is the case when both feet are on the ground
-            left_leg.status = Stance;
-            right_leg.status = Stance;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
-            break;
-        }
-        default:{
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
-        }
+    // for each joint in the leg, calculate the torque weight and position weight
+    for(auto t: torque_ranges){
+        float torque_range = std::get<2>(t) - std::get<1>(t);
+
+        float torque_weight = torque_range * torque_percentage;
+        float position_weight = 1 - torque_weight;
+
+        joints.push_back(std::make_tuple(std::get<0>(t), position_weight, torque_weight));
     }
+
+    return joints;
 }
 
-// getters
+std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(std::string leg){
+    //TODO: implement
+    std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 
-Leg* FuzzyGenerator::getLeftLeg(){
-    return &left_leg;
+    // const auto joint_name = this->robot_config_.begin()->first.as<std::string>();
+
+    // YAML::Node lineup = YAML::Load("{1B: Prince Fielder, 2B: Rickie Weeks, LF: Ryan Braun}");
+
+    // YAML::Node joint_config = config["joints"];
+
+    // for(YAML::const_iterator it=joint_config.begin();it!=joint_config.end();++it) {
+    //     std::string joint_name = it->first.as<std::string>();
+
+    //     // std::cout << "Playing at " << it->first.as<std::string>() << " is " << it->second.as<std::string>() << "\n";
+    // }
+    return joints;
 }
 
-Leg* FuzzyGenerator::getRightLeg(){
-    return &right_leg;
+float FuzzyGenerator::getUpperBound(){
+    return upper_bound;
+}
+
+float FuzzyGenerator::getLowerBound(){
+    return lower_bound;
 }

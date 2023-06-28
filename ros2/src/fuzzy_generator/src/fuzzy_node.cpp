@@ -12,8 +12,8 @@ FuzzyNode::FuzzyNode()
         : Node("fuzzy_node")
         , m_fuzzy_generator()
 {
-    m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
-            "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
+    // m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
+    //         "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
             "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
 
@@ -26,40 +26,6 @@ FuzzyNode::FuzzyNode()
 }
 
 /**
- * Sets the right and left leg to either swing or stance. Updates and publishes new weights accordingly.
- *
- * @param msg Message that contains the integer to indicate which leg is the stance leg.
- * @return
- */
-void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
-{
-    // set the stance leg
-    m_fuzzy_generator.setStanceLeg(*msg.get());
-
-    // update the weights for the left leg
-    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
-    m_fuzzy_generator.updateWeights(left_leg);
-
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped left_weights;
-    left_weights.torque_weight = left_leg->getTorqueWeight();
-    left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = "l";
-    publish_weights(left_weights);
-
-    // update the weights for the right leg
-    Leg* right_leg = m_fuzzy_generator.getRightLeg();
-    m_fuzzy_generator.updateWeights(right_leg);
-
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped right_weights;
-    right_weights.torque_weight = right_leg->getTorqueWeight();
-    right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = "r";
-    publish_weights(right_weights);
-}
-
-/**
  * Sets the height of both feet
  *
  * @param msg Message that contains the height of both feet. Updates and publishes new weights accordingly.
@@ -67,32 +33,36 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
  */
 void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
 
-    // update the feet height
-    m_fuzzy_generator.setFeetHeight(*msg.get());
+    float left_foot_height = msg->heights[0];
+    float right_foot_height = msg->heights[1];
 
-    // update the weights for the left leg
-    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
-    m_fuzzy_generator.updateWeights(left_leg);
+    if(left_foot_height > m_fuzzy_generator.getLowerBound() && left_foot_height < m_fuzzy_generator.getUpperBound()){
+        auto weights = m_fuzzy_generator.calculateWeights("left", left_foot_height);
+        for(auto w: weights){
 
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped left_weights;
-    left_weights.torque_weight = left_leg->getTorqueWeight();
-    left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = "l";
-    left_weights.header.frame_id = this->get_name();
-    publish_weights(left_weights);
+            // send the weights for the left leg
+            march_shared_msgs::msg::WeightStamped left_weights;
+            left_weights.joint_name = std::get<0>(w);
+            left_weights.position_weight = std::get<1>(w);
+            left_weights.torque_weight = std::get<2>(w);
+            left_weights.header.frame_id = this->get_name();
+            publish_weights(left_weights);
+        }
+    }
 
-    // update the weights for the right leg
-    Leg* right_leg = m_fuzzy_generator.getRightLeg();
-    m_fuzzy_generator.updateWeights(right_leg);
+    if(right_foot_height > m_fuzzy_generator.getLowerBound() && right_foot_height < m_fuzzy_generator.getUpperBound()){
+        auto weights = m_fuzzy_generator.calculateWeights("right", right_foot_height);
+        for(auto w: weights){
 
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped right_weights;
-    right_weights.torque_weight = right_leg->getTorqueWeight();
-    right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = "r";
-    right_weights.header.frame_id = this->get_name();
-    publish_weights(right_weights);
+            // send the weights for the right leg
+            march_shared_msgs::msg::WeightStamped right_weights;
+            right_weights.joint_name = std::get<0>(w);
+            right_weights.position_weight = std::get<1>(w);
+            right_weights.torque_weight = std::get<2>(w);
+            right_weights.header.frame_id = this->get_name();
+            publish_weights(right_weights);
+        }
+    }
 }
 
 /**
@@ -123,12 +93,10 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     march_shared_msgs::msg::WeightStamped weights;
     weights.torque_weight = 0;
     weights.position_weight = 0;
-    weights.leg = "";
     publish_weights(weights);
 }
 
 void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
-    std::string leg = msg.leg;
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
     RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
@@ -144,7 +112,6 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
         m_weight_publisher->publish(msg);
     }
     else if(allowed_control_type == "fuzzy"){
-        RCLCPP_INFO_STREAM(this->get_logger(), "we have leg: " << leg);
         m_weight_publisher->publish(msg);
     }
     else{

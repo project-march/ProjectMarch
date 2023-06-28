@@ -91,7 +91,7 @@ struct JointInfo {
             RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
             // return;
             #endif
-            setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
+            setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
         /**
@@ -113,26 +113,13 @@ struct JointInfo {
          * @param torque_weight A float between 0 and 1 to apply to joints
          * @return
          */
-        void setJointsWeight(std::string leg, float position_weight, float torque_weight){
+        void setJointWeight(std::string joint_name, float position_weight, float torque_weight){
 
-            // check the leg choice
-            if(leg != "l" and leg != "r"){
-                RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
-            }
-            RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of" << leg);
+            RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
 
             for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
-                if(leg == "l" and jointInfo.name.find("left") != std::string::npos){
-                    jointInfo.torque_weight = torque_weight;
-                    jointInfo.position_weight = position_weight;
-                }
-                else if(leg == "r" and jointInfo.name.find("right") != std::string::npos){
-                    jointInfo.torque_weight = torque_weight;
-                    jointInfo.position_weight = position_weight;
-                }
-                else{
-                    RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg... We are likely using the TSU", jointInfo.name);
+                if(jointInfo.name == joint_name){
                     jointInfo.torque_weight = torque_weight;
                     jointInfo.position_weight = position_weight;
                 }
