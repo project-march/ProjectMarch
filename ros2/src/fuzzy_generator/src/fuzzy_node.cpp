@@ -36,7 +36,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     float left_foot_height = msg->heights[0];
     float right_foot_height = msg->heights[1];
 
-    if(left_foot_height > m_fuzzy_generator.getLowerBound() && left_foot_height < m_fuzzy_generator.getUpperBound()){
+    if(left_foot_height >= m_fuzzy_generator.getLowerBound() && left_foot_height <= m_fuzzy_generator.getUpperBound()){
         auto weights = m_fuzzy_generator.calculateWeights("left", left_foot_height);
         for(auto w: weights){
 
@@ -50,7 +50,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
         }
     }
 
-    if(right_foot_height > m_fuzzy_generator.getLowerBound() && right_foot_height < m_fuzzy_generator.getUpperBound()){
+    if(right_foot_height >= m_fuzzy_generator.getLowerBound() && right_foot_height <= m_fuzzy_generator.getUpperBound()){
         auto weights = m_fuzzy_generator.calculateWeights("right", right_foot_height);
         for(auto w: weights){
 
@@ -99,7 +99,7 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
 void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
-    RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
+    RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
 
     if(allowed_control_type == "position"){
         msg.position_weight = 1;

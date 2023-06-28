@@ -117,12 +117,18 @@ struct JointInfo {
 
             RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
 
+            bool found_joint = false;
             for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
                 if(jointInfo.name == joint_name){
                     jointInfo.torque_weight = torque_weight;
                     jointInfo.position_weight = position_weight;
+                    found_joint = true;
+                    break;
                 }
+            }
+            if(!found_joint){
+                RCLCPP_INFO_STREAM(this->get_logger(), "we have not found joint " << jointInfo.name);
             }
         }
 

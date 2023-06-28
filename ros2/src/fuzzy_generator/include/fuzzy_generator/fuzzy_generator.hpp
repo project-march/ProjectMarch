@@ -10,7 +10,15 @@
 #include "std_msgs/msg/int32.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
-// #include <yaml-cpp/yaml.h>
+#include <yaml-cpp/yaml.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+inline static const char PATH_SEPARATOR =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
 
 class FuzzyGenerator {
 public:
@@ -25,10 +33,10 @@ public:
 
 
 private:
-    double upper_bound; //TODO: add actual value
-    double lower_bound; //TODO: add actual value
+    double upper_bound;
+    double lower_bound;
 
-    // YAML::Node config_;    
+    YAML::Node config_;    
 };
 
 #endif //MARCH_FUZZY_GENERATOR_HPP
