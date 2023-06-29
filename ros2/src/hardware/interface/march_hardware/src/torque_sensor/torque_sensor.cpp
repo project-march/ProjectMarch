@@ -5,9 +5,10 @@
 #include "../../include/march_hardware/torque_sensor/torque_sensor.h"
 
 namespace march {
-TorqueSensor::TorqueSensor(MotorControllerType motor_controller_type, float max_torque)
+TorqueSensor::TorqueSensor(MotorControllerType motor_controller_type, float max_torque, float average_torque)
     : motor_controller_type_(motor_controller_type)
     , max_torque_(max_torque)
+    , average_torque_(average_torque)
 {
 }
 
@@ -24,5 +25,10 @@ MotorControllerType TorqueSensor::getMotorControllerType() const
 float TorqueSensor::getMaxTorque() const
 {
     return max_torque_;
+}
+
+float TorqueSensor::getAverageTorque() const
+{
+    return average_torque_;
 }
 } // namespace march

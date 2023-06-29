@@ -10,8 +10,9 @@
 class TorqueSensorTest : public testing::Test {
 protected:
     const size_t max_torque = 10;
+    const size_t average_torque = 10;
     const march::MotorControllerType motor_controller_type = march::MotorControllerType::ODrive;
-    march::TorqueSensor torque_sensor = march::TorqueSensor(motor_controller_type, max_torque);
+    march::TorqueSensor torque_sensor = march::TorqueSensor(motor_controller_type, max_torque, average_torque);
 };
 
 TEST_F(TorqueSensorTest, getMotorControllerTypeTest)

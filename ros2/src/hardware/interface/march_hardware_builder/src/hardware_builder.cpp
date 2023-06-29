@@ -343,9 +343,11 @@ std::unique_ptr<march::TorqueSensor> HardwareBuilder::createTorqueSensor(
         torque_sensor_config, HardwareBuilder::TORQUE_SENSOR_REQUIRED_KEYS, "torqueSensor");
 
     const auto max_torque = torque_sensor_config["maxTorque"].as<float>();
+    const auto average_torque = torque_sensor_config["averageTorque"].as<float>();
     return std::make_unique<march::TorqueSensor>(
         /*motor_controller_type*/ motor_controller_type,
-        /*max_torque*/ max_torque);
+        /*max_torque*/ max_torque,
+        /*average_torque*/ average_torque);
 }
 
 std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(

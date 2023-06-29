@@ -128,7 +128,7 @@ struct JointInfo {
                 }
             }
             if(!found_joint){
-                RCLCPP_INFO_STREAM(this->get_logger(), "we have not found joint " << jointInfo.name);
+                RCLCPP_INFO_STREAM(this->get_logger(), "we have not found joint " << joint_name);
             }
         }
 

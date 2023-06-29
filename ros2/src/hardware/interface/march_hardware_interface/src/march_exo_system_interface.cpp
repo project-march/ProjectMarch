@@ -76,10 +76,9 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_EFFORT, hardware_interface::HW_IF_POSITION },
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
             /*required_state_interfaces=*/
-            { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,
-                hardware_interface::HW_IF_EFFORT },
+            { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY},
             /*logger=*/(*logger_))) {
         RCLCPP_FATAL((*logger_), "Joints do not have the right interface types");
         return hardware_interface::return_type::ERROR;
@@ -141,7 +140,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
+        /*target_torque=*/march_robot_->getJoint(joint.name.c_str()).getMotorController()->getTorqueSensor()->getAverageTorque(),
             /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
@@ -179,9 +178,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
-        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-        state_interfaces.emplace_back(
-            hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
         // For motor controller state broadcasting.
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
@@ -230,9 +226,6 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
         RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
-        // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
-        command_interfaces.emplace_back(hardware_interface::CommandInterface(
-            jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
@@ -271,21 +264,21 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
-            jointInfo.target_torque = jointInfo.joint.getTorque();
+            // jointInfo.target_torque = jointInfo.joint.getTorque();
 
             RCLCPP_INFO((*logger_), "The first read pos value is %f", jointInfo.target_position);
-            RCLCPP_INFO((*logger_), "The first read torque value is %f", jointInfo.target_torque);
+            RCLCPP_INFO((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
             // if no weight has been assigned, we start in position control
-            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
-            //     jointInfo.torque_weight = 0.0f;
-            //     jointInfo.position_weight = 1.0f;
-            // }
-            // if no weight has been assigned, we start in torque control
             if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
-                jointInfo.torque_weight = 1.0f;
-                jointInfo.position_weight = 0.0f;
+                jointInfo.torque_weight = 0.0f;
+                jointInfo.position_weight = 1.0f;
             }
+            // if no weight has been assigned, we start in torque control
+            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
+            //     jointInfo.torque_weight = 1.0f;
+            //     jointInfo.position_weight = 0.0f;
+            // }
 
             jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
@@ -504,22 +497,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
-        }
-
-        // function used for only the direct torque method
-        if(weight_node->delta.has_value()){
-            if(weight_node->delta.value() > 0.00){
-                float c = cos(jointInfo.position*0.75);
-                RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
-
-                float t = jointInfo.torque + (weight_node->delta.value() * c);
-                jointInfo.target_torque = t;
-            }
-            else{
-                jointInfo.target_torque = jointInfo.torque;
-                weight_node->delta.reset();
-            }
-
         }
 
         // TORQUEDEBUG LINE
