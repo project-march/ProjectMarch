@@ -100,6 +100,7 @@ class MujocoSimNode(Node):
             namespace="",
             parameters=[
                 ("position.P", None),
+                ("position.I", None),
                 ("position.D", None),
                 ("torque.P", None),
                 ("torque.D", None),
@@ -110,7 +111,10 @@ class MujocoSimNode(Node):
         self.controller = []
         self.controller.append(
             PositionController(
-                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+                self, self.model,
+                self.get_parameter("position.P").value,
+                self.get_parameter("position.I").value,
+                self.get_parameter("position.D").value
             )
         )
         self.controller.append(
