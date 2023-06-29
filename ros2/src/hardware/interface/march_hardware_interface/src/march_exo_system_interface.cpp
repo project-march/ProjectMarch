@@ -292,7 +292,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.velocity = 0;
-            // jointInfo.torque = jointInfo.joint.getTorque();
+            jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
 

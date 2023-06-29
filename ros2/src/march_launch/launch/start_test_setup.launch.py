@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='false')
+    test_rotational = LaunchConfiguration("test_rotational", default='true')
 
     # region Launch march control
     march_control = IncludeLaunchDescription(
@@ -82,12 +82,12 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_node',
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
-        Node(
-            package='joint_trajectory_buffer',
-            executable='joint_trajectory_buffer_node',
-            name='joint_trajectory_buffer_node',
-            # arguments=['--ros-args', '--log-level', 'debug']
-        ),
+        # Node(
+        #     package='joint_trajectory_buffer',
+        #     executable='joint_trajectory_buffer_node',
+        #     name='joint_trajectory_buffer_node',
+        #     # arguments=['--ros-args', '--log-level', 'debug']
+        # ),
         # torque_converter,
         rqt_input_device,
         march_control,
