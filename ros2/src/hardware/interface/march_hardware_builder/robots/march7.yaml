@@ -31,7 +31,7 @@ march7:
             transmission: 204
             direction: 1
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 30.0
@@ -66,7 +66,7 @@ march7:
             transmission: 314
             direction: 1
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 35.0
@@ -101,7 +101,7 @@ march7:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 25.0
@@ -136,7 +136,7 @@ march7:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 20.0
@@ -171,7 +171,7 @@ march7:
             transmission: 204
             direction: 1
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 30.0
@@ -206,7 +206,7 @@ march7:
             transmission: 314
             direction: 1
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 35.0
@@ -241,7 +241,7 @@ march7:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 25.0
@@ -277,7 +277,7 @@ march7:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 10
+            maxTorque: 50
         pids:
           position:
             p: 10.0

@@ -91,7 +91,7 @@ struct JointInfo {
             // RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
             // return;
             #endif
-            RCLCPP_INFO(this->get_logger(), "Ignoring calculated weight: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            // RCLCPP_INFO(this->get_logger(), "Ignoring calculated weight: position %f, torque %f", msg->position_weight, msg->torque_weight);
             // setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
         }
 
