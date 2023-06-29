@@ -26,39 +26,26 @@ class MujocoWriterNode(Node):
         """
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(MujocoInput, "mujoco_input", 10)
-        # self.subscription = self.create_subscription(
-        #     JointTrajectoryControllerState, "joint_trajectory_controller/state", self.listener_callback, 10
-        # )
+        self.subscription = self.create_subscription(
+            JointTrajectoryControllerState, "joint_trajectory_controller/state", self.listener_callback, 10
+        )
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.
         self.reset_subscription = self.create_subscription(
-            Bool, "/march/mujoco_reset_trajectory", self.reset_callback, 10
+            Bool, "/mujoco_reset_trajectory", self.reset_callback, 10
         )
-
-        self._action_server = ActionServer(
-            self,
-            FollowJointTrajectory,
-            '/joint_trajectory_controller/follow_joint_trajectory',
-            self.execute_callback)
         self.reset = False
-
-    def execute_callback(self, goal_handle):
-        self.get_logger().info('Executing goal...')
-        trajectory = goal_handle.request.trajectory.points
-        msg_to_send = MujocoInput()
-        msg_to_send.points = trajectory
-        self.publisher.publish(msg_to_send)
-        goal_handle.succeed()
-        result = FollowJointTrajectory.Result()
-        return result
+        # self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
         """This listener callback publishes all the messages from the MARCH code to the topic Mujoco sim subscribes to.
 
         This callback is just a simple passthrough to keep the flow clear.
         """
-        msg_tosend = MujocoInput()
+        msg_to_send = MujocoInput()
         skip = False
+        if len(msg.desired.positions) == 0:
+            skip = True
         for i, x in enumerate(msg.desired.positions):
             if x != x:
                 skip = True
@@ -66,11 +53,11 @@ class MujocoWriterNode(Node):
             else:
                 msg.desired.positions[i] *= 1
         if not skip:
-            msg_tosend.trajectory = msg
+            msg_to_send.trajectory = msg
             if self.reset:
-                msg_tosend.reset = 1
+                msg_to_send.reset = 1
                 self.reset = False
-            self.publisher.publish(msg_tosend)
+            self.publisher.publish(msg_to_send)
 
     def reset_callback(self, msg):
         """Set the reset flag when a message is received with data True."""

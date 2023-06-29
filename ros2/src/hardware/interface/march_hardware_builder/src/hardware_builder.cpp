@@ -318,7 +318,7 @@ std::unique_ptr<march::IncrementalEncoder> HardwareBuilder::createIncrementalEnc
 march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node& encoder_config)
 {
     if (encoder_config["direction"]) {
-        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"),"determining encodr direction.");
+        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "determining encodr direction.");
         switch (encoder_config["direction"].as<int>()) {
             case 1:
                 return march::Encoder::Direction::Positive;
@@ -330,6 +330,7 @@ march::Encoder::Direction HardwareBuilder::getEncoderDirection(const YAML::Node&
     } else {
         return march::Encoder::Direction::Positive;
     }
+
 }
 
 // TODO add method for creation of torque sensor :)

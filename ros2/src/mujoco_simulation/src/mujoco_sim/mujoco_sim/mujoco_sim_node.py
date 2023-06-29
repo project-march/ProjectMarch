@@ -79,7 +79,7 @@ class MujocoSimNode(Node):
         # The model can be found in the robot_description package.
         self.model_name = self.get_parameter("model_toload")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
@@ -100,17 +100,37 @@ class MujocoSimNode(Node):
             namespace="",
             parameters=[
                 ("position.P", None),
+                ("position.I", None),
                 ("position.D", None),
                 ("torque.P", None),
                 ("torque.D", None),
             ],
         )
+
+        # Create an instance of that data extractor.
+        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+                                                           self.model.sensor_adr)
+
+        self.set_init_joint_qpos(None)
+
+        joint_val_dict = {}
+        joint_val = self.sensor_data_extraction.get_joint_pos()
+        for index, name in enumerate(self.actuator_names):
+            joint_val_dict[name] = joint_val[index]
+        self.get_logger().info(f"Keeping initial joint positions, "
+                               f"set desired positions to {joint_val_dict}")
+
         # This list of controllers contains all active controllers
         self.controller_mode = 0
         self.controller = []
         self.controller.append(
             PositionController(
-                self, self.model, self.get_parameter("position.P").value, self.get_parameter("position.D").value
+                self,
+                self.model,
+                self.get_parameter("position.P").value,
+                self.get_parameter("position.D").value,
+                self.get_parameter("position.I").value,
+                joint_desired=joint_val_dict,
             )
         )
         self.controller.append(
@@ -133,8 +153,16 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.0005
+        self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
+
+    def set_init_joint_qpos(self, qpos_init):
+        """Set initial qpos to make eo not falling over in sim."""
+        if qpos_init is None:
+            return
+
+        self.data.qpos[-8:] = qpos_init
+        mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
@@ -151,7 +179,7 @@ class MujocoSimNode(Node):
         """Updates the trajectory if possible."""
         try:
             msg = self.msg_queue.get_nowait()
-            joint_pos = msg.positions
+            joint_pos = msg
             for j in range(len(self.controller)):
                 self.controller[j].joint_desired = joint_pos
             self.trajectory_last_updated = self.get_clock().now()
@@ -165,9 +193,12 @@ class MujocoSimNode(Node):
         With this queue, the sim_update_timer_callback can time the messages correctly in the simulation.
             msg (MujocoControl message): Contains the inputs to be changed
         """
-        points = msg.points
-        for i in points:
-            self.msg_queue.put(i)
+        if msg.reset == 1:
+            self.msg_queue = Queue()
+        joint_pos_dict = {}
+        for i, name in enumerate(msg.trajectory.joint_names):
+            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        self.msg_queue.put(joint_pos_dict)
 
     def sim_step(self):
         """This function performs the simulation update.

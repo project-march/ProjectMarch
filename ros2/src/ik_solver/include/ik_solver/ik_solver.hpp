@@ -20,6 +20,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -37,11 +38,11 @@ struct state {
     // Pose, in this case, is [POSITION, ANGLE]
     Eigen::Matrix<double, 6, 1> left_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
     Eigen::Matrix<double, 6, 1> right_foot_pose = Eigen::Matrix<double, 6, 1>::Zero();
-    Eigen::Matrix<double, 3, 1> com_pos = Eigen::Vector3d::Zero();
+    Eigen::Matrix<double, 6, 1> com_pos = Eigen::Matrix<double, 6, 1>::Zero();
 
     Eigen::Matrix<double, 6, 1> left_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
     Eigen::Matrix<double, 6, 1> right_foot_vel = Eigen::Matrix<double, 6, 1>::Zero();
-    Eigen::Matrix<double, 3, 1> com_vel = Eigen::Vector3d::Zero();
+    Eigen::Matrix<double, 6, 1> com_vel = Eigen::Matrix<double, 6, 1>::Zero();
 };
 
 class IkSolver {
@@ -52,12 +53,15 @@ public:
     int set_jacobian();
     int get_model_joints();
     void initialize_solver();
-    Eigen::VectorXd solve_for_velocity(state, state, int);
-    Eigen::VectorXd velocity_to_pos(Eigen::VectorXd&, double);
+    Eigen::VectorXd solve_for_velocity(state, state, const double, int);
+    Eigen::VectorXd velocity_to_pos(Eigen::VectorXd&, const double);
     pinocchio::Data::Matrix6x get_model_jacobian();
     void set_current_state();
     const state get_state();
     const pinocchio::Model get_model();
+    const pinocchio::Data get_data();
+    std::vector<double> get_joint_pos();
+    std::vector<double> get_joint_vel();
 
 private:
     pinocchio::Model m_model;
@@ -66,6 +70,12 @@ private:
     Eigen::VectorXd m_joint_pos;
     Eigen::VectorXd m_joint_vel;
     Eigen::VectorXd m_joint_acc;
+    Eigen::VectorXd m_joint_lim_min;
+    Eigen::VectorXd m_joint_lim_max;
+
+    Eigen::VectorXd m_body_com;
+
+    std::map<std::string, int> m_pinocchio_to_march_joint_map;
 
     pinocchio::Data::Matrix6x J_left_foot;
     pinocchio::Data::Matrix6x J_right_foot;

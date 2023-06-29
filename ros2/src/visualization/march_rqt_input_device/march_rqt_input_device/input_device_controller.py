@@ -3,7 +3,7 @@ import getpass
 import socket
 import time
 
-from std_msgs.msg import Header, Bool
+from std_msgs.msg import Header, Bool, Int32
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
 from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Float32
@@ -59,7 +59,7 @@ class InputDeviceController:
         )
         self._error_pub = self._node.create_publisher(
             msg_type=Error,
-            topic="/march/error",
+            topic="/march/input_device/error",
             qos_profile=10
         )
         self._send_gait_request = self._node.create_publisher(
@@ -70,6 +70,11 @@ class InputDeviceController:
         self._set_gait_control_type = self._node.create_publisher(
             msg_type=String,
             topic="weight_control_type",
+            qos_profile=10,
+        )
+        self._swing_leg_command_pub = self._node.create_publisher(
+            msg_type=Int32,
+            topic="/publish_swing_leg_command",
             qos_profile=10,
         )
         self._gait_response_subscriber = self._node.create_subscription(
@@ -83,6 +88,14 @@ class InputDeviceController:
             topic="direct_torque",
             qos_profile=10,
         )
+
+        self._eeg_input_subscriber = self._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
+        )
+
         if self._ping:
             self._alive_pub = self._node.create_publisher(
                 Alive,
@@ -104,12 +117,26 @@ class InputDeviceController:
 
     def update_possible_gaits(self):
         """Update the possible gait that can be selected by the IPD."""
-        return self.POSSIBLE_TRANSITIONS[self._current_gait]
+        if self.eeg:
+            return ["stop"]
+        else:
+            return self.POSSIBLE_TRANSITIONS[self._current_gait]
 
     def _gait_response_callback(self, msg: GaitResponse):
         """Update current node from the state machine."""
-        self._node.get_logger().debug("Received new gait from other IPD.")
         self._current_gait = msg.gait_type
+
+    def _eeg_gait_request_callback(self, msg: Int32):
+        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
+        self.publish_gait(msg.data)
+
+    def publish_eeg_on_off(self) -> None:
+        """Publish eeg on if its off and off if it is on."""
+        self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
+
+    def update_eeg_on_off(self, msg: Bool) -> None:
+        """Update eeg value for when it is changed in the state machine."""
+        self.eeg = msg.data
 
     def publish_gait(self, gait_type: int, control_type) -> None:
         """Publish a message on `/march/gait_request` to publish the gait."""
@@ -125,13 +152,17 @@ class InputDeviceController:
         if control_type is not None:
             self.publish_control_type(control_type)
 
-    def publish_eeg_on_off(self) -> None:
-        """Publish eeg on if its off and off if it is on."""
-        self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
 
-    def update_eeg_on_off(self, msg: Bool) -> None:
-        """Update eeg value for when it is changed in the state machine."""
-        self.eeg = msg.data
+        if gait_type in [2, 3]:
+            zero_swing_msg = Int32()
+            zero_swing_msg.data = 0
+            self._swing_leg_command_pub.publish(zero_swing_msg)
+
+        if gait_type == 5:
+            error_msg = Error()
+            error_msg.error_message = "Error button clicked on IPD"
+            error_msg.type = 0
+            self._error_pub.publish(error_msg)
 
     def _timer_callback(self) -> None:
         """Callback to send out an alive message."""

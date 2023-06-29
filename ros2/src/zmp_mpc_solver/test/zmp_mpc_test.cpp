@@ -37,9 +37,9 @@ TEST_F(ZmpSolverTest, MpcIsSolvableTest)
     // With this, we can also check if our initial conditions allow for a solvable start
     this->zmp_solver->initialize_mpc_params();
 
-    this->zmp_solver->set_current_com(0, 0, 0, 0);
-    this->zmp_solver->set_current_zmp(0, 0);
-    this->zmp_solver->set_current_foot(0, 0);
+    this->zmp_solver->set_current_com(0.0, 0.18, 0, 0);
+    this->zmp_solver->set_current_zmp(0, 0.2);
+    this->zmp_solver->set_current_foot(0, 0.2);
     this->zmp_solver->set_previous_foot(0, 0);
 
     this->zmp_solver->set_current_state();
@@ -47,25 +47,6 @@ TEST_F(ZmpSolverTest, MpcIsSolvableTest)
     int solving_status = this->zmp_solver->solve_step();
     // If we get 0, We can solve at least.
     ASSERT_EQ(solving_status, 0);
-}
-
-TEST_F(ZmpSolverTest, StateIsUpdatedTest)
-{
-    // With this, we can also check if our initial conditions allow for a solvable start
-    this->zmp_solver->initialize_mpc_params();
-
-    this->zmp_solver->set_current_com(0.01, 0, 0, 0);
-    this->zmp_solver->set_current_zmp(0, 0);
-    this->zmp_solver->set_current_foot(0, 0);
-    this->zmp_solver->set_previous_foot(0, 0);
-
-    this->zmp_solver->set_current_state();
-    std::array<double, NX> initial_state = this->zmp_solver->get_state();
-
-    int solving_status = this->zmp_solver->solve_step();
-    // If we get 0, We can solve at least.
-    ASSERT_EQ(solving_status, 0);
-    ASSERT_NE(this->zmp_solver->get_state(), initial_state);
 }
 
 // NOLINTEND

@@ -10,46 +10,19 @@ using Pose = geometry_msgs::msg::Pose;
 
 SwingLegTrajectoryGenerator::SwingLegTrajectoryGenerator()
 {
-    // TODO: Check if these points are correct for the ik-solver, or if they have to be altered for a realistic step.
     m_curve = BezierCurve();
-    auto start_point = Point();
-    start_point.x = 0;
-    start_point.y = 0;
-    start_point.z = 0;
-
-    auto left_point = Point();
-    left_point.x = 25;
-    left_point.y = 50;
-    left_point.z = 0;
-
-    auto right_point = Point();
-    right_point.x = 75;
-    right_point.y = 50;
-    right_point.z = 0;
-
-    auto end_point = Point();
-    end_point.x = 100;
-    end_point.y = 0;
-    end_point.z = 0;
-
-    m_curve.points.push_back(start_point);
-    m_curve.points.push_back(left_point);
-    m_curve.points.push_back(right_point);
-    m_curve.points.push_back(end_point);
-
     m_curve.point_amount = 75; // Based on the shooting nodes in the  ZMP_MPC, that fit in one step.
-    m_step_length = 100.0;
-
-    // Generate the trajectory for the first time
-    generate_trajectory();
+    m_step_length = 0.2;
 }
 
 void SwingLegTrajectoryGenerator::generate_trajectory()
 {
     geometry_msgs::msg::PoseArray trajectory;
-    for (int i = 0; i < m_curve.point_amount; i++) {
+    double step_size = 1.0 / m_curve.point_amount;
+    for (double i = 0.0; i <= 1.0; i += step_size) {
         geometry_msgs::msg::Pose pose;
-        pose.position = get_point(m_curve.points, i);
+        auto points = m_curve.points;
+        pose.position = get_point(points, i);
         trajectory.poses.push_back(pose);
     }
     m_curve.trajectory = trajectory;

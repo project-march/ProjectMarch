@@ -1,7 +1,9 @@
 """Author Marco Bak - M8."""
 import sys
+import os
 import rclpy
 from rclpy.node import Node
+import yaml
 
 import math
 from matplotlib.path import Path
@@ -10,7 +12,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
-
 NODE_NAME = "bezier_plotter"
 
 
@@ -39,6 +40,7 @@ class BezierCurve(Node):
 
     When the points are changed, the swing-leg is updated through the publisher.
     """
+
     def __init__(self):
         super().__init__(NODE_NAME)
 
@@ -53,8 +55,30 @@ class BezierCurve(Node):
 
         self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
         self.figure = plt.figure("Bezier Curve")
-        # TODO: if these points have good values
-        self.points = {1: 0, 25: 50, 75: 50, 99: 0}
+
+        self.points = {}
+        self.point_config_location = os.path.join(os.path.dirname(__file__), '..', 'config', 'bezier_points.yaml')
+        with open(self.point_config_location, 'r') as points_file:
+            try:
+                points_yaml = yaml.safe_load(points_file)
+            except yaml.YAMLError as exc:
+                self.get_logger().error(str(exc))
+
+        points_list_yaml = points_yaml["points"]
+
+        for i in points_list_yaml:
+            self.points[i[0]] = i[1]
+
+        msg = PoseArray()
+        for key in sorted(self.points):
+            p = Pose()
+            p.position.x = float(key)
+            p.position.y = float(self.points[key])
+            p.position.z = 0.0
+            msg.poses.append(p)
+        self.publish_points.publish(msg)
+        self.get_logger().info("Published Bezier points at startup")
+
         self.axes = plt.subplot(1, 1, 1)
         self._init_plot()
 
@@ -91,8 +115,6 @@ class BezierCurve(Node):
         :type event: MouseEvent
         """
         # Only respond to left click within the axes, right click is not relevant
-
-        self.get_logger().info("click")
         if event.button == 1 and event.inaxes in [self.axes]:
             # Check if the click is close to a point
             distance_threshold = 2.0
@@ -150,18 +172,28 @@ class BezierCurve(Node):
         """
         self.dragging_point = None
         plt.ion()
+        points_list = []
         msg = PoseArray()
-        for key in self.points:
+        for key in sorted(self.points):
             p = Pose()
-            p.point.x = float(key)
-            p.point.y = float(self.points[key])
-            msg.points.append(p)
+            p.position.x = float(key)
+            p.position.y = 0.0
+            p.position.z = float(self.points[key])
+            msg.poses.append(p)
+            points_list.append([key, self.points[key]])
         self.publish_points.publish(msg)
+
+        points_dict = {"points": points_list}
+        with open(self.point_config_location, 'w') as points_file:
+            try:
+                yaml.dump(points_dict, points_file)
+            except yaml.YAMLError as exc:
+                self.get_logger().error(str(exc))
+
         plt.ioff()
 
     def listener_callback(self, msg):
         """Callback for subscriber, not used for now, probably not needed."""
-        self.get_logger().info("Callback")
         self.plot_x = []
         self.plot_y = []
 

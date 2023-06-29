@@ -144,7 +144,7 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
         m_weight_publisher->publish(msg);
     }
     else if(allowed_control_type == "fuzzy"){
-        RCLCPP_INFO_STREAM(this->get_logger(), "we have leg: " << leg);
+        // RCLCPP_INFO_STREAM(this->get_logger(), "we have leg: " << leg);
         m_weight_publisher->publish(msg);
     }
     else{

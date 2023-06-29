@@ -5,6 +5,7 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include <chrono>
 #include <cstdio>
 
@@ -26,11 +27,12 @@ private:
     void publish_footsteps(geometry_msgs::msg::PoseArray footsteps);
 
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_publisher;
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_swing_trajectory_command_publisher;
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
 
     int m_steps;
-    const double m_vx;
-    const double m_vy;
+    double m_vx;
+    double m_vy;
     double m_l;
 };
 

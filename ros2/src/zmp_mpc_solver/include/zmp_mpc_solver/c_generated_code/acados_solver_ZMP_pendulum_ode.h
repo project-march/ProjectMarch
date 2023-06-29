@@ -63,10 +63,10 @@
 #define ZMP_PENDULUM_ODE_NY0 0
 #define ZMP_PENDULUM_ODE_NY 0
 #define ZMP_PENDULUM_ODE_NYN 0
-#define ZMP_PENDULUM_ODE_N 501
-#define ZMP_PENDULUM_ODE_NH 4
+#define ZMP_PENDULUM_ODE_N 251
+#define ZMP_PENDULUM_ODE_NH 0
 #define ZMP_PENDULUM_ODE_NPHI 0
-#define ZMP_PENDULUM_ODE_NHN 2
+#define ZMP_PENDULUM_ODE_NHN 0
 #define ZMP_PENDULUM_ODE_NPHIN 0
 #define ZMP_PENDULUM_ODE_NR 0
 
@@ -110,11 +110,6 @@ typedef struct ZMP_pendulum_ode_solver_capsule {
     external_function_param_casadi ext_cost_e_fun_jac_hess;
 
     // constraints
-    external_function_param_casadi* nl_constr_h_fun_jac;
-    external_function_param_casadi* nl_constr_h_fun;
-
-    external_function_param_casadi nl_constr_h_e_fun_jac;
-    external_function_param_casadi nl_constr_h_e_fun;
 
 } ZMP_pendulum_ode_solver_capsule;
 

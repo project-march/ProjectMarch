@@ -302,7 +302,7 @@ def generate_launch_description() -> launch.LaunchDescription:
 
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="true",
+            default_value="false",
             description="Whether to log simulation data or not.",
             choices=["true", "false"],
         ),

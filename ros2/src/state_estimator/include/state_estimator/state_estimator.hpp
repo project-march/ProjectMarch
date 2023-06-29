@@ -6,12 +6,14 @@
 #include "imu_estimator.hpp"
 #include "joint_estimator.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
+#include "march_shared_msgs/msg/feet.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2/LinearMath/Transform.h"
@@ -69,11 +71,14 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_state_subscriber;
 
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_stance_foot_publisher;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_publisher;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_cop_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_pos_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::Feet>::SharedPtr m_foot_impact_publisher;
 
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;

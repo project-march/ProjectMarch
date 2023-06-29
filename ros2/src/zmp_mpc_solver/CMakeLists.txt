@@ -25,6 +25,8 @@ find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+
 include_directories(include)
 
 
@@ -67,6 +69,7 @@ ament_target_dependencies(
   "geometry_msgs"
   "nav_msgs"
   "march_shared_msgs"
+  "visualization_msgs"
 )
 
 
@@ -147,7 +150,8 @@ if(BUILD_TESTING)
     "pluginlib"
     "rclcpp"
     "geometry_msgs"
-    "nav_msgs")
+    "nav_msgs"
+    "visualization_msgs")
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)

@@ -14,6 +14,7 @@ def generate_launch_description():
     urdf_default = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
+        'march8',
         'hennie_v0.urdf'
     )
 

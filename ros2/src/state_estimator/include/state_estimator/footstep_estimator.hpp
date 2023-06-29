@@ -27,10 +27,12 @@ struct Foot {
     double width;
     double height;
     double threshold;
+    double total_pressure;
     bool on_ground;
     // The prefix can be L or R
     void set_on_ground(const std::vector<PressureSensor*>* sensors, const char* prefix)
     {
+        threshold = 3.1;
         double measured_foot_pressure = 0.0;
         // look for the right pressure sensors specific to the foot
         for (auto i : *sensors) {
@@ -39,8 +41,9 @@ struct Foot {
             }
         }
         // we have 8 sensors, so we divide by 1
-
-        on_ground = (measured_foot_pressure / 8 >= threshold);
+        total_pressure = measured_foot_pressure;
+        // RCLCPP_INFO(rclcpp::get_logger("feet on ground"), "total pressure is: %f", total_pressure);
+        on_ground = (total_pressure / 8 <= threshold);
     };
 };
 
@@ -53,6 +56,8 @@ public:
     bool get_foot_on_ground(const char*);
     void set_threshold(double);
     Foot* get_foot(const char*);
+    void set_footstep_positions(geometry_msgs::msg::Vector3 right_foot_vec, geometry_msgs::msg::Vector3 left_foot_vec);
+
     // IMU& get_imu();
 
 private:
