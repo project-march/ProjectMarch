@@ -21,11 +21,11 @@ joint_trajectory_controller:
       - rotational_joint
     command_interfaces:
       - position
-      # - effort
+      - effort
     state_interfaces:
       - position
       - velocity
-      # - effort
+      - effort
     gains:
       rotational_joint: { p: 60.0, i: 0.0, d: 5.0, i_clamp: 100.0}
   
