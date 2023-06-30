@@ -4,6 +4,7 @@
 
 #include "fuzzy_generator/fuzzy_node.hpp"
 #include "fuzzy_generator/fuzzy_generator.hpp"
+#include <chrono>
 using std::placeholders::_1;
 using std::placeholders::_2;
 using namespace std::chrono_literals;

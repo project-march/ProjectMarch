@@ -148,6 +148,7 @@ struct JointInfo {
             auto now = std::chrono::steady_clock::now;
             auto work_duration = std::chrono::seconds{msg->data};
             auto start = now();
+            // RCLCPP_INFO_STREAM(this->get_logger(), "start: " <<  std::chrono::system_clock::to_time_t(start) << " duration: " << work_duration);
             while ( (now() - start) < work_duration)
             {
                 for(auto j: *joints_info_){

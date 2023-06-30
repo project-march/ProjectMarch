@@ -18,6 +18,11 @@
          "always_enabled": true
       },
       {
+         "name": "measure-torque",
+         "callback": "measure_torque",
+         "always_enabled": true
+      },
+      {
          "name": "direct-torque",
          "callback": "publish_direct_torque",
          "control_type": "torque",
