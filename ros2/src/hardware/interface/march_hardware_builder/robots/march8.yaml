@@ -10,7 +10,7 @@ march8:
           actuationMode: torque
           slaveIndex: 1
           axis: 1
-          motorKV: 355
+          motorKV: 210
           useIncrementalEncoder: false
           #          indexFound: true
           absoluteEncoder:
@@ -28,14 +28,14 @@ march8:
             transmission: 204
             direction: 1
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 30.0
             i: 0.0
             d: 0.4
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -45,7 +45,7 @@ march8:
           actuationMode: torque
           slaveIndex: 2
           axis: 1
-          motorKV: 355
+          motorKV: 210
           useIncrementalEncoder: false
           #          indexFound: true
           absoluteEncoder:
@@ -63,14 +63,14 @@ march8:
             transmission: 314
             direction: 1
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 35.0
             i: 0.0
             d: 0.6
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -98,14 +98,14 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 25.0
             i: 0.0
             d: 0.4
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -133,14 +133,14 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 20.0
             i: 0.0
             d: 1.5
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -150,7 +150,7 @@ march8:
           actuationMode: torque
           slaveIndex: 4
           axis: 1
-          motorKV: 355
+          motorKV: 210
           useIncrementalEncoder: false
           #          indexFound: true
           absoluteEncoder:
@@ -168,14 +168,14 @@ march8:
             transmission: 204
             direction: 1
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 30.0
             i: 0.0
             d: 0.4
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -203,14 +203,14 @@ march8:
             transmission: 314
             direction: 1
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 35.0
             i: 0.0
             d: 0.6
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -238,14 +238,14 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 25.0
             i: 0.0
             d: 0.4
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 
@@ -274,14 +274,14 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 50
+            maxTorque: 100.0
         pids:
           position:
             p: 10.0
             i: 0.0
             d: 1.5
           torque:
-            p: 0.0
+            p: 0.1
             i: 0.0
             d: 0.0
 

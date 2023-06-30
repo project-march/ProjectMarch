@@ -124,7 +124,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         // Comment back in after debugging
         if (initial_torque_ > motor_controller_->getTorqueSensor()->getMaxTorque()) {
             throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an initial torque of %d, while initial torque can at most be ", name_.c_str(),
+                "Joint %s has an initial torque of %f, while initial torque can at most be ", name_.c_str(),
                 initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
         }
     }
@@ -176,7 +176,7 @@ void Joint::readEncoders()
             torque_ = motor_controller_->getTorque();
             if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
                 throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                    "Joint %s has a torque of %d, while max torque is %d", name_.c_str(), torque_,
+                    "Joint %s has a torque of %f, while max torque is %f", name_.c_str(), torque_,
                     motor_controller_->getTorqueSensor()->getMaxTorque());
             }
         }

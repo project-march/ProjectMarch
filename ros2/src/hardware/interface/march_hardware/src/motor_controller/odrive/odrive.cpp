@@ -86,13 +86,13 @@ void ODrive::actuateTorque(float target_torque, float fuzzy_weight)
         throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
             "Target torque of %f exceeds effort limit of %f", target_torque, TORQUE_LIMIT);
     }
+    bit32 write_fuzzy {};
+    write_fuzzy.f = fuzzy_weight;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyTorque, axis_), write_fuzzy);
 
     bit32 write_torque {};
     write_torque.f = target_torque;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
-    bit32 write_fuzzy {};
-    write_fuzzy.f = fuzzy_weight;
-    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyTorque, axis_), write_fuzzy);
 }
 
 /*** This method writes the desired position to the ethercat, together with the corresponding fuzzy control weight.
@@ -114,8 +114,8 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 
     bit32 write_position {};
     write_position.f = target_position;
-    // logger_->info(logger_->fstring(
-    //     "Sending position %f to the exo.", target_position));
+    logger_->info(logger_->fstring(
+        "Sending position %f to the exo.", target_position));
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;

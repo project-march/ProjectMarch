@@ -78,7 +78,7 @@ public:
     float getOdriveTemperature();
 
     double getTorqueLimit() const override;
-    static constexpr double TORQUE_LIMIT = 50.0; // TODO: Determine a better value here
+    static constexpr double TORQUE_LIMIT = 100.0; // TODO: Determine a better value here
 
 protected:
     // Override protected functions from MotorController class
