@@ -10,7 +10,7 @@ FuzzyGenerator::FuzzyGenerator()
 {
 
     std::string config_file_path = ament_index_cpp::get_package_share_directory("fuzzy_generator")
-    + PATH_SEPARATOR + "config" + PATH_SEPARATOR + "joints.yaml";
+    + PATH_SEPARATOR + "config" + PATH_SEPARATOR + "test_joints.yaml";
 
     config_ = YAML::LoadFile(config_file_path);
     

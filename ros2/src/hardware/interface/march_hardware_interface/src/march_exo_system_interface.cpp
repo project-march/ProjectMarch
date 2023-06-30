@@ -264,7 +264,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
-            // jointInfo.target_torque = jointInfo.joint.getTorque();
+            jointInfo.target_torque = jointInfo.joint.getTorque();
 
             RCLCPP_INFO((*logger_), "The first read pos value is %f", jointInfo.target_position);
             RCLCPP_INFO((*logger_), "The first set torque value is %f", jointInfo.target_torque);
@@ -501,7 +501,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG
-        RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
+        RCLCPP_INFO((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
 

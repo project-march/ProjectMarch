@@ -156,10 +156,10 @@ struct JointInfo {
                 }
             }
 
-            for(auto j: *joints_info_){
-                std::vector<float> total = measured_torques[j.name];
+            for(march_hardware_interface::JointInfo& jointInfo: *joints_info_){
+                std::vector<float> total = measured_torques[jointInfo.name];
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
-                j.target_torque = avg_torque;
+                jointInfo.target_torque = avg_torque;
             }
         }
 
