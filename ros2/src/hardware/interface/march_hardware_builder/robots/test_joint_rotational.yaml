@@ -27,12 +27,12 @@ testsetup:
             direction: 1
           torqueSensor:
             maxTorque: 20
-            averageTorque: 20
+            averageTorque: 1
         pids:
           position:
-            p: 5.0
+            p: 15.0
             i: 0.0
-            d: 0.1
+            d: 0.2
           torque:
             p: 0.1
             i: 0.0

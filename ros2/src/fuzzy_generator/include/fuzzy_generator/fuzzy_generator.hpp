@@ -24,8 +24,8 @@ class FuzzyGenerator {
 public:
     FuzzyGenerator();
 
-    std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::string leg, float foot_height);
-    std::vector<std::tuple<std::string, float, float>>  getTorqueRanges(std::string leg);
+    std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
+    std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
 
     float getUpperBound();
     float getLowerBound();

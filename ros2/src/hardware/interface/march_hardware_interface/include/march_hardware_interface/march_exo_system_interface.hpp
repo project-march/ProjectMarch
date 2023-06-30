@@ -88,7 +88,7 @@ struct JointInfo {
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
             #ifdef TORQUEDEBUG
-            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: joint : %s position %f, torque %f", msg->joint_name, msg->position_weight, msg->torque_weight);
             // return;
             #endif
             setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);

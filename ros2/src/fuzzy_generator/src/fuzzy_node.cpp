@@ -33,36 +33,48 @@ FuzzyNode::FuzzyNode()
  */
 void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
 
-    float left_foot_height = msg->heights[0];
-    float right_foot_height = msg->heights[1];
+    // float left_foot_height = msg->heights[0];
+    // float right_foot_height = msg->heights[1];
 
-    if(left_foot_height >= m_fuzzy_generator.getLowerBound() && left_foot_height <= m_fuzzy_generator.getUpperBound()){
-        auto weights = m_fuzzy_generator.calculateWeights("left", left_foot_height);
-        for(auto w: weights){
+    auto weights = m_fuzzy_generator.calculateWeights(msg->heights);
+    for(auto w: weights){
 
-            // send the weights for the left leg
-            march_shared_msgs::msg::WeightStamped left_weights;
-            left_weights.joint_name = std::get<0>(w);
-            left_weights.position_weight = std::get<1>(w);
-            left_weights.torque_weight = std::get<2>(w);
-            left_weights.header.frame_id = this->get_name();
-            publish_weights(left_weights);
-        }
+        // send the weights for the left leg
+        march_shared_msgs::msg::WeightStamped fuzzy_weights;
+        fuzzy_weights.joint_name = std::get<0>(w);
+        fuzzy_weights.position_weight = std::get<1>(w);
+        fuzzy_weights.torque_weight = std::get<2>(w);
+        fuzzy_weights.header.frame_id = this->get_name();
+        publish_weights(fuzzy_weights);
     }
 
-    if(right_foot_height >= m_fuzzy_generator.getLowerBound() && right_foot_height <= m_fuzzy_generator.getUpperBound()){
-        auto weights = m_fuzzy_generator.calculateWeights("right", right_foot_height);
-        for(auto w: weights){
+    // if(left_foot_height >= m_fuzzy_generator.getLowerBound() && left_foot_height <= m_fuzzy_generator.getUpperBound()){
+    //     auto weights = m_fuzzy_generator.calculateWeights("left", left_foot_height);
+    //     for(auto w: weights){
 
-            // send the weights for the right leg
-            march_shared_msgs::msg::WeightStamped right_weights;
-            right_weights.joint_name = std::get<0>(w);
-            right_weights.position_weight = std::get<1>(w);
-            right_weights.torque_weight = std::get<2>(w);
-            right_weights.header.frame_id = this->get_name();
-            publish_weights(right_weights);
-        }
-    }
+    //         // send the weights for the left leg
+    //         march_shared_msgs::msg::WeightStamped left_weights;
+    //         left_weights.joint_name = std::get<0>(w);
+    //         left_weights.position_weight = std::get<1>(w);
+    //         left_weights.torque_weight = std::get<2>(w);
+    //         left_weights.header.frame_id = this->get_name();
+    //         publish_weights(left_weights);
+    //     }
+    // }
+
+    // if(right_foot_height >= m_fuzzy_generator.getLowerBound() && right_foot_height <= m_fuzzy_generator.getUpperBound()){
+    //     auto weights = m_fuzzy_generator.calculateWeights("right", right_foot_height);
+    //     for(auto w: weights){
+
+    //         // send the weights for the right leg
+    //         march_shared_msgs::msg::WeightStamped right_weights;
+    //         right_weights.joint_name = std::get<0>(w);
+    //         right_weights.position_weight = std::get<1>(w);
+    //         right_weights.torque_weight = std::get<2>(w);
+    //         right_weights.header.frame_id = this->get_name();
+    //         publish_weights(right_weights);
+    //     }
+    // }
 }
 
 /**

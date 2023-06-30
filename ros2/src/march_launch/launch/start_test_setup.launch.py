@@ -28,6 +28,12 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
     # endregion
+    
+    fuzzy_config_file = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
 
 
     # region Launch input device
@@ -68,6 +74,9 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             executable='fuzzy_node',
             name='fuzzy_node',
+            # parameters=[
+            #     {"config_file_path", fuzzy_config_file}
+            # ]
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
         rqt_input_device,
