@@ -84,7 +84,9 @@ void Joint::actuate(float target_position, float target_torque, float position_w
             "Total weight exceeds value of one. With fuzzy position: %f and fuzzy torque: %f: ", position_weight,
                                        torque_weight);
     }
-    motor_controller_->actuateTorque(target_torque, torque_weight);
+    float whatever = target_torque;
+    whatever++;
+    // motor_controller_->actuateTorque(target_torque, torque_weight);
     motor_controller_->actuateRadians(target_position, position_weight);
 }
 

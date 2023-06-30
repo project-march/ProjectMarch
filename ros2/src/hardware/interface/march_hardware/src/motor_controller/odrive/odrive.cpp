@@ -271,7 +271,8 @@ float ODrive::getIncrementalVelocityUnchecked()
 
 float ODrive::getTorqueUnchecked()
 {
-    float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
+    // float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
+    float measured_torque = 1.5f;
     return measured_torque;
 }
 
