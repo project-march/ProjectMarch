@@ -12,6 +12,7 @@
 #include <rclcpp/logger.hpp>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "hardware_interface/base_interface.hpp"
 #include "hardware_interface/handle.hpp"
@@ -28,6 +29,9 @@
 #include <rclcpp/clock.hpp>
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/int32.hpp>
+
+
 
 #define TORQUEDEBUG
 
@@ -75,6 +79,9 @@ struct JointInfo {
 
             m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
                     "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
+
+            m_measure_torque_subscription = this->create_subscription<std_msgs::msg::Int32>(
+                    "/march/measure_torque", 10, std::bind(&WeightNode::measure_torque_callback, this, _1));
 
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
@@ -132,12 +139,36 @@ struct JointInfo {
             }
         }
 
+        void measure_torque_callback(std_msgs::msg::Int32::SharedPtr msg){
+
+            std::map<std::string, std::vector<float>> measured_torques;
+            for(auto j: *joints_info_){
+                measured_torques[j.name] = std::vector<float>();
+            }
+            auto now = std::chrono::steady_clock::now;
+            auto work_duration = std::chrono::seconds{msg->data};
+            auto start = now();
+            while ( (now() - start) < work_duration)
+            {
+                for(auto j: *joints_info_){
+                    measured_torques[j.name].push_back(j.torque);
+                }
+            }
+
+            for(auto j: *joints_info_){
+                std::vector<float> total = measured_torques[j.name];
+                float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
+                j.target_torque = avg_torque;
+            }
+        }
+
         std::vector<JointInfo>* joints_info_;
         std::optional<float> delta;
 
     private:
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
         rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
+        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
     };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
