@@ -28,6 +28,8 @@
 #include <rclcpp/clock.hpp>
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include <std_msgs/msg/float32.hpp>
+#include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
 #define TORQUEDEBUG
 
@@ -76,6 +78,9 @@ struct JointInfo {
             m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
                     "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
 
+            m_measured_torque_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+                    "/measured_torque", 10);
+
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
 
@@ -105,6 +110,28 @@ struct JointInfo {
         {
             delta = msg->data;
         }
+
+        /**
+         * This is a temporary method: it is used for logging measured torque
+         *
+         * @return
+         */
+        void publish_measured_torque()
+        {
+            trajectory_msgs::msg::JointTrajectory torque_points = trajectory_msgs::msg::JointTrajectory();
+
+            trajectory_msgs::msg::JointTrajectoryPoint point;
+            for(march_hardware_interface::JointInfo& jointInfo : *joints_info_){
+                torque_points.joint_names.push_back(jointInfo.name);
+                point.effort.push_back(jointInfo.torque);
+            }
+
+            torque_points.points.push_back(point);
+
+            m_measured_torque_publisher->publish(torque_points);
+
+        }
+
 
         /**
          * Applies torque and position weights to all JointInfo objects in the hardware interface
@@ -146,6 +173,7 @@ struct JointInfo {
     private:
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
         rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
+        rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_measured_torque_publisher;
     };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {

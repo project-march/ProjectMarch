@@ -446,7 +446,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
-        // jointInfo.torque = jointInfo.joint.getTorque();
+        jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
 
@@ -504,24 +504,27 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
+        // publish the measured torque each iteration
+        weight_node->publish_measured_torque();
+
         // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG
 
         // function used for only the direct torque method
-        if(weight_node->delta.has_value()){
-            if(weight_node->delta.value() > 0.00){
-                float c = cos(jointInfo.position*0.75);
-                RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
+        // if(weight_node->delta.has_value()){
+        //     if(weight_node->delta.value() > 0.00){
+        //         float c = cos(jointInfo.position*0.75);
+        //         RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
 
-                float t = jointInfo.torque + (weight_node->delta.value() * c);
-                jointInfo.target_torque = t;
-            }
-            else{
-                jointInfo.target_torque = jointInfo.torque;
-                weight_node->delta.reset();
-            }
+        //         float t = jointInfo.torque + (weight_node->delta.value() * c);
+        //         jointInfo.target_torque = t;
+        //     }
+        //     else{
+        //         jointInfo.target_torque = jointInfo.torque;
+        //         weight_node->delta.reset();
+        //     }
 
-        }
+        // }
 
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
