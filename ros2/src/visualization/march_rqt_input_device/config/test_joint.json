@@ -12,12 +12,6 @@
          "gait_type": 1
       },
       {
-         "name": "test_joint_gait",
-         "control_type": "torque",
-         "gait_type": 1,
-         "always_enabled": true
-      },
-      {
          "name": "direct-torque",
          "callback": "publish_direct_torque",
          "control_type": "torque",
@@ -33,6 +27,12 @@
          "name": "switch_to_position",
          "callback": "switch_to_position",
          "control_type": "position",
+         "always_enabled": true
+      },
+      {
+         "name": "switch_to_fuzzy",
+         "callback": "switch_to_fuzzy",
+         "control_type": "fuzzy",
          "always_enabled": true
       },
       {

@@ -2,33 +2,40 @@
   [
     {
       "name": "home_sit",
-      "gait_type": 0
+      "gait_type": 0,
+      "control_type": "position"
     },
     {
       "name": "home_stand",
-      "gait_type": 1
+      "gait_type": 1,
+      "control_type": "position"
     },
     {
       "name": "stand",
-      "gait_type": 1
+      "gait_type": 1,
+      "control_type": "position"
     },
     {
       "name": "sit",
-      "gait_type": 0
+      "gait_type": 0,
+      "control_type": "position"
     }
   ],
   [
     {
       "name": "walk",
-      "gait_type": 2
+      "gait_type": 2,
+      "control_type": "position"
     },
     {
       "name": "step_and_close",
-      "gait_type": 3
+      "gait_type": 3,
+      "control_type": "position"
     },
     {
       "name": "stop",
-      "gait_type": 1
+      "gait_type": 1,
+      "control_type": "position"
     }
   ],
   [

@@ -226,6 +226,12 @@ class InputDeviceController:
         
         self._node.get_logger().info("Publishing control type position")
         self._set_gait_control_type.publish(String(data="position"))
+        
+    def switch_to_fuzzy(self) -> None:
+        """switches to fuzzy control"""
+        
+        self._node.get_logger().info("Publishing control type fuzzy")
+        self._set_gait_control_type.publish(String(data="fuzzy"))
 
 
     def publish_control_type(self, control_type) -> None:
