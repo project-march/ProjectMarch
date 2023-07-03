@@ -46,7 +46,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             ),
             DeclareLaunchArgument(
                 name="layout",
-                default_value="test_joint",
+                default_value="training",
                 description="Layout .json file to use. Must be in the config directory.",
             ),
             Node(
@@ -59,7 +59,6 @@ def generate_launch_description() -> launch.LaunchDescription:
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"ping_safety_node": LaunchConfiguration("ping_safety_node")},
                     {"layout_file": layout_file},
-                    {"testing": "false"},
                 ],
             ),
         ]

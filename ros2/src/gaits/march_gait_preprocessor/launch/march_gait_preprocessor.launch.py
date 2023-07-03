@@ -10,7 +10,7 @@ from march_utility.utilities.utility_functions import (
 # Get lengths from urdf:
 lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
 LENGTH_HIP_AA, LENGTH_HIP_BASE = lengths[2], lengths[-1]
-DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
+DEFAULT_FEET_DISTANCE = 0.16 # LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():

@@ -34,18 +34,26 @@ class InputDeviceView(QWidget):
     def __init__(self, ui_file: str, layout_file: str, controller: InputDeviceController, logger):
         super(InputDeviceView, self).__init__()
         self._controller = controller
+        self._controller.accepted_cb = self._accepted_cb
+        self._controller.finished_cb = self._finished_cb
+        self._controller.rejected_cb = self._rejected_cb
+        self._controller.current_gait_cb = self._current_gait_cb
+        self.possible_gaits_future = None
 
-        self._eeg_alive_subscriber = self._controller._node.create_subscription(
+        self._controller._node.create_subscription(
             msg_type=Bool,
-            topic="/eeg_alive",
-            callback=self._eeg_alive_callback,
-            qos_profile=10,
+            topic="/march/eeg/on_off",
+            callback=self._eeg_cb,
+            qos_profile=1,
         )
 
         self._always_enabled_buttons = []
 
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
+
+        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
+
         self.logger = logger
         self._layout_file = layout_file if layout_file != "" else DEFAULT_LAYOUT_FILE
         self._image_names = [
@@ -54,57 +62,6 @@ class InputDeviceView(QWidget):
         ]
         self._create_buttons()
         self._update_possible_gaits()
-
-    def _eeg_alive_callback(self, msg: Bool) -> None:
-        """Update the possible gaits when eeg is turned on or off."""
-        self._controller.eeg = msg.data
-        if msg.data:
-            self._controller.get_node().get_logger().info("EEG is alive.")
-        else:
-            self._controller.get_node().get_logger().warn("EEG disconnected.")
-        self._update_possible_gaits()
-
-    def publish_gait(self, gait_type: int, control_type):
-        """Publish gait to state_machine."""
-        self._controller.publish_gait(gait_type, control_type)
-        self._update_possible_gaits()
-
-    def _update_possible_gaits(self) -> None:
-        """Updates the gaits based on the possible gaits according to the controller.
-
-        First requests the controller to update the possible, then creates a timer to update the view if the possible
-        gaits changed.
-        """
-        self.possible_gaits = self._controller.update_possible_gaits()
-        self._controller.get_node().get_logger().debug("possible gaits: " + str(self.possible_gaits))
-        self._update_gait_buttons(self.possible_gaits)
-
-    def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
-        """Update which buttons are available to the given possible gaits list.
-
-        Args:
-            possible_gaits (List[str]): List of gaits names that can be executed.
-        """
-        self.frame.setEnabled(False)
-        self.frame.verticalScrollBar().setEnabled(False)
-        self.possible_gaits = possible_gaits
-
-        layout = self.content.layout()
-        if layout:
-            for i in range(layout.count()):
-                button = layout.itemAt(i).widget()
-                name = button.objectName()
-                if len(possible_gaits) == 0:
-                    button.setEnabled(False)
-                    continue
-                if name in self._always_enabled_buttons:
-                    continue
-                if name in self.possible_gaits:
-                    button.setEnabled(True)
-                else:
-                    button.setEnabled(False)
-        self.frame.setEnabled(True)
-        self.frame.verticalScrollBar().setEnabled(True)
 
     def _create_buttons(self) -> None:
         """Creates all the buttons, new buttons should be added here."""
@@ -123,32 +80,99 @@ class InputDeviceView(QWidget):
         qt_layout.setSpacing(10)
         self.content.adjustSize()
 
+    def _accepted_cb(self) -> None:
+        """Show the GaitInstructionResponse and update possible gaits."""
+        self.status_label.setText("Gait accepted")
+        self._update_possible_gaits()
+
+    def _finished_cb(self) -> None:
+        """Show the GaitInstructionResponse and update possible gaits."""
+        self.status_label.setText("Gait finished")
+        self.gait_label.setText("")
+        self._update_possible_gaits()
+
+    def _rejected_cb(self) -> None:
+        """Show the GaitInstructionResponse and update possible gaits."""
+        self.status_label.setText("Gait rejected")
+        self.gait_label.setText("")
+        self._update_possible_gaits()
+
+    def _current_gait_cb(self, gait_name: str) -> None:
+        """Show the current gait and update possible gaits."""
+        self.gait_label.setText(gait_name)
+
+    def _eeg_cb(self, data) -> None:
+        """Update the possible gaits when eeg is turned on or off."""
+        self._update_possible_gaits()
+
+    def _update_possible_gaits(self) -> None:
+        """Updates the gaits based on the possible gaits according to the controller.
+
+        First requests the controller to update the possible, then creates a timer to update the view if the possible
+        gaits changed.
+        """
+        self._controller.update_possible_gaits()
+        self.possible_gaits = []
+        self._update_gait_buttons([])
+        self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
+
+    def _update_possible_gaits_view(self, future) -> None:
+        """Update the buttons if the possible gaits have changed."""
+        new_possible_gaits = future.result().gaits
+        if set(self.possible_gaits) != set(new_possible_gaits):
+            self._update_gait_buttons(new_possible_gaits)
+
+    def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
+        """Update which buttons are available to the given possible gaits list.
+
+        Args:
+            possible_gaits (List[str]): List of gaits names that can be executed.
+        """
+        self.frame.setEnabled(False)
+        self.frame.verticalScrollBar().setEnabled(False)
+        self.possible_gaits = possible_gaits
+
+        layout = self.content.layout()
+        if layout:
+            for i in range(layout.count()):
+                button = layout.itemAt(i).widget()
+                name = button.objectName()
+                if name in self._always_enabled_buttons:
+                    continue
+                if name in self.possible_gaits:
+                    button.setEnabled(True)
+                else:
+                    button.setEnabled(False)
+        self.frame.setEnabled(True)
+        self.frame.verticalScrollBar().setEnabled(True)
+
     def create_button(
         self,
         name: str,
-        gait_type: Optional[int] = None,
         callback: Optional[Union[str, Callable]] = None,
-        control_type: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
     ):
         """Create a push button which can be pressed to execute a gait instruction.
 
-        :param name: name of button;
-        :param gait_type: int of gait type started by the button;
-        :param control_type (str, Optional): the name of the control type. Options are "fuzzy", "position", "torque". Default is None
-        :param callback: callback linked to the button;
-        :param image_path: path to the button image;
-        :param size: size of the button;
-        :param always_enabled: if the button should always be visible.
-        :return:
+        Args:
+            name (str): Name of the button.
+            callback (Union[str, Callable], Optional): The callback to attach to the button when pressed.
+            image_path (str, Optional): The name of the image file. Default is `None`.
+            size ((int,int)): Size of the button in pixels in format (width, height). Default is (w=125px, h=140px).
+            always_enabled (bool): Whether the button can be disabled. Default is False.
+                `True` if the button should never be disabled
+                `False` if the button should be disabled if it's not in possible gaits.
+
+        Returns:
+            QPushButton. The QPushButton contains the passed arguments and the same style.
         """
         qt_button = QToolButton()
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        qt_button.setStyleSheet("QToolButton {background-color: white; font-size: 13px; font: 'Montserat'}")
+        qt_button.setStyleSheet("QToolButton {background-color: lightgrey; font-size: 13px; font: 'Times New Roman'}")
         qt_button.setIconSize(QSize(90, 90))
-        qt_button.setText(check_string(name) + "\n" + check_string(control_type))
+        qt_button.setText(check_string(name))
         if image_path is not None:
             qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
@@ -168,7 +192,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            qt_button.clicked.connect(lambda: self.publish_gait(gait_type, control_type))
+            qt_button.clicked.connect(lambda: self._controller.publish_gait(name))
 
         return qt_button
 
@@ -219,8 +243,6 @@ def check_string(text: str) -> str:
     Returns:
          str. The string that has a new word on every third word.
     """
-    if(text == None):
-        return ""
     words = text.replace("_", " ").split(" ")
     new_string = words[0]
     characters_since_line_break = len(new_string)
