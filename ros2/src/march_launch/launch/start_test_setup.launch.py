@@ -56,10 +56,15 @@ def generate_launch_description() -> LaunchDescription:
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
         condition=IfCondition(rosbags),
     )
-    # endregion
+    
+    fuzzy_config_file = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
 
 
-    # region Launch torque converter
+    # region Launch input device
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -97,6 +102,9 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             executable='fuzzy_node',
             name='fuzzy_node',
+            # parameters=[
+            #     {"config_file_path", fuzzy_config_file}
+            # ]
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
         rqt_input_device,

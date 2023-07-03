@@ -114,8 +114,8 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 
     bit32 write_position {};
     write_position.f = target_position;
-    logger_->info(logger_->fstring(
-        "Sending position %f to the exo.", target_position));
+    // logger_->info(logger_->fstring(
+    //     "Sending position %f to the exo.", target_position));
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;

@@ -12,7 +12,7 @@
 namespace march {
 class TorqueSensor {
 public:
-    TorqueSensor(MotorControllerType motor_controller_type_, float max_torque_);
+    TorqueSensor(MotorControllerType motor_controller_type_, float max_torque_, float average_torque_);
 
     ~TorqueSensor() noexcept = default;
 
@@ -20,11 +20,12 @@ public:
 
     MotorControllerType getMotorControllerType() const;
     float getMaxTorque() const;
+    float getAverageTorque() const;
 
     /** @brief Override comparison operator */
     friend bool operator==(const TorqueSensor& lhs, const TorqueSensor& rhs)
     {
-        return lhs.getMotorControllerType() == rhs.getMotorControllerType() && lhs.max_torque_ == rhs.max_torque_;
+        return lhs.getMotorControllerType() == rhs.getMotorControllerType() && lhs.max_torque_ == rhs.max_torque_ && lhs.average_torque_ == rhs.average_torque_;
     }
     /** @brief Override stream operator for clean printing */
     friend std::ostream& operator<<(std::ostream& os, const TorqueSensor& torque_sensor)
@@ -39,6 +40,7 @@ private:
 
     // Max torque that the may outputted at any time, if outputted torque is higher a warning/ error occurs
     const float max_torque_;
+    const float average_torque_;
 };
 } // namespace march
 

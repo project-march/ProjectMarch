@@ -164,6 +164,12 @@ def generate_launch_description() -> LaunchDescription:
             name='bezier_visualization',
         ),
         Node(
+            package='footstep_generator',
+            namespace='',
+            executable='footstep_generator_node',
+            name='footstep_generator'
+        ),
+        Node(
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',

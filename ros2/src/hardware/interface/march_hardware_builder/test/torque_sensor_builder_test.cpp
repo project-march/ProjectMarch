@@ -41,7 +41,7 @@ TEST_F(TorqueSensorBuilderTest, ValidTorqueSensor)
     YAML::Node config = this->loadTestYaml("/torque_sensor.yaml");
     std::cout << this->base_path << std::endl;
     march::TorqueSensor expected = march::TorqueSensor(motor_controller_type,
-        /*max_torque=*/10);
+        /*max_torque=*/10, /*average_torque*/10);
     auto created = HardwareBuilder::createTorqueSensor(config, motor_controller_type);
     ASSERT_EQ(expected, *created);
 }

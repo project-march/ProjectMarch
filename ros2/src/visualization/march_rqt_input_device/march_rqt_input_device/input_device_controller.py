@@ -6,7 +6,7 @@ import time
 from std_msgs.msg import Header, Bool, Int32
 from march_shared_msgs.msg import Alive, Error, GaitRequest, GaitResponse
 from rclpy import Future
-from std_msgs.msg import Header, String, Bool, Float32
+from std_msgs.msg import Header, String, Bool, Float32, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse, GaitRequest, GaitResponse
 from march_shared_msgs.srv import PossibleGaits
@@ -81,6 +81,11 @@ class InputDeviceController:
             msg_type=GaitResponse,
             topic="/march/gait_response",
             callback=self._gait_response_callback,
+            qos_profile=10,
+        )
+        self.measure_torque_pub = self._node.create_publisher(
+            msg_type=Int32,
+            topic="measure_torque",
             qos_profile=10,
         )
         self.direct_torque_pub = self._node.create_publisher(
@@ -189,6 +194,17 @@ class InputDeviceController:
     def node(self):
         """Define the node."""
         return self._node
+    
+    def measure_torque(self) -> None:
+        """measure the torque values coming in for a few seconds"""
+        seconds = 3
+        self._node.get_logger().info("Measuring torque for " + str(seconds) + " seconds")
+        self.measure_torque_pub.publish(
+            Int32(
+                data = seconds
+            )
+        )
+
 
     def publish_direct_torque(self) -> None:
         """Publish a message on `direct_torque` to publish the torque."""

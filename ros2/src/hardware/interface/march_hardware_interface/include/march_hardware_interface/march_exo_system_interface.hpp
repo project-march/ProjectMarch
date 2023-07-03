@@ -12,6 +12,7 @@
 #include <rclcpp/logger.hpp>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "hardware_interface/base_interface.hpp"
 #include "hardware_interface/handle.hpp"
@@ -28,6 +29,7 @@
 #include <rclcpp/clock.hpp>
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/int32.hpp>
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
@@ -94,11 +96,10 @@ struct JointInfo {
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
             #ifdef TORQUEDEBUG
-            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: joint : %s position %f, torque %f", msg->joint_name, msg->position_weight, msg->torque_weight);
             // return;
             #endif
-            // RCLCPP_INFO(this->get_logger(), "Ignoring calculated weight: position %f, torque %f", msg->position_weight, msg->torque_weight);
-            setJointsWeight(msg->leg, msg->position_weight, msg->torque_weight);
+            setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
         /**
@@ -147,29 +148,46 @@ struct JointInfo {
          * @param torque_weight A float between 0 and 1 to apply to joints
          * @return
          */
-        void setJointsWeight(std::string leg, float position_weight, float torque_weight){
+        void setJointWeight(std::string joint_name, float position_weight, float torque_weight){
 
-            // check the leg choice
-            if(leg != "l" and leg != "r"){
-                RCLCPP_WARN(this->get_logger(), "Invalid character provided in weight message: %c! Provide either 'l' or 'r'.", leg);
-            }
-            RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of" << leg);
+            RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
 
+            bool found_joint = false;
             for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
-                if(leg == "l" and jointInfo.name.find("left") != std::string::npos){
+                if(joint_name == "" || jointInfo.name == joint_name){
                     jointInfo.torque_weight = torque_weight;
                     jointInfo.position_weight = position_weight;
+                    found_joint = true;
+                    break;
                 }
-                else if(leg == "r" and jointInfo.name.find("right") != std::string::npos){
-                    jointInfo.torque_weight = torque_weight;
-                    jointInfo.position_weight = position_weight;
+            }
+            if(!found_joint){
+                RCLCPP_INFO_STREAM(this->get_logger(), "we have not found joint " << joint_name);
+            }
+        }
+
+        void measure_torque_callback(std_msgs::msg::Int32::SharedPtr msg){
+
+            std::map<std::string, std::vector<float>> measured_torques;
+            for(auto j: *joints_info_){
+                measured_torques[j.name] = std::vector<float>();
+            }
+            auto now = std::chrono::steady_clock::now;
+            auto work_duration = std::chrono::seconds{msg->data};
+            auto start = now();
+            // RCLCPP_INFO_STREAM(this->get_logger(), "start: " <<  std::chrono::system_clock::to_time_t(start) << " duration: " << work_duration);
+            while ( (now() - start) < work_duration)
+            {
+                for(auto j: *joints_info_){
+                    measured_torques[j.name].push_back(j.torque);
                 }
-                else{
-                    RCLCPP_WARN(this->get_logger(), "Joint %s seems to be part of neither the right nor the left leg... We are likely using the TSU", jointInfo.name);
-                    jointInfo.torque_weight = torque_weight;
-                    jointInfo.position_weight = position_weight;
-                }
+            }
+
+            for(march_hardware_interface::JointInfo& jointInfo: *joints_info_){
+                std::vector<float> total = measured_torques[jointInfo.name];
+                float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
+                jointInfo.target_torque = avg_torque;
             }
         }
 

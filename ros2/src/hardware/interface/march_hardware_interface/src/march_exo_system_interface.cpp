@@ -140,7 +140,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
+        /*target_torque=*/march_robot_->getJoint(joint.name.c_str()).getMotorController()->getTorqueSensor()->getAverageTorque(),
             /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
@@ -273,7 +273,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.target_torque = jointInfo.joint.getTorque();
 
             RCLCPP_INFO((*logger_), "The first read pos value is %f", jointInfo.target_position);
-            RCLCPP_INFO((*logger_), "The first read torque value is %f", jointInfo.target_torque);
+            RCLCPP_INFO((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
             // if no weight has been assigned, we start in position control
             if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight) ){
@@ -413,7 +413,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
     }
     joints_ready_for_actuation_ = false;
@@ -449,7 +449,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
 
-        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
     }
     return hardware_interface::return_type::OK;
 }
@@ -505,27 +505,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // publish the measured torque each iteration
         weight_node->publish_measured_torque();
-
+        
         // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG
-
-        // function used for only the direct torque method
-        // if(weight_node->delta.has_value()){
-        //     if(weight_node->delta.value() > 0.00){
-        //         float c = cos(jointInfo.position*0.75);
-        //         RCLCPP_INFO((*logger_), "Measured torque: %f \n Delta: %f \n  C: %f \n", jointInfo.torque, weight_node->delta.value(), c);
-
-        //         float t = jointInfo.torque + (weight_node->delta.value() * c);
-        //         jointInfo.target_torque = t;
-        //     }
-        //     else{
-        //         jointInfo.target_torque = jointInfo.torque;
-        //         weight_node->delta.reset();
-        //     }
-
-        // }
-
-        RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
+        RCLCPP_INFO((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
 

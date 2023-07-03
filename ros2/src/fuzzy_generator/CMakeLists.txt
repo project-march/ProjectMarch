@@ -20,6 +20,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+
+find_package(PkgConfig)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -38,10 +42,12 @@ ament_target_dependencies(
         "rclcpp"
         "march_shared_msgs"
         "geometry_msgs"
+        ament_index_cpp
 )
 
 add_executable(fuzzy_node src/fuzzy_node.cpp src/fuzzy_generator.cpp include/${PROJECT_NAME}/fuzzy_generator.hpp
         include/${PROJECT_NAME}/fuzzy_node.hpp)
+target_link_libraries(fuzzy_node ${YAMLCPP_LIBRARIES})
 target_include_directories(fuzzy_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
@@ -51,7 +57,12 @@ ament_target_dependencies(
         "rclcpp"
         "march_shared_msgs"
         "geometry_msgs"
+        ament_index_cpp
 )
+
+install(DIRECTORY config
+        DESTINATION share/${PROJECT_NAME}
+        )
 
 install(TARGETS fuzzy_node
         EXPORT export_${PROJECT_NAME}
@@ -61,6 +72,10 @@ install(DIRECTORY
         launch
         DESTINATION share/${PROJECT_NAME}/
         )
+
+# find_package(yaml-cpp REQUIRED)
+# include_directories(${YAML_INCLUDE_DIRS})
+# target_link_libraries(${YAML_CPP_LIBRARIES})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
