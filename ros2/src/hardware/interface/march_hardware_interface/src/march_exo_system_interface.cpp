@@ -414,7 +414,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
     }
     joints_ready_for_actuation_ = false;
@@ -450,7 +450,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
 
-        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
     }
     return hardware_interface::return_type::OK;
 }

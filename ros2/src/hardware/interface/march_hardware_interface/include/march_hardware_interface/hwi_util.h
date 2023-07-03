@@ -135,7 +135,7 @@ inline string joint_vector_to_string(std::vector<march::Joint*>& joints)
 inline void repeat_function_on_joints_until_timeout(const string& function_goal,
     const function<bool(march::Joint&)>& function, const rclcpp::Logger& logger, std::vector<march::Joint*>& joints,
     const optional<std::function<void(march::Joint&)>>& function_when_timeout = nullopt,
-    const chrono::nanoseconds sleep_between_tries = std::chrono::seconds(1), const unsigned maximum_tries = 5)
+    const chrono::nanoseconds sleep_between_tries = std::chrono::seconds(2), const unsigned maximum_tries = 10)
 {
     // RCLCPP_INFO((logger), "repeat_function_on_joints_until_timeout");
     vector<bool> is_ok;

@@ -19,9 +19,9 @@ march8:
             minPositionIU: 4669  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 6474 # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 6019
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             resolution: 13
@@ -66,9 +66,9 @@ march8:
             maxTorque: 100.0
         pids:
           position:
-            p: 35.0
+            p: 10.0 #35.0
             i: 0.0
-            d: 0.6
+            d: 0.2 #0.6
           torque:
             p: 0.1
             i: 0.0
@@ -159,9 +159,9 @@ march8:
             minPositionIU: 1126  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 2915  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 2460 #9205
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             resolution: 13
@@ -206,9 +206,9 @@ march8:
             maxTorque: 100.0
         pids:
           position:
-            p: 35.0
+            p: 10.0 #35.0
             i: 0.0
-            d: 0.6
+            d: 0.2 #0.6
           torque:
             p: 0.1
             i: 0.0
