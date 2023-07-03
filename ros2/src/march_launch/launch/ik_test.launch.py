@@ -80,7 +80,7 @@ def generate_launch_description() -> LaunchDescription:
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
-        'hennie_v0.urdf'
+        'hennie_with_koen.urdf'
     )
 
     # declare parameters
