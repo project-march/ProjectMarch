@@ -534,11 +534,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         #endif
         if(jointInfo.name.compare("left_hip_aa") == 0){
             // RCLCPP_INFO((*logger_), "left hip aa measured torque: %f", jointInfo.torque);
-            jointInfo.joint.actuate((float)jointInfo.target_position, -0.003f, 0.7f, 0.3f);
+            jointInfo.joint.actuate((float)jointInfo.target_position, -0.003f, 0.6f, 0.4f);
         }
         else if(jointInfo.name.compare("right_hip_aa") == 0){
             // RCLCPP_INFO((*logger_), "right hip aa measured torque: %f", jointInfo.torque);
-            jointInfo.joint.actuate((float)jointInfo.target_position, -0.07f, 0.7f, 0.3f);
+            jointInfo.joint.actuate((float)jointInfo.target_position, -0.07f, 0.6f, 0.4f);
         }
         else{
             // ACTUAL TORQUE LINE
