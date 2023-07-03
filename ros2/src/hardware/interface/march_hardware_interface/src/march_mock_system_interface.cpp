@@ -93,8 +93,8 @@ std::vector<hardware_interface::StateInterface> MarchMockSystemInterface::export
             info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_state_info_[i].hw_position));
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_state_info_[i].hw_velocity));
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_state_info_[i].hw_effort));
+        // state_interfaces.emplace_back(hardware_interface::StateInterface(
+        //     info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_state_info_[i].hw_effort));
 
         //      [TO DO] For now only a position state interface is created, later when more control types are added,
         //      this should be expanded.
