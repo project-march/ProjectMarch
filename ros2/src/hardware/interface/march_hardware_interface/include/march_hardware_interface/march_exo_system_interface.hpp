@@ -84,6 +84,9 @@ struct JointInfo {
             m_measured_torque_publisher = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
                     "/measured_torque", 10);
 
+            m_measure_torque_subscription = this->create_subscription<std_msgs::msg::Int32>(
+                    "/march/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
+
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
 
@@ -99,7 +102,7 @@ struct JointInfo {
             RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: joint : %s position %f, torque %f", msg->joint_name, msg->position_weight, msg->torque_weight);
             // return;
             #endif
-            setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
+            // setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
         /**
@@ -167,7 +170,7 @@ struct JointInfo {
             }
         }
 
-        void measure_torque_callback(std_msgs::msg::Int32::SharedPtr msg){
+        void average_torque_callback(std_msgs::msg::Int32::SharedPtr msg){
 
             std::map<std::string, std::vector<float>> measured_torques;
             for(auto j: *joints_info_){
@@ -198,6 +201,7 @@ struct JointInfo {
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
         rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
         rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
+        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
     };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {

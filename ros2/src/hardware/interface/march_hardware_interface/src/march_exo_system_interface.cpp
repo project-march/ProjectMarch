@@ -140,7 +140,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*target_position=*/std::numeric_limits<double>::quiet_NaN(),
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*target_torque=*/march_robot_->getJoint(joint.name.c_str()).getMotorController()->getTorqueSensor()->getAverageTorque(),
+        /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
             /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
