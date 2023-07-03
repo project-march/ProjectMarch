@@ -191,6 +191,7 @@ struct JointInfo {
                 std::vector<float> total = measured_torques[jointInfo.name];
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
                 jointInfo.target_torque = avg_torque;
+                // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
         }
 

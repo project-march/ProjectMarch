@@ -505,6 +505,9 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // publish the measured torque each iteration
         weight_node->publish_measured_torque();
+
+        // either this or setting the target torque to the real-time measured torque in the weight node
+        jointInfo.target_torque = jointInfo.joint.getMotorController()->getTorqueSensor()->getAverageTorque();
         
         // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG

@@ -29,6 +29,7 @@ march8:
             direction: 1
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 30.0
@@ -64,6 +65,7 @@ march8:
             direction: 1
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 35.0
@@ -99,6 +101,7 @@ march8:
             transmission: 121
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 25.0
@@ -134,6 +137,7 @@ march8:
             transmission: 121
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 20.0
@@ -169,6 +173,7 @@ march8:
             direction: 1
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 30.0
@@ -204,6 +209,7 @@ march8:
             direction: 1
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 35.0
@@ -239,6 +245,7 @@ march8:
             transmission: 121
           torqueSensor:
             maxTorque: 100.0
+            averageTorque: 10
         pids:
           position:
             p: 25.0
@@ -275,6 +282,7 @@ march8:
             transmission: 121
           torqueSensor:
             maxTorque: 100.0
+            averageTorque:10.0
         pids:
           position:
             p: 10.0
