@@ -498,14 +498,17 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
+
+    // publish the measured torque each iteration
+    weight_node->publish_measured_torque();
+
     for (JointInfo& jointInfo : joints_info_) {
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
         }
 
-        // publish the measured torque each iteration
-        weight_node->publish_measured_torque();
+
 
         // TORQUEDEBUG LINE
         #ifdef TORQUEDEBUG
@@ -529,9 +532,15 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
-        if(jointInfo.name.find("hip_aa") != std::string::npos){
-            jointInfo.joint.actuate((float)jointInfo.target_position, 2.0f, 0.5f, 0.5f);
-        } else{
+        if(jointInfo.name.find("left_hip_aa") != std::string::npos){
+            RCLCPP_INFO_ONCE((*logger_), "setting left hip aa seperately");
+            jointInfo.joint.actuate((float)jointInfo.target_position, 0.000507f, 0.9f, 0.1f);
+        }
+        else if(jointInfo.name.find("right_hip_aa") != std::string::npos){
+            RCLCPP_INFO_ONCE((*logger_), "setting right hip aa seperately");
+            jointInfo.joint.actuate((float)jointInfo.target_position, -0.0386f, 0.9f, 0.1f);
+        }
+        else{
             // ACTUAL TORQUE LINE
             jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
         }
