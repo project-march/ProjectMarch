@@ -532,12 +532,12 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
-        if(jointInfo.name.find("left_hip_aa") != std::string::npos){
-            RCLCPP_INFO_ONCE((*logger_), "left hip aa measured torque: %f", jointInfo.torque);
+        if(jointInfo.name.compare("left_hip_aa") == 0){
+            RCLCPP_INFO((*logger_), "left hip aa measured torque: %f", jointInfo.torque);
             // jointInfo.joint.actuate((float)jointInfo.target_position, 0.000507f, 0.9f, 0.1f);
         }
-        else if(jointInfo.name.find("right_hip_aa") != std::string::npos){
-            RCLCPP_INFO_ONCE((*logger_), "right hip aa measured torque: %f", jointInfo.torque);
+        else if(jointInfo.name.compare("right_hip_aa") == 0){
+            RCLCPP_INFO((*logger_), "right hip aa measured torque: %f", jointInfo.torque);
             // jointInfo.joint.actuate((float)jointInfo.target_position, -0.0386f, 0.9f, 0.1f);
         }
         // else{
