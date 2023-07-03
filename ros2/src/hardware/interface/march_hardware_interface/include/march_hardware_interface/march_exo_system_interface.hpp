@@ -28,6 +28,8 @@
 #include <rclcpp/clock.hpp>
 #include "march_shared_msgs/msg/weight_stamped.hpp"
 #include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
@@ -78,7 +80,7 @@ struct JointInfo {
             m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
                     "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
 
-            m_measured_torque_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+            m_measured_torque_publisher = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
                     "/measured_torque", 10);
 
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
@@ -93,7 +95,7 @@ struct JointInfo {
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
             #ifdef TORQUEDEBUG
-            // RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: position %f, torque %f", msg->position_weight, msg->torque_weight);
+            // RCLCPP_INFO(this->get_logger(), "Weights are in from fuzzy node: joint : %s position %f, torque %f", msg->joint_name, msg->position_weight, msg->torque_weight);
             // return;
             #endif
             // RCLCPP_INFO(this->get_logger(), "Ignoring calculated weight: position %f, torque %f", msg->position_weight, msg->torque_weight);
@@ -118,15 +120,20 @@ struct JointInfo {
          */
         void publish_measured_torque()
         {
-            trajectory_msgs::msg::JointTrajectory torque_points = trajectory_msgs::msg::JointTrajectory();
+            control_msgs::msg::JointTrajectoryControllerState torque_points;
 
             trajectory_msgs::msg::JointTrajectoryPoint point;
             for(march_hardware_interface::JointInfo& jointInfo : *joints_info_){
+                // RCLCPP_INFO(this->get_logger(), "Publishing the measured torque: %f", jointInfo.torque); 
                 torque_points.joint_names.push_back(jointInfo.name);
                 point.effort.push_back(jointInfo.torque);
             }
 
-            torque_points.points.push_back(point);
+            point.time_from_start.sec = 0;
+            point.time_from_start.nanosec = 8 * 1e6;
+            // torque_points.points.push_back(point);
+            torque_points.actual = point;
+            torque_points.header.stamp = this->get_clock()->now();
 
             m_measured_torque_publisher->publish(torque_points);
 
@@ -173,7 +180,7 @@ struct JointInfo {
     private:
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
         rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
-        rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_measured_torque_publisher;
+        rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
     };
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
