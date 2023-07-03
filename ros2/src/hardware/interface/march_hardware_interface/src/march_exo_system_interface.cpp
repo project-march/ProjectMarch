@@ -529,9 +529,13 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         RCLCPP_INFO_ONCE((*logger_), "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
+        if(jointInfo.name.find("hip_aa") != std::string::npos){
+            jointInfo.joint.actuate((float)jointInfo.target_position, 2.0f, 0.5f, 0.5f);
+        } else{
+            // ACTUAL TORQUE LINE
+            jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+        }
 
-        // ACTUAL TORQUE LINE
-        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
 
     return hardware_interface::return_type::OK;
