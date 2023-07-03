@@ -163,12 +163,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='bezier_visualization_node',
             name='bezier_visualization',
         ),
-        # Node(
-        #     package='torque_converter',
-        #     namespace='',
-        #     executable='torque_converter_node',
-        #     name='torque_converter_node'
-        # ),
         Node(
             package='fuzzy_generator',
             namespace='',
