@@ -70,9 +70,9 @@ march8:
             i: 0.0
             d: 0.2 #0.6
           torque:
-            p: 0.1
+            p: 1.0
             i: 0.0
-            d: 0.0
+            d: 0.0001
 
     - left_hip_fe:
         motor_controller:
@@ -210,9 +210,9 @@ march8:
             i: 0.0
             d: 0.2 #0.6
           torque:
-            p: 0.1
+            p: 1.0
             i: 0.0
-            d: 0.0
+            d: 0.0001
 
     - right_hip_fe:
         motor_controller:
