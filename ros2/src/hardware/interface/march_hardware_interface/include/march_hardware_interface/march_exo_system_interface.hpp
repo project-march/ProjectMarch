@@ -193,7 +193,12 @@ struct JointInfo {
                 std::vector<float> total = measured_torques[jointInfo.name];
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size() << " values");
-                // jointInfo.target_torque = avg_torque;
+                if(jointInfo.name.compare("left_hip_aa") == 0 || jointInfo.name.compare("right_hip_aa") == 0){
+                    RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
+                    jointInfo.target_torque = avg_torque;
+                    jointInfo.torque_weight = 0.4;
+                    jointInfo.position_weight = 0.6;
+                }
                 // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
         }
