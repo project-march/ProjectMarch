@@ -172,6 +172,8 @@ struct JointInfo {
 
         void average_torque_callback(std_msgs::msg::Int32::SharedPtr msg){
 
+            RCLCPP_INFO_STREAM(this->get_logger(), "test log");
+
             std::map<std::string, std::vector<float>> measured_torques;
             for(auto j: *joints_info_){
                 measured_torques[j.name] = std::vector<float>();
@@ -190,7 +192,7 @@ struct JointInfo {
             for(march_hardware_interface::JointInfo& jointInfo: *joints_info_){
                 std::vector<float> total = measured_torques[jointInfo.name];
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
-                    RCLCPP_INFO_STREAM(this->get_logger(), "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size() << " values");
+                RCLCPP_INFO_STREAM(this->get_logger(), "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size() << " values");
                 // jointInfo.target_torque = avg_torque;
                 // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
