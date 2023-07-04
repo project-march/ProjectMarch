@@ -3,55 +3,89 @@
 //
 
 #include "fuzzy_generator/fuzzy_generator.hpp"
+#include "rclcpp/rclcpp.hpp"
 
-FuzzyGenerator::FuzzyGenerator(){
+
+FuzzyGenerator::FuzzyGenerator()
+{
+
+    std::string config_file_path = ament_index_cpp::get_package_share_directory("fuzzy_generator")
+    + PATH_SEPARATOR + "config" + PATH_SEPARATOR + "joints.yaml";
+
+    config_ = YAML::LoadFile(config_file_path);
+    
+    lower_bound = config_["bounds"]["lower_bound"].as<double>();
+    upper_bound = config_["bounds"]["upper_bound"].as<double>();
 };
 
-void FuzzyGenerator::updateWeights(Leg* leg){
-    //TODO: differentiate between logic for stance -> swing and swing -> stance
-    leg->position_weight = std::max(0.0, std::min(1.0, (leg->getFootHeight() - full_torque) / (full_position - full_torque)));//(1 / full_torque) * leg->getFootHeight() - full_position;
-    leg->torque_weight = 1 - leg->position_weight;
-};
 
-// setters
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeights(std::vector<double> both_foot_heights){
+    
+    // get the joints, with their torque ranges from the yaml
+    std::vector<std::tuple<std::string, float, float>> torque_ranges = getTorqueRanges();
+    std::vector<std::tuple<std::string, float, float>> joints;
 
-void FuzzyGenerator::setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg){
-    left_leg.foot_height = msg.heights[0];
-    right_leg.foot_height = msg.heights[1];
-};
 
-void FuzzyGenerator::setStanceLeg(std_msgs::msg::Int32 msg){
-    switch(msg.data){
-        case -1:{
-            left_leg.status = Stance;
-            right_leg.status = Swing;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Left foot is on the ground, Right foot is up");
-            break;
+    // for each joint in the leg, calculate the torque weight and position weight
+    for(auto t: torque_ranges){
+        std::string joint_name = std::get<0>(t);
+        float minimum_torque = std::get<1>(t);
+        float maximum_torque = std::get<2>(t);
+
+        float torque_range = maximum_torque - minimum_torque;
+
+        // getting the correct foot height
+        float foot_height;
+        if(joint_name.find("left") != std::string::npos){
+            foot_height = both_foot_heights[0];
         }
-        case 1:{
-            left_leg.status = Swing;
-            right_leg.status = Stance;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Right foot is on the ground, Left foot is up");
-            break;
+        else if(joint_name.find("right") != std::string::npos){
+            foot_height = both_foot_heights[1];
         }
-        case 0:{ //this is the case when both feet are on the ground
-            left_leg.status = Stance;
-            right_leg.status = Stance;
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Both feet are on the ground");
-            break;
+        else{
+            foot_height = both_foot_heights[0];
+            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "We could not determine if joint " << joint_name << " was left or right. Assuming test joint and using left foot height");
         }
-        default:{
-            RCLCPP_INFO_ONCE(rclcpp::get_logger("fuzzy_logger"), "Invalid value %i was passed. Allowed values are -1,0,1", msg.data);
-        }
+
+        // calculate far the foot is in the 'fuzzy shifting range'
+        float torque_percentage = (upper_bound - foot_height)/(upper_bound - lower_bound);
+
+        // calculating the weights for both position and torque
+        float torque_weight = torque_range * torque_percentage;
+        torque_weight = std::max(minimum_torque, std::min(torque_weight, maximum_torque));
+        float position_weight = 1 - torque_weight;
+
+        joints.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "name: " << std::get<1>(t) << " pos weight: " << position_weight << " torque weight: " << torque_weight);
     }
+
+    return joints;
 }
 
-// getters
+std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(){
+    std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 
-Leg* FuzzyGenerator::getLeftLeg(){
-    return &left_leg;
+    YAML::Node joints_config = config_["joints"];
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "we got " << leg << " joints:");
+
+    for(YAML::const_iterator it=joints_config.begin();it!=joints_config.end();++it) {
+        std::string joint_name = it->first.as<std::string>();
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "" << joint_name);
+
+        float min_torque = joints_config[joint_name]["minimum_torque"].as<float>();
+        float max_torque = joints_config[joint_name]["maximum_torque"].as<float>();
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "with min torque " << min_torque);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "with max torque " << max_torque);
+
+        joints.push_back(std::make_tuple(joint_name, min_torque, max_torque));
+    }
+    return joints;
 }
 
-Leg* FuzzyGenerator::getRightLeg(){
-    return &right_leg;
+float FuzzyGenerator::getUpperBound(){
+    return upper_bound;
+}
+
+float FuzzyGenerator::getLowerBound(){
+    return lower_bound;
 }

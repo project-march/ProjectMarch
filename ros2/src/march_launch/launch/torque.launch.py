@@ -68,18 +68,6 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_node',
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
-        Node(
-            package='joint_trajectory_buffer',
-            executable='joint_trajectory_buffer_node',
-            name='joint_trajectory_buffer_node',
-            # arguments=['--ros-args', '--log-level', 'debug']
-        ),
-        Node(
-            package='torque_converter',
-            executable='torque_converter_node',
-            name='torque_converter_node',
-            # arguments=['--ros-args', '--log-level', 'debug']
-        ),
         rqt_input_device,
         march_control,
     ])

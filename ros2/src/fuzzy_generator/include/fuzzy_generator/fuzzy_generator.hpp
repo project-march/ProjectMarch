@@ -10,55 +10,33 @@
 #include "std_msgs/msg/int32.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include <yaml-cpp/yaml.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
-//enum Side {Left, Right, Both, None};
-enum Status {Stance, Swing};
-
-struct Leg {
-    Status status = Stance;
-
-    double foot_height = 0; // by default both feet are on the ground
-
-    float torque_weight = 0; // holds the weight for the torque
-    float position_weight = 1; // holds the weight for the position
-
-    // setters
-    void setTorqueWeight(float weight){ torque_weight = weight; }; // set the weight for the torque (does not publish the weight yet)
-    void setPositionWeight(float weight){ position_weight = weight; }; // set the weight for the position (does not publish the weight yet)
-
-    // getters
-    double getFootHeight(){ return foot_height; };
-    float getTorqueWeight(){ return torque_weight; };
-    float getPositionWeight(){ return position_weight; };
-};
+inline static const char PATH_SEPARATOR =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
 
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
 
-    // the function that will update the weights with the fuzzy logic
-    void updateWeights(Leg* leg);
+    std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
+    std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
 
-    void setFeetHeight(march_shared_msgs::msg::FeetHeightStamped msg); // set the height of both feet
-    void setStanceLeg(std_msgs::msg::Int32 msg); // set the stance leg to the correct leg
+    float getUpperBound();
+    float getLowerBound();
 
-    Leg* getLeftLeg();
-    Leg* getRightLeg();
-
-    // the function that will update the weights with the fuzzy logic
-    void updateWeights(Leg leg);
 
 
 private:
-    // above full_position height we use 100% position control
-    // below full_torque height we use 100% torque control
-    // and linearly decrease/increase in between
-    double full_position = 30; //TODO: add actual value
-    double full_torque = 12; //TODO: add actual value
+    double upper_bound;
+    double lower_bound;
 
-    Leg left_leg;
-    Leg right_leg;
-
+    YAML::Node config_;    
 };
 
 #endif //MARCH_FUZZY_GENERATOR_HPP

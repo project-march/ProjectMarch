@@ -1,0 +1,28 @@
+bounds:
+  lower_bound: 0.0
+  upper_bound: 0.1
+joints:
+  left_ankle:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  left_hip_aa:
+    minimum_torque: 0.5
+    maximum_torque: 0.5
+  left_hip_fe:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  left_knee:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_ankle:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_hip_aa:
+    minimum_torque: 0.5
+    maximum_torque: 0.5
+  right_hip_fe:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_knee:
+    minimum_torque: 0.0
+    maximum_torque: 0.1

@@ -15,7 +15,12 @@
     {
       "name": "sit",
       "gait_type": 0
-    }
+    },
+    {
+      "name": "measure-torque",
+      "callback": "measure_torque",
+      "always_enabled": true
+   }
   ],
   [
     {

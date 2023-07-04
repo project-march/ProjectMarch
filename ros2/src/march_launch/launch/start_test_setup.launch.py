@@ -28,21 +28,43 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
     # endregion
-
-    # region Launch rqt input device if not rqt_input:=false
-    torque_converter = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("torque_converter"),
-                "launch",
-                "torque_converter_launch.py",
-            )
-        )
+    
+    rosbags = LaunchConfiguration("rosbags", default='true')
+    
+    DeclareLaunchArgument(
+        name="rosbags",
+        default_value="true",
+        description="Whether the rosbags should stored.",
+        choices=["true", "false"],
     )
-    # endregion
+    
+        # region rosbags
+    # Make sure you have build the ros bags from the library not the ones from foxy!
+    record_rosbags_action = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "bag",
+            "record",
+            "-o",
+            '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
+            "-a",
+        ],
+        output={
+            "stdout": "log",
+            "stderr": "log",
+        },
+        shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
+        condition=IfCondition(rosbags),
+    )
+    
+    fuzzy_config_file = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
 
 
-    # region Launch torque converter
+    # region Launch input device
     rqt_input_device = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -80,15 +102,12 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             executable='fuzzy_node',
             name='fuzzy_node',
+            # parameters=[
+            #     {"config_file_path", fuzzy_config_file}
+            # ]
             # arguments=['--ros-args', '--log-level', 'debug']
         ),
-        # Node(
-        #     package='joint_trajectory_buffer',
-        #     executable='joint_trajectory_buffer_node',
-        #     name='joint_trajectory_buffer_node',
-        #     # arguments=['--ros-args', '--log-level', 'debug']
-        # ),
-        # torque_converter,
         rqt_input_device,
         march_control,
+        record_rosbags_action,
     ])
