@@ -5,6 +5,7 @@ for general use cases.
 """
 import os
 from typing import List, Optional
+import math
 
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
@@ -194,10 +195,19 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
                 motor_controller = joint[name]["motor_controller"]
                 absoluteEncoder = motor_controller["absoluteEncoder"]
 
-    upper_limit = absoluteEncoder["maxPositionIU"]
-    lower_limit = absoluteEncoder["minPositionIU"]
+    total_iu = pow(2, absoluteEncoder["resolution"])
+    rad_per_iu = (2 * math.pi) / total_iu
+    zero_pos = absoluteEncoder["zeroPositionIU"]
+
+    lower_soft_error_lim = absoluteEncoder["lowerSoftLimitMarginRad"]
+    upper_soft_error_lim = absoluteEncoder["upperSoftLimitMarginRad"]
+
+    upper_iu = absoluteEncoder["maxPositionIU"]
+    lower_iu = absoluteEncoder["minPositionIU"]
+    upper_rad = (upper_iu - zero_pos) * rad_per_iu - upper_soft_error_lim
+    lower_rad = (lower_iu - zero_pos) * rad_per_iu + lower_soft_error_lim
     velocity_limit = 3.0
-    joint_limits = Limits(upper=upper_limit, lower=lower_limit, velocity=velocity_limit)
+    joint_limits = Limits(upper=upper_rad, lower=lower_rad, velocity=velocity_limit)
 
     return joint_limits
 
