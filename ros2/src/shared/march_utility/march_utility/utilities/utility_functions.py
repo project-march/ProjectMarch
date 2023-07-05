@@ -18,7 +18,7 @@ from .side import Side
 
 import yaml
 
-MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/test_joint_rotational.urdf"
+MARCH_URDF = march_urdf = get_package_share_directory("march_description") + "/urdf/march8.urdf"
 MODE_READING = "r"
 
 
@@ -182,7 +182,7 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
         float. The limit of the given joint.
     """
     # get limits from march7 yaml
-    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march7.yaml'
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march8.yaml'
     with open(robot_path) as file:
         document = yaml.full_load(file)
 
@@ -216,8 +216,8 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         None. If the robot description does not contain the required joints.
         List[str]. Otherwise, a list of joint names.
     """
-    robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    robot_joint_names = robot.joint_map.keys()
+    # robot = urdf.Robot.from_xml_file(MARCH_URDF)
+    # robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
         "left_hip_aa",
         "left_hip_fe",
@@ -226,11 +226,11 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         "right_hip_fe",
         "right_knee",
     ]
-    for joint_name in joint_name_list:
-        if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
-            if logger is not None:
-                logger.warn(f"{joint_name} is fixed, but required for IK")
-            return None
+    # for joint_name in joint_name_list:
+    #     if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
+    #         if logger is not None:
+    #             logger.warn(f"{joint_name} is fixed, but required for IK")
+    #         return None
 
     return sorted(joint_name_list)
 
@@ -240,7 +240,7 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
 
     Retrieves it from the `MARCH_URDF`.
     """
-    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march7.yaml'
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march8.yaml'
     with open(robot_path) as file:
         document = yaml.full_load(file)
 
