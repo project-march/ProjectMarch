@@ -44,7 +44,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="location_z",
-                default_value="0.4",
+                default_value= "0.4", #str(DEFAULT_FEET_DISTANCE),
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
