@@ -910,7 +910,7 @@ class Pose:
         self.reduce_hip_extension()
 
         # Apply side_step, hard_coded to default feet distance for now:
-        self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
+        # self.perform_side_step(abs(self.ankle_y), abs(ankle_z))
 
         # Raise the toes when desired:
         if self._parameters.dorsiflexion_at_end_position_radians != 0:
