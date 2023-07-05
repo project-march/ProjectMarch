@@ -347,6 +347,7 @@ class DynamicGaitWalk(GaitInterface):
         self.joint_soft_limits = []
         for joint_name in self.actuating_joint_names:
             limit = get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
+            self.node.get_logger().info(joint_name)
             self.node.get_logger().info(str(limit.lower))
             self.node.get_logger().info(str(limit.upper))
             self.joint_soft_limits.append(limit)
