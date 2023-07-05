@@ -15,7 +15,6 @@ from march_gait_selection.state_machine.gait_state_machine import GaitStateMachi
 
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 from march_utility.utilities.duration import Duration
-from march_utility.utilities.node_utils import on_urdf_online
 
 NODE_NAME = "gait"
 
@@ -30,16 +29,16 @@ def main():
     rclpy.init()
 
     node = GaitNode()
+    node.get_logger().info("Starting up gait node.")
+    node.get_logger().info("Init up gait node.")
 
-    def init(robot) -> None:
-        gait_loader = GaitLoader(node, robot)
-        scheduler = TrajectoryScheduler(node)
-        gait_state_machine = GaitStateMachine(node, scheduler, gait_loader.gaits, gait_loader.positions)
-        gait_state_machine.run()
+    gait_loader = GaitLoader(node)
+    scheduler = TrajectoryScheduler(node)
+    gait_state_machine = GaitStateMachine(node, scheduler, gait_loader.gaits, gait_loader.positions)
+    gait_state_machine.run()
 
-        node.add_on_set_parameters_callback(lambda params: parameter_callback(node, gait_state_machine, params))
+    node.add_on_set_parameters_callback(lambda params: parameter_callback(node, gait_state_machine, params))
 
-    on_urdf_online(node, init)
     signal.signal(signal.SIGTERM, sys_exit)
 
     executor = MultiThreadedExecutor()

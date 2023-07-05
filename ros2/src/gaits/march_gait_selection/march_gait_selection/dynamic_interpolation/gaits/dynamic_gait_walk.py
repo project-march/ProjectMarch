@@ -79,6 +79,7 @@ class DynamicGaitWalk(GaitInterface):
         )
 
         self.actuating_joint_names = get_joint_names_from_urdf()
+        self.node.get_logger().info(str(self.actuating_joint_names))
         self.all_joint_names = get_joint_names_from_urdf(return_fixed_joints=True)
         self.home_stand_position_all_joints = get_position_from_yaml("stand")
         self.home_stand_position_actuating_joints = {
@@ -345,7 +346,10 @@ class DynamicGaitWalk(GaitInterface):
         """Get the limits of all joints in the urdf."""
         self.joint_soft_limits = []
         for joint_name in self.actuating_joint_names:
-            self.joint_soft_limits.append(get_limits_robot_from_urdf_for_inverse_kinematics(joint_name))
+            limit = get_limits_robot_from_urdf_for_inverse_kinematics(joint_name)
+            self.node.get_logger().info(str(limit.lower))
+            self.node.get_logger().info(str(limit.upper))
+            self.joint_soft_limits.append(limit)
 
     def reset_start_position_to_home_stand(self) -> None:
         """Reset start position to home stand after force unknown."""

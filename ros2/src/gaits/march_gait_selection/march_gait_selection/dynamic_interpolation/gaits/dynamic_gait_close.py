@@ -11,10 +11,6 @@ from march_gait_selection.dynamic_interpolation.trajectory_command_factories.tra
     TrajectoryCommandFactoryClose,
 )
 
-from march_utility.utilities.utility_functions import (
-    STEPPING_STONES_END_POSITION_RIGHT,
-    STEPPING_STONES_END_POSITION_LEFT,
-)
 from march_utility.utilities.duration import Duration
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 

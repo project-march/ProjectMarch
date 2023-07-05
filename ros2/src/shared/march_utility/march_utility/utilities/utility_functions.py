@@ -9,6 +9,7 @@ from typing import List, Optional
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
 from rclpy.node import Node
+import rclpy
 
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
@@ -181,9 +182,25 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
     Returns:
         float. The limit of the given joint.
     """
-    robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    urdf_joint = next((joint for joint in robot.joints if joint.name == joint_name), None)
-    return Limits.from_urdf_joint(urdf_joint)
+    # get limits from march7 yaml
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march7.yaml'
+    with open(robot_path) as file:
+        document = yaml.full_load(file)
+
+    robot_name = list(document.keys())[0]
+    joints = document[robot_name]["joints"]
+    for joint in joints:
+        for name in joint:
+            if name == joint_name:
+                motor_controller = joint[name]["motor_controller"]
+                absoluteEncoder = motor_controller["absoluteEncoder"]
+
+    upper_limit = absoluteEncoder["maxPositionIU"]
+    lower_limit = absoluteEncoder["minPositionIU"]
+    velocity_limit = 3.0
+    joint_limits = Limits(upper=upper_limit, lower=lower_limit, velocity=velocity_limit)
+
+    return joint_limits
 
 
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
@@ -224,13 +241,42 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
 
     Retrieves it from the `MARCH_URDF`.
     """
-    robot = urdf.Robot.from_xml_file(MARCH_URDF)
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march7.yaml'
+    with open(robot_path) as file:
+        document = yaml.full_load(file)
 
-    # Get all joints from URDF. A joint can be fixed, but something is only considered as a joint when it contains the limit value:
-    joint_names = [name for name in robot.joint_map.keys() if robot.joint_map[name].limit is not None]
-
-    # Joints we cannot control are fixed in the urdf. These should be removed, unless explicitely asked to return fixed joints.
-    if not return_fixed_joints:
-        joint_names = [name for name in joint_names if robot.joint_map[name].type != "fixed"]
+    joint_names = []
+    robot_name = list(document.keys())[0]
+    for joint in document[robot_name]["joints"]:
+        for name in joint:
+            joint_names.append(name)
 
     return sorted(joint_names)
+
+def get_position_from_yaml(position: str):
+    """Gets a dictionary for default joint angles and given positions.
+
+    Note:
+        Gets the position from the 'default.yaml` located in the "march_gait_files" package in "airgait_vi".
+
+    Args:
+        position (str): Name of the position, e.g. "stand", for home stand.
+
+    Returns:
+        dict[str, float]. The str is the joint name and the float is the joint angle in radians.
+    """
+    try:
+        with open(
+                os.path.join(
+                    get_package_share_directory("march_gait_files"),
+                    "airgait_vi",
+                    "default.yaml",
+                ),
+                MODE_READING,
+        ) as yaml_file:
+            try:
+                return yaml.safe_load(yaml_file)["positions"][position]["joints"]
+            except KeyError as e:
+                raise KeyError(f"No position found with name {e}")
+    except FileNotFoundError as e:
+        Node("march_utility").get_logger().error(e)
