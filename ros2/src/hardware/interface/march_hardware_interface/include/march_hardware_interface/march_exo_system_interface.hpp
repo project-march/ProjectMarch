@@ -102,6 +102,7 @@ struct JointInfo {
             RCLCPP_INFO_STREAM(this->get_logger(), "Ignoring weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
             // return;
             #endif
+            // FIXME: BEUNFIX
             // setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
@@ -193,6 +194,7 @@ struct JointInfo {
                 std::vector<float> total = measured_torques[jointInfo.name];
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size() << " values");
+                // FIXME: BEUNFIX
                 if(jointInfo.name.compare("left_hip_aa") == 0 || jointInfo.name.compare("right_hip_aa") == 0){
                     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
                     jointInfo.target_torque = avg_torque;

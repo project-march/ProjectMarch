@@ -518,6 +518,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque, jointInfo.torque, jointInfo.torque_weight);
         #endif
 
+        // FIXME: BEUNFIX
         // RCLCPP_INFO_STREAM((*logger_), "The fuzzy target values for " << jointInfo.name << " are as follows: \n target position: " << jointInfo.target_position << " \n measured position: " << jointInfo.position << "\n position weight: " << jointInfo.position_weight << " \n target torque: " << jointInfo.target_torque << " \n measured torque: " << jointInfo.torque << " \n torque weight: " << jointInfo.torque_weight);
         // if(jointInfo.name.compare("left_hip_aa") == 0){
         //     RCLCPP_INFO((*logger_), "left hip aa measured torque: %f", jointInfo.torque);

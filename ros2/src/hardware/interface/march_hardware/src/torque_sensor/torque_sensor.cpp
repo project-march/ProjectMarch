@@ -14,7 +14,7 @@ TorqueSensor::TorqueSensor(MotorControllerType motor_controller_type, float max_
 
 bool TorqueSensor::exceedsMaxTorque(float torque)
 {
-    return torque > max_torque_;
+    return torque > max_torque_ || torque < -max_torque_;
 }
 
 MotorControllerType TorqueSensor::getMotorControllerType() const

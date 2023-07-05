@@ -47,7 +47,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
         fuzzy_weights.torque_weight = std::get<2>(w);
         fuzzy_weights.header.frame_id = this->get_name();
         publish_weights(fuzzy_weights);
-        RCLCPP_WARN_STREAM(this->get_logger(), "weights for joint: " << fuzzy_weights.joint_name << " position: " << fuzzy_weights.position_weight << " torque: " << fuzzy_weights.torque_weight);
+        // RCLCPP_WARN_STREAM(this->get_logger(), "weights for joint: " << fuzzy_weights.joint_name << " position: " << fuzzy_weights.position_weight << " torque: " << fuzzy_weights.torque_weight);
     }
 }
 
@@ -75,10 +75,10 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
 
     // dummy message to make sure that the fuzzy node publishes weights after setting a control type such that all the joints are in position control
-    if(allowed_control_type != "fuzzy"){
+    if(allowed_control_type == "position"){
         march_shared_msgs::msg::WeightStamped weights;
         weights.torque_weight = 0;
-        weights.position_weight = 0;
+        weights.position_weight = 1;
         weights.joint_name = "";
         publish_weights(weights);
     }
@@ -88,7 +88,7 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
 void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
-    RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
+    // RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
 
     if(allowed_control_type == "position"){
         msg.position_weight = 1;

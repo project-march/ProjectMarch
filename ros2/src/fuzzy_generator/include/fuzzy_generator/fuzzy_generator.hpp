@@ -26,15 +26,21 @@ public:
 
     std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
     std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
-
-    float getUpperBound();
-    float getLowerBound();
+    std::string getStanceLeg(std::vector<double> both_foot_heights);
+    bool isAscending(std::string current_leg);
 
 
 
 private:
-    double upper_bound;
-    double lower_bound;
+    double descending_upper_bound;
+    double descending_lower_bound;
+    double ascending_upper_bound;
+    double ascending_lower_bound;
+
+    std::vector<std::vector<float>> log{{},{}};
+
+    float delta_avg = 0.0f;
+    float alpha = 0.5;
 
     YAML::Node config_;    
 };
