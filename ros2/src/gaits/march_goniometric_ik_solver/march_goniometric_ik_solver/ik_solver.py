@@ -37,7 +37,7 @@ for name in JOINT_NAMES:
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
-DEFAULT_FOOT_DISTANCE = 0.47  # m
+DEFAULT_FOOT_DISTANCE = 0.16  # LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE m
 
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad

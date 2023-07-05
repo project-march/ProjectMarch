@@ -13,7 +13,7 @@ class IKSolverParameters:
     default_knee_bend: float = 8.0  # deg
     hip_x_fraction: float = 0.5
     upper_body_front_rotation: float = 0.0  # deg
-    dorsiflexion_at_end_position: float = 10.0  # deg
+    dorsiflexion_at_end_position: float = 0.0  # deg
     hip_swing: bool = False
     hip_swing_fraction: float = 0.0
     middle_point_fraction: float = 0.5

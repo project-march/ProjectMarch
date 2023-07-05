@@ -34,7 +34,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="location_x",
-                default_value="0.4",
+                default_value="0.1",
                 description="x-location for fake covid topic, takes double'",
             ),
             DeclareLaunchArgument(
@@ -44,7 +44,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="location_z",
-                default_value=str(DEFAULT_FEET_DISTANCE),
+                default_value="0.4",
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(
@@ -64,7 +64,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="duration",
-                default_value="1.5",
+                default_value="3.0",
                 description="Base duration of dynamic gait, may be scaled depending on step height",
             ),
             DeclareLaunchArgument(

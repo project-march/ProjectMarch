@@ -129,7 +129,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
                 "urdf",
                 "march7",
                 "properties",
-                "properties_march7.yaml",
+                "properties_march8.yaml",
             ),
             MODE_READING,
         ) as yaml_file:

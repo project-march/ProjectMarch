@@ -28,6 +28,7 @@ set(XACRO_FILES
         urdf/march6/march6.xacro
         urdf/march6/march6_three_cameras.xacro
         urdf/march7/march7.xacro
+        urdf/march8.xacro
 )
 
 # Without this the package link of stl files in gazebo doesn't work
