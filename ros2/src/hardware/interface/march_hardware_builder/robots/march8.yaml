@@ -72,9 +72,9 @@ march8:
             i: 0.0
             d: 0.6
           torque:
-            p: 7.5
+            p: 45.0
             i: 0.0
-            d: 0.0001
+            d: 0.0004
 
     - left_hip_fe:
         motor_controller:
@@ -100,7 +100,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 150.0
+            maxTorque: 250.0
             averageTorque: 10
         pids:
           position:
@@ -136,7 +136,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 100.0
+            maxTorque: 150.0
             averageTorque: 10
         pids:
           position:
@@ -196,9 +196,9 @@ march8:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 7559  # Ros kills itself if it is in its hard limits (same as encode limits).
-            maxPositionIU: 8676  # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 8220
+            minPositionIU: 5271  # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 6279  # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 5824
             lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
@@ -216,9 +216,9 @@ march8:
             i: 0.0
             d: 0.6
           torque:
-            p: 5.0
+            p: 15.0
             i: 0.0
-            d: 0.0001
+            d: 0.0002
 
     - right_hip_fe:
         motor_controller:
@@ -244,7 +244,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 150.0
+            maxTorque: 250.0
             averageTorque: 10
         pids:
           position:
@@ -281,7 +281,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 100.0
+            maxTorque: 150.0
             averageTorque: 10.0
         pids:
           position:
