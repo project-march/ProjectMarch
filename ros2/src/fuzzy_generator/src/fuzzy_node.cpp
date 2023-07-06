@@ -11,8 +11,10 @@ using namespace std::chrono_literals;
 
 FuzzyNode::FuzzyNode()
         : Node("fuzzy_node")
-        , m_fuzzy_generator()
 {
+    declare_parameter("config_path", std::string(""));
+    std::string config_path = this->get_parameter("config_path").as_string();
+    m_fuzzy_generator = FuzzyGenerator(config_path);
     // m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
     //         "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
@@ -62,11 +64,11 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
 
     if(allowed_control_type == "torque"){
         RCLCPP_FATAL_STREAM(this->get_logger(), "switching to torque causes shooting!");
-        throw(std::invalid_argument("SHOULD NOT SWITCH TO TORQUE CONTROL!"));
     }
 
-    if(allowed_control_type != "fuzzy" && allowed_control_type != "torque" && allowed_control_type != "position"){
+    if(allowed_control_type != "fuzzy" && allowed_control_type != "position"){
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
+        return;
     }
     else{
         RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");

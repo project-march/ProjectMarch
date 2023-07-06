@@ -57,12 +57,14 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(rosbags),
     )
     
-    fuzzy_config_file = os.path.join(
+    default_fuzzy_config = os.path.join(
         get_package_share_directory('fuzzy_generator'),
         'config',
         'joints.yaml'
     )
 
+    # parameters
+    fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
 
     # region Launch input device
     rqt_input_device = IncludeLaunchDescription(
@@ -102,7 +104,7 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             executable='fuzzy_node',
             name='fuzzy_node',
-            # parameters=[
+            parameters=[ {'config_path': fuzzy_config_path}]
             #     {"config_file_path", fuzzy_config_file}
             # ]
             # arguments=['--ros-args', '--log-level', 'debug']

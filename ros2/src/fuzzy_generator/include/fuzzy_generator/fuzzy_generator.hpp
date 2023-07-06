@@ -23,6 +23,7 @@ inline static const char PATH_SEPARATOR =
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
+    FuzzyGenerator(std::string config_path);
 
     std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
     std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();

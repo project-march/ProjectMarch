@@ -5,14 +5,11 @@
 #include "fuzzy_generator/fuzzy_generator.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+FuzzyGenerator::FuzzyGenerator(){}
 
-FuzzyGenerator::FuzzyGenerator()
+FuzzyGenerator::FuzzyGenerator(std::string config_path)
 {
-
-    std::string config_file_path = ament_index_cpp::get_package_share_directory("fuzzy_generator")
-    + PATH_SEPARATOR + "config" + PATH_SEPARATOR + "joints.yaml";
-
-    config_ = YAML::LoadFile(config_file_path);
+    config_ = YAML::LoadFile(config_path);
     
     descending_lower_bound = config_["bounds"]["descending_lower_bound"].as<double>();
     descending_upper_bound = config_["bounds"]["descending_upper_bound"].as<double>();
@@ -153,7 +150,6 @@ std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRan
     std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 
     YAML::Node joints_config = config_["joints"];
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "we got " << leg << " joints:");
 
     for(YAML::const_iterator it=joints_config.begin();it!=joints_config.end();++it) {
         std::string joint_name = it->first.as<std::string>();
