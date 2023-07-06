@@ -261,7 +261,7 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_generator'
         ),
         mujoco_node,
-        rqt_input_device,
+        # rqt_input_device,
         march_control,
         record_rosbags_action,
         safety_node,
