@@ -26,10 +26,10 @@ dimensions:
   lower_leg:
     length: 0.414
     mass: 7.061
-    offset: 0
+    offset: 0.0
   ankle_plate:
     length: 0.138
-    offset: 0
+    offset: 0.0
     collision_offset: 0
   foot:
     height_forward: 0.217

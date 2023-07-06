@@ -229,9 +229,11 @@ def validate_and_get_joint_names_for_inverse_kinematics(
     # robot = urdf.Robot.from_xml_file(MARCH_URDF)
     # robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
+        "left_ankle",
         "left_hip_aa",
         "left_hip_fe",
         "left_knee",
+        "left_ankle",
         "right_hip_aa",
         "right_hip_fe",
         "right_knee",

@@ -8,9 +8,16 @@ from march_utility.utilities.utility_functions import (
 )
 
 # Get lengths from urdf:
-lengths = get_lengths_robot_from_urdf_for_inverse_kinematics()
-LENGTH_HIP_AA, LENGTH_HIP_BASE = lengths[2], lengths[-1]
-DEFAULT_FEET_DISTANCE = 0.16 # LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
+(
+    LENGTH_UPPER_LEG,
+    LENGTH_LOWER_LEG,
+    LENGTH_HIP_AA,
+    LENGTH_HIP_BASE,
+) = get_lengths_robot_from_urdf_for_inverse_kinematics(
+    length_names=["upper_leg", "lower_leg", "hip_aa_front", "hip_base"]
+)
+
+DEFAULT_FEET_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 
 def generate_launch_description():
@@ -44,7 +51,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="location_z",
-                default_value= "0.4", #str(DEFAULT_FEET_DISTANCE),
+                default_value=str(DEFAULT_FEET_DISTANCE),
                 description="z-location for fake covid topic, takes double or 'random'",
             ),
             DeclareLaunchArgument(

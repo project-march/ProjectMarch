@@ -37,7 +37,7 @@ for name in JOINT_NAMES:
 
 # Constants:
 LENGTH_FOOT = 0.10  # m
-DEFAULT_FOOT_DISTANCE = 0.16  # LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE m
+DEFAULT_FOOT_DISTANCE = LENGTH_HIP_AA * 2 + LENGTH_HIP_BASE
 
 ANKLE_ZERO_ANGLE = np.pi / 2  # rad
 KNEE_ZERO_ANGLE = np.pi  # rad
@@ -101,14 +101,16 @@ class Pose:
             max(JOINT_LIMITS["left_hip_aa"].lower, JOINT_LIMITS["right_hip_aa"].lower)
             + self._parameters.hip_buffer_radians
         )
+        self.aa_hip1 = self.aa_hip2 = -0.05
 
         if pose is None:
             angle_ankle, angle_hip, angle_knee = self.leg_length_angles(self.max_leg_length)
             self.fe_ankle1 = self.fe_ankle2 = angle_ankle
             self.fe_hip1 = self.fe_hip2 = angle_hip
             self.fe_knee1 = self.fe_knee2 = KNEE_ZERO_ANGLE - angle_knee
-            self.aa_hip1 = self.aa_hip2 = 0
+            self.aa_hip1 = self.aa_hip2 = -0.05
         else:
+            self.aa_hip1 = self.aa_hip2 = -0.05
             if leg1 == "left":
                 (
                     self.fe_ankle1,
@@ -120,6 +122,7 @@ class Pose:
                     self.fe_hip2,
                     self.fe_knee2,
                 ) = pose
+                self.aa_hip1 = self.aa_hip2 = -0.05
             elif leg1 == "right":
                 (
                     self.fe_ankle2,
@@ -131,6 +134,7 @@ class Pose:
                     self.fe_hip1,
                     self.fe_knee1,
                 ) = pose
+                self.aa_hip1 = self.aa_hip2 = -0.05
             else:
                 raise ValueError(f"Invalid input {leg1}, should be 'right' or 'left'.")
         self.rot_foot1 = 0
