@@ -39,6 +39,8 @@ alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
 alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
 alias m8_airgait='sudo -v && sfox && sros2 && ros2 launch march_launch march8.launch.py simulation:="false" airgait:="true"'
 alias m8_training='sudo -v && sfox && sros2 && ros2 launch march_launch march8.launch.py simulation:="false"'
+alias m8_gaitloader_training='sudo -v && sfox && sros2 && ros2 launch march_launch march8_gaitloader.launch.py simulation:=false'
+alias m8_sim_gaitloader='sfox && sros2 && ros2 launch march_launch march8_gaitloader.launch.py simulation:=false'
 alias training='march_run_ros2_training'
 alias gits='git status'
 
