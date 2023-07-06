@@ -41,6 +41,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
     RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "pushing back heights ");
     log[0].push_back(both_foot_heights[0]);
     log[1].push_back(both_foot_heights[1]);
+    updateVelocities();
     // if not, then the feet height are just as they are
 
     // for each joint in the leg, calculate the torque weight and position weight
@@ -102,6 +103,8 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "name: " << joint_name << " pos weight: " << position_weight << " torque weight: " << torque_weight);
     }
 
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "-----------------------------------------------------------------------------");
+
     return joints;
 }
 
@@ -110,48 +113,40 @@ std::string FuzzyGenerator::getStanceLeg(std::vector<double> foot_heights){
     return (foot_heights[1] - foot_heights[0]) > std::numeric_limits<double>::epsilon() ? "left" : "right";
 }
 
+void FuzzyGenerator::updateVelocities(){
+
+        std::vector<float> last_iterations_l = log[0];
+        std::vector<float> last_iterations_r = log[1];
+
+        if(last_iterations_l.size() <= 1 || last_iterations_r.size() <= 1){
+            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "not enough data: " << last_iterations_l.size());
+            return;
+        }
+
+        float deltaZ = last_iterations_l.back() - last_iterations_l.end()[-2];
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_l);
+        delta_avg_l = (delta_avg_l * alpha) + (deltaZ * (1 - alpha));
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_l);
+
+        deltaZ = last_iterations_r.back() - last_iterations_r.end()[-2];
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_r);
+        delta_avg_r = (delta_avg_r * alpha) + (deltaZ * (1 - alpha));
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_r);
+}
+
 bool FuzzyGenerator::isAscending(std::string leg){
     // if the desired positions of the leg are strictly increasing over the z-axis over x iterations, we say the leg is ascending
     // if the foot is staying at the same height, it is safest to assume it is on the ground, and we will be ascending soon
-    auto equal_and_smaller = [this](float a, float b) -> bool {
-        {
-            return (a <= b);
-        }
-    };
 
-    std::vector<float> last_iterations = leg.compare("left") == 0 ? log[0] : log[1];
-
-    if(last_iterations.size() <= 1){
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "not enough data: " << last_iterations.size());
-        return leg.compare("left") == 0 ? true : false;     
-    }
-
-    float deltaZ = last_iterations.back() - last_iterations.end()[-2];
-    delta_avg = (delta_avg * alpha) + (deltaZ * (1 - alpha));
-
-    if(delta_avg >= 0){
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is ascending");
-        return true;
+    if(leg.compare("left") == 0){
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is ascending");
+        return delta_avg_l >= 0;
     } else {
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is descending");
-        return false;     
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is descending");
+        return delta_avg_r >= 0;     
     }
-
-
-    // // the first few iterations we only set the left leg as swing and the right as stance
-    // if(last_iterations.size() < height_history_size){
-    //     RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "not enough data: " << last_iterations.size());
-    //     return leg.compare("left") == 0 ? true : false;
-    // }
-
-    // if(last_iterations[last_iterations.size()-height_history_size] <= last_iterations.back()){
-    //     RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is ascending");
-    //     return true;
-    // } else {
-    //     RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " is descending");
-    //     return false;
-    // }
-
 }
 
 std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(){

@@ -28,6 +28,7 @@ public:
     std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
     std::string getStanceLeg(std::vector<double> both_foot_heights);
     bool isAscending(std::string current_leg);
+    void updateVelocities();
 
 
 
@@ -39,8 +40,9 @@ private:
 
     std::vector<std::vector<float>> log{{},{}};
 
-    float delta_avg = 0.0f;
-    float alpha = 0.5;
+    float delta_avg_l = 0.0f;
+    float delta_avg_r = 0.0f;
+    float alpha = 0.2;
 
     YAML::Node config_;    
 };
