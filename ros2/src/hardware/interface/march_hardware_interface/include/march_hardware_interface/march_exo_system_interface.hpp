@@ -85,7 +85,7 @@ struct JointInfo {
                     "/measured_torque", 10);
 
             m_measure_torque_subscription = this->create_subscription<std_msgs::msg::Int32>(
-                    "/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
+                    "/march/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
 
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
@@ -195,11 +195,11 @@ struct JointInfo {
                 float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
                 RCLCPP_INFO_STREAM(this->get_logger(), "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size() << " values");
                 // FIXME: BEUNFIX
-                if(jointInfo.name.compare("left_hip_aa") == 0 || jointInfo.name.compare("right_hip_aa") == 0){
+                if(jointInfo.name.compare("left_hip_fe") == 0 || jointInfo.name.compare("right_hip_fe") == 0){
                     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
                     jointInfo.target_torque = avg_torque;
-                    jointInfo.torque_weight = 0.7;
-                    jointInfo.position_weight = 0.3;
+                    jointInfo.torque_weight = 0.1;
+                    jointInfo.position_weight = 0.9;
                 }
                 // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
