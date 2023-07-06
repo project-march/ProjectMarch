@@ -224,8 +224,8 @@ std::vector<double> JointEstimator::get_feet_height()
     tf2::doTransform(foot_point, right_transformed_point, right_foot_transform);
 
     // correct both feet with ankle height compared to the bottom of the feet
-    left_transformed_point.point.z -= std::abs(m_joints.at(1).length_z);
-    right_transformed_point.point.z -= std::abs(m_joints.at(9).length_z);
+    // left_transformed_point.point.z -= std::abs(m_joints.at(1).length_z);
+    // right_transformed_point.point.z -= std::abs(m_joints.at(9).length_z);
 
     return { left_transformed_point.point.z, right_transformed_point.point.z };
 }

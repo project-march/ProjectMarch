@@ -128,6 +128,15 @@ def generate_launch_description() -> LaunchDescription:
         'hennie_v0.urdf'
     )
 
+    fuzzy_default_config = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
+
+    # parameters
+    fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
+
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -173,7 +182,8 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',
-            name='fuzzy_generator'
+            name='fuzzy_generator',
+            parameters=[{'config_path': fuzzy_config_path}]
         ),
         Node(
             package='swing_leg_trajectory_generator',

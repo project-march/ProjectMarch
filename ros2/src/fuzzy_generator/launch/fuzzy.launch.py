@@ -21,7 +21,7 @@ def generate_launch_description():
     default_config = os.path.join(
         get_package_share_directory('fuzzy_generator'),
         'config',
-        'test_joints.yaml'
+        'joints.yaml'
     )
 
     # parameters
