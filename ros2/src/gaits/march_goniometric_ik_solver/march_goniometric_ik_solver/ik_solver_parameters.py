@@ -17,6 +17,7 @@ class IKSolverParameters:
     hip_swing: bool = False
     hip_swing_fraction: float = 0.0
     middle_point_fraction: float = 0.5
+    middle_point_height: float = 0.05
     base_number: int = 7
 
     @property

@@ -167,6 +167,7 @@ class DynamicStep:
         """Calls IK solver to compute the joint angles needed for the middle setpoint."""
         fraction = self.middle_point_fraction if fraction is None else fraction
         height = self.middle_point_height if height is None else height
+        self._node.get_logger().info(str(height))
 
         middle_position = self.start_pose.solve_mid_position(
             next_pose=self._end_pose,
@@ -323,6 +324,7 @@ class DynamicStep:
             node.hip_swing,
             node.hip_swing_fraction,
             node.middle_point_fraction,
+            node.middle_point_height,
             node.base_number,
         )
 
