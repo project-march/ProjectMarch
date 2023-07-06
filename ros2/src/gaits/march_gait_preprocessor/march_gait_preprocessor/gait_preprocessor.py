@@ -202,7 +202,7 @@ class GaitPreprocessor(Node):
             if max_height > absolute_max_height:
                 absolute_max_height = max_height
 
-        relative_midpoint_height = 0.075
+        relative_midpoint_height = 0.1
         if 0.14 < absolute_max_height <= 0.17:
             relative_midpoint_height = 0.15 - (absolute_max_height - 0.14)
         elif max_height > 0.17:

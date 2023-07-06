@@ -95,7 +95,7 @@ class TrajectoryCommandFactory:
             self.foot_location.processed_point.x = 0.0
             self.foot_location.processed_point.y = 0.0
             self.foot_location.processed_point.z = DEFAULT_FOOT_DISTANCE
-            self.foot_location.relative_midpoint_height = 0.075
+            self.foot_location.relative_midpoint_height = 0.1
             self._gait._end = True
             self._logger.info("Stopping dynamic gait.")
 
