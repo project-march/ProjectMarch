@@ -21,13 +21,6 @@
       {
          "name": "direct-torque",
          "callback": "publish_direct_torque",
-         "control_type": "torque",
-         "always_enabled": true
-      },
-      {
-         "name": "switch_to_torque",
-         "callback": "switch_to_torque",
-         "control_type": "torque",
          "always_enabled": true
       },
       {

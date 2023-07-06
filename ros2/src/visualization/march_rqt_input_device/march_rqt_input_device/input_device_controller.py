@@ -207,9 +207,7 @@ class InputDeviceController:
 
 
     def publish_direct_torque(self) -> None:
-        """Publish a message on `direct_torque` to publish the torque."""
-        self.publish_control_type("torque")
-        
+        """Publish a message on `direct_torque` to publish the torque."""        
         delta = 3.5; #This is the value at which the Rotational Joint actuates without extra pushes
         self._node.get_logger().info("Publishing direct torque " + str(delta))
         self.direct_torque_pub.publish(
@@ -230,15 +228,9 @@ class InputDeviceController:
             )
         )
 
-    
-    def switch_to_torque(self) -> None:
-        """switches between torque and position control"""
-        
-        self._node.get_logger().info("Publishing control type torque")
-        self._set_gait_control_type.publish(String(data="torque"))
         
     def switch_to_position(self) -> None:
-        """switches between torque and position control"""
+        """switches between fuzzy and position control"""
         
         self._node.get_logger().info("Publishing control type position")
         self._set_gait_control_type.publish(String(data="position"))

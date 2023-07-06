@@ -2,19 +2,23 @@
   [
     {
       "name": "home_sit",
-      "gait_type": 0
+      "gait_type": 0,
+      "control_type": "position"
     },
     {
       "name": "home_stand",
-      "gait_type": 1
+      "gait_type": 1,
+      "control_type": "position"
     },
     {
       "name": "stand",
-      "gait_type": 1
+      "gait_type": 1,
+      "control_type": "position"
     },
     {
       "name": "sit",
-      "gait_type": 0
+      "gait_type": 0,
+      "control_type": "position"
     },
     {
       "name": "measure-torque",
@@ -51,6 +55,18 @@
   [
     {
       "name": "eeg"
-    }
+    },
+    {
+      "name": "switch_to_position",
+      "callback": "switch_to_position",
+      "control_type": "position",
+      "always_enabled": true
+   },
+   {
+      "name": "switch_to_fuzzy",
+      "callback": "switch_to_fuzzy",
+      "control_type": "fuzzy",
+      "always_enabled": true
+   }
   ]
 ]
