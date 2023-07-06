@@ -22,10 +22,6 @@ FuzzyGenerator::FuzzyGenerator()
 
 
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeights(std::vector<double> both_foot_heights){
-
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "pushing back heights ");
-    log[0].push_back(both_foot_heights[0]);
-    log[1].push_back(both_foot_heights[1]);
     
     // get the joints, with their torque ranges from the yaml
     std::vector<std::tuple<std::string, float, float>> torque_ranges = getTorqueRanges();
@@ -37,9 +33,14 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
 
     if(stance_leg.compare("left") == 0){
         // if left is the stance leg, the heights are converted regarding the right foot
-        both_foot_heights[1] = std::abs(both_foot_heights[0]);
-        both_foot_heights[0] = 0.0f;
+        both_foot_heights[1] += std::abs(both_foot_heights[0]);
+        both_foot_heights[0] += std::abs(both_foot_heights[0]);
     }
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "left height: " << both_foot_heights[0] << " right height: " << both_foot_heights[1]);
+
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "pushing back heights ");
+    log[0].push_back(both_foot_heights[0]);
+    log[1].push_back(both_foot_heights[1]);
     // if not, then the feet height are just as they are
 
     // for each joint in the leg, calculate the torque weight and position weight
@@ -75,9 +76,11 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         double upper_bound;
 
         if(isAscending(current_leg)){
+            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is ascending");
             lower_bound = ascending_lower_bound;
             upper_bound = ascending_upper_bound;
         } else{
+            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is descending");
             lower_bound = descending_lower_bound;
             upper_bound = descending_upper_bound;
         }
