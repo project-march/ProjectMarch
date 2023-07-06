@@ -151,7 +151,7 @@ def generate_launch_description():
                 name="middle_point_height",
                 default_value=str(IKSolverParameters.middle_point_height),
                 description="the height of the middle point used by the ik solver.",
-            )
+            ),
             DeclareLaunchArgument(
                 name="hip_swing",
                 default_value=str(IKSolverParameters.hip_swing),
