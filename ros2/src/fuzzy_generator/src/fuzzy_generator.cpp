@@ -26,16 +26,16 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
 
     // get stance leg
     std::string stance_leg = getStanceLeg(both_foot_heights);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "stance leg: " << stance_leg);
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "stance leg: " << stance_leg);
 
     if(stance_leg.compare("left") == 0){
         // if left is the stance leg, the heights are converted regarding the right foot
         both_foot_heights[1] += std::abs(both_foot_heights[0]);
         both_foot_heights[0] += std::abs(both_foot_heights[0]);
     }
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "left height: " << both_foot_heights[0] << " right height: " << both_foot_heights[1]);
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "left height: " << both_foot_heights[0] << " right height: " << both_foot_heights[1]);
 
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "pushing back heights ");
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "pushing back heights ");
     log[0].push_back(both_foot_heights[0]);
     log[1].push_back(both_foot_heights[1]);
     updateVelocities();
@@ -74,20 +74,20 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         double upper_bound;
 
         if(isAscending(current_leg)){
-            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is ascending");
+            // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is ascending");
             lower_bound = ascending_lower_bound;
             upper_bound = ascending_upper_bound;
         } else{
-            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is descending");
+            // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), current_leg << " leg is descending");
             lower_bound = descending_lower_bound;
             upper_bound = descending_upper_bound;
         }
 
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "lower bound: " << lower_bound << " upper bound: " << upper_bound);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "lower bound: " << lower_bound << " upper bound: " << upper_bound);
 
         // calculate far the foot is in the 'fuzzy shifting range'
         float height_percentage = (upper_bound - foot_height)/(upper_bound - lower_bound);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "height percentage: " << height_percentage);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "height percentage: " << height_percentage);
 
         // calculating the weights for both position and torque
         float torque_weight = torque_range * height_percentage;
@@ -97,10 +97,10 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         float position_weight = 1 - torque_weight;
 
         joints.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "name: " << joint_name << " pos weight: " << position_weight << " torque weight: " << torque_weight);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "name: " << joint_name << " pos weight: " << position_weight << " torque weight: " << torque_weight);
     }
 
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "-----------------------------------------------------------------------------");
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "-----------------------------------------------------------------------------");
 
     return joints;
 }
@@ -121,16 +121,16 @@ void FuzzyGenerator::updateVelocities(){
         }
 
         float deltaZ = last_iterations_l.back() - last_iterations_l.end()[-2];
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_l);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_l);
         delta_avg_l = (delta_avg_l * alpha) + (deltaZ * (1 - alpha));
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_l);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_l);
 
         deltaZ = last_iterations_r.back() - last_iterations_r.end()[-2];
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_r);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " our last velocity is " << deltaZ);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " so the new velocity transformed from " << delta_avg_r);
         delta_avg_r = (delta_avg_r * alpha) + (deltaZ * (1 - alpha));
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_r);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), " to " << delta_avg_r);
 }
 
 bool FuzzyGenerator::isAscending(std::string leg){

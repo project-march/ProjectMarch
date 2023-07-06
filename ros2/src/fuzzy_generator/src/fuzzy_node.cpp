@@ -39,7 +39,7 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
     // float left_foot_height = msg->heights[0];
     // float right_foot_height = msg->heights[1];
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "left foot height " << msg->heights[0] << " right foot height " << msg->heights[1]);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "left foot height " << msg->heights[0] << " right foot height " << msg->heights[1]);
 
     auto weights = m_fuzzy_generator.calculateWeights(msg->heights);
     for(auto w: weights){
