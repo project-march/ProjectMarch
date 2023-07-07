@@ -36,9 +36,9 @@ march8:
             i: 0.0
             d: 0.4
           torque:
-            p: 0.1
+            p: 50.0
             i: 0.0
-            d: 0.0
+            d: 0.0002
 
     - left_hip_aa:
         motor_controller:
@@ -180,9 +180,9 @@ march8:
             i: 0.0
             d: 0.4
           torque:
-            p: 0.1
+            p: 50.0
             i: 0.0
-            d: 0.0
+            d: 0.0002
 
     - right_hip_aa:
         motor_controller:
