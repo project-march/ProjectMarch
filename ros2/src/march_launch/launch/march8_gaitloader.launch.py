@@ -253,12 +253,20 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    state_estimator_launch_dir = os.path.join(
+        get_package_share_directory('state_estimator'),
+        'launch'
+    )
+
     return LaunchDescription(declared_arguments + [
         Node(
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',
             name='fuzzy_generator'
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
         mujoco_node,
         # rqt_input_device,
