@@ -50,10 +50,6 @@ class PressureSoleVis(Node):
 
     def __init__(self):
         super().__init__(NODE_NAME)
-
-        # self.timer_period = 1.0  # seconds
-        # self.timer = self.create_timer(self.timer_period, self.timer_callback)
-
         self.subscription = self.create_subscription(
             PressureSolesData,
             '/march/pressure_sole_data',
@@ -65,58 +61,15 @@ class PressureSoleVis(Node):
         self.subscription  # prevent unused variable warning
 
         # the coordinates of the pressure sole pads - left foot
-        self.x_coord_left = np.array([0.04,0.04,0.134,0.202,0.2122,0.228,0.265,0.275])
+        self.x_coord_left = np.array([0.044,0.044,0.138,0.206,0.2162,0.228,0.265,0.275])
         self.y_coord_left = np.array([0.039,0.013,0.050,0.061,0.025,-0.007,0.038,0.002]) + 0.05
 
         # the coordinates of the pressure sole pads - right foot
         self.x_coord_right = self.x_coord_left
-        self.y_coord_right = self.y_coord_left * -1  - 0.05
+        self.y_coord_right = self.y_coord_left * -1
 
-        # self.foot_length = 0.3 # m 
-        # self.foot_width = 0.1 # m
-
-        # Define the resolution of the heatmap
-        # self.resolution = 0.001
-        # self.pressure_values = np.zeros(8)
-
-        # Generate the X and Y mesh values for the foot shape
-        # x_values = np.arange(-self.foot_width/2, self.foot_width/2, self.resolution)
-        # y_values = np.arange(0, self.foot_length, self.resolution)
-        # self.X, self.Y = np.meshgrid(x_values, y_values)
-
-        # Create a figure and a 3D plot
-        # self.fig = plt.figure()
-        # self.ax = self.fig.add_subplot(111, projection='3d')
-        # plt.ion()  # Turn on interactive mode for dynamic updates
-        # plt.show()
-
-        # Initialize the bar plot
-        # self.bars = None # instead of creating a new bar everytime, update the values of the first bar object
 
     def create_heatmap(self, data):
-        # Create a figure and a 3D plot
-
-        # if self.bars:
-        #     self.ax.collections.remove(self.bars)
-
-        # x = self.X.ravel()
-        # y = self.Y.ravel()
-        # top = np.zeros_like(x)
-        # bottom = np.zeros_like(top)
-        # self.bars = self.ax.bar3d(x, y, bottom, self.resolution, self.resolution, top, shade=True)
-
-        # # left foot
-
-        # z_value = np.array([data[0],data[1],data[2],data[3],data[4],data[5],data[6]*1000,data[7]*1000])
-
-        # self.bars = self.ax.bar3d(x_coord, y_coord, 0, self.resolution, self.resolution, z_value, shade=True)
-
-        # # Customize the plot if needed
-        # self.ax.set_xlabel('X')
-        # self.ax.set_ylabel('Y')
-        # self.ax.set_zlabel('Z')
-
-        # self.fig.canvas.draw()
         press_vis = MarkerArray()
 
 
@@ -131,21 +84,22 @@ class PressureSoleVis(Node):
 
             marker_container.scale.x = 0.01
             marker_container.scale.y = 0.01
-            marker_container.scale.z = data[i]
+            marker_container.scale.z = min(data[i],0.1)
 
             marker_container.pose.position.x = self.x_coord_left[i]
             marker_container.pose.position.y = self.y_coord_left[i]
-            marker_container.pose.position.z = data[i]/2 # the scale is from the middle of the marker so move the marker up
+            marker_container.pose.position.z = marker_container.scale.z/2 # the scale is from the middle of the marker so move the marker up
 
             marker_container.pose.orientation.z = 0.0
             marker_container.pose.orientation.y = 0.0
             marker_container.pose.orientation.z = 0.0
             marker_container.pose.orientation.w = 1.0
             marker_container.action = 0
-            marker_container.frame_locked = True;
-            marker_container.color.a = 1.0;
-            marker_container.color.b = 0.5;
-            marker_container.color.g = 0.7;
+            marker_container.frame_locked = True
+            marker_container.color.a = 1.0
+            marker_container.color.r = 1.0
+            marker_container.color.b = 0.0
+            marker_container.color.g = 0.0
 
 
             press_vis.markers.append(marker_container)
@@ -158,11 +112,11 @@ class PressureSoleVis(Node):
 
             marker_container.scale.x = 0.01
             marker_container.scale.y = 0.01
-            marker_container.scale.z = data[i+8]
+            marker_container.scale.z = min(data[i+8],0.1)
 
             marker_container.pose.position.x = self.x_coord_right[i]
             marker_container.pose.position.y = self.y_coord_right[i]
-            marker_container.pose.position.z = data[i+8]/2 # the scale is from the middle of the marker so move the marker up
+            marker_container.pose.position.z = marker_container.scale.z/2 # the scale is from the middle of the marker so move the marker up
 
             marker_container.pose.orientation.z = 0.0
             marker_container.pose.orientation.y = 0.0
@@ -170,22 +124,75 @@ class PressureSoleVis(Node):
             marker_container.pose.orientation.w = 1.0
 
             marker_container.action = 0
-            marker_container.frame_locked = True;
-            marker_container.color.a = 1.0;
-            marker_container.color.b = 0.5;
-            marker_container.color.g = 0.7;
-
+            marker_container.frame_locked = True
+            marker_container.color.a = 1.0
+            marker_container.color.b = 0.5
+            marker_container.color.g = 0.7
 
             press_vis.markers.append(marker_container)
 
+        marker_left_foot = Marker()
+        marker_left_foot.type = 10
+
+        marker_left_foot.header.frame_id = "map"
+        marker_left_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootLeft.obj"
+        marker_left_foot.mesh_use_embedded_materials = True
+
+        marker_left_foot.action = 0
+        marker_left_foot.frame_locked = True
+        marker_left_foot.scale.x = 1.0
+        marker_left_foot.scale.y = 1.0
+        marker_left_foot.scale.z = 1.0
+        marker_left_foot.ns = "left pressure sole"
+        # marker_left_foot.lifetime.sec = 1;
+
+        marker_left_foot.pose.position.x = 0.09
+        marker_left_foot.pose.position.y = 0.16
+        marker_left_foot.pose.position.z = 0.138
+
+        marker_left_foot.pose.orientation.z = 0.0
+        marker_left_foot.pose.orientation.y = 0.0
+        marker_left_foot.pose.orientation.z = 0.0
+        marker_left_foot.pose.orientation.w = 1.0
+
+        # marker_left_foot.color.a = 1.0
+        # marker_left_foot.color.b = 0.5
+        # marker_left_foot.color.g = 0.7
+
+        press_vis.markers.append(marker_left_foot)
+
+        marker_right_foot = Marker()
+
+        marker_right_foot.type = 10
+
+        marker_right_foot.header.frame_id = "map"
+        marker_right_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootRight.obj"
+        marker_right_foot.mesh_use_embedded_materials = True
+
+        marker_right_foot.action = 0;
+        marker_right_foot.frame_locked = True
+        marker_right_foot.scale.x = 1.0
+        marker_right_foot.scale.y = 1.0
+        marker_right_foot.scale.z = 1.0
+        marker_right_foot.ns = "right pressure sole"
+        # marker_right_foot.lifetime.sec = 1
+
+        marker_right_foot.pose.position.x = 0.09
+        marker_right_foot.pose.position.y = -0.16
+        marker_right_foot.pose.position.z = 0.138
+
+        marker_right_foot.pose.orientation.z = 0.0
+        marker_right_foot.pose.orientation.y = 0.0
+        marker_right_foot.pose.orientation.z = 0.0
+        marker_right_foot.pose.orientation.w = 1.0
+
+        press_vis.markers.append(marker_right_foot)
 
         self.publisher.publish(press_vis)
 
-    # def timer_callback(self):
 
     def listener_callback(self, msg):
         self.create_heatmap(msg.pressure_values)
-        # self.pressure_values = msg.pressure_values
 
     
     if __name__ == '__main__':
