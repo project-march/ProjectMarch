@@ -273,12 +273,6 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',
-            name='fuzzy_generator'
-        ),
-        Node(
-            package='fuzzy_generator',
-            namespace='',
-            executable='fuzzy_node',
             name='fuzzy_generator',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
@@ -286,7 +280,7 @@ def generate_launch_description() -> LaunchDescription:
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
         mujoco_node,
-        # rqt_input_device,
+        rqt_input_device,
         march_control,
         record_rosbags_action,
         safety_node,

@@ -104,12 +104,12 @@ class InputDeviceController:
             topic="/publish_swing_leg_command",
             qos_profile=10,
         )
-        self._gait_response_subscriber = self._node.create_subscription(
-            msg_type=GaitResponse,
-            topic="/march/gait_response",
-            callback=self._gait_response_callback,
-            qos_profile=10,
-        )
+        # self._gait_response_subscriber = self._node.create_subscription(
+        #     msg_type=GaitResponse,
+        #     topic="/march/gait_response",
+        #     callback=self._gait_response_callback,
+        #     qos_profile=10,
+        # )
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -139,12 +139,12 @@ class InputDeviceController:
                 clock=self._node.get_clock(),
             )
 
-        self._eeg_input_subscriber = self._node.create_subscription(
-            msg_type=Int32,
-            topic="/eeg_gait_request",
-            callback=self._eeg_gait_request_callback,
-            qos_profile=10,
-        )
+        # self._eeg_input_subscriber = self._node.create_subscription(
+        #     msg_type=Int32,
+        #     topic="/eeg_gait_request",
+        #     callback=self._eeg_gait_request_callback,
+        #     qos_profile=10,
+        # )
 
         if self._ping:
             self._alive_pub = self._node.create_publisher(
