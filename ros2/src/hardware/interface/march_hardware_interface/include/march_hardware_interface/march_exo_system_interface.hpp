@@ -85,7 +85,7 @@ struct JointInfo {
                     "/measured_torque", 10);
 
             m_measure_torque_subscription = this->create_subscription<std_msgs::msg::Int32>(
-                    "/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
+                    "/march/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
 
             RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
         }
