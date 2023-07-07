@@ -1,0 +1,32 @@
+bounds:
+  # all values represent height in meters
+  descending_lower_bound: 0.0
+  descending_upper_bound: 0.2
+  ascending_lower_bound: 0.0
+  ascending_upper_bound: 0.1
+joints:
+  # all values represent ratios in percentage points
+  left_ankle:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  left_hip_aa:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  left_hip_fe:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  left_knee:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_ankle:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_hip_aa:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_hip_fe:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  right_knee:
+    minimum_torque: 0.0
+    maximum_torque: 0.1

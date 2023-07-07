@@ -258,12 +258,29 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
+    fuzzy_default_config = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
+
+    # parameters
+    fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
+
+
     return LaunchDescription(declared_arguments + [
         Node(
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',
             name='fuzzy_generator'
+        ),
+        Node(
+            package='fuzzy_generator',
+            namespace='',
+            executable='fuzzy_node',
+            name='fuzzy_generator',
+            parameters=[{'config_path': fuzzy_config_path}]
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),

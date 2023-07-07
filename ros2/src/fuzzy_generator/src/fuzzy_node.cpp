@@ -4,16 +4,19 @@
 
 #include "fuzzy_generator/fuzzy_node.hpp"
 #include "fuzzy_generator/fuzzy_generator.hpp"
+#include <chrono>
 using std::placeholders::_1;
 using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 FuzzyNode::FuzzyNode()
         : Node("fuzzy_node")
-        , m_fuzzy_generator()
 {
-    m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
-            "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
+    declare_parameter("config_path", std::string(""));
+    std::string config_path = this->get_parameter("config_path").as_string();
+    m_fuzzy_generator = FuzzyGenerator(config_path);
+    // m_stance_leg_subscription = this->create_subscription<std_msgs::msg::Int32>(
+    //         "current_stance_foot", 10, std::bind(&FuzzyNode::stance_leg_callback, this, _1));
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
             "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
 
@@ -26,40 +29,6 @@ FuzzyNode::FuzzyNode()
 }
 
 /**
- * Sets the right and left leg to either swing or stance. Updates and publishes new weights accordingly.
- *
- * @param msg Message that contains the integer to indicate which leg is the stance leg.
- * @return
- */
-void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
-{
-    // set the stance leg
-    m_fuzzy_generator.setStanceLeg(*msg.get());
-
-    // update the weights for the left leg
-    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
-    m_fuzzy_generator.updateWeights(left_leg);
-
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped left_weights;
-    left_weights.torque_weight = left_leg->getTorqueWeight();
-    left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = "l";
-    publish_weights(left_weights);
-
-    // update the weights for the right leg
-    Leg* right_leg = m_fuzzy_generator.getRightLeg();
-    m_fuzzy_generator.updateWeights(right_leg);
-
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped right_weights;
-    right_weights.torque_weight = right_leg->getTorqueWeight();
-    right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = "r";
-    publish_weights(right_weights);
-}
-
-/**
  * Sets the height of both feet
  *
  * @param msg Message that contains the height of both feet. Updates and publishes new weights accordingly.
@@ -67,32 +36,23 @@ void FuzzyNode::stance_leg_callback(std_msgs::msg::Int32::SharedPtr msg)
  */
 void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
 
-    // update the feet height
-    m_fuzzy_generator.setFeetHeight(*msg.get());
+    // float left_foot_height = msg->heights[0];
+    // float right_foot_height = msg->heights[1];
 
-    // update the weights for the left leg
-    Leg* left_leg = m_fuzzy_generator.getLeftLeg();
-    m_fuzzy_generator.updateWeights(left_leg);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "left foot height " << msg->heights[0] << " right foot height " << msg->heights[1]);
 
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped left_weights;
-    left_weights.torque_weight = left_leg->getTorqueWeight();
-    left_weights.position_weight = left_leg->getPositionWeight();
-    left_weights.leg = "l";
-    left_weights.header.frame_id = this->get_name();
-    publish_weights(left_weights);
+    auto weights = m_fuzzy_generator.calculateWeights(msg->heights);
+    for(auto w: weights){
 
-    // update the weights for the right leg
-    Leg* right_leg = m_fuzzy_generator.getRightLeg();
-    m_fuzzy_generator.updateWeights(right_leg);
-
-    // send the weights for the left leg
-    march_shared_msgs::msg::WeightStamped right_weights;
-    right_weights.torque_weight = right_leg->getTorqueWeight();
-    right_weights.position_weight = right_leg->getPositionWeight();
-    right_weights.leg = "r";
-    right_weights.header.frame_id = this->get_name();
-    publish_weights(right_weights);
+        // send the weights for the left leg
+        march_shared_msgs::msg::WeightStamped fuzzy_weights;
+        fuzzy_weights.joint_name = std::get<0>(w);
+        fuzzy_weights.position_weight = std::get<1>(w);
+        fuzzy_weights.torque_weight = std::get<2>(w);
+        fuzzy_weights.header.frame_id = this->get_name();
+        publish_weights(fuzzy_weights);
+        // RCLCPP_WARN_STREAM(this->get_logger(), "weights for joint: " << fuzzy_weights.joint_name << " position: " << fuzzy_weights.position_weight << " torque: " << fuzzy_weights.torque_weight);
+    }
 }
 
 /**
@@ -104,14 +64,13 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
 void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     std::string allowed_control_type = msg->data;
 
-    std::string prev_allowed_control_type = this->get_parameter("allowed_control_type").as_string();
-    if((prev_allowed_control_type == "position" && allowed_control_type == "torque") || (prev_allowed_control_type == "torque" && allowed_control_type == "position")){
-        RCLCPP_FATAL_STREAM(this->get_logger(), "switching from position to torque causes shooting!");
-        throw(std::invalid_argument("SHOULD NOT YET SWITCH BETWEEN POSITION AND CONTROL!"));
+    if(allowed_control_type == "torque"){
+        RCLCPP_FATAL_STREAM(this->get_logger(), "switching to torque causes shooting!");
     }
 
-    if(allowed_control_type != "fuzzy" && allowed_control_type != "torque" && allowed_control_type != "position"){
+    if(allowed_control_type != "fuzzy" && allowed_control_type != "position"){
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
+        return;
     }
     else{
         RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
@@ -119,19 +78,21 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
 
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
 
-    // dummy message to make sure that the fuzzy node publishes weights after setting a control type
-    march_shared_msgs::msg::WeightStamped weights;
-    weights.torque_weight = 0;
-    weights.position_weight = 0;
-    weights.leg = "";
-    publish_weights(weights);
+    // dummy message to make sure that the fuzzy node publishes weights after setting a control type such that all the joints are in position control
+    if(allowed_control_type == "position"){
+        march_shared_msgs::msg::WeightStamped weights;
+        weights.torque_weight = 0;
+        weights.position_weight = 1;
+        weights.joint_name = "";
+        publish_weights(weights);
+    }
+
 }
 
 void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
-    std::string leg = msg.leg;
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
-    RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
+    // RCLCPP_INFO_STREAM(this->get_logger(), "setting weights according to " << allowed_control_type << " control ");
 
     if(allowed_control_type == "position"){
         msg.position_weight = 1;
@@ -144,7 +105,6 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
         m_weight_publisher->publish(msg);
     }
     else if(allowed_control_type == "fuzzy"){
-        // RCLCPP_INFO_STREAM(this->get_logger(), "we have leg: " << leg);
         m_weight_publisher->publish(msg);
     }
     else{

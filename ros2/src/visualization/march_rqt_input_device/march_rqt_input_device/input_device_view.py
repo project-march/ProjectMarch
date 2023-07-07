@@ -150,6 +150,7 @@ class InputDeviceView(QWidget):
         self,
         name: str,
         callback: Optional[Union[str, Callable]] = None,
+        control_type: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
@@ -172,7 +173,7 @@ class InputDeviceView(QWidget):
         qt_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         qt_button.setStyleSheet("QToolButton {background-color: lightgrey; font-size: 13px; font: 'Times New Roman'}")
         qt_button.setIconSize(QSize(90, 90))
-        qt_button.setText(check_string(name))
+        qt_button.setText(check_string(name)) + "\n" + check_string(control_type)
         if image_path is not None:
             qt_button.setIcon(QIcon(QPixmap(get_image_path(image_path))))
         elif name + ".png" in self._image_names:
@@ -192,7 +193,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         else:
-            qt_button.clicked.connect(lambda: self._controller.publish_gait(name))
+            qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
 
         return qt_button
 
@@ -243,6 +244,8 @@ def check_string(text: str) -> str:
     Returns:
          str. The string that has a new word on every third word.
     """
+    if(text == None):
+        return ""
     words = text.replace("_", " ").split(" ")
     new_string = words[0]
     characters_since_line_break = len(new_string)

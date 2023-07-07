@@ -59,6 +59,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"ping_safety_node": LaunchConfiguration("ping_safety_node")},
                     {"layout_file": layout_file},
+                    {"testing": "false"},
                 ],
             ),
         ]

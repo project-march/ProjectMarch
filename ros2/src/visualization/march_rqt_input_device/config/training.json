@@ -1,10 +1,12 @@
 [
   [
     {
-      "name": "home_sit"
+      "name": "home_sit",
+      "control_type": "position"
     },
     {
-      "name": "home_stand"
+      "name": "home_stand",
+      "control_type": "position"
     },
     {
       "name": "stop",
@@ -15,17 +17,6 @@
       "name": "force_unknown",
       "callback": "publish_sm_to_unknown",
       "always_enabled": true
-    }
-  ],
-  [
-    {
-      "name": "dynamic_walk"
-    },
-    {
-      "name": "dynamic_step_and_close"
-    },
-    {
-      "name": "dynamic_step"
     }
   ],
   [
@@ -41,10 +32,12 @@
   ],
   [
     {
-      "name": "stand"
+      "name": "stand",
+      "control_type": "position"
     },
     {
-      "name": "sit"
+      "name": "sit",
+      "control_type": "position"
     },
     {
       "name": "eeg",
@@ -57,39 +50,16 @@
       "callback": "publish_error",
       "always_enabled": true
     },
-  {
-      "name": "stepping_stones_step_and_close"
-    },
     {
-      "name": "start_with_right",
-      "callback": "publish_start_with_right",
+      "name": "switch_to_position",
+      "callback": "switch_to_position",
+      "control_type": "position",
       "always_enabled": true
     },
     {
-      "name": "start_with_left",
-      "callback": "publish_start_with_left",
-      "always_enabled": true
-    }
-  ],
-  [
-    {
-      "name": "small_narrow",
-      "callback": "publish_small_narrow",
-      "always_enabled": true
-    },
-    {
-      "name": "small_wide",
-      "callback": "publish_small_wide",
-      "always_enabled": true
-    },
-    {
-      "name": "large_narrow",
-      "callback": "publish_large_narrow",
-      "always_enabled": true
-    },
-    {
-      "name": "large_wide",
-      "callback": "publish_large_wide",
+      "name": "switch_to_fuzzy",
+      "callback": "switch_to_fuzzy",
+      "control_type": "fuzzy",
       "always_enabled": true
     }
   ]

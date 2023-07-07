@@ -1,0 +1,13 @@
+bounds:
+  descending_lower_bound: 0.0
+  descending_upper_bound: 0.1
+  ascending_lower_bound: 0.0
+  ascending_upper_bound: 0.1
+joints:
+  rotational_joint:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  linear_joint:
+    minimum_torque: 0.0
+    maximum_torque: 0.1
+  
