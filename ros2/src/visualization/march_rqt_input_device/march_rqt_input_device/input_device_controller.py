@@ -85,12 +85,12 @@ class InputDeviceController:
         )
         self._set_gait_control_type = self._node.create_publisher(
             msg_type=String,
-            topic="weight_control_type",
+            topic="/march/weight_control_type",
             qos_profile=10,
         )
         self.measure_torque_pub = self._node.create_publisher(
             msg_type=Int32,
-            topic="measure_torque",
+            topic="/march/measure_torque",
             qos_profile=10,
         )
         self._current_gait = self._node.create_subscription(
