@@ -520,14 +520,14 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // FIXME: BEUNFIX
         // RCLCPP_INFO_STREAM((*logger_), "The fuzzy target values for " << jointInfo.name << " are as follows: \n target position: " << jointInfo.target_position << " \n measured position: " << jointInfo.position << "\n position weight: " << jointInfo.position_weight << " \n target torque: " << jointInfo.target_torque << " \n measured torque: " << jointInfo.torque << " \n torque weight: " << jointInfo.torque_weight);
-        if(jointInfo.name.compare("left_ankle") == 0){
-            RCLCPP_INFO((*logger_), "left ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
-            // jointInfo.joint.actuate((float)jointInfo.target_position, -0.012, 0.6f, 0.4f);
-        }
-        else if(jointInfo.name.compare("right_ankle") == 0){
-            RCLCPP_INFO((*logger_), "right ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
-            // jointInfo.joint.actuate((float)jointInfo.target_position, -0.185f, 0.6f, 0.4f);
-        }
+        // if(jointInfo.name.compare("left_ankle") == 0){
+        //     RCLCPP_INFO((*logger_), "left ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
+        //     // jointInfo.joint.actuate((float)jointInfo.target_position, -0.012, 0.6f, 0.4f);
+        // }
+        // else if(jointInfo.name.compare("right_ankle") == 0){
+        //     RCLCPP_INFO((*logger_), "right ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
+        //     // jointInfo.joint.actuate((float)jointInfo.target_position, -0.185f, 0.6f, 0.4f);
+        // }
         // else{
             // ACTUAL TORQUE LINE
             jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
