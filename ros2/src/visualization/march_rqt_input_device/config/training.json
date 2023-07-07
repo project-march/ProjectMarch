@@ -61,6 +61,11 @@
       "callback": "switch_to_fuzzy",
       "control_type": "fuzzy",
       "always_enabled": true
-    }
+    },
+    {
+      "name": "measure-torque",
+      "callback": "measure_torque",
+      "always_enabled": true
+   }
   ]
 ]
