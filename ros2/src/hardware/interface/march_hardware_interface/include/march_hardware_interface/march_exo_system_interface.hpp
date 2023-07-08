@@ -199,8 +199,8 @@ struct JointInfo {
                 if(jointInfo.name.compare("left_ankle") == 0 || jointInfo.name.compare("right_ankle") == 0){
                     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
                     jointInfo.target_torque = avg_torque;
-                    jointInfo.torque_weight = 0.2;
-                    jointInfo.position_weight = 0.8;
+                    jointInfo.torque_weight = 0.3;
+                    jointInfo.position_weight = 0.7;
                 }
                 // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
