@@ -136,7 +136,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 150.0
+            maxTorque: 250.0
             averageTorque: 10
         pids:
           position:
@@ -281,7 +281,7 @@ march8:
             resolution: 12
             transmission: 121
           torqueSensor:
-            maxTorque: 150.0
+            maxTorque: 250.0
             averageTorque: 10.0
         pids:
           position:
