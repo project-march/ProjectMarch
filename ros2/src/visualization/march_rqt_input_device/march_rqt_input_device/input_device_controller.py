@@ -2,7 +2,7 @@
 import getpass
 import socket
 
-from march_shared_msgs.msg import Alive, Error, GaitRequest
+from march_shared_msgs.msg import GaitRequest
 from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock

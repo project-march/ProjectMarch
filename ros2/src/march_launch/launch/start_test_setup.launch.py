@@ -103,7 +103,7 @@ def generate_launch_description() -> LaunchDescription:
             package='fuzzy_generator',
             executable='fuzzy_node',
             name='fuzzy_node',
-            parameters=[ {'config_path': fuzzy_config_path}]
+            parameters=[{'config_path': fuzzy_config_path}]
         ),
         rqt_input_device,
         march_control,

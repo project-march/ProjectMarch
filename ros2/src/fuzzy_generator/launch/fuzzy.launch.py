@@ -1,4 +1,4 @@
-"""Created by: Rixt Hellinga, MVIII"""
+"""Created by: Rixt Hellinga, MVIII."""
 from launch import LaunchDescription
 from launch.actions import SetEnvironmentVariable
 from launch_ros.actions import Node
