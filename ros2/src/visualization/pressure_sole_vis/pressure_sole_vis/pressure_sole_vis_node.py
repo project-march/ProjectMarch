@@ -5,9 +5,9 @@ from march_shared_msgs.msg import PressureSolesData
 import numpy as np
 from visualization_msgs.msg import MarkerArray
 from visualization_msgs.msg import Marker
-from geometry_msgs.msg import Pose
-from geometry_msgs.msg import Vector3
-
+from std_msgs.msg import ColorRGBA
+from geometry_msgs.msg import Point
+import colorsys
 
 NODE_NAME = "pressure_sole_vis"
 
@@ -59,7 +59,8 @@ class PressureSoleVis(Node):
         self.publisher = self.create_publisher(MarkerArray, '/pressure_sole_visualization', 10)        
         
         self.subscription  # prevent unused variable warning
-
+        self.min_z = 0.0
+        self.max_z = 0.2
         # the coordinates of the pressure sole pads - left foot
         self.x_coord_left = np.array([0.044,0.044,0.138,0.206,0.2162,0.228,0.265,0.275])
         self.y_coord_left = np.array([0.039,0.013,0.050,0.061,0.025,-0.007,0.038,0.002]) + 0.05
@@ -69,67 +70,87 @@ class PressureSoleVis(Node):
         self.y_coord_right = self.y_coord_left * -1
 
 
+    def hsv_to_rgb(self, h, s, v):
+        if h == None:
+            h = 0
+        r, g, b = colorsys.hsv_to_rgb(0.667 - (h * 0.667), s, v)
+        return r, g, b
+    
     def create_heatmap(self, data):
         press_vis = MarkerArray()
-
+        data = np.clip(data, 0.0,0.2)
+        resolution = 150 # amount of markers that are created
 
         # create markers for all of the pressure sole values
         for i in range(int(len(data)/2)):
+            # for j in range(20): 
+            marker_container_strip = Marker()
+            marker_container_strip.type = 6
+            marker_container_strip.header.frame_id = "map"
 
-            marker_container = Marker()
-            marker_container.header.frame_id = "map"
-            marker_container.type = 1
-            marker_container.id = i
-            marker_container.ns = f'pressure sole vis {i}'
+            marker_container_strip.scale.x = 0.01
+            marker_container_strip.scale.y = 0.01
+            marker_container_strip.scale.z = 0.5/resolution
 
-            marker_container.scale.x = 0.01
-            marker_container.scale.y = 0.01
-            marker_container.scale.z = min(data[i],0.1)
+            marker_container_strip.pose.position.x = self.x_coord_right[i]
+            marker_container_strip.pose.position.y = self.y_coord_right[i]
+            marker_container_strip.pose.position.z = 0.0
 
-            marker_container.pose.position.x = self.x_coord_left[i]
-            marker_container.pose.position.y = self.y_coord_left[i]
-            marker_container.pose.position.z = marker_container.scale.z/2 # the scale is from the middle of the marker so move the marker up
+            marker_container_strip.pose.orientation.z = 0.0
+            marker_container_strip.pose.orientation.y = 0.0
+            marker_container_strip.pose.orientation.z = 0.0   
+            marker_container_strip.pose.orientation.w = 1.0
+            marker_container_strip.id = (i)
+            marker_container_strip.ns = f'pressure sole vis {(i+1)}'
 
-            marker_container.pose.orientation.z = 0.0
-            marker_container.pose.orientation.y = 0.0
-            marker_container.pose.orientation.z = 0.0
-            marker_container.pose.orientation.w = 1.0
-            marker_container.action = 0
-            marker_container.frame_locked = True
-            marker_container.color.a = 1.0
-            marker_container.color.r = 1.0
-            marker_container.color.b = 0.0
-            marker_container.color.g = 0.0
+            marker_container_strip.action = 0
+            marker_container_strip.frame_locked = True
+            press_vis.markers.append(marker_container_strip)
 
+            for j in range(int(data[i]*resolution)): #something that creates an amount of markers based on the height
+                point_container = Point()
+                color = ColorRGBA()
+                color.a = 1.0
+                normalized_z = (data[i] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
 
-            press_vis.markers.append(marker_container)
+                point_container.x = 0.0
+                point_container.y = 0.0
+                point_container.z = j*marker_container_strip.scale.z # the scale is from the middle of the point so move the point up
 
-            marker_container = Marker()
-            marker_container.header.frame_id = "map"
-            marker_container.type = 1
-            marker_container.id = i+8
-            marker_container.ns = f'pressure sole vis {i+8}'
+                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(data[i]*resolution))*j), 1.0, 1.0)
+                
+                marker_container_strip.points.append(point_container)
+                marker_container_strip.colors.append(color)
 
-            marker_container.scale.x = 0.01
-            marker_container.scale.y = 0.01
-            marker_container.scale.z = min(data[i+8],0.1)
+                # marker_container = Marker()
+                # color = ColorRGBA()
+                # color.a = 1.0
+                # normalized_z = (data[i+8] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
+                # marker_container.header.frame_id = "map"
+                # marker_container.type = 1
+                # marker_container.id = (j+1)*(i+8)
+                # marker_container.ns = f'pressure sole vis {(j+1000)*(i+8)}'
 
-            marker_container.pose.position.x = self.x_coord_right[i]
-            marker_container.pose.position.y = self.y_coord_right[i]
-            marker_container.pose.position.z = marker_container.scale.z/2 # the scale is from the middle of the marker so move the marker up
+                # marker_container.scale.x = 0.01
+                # marker_container.scale.y = 0.01
+                # marker_container.scale.z = 1.0/resolution
 
-            marker_container.pose.orientation.z = 0.0
-            marker_container.pose.orientation.y = 0.0
-            marker_container.pose.orientation.z = 0.0
-            marker_container.pose.orientation.w = 1.0
+                # marker_container.pose.position.x = self.x_coord_right[i]
+                # marker_container.pose.position.y = self.y_coord_right[i]
+                # marker_container.pose.position.z = j*marker_container.scale.z # the scale is from the middle of the marker so move the marker up
 
-            marker_container.action = 0
-            marker_container.frame_locked = True
-            marker_container.color.a = 1.0
-            marker_container.color.b = 0.5
-            marker_container.color.g = 0.7
+                # marker_container.pose.orientation.z = 0.0
+                # marker_container.pose.orientation.y = 0.0
+                # marker_container.pose.orientation.z = 0.0
+                # marker_container.pose.orientation.w = 1.0
 
-            press_vis.markers.append(marker_container)
+                # marker_container.action = 0
+                # marker_container.frame_locked = True
+
+                # color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(data[i+8]*resolution))*j), 1.0, 1.0)
+                # marker_container.color = color
+
+                # press_vis.markers.append(marker_container)
 
         marker_left_foot = Marker()
         marker_left_foot.type = 10
@@ -154,10 +175,6 @@ class PressureSoleVis(Node):
         marker_left_foot.pose.orientation.y = 0.0
         marker_left_foot.pose.orientation.z = 0.0
         marker_left_foot.pose.orientation.w = 1.0
-
-        # marker_left_foot.color.a = 1.0
-        # marker_left_foot.color.b = 0.5
-        # marker_left_foot.color.g = 0.7
 
         press_vis.markers.append(marker_left_foot)
 
