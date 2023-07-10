@@ -11,7 +11,7 @@ FootstepGenerator::FootstepGenerator()
     , m_l(0.33)
 {
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
-            "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
+        "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
     m_swing_trajectory_command_publisher
         = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
@@ -22,8 +22,8 @@ FootstepGenerator::FootstepGenerator()
 }
 
 void FootstepGenerator::publish_foot_placements(
-        const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
-        std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
+    const std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::RequestFootsteps::Response> response)
 {
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();

@@ -25,7 +25,8 @@ public:
     /** @brief Override comparison operator */
     friend bool operator==(const TorqueSensor& lhs, const TorqueSensor& rhs)
     {
-        return lhs.getMotorControllerType() == rhs.getMotorControllerType() && lhs.max_torque_ == rhs.max_torque_ && lhs.average_torque_ == rhs.average_torque_;
+        return lhs.getMotorControllerType() == rhs.getMotorControllerType() && lhs.max_torque_ == rhs.max_torque_
+            && lhs.average_torque_ == rhs.average_torque_;
     }
     /** @brief Override stream operator for clean printing */
     friend std::ostream& operator<<(std::ostream& os, const TorqueSensor& torque_sensor)
