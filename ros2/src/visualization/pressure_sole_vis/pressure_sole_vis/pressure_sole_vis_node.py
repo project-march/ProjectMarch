@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
 from march_shared_msgs.msg import PressureSolesData
 import numpy as np
 from visualization_msgs.msg import MarkerArray
@@ -62,13 +61,13 @@ class PressureSoleVis(Node):
         self.min_z = 0.0
         self.max_z = 0.2
         # the coordinates of the pressure sole pads - left foot
-        self.x_coord_left = np.array([0.044,0.044,0.138,0.206,0.2162,0.228,0.265,0.275])
-        self.y_coord_left = np.array([0.039,0.013,0.050,0.061,0.025,-0.007,0.038,0.002]) + 0.05
+        self.x_coord_left = np.array([0.044,0.044,0.139,0.206,0.219,0.228,0.265,0.275]) # the coordinates of the pressure sole pads
+        self.y_coord_left = np.array([0.039,0.012,0.049,0.061,0.026,-0.007,0.038,0.005]) + 0.05
 
         # the coordinates of the pressure sole pads - right foot
         self.x_coord_right = self.x_coord_left
         self.y_coord_right = self.y_coord_left * -1
-
+        self.previous_data = np.zeros(16) # amount of pressure pads 
 
     def hsv_to_rgb(self, h, s, v):
         if h == None:
@@ -79,6 +78,8 @@ class PressureSoleVis(Node):
     def create_heatmap(self, data):
         press_vis = MarkerArray()
         data = np.clip(data, 0.0,0.2)
+        effective_data = data*0.5 + self.previous_data*0.5
+        self.previous_data = data
         resolution = 150 # amount of markers that are created
 
         # create markers for all of the pressure sole values
@@ -88,17 +89,29 @@ class PressureSoleVis(Node):
             marker_container_strip.type = 6
             marker_container_strip.header.frame_id = "map"
 
-            marker_container_strip.scale.x = 0.01
-            marker_container_strip.scale.y = 0.01
+            marker_container_strip.scale.x = 0.033
+            marker_container_strip.scale.y = 0.02
             marker_container_strip.scale.z = 0.5/resolution
 
             marker_container_strip.pose.position.x = self.x_coord_right[i]
             marker_container_strip.pose.position.y = self.y_coord_right[i]
             marker_container_strip.pose.position.z = 0.0
 
-            marker_container_strip.pose.orientation.z = 0.0
+            marker_container_strip.pose.orientation.x = 0.0
             marker_container_strip.pose.orientation.y = 0.0
             marker_container_strip.pose.orientation.z = 0.0   
+
+            if i == 2:
+                marker_container_strip.pose.orientation.z = -0.08
+            elif i == 3:
+                marker_container_strip.pose.orientation.z = 0.01
+            elif i == 5:
+                marker_container_strip.pose.orientation.z = 0.01
+            elif i == 6:
+                marker_container_strip.pose.orientation.z = 0.4
+            elif i == 7:
+                marker_container_strip.pose.orientation.z = -0.08
+
             marker_container_strip.pose.orientation.w = 1.0
             marker_container_strip.id = (i)
             marker_container_strip.ns = f'pressure sole vis {(i+1)}'
@@ -107,17 +120,17 @@ class PressureSoleVis(Node):
             marker_container_strip.frame_locked = True
             press_vis.markers.append(marker_container_strip)
 
-            for j in range(int(data[i]*resolution)): #something that creates an amount of markers based on the height
+            for j in range(int(effective_data[i]*resolution)): #something that creates an amount of markers based on the height
                 point_container = Point()
                 color = ColorRGBA()
                 color.a = 1.0
-                normalized_z = (data[i] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
+                normalized_z = (effective_data[i] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
 
                 point_container.x = 0.0
                 point_container.y = 0.0
                 point_container.z = j*marker_container_strip.scale.z # the scale is from the middle of the point so move the point up
 
-                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(data[i]*resolution))*j), 1.0, 1.0)
+                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(effective_data[i]*resolution))*j), 1.0, 1.0)
                 
                 marker_container_strip.points.append(point_container)
                 marker_container_strip.colors.append(color)
@@ -139,7 +152,7 @@ class PressureSoleVis(Node):
                 # marker_container.pose.position.y = self.y_coord_right[i]
                 # marker_container.pose.position.z = j*marker_container.scale.z # the scale is from the middle of the marker so move the marker up
 
-                # marker_container.pose.orientation.z = 0.0
+                # marker_container.pose.orientation.x = 0.0
                 # marker_container.pose.orientation.y = 0.0
                 # marker_container.pose.orientation.z = 0.0
                 # marker_container.pose.orientation.w = 1.0
@@ -152,31 +165,31 @@ class PressureSoleVis(Node):
 
                 # press_vis.markers.append(marker_container)
 
-        marker_left_foot = Marker()
-        marker_left_foot.type = 10
+        # marker_left_foot = Marker()
+        # marker_left_foot.type = 10
 
-        marker_left_foot.header.frame_id = "map"
-        marker_left_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootLeft.obj"
-        marker_left_foot.mesh_use_embedded_materials = True
+        # marker_left_foot.header.frame_id = "map"
+        # marker_left_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootLeft.obj"
+        # marker_left_foot.mesh_use_embedded_materials = True
 
-        marker_left_foot.action = 0
-        marker_left_foot.frame_locked = True
-        marker_left_foot.scale.x = 1.0
-        marker_left_foot.scale.y = 1.0
-        marker_left_foot.scale.z = 1.0
-        marker_left_foot.ns = "left pressure sole"
-        # marker_left_foot.lifetime.sec = 1;
+        # marker_left_foot.action = 0
+        # marker_left_foot.frame_locked = True
+        # marker_left_foot.scale.x = 1.0
+        # marker_left_foot.scale.y = 1.0
+        # marker_left_foot.scale.z = 1.0
+        # marker_left_foot.ns = "left pressure sole"
+        # # marker_left_foot.lifetime.sec = 1;
 
-        marker_left_foot.pose.position.x = 0.09
-        marker_left_foot.pose.position.y = 0.16
-        marker_left_foot.pose.position.z = 0.138
+        # marker_left_foot.pose.position.x = 0.09
+        # marker_left_foot.pose.position.y = 0.16
+        # marker_left_foot.pose.position.z = 0.138
 
-        marker_left_foot.pose.orientation.z = 0.0
-        marker_left_foot.pose.orientation.y = 0.0
-        marker_left_foot.pose.orientation.z = 0.0
-        marker_left_foot.pose.orientation.w = 1.0
+        # marker_left_foot.pose.orientation.z = 0.0
+        # marker_left_foot.pose.orientation.y = 0.0
+        # marker_left_foot.pose.orientation.z = 0.0
+        # marker_left_foot.pose.orientation.w = 1.0
 
-        press_vis.markers.append(marker_left_foot)
+        # press_vis.markers.append(marker_left_foot)
 
         marker_right_foot = Marker()
 
@@ -192,7 +205,6 @@ class PressureSoleVis(Node):
         marker_right_foot.scale.y = 1.0
         marker_right_foot.scale.z = 1.0
         marker_right_foot.ns = "right pressure sole"
-        # marker_right_foot.lifetime.sec = 1
 
         marker_right_foot.pose.position.x = 0.09
         marker_right_foot.pose.position.y = -0.16
@@ -210,7 +222,6 @@ class PressureSoleVis(Node):
 
     def listener_callback(self, msg):
         self.create_heatmap(msg.pressure_values)
-
     
     if __name__ == '__main__':
         main()
