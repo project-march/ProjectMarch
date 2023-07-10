@@ -5,8 +5,7 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -28,17 +27,17 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
     # endregion
-    
+
     rosbags = LaunchConfiguration("rosbags", default='true')
-    
+
     DeclareLaunchArgument(
         name="rosbags",
         default_value="true",
         description="Whether the rosbags should stored.",
         choices=["true", "false"],
     )
-    
-        # region rosbags
+
+    # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
         cmd=[
@@ -56,7 +55,7 @@ def generate_launch_description() -> LaunchDescription:
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
         condition=IfCondition(rosbags),
     )
-    
+
     default_fuzzy_config = os.path.join(
         get_package_share_directory('fuzzy_generator'),
         'config',
@@ -105,9 +104,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='fuzzy_node',
             name='fuzzy_node',
             parameters=[ {'config_path': fuzzy_config_path}]
-            #     {"config_file_path", fuzzy_config_file}
-            # ]
-            # arguments=['--ros-args', '--log-level', 'debug']
         ),
         rqt_input_device,
         march_control,

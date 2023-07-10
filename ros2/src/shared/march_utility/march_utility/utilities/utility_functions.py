@@ -226,8 +226,6 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         None. If the robot description does not contain the required joints.
         List[str]. Otherwise, a list of joint names.
     """
-    # robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    # robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
         "left_ankle",
         "left_hip_aa",
@@ -238,12 +236,6 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         "right_hip_fe",
         "right_knee",
     ]
-    # for joint_name in joint_name_list:
-    #     if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
-    #         if logger is not None:
-    #             logger.warn(f"{joint_name} is fixed, but required for IK")
-    #         return None
-
     return sorted(joint_name_list)
 
 
@@ -263,6 +255,7 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
             joint_names.append(name)
 
     return sorted(joint_names)
+
 
 def get_position_from_yaml(position: str):
     """Gets a dictionary for default joint angles and given positions.

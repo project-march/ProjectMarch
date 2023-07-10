@@ -56,4 +56,3 @@ class LowLvlController():
             sensor_map (integer list): A mapping matrix from sensor data to joint reference
         """
         self.sensor_map = sensor_map
-

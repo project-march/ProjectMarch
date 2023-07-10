@@ -84,10 +84,6 @@ class DynamicGaitClose(DynamicGaitWalk):
         if self.start_position_actuating_joints == self.home_stand_position_actuating_joints:
             self._logger.warn("Already in home stand position.")
             return GaitUpdate.empty()
-        elif self.start_position_all_joints == STEPPING_STONES_END_POSITION_RIGHT:
-            self.subgait_id = "right_swing"
-        elif self.start_position_all_joints == STEPPING_STONES_END_POSITION_LEFT:
-            self.subgait_id = "left_swing"
 
         self.update_parameters()
         self.start_time_next_command = current_time + first_subgait_delay

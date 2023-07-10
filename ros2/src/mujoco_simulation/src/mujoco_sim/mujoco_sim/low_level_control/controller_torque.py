@@ -47,4 +47,3 @@ class TorqueController(LowLvlController):
             data.ctrl[index] += ctrl_input
 
             self.e_prev[index] = e
-

@@ -9,8 +9,6 @@ from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from sensor_msgs.msg import JointState
-from control_msgs.msg import JointTrajectoryControllerState
-from trajectory_msgs.msg import JointTrajectoryPoint
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -209,8 +207,6 @@ class MujocoSimNode(Node):
         vs the time in ROS, so we can update the control inputs on time
         """
         time_current = self.get_clock().now()
-        time_difference = (time_current - self.time_last_updated).to_msg()
-        mj_time_current = self.data.time
 
         time_shifted = (time_current - self.ros_first_updated).to_msg()
 
@@ -282,4 +278,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-

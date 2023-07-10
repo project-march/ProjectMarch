@@ -1,9 +1,9 @@
-"""Author: Marten Haitjema."""
+"""Author: Marco Bak."""
 
 import os
 import yaml
 
-from typing import List, Optional, Dict
+from typing import List, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 
