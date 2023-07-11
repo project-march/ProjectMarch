@@ -7,11 +7,11 @@
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/torque_stamped.hpp"
-#include "std_msgs/msg/int32.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
-#include <yaml-cpp/yaml.h>
+#include "std_msgs/msg/int32.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <yaml-cpp/yaml.h>
 
 class FuzzyGenerator {
 public:
@@ -26,7 +26,7 @@ private:
     double lower_bound;
     double upper_bound;
 
-    YAML::Node config_;    
+    YAML::Node config_;
 };
 
-#endif //MARCH_FUZZY_GENERATOR_HPP
+#endif // MARCH_FUZZY_GENERATOR_HPP

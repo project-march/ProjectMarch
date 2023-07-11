@@ -21,10 +21,11 @@
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-    std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode, bool index_found,
-    unsigned int motor_kv, bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger)
-    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor), actuation_mode,
-        is_incremental_encoder_more_precise, std::move(logger))
+    std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
+    ActuationMode actuation_mode, bool index_found, unsigned int motor_kv, bool is_incremental_encoder_more_precise,
+    std::shared_ptr<march_logger::BaseLogger> logger)
+    : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor),
+        actuation_mode, is_incremental_encoder_more_precise, std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
     , torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
@@ -51,8 +52,7 @@ void ODrive::enableActuation()
 {
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
-    }
-    else{
+    } else {
         logger_->info("ODrive state already in closed loop control");
     }
 
@@ -115,7 +115,7 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
     bit32 write_position {};
     write_position.f = target_position;
     // logger_->info(logger_->fstring(
-        // "Sending position %f to the exo.", target_position));
+    // "Sending position %f to the exo.", target_position));
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;
@@ -124,7 +124,8 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 
 void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
 {
-    auto offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
+    auto offset
+        = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
     for (double& i : *pos_pid.get()) {
         bit32 write_value {};
         logger_->info(logger_->fstring("Sending PID value %f, with offset %d, to the exo.", i, offset));
@@ -199,7 +200,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
     return state;
 }
 
-//float ODrive::getTorque()
+// float ODrive::getTorque()
 //{
 //    return getMotorCurrent() * torque_constant_;
 //}

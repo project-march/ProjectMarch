@@ -17,13 +17,16 @@ class MotorController : public Slave {
 public:
     MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-        ActuationMode actuation_mode, bool is_incremental_encoder_more_precise, std::shared_ptr<march_logger::BaseLogger> logger);
+        ActuationMode actuation_mode, bool is_incremental_encoder_more_precise,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
-    MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger);
+    MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+        std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
-    MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, std::shared_ptr<march_logger::BaseLogger> logger);
+    MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
+        std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode,
+        std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Get the most precise position or velocity
     float getPosition();

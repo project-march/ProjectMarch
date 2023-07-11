@@ -244,7 +244,7 @@ def check_string(text: str) -> str:
     Returns:
          str. The string that has a new word on every third word.
     """
-    if(text == None):
+    if text is None:
         return ""
     words = text.replace("_", " ").split(" ")
     new_string = words[0]

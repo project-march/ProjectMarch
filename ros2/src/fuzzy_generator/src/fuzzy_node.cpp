@@ -10,17 +10,17 @@ using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 FuzzyNode::FuzzyNode()
-        : Node("fuzzy_node")
+    : Node("fuzzy_node")
 {
     declare_parameter("config_path", std::string(""));
     std::string config_path = this->get_parameter("config_path").as_string();
     m_fuzzy_generator = FuzzyGenerator(config_path);
 
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
-            "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
+        "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
 
     m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
-            "/march/weight_control_type", 10, std::bind(&FuzzyNode::control_type_callback, this, _1));
+        "/march/weight_control_type", 10, std::bind(&FuzzyNode::control_type_callback, this, _1));
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10);
 
@@ -33,10 +33,11 @@ FuzzyNode::FuzzyNode()
  * @param msg Message that contains the height of both feet. Updates and publishes new weights accordingly.
  * @return
  */
-void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
+void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg)
+{
 
     auto weights = m_fuzzy_generator.calculateWeights(msg->heights);
-    for(auto w: weights){
+    for (auto w : weights) {
 
         // send the weights for the legs
         march_shared_msgs::msg::WeightStamped fuzzy_weights;
@@ -55,14 +56,14 @@ void FuzzyNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::Share
  * @param msg Message that contains the control type: Position, Torque, or Fuzzy
  * @return
  */
-void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
+void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg)
+{
     std::string allowed_control_type = msg->data;
 
     if(allowed_control_type != "fuzzy" && allowed_control_type != "position"){
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
         return;
-    }
-    else{
+    } else {
         RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
     }
 
@@ -71,7 +72,8 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg) {
     // RCLCPP_INFO_STREAM(this->get_logger(), "--------------------------------------");
 }
 
-void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
+void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg)
+{
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
 

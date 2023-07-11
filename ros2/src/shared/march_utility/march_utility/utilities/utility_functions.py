@@ -8,9 +8,7 @@ from typing import List, Optional
 import math
 
 from ament_index_python.packages import get_package_share_directory
-from urdf_parser_py import urdf
 from rclpy.node import Node
-import rclpy
 
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
@@ -193,23 +191,21 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
         for name in joint:
             if name == joint_name:
                 motor_controller = joint[name]["motor_controller"]
-                absoluteEncoder = motor_controller["absoluteEncoder"]
+                absolute_encoder = motor_controller["absoluteEncoder"]
 
-    total_iu = pow(2, absoluteEncoder["resolution"])
+    total_iu = pow(2, absolute_encoder["resolution"])
     rad_per_iu = (2 * math.pi) / total_iu
-    zero_pos = absoluteEncoder["zeroPositionIU"]
+    zero_pos = absolute_encoder["zeroPositionIU"]
 
-    lower_soft_error_lim = absoluteEncoder["lowerSoftLimitMarginRad"]
-    upper_soft_error_lim = absoluteEncoder["upperSoftLimitMarginRad"]
+    lower_soft_error_lim = absolute_encoder["lowerSoftLimitMarginRad"]
+    upper_soft_error_lim = absolute_encoder["upperSoftLimitMarginRad"]
 
-    upper_iu = absoluteEncoder["maxPositionIU"]
-    lower_iu = absoluteEncoder["minPositionIU"]
+    upper_iu = absolute_encoder["maxPositionIU"]
+    lower_iu = absolute_encoder["minPositionIU"]
     upper_rad = (upper_iu - zero_pos) * rad_per_iu - upper_soft_error_lim
     lower_rad = (lower_iu - zero_pos) * rad_per_iu + lower_soft_error_lim
     velocity_limit = 3.0
-    joint_limits = Limits(upper=upper_rad, lower=lower_rad, velocity=velocity_limit)
-
-    return joint_limits
+    return Limits(upper=upper_rad, lower=lower_rad, velocity=velocity_limit)
 
 
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
@@ -226,8 +222,6 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         None. If the robot description does not contain the required joints.
         List[str]. Otherwise, a list of joint names.
     """
-    # robot = urdf.Robot.from_xml_file(MARCH_URDF)
-    # robot_joint_names = robot.joint_map.keys()
     joint_name_list = [
         "left_ankle",
         "left_hip_aa",
@@ -238,12 +232,6 @@ def validate_and_get_joint_names_for_inverse_kinematics(
         "right_hip_fe",
         "right_knee",
     ]
-    # for joint_name in joint_name_list:
-    #     if joint_name not in robot_joint_names or robot.joint_map[joint_name].type == "fixed":
-    #         if logger is not None:
-    #             logger.warn(f"{joint_name} is fixed, but required for IK")
-    #         return None
-
     return sorted(joint_name_list)
 
 
@@ -263,6 +251,7 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
             joint_names.append(name)
 
     return sorted(joint_names)
+
 
 def get_position_from_yaml(position: str):
     """Gets a dictionary for default joint angles and given positions.

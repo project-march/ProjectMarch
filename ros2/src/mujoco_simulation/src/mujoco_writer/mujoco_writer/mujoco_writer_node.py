@@ -2,9 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionServer, GoalResponse, CancelResponse
 from control_msgs.msg import JointTrajectoryControllerState
-from control_msgs.action import FollowJointTrajectory
 from std_msgs.msg import Bool
 
 from mujoco_interfaces.msg import MujocoInput
@@ -78,4 +76,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-

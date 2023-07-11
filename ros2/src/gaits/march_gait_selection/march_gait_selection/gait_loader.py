@@ -3,11 +3,10 @@
 import os
 import yaml
 
-from typing import List, Optional, Dict
+from typing import List, Dict
 from ament_index_python import get_package_share_directory
 from rclpy.node import Node
 
-from march_gait_selection.dynamic_interpolation.point_handlers.camera_point_handler import CameraPointHandler
 from march_gait_selection.dynamic_interpolation.point_handlers.simulated_point_handler import (
     SimulatedPointHandler,
 )
@@ -18,7 +17,7 @@ from march_gait_selection.dynamic_interpolation.gaits.dynamic_gait_step import D
 from march_gait_selection.gaits.home_gait import HomeGait
 from march_gait_selection.gaits.setpoints_gait import SetpointsGait
 from march_utility.gait.edge_position import UnknownEdgePosition, StaticEdgePosition, EdgePosition
-from march_utility.utilities.utility_functions import get_joint_names_from_urdf, get_position_from_yaml
+from march_utility.utilities.utility_functions import get_joint_names_from_urdf
 
 NODE_NAME = "gait_selection"
 UNKNOWN = "unknown"

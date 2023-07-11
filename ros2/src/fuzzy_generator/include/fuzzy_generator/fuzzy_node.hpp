@@ -4,16 +4,15 @@
 
 #ifndef MARCH_FUZZY_NODE_HPP
 #define MARCH_FUZZY_NODE_HPP
-#include "rclcpp/rclcpp.hpp"
 #include "fuzzy_generator.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/torque_stamped.hpp"
 #include "march_shared_msgs/msg/weight_stamped.hpp"
-#include "std_msgs/msg/int32.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include <std_msgs/msg/string.hpp>
-
 
 class FuzzyNode : public rclcpp::Node {
 public:
@@ -33,4 +32,4 @@ private:
 
     FuzzyGenerator m_fuzzy_generator;
 };
-#endif //MARCH_FUZZY_NODE_HPP
+#endif // MARCH_FUZZY_NODE_HPP

@@ -2,10 +2,6 @@
 	path = ros2/src/libraries/diagnostic_updater
 	url = ../libraries/diagnostic-updater.git
 	branch = master
-[submodule "ros2/src/libraries/march_robot_state_publisher"]
-	path = ros2/src/libraries/march_robot_state_publisher
-	url = ../libraries/robot-state-publisher.git
-	branch = main
 [submodule "ros2/src/libraries/control/control_msgs"]
 	path = ros2/src/libraries/control/control_msgs
 	url = ../libraries/control/control_msgs.git

@@ -65,4 +65,3 @@ class PositionController(LowLvlController):
                 self.e_prev[index] = e
         except IndexError:
             pass
-

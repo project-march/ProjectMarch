@@ -39,4 +39,3 @@ def generate_launch_description():
             name='mujoco_writer',
         ),
     ])
-

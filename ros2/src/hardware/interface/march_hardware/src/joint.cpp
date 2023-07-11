@@ -82,7 +82,7 @@ void Joint::actuate(float target_position, float target_torque, float position_w
     if (std::fabs(total_fuzzy - 1.0F) > std::numeric_limits<float>::epsilon()) {
         throw error::HardwareException(error::ErrorType::TOTAL_FUZZY_NOT_ONE,
             "Total weight exceeds value of one. With fuzzy position: %f and fuzzy torque: %f: ", position_weight,
-                                       torque_weight);
+            torque_weight);
     }
     motor_controller_->actuateTorque(target_torque, torque_weight);
     motor_controller_->actuateRadians(target_position, position_weight);
@@ -172,15 +172,14 @@ void Joint::readEncoders()
             position_ = motor_controller_->getAbsolutePosition();
         }
         velocity_ = motor_controller_->getVelocity();
-        if(motor_controller_->hasTorqueSensor()){
+        if (motor_controller_->hasTorqueSensor()) {
             torque_ = motor_controller_->getTorque();
             if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
                 throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
                     "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
                     motor_controller_->getTorqueSensor()->getMaxTorque());
             }
-        }
-        else{
+        } else {
             logger_->info(logger_->fstring("No reading the torque sensors"));
         }
     } else {
