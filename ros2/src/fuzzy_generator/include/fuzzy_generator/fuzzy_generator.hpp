@@ -13,35 +13,18 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
 
-inline static const char PATH_SEPARATOR =
-#ifdef _WIN32
-    '\\';
-#else
-    '/';
-#endif
-
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
     FuzzyGenerator(std::string config_path);
 
-    std::vector<std::tuple<std::string, float, float>> calculateWeights(std::vector<double> both_foot_heights);
-    std::vector<std::tuple<std::string, float, float>> getTorqueRanges();
-    std::string getStanceLeg(std::vector<double> both_foot_heights);
-    bool isAscending(std::string current_leg);
-    void updateVelocities();
+    std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
+    std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
+
 
 private:
-    double descending_upper_bound;
-    double descending_lower_bound;
-    double ascending_upper_bound;
-    double ascending_lower_bound;
-
-    std::vector<std::vector<float>> log { {}, {} };
-
-    float delta_avg_l = 0.0f;
-    float delta_avg_r = 0.0f;
-    float alpha = 0.2;
+    double lower_bound;
+    double upper_bound;
 
     YAML::Node config_;
 };
