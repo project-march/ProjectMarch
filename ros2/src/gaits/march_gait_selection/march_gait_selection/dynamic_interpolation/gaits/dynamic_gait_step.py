@@ -86,12 +86,12 @@ class DynamicGaitStep(DynamicGaitWalk):
         """
         if current_time >= self.start_time_next_command:
             if not self._has_gait_started:
-                return self._update_start_subgait()
+                return self._update_start_subgait(delay)
             else:
                 self._final_position_pub.publish(
                     JointState(position=self.trajectory_command_factory.final_position.values())
                 )
-                return self._update_next_subgait()
+                return self._update_next_subgait(delay)
 
         return GaitUpdate.empty()
 

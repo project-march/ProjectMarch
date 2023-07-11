@@ -21,13 +21,16 @@
   ],
   [
     {
-      "name": "fixed_walk"
+      "name": "fixed_walk",
+      "control_type": "fuzzy"
     },
     {
-      "name": "fixed_step_and_close"
+      "name": "fixed_step_and_close",
+      "control_type": "fuzzy"
     },
     {
-      "name": "fixed_step"
+      "name": "fixed_step",
+      "control_type": "position"
     }
   ],
   [

@@ -78,9 +78,6 @@ struct JointInfo {
             m_weight_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
                     "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
 
-            m_direct_torque_subscription = this->create_subscription<std_msgs::msg::Float32>(
-                    "/march/direct_torque", 10, std::bind(&WeightNode::direct_torque_callback, this, _1));
-
             m_measured_torque_publisher = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
                     "/measured_torque", 10);
 
@@ -98,23 +95,9 @@ struct JointInfo {
          */
         void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
         {
-            #ifdef TORQUEDEBUG
-            RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Ignoring weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
-            // return;
-            #endif
-            // FIXME: BEUNFIX
-            // setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
-        }
+            RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
 
-        /**
-         * This is a temporary method: it immediately sends out torque using a delta
-         *
-         * @param msg Message that contains the weights for both torque and position
-         * @return
-         */
-        void direct_torque_callback(std_msgs::msg::Float32::SharedPtr msg)
-        {
-            delta = msg->data;
+            setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
         /**
@@ -202,6 +185,7 @@ struct JointInfo {
                     jointInfo.torque_weight = 0.3;
                     jointInfo.position_weight = 0.7;
                 }
+                jointInfo.target_torque = avg_torque;
                 // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
             }
         }
@@ -211,7 +195,6 @@ struct JointInfo {
 
     private:
         rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
-        rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr m_direct_torque_subscription;
         rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
     };
