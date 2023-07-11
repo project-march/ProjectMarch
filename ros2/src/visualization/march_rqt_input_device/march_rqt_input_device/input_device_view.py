@@ -226,6 +226,7 @@ class InputDeviceView(QWidget):
 
     def publish_mpc_gait(self, gait_type: int, mpc_command: bool):
         """Publish gait to state_machine."""
+        self._controller._node.get_logger().warn("\n\n MPC Gaits are selected! \n")
         self._controller.use_mpc = mpc_command
         self._controller.publish_mpc_gait(gait_type)
         if gait_type == 1:
