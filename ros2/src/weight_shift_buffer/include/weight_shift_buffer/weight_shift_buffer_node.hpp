@@ -19,6 +19,8 @@ public:
     WeightShiftBufferNode();
 
 private:
+    WeightShiftBuffer m_weight_shift_buffer;
+    
     rclcpp_action::Server<control_msgs::action::FollowJointTrajectory>::SharedPtr m_gait_loader_server;
     rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SharedPtr m_joint_controller_client;
     rclcpp_action::GoalResponse handle_goal(

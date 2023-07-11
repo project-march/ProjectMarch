@@ -112,6 +112,7 @@ class TrajectoryScheduler:
         self._failed = False
         goal_msg = FollowJointTrajectory.Goal()
         goal_msg.trajectory = command.trajectory
+
         if not self._action_client_to_controller.wait_for_server(SCHEDULE_TIMEOUT):
             self._logger.warn(f"Failed to schedule trajectory {command} within {SCHEDULE_TIMEOUT} seconds")
             return

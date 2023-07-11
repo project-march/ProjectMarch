@@ -5,6 +5,7 @@ using std::placeholders::_2;
 WeightShiftBufferNode::WeightShiftBufferNode()
     : Node("weight_shift_buffer")
     , m_gait_type(0)
+    , m_weight_shift_buffer()
 {
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
     this->m_gait_loader_server = rclcpp_action::create_server<control_msgs::action::FollowJointTrajectory>(this,
@@ -80,6 +81,12 @@ void WeightShiftBufferNode::request_feedback(control_msgs::action::FollowJointTr
     }
     RCLCPP_INFO(this->get_logger(), "Action server is alive");
     auto goal_msg = goal;
+    if (m_gait_type == 1){
+        goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
+        // for (int i; i<goal_msg.trajectory.points.size();i++){
+        //     RCLCPP_INFO(this->get_logger(), "after %f ", goal_msg.trajectory.points[i].positions[5]);
+        // }
+    }
 
     auto send_goal_options = rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SendGoalOptions();
     send_goal_options.goal_response_callback = std::bind(&WeightShiftBufferNode::goal_response_callback, this, _1);
