@@ -179,12 +179,13 @@ class WeightNode : public rclcpp::Node {
                 "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size()
                          << " values");
             // FIXME: BEUNFIX
-            if (jointInfo.name.compare("left_ankle") == 0 || jointInfo.name.compare("right_ankle") == 0) {
-                RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
-                jointInfo.target_torque = avg_torque;
-                jointInfo.torque_weight = 0.4;
-                jointInfo.position_weight = 0.6;
-            }
+            // if (jointInfo.name.compare("left_ankle") == 0 || jointInfo.name.compare("right_ankle") == 0) {
+            //     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
+            //     jointInfo.target_torque = avg_torque;
+            //     jointInfo.torque_weight = 0.4;
+            //     jointInfo.position_weight = 0.6;
+            // }
+            jointInfo.target_torque = avg_torque;
             // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to
             // hardcode it
         }
