@@ -20,8 +20,8 @@ def generate_launch_description():
         executable='weight_shift_buffer_node',
         name='weight_shift_buffer_node',
         parameters=[
-            {"test1", test1},
-            {"test2", test2},
+            {"test1": test1},
+            {"test2": test2},
         ]
         ),
     ])
