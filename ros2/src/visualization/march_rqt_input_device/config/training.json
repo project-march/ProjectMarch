@@ -67,5 +67,28 @@
       "callback": "measure_torque",
       "always_enabled": true
    }
+  ],
+  [
+    {
+      "name": "use_mpc",
+      "mpc_command": true,
+      "gait_type": 1,
+      "always_enabled": true
+    },
+    {
+      "name": "mpc_walk",
+      "gait_type": 2
+    },
+    {
+      "name": "mpc_step_and_close",
+      "gait_type": 3
+    },
+    {
+      "name": "mpc_stop",
+      "mpc_command": false,
+      "gait_type": 1,
+      "always_enabled": true
+
+    }
   ]
 ]

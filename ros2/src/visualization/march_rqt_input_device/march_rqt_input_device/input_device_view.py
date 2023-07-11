@@ -111,10 +111,14 @@ class InputDeviceView(QWidget):
         First requests the controller to update the possible, then creates a timer to update the view if the possible
         gaits changed.
         """
-        self._controller.update_possible_gaits()
-        self.possible_gaits = []
-        self._update_gait_buttons([])
-        self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
+        if self._controller.use_mpc:
+            self.possible_gaits = self._controller.update_mpc_gaits()
+            self._update_gait_buttons(self.possible_gaits)
+        else:
+            self._controller.update_possible_gaits()
+            self.possible_gaits = []
+            self._update_gait_buttons([])
+            self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
 
     def _update_possible_gaits_view(self, future) -> None:
         """Update the buttons if the possible gaits have changed."""
@@ -149,6 +153,8 @@ class InputDeviceView(QWidget):
     def create_button(
         self,
         name: str,
+        mpc_command: bool = False,
+        gait_type: Optional[int] = None,
         callback: Optional[Union[str, Callable]] = None,
         control_type: Optional[str] = None,
         image_path: Optional[str] = None,
@@ -192,6 +198,8 @@ class InputDeviceView(QWidget):
                 qt_button.clicked.connect(callback)
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
+        if gait_type is not None:
+            qt_button.clicked.connect(lambda: self.publish_mpc_gait(gait_type, mpc_command))
         else:
             qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
 
@@ -215,6 +223,15 @@ class InputDeviceView(QWidget):
                 qt_button_layout.addWidget(user_input_object, row, column, 1, 1)
 
         return qt_button_layout
+
+    def publish_mpc_gait(self, gait_type: int, mpc_command: bool):
+        """Publish gait to state_machine."""
+        self._controller.use_mpc = mpc_command
+        self._controller.publish_mpc_gait(gait_type)
+        if gait_type == 1:
+            self._controller.publish_sm_to_unknown()
+            self._controller.publish_gait("home_stand", "position")
+        self._update_possible_gaits()
 
 
 def get_image_path(image_path: str) -> str:

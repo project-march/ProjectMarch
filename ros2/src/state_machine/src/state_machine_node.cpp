@@ -30,14 +30,6 @@ StateMachineNode::StateMachineNode()
     m_state_machine = StateMachine();
     m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
     m_gait_request = std::make_shared<march_shared_msgs::srv::RequestGait::Request>();
-    while (!m_gait_client->wait_for_service(1s)) {
-        if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
-            return;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service not available, waiting again...");
-    }
-    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service connected");
 
     while (!m_footstep_client->wait_for_service(1s)) {
         if (!rclcpp::ok()) {

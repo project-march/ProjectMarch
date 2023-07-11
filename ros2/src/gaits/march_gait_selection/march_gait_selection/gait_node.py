@@ -29,8 +29,6 @@ def main():
     rclpy.init()
 
     node = GaitNode()
-    node.get_logger().info("Starting up gait node.")
-    node.get_logger().info("Init up gait node.")
 
     gait_loader = GaitLoader(node)
     scheduler = TrajectoryScheduler(node)

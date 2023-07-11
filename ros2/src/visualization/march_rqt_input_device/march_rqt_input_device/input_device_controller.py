@@ -2,7 +2,7 @@
 import getpass
 import socket
 
-from march_shared_msgs.msg import GaitRequest
+from march_shared_msgs.msg import GaitRequest, GaitResponse
 from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
@@ -29,20 +29,9 @@ class InputDeviceController:
 
     # Valid transition that can be made from the current state
     POSSIBLE_GAIT_TRANSITIONS = {
-        GaitRequest.SIT: ["stand"],
-        GaitRequest.STAND: ["sit", "walk", "step_and_close", "stop"],
-        GaitRequest.WALK: ["stop"],
-        GaitRequest.STEP_CLOSE: ["walk", "stand", "stop"],
-        GaitRequest.FORCE_UNKNOWN: ["home_stand", "home_sit", "stop"],
-        GaitRequest.ERROR: []
-    }
-
-    # Valid transition that can be made from the current state
-    POSSIBLE_TEST_TRANSITIONS = {
-        0: ["home_setup", "test_joint_gait", "stop"],
-        1: ["home_setup"],
-        GaitRequest.FORCE_UNKNOWN: ["home_setup", "stop"],
-        GaitRequest.ERROR: []
+        GaitRequest.STAND: ["home_stand", "mpc_stop", "mpc_walk", "mpc_step_and_close"],
+        GaitRequest.WALK: ["mpc_stop"],
+        GaitRequest.STEP_CLOSE: ["mpc_stop"]
     }
 
     def __init__(self, node: Node, testing: Bool):
@@ -144,15 +133,33 @@ class InputDeviceController:
                 clock=self._node.get_clock(),
             )
         self.POSSIBLE_TRANSITIONS = self.POSSIBLE_GAIT_TRANSITIONS
-        if testing:
-            self.POSSIBLE_TRANSITIONS = self.POSSIBLE_TEST_TRANSITIONS
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
-        self.eeg = False
-        self._current_gait = GaitRequest.FORCE_UNKNOWN
 
         self.gait_future = None
         self.update_possible_gaits()
+
+        # From here is m8 high level control logic, to start with
+        self._send_gait_request = self._node.create_publisher(
+            msg_type=GaitRequest,
+            topic="/march/gait_request",
+            qos_profile=10,
+        )
+        self._swing_leg_command_pub = self._node.create_publisher(
+            msg_type=Int32,
+            topic="/publish_swing_leg_command",
+            qos_profile=10,
+        )
+        self._gait_response_subscriber = self._node.create_subscription(
+            msg_type=GaitResponse,
+            topic="/march/gait_response",
+            callback=self._gait_response_callback,
+            qos_profile=10,
+        )
+        self.use_mpc = False
+        self.eeg = False
+        self._current_gait = GaitRequest.FORCE_UNKNOWN
+
 
     def __del__(self):
         """Deconstructer, that shutsdown the publishers and resets the timers."""
@@ -374,3 +381,32 @@ class InputDeviceController:
     def _update_eeg_on_off(self, msg: Bool) -> None:
         """Update eeg value for when it is changed in the state machine."""
         self.eeg = msg.data
+
+    def _gait_response_callback(self, msg: GaitResponse):
+        """Update current node from the state machine."""
+        self._current_gait = msg.gait_type
+
+    def publish_mpc_gait(self, gait_type):
+        """Publish a message on `/march/gait_request` to publish the gait."""
+        self._current_gait = gait_type
+        msg = GaitRequest(
+            header=Header(stamp=self._node.get_clock().now().to_msg()),
+            gait_type=gait_type,
+            id=str(self._id),
+        )
+        self._send_gait_request.publish(msg)
+        if gait_type in [2, 3]:
+            zero_swing_msg = Int32()
+            zero_swing_msg.data = 0
+            self._swing_leg_command_pub.publish(zero_swing_msg)
+
+        if gait_type == 5:
+            error_msg = Error()
+            error_msg.error_message = "Error button clicked on IPD"
+            error_msg.type = 0
+            self._error_pub.publish(error_msg)
+
+    def update_mpc_gaits(self):
+        """Update the possible gait that can be selected by the IPD."""
+        return self.POSSIBLE_TRANSITIONS[self._current_gait]
+
