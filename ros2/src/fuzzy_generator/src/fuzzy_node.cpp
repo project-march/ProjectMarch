@@ -60,7 +60,7 @@ void FuzzyNode::control_type_callback(std_msgs::msg::String::SharedPtr msg)
 {
     std::string allowed_control_type = msg->data;
 
-    if(allowed_control_type != "fuzzy" && allowed_control_type != "position"){
+    if (allowed_control_type != "fuzzy" && allowed_control_type != "position") {
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
         return;
     } else {
@@ -77,23 +77,22 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg)
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
 
-    if(allowed_control_type.compare("position") == 0){
+    if (allowed_control_type.compare("position") == 0) {
         msg.position_weight = 1.0f;
         msg.torque_weight = 0.0f;
         m_weight_publisher->publish(msg);
-        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
-    }
-    else if(allowed_control_type.compare("fuzzy") == 0){
+        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " "
+        // << msg.torque_weight); RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s
+        // position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
+    } else if (allowed_control_type.compare("fuzzy") == 0) {
         m_weight_publisher->publish(msg);
-        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
-        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
-    }
-    else{
+        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " "
+        // << msg.torque_weight); RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s
+        // position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
+    } else {
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
     }
 }
-
 
 /**
  * Main function to run the node.
