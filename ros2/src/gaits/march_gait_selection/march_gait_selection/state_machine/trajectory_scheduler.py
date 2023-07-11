@@ -95,7 +95,7 @@ class TrajectoryScheduler:
         self._active_goals = LifoQueue()
         self._messages_in_transit: Set[Future] = set()
         self._action_client_to_controller = ActionClient(
-            self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
+            self._node, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory_buffer"
         )
 
     def schedule(self, command: TrajectoryCommand) -> None:

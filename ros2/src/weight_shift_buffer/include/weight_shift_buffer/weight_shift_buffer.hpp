@@ -13,7 +13,6 @@ public:
     WeightShiftBuffer();
 
 private:
-    
 };
 
 #endif

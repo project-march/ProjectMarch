@@ -19,6 +19,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
@@ -35,7 +37,10 @@ add_library(${PROJECT_NAME}
 ament_target_dependencies(
   ${PROJECT_NAME}
   "rclcpp"
+  "rclcpp_action"
+  "rclcpp_components"
   "geometry_msgs"
+  "control_msgs"
   "std_msgs"
   "march_shared_msgs"
 )
@@ -49,8 +54,11 @@ target_include_directories(weight_shift_buffer_node PUBLIC
 ament_target_dependencies(
   weight_shift_buffer_node
   "rclcpp"
+  "rclcpp_action"
+  "rclcpp_components"
   "geometry_msgs"
   "std_msgs"
+  "control_msgs"
   "march_shared_msgs"
 )
 
@@ -71,7 +79,10 @@ install(TARGETS weight_shift_buffer_node
     ament_target_dependencies(
       ${PROJECT_NAME}_test 
       "rclcpp"
+      "rclcpp_action"
+      "rclcpp_components"
       "geometry_msgs"
+      "control_msgs"
       "std_msgs"
       "march_shared_msgs")
   endif()

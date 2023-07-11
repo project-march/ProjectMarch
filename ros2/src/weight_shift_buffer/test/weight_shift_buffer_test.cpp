@@ -13,10 +13,7 @@ protected:
     std::unique_ptr<WeigthShiftBuffer> weight_shift_buffer;
 
 private:
-   
 };
-
-
 
 // NOLINTEND
 #endif

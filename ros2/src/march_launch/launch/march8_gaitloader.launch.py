@@ -233,6 +233,8 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    
+
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -285,5 +287,11 @@ def generate_launch_description() -> LaunchDescription:
         record_rosbags_action,
         safety_node,
         gait_preprocessor_node,
-        march_gait_selection_node
+        march_gait_selection_node,
+        Node(
+        package='weight_shift_buffer',
+        namespace='',
+        executable='weight_shift_buffer_node',
+        name='weight_shift_buffer_node',
+        )
     ])

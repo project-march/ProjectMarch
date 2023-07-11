@@ -3,10 +3,6 @@
 #include <cstdio>
 #include <string>
 
-
 WeightShiftBuffer::WeightShiftBuffer()
 {
-    
 }
-
-
