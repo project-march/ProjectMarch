@@ -95,7 +95,7 @@ class WeightNode : public rclcpp::Node {
     {
         RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
 
-        // setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
+        setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
     }
 
     /**
@@ -134,11 +134,11 @@ class WeightNode : public rclcpp::Node {
     void setJointWeight(std::string joint_name, float position_weight, float torque_weight)
     {
 
-        RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
+        // RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
 
         bool found_joint = false;
         for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-            RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
+            // RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
             // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
                 if(jointInfo.torque_weight > std::numeric_limits<float>::epsilon() && (!jointInfo.target_torque || std::isnan(jointInfo.target_torque))){

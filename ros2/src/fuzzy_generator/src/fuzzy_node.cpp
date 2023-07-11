@@ -81,12 +81,12 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg)
         msg.position_weight = 1.0f;
         msg.torque_weight = 0.0f;
         m_weight_publisher->publish(msg);
-        RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
+        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
     }
     else if(allowed_control_type.compare("fuzzy") == 0){
         m_weight_publisher->publish(msg);
-        RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
+        // RCLCPP_INFO_STREAM(this->get_logger(), "published: " << msg.joint_name << " " << msg.position_weight << " " << msg.torque_weight);
         // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500, "published: %s position: %f torque: %f", msg.joint_name.c_str(), msg.position_weight, msg.torque_weight);
     }
     else{
