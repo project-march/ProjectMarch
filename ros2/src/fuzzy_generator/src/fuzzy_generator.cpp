@@ -77,11 +77,6 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
     return joints;
 }
 
-std::string FuzzyGenerator::getStanceLeg(std::vector<double> foot_heights){
-    // if the left foot significantly lower than the right foot, then left is the stance leg
-    return (foot_heights[1] - foot_heights[0]) > std::numeric_limits<double>::epsilon() ? "left" : "right";
-}
-
 std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(){
     std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 

@@ -97,7 +97,7 @@ struct JointInfo {
         {
             RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
 
-            setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
+            // setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
         }
 
         /**
@@ -185,8 +185,8 @@ struct JointInfo {
                     jointInfo.torque_weight = 0.3;
                     jointInfo.position_weight = 0.7;
                 }
-                jointInfo.target_torque = avg_torque;
-                // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to hardcode it
+
+                // jointInfo.target_torque = avg_torque;
             }
         }
 
