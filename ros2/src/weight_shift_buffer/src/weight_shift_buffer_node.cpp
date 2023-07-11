@@ -4,6 +4,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 WeightShiftBufferNode::WeightShiftBufferNode()
     : Node("weight_shift_buffer")
+    , m_gait_type(0)
 {
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
     this->m_gait_loader_server = rclcpp_action::create_server<control_msgs::action::FollowJointTrajectory>(this,
@@ -15,7 +16,20 @@ WeightShiftBufferNode::WeightShiftBufferNode()
     this->m_joint_controller_client = rclcpp_action::create_client<control_msgs::action::FollowJointTrajectory>(
         this, "/joint_trajectory_controller/follow_joint_trajectory");
 
+    m_gait_type_subscriber = this->create_subscription<march_shared_msgs::msg::CurrentGait>(
+        "/march/gait_selection/current_gait", 10, std::bind(&WeightShiftBufferNode::gait_type_callback, this, _1));
+
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
+}
+
+//
+void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::CurrentGait::SharedPtr msg)
+{
+    m_gait_type = 0;
+    if (msg->gait_type.compare("walk_like") == 0) {
+        // RCLCPP_INFO(this->get_logger(), "Received walk goal");
+        m_gait_type = 1;
+    }
 }
 
 // Action server stuff(interacts with gait loader)
