@@ -45,6 +45,12 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
+
 add_executable(weight_shift_buffer_node
   src/weight_shift_buffer_node.cpp src/weight_shift_buffer.cpp
   include/${PROJECT_NAME}/weight_shift_buffer_node.hpp include/${PROJECT_NAME}/weight_shift_buffer.hpp)

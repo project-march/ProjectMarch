@@ -19,6 +19,13 @@ WeightShiftBufferNode::WeightShiftBufferNode()
     m_gait_type_subscriber = this->create_subscription<march_shared_msgs::msg::CurrentGait>(
         "/march/gait_selection/current_gait", 10, std::bind(&WeightShiftBufferNode::gait_type_callback, this, _1));
 
+    declare_parameter("test1", 0);
+    declare_parameter("test2", 0.0);
+    auto test1 = this->get_parameter("test1").as_int();
+    auto test2 = this->get_parameter("test2").as_double();
+    RCLCPP_INFO(this->get_logger(), "%i", test1);
+    RCLCPP_INFO(this->get_logger(), "%f", test2);
+
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
 }
 

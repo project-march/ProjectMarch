@@ -233,6 +233,19 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch Safety
+    weight_shift_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("weight_shift_buffer"),
+                "launch",
+                "weight_shift_buffer_launch.py",
+            )
+        ),
+        launch_arguments=[("simulation", "true")],
+    )
+    # endregion
+
     
 
     # region rosbags
@@ -288,10 +301,5 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         gait_preprocessor_node,
         march_gait_selection_node,
-        Node(
-        package='weight_shift_buffer',
-        namespace='',
-        executable='weight_shift_buffer_node',
-        name='weight_shift_buffer_node',
-        )
+        weight_shift_node,
     ])
