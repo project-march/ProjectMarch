@@ -239,6 +239,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("weight_shift_buffer"),
                 "launch",
+                "launch",
                 "weight_shift_buffer_launch.py",
             )
         ),
