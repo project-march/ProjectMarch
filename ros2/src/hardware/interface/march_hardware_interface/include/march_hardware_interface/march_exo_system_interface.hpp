@@ -141,6 +141,10 @@ class WeightNode : public rclcpp::Node {
             RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
             // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
+                if(jointInfo.torque_weight > std::numeric_limits<float>::epsilon() && (!jointInfo.target_torque || std::isnan(jointInfo.target_torque))){
+                    RCLCPP_FATAL_STREAM(this->get_logger(), "No torque setpoint found for " << joint_name << ". No torque weight will be applied.");
+                    return;
+                };
                 jointInfo.torque_weight = torque_weight;
                 jointInfo.position_weight = position_weight;
                 found_joint = true;
