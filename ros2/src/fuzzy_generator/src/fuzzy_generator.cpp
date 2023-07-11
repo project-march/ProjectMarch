@@ -26,7 +26,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
     std::vector<std::tuple<std::string, float, float>> joints;
 
     // get stance leg
-    
+
     both_foot_heights[1] -= both_foot_heights[0];
     both_foot_heights[0] = 0;
     float min = std::min(both_foot_heights[0], both_foot_heights[1]);
@@ -34,8 +34,8 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
     both_foot_heights[1] -= min;
 
     // if not, then the feet height are just as they are
-    // RCLCPP_INFO(rclcpp::get_logger("fuzzy_generator"), "left %f right %f ", both_foot_heights[0], both_foot_heights[1]);
-
+    // RCLCPP_INFO(rclcpp::get_logger("fuzzy_generator"), "left %f right %f ", both_foot_heights[0],
+    // both_foot_heights[1]);
 
     // for each joint in the leg, calculate the torque weight and position weight
     for (auto t : torque_ranges) {
@@ -64,7 +64,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         }
 
         // calculate far the foot is in the 'fuzzy shifting range'
-        float height_percentage = (upper_bound - foot_height)/(upper_bound - lower_bound);
+        float height_percentage = (upper_bound - foot_height) / (upper_bound - lower_bound);
 
         // calculating the weights for both position and torque
         float torque_weight = torque_range * height_percentage;
@@ -76,11 +76,11 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         joints.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
     }
 
-
     return joints;
 }
 
-std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(){
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getTorqueRanges()
+{
     std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 
     YAML::Node joints_config = config_["joints"];

@@ -18,9 +18,8 @@ public:
     FuzzyGenerator();
     FuzzyGenerator(std::string config_path);
 
-    std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
-    std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
-
+    std::vector<std::tuple<std::string, float, float>> calculateWeights(std::vector<double> both_foot_heights);
+    std::vector<std::tuple<std::string, float, float>> getTorqueRanges();
 
 private:
     double lower_bound;

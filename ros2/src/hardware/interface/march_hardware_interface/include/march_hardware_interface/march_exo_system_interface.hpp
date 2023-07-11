@@ -69,18 +69,18 @@ struct JointInfo {
     JointLimit limit;
 };
 class WeightNode : public rclcpp::Node {
-    public:
+public:
     explicit WeightNode()
-            : Node("weight_node")
+        : Node("weight_node")
     {
         m_weight_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
-                "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
+            "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
 
-        m_measured_torque_publisher = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
-                "/measured_torque", 10);
+        m_measured_torque_publisher
+            = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>("/measured_torque", 10);
 
         m_measure_torque_subscription = this->create_subscription<std_msgs::msg::Int32>(
-                "/march/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
+            "/march/measure_torque", 10, std::bind(&WeightNode::average_torque_callback, this, _1));
 
         RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
     }
@@ -93,7 +93,9 @@ class WeightNode : public rclcpp::Node {
      */
     void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
     {
-        RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight << ", torque " << msg->torque_weight);
+        RCLCPP_INFO_STREAM_ONCE(this->get_logger(),
+            "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight
+                                                       << ", torque " << msg->torque_weight);
 
         setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
     }
@@ -141,8 +143,10 @@ class WeightNode : public rclcpp::Node {
             // RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
             // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
-                if(jointInfo.torque_weight > std::numeric_limits<float>::epsilon() && (!jointInfo.target_torque || std::isnan(jointInfo.target_torque))){
-                    RCLCPP_FATAL_STREAM(this->get_logger(), "No torque setpoint found for " << joint_name << ". No torque weight will be applied.");
+                if (jointInfo.torque_weight > std::numeric_limits<float>::epsilon()
+                    && (!jointInfo.target_torque || std::isnan(jointInfo.target_torque))) {
+                    RCLCPP_FATAL_STREAM(this->get_logger(),
+                        "No torque setpoint found for " << joint_name << ". No torque weight will be applied.");
                     return;
                 };
                 jointInfo.torque_weight = torque_weight;
@@ -198,11 +202,11 @@ class WeightNode : public rclcpp::Node {
     std::vector<JointInfo>* joints_info_;
     std::optional<float> delta;
 
-    private:
-        rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
-        rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
-        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
-    };
+private:
+    rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
+    rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
+};
 
 class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardware_interface::SystemInterface> {
 public:
