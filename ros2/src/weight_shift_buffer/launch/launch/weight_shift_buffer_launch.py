@@ -12,7 +12,8 @@ def generate_launch_description():
 
     test3 = LaunchConfiguration("weight_shift_type", default='0')
     test1 = LaunchConfiguration("weight_shift_duration", default='0.5')
-    test2 = LaunchConfiguration("weight_shift_length", default='0.05')
+    test2 = LaunchConfiguration("weight_shift_length", default='0.1')
+
 
     return LaunchDescription([
         Node(

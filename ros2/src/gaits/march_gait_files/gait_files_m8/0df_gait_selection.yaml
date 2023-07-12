@@ -19,7 +19,7 @@ middle_point_height: 0.15
 minimum_stair_height: 0.15
 push_off_fraction: 0.15
 push_off_position: -0.15
-scheduling_delay: 0.15
+scheduling_: 0.15
 stop_mid2_fraction: 0.7
 stop_mid2_x: 0.03
 stop_mid2_y: 0.05
