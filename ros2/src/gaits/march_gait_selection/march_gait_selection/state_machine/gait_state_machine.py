@@ -190,7 +190,7 @@ class GaitStateMachine:
             return
 
         now = self._node.get_clock().now()
-        delay = Duration(0.0) if "fixed" in self._current_gait.name else self._node.scheduling_delay
+        delay = self._node.scheduling_delay
         if not self._executing_gait:
             try:
                 gait_update = self._current_gait.start(now)

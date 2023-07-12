@@ -147,6 +147,7 @@ void WeightShiftBufferNode::feedback_callback(
 void WeightShiftBufferNode::result_callback(
     const rclcpp_action::ClientGoalHandle<control_msgs::action::FollowJointTrajectory>::WrappedResult& result)
 {
+    RCLCPP_WARN(this->get_logger(), "Result callback called");
     if (m_server_goal_handle) {
         switch (result.code) {
             case rclcpp_action::ResultCode::SUCCEEDED:
