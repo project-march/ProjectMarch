@@ -24,6 +24,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME}
@@ -43,6 +44,7 @@ ament_target_dependencies(
   "control_msgs"
   "std_msgs"
   "march_shared_msgs"
+  "builtin_interfaces"
 )
 
 # Install launch files.
@@ -66,6 +68,7 @@ ament_target_dependencies(
   "std_msgs"
   "control_msgs"
   "march_shared_msgs"
+  "builtin_interfaces"
 )
 
 install(TARGETS weight_shift_buffer_node
@@ -90,7 +93,8 @@ install(TARGETS weight_shift_buffer_node
       "geometry_msgs"
       "control_msgs"
       "std_msgs"
-      "march_shared_msgs")
+      "march_shared_msgs"
+      "builtin_interfaces")
   endif()
 
 ament_package()
