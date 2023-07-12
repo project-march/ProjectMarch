@@ -7,7 +7,7 @@
 WeightShiftBuffer::WeightShiftBuffer()
 {
     m_duration_weight_shift = 0.5;
-    m_duration_step = 3.0; //parameter linken aan recon2 parameter
+    m_duration_step = 2.0; //parameter linken aan recon2 parameter
     swing_leg = "R";
     m_hip_aa_position = 0.1;
 }

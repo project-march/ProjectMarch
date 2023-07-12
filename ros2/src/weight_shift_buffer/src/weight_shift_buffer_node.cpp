@@ -53,6 +53,7 @@ void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::GaitInstr
     m_gait_type = 0;
     if (msg->gait_name.compare("fixed_walk") == 0 || msg->gait_name.compare("fixed_step_and_close") == 0) {
         RCLCPP_WARN(this->get_logger(), "Received walk goal");
+        m_weight_shift_buffer.swing_leg = "R";
         m_gait_type = 1;
     }
 }

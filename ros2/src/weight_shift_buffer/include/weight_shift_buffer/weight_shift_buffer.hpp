@@ -17,6 +17,8 @@ public:
     void reset_HAA_at_end();
     void fix_timings_traj();
     trajectory_msgs::msg::JointTrajectory return_final_traj_with_weight_shift(trajectory_msgs::msg::JointTrajectory);
+    
+    std::string swing_leg; // which leg does the step
 
     void set_incoming_joint_trajectory(trajectory_msgs::msg::JointTrajectory);
     // weight shift during
@@ -38,7 +40,6 @@ private:
 
     float m_hip_aa_position; // position HAA's go to during weight_shift
 
-    std::string swing_leg; // which leg does the step
 };
 
 #endif
