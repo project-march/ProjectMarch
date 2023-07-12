@@ -1,4 +1,5 @@
 #include "weight_shift_buffer/weight_shift_buffer.hpp"
+#include <boost/algorithm/string/join.hpp>
 #include <chrono>
 #include <cstdio>
 #include <string>
@@ -6,8 +7,7 @@
 WeightShiftBuffer::WeightShiftBuffer()
 {
     m_duration_weight_shift = 0.5;
-    m_duration_step = 3.0; // parameter linken aan recon2 parameter
-    m_duration_reset_haa = 0.5;
+    m_duration_step = 3.0; //parameter linken aan recon2 parameter
     swing_leg = "R";
     m_hip_aa_position = 0.1;
 }
@@ -41,31 +41,27 @@ void WeightShiftBuffer::add_weight_shift()
 {
     trajectory_msgs::msg::JointTrajectoryPoint point_to_add = m_first_traj_point;
     m_final_joint_trajectory.points.push_back(point_to_add);
+    
+    if (swing_leg == "R"){
+        for (int i = 1; i<m_duration_weight_shift*10; i++){
+            point_to_add.positions[1] +=  (m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
+            point_to_add.positions[5] +=  (-m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
 
-    if (swing_leg == "R") {
-        for (int i = 0; i < m_duration_weight_shift * 10; i++) {
-            point_to_add.positions[1]
-                += (m_hip_aa_position - m_first_traj_point.positions[1]) / (m_duration_weight_shift * 10);
-            point_to_add.positions[5]
-                += (-m_hip_aa_position - m_first_traj_point.positions[5]) / (m_duration_weight_shift * 10);
-
-            for (int i = 0; i < 8; i++) {
-                point_to_add.velocities[i] = 0.0;
-            }
+            // for (int j = 0; j<8; j++){
+            //     point_to_add.velocities[j] = 0.0;
+            // }
 
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "L";
         }
-    } else if (swing_leg == "L") {
-        for (int i = 0; i < m_duration_weight_shift * 10; i++) {
-            point_to_add.positions[1]
-                += (-m_hip_aa_position - m_first_traj_point.positions[1]) / (m_duration_weight_shift * 10);
-            point_to_add.positions[5]
-                += (m_hip_aa_position - m_first_traj_point.positions[5]) / (m_duration_weight_shift * 10);
+    } else if (swing_leg == "L"){
+        for (int i = 1; i<m_duration_weight_shift*10; i++){
+            point_to_add.positions[1] +=  (-m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
+            point_to_add.positions[5] +=  (m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
 
-            for (int i = 0; i < 8; i++) {
-                point_to_add.velocities[i] = 0.0;
-            }
+            // for (int j = 0; j<8; j++){
+            //     point_to_add.velocities[j] = 0.0;
+            // }
 
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "R";
@@ -81,58 +77,49 @@ void WeightShiftBuffer::reset_HAA_at_end()
     trajectory_msgs::msg::JointTrajectoryPoint last_point_of_step
         = m_final_joint_trajectory.points[(m_final_joint_trajectory.points.size() - 1)];
     trajectory_msgs::msg::JointTrajectoryPoint point_to_add = last_point_of_step;
-
-    for (int i = 0; i < m_duration_reset_haa * 10; i++) {
-        //    trajectory_msgs::msg::JointTrajectoryPoint point_to_add = m_final_joint_trajectory.points[-1];
-        point_to_add.positions[1]
-            += (m_first_traj_point.positions[1] - last_point_of_step.positions[1]) / (m_duration_reset_haa * 10);
-        point_to_add.positions[5]
-            += (m_first_traj_point.positions[5] - last_point_of_step.positions[5]) / (m_duration_reset_haa * 10);
-        m_final_joint_trajectory.points.push_back(point_to_add);
+    
+    for (int i = 0; i<m_duration_weight_shift*10; i++){
+    //    trajectory_msgs::msg::JointTrajectoryPoint point_to_add = m_final_joint_trajectory.points[-1];
+       point_to_add.positions[1] += (m_first_traj_point.positions[1]-last_point_of_step.positions[1])/(m_duration_weight_shift*10);
+       point_to_add.positions[5] += (m_first_traj_point.positions[5]-last_point_of_step.positions[5])/(m_duration_weight_shift*10);
+       m_final_joint_trajectory.points.push_back(point_to_add);
     }
 }
 
 void WeightShiftBuffer::fix_timings_traj()
 {
-    // double total_duration_traj = m_duration_weight_shift + m_duration_step + m_duration_reset_haa;
-    // double duration_one_point = total_duration_traj/(m_final_joint_trajectory.points.size()-1);
-    // for (int i =0; i<m_final_joint_trajectory.points.size(); i++){
-    //     m_final_joint_trajectory.points[i].time_from_start.sec = i * duration_one_point;
-    //     m_final_joint_trajectory.points[i].time_from_start.nanosec = (i * duration_one_point - floorf(i *
-    //     duration_one_point)) * 1e8;
-    //     // RCLCPP_INFO(rclcpp::get_logger("time"), "%i", m_final_joint_trajectory.points[i].time_from_start.sec);
-    //     // RCLCPP_INFO(rclcpp::get_logger("time nano"), "%i",
-    //     m_final_joint_trajectory.points[i].time_from_start.nanosec);
-    // }
-
-    double total_duration_traj = m_duration_weight_shift + m_duration_step + m_duration_reset_haa;
-    double duration_one_point = total_duration_traj / (m_final_joint_trajectory.points.size() - 1);
-    for (int i = 0; i < m_duration_weight_shift * 10; i++) {
-        m_final_joint_trajectory.points[i].time_from_start.sec = (int)floor(i * duration_one_point);
-        m_final_joint_trajectory.points[i].time_from_start.nanosec
-            = (i * duration_one_point - floorf(i * duration_one_point)) * 1e8;
+    double total_duration_traj = 2.0*m_duration_weight_shift + m_duration_step;
+    RCLCPP_INFO(rclcpp::get_logger("total duration"), "%f", total_duration_traj);
+    double duration_one_point = total_duration_traj/(m_final_joint_trajectory.points.size()-1);
+    for (int i =0; i<m_duration_weight_shift*10; i++){
+        m_final_joint_trajectory.points[i].time_from_start.sec = (int) floor(i * duration_one_point);
+        m_final_joint_trajectory.points[i].time_from_start.nanosec = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
     }
     for (int i = m_duration_weight_shift * 10;
-         i < (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size()); i++) {
+        i < (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size()); i++) {
         int old_time_sec = m_final_joint_trajectory.points[i].time_from_start.sec;
         uint old_time_nanosec = m_final_joint_trajectory.points[i].time_from_start.nanosec;
 
-        int new_time_sec = (int)floor(old_time_sec + (old_time_nanosec + 5e8) / 1e9);
-        uint new_time_nanosec = (old_time_nanosec + 50000000) % 100000000;
-
+        // RCLCPP_INFO(rclcpp::get_logger("old time during incoming traj"), "%i", m_incoming_joint_trajectory.points[0].time_from_start.sec);
+        // RCLCPP_INFO(rclcpp::get_logger("old time incoming traj nano"), "%i", m_incoming_joint_trajectory.points[0].time_from_start.nanosec);
+        //  RCLCPP_INFO(rclcpp::get_logger("old time 2 during incoming traj"), "%i", m_incoming_joint_trajectory.points[1].time_from_start.sec);
+        // RCLCPP_INFO(rclcpp::get_logger("old time 2 incoming traj nano"), "%i", m_incoming_joint_trajectory.points[1].time_from_start.nanosec);
+        int converted_duration = (int)(10 * m_duration_weight_shift);
+        int new_time_sec = (int) floor(old_time_sec + (old_time_nanosec + converted_duration * 100000000)/1e9);
+        uint new_time_nanosec = (old_time_nanosec + converted_duration*100000000)%1000000000;
+        
         m_final_joint_trajectory.points[i].time_from_start.sec = new_time_sec;
         m_final_joint_trajectory.points[i].time_from_start.nanosec = new_time_nanosec;
 
-        RCLCPP_INFO(
-            rclcpp::get_logger("time during step"), "%i", m_final_joint_trajectory.points[i].time_from_start.sec);
-        RCLCPP_INFO(rclcpp::get_logger("time nano"), "%i", m_final_joint_trajectory.points[i].time_from_start.nanosec);
+        // RCLCPP_INFO(rclcpp::get_logger("time during step"), "%i", m_final_joint_trajectory.points[i].time_from_start.sec);
+        // RCLCPP_INFO(rclcpp::get_logger("time nano"), "%i", m_final_joint_trajectory.points[i].time_from_start.nanosec);
     }
     for (int i = (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size());
          i < m_final_joint_trajectory.points.size(); i++) {
         m_final_joint_trajectory.points[i].time_from_start.sec = i * duration_one_point;
-        m_final_joint_trajectory.points[i].time_from_start.nanosec
-            = (i * duration_one_point - floorf(i * duration_one_point)) * 1e8;
+        m_final_joint_trajectory.points[i].time_from_start.nanosec = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
     }
+    
 }
 
 // combine everything into one function
@@ -140,12 +127,23 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_
     trajectory_msgs::msg::JointTrajectory msg)
 {
     set_incoming_joint_trajectory(msg);
+    // RCLCPP_INFO(rclcpp::get_logger("size m_incoming_joint_traj"), "%i", m_incoming_joint_trajectory.points.size());
     m_first_traj_point = m_incoming_joint_trajectory.points[0];
     update_HAA_during_step();
     add_weight_shift();
     reset_HAA_at_end();
     fix_timings_traj();
-
+    for (int i =0; i<m_final_joint_trajectory.points.size(); i++){
+        // RCLCPP_INFO(rclcpp::get_logger("positions lhaa"), "%f", m_final_joint_trajectory.points[i].positions[1]);
+        // RCLCPP_INFO(rclcpp::get_logger("positions lhfe"), "%f", m_final_joint_trajectory.points[i].positions[2]);
+        // RCLCPP_INFO(rclcpp::get_logger("positions lkfe"), "%f", m_final_joint_trajectory.points[i].positions[3]);
+        // RCLCPP_INFO(rclcpp::get_logger("positions rhaa"), "%f", m_final_joint_trajectory.points[i].positions[5]);
+        // RCLCPP_INFO(rclcpp::get_logger("positions rhfe"), "%f", m_final_joint_trajectory.points[i].positions[6]);
+        // RCLCPP_INFO(rclcpp::get_logger("positions rkfe"), "%f", m_final_joint_trajectory.points[i].positions[7]);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("time sec"), i << "=" << m_final_joint_trajectory.points[i].time_from_start.sec);
+        // RCLCPP_INFO_STREAM(rclcpp::get_logger("time nanosec"), i << "=" << m_final_joint_trajectory.points[i].time_from_start.nanosec);
+    }
+    // RCLCPP_INFO(rclcpp::get_logger("size m_final_joint_traj"), "%i", m_final_joint_trajectory.points.size());
     return m_final_joint_trajectory;
 }
 //
@@ -210,6 +208,6 @@ void WeightShiftBuffer::set_weight_shift_duration(double duration)
 
 void WeightShiftBuffer::set_step_size(double step_size)
 {
-    m_duration_step = step_size;
+    m_hip_aa_position = step_size;
     RCLCPP_INFO(rclcpp::get_logger("weight_shift_buffer"), "\n\n CHANGED WEIGHT SHIFT SIZE TO %f", step_size);
 }
