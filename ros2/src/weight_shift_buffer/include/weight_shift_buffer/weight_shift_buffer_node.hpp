@@ -6,6 +6,7 @@
 #define WEIGHT_SHIFT_BUFFER_NODE_HPP
 #include "control_msgs/action/follow_joint_trajectory.hpp"
 #include "march_shared_msgs/msg/current_gait.hpp"
+#include "march_shared_msgs/msg/gait_instruction.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
@@ -45,9 +46,9 @@ private:
     std::shared_ptr<control_msgs::action::FollowJointTrajectory::Result> m_result_pointer;
 
     //
-    rclcpp::Subscription<march_shared_msgs::msg::CurrentGait>::SharedPtr m_gait_type_subscriber;
+    rclcpp::Subscription<march_shared_msgs::msg::GaitInstruction>::SharedPtr m_gait_type_subscriber;
     int m_gait_type;
 
-    void gait_type_callback(march_shared_msgs::msg::CurrentGait::SharedPtr);
+    void gait_type_callback(march_shared_msgs::msg::GaitInstruction::SharedPtr);
 };
 #endif // BUILD_WEIGHT_SHIFT_BUFFER_NODE_HPP

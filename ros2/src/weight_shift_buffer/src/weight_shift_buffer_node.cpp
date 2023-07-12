@@ -17,8 +17,8 @@ WeightShiftBufferNode::WeightShiftBufferNode()
     this->m_joint_controller_client = rclcpp_action::create_client<control_msgs::action::FollowJointTrajectory>(
         this, "/joint_trajectory_controller/follow_joint_trajectory");
 
-    m_gait_type_subscriber = this->create_subscription<march_shared_msgs::msg::CurrentGait>(
-        "/march/gait_selection/current_gait", 10, std::bind(&WeightShiftBufferNode::gait_type_callback, this, _1));
+    m_gait_type_subscriber = this->create_subscription<march_shared_msgs::msg::GaitInstruction>(
+        "/march/input_device/instruction", 10, std::bind(&WeightShiftBufferNode::gait_type_callback, this, _1));
 
     declare_parameter("test1", 0);
     declare_parameter("test2", 0.0);
@@ -31,11 +31,11 @@ WeightShiftBufferNode::WeightShiftBufferNode()
 }
 
 //
-void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::CurrentGait::SharedPtr msg)
+void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::GaitInstruction::SharedPtr msg)
 {
     m_gait_type = 0;
-    if (msg->gait_type.compare("walk_like") == 0) {
-        // RCLCPP_INFO(this->get_logger(), "Received walk goal");
+    if (msg->gait_name.compare("fixed_walk") == 0 || msg->gait_name.compare("fixed_step_and_close") == 0) {
+        RCLCPP_WARN(this->get_logger(), "Received walk goal");
         m_gait_type = 1;
     }
 }
@@ -82,6 +82,7 @@ void WeightShiftBufferNode::request_feedback(control_msgs::action::FollowJointTr
     RCLCPP_INFO(this->get_logger(), "Action server is alive");
     auto goal_msg = goal;
     if (m_gait_type == 1){
+        RCLCPP_ERROR(this->get_logger(),"I am walking");
         goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
         // for (int i; i<goal_msg.trajectory.points.size();i++){
         //     RCLCPP_INFO(this->get_logger(), "after %f ", goal_msg.trajectory.points[i].positions[5]);
