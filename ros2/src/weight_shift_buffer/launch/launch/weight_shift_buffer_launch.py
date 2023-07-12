@@ -10,9 +10,9 @@ def generate_launch_description():
     This node is started when the state estimator is run
     """
 
-    test3 = LaunchConfiguration("weight_shift_type", default='1')
-    test1 = LaunchConfiguration("weight_shift_duration", default='1.0')
-    test2 = LaunchConfiguration("weight_shift_length", default='8.0')
+    test3 = LaunchConfiguration("weight_shift_type", default='0')
+    test1 = LaunchConfiguration("weight_shift_duration", default='0.5')
+    test2 = LaunchConfiguration("weight_shift_length", default='0.05')
 
     return LaunchDescription([
         Node(

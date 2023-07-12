@@ -151,7 +151,7 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_
 //
 trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during_gait()
 {
-
+    double base_offset = -0.05;
     if (swing_leg == "R") {
         for (int i = 0; i < m_duration_weight_shift * 10; i++) {
             m_incoming_joint_trajectory.points[i].positions[1]
@@ -170,8 +170,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
 
         for (int i = m_duration_weight_shift * 10;
              i < m_incoming_joint_trajectory.points.size() - (m_duration_weight_shift * 10); i++) {
-            m_incoming_joint_trajectory.points[i].positions[1] = (m_hip_aa_position);
-            m_incoming_joint_trajectory.points[i].positions[5] = -(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[1] = base_offset+(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[5] = base_offset-(m_hip_aa_position);
         }
 
         swing_leg = "L";
@@ -191,8 +191,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
 
         for (int i = m_duration_weight_shift * 10;
              i < m_incoming_joint_trajectory.points.size() - (m_duration_weight_shift * 10); i++) {
-            m_incoming_joint_trajectory.points[i].positions[5] = (m_hip_aa_position);
-            m_incoming_joint_trajectory.points[i].positions[1] = -(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[5] = base_offset+(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[1] = base_offset-(m_hip_aa_position);
         }
 
         swing_leg = "R";
@@ -210,6 +210,6 @@ void WeightShiftBuffer::set_weight_shift_duration(double duration)
 
 void WeightShiftBuffer::set_step_size(double step_size)
 {
-    m_duration_step = step_size;
+    m_hip_aa_position = step_size;
     RCLCPP_INFO(rclcpp::get_logger("weight_shift_buffer"), "\n\n CHANGED WEIGHT SHIFT SIZE TO %f", step_size);
 }
