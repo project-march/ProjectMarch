@@ -354,30 +354,6 @@ class InputDeviceController:
         """Publish eeg on if its off and off if it is on."""
         self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
 
-    def publish_small_narrow(self) -> None:
-        """Publish a small_narrow gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="small_narrow"))
-
-    def publish_small_wide(self) -> None:
-        """Publish a small_wide gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="small_wide"))
-
-    def publish_large_narrow(self) -> None:
-        """Publish a large_narrow gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="large_narrow"))
-
-    def publish_large_wide(self) -> None:
-        """Publish a large_wide gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="large_wide"))
-
-    def publish_start_with_left(self) -> None:
-        """Publish that a step_and_hold starts from left_swing."""
-        self._step_and_hold_start_side_pub.publish(String(data="left_swing"))
-
-    def publish_start_with_right(self) -> None:
-        """Publish that a step_and_hold starts from right_swing."""
-        self._step_and_hold_start_side_pub.publish(String(data="right_swing"))
-
     def _update_eeg_on_off(self, msg: Bool) -> None:
         """Update eeg value for when it is changed in the state machine."""
         self.eeg = msg.data
@@ -386,7 +362,7 @@ class InputDeviceController:
         """Update current node from the state machine."""
         self._current_gait = msg.gait_type
 
-    def publish_mpc_gait(self, gait_type):
+    def publish_mpc_gait(self, gait_type, control_type):
         """Publish a message on `/march/gait_request` to publish the gait."""
         self._current_gait = gait_type
         msg = GaitRequest(
@@ -400,11 +376,8 @@ class InputDeviceController:
             zero_swing_msg.data = 0
             self._swing_leg_command_pub.publish(zero_swing_msg)
 
-        if gait_type == 5:
-            error_msg = Error()
-            error_msg.error_message = "Error button clicked on IPD"
-            error_msg.type = 0
-            self._error_pub.publish(error_msg)
+        if control_type is not None:
+            self.publish_control_type(control_type)
 
     def update_mpc_gaits(self):
         """Update the possible gait that can be selected by the IPD."""

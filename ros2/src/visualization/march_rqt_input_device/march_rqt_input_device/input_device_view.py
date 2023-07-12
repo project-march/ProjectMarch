@@ -199,7 +199,7 @@ class InputDeviceView(QWidget):
             else:
                 qt_button.clicked.connect(getattr(self._controller, callback))
         if gait_type is not None:
-            qt_button.clicked.connect(lambda: self.publish_mpc_gait(gait_type, mpc_command))
+            qt_button.clicked.connect(lambda: self.publish_mpc_gait(gait_type, mpc_command, control_type))
         else:
             qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
 
@@ -224,11 +224,11 @@ class InputDeviceView(QWidget):
 
         return qt_button_layout
 
-    def publish_mpc_gait(self, gait_type: int, mpc_command: bool):
+    def publish_mpc_gait(self, gait_type: int, mpc_command: bool, control_type: str):
         """Publish gait to state_machine."""
         self._controller._node.get_logger().warn("\n\n MPC Gaits are selected! \n")
         self._controller.use_mpc = mpc_command
-        self._controller.publish_mpc_gait(gait_type)
+        self._controller.publish_mpc_gait(gait_type, control_type)
         if gait_type == 1:
             self._controller.publish_sm_to_unknown()
             self._controller.publish_gait("home_stand", "position")
