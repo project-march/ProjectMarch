@@ -5,6 +5,7 @@ using std::placeholders::_2;
 WeightShiftBufferNode::WeightShiftBufferNode()
     : Node("weight_shift_buffer")
     , m_gait_type(0)
+    , m_weight_shift_type(0)
     , m_weight_shift_buffer()
 {
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
@@ -20,19 +21,35 @@ WeightShiftBufferNode::WeightShiftBufferNode()
     m_gait_type_subscriber = this->create_subscription<march_shared_msgs::msg::GaitInstruction>(
         "/march/input_device/instruction", 10, std::bind(&WeightShiftBufferNode::gait_type_callback, this, _1));
 
-    declare_parameter("test1", 0);
-    declare_parameter("test2", 0.0);
-    auto test1 = this->get_parameter("test1").as_int();
-    auto test2 = this->get_parameter("test2").as_double();
-    RCLCPP_INFO(this->get_logger(), "%i", test1);
-    RCLCPP_INFO(this->get_logger(), "%f", test2);
+    declare_parameter("weight_shift_duration", 0.1);
+    declare_parameter("weight_shift_length", 0.0);
+    declare_parameter("weight_shift_type", 0);
+    auto test1 = this->get_parameter("weight_shift_duration").as_double();
+    auto test2 = this->get_parameter("weight_shift_length").as_double();
+    auto test3 = this->get_parameter("weight_shift_type").as_int();
+    RCLCPP_INFO(this->get_logger(), "weight shift duration is %f", test1);
+    RCLCPP_INFO(this->get_logger(), "weight_shift_length is %f", test2);
+    RCLCPP_INFO(this->get_logger(), "weight shift type is %i", test3);
 
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
+    m_weight_shift_type = test3;
+    m_weight_shift_buffer.set_weight_shift_duration(test1);
+    m_weight_shift_buffer.set_step_size(test2);
 }
 
 //
 void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::GaitInstruction::SharedPtr msg)
 {
+    auto test1 = this->get_parameter("weight_shift_duration").as_double();
+    auto test2 = this->get_parameter("weight_shift_length").as_double();
+    auto test3 = this->get_parameter("weight_shift_type").as_int();
+    RCLCPP_INFO(this->get_logger(), "weight shift duration is %f", test1);
+    RCLCPP_INFO(this->get_logger(), "weight_shift_length is %f", test2);
+    RCLCPP_INFO(this->get_logger(), "weight shift type is %i", test3);
+    m_weight_shift_type = test3;
+    m_weight_shift_buffer.set_weight_shift_duration(test1);
+    m_weight_shift_buffer.set_step_size(test2);
+
     m_gait_type = 0;
     if (msg->gait_name.compare("fixed_walk") == 0 || msg->gait_name.compare("fixed_step_and_close") == 0) {
         RCLCPP_WARN(this->get_logger(), "Received walk goal");
@@ -81,12 +98,17 @@ void WeightShiftBufferNode::request_feedback(control_msgs::action::FollowJointTr
     }
     RCLCPP_INFO(this->get_logger(), "Action server is alive");
     auto goal_msg = goal;
-    if (m_gait_type == 1){
-        RCLCPP_ERROR(this->get_logger(),"I am walking");
-        goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
-        for (int i; i<goal_msg.trajectory.points.size();i++){
-            RCLCPP_INFO(this->get_logger(), "after %f ", goal_msg.trajectory.points[i].positions[5]);
+    if (m_gait_type == 1) {
+        RCLCPP_ERROR(this->get_logger(), "I am walking");
+        if (m_weight_shift_type == 0) {
+            m_weight_shift_buffer.set_incoming_joint_trajectory(goal.trajectory);
+            goal_msg.trajectory = m_weight_shift_buffer.add_weight_shift_during_gait();
+        } else {
+            goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
         }
+        // for (int i; i<goal_msg.trajectory.points.size();i++){
+        //     RCLCPP_INFO(this->get_logger(), "after %f ", goal_msg.trajectory.points[i].positions[5]);
+        // }
     }
 
     auto send_goal_options = rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SendGoalOptions();
