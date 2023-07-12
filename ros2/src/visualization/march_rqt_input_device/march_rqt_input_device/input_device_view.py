@@ -16,6 +16,7 @@ from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
+from functools import partial
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -151,6 +152,7 @@ class InputDeviceView(QWidget):
         name: str,
         callback: Optional[Union[str, Callable]] = None,
         control_type: Optional[str] = None,
+        param: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
@@ -190,8 +192,10 @@ class InputDeviceView(QWidget):
         if callback is not None:
             if callable(callback):
                 qt_button.clicked.connect(callback)
-            else:
+            elif param is None:
                 qt_button.clicked.connect(getattr(self._controller, callback))
+            else:
+                qt_button.clicked.connect(partial(getattr(self._controller, callback), param))
         else:
             qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
 
