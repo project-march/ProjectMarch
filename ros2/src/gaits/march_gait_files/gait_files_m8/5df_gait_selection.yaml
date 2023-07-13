@@ -1,4 +1,3 @@
-add_cybathlon_gaits: false
 add_push_off: false
 amount_of_steps: 0
 ankle_buffer: 3.0

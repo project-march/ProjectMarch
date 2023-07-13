@@ -39,8 +39,8 @@ this issue can be avoided.
 
 ## DynamicSetpointGait
 
-`DynamicSetpointGait` implements the dynamic walk gait. All other dynamic gaits (step and close, step, close,
-cybathlon gaits) inherit from this class. Its main function is communicating with the `GaitStateMachine`. For this, it
+`DynamicSetpointGait` implements the dynamic walk gait. All other dynamic gaits (step and close, step, close)
+inherit from this class. Its main function is communicating with the `GaitStateMachine`. For this, it
 implements the `GaitInterface`. Most of the interaction with the state machine take place in the `start()` and 
 `update()` methods. Both of these methods return a `GaitUpdate`. This dataclass contains an optional `TrajectoryCommand`
 and the two booleans `is_new_subgait` and `is_finished`. At the early schedule duration, a GaitUpdate containing a new

@@ -121,7 +121,6 @@ def generate_launch_description() -> LaunchDescription:
     push_off_position = LaunchConfiguration("push_off_position")
     add_push_off = LaunchConfiguration("add_push_off")
     use_position_queue = LaunchConfiguration("use_position_queue")
-    add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     amount_of_steps = LaunchConfiguration("amount_of_steps")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
@@ -298,11 +297,6 @@ def generate_launch_description() -> LaunchDescription:
             "points given by (simulated) covid.",
         ),
         DeclareLaunchArgument(
-            name="add_cybathlon_gaits",
-            default_value="false",
-            description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
-        ),
-        DeclareLaunchArgument(
             name="first_subgait_delay",
             default_value="0.0",
             description="Duration to wait before starting first subgait."
@@ -414,7 +408,6 @@ def generate_launch_description() -> LaunchDescription:
             ("add_push_off", add_push_off),
             ("amount_of_steps", amount_of_steps),
             ("use_position_queue", use_position_queue),
-            ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("scheduling_delay", scheduling_delay),
             ("first_subgait_delay", first_subgait_delay),
             ("timer_period", timer_period),

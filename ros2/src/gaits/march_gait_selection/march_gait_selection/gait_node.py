@@ -76,8 +76,6 @@ def parameter_callback(node: Node, gait_state_machine: GaitStateMachine, paramet
             node.amount_of_steps = param.get_parameter_value().integer_value
         elif param.name == "use_position_queue":
             node.use_position_queue = param.get_parameter_value().bool_value
-        elif param.name == "add_cybathlon_gaits":
-            node.add_cybathlon_gaits = param.get_parameter_value().bool_value
         elif param.name == "ankle_buffer":
             node.ankle_buffer = param.get_parameter_value().double_value
         elif param.name == "hip_buffer":
@@ -137,7 +135,6 @@ class GaitNode(Node):
             self.use_position_queue = self.get_parameter("use_position_queue").get_parameter_value().bool_value
             self.amount_of_steps = self.get_parameter("amount_of_steps").get_parameter_value().integer_value
             self.minimum_stair_height = self.get_parameter("minimum_stair_height").get_parameter_value().double_value
-            self.add_cybathlon_gaits = self.get_parameter("add_cybathlon_gaits").get_parameter_value().bool_value
             self.add_push_off = self.get_parameter("add_push_off").get_parameter_value().bool_value
             self.push_off_fraction = self.get_parameter("push_off_fraction").get_parameter_value().double_value
             self.push_off_position = self.get_parameter("push_off_position").get_parameter_value().double_value

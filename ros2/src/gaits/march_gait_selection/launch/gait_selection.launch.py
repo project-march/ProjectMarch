@@ -83,11 +83,6 @@ def generate_launch_description():
                 "points given by (simulated) covid.",
             ),
             DeclareLaunchArgument(
-                name="add_cybathlon_gaits",
-                default_value="false",
-                description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
-            ),
-            DeclareLaunchArgument(
                 name="fixed_midpoint_velocity",
                 default_value="false",
                 choices=["true", "false"],
@@ -187,7 +182,6 @@ def generate_launch_description():
                     {"add_push_off": LaunchConfiguration("add_push_off")},
                     {"amount_of_steps": LaunchConfiguration("amount_of_steps")},
                     {"use_position_queue": LaunchConfiguration("use_position_queue")},
-                    {"add_cybathlon_gaits": LaunchConfiguration("add_cybathlon_gaits")},
                     {"fixed_midpoint_velocity": LaunchConfiguration("fixed_midpoint_velocity")},
                     {"stop_mid2_fraction": LaunchConfiguration("stop_mid2_fraction")},
                     {"stop_mid2_x": LaunchConfiguration("stop_mid2_x")},

@@ -71,7 +71,6 @@ def generate_launch_description() -> launch.LaunchDescription:
     add_push_off = LaunchConfiguration("add_push_off")
     amount_of_steps = LaunchConfiguration("amount_of_steps")
     use_position_queue = LaunchConfiguration("use_position_queue")
-    add_cybathlon_gaits = LaunchConfiguration("add_cybathlon_gaits")
     first_subgait_delay = LaunchConfiguration("first_subgait_delay")
     scheduling_delay = LaunchConfiguration("scheduling_delay")
 
@@ -254,12 +253,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             choices=["true", "false"],
         ),
         DeclareLaunchArgument(
-            name="add_cybathlon_gaits",
-            default_value="false",
-            description="Will add gaits created specifically for cybathlon obstacles to gait selection.",
-            choices=["true", "false"],
-        ),
-        DeclareLaunchArgument(
             name="first_subgait_delay",
             default_value="0.0",
             description="Duration to wait before starting first subgait."
@@ -344,7 +337,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             ("add_push_off", add_push_off),
             ("amount_of_steps", amount_of_steps),
             ("use_position_queue", use_position_queue),
-            ("add_cybathlon_gaits", add_cybathlon_gaits),
             ("first_subgait_delay", first_subgait_delay),
             ("scheduling_delay", scheduling_delay),
             ("fake_sensor_data", fake_sensor_data),
