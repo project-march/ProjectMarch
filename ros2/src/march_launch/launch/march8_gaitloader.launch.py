@@ -130,7 +130,7 @@ def generate_launch_description() -> LaunchDescription:
 
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="false",
+            default_value="true",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
         )
