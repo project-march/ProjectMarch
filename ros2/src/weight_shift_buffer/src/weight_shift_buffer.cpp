@@ -10,6 +10,7 @@ WeightShiftBuffer::WeightShiftBuffer()
     m_duration_step = 2.0; //parameter linken aan recon2 parameter
     swing_leg = "R";
     m_hip_aa_position = 0.1;
+    m_right_swing_scaling = 1.0;
 }
 
 void WeightShiftBuffer::set_incoming_joint_trajectory(trajectory_msgs::msg::JointTrajectory msg)
@@ -127,23 +128,12 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_
     trajectory_msgs::msg::JointTrajectory msg)
 {
     set_incoming_joint_trajectory(msg);
-    // RCLCPP_INFO(rclcpp::get_logger("size m_incoming_joint_traj"), "%i", m_incoming_joint_trajectory.points.size());
     m_first_traj_point = m_incoming_joint_trajectory.points[0];
     update_HAA_during_step();
     add_weight_shift();
     reset_HAA_at_end();
     fix_timings_traj();
-    for (int i =0; i<m_final_joint_trajectory.points.size(); i++){
-        // RCLCPP_INFO(rclcpp::get_logger("positions lhaa"), "%f", m_final_joint_trajectory.points[i].positions[1]);
-        // RCLCPP_INFO(rclcpp::get_logger("positions lhfe"), "%f", m_final_joint_trajectory.points[i].positions[2]);
-        // RCLCPP_INFO(rclcpp::get_logger("positions lkfe"), "%f", m_final_joint_trajectory.points[i].positions[3]);
-        // RCLCPP_INFO(rclcpp::get_logger("positions rhaa"), "%f", m_final_joint_trajectory.points[i].positions[5]);
-        // RCLCPP_INFO(rclcpp::get_logger("positions rhfe"), "%f", m_final_joint_trajectory.points[i].positions[6]);
-        // RCLCPP_INFO(rclcpp::get_logger("positions rkfe"), "%f", m_final_joint_trajectory.points[i].positions[7]);
-        // RCLCPP_INFO_STREAM(rclcpp::get_logger("time sec"), i << "=" << m_final_joint_trajectory.points[i].time_from_start.sec);
-        // RCLCPP_INFO_STREAM(rclcpp::get_logger("time nanosec"), i << "=" << m_final_joint_trajectory.points[i].time_from_start.nanosec);
-    }
-    // RCLCPP_INFO(rclcpp::get_logger("size m_final_joint_traj"), "%i", m_final_joint_trajectory.points.size());
+    
     return m_final_joint_trajectory;
 }
 //
@@ -210,4 +200,26 @@ void WeightShiftBuffer::set_step_size(double step_size)
 {
     m_hip_aa_position = step_size;
     RCLCPP_INFO(rclcpp::get_logger("weight_shift_buffer"), "\n\n CHANGED WEIGHT SHIFT SIZE TO %f", step_size);
+}
+
+void WeightShiftBuffer::set_swing_scaling(double swing_scaling)
+{
+    m_right_swing_scaling = swing_scaling;
+    RCLCPP_INFO(rclcpp::get_logger("weight_shift_buffer"), "\n\n CHANGED SWING SCALING SIZE TO %f", swing_scaling);
+}
+
+// CODE BELOW IS FOR TRYING TO HELP THE ASYMMETRY OF KOEN
+
+trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::fix_asymmetry(trajectory_msgs::msg::JointTrajectory msg)
+{
+    set_incoming_joint_trajectory(msg);
+
+    if (swing_leg == "R") {
+        for (int i = 0; i < m_incoming_joint_trajectory.points.size(); i++) {
+            m_incoming_joint_trajectory.points[i].positions[6] =  m_right_swing_scaling* m_incoming_joint_trajectory.points[i].positions[6];
+            m_incoming_joint_trajectory.points[i].positions[7] =  m_right_swing_scaling* m_incoming_joint_trajectory.points[i].positions[7];
+        }
+    } 
+    m_final_joint_trajectory = m_incoming_joint_trajectory;
+    return m_final_joint_trajectory;
 }

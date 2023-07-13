@@ -24,17 +24,21 @@ WeightShiftBufferNode::WeightShiftBufferNode()
     declare_parameter("weight_shift_duration", 0.1);
     declare_parameter("weight_shift_length", 0.0);
     declare_parameter("weight_shift_type", 0);
+    declare_parameter("right_swing_scaling", 1.0);
     auto test1 = this->get_parameter("weight_shift_duration").as_double();
     auto test2 = this->get_parameter("weight_shift_length").as_double();
     auto test3 = this->get_parameter("weight_shift_type").as_int();
+    auto test4 = this->get_parameter("right_swing_scaling").as_double();
     RCLCPP_INFO(this->get_logger(), "weight shift duration is %f", test1);
     RCLCPP_INFO(this->get_logger(), "weight_shift_length is %f", test2);
     RCLCPP_INFO(this->get_logger(), "weight shift type is %i", test3);
+    RCLCPP_INFO(this->get_logger(), "right_swing_leg_scaling is %f", test4);
 
     RCLCPP_INFO(this->get_logger(), "Initialized weight shift node");
     m_weight_shift_type = test3;
     m_weight_shift_buffer.set_weight_shift_duration(test1);
     m_weight_shift_buffer.set_step_size(test2);
+    m_weight_shift_buffer.set_swing_scaling(test4);
 }
 
 //
@@ -43,12 +47,15 @@ void WeightShiftBufferNode::gait_type_callback(march_shared_msgs::msg::GaitInstr
     auto test1 = this->get_parameter("weight_shift_duration").as_double();
     auto test2 = this->get_parameter("weight_shift_length").as_double();
     auto test3 = this->get_parameter("weight_shift_type").as_int();
+    auto test4 = this->get_parameter("right_swing_scaling").as_double();
     RCLCPP_INFO(this->get_logger(), "weight shift duration is %f", test1);
     RCLCPP_INFO(this->get_logger(), "weight_shift_length is %f", test2);
     RCLCPP_INFO(this->get_logger(), "weight shift type is %i", test3);
+    RCLCPP_INFO(this->get_logger(), "right_swing_leg_scaling is %f", test4);
     m_weight_shift_type = test3;
     m_weight_shift_buffer.set_weight_shift_duration(test1);
     m_weight_shift_buffer.set_step_size(test2);
+    m_weight_shift_buffer.set_swing_scaling(test4);
 
     m_gait_type = 0;
     if (msg->gait_name.compare("fixed_walk") == 0 || msg->gait_name.compare("fixed_step_and_close") == 0) {
@@ -101,15 +108,24 @@ void WeightShiftBufferNode::request_feedback(control_msgs::action::FollowJointTr
     auto goal_msg = goal;
     if (m_gait_type == 1) {
         RCLCPP_ERROR(this->get_logger(), "I am walking");
-        if (m_weight_shift_type == 0) {
+        switch(m_weight_shift_type)
+        {
+            case 0:
+            // Make right step more extreme than left
+            goal_msg.trajectory = m_weight_shift_buffer.fix_asymmetry(goal.trajectory);
+            break;
+
+            case 1:
+            // Add weight shift during step
             m_weight_shift_buffer.set_incoming_joint_trajectory(goal.trajectory);
             goal_msg.trajectory = m_weight_shift_buffer.add_weight_shift_during_gait();
-        } else {
+            break;
+
+            case 2:
+            // Add weight shift inbetween steps
             goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
+            break;
         }
-        // for (int i; i<goal_msg.trajectory.points.size();i++){
-        //     RCLCPP_INFO(this->get_logger(), "after %f ", goal_msg.trajectory.points[i].positions[5]);
-        // }
     }
 
     auto send_goal_options = rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SendGoalOptions();
