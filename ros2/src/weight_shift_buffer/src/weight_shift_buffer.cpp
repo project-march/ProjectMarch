@@ -7,7 +7,7 @@
 WeightShiftBuffer::WeightShiftBuffer()
 {
     m_duration_weight_shift = 0.5;
-    m_duration_step = 2.0; //parameter linken aan recon2 parameter
+    m_duration_step = 2.0;
     swing_leg = "R";
     m_hip_aa_position = 0.1;
     m_right_swing_scaling = 1.0;
@@ -26,7 +26,7 @@ void WeightShiftBuffer::update_HAA_during_step()
 {
     if (swing_leg == "R") {
         for (int i = 0; i < m_incoming_joint_trajectory.points.size(); i++) {
-            m_incoming_joint_trajectory.points[i].positions[1] = m_hip_aa_position; // 1&5 are the HAA joints
+            m_incoming_joint_trajectory.points[i].positions[1] = m_hip_aa_position; // 1 is the LHAA & 5 the RHAA joint
             m_incoming_joint_trajectory.points[i].positions[5] = -m_hip_aa_position;
         }
     } else if (swing_leg == "L") {
@@ -48,10 +48,6 @@ void WeightShiftBuffer::add_weight_shift()
             point_to_add.positions[1] +=  (m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
             point_to_add.positions[5] +=  (-m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
 
-            // for (int j = 0; j<8; j++){
-            //     point_to_add.velocities[j] = 0.0;
-            // }
-
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "L";
         }
@@ -59,10 +55,6 @@ void WeightShiftBuffer::add_weight_shift()
         for (int i = 1; i<m_duration_weight_shift*10; i++){
             point_to_add.positions[1] +=  (-m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
             point_to_add.positions[5] +=  (m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
-
-            // for (int j = 0; j<8; j++){
-            //     point_to_add.velocities[j] = 0.0;
-            // }
 
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "R";
@@ -80,13 +72,13 @@ void WeightShiftBuffer::reset_HAA_at_end()
     trajectory_msgs::msg::JointTrajectoryPoint point_to_add = last_point_of_step;
     
     for (int i = 0; i<m_duration_weight_shift*10; i++){
-    //    trajectory_msgs::msg::JointTrajectoryPoint point_to_add = m_final_joint_trajectory.points[-1];
        point_to_add.positions[1] += (m_first_traj_point.positions[1]-last_point_of_step.positions[1])/(m_duration_weight_shift*10);
        point_to_add.positions[5] += (m_first_traj_point.positions[5]-last_point_of_step.positions[5])/(m_duration_weight_shift*10);
        m_final_joint_trajectory.points.push_back(point_to_add);
     }
 }
 
+// Add correct time_from_start to all points in the trajectory
 void WeightShiftBuffer::fix_timings_traj()
 {
     double total_duration_traj = 2.0*m_duration_weight_shift + m_duration_step;
@@ -101,19 +93,12 @@ void WeightShiftBuffer::fix_timings_traj()
         int old_time_sec = m_final_joint_trajectory.points[i].time_from_start.sec;
         uint old_time_nanosec = m_final_joint_trajectory.points[i].time_from_start.nanosec;
 
-        // RCLCPP_INFO(rclcpp::get_logger("old time during incoming traj"), "%i", m_incoming_joint_trajectory.points[0].time_from_start.sec);
-        // RCLCPP_INFO(rclcpp::get_logger("old time incoming traj nano"), "%i", m_incoming_joint_trajectory.points[0].time_from_start.nanosec);
-        //  RCLCPP_INFO(rclcpp::get_logger("old time 2 during incoming traj"), "%i", m_incoming_joint_trajectory.points[1].time_from_start.sec);
-        // RCLCPP_INFO(rclcpp::get_logger("old time 2 incoming traj nano"), "%i", m_incoming_joint_trajectory.points[1].time_from_start.nanosec);
         int converted_duration = (int)(10 * m_duration_weight_shift);
         int new_time_sec = (int) floor(old_time_sec + (old_time_nanosec + converted_duration * 100000000)/1e9);
         uint new_time_nanosec = (old_time_nanosec + converted_duration*100000000)%1000000000;
         
         m_final_joint_trajectory.points[i].time_from_start.sec = new_time_sec;
         m_final_joint_trajectory.points[i].time_from_start.nanosec = new_time_nanosec;
-
-        // RCLCPP_INFO(rclcpp::get_logger("time during step"), "%i", m_final_joint_trajectory.points[i].time_from_start.sec);
-        // RCLCPP_INFO(rclcpp::get_logger("time nano"), "%i", m_final_joint_trajectory.points[i].time_from_start.nanosec);
     }
     for (int i = (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size());
          i < m_final_joint_trajectory.points.size(); i++) {
@@ -123,7 +108,7 @@ void WeightShiftBuffer::fix_timings_traj()
     
 }
 
-// combine everything into one function
+// Combine everything for weight shift before step, into one function.
 trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_weight_shift(
     trajectory_msgs::msg::JointTrajectory msg)
 {
@@ -136,7 +121,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_
     
     return m_final_joint_trajectory;
 }
-//
+
+// The function for weight shifting during the step.
 trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during_gait()
 {
     double base_offset = -0.05;
@@ -190,6 +176,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
     return m_final_joint_trajectory;
 }
 
+
+// some set functions for parameters
 void WeightShiftBuffer::set_weight_shift_duration(double duration)
 {
     m_duration_weight_shift = duration;
@@ -208,7 +196,7 @@ void WeightShiftBuffer::set_swing_scaling(double swing_scaling)
     RCLCPP_INFO(rclcpp::get_logger("weight_shift_buffer"), "\n\n CHANGED SWING SCALING SIZE TO %f", swing_scaling);
 }
 
-// CODE BELOW IS FOR TRYING TO HELP THE ASYMMETRY OF KOEN
+// CODE BELOW IS FOR TRYING TO HELP THE ASYMMETRY OF KOEN. BEUNFIX - HAS NOTHING TO DO WITH WEIGHT SHIFT
 
 trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::fix_asymmetry(trajectory_msgs::msg::JointTrajectory msg)
 {
