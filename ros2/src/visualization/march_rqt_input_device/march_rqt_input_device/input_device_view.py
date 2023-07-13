@@ -47,6 +47,13 @@ class InputDeviceView(QWidget):
             qos_profile=1,
         )
 
+        self._eeg_alive_subscriber = self._controller._node.create_subscription(
+            msg_type=Bool,
+            topic="/eeg_alive",
+            callback=self._eeg_alive_callback,
+            qos_profile=10,
+        )
+
         self._always_enabled_buttons = []
 
         # Extend the widget with all attributes and children from UI file
@@ -61,6 +68,15 @@ class InputDeviceView(QWidget):
             for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
         self._create_buttons()
+        self._update_possible_gaits()
+
+    def _eeg_alive_callback(self, msg: Bool) -> None:
+        """Update the possible gaits when eeg is turned on or off."""
+        self._controller.eeg = msg.data
+        if msg.data:
+            self._controller.get_node().get_logger().info("EEG is alive.")
+        else:
+            self._controller.get_node().get_logger().warn("EEG disconnected.")
         self._update_possible_gaits()
 
     def _create_buttons(self) -> None:

@@ -103,7 +103,14 @@ class InputDeviceController:
             topic="/publish_swing_leg_command",
             qos_profile=10,
         )
-        self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
+        self._eeg_input_subscriber = self._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
+        )
+
+    self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
@@ -195,7 +202,9 @@ class InputDeviceController:
 
     def update_possible_gaits(self) -> None:
         """Send out an asynchronous request to get the possible gaits and stores response in gait_future."""
-        if self._possible_gait_client.service_is_ready():
+        if self.eeg:
+            return ["stop"]
+        elif self._possible_gait_client.service_is_ready():
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
@@ -208,6 +217,11 @@ class InputDeviceController:
             Future. Future for the possible gaits.
         """
         return self.gait_future
+
+    def _eeg_gait_request_callback(self, msg: Int32):
+        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
+        #TODO: Update this better.
+        self.publish_gait(msg.data)
 
     def get_node(self) -> Node:
         """Get function for the node.
