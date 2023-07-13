@@ -5,8 +5,8 @@ bounds:
 joints:
   # all values represent ratios in percentage points
   left_ankle:
-    minimum_torque: 0.5
-    maximum_torque: 0.5 # 70% position 30% torque
+    minimum_torque: 0.3
+    maximum_torque: 0.3 # 70% position 30% torque
   left_hip_aa:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 100% position 0% torque
@@ -17,8 +17,8 @@ joints:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 90% position 10% torque
   right_ankle:
-    minimum_torque: 0.5
-    maximum_torque: 0.5 # 70% position 30% torque
+    minimum_torque: 0.3
+    maximum_torque: 0.3 # 70% position 30% torque
   right_hip_aa:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 100% position 0% torque
