@@ -1,32 +1,30 @@
 bounds:
   # all values represent height in meters
-  descending_lower_bound: 0.0
-  descending_upper_bound: 0.05 # interpolate from 5cm downwards
-  ascending_lower_bound: 0.0
-  ascending_upper_bound: 0.025 # interpolate upwards to 2.5cm
+  lower_bound: 0.0
+  upper_bound: 0.05 # interpolate up to 5cm
 joints:
   # all values represent ratios in percentage points
   left_ankle:
-    minimum_torque: 0.0
-    maximum_torque: 0.3 # 70% position 30% torque
+    minimum_torque: 0.5
+    maximum_torque: 0.5 # 70% position 30% torque
   left_hip_aa:
     minimum_torque: 0.0
-    maximum_torque: 0.5 # 50% position 50% torque
+    maximum_torque: 0.0 # 100% position 0% torque
   left_hip_fe:
     minimum_torque: 0.0
-    maximum_torque: 0.1 # 90% position 10% torque
+    maximum_torque: 0.0 # 100% position 0% torque
   left_knee:
     minimum_torque: 0.0
-    maximum_torque: 0.2 # 80% position 20% torque
+    maximum_torque: 0.0 # 90% position 10% torque
   right_ankle:
-    minimum_torque: 0.0
-    maximum_torque: 0.3 # 70% position 30% torque
+    minimum_torque: 0.5
+    maximum_torque: 0.5 # 70% position 30% torque
   right_hip_aa:
     minimum_torque: 0.0
-    maximum_torque: 0.5 # 50% position 50% torque
+    maximum_torque: 0.0 # 100% position 0% torque
   right_hip_fe:
     minimum_torque: 0.0
-    maximum_torque: 0.1 # 90% position 10% torque
+    maximum_torque: 0.0 # 100% position 0% torque
   right_knee:
     minimum_torque: 0.0
-    maximum_torque: 0.2 # 80% position 20% torque
+    maximum_torque: 0.0 # 90% position 10% torque

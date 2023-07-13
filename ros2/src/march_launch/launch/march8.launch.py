@@ -20,7 +20,7 @@ def generate_launch_description() -> LaunchDescription:
 
     DeclareLaunchArgument(
         name="rosbags",
-        default_value="false",
+        default_value="true",
         description="Whether the rosbags should stored.",
         choices=["true", "false"],
     )
@@ -278,7 +278,7 @@ def generate_launch_description() -> LaunchDescription:
         get_package_share_directory('march_description'),
         'urdf',
         "march8",
-        'hennie_v0.urdf'
+        'hennie_with_koen.urdf'
     )
 
     fuzzy_default_config = os.path.join(

@@ -124,7 +124,7 @@ def generate_launch_description() -> LaunchDescription:
 
         DeclareLaunchArgument(
             name="rosbags",
-            default_value="false",
+            default_value="true",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
         )
@@ -226,6 +226,22 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch Safety
+    weight_shift_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("weight_shift_buffer"),
+                "launch",
+                "launch",
+                "weight_shift_buffer_launch.py",
+            )
+        ),
+        launch_arguments=[("simulation", "true")],
+    )
+    # endregion
+
+    
+
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -277,5 +293,6 @@ def generate_launch_description() -> LaunchDescription:
         record_rosbags_action,
         safety_node,
         gait_preprocessor_node,
-        march_gait_selection_node
+        march_gait_selection_node,
+        weight_shift_node,
     ])
