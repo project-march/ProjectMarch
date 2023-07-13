@@ -125,7 +125,7 @@ def generate_launch_description() -> LaunchDescription:
         get_package_share_directory('march_description'),
         'urdf',
         "march8",
-        'hennie_v0.urdf'
+        'hennie_with_koen.urdf'
     )
 
     fuzzy_default_config = os.path.join(
