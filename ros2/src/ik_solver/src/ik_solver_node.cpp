@@ -42,7 +42,8 @@ IkSolverNode::IkSolverNode()
     auto robot_description = this->get_parameter("robot_description").as_string();
     m_ik_solver.load_urdf_model(robot_description);
     m_ik_solver.initialize_solver();
-    // publish_ik_visualizations();
+
+    publish_ik_visualizations();
 
     // Initializing the timestep
     declare_parameter("timestep", 8);
@@ -52,6 +53,12 @@ IkSolverNode::IkSolverNode()
         = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&IkSolverNode::timer_callback, this));
 }
 
+/**
+ * This callback updates the com_trajectory that the exo needs to follow, and for which the IK solver calculates the
+ * trajectory for. When the reset flag is -1, the gait selection node is used so the callback should not update
+ * anything.
+ * @param msg the message received from the zmp-mpc with the com trajectory.
+ */
 void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     if (this->m_reset != -1) {
@@ -62,6 +69,12 @@ void IkSolverNode::com_trajectory_subscriber_callback(march_shared_msgs::msg::Ik
     }
 }
 
+/**
+ * This callback is activated when a new swing-leg trajectory is received.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg the message received from the sing-leg trajectory generator.
+ */
 void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::IkSolverCommand::SharedPtr msg)
 {
     if (this->m_reset != -1) {
@@ -73,35 +86,59 @@ void IkSolverNode::swing_trajectory_subscriber_callback(march_shared_msgs::msg::
     }
 }
 
+/**
+ * This callback receives the updates of the joint states from the state estimator.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::joint_state_subscriber_callback(sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    // if (this->m_reset != -1) {
-    // m_joint_names = msg->name;
-    // m_ik_solver.set_joint_configuration(msg);
-    // m_ik_solver.set_current_state();
-    // m_ik_solver.set_jacobian();
-    // }
+    if (this->m_reset != -1) {
+        // m_joint_names = msg->name;
+        // m_ik_solver.set_joint_configuration(msg);
+        // m_ik_solver.set_current_state();
+        // m_ik_solver.set_jacobian();
+    }
 }
 
+/**
+ * Callback that updates the current foot positions of the ex.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::foot_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // if (this->m_reset != -1) {
     set_foot_placement(msg);
-    // }
 }
 
+/**
+ * set the foot positions to the last received foot positions.
+ * @param setter the foot positions to which the state should be set.
+ */
 void IkSolverNode::set_foot_placement(geometry_msgs::msg::PoseArray::SharedPtr setter)
 {
     m_latest_foot_positions = setter;
 }
 
+/**
+ * This callback updates the stance foot of the ik with the stance foot determined by the state esstimator.
+ *
+ * When the reset flag is -1, the gait selection node is used so the callback should not update anything.
+ * @param msg
+ */
 void IkSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
-    // if (this->m_reset != -1) {
     m_stance_foot = msg->data;
-    // }
 }
 
+/**
+ * When the reset flag is -1, the gait selection node is used.
+ * This means that the trajectories should be set to null pointers to stop the IK from solving.
+ * If the IK does not stop solving, the trajectories will conflict with those of the gait selection node.
+ * @param msg
+ */
 void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     // RESET -1-> RESET TRAJECTORIES
@@ -130,6 +167,10 @@ void IkSolverNode::reset_subscriber_callback(std_msgs::msg::Int32::SharedPtr msg
     this->m_reset = msg->data;
 }
 
+/**
+ * The timer callback starts the solving cycle.
+ * It makes sure that every time interval the IK solves ands sends a trajectory to the ros2 control.
+ */
 void IkSolverNode::timer_callback()
 {
 
@@ -137,10 +178,10 @@ void IkSolverNode::timer_callback()
     publish_ik_visualizations();
     if (!(m_latest_foot_positions) || !(m_com_trajectory_container) || !(m_swing_trajectory_container)
         || (m_stance_foot == 0)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
-            "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n",
-            (m_com_trajectory_container) ? "true" : "false", (m_swing_trajectory_container) ? "true" : "false",
-            m_stance_foot);
+        //        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+        //            "Waiting for input\nCoM input received: %s\n, swing input received: %s\n, Stance foot: %i\n",
+        //            (m_com_trajectory_container) ? "true" : "false", (m_swing_trajectory_container) ? "true" :
+        //            "false", m_stance_foot);
         return;
     } else {
         float swing_z_factor = 1.0;
@@ -163,6 +204,7 @@ void IkSolverNode::timer_callback()
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].y,
                 m_swing_trajectory_container->velocity[m_swing_trajectory_index].z * swing_z_factor, 0.0, 0.0, 0.0;
         }
+        // RCLCPP_INFO(this->get_logger(), "Initialized stance foot");
 
         m_desired_state.com_pos << m_com_trajectory_container->velocity[m_com_trajectory_index].x, 0.0, 0.0, 0.0, 0.0,
             0.0;
@@ -193,6 +235,10 @@ void IkSolverNode::timer_callback()
     }
 }
 
+/**
+ * Publish the calculated trajectory to the ros2 control.
+ * @param joint_positions
+ */
 void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
 {
     trajectory_msgs::msg::JointTrajectory trajectory = trajectory_msgs::msg::JointTrajectory();
@@ -270,10 +316,14 @@ void IkSolverNode::publish_joint_states(std::vector<double> joint_positions)
     m_ik_solver.set_jacobian();
 }
 
+/**
+ * An extra method to visualize the ik movements in RVIZ. This makes it easier to verify and test the IK solver.
+ */
 void IkSolverNode::publish_ik_visualizations()
 {
     pinocchio::Model vis_model = m_ik_solver.get_model();
     pinocchio::Data vis_data = m_ik_solver.get_data();
+
     // Publish the joint visualizations
     visualization_msgs::msg::Marker ik_markers;
     ik_markers.type = 7;
@@ -290,6 +340,7 @@ void IkSolverNode::publish_ik_visualizations()
         marker_container.z = frame_transform[2];
         ik_markers.points.push_back(marker_container);
     }
+
     ik_markers.action = 0;
     ik_markers.frame_locked = 1;
     ik_markers.scale.x = 0.07;

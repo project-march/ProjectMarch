@@ -36,37 +36,63 @@ ZmpSolver::ZmpSolver()
     set_current_state();
 }
 
+/**
+ * Get the com height
+ * @return
+ */
 double ZmpSolver::get_com_height()
 {
     return m_com_height;
 }
 
+/**
+ * Update the current shooting node to a newer one.
+ * @param current_shooting_node
+ */
 void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
 {
     m_current_shooting_node = current_shooting_node;
 }
 
+/**
+ * Call the solving step of the zmp mpc
+ * @return The return status of the solver.
+ */
 int ZmpSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
-    // return 1;
 }
 
+/**
+ * Get the current state of the solver
+ * @return
+ */
 std::array<double, NX> ZmpSolver::get_state()
 {
     return m_x_current;
 }
 
+/**
+ * Get the real time x coordinates of the com trajectory.
+ * @return
+ */
 std::vector<double> ZmpSolver::get_real_time_com_trajectory_x()
 {
     return m_real_time_com_trajectory_x;
 }
 
+/**
+ * return the real time y coordinate of the com trajectory
+ * @return
+ */
 std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
 {
     return m_real_time_com_trajectory_y;
 }
 
+/**
+ * Reset the solver to solve for a double stance.
+ */
 void ZmpSolver::reset_to_double_stance()
 {
     m_current_shooting_node = 100;
@@ -74,16 +100,28 @@ void ZmpSolver::reset_to_double_stance()
     m_current_count = -1;
 }
 
+/**
+ * Get the state trajectory of the mpc solver.
+ * @return
+ */
 std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
 {
     return &m_x_trajectory;
 }
 
+/**
+ * Get the input trajectory that is used by the solver.
+ * @return
+ */
 std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
 {
     return m_u_current;
 }
 
+/**
+ * Get the current shooting node that the mpc is solving for.
+ * @return The number of the shooting node the solver is on.
+ */
 std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 {
     std_msgs::msg::Int32 current_shooting_node;
@@ -91,6 +129,11 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
     return current_shooting_node;
 }
 
+/**
+ * Set the state of the mpc.
+ * Here we take all the latest outputs of the state estimator, to set the start state of the MPC.
+ * This state is the starting point from which the mpc wil start solving and optimizing trajectories.
+ */
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
@@ -114,21 +157,33 @@ void ZmpSolver::set_current_state()
     m_x_current[11] = 0;
 }
 
+/**
+ * Get the current stance foot that the mpc uses.
+ * @return The number representing the stance foot.
+ */
 int ZmpSolver::get_current_stance_foot()
 {
     return m_current_stance_foot;
 }
 
+/**
+ * Set the current foot.
+ * @param x the x coordinate of the foot
+ * @param y the y coordinate of the foot
+ */
 void ZmpSolver::set_current_foot(double x, double y)
 {
     m_pos_foot_current[0] = x;
     m_pos_foot_current[1] = y;
 }
 
+/**
+ * change the footstep.
+ * If a step is completed, the foot switches from left to right, or vice versa, depending on the previous foot.
+ */
 void ZmpSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
-        // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
         m_pos_foot_current[0] = 0.0; // at the start, the CoM is about 0.11 meters in the positive direction, because
                                      // the 0 is from the right ankle
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
@@ -138,6 +193,10 @@ void ZmpSolver::update_current_foot()
     }
 }
 
+/**
+ * Set the right foot on ground or not.
+ * @param foot_on_ground True if foot is on the ground, False in foot is not on ground.
+ */
 void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
 {
     if (foot_on_ground) {
@@ -145,6 +204,10 @@ void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
     }
 }
 
+/**
+ * Set the left foot on ground or not.
+ * @param foot_on_ground True if foot is on the ground, False in foot is not on ground.
+ */
 void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
 {
     if (foot_on_ground) {
@@ -152,12 +215,21 @@ void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
     }
 }
 
+/**
+ * Set the position of the previous foot.
+ * @param x The x coordinate of the previous foot position
+ * @param y The y coordinate of the previous foot position
+ */
 void ZmpSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
 }
 
+/**
+ * Set the new footsteps which the mpc will place during the walk.
+ * @param footsteps
+ */
 void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
 {
     m_candidate_footsteps.clear();
@@ -166,6 +238,11 @@ void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr
     }
 }
 
+/**
+ * Check if the zmp of the exo state is above the foot.
+ * When this is the case, the weight shift is done.
+ * @return True if the zmp is above the foot, false otherwise
+ */
 bool ZmpSolver::check_zmp_on_foot()
 {
     bool x_check;
@@ -189,11 +266,8 @@ bool ZmpSolver::check_zmp_on_foot()
     if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
         && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
         y_check = true;
-        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
-
     } else {
         y_check = false;
-        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
     }
 
     if (x_check == true && y_check == true) {
@@ -206,6 +280,10 @@ bool ZmpSolver::check_zmp_on_foot()
     }
 }
 
+/**
+ * Set the step size that will be used in the solving step
+ * @param m_candidate_footsteps The footstep from where the step size will be derived.
+ */
 void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
 {
     m_reference_stepsize_y.clear();
@@ -218,6 +296,13 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
     }
 }
 
+/**
+ * Set the current position and velocities of the com of the mpc state.
+ * @param x the x position of the CoM
+ * @param y the y position of the CoM
+ * @param dx the x velocity of the CoM
+ * @param dy the y velocity of the CoM
+ */
 void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
 {
     m_com_current[0] = x;
@@ -227,17 +312,30 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
     m_com_vel_current[1] = dy;
 }
 
+/**
+ * Set the height of the com state
+ * @param height the height of the new CoM
+ */
 void ZmpSolver::set_com_height(double height)
 {
     m_com_height = height;
 }
 
+/**
+ * Set the new position of the zmp of the mpc state
+ * @param x the x position of the zmp
+ * @param y the y position of the zmp
+ */
 void ZmpSolver::set_current_zmp(double x, double y)
 {
     m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
+/**
+ * Initialize all the standard parameters the MPC needs to solve.
+ * Some of there parameters are: foot width, foot height, step size etc.
+ */
 void ZmpSolver::initialize_mpc_params()
 {
     // Later, change this to read from a yaml
@@ -258,24 +356,35 @@ void ZmpSolver::initialize_mpc_params()
     m_number_of_footsteps = 2;
 }
 
+/**
+ * Set the current stance foot.
+ * @param stance_foot
+ */
 void ZmpSolver::set_current_stance_foot(int stance_foot)
 {
     m_current_stance_foot = stance_foot;
 }
 
+/**
+ * Update the current shooting node by upping it by one.
+ */
 void ZmpSolver::update_current_shooting_node()
 {
     m_current_shooting_node += 1;
 }
 
+/**
+ * The actual solving step of the MPC
+ * @param x_init_input Initial input
+ * @param u_current current state
+ * @return succes / error code.
+ */
 inline int ZmpSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
-    // RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
-
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
     printf("Shooting nodes: %i\n", N);
@@ -440,23 +549,14 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // only change the initial count when a new footstep has to be set and check if the weight shift is done by checking
     // the current stance foot and ZMP location based on a margin. (The ZMP has to be on the new stance foot)
-    // RCLCPP_INFO(rclcpp::get_logger(""), "x zmp is %f", m_zmp_current[0]);
-    // RCLCPP_INFO(rclcpp::get_logger(""), "y zmp is %f", m_zmp_current[1]);
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Stance foot is %d", m_current_stance_foot);
+
     if (m_current_shooting_node == 0 && m_current_stance_foot == -1 && m_current_count == 1 && check_zmp_on_foot()
 
         || m_current_shooting_node == 0 && m_current_stance_foot == 1 && m_current_count == -1 && check_zmp_on_foot()) {
-        // m_current_count = m_current_stance_foot;
-        // m_step_counter++;
-        // RCLCPP_INFO(rclcpp::get_logger(""), "weight shift is complete \n");
-        // printf("now going into current_shooting node %i\n", m_current_shooting_node);
     } else if (m_current_shooting_node == 0) {
-        // m_current_shooting_node--; // stance foot is not working so without check we have to switch the stance leg
-        // manually and increment the step counter still
         m_current_count = -m_current_count; // turn off if pressure sole on
         m_step_counter++; // turn off if pressure sole on
     }
-    // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
 
     printf("step_counter %i\n", m_step_counter);
     printf("current stance foot is %i\n", m_current_stance_foot);
@@ -546,9 +646,6 @@ inline int ZmpSolver::solve_zmp_mpc(
             //
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-            // printf("elif shooting node ii + current = %i\n", ii+m_current_shooting_node);
-            // printf("Between %d\n", (step_number-1)*((N-1)/m_number_of_footsteps));
-            // printf("and %f\n",(step_number - 1) * ((N - 1) / m_number_of_footsteps) + ((N - 1) /
             // m_number_of_footsteps / step_duration_factor));
 
             // for periodic tail constraint
@@ -598,32 +695,10 @@ inline int ZmpSolver::solve_zmp_mpc(
             uh[1] = -count * m_step_size_y + 0.5 * m_admissible_region_y;
             uh[2] = m_foot_width_x / 2;
             uh[3] = m_foot_width_y / 2;
-            //
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", lh);
             ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", uh);
-            // printf("Else Timing value t is %f\n", m_timing_value);
         }
-        // printf("current_shooting node is %i\n", ii + m_current_shooting_node);
-        // printf("tming value node is %f\n", m_timing_value);
-
-        // printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
     }
-    // printf("current_shooting node is %i\n", m_current_shooting_node);
-    // RCLCPP_INFO(rclcpp::get_logger(""), "Current shooting node is %i", m_current_shooting_node);
-    // Set terminal and initial constraints
-
-    //
-    // lh[0] = -m_foot_width_x;
-    // lh[1] = -m_foot_width_y;
-    // lh[2] = -m_foot_width_x*10;
-    // lh[3] = -m_foot_width_y*10;
-
-    // uh[0] = m_foot_width_x;
-    // uh[1] = m_foot_width_y;
-    // uh[2] = m_foot_width_x*10;
-    // uh[3] = m_foot_width_y*10;
-    // ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "lh", lh);
-    // ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "uh", uh);
 
     // prepare evaluation
     int NTIMINGS = 1;
@@ -657,11 +732,6 @@ inline int ZmpSolver::solve_zmp_mpc(
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    // printf("\n--- xtraj ---\n");
-    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
-    // printf("\n--- utraj ---\n");
-    // d_print_exp_tran_mat(NU, N, utraj, NU);
-    // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
     printf("The current state is \n\n");
 
     for (int i = 0; i < 12; i++) {
@@ -684,43 +754,12 @@ inline int ZmpSolver::solve_zmp_mpc(
         printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
     }
 
-    // here, we copy our array into the std::array
-
-    // for (int ii = 0; ii < nlp_dims->N; ii++) {
-    //         u_current[ii] = utraj[ii];
-    //     }
-
-    // for (int ii = 0; ii < NX; ii++) {
-    //        x_init_input[ii] = xtraj[NX + ii];
-    //     }
-    // Take solution from trajectory for visualization
-    // m_real_time_com_trajectory_x.empty();
-    // m_real_time_com_trajectory_y.empty();
-    // std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
-    // for (int ii = 0; ii < NX * (N + 1); ii += NX) {
-    // m_x_trajectory[ii] = xtraj[ii];
-    // m_real_time_com_trajectory_x.push_back(xtraj[ii]);
-    // m_real_time_com_trajectory_y.push_back(xtraj[ii+3]);
-    // }
-
-    // printf("m_x_trajectory %f \n", m_x_trajectory[3+12]);
-    // printf("m_x_trajectory is %ld \n", m_x_trajectory.size());
-
-    // m_real_time_com_trajectory_x.push_back(xtraj[0]);
-    // m_real_time_com_trajectory_y.push_back(xtraj[3]);
-
-    // for (auto element : m_x_trajectory){
-    //     printf("real time trajectory is %f\n", element);
-    // }
-
     // get solution
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
     ocp_nlp_get(nlp_config, nlp_solver, "sqp_iter", &sqp_iter);
 
     ZMP_pendulum_ode_acados_print_stats(acados_ocp_capsule);
 
-    // printf("the solution x is %f\n:", m_x_trajectory[6+12]);
-    // printf("the solution y is %f\n:", m_x_trajectory[8+12]);
     printf("\nSolver info:\n");
     printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n", sqp_iter, NTIMINGS, min_time * 1000,
         kkt_norm_inf);

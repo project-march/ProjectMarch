@@ -25,12 +25,20 @@ BufferNode::BufferNode()
     m_timestep = this->get_parameter("timestep").as_int();
 }
 
+/**
+ * This callback receives the con trajectory fromm the zmp-mpc.
+ * @param msg
+ */
 void BufferNode::com_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_com_trajectory(msg);
     publish_com_trajectory();
 }
 
+/**
+ * This callback processes the swing leg trajectory from the swi ng leg generator.
+ * @param msg
+ */
 void BufferNode::swing_subscriber_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     set_swing_trajectory(msg);
@@ -56,6 +64,11 @@ void BufferNode::set_com_trajectory(geometry_msgs::msg::PoseArray::SharedPtr set
     m_latest_com_trajectory = setter;
 }
 
+/**
+ * Set the velocities of the received trajectories. The IK needs position and velocity trajectories to solve correctly.
+ * @param position_vector the vector of the position trajectory
+ * @param output_vector the vector with the calculated velocities.
+ */
 void BufferNode::set_velocity(std::vector<geometry_msgs::msg::Point>& position_vector,
     std::vector<geometry_msgs::msg::Point>& output_vector, int base_time_delay)
 {
@@ -80,16 +93,31 @@ void BufferNode::set_velocity(std::vector<geometry_msgs::msg::Point>& position_v
     }
 }
 
+/**
+ * Set the swing leg trajectory to the latest received trajectory.
+ * @param setter
+ */
 void BufferNode::set_swing_trajectory(geometry_msgs::msg::PoseArray::SharedPtr setter)
 {
     m_latest_swing_trajectory = setter;
 }
 
+/**
+ * Old function to make the buffer synchronous,
+ *
+ * NOTE: This function is not used now, since we send the com trajectory more often than the swing trajectory.
+ * @return
+ */
 bool BufferNode::check_if_ready()
 {
     return ((m_latest_com_trajectory) && (m_latest_swing_trajectory));
 }
 
+/**
+ * Publish the com trajectory.
+ * Before this happens, the trajectory should also get a velocity trajectory.
+ * When that is done the trajectory is send to the IK solver
+ */
 void BufferNode::publish_com_trajectory()
 {
     march_shared_msgs::msg::IkSolverCommand ik_command_to_send;
@@ -112,6 +140,11 @@ void BufferNode::publish_com_trajectory()
     m_latest_com_trajectory.reset();
 }
 
+/**
+ * Publish the swing trajectory.
+ * Before this happens, the trajectory should also get a velocity trajectory.
+ * When that is done the trajectory is send to the IK solver
+ */
 void BufferNode::publish_swing_trajectory()
 {
     march_shared_msgs::msg::IkSolverCommand ik_command_to_send;

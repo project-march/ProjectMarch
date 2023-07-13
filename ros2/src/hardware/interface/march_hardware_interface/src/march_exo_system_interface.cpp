@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "march_hardware_interface/march_exo_system_interface.hpp"
-//#include "march_hardware_interface/weight_node.h"
 
 #include <cassert>
 #include <chrono>
@@ -42,11 +41,8 @@ namespace march_hardware_interface {
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
-//    , m_weight_node_()
 {
     RCLCPP_INFO((*logger_), "creating Hardware Interface...");
-    //    m_weight_node_->m_hardware_interface = this;
-    //    RCLCPP_INFO((*logger_), "should've assigned the hwi to the weightnode now...");
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
 }
 
@@ -96,10 +92,10 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
 
-    march::PressureSoleData left_sole;
+    march::PressureSoleData left_sole = march::PressureSoleData();
     left_sole.side = march::pressure_sole_side::left;
     pressure_soles_data_.push_back(left_sole);
-    march::PressureSoleData right_sole;
+    march::PressureSoleData right_sole = march::PressureSoleData();
     right_sole.side = march::pressure_sole_side::right;
     pressure_soles_data_.push_back(right_sole);
 
@@ -179,8 +175,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
         // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-        // state_interfaces.emplace_back(
-        //     hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
         // For motor controller state broadcasting.
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
@@ -281,12 +275,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
             }
-            // if no weight has been assigned, we start in torque control
-            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight ||
-            // isnan(jointInfo.position_weight) ){
-            //     jointInfo.torque_weight = 1.0f;
-            //     jointInfo.position_weight = 0.0f;
-            // }
 
             RCLCPP_INFO_ONCE((*logger_),
                 "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
@@ -416,7 +404,6 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
     }
     joints_ready_for_actuation_ = false;
@@ -451,8 +438,6 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
-
-        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
     }
     return hardware_interface::return_type::OK;
 }

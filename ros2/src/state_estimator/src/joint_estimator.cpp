@@ -8,24 +8,27 @@ JointEstimator::JointEstimator(StateEstimator* owner)
     initialize_joints();
 }
 
+/**
+ * Set the new joint states received from the hardware interface
+ * @param new_joint_states The new joint states taht where received.
+ */
 void JointEstimator::set_joint_states(sensor_msgs::msg::JointState::SharedPtr new_joint_states)
 {
-    // RCLCPP_DEBUG(m_owner->get_logger(), "Set joint states :)");
     tf2::Quaternion quaternion_math;
     geometry_msgs::msg::Quaternion quaternion_joint;
     for (size_t i = 0; i < new_joint_states->name.size(); i++) {
-        // RCLCPP_INFO(m_owner->get_logger(), "Setting joint %s to %f", new_joint_states->name.at(i).c_str(),
-        //     new_joint_states->position.at(i));
-        // if (new_joint_states->position.at(i) == 0.0) {
         set_individual_joint_state(new_joint_states->name.at(i), new_joint_states->position.at(i));
-        // }
     }
-    // RCLCPP_INFO(m_owner->get_logger(), "Done setting joint states :)");
 }
 
+/**
+ * Set the joint state of an individual joint.
+ * This is done for searching the joint by name, and then assigning the new position to the joint
+ * @param joint_name The joint which value needs updating
+ * @param new_position the new position of the joint
+ */
 void JointEstimator::set_individual_joint_state(std::string joint_name, double new_position)
 {
-
     // NOTE: This is not an efficient function, mainly use this for debugging purposes
     std::vector<JointContainer>::iterator it
         = std::find_if(m_joints.begin(), m_joints.end(), [joint_name](const JointContainer& joint) {
@@ -53,6 +56,11 @@ void JointEstimator::set_individual_joint_state(std::string joint_name, double n
     tf2::convert(quaternion_math, it->frame.transform.rotation);
 }
 
+/**
+ * Retrieve the state of a single joint
+ * @param joint_name the name of the joint that should be retreived
+ * @return The joint
+ */
 const JointContainer JointEstimator::get_individual_joint(std::string joint_name)
 {
 
@@ -65,6 +73,10 @@ const JointContainer JointEstimator::get_individual_joint(std::string joint_name
     return *it;
 }
 
+/**
+ * Get the joint frames
+ * @return the joint frames
+ */
 const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_joint_frames()
 {
     std::vector<geometry_msgs::msg::TransformStamped> transform_frames;
@@ -72,14 +84,15 @@ const std::vector<geometry_msgs::msg::TransformStamped> JointEstimator::get_join
     geometry_msgs::msg::TransformStamped current_frame;
     for (auto i : m_joints) {
         transform_frames.push_back(i.frame);
-        // RCLCPP_INFO(m_owner->get_logger(), "Joint Rotation of %s is (%f, %f, %f, %f)", i.name.c_str(),
-        // i.frame.transform.rotation.x, i.frame.transform.rotation.y, i.frame.transform.rotation.z,
-        // i.frame.transform.rotation.w);
     };
 
     return transform_frames;
 }
 
+/**
+ * Set the joint links from the ros parameters.
+ * @return
+ */
 std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_links()
 {
     // We must declare these specific parameters here because they're called before the constructor
@@ -97,9 +110,11 @@ std::unordered_map<std::string, std::string> JointEstimator::interpret_joint_lin
     return joint_link_map;
 }
 
+/**
+ * Create the joints from the ros parameters defined in the config files.
+ */
 void JointEstimator::initialize_joints()
 {
-
     // We must declare these specific parameters here because they're called before the constructor
     // It's sadly a long list but it only happens once at initialization so it doesn't need a separate function
     // It just looks very ugly but it's necessary because it's ROS2 :(
@@ -184,6 +199,11 @@ void JointEstimator::initialize_joints()
     }
 }
 
+/**
+ * Get the center of mass positions of the joint. These are later used to determine the com of the exo.
+ * @param coordinate_frame the coordinates of the frame of which to retrieve the com from.
+ * @return
+ */
 std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string coordinate_frame)
 {
     std::vector<CenterOfMass> com_positions;
@@ -206,6 +226,13 @@ std::vector<CenterOfMass> JointEstimator::get_joint_com_positions(std::string co
     return com_positions;
 }
 
+/**
+ * Calculate the height of the feet, later this will be used for the fuzzy control.
+ * This is done by getting the height of the ankles.
+ * Then the default ankle height is subtracted, because the anke frame is not defined at the ground, but at the rotation
+ * point in the ankle.
+ * @return The height of the feet from the ground.
+ */
 std::vector<double> JointEstimator::get_feet_height()
 {
     geometry_msgs::msg::PointStamped foot_point;
@@ -230,6 +257,10 @@ std::vector<double> JointEstimator::get_feet_height()
     return { left_transformed_point.point.z, right_transformed_point.point.z };
 }
 
+/**
+ *
+ * @return All the joints used in the state estimator.
+ */
 const std::vector<JointContainer> JointEstimator::get_joints()
 {
     return m_joints;

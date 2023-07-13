@@ -50,17 +50,29 @@ SolverNode::SolverNode()
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
+/**
+ * Callback from the state estimator to update the com in the mpc
+ * @param msg
+ */
 void SolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
     m_zmp_solver.set_current_com(msg->position.x, msg->position.y, msg->velocity.x, msg->velocity.y);
     m_zmp_solver.set_com_height(msg->position.z);
 }
 
+/**
+ * Callback from teh state estimator to update the zmp in the mpc
+ * @param msg
+ */
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
     m_zmp_solver.set_current_zmp(msg->point.x, msg->point.y);
 }
 
+/**
+ * Callback with the desired foot positions from the foot step planner.
+ * @param msg
+ */
 void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
@@ -70,22 +82,13 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
 
+/**
+ * Callback with the current foot positions from the state estimator
+ * Pose with index 0 is the right foot, index 1 is the left foot.
+ * @param msg
+ */
 void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    // if ((m_zmp_solver.get_current_stance_foot() == -1)
-    //     || (m_zmp_solver.get_current_stance_foot() == 1 && m_zmp_solver.get_m_current_shooting_node().data == 1)) {
-    //     m_zmp_solver.set_previous_foot(msg->poses[1].position.x, msg->poses[1].position.y);
-    // } else if ((m_zmp_solver.get_current_stance_foot() == 1)
-    //     || (m_zmp_solver.get_current_stance_foot() == -1 && m_zmp_solver.get_m_current_shooting_node().data == 1)) {
-    //     m_zmp_solver.set_previous_foot(msg->poses[0].position.x, msg->poses[0].position.y);
-    // }
-
-    // double m_desired_previous_foot_x;
-    // double m_desired_previous_foot_y;
-
-    // msg->poses[0] is the right foot
-    // msg->poses[1] is the left foot
     if ((m_zmp_solver.get_current_stance_foot() == -1)
         || (m_zmp_solver.get_current_stance_foot() == 1
             && m_zmp_solver.get_m_current_shooting_node().data == 0)) { // if stance foot is the left foot
@@ -108,26 +111,43 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
     m_zmp_solver.set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
 }
 
+/**
+ * Callback that receives the current stance foot from the state estuimator.
+ * @param msg
+ */
 void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_zmp_solver.set_current_stance_foot(msg->data);
 }
 
+/**
+ * Callback to update if the right foot is on the ground or not
+ * @param msg
+ */
 void SolverNode::right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_right_foot_on_gound(msg->data);
 }
 
+/**
+ * Callback from the state estimator to update if the left foot is on the ground or not.
+ * @param msg
+ */
 void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_left_foot_on_gound(msg->data);
 }
 
+/**
+ * The timer callback which lets the mpc solve.
+ */
 void SolverNode::timer_callback()
 {
     if (!(m_desired_footsteps)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input from footstep planner");
+        //        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input from footstep
+        //        planner");
         // printf("prev des%i\n", m_prev_des_footsteps);
+        return;
     } else {
         if (*m_desired_footsteps != m_prev_des_footsteps) {
             m_zmp_solver.reset_to_double_stance();

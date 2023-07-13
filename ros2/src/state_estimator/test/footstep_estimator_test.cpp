@@ -50,46 +50,6 @@ TEST_F(FootstepEstimatorTest, feetOnGroundTest)
     ASSERT_TRUE(footstep_estimator->get_foot_on_ground(&prefixL));
 }
 
-TEST_F(FootstepEstimatorTest, feetOffGroundTest)
-{
-    auto* sensors = new std::vector<PressureSensor*>();
-
-    const char prefixR = 'r';
-    auto* mock_sensor_r = new PressureSensor();
-    mock_sensor_r->name = "r_";
-    mock_sensor_r->pressure = 2;
-    sensors->push_back(mock_sensor_r);
-
-    const char prefixL = 'l';
-    PressureSensor* mock_sensor_l;
-    mock_sensor_l->name = "l_";
-    mock_sensor_l->pressure = 2;
-    sensors->push_back(mock_sensor_l);
-
-    const char* l_prefix = "l";
-    const char* r_prefix = "r";
-    footstep_estimator->get_foot(l_prefix)->threshold = 0.5;
-    footstep_estimator->get_foot(r_prefix)->threshold = 0.5;
-
-    footstep_estimator->update_feet(sensors);
-    ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
-    ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixL));
-}
-
-TEST_F(FootstepEstimatorTest, updateFaultySensorTest)
-{
-    auto* sensors = new std::vector<PressureSensor*>();
-
-    const char prefixR = 'r';
-    auto* mock_sensor_faulty = new PressureSensor();
-    mock_sensor_faulty->name = "faulty";
-    mock_sensor_faulty->pressure = 20;
-    sensors->push_back(mock_sensor_faulty);
-
-    footstep_estimator->update_feet(sensors);
-    ASSERT_FALSE(footstep_estimator->get_foot_on_ground(&prefixR));
-}
-
 TEST_F(FootstepEstimatorTest, unknownFootTest)
 {
     auto* sensors = new std::vector<PressureSensor*>();

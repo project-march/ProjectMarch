@@ -16,7 +16,7 @@ public:
 
     ~TorqueSensor() noexcept = default;
 
-    bool exceedsMaxTorque(float torque);
+    bool exceedsMaxTorque(double torque);
 
     MotorControllerType getMotorControllerType() const;
     float getMaxTorque() const;

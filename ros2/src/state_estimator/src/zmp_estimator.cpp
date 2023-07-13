@@ -4,11 +4,13 @@ ZmpEstimator::ZmpEstimator()
 {
 }
 
+/**
+ * This calculates and then sets the zero moment point of the exo.
+ */
 void ZmpEstimator::set_zmp()
 {
     // obtain the necessary variables
     // This includes calculating imu acceleration :(
-    // double dt = (current_time - m_last_updated_time).nanoseconds() / 1e9;
     tf2::Vector3 linear_acceleration_com = get_com_acceleration();
     // calculate the actual zmp
     double g = 9.81;
@@ -22,21 +24,27 @@ void ZmpEstimator::set_zmp()
     m_position.point.y
         = m_com_history[0].y - (m_com_velocity_history[0].y / std::sqrt(g / m_com_history[0].z)) * -m_com_history[0].z;
     m_position.point.z = 0.0;
-
-    // set_time(current_time);
 }
 
+/**
+ *
+ * @return The zmp of the exo
+ */
 geometry_msgs::msg::PointStamped ZmpEstimator::get_zmp()
 {
     return m_position;
 }
 
+/**
+ * Calculate the velocity tht the com has over the last two points.
+ *
+ * We use a try to wait until the entire time has been filled
+ *
+ * The velocity is calculated immediately to avoid doing this every time we want to set the zmp.
+ * Instead, we can just save old values.
+ */
 void ZmpEstimator::set_com_velocity()
 {
-    // We use a try to wait until the entire time has been filled
-
-    // Here, we calculate the velocity immediately.
-    // We do this to avoid doing this every time we want to set the zmp. Instead, we can just save old values
     try {
         double dt = (m_com_time_history[1] - m_com_time_history[2]).nanoseconds() / 1e9;
         m_com_velocity_history[1].x = (m_com_history[1].x - m_com_history[2].x) / dt;
@@ -51,6 +59,9 @@ void ZmpEstimator::set_com_velocity()
     }
 }
 
+/**
+ * @return The com velocity.
+ */
 geometry_msgs::msg::Vector3 ZmpEstimator::get_com_velocity()
 {
     return m_com_velocity_history[0];
@@ -69,6 +80,12 @@ tf2::Vector3 ZmpEstimator::get_com_acceleration()
     }
 }
 
+/**
+ * For the acceleration and velocity calculations we need old com points.
+ * These points are stored here together with the passed delta t between the points.
+ * @param com The new com point to be added to the com history
+ * @param com_time the new delta time to be added to the history.
+ */
 void ZmpEstimator::set_com_states(CenterOfMass com, rclcpp::Time com_time)
 {
     // We're doing this in a native way for efficiency and readability

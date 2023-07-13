@@ -31,7 +31,7 @@ stages:
   - Lint code
   - Build code
   - Test code
-#  - Static analysis on code
+  - Static analysis on code
 
 # GitLab defines different job types, depending on how the job is scheduled.
 # Right now, we use two types: 1) branches, 2) merge_requests
@@ -71,4 +71,4 @@ include:
     - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
     - local: /.gitlab/pipeline/test-code.yml
-#    - local: /.gitlab/pipeline/static-analysis.yml
+    - local: /.gitlab/pipeline/static-analysis.yml
