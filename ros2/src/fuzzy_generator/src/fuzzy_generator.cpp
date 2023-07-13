@@ -79,8 +79,8 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
             lower_bound = (float)ascending_lower_bound;
             upper_bound = (float)ascending_upper_bound;
         } else {
-            lower_bound = descending_lower_bound;
-            upper_bound = descending_upper_bound;
+            lower_bound = (float)descending_lower_bound;
+            upper_bound = (float)descending_upper_bound;
         }
 
         // calculate far the foot is in the 'fuzzy shifting range'
