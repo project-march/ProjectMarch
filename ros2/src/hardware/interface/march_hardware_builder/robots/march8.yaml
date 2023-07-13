@@ -104,7 +104,7 @@ march8:
             averageTorque: 10
         pids:
           position:
-            p: 25.0
+            p: 35.0
             i: 0.0
             d: 0.4
           torque:
@@ -248,7 +248,7 @@ march8:
             averageTorque: 10
         pids:
           position:
-            p: 25.0
+            p: 35.0
             i: 0.0
             d: 0.4
           torque:
