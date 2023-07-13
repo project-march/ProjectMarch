@@ -17,7 +17,6 @@ def generate_launch_description() -> LaunchDescription:
     simulation = LaunchConfiguration("simulation", default='true')
     rosbags = LaunchConfiguration("rosbags", default='true')
     airgait = LaunchConfiguration("airgait", default='false')
-    robot = LaunchConfiguration("robot")
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -364,13 +363,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='state_machine_node',
             name='state_machine',
         ),
-        # Node(
-        #     package='gait_selection',
-        #     namespace='',
-        #     executable='gait_selection_node',
-        #     name='gait_selection',
-        #     parameters=[('robot', str(robot))],
-        # ),
         Node(
             package='state_estimator_mock',
             namespace='',

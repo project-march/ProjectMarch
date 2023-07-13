@@ -160,9 +160,8 @@ class InputDeviceController:
         self.eeg = False
         self._current_gait = GaitRequest.FORCE_UNKNOWN
 
-
     def __del__(self):
-        """Deconstructer, that shutsdown the publishers and resets the timers."""
+        """Deconstructer, that shuts down the publishers and resets the timers."""
         self._node.destroy_publisher(self._instruction_gait_pub)
         self._node.destroy_publisher(self._error_pub)
         if self._ping:
@@ -382,4 +381,3 @@ class InputDeviceController:
     def update_mpc_gaits(self):
         """Update the possible gait that can be selected by the IPD."""
         return self.POSSIBLE_TRANSITIONS[self._current_gait]
-

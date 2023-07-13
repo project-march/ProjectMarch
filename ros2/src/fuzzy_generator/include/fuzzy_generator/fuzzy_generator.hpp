@@ -23,7 +23,7 @@ inline static const char PATH_SEPARATOR =
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
-    FuzzyGenerator(std::string config_path);
+    explicit FuzzyGenerator(std::string config_path);
 
     std::vector<std::tuple<std::string, float, float>> calculateWeights(std::vector<double> both_foot_heights);
     std::vector<std::tuple<std::string, float, float>> getTorqueRanges();
@@ -39,9 +39,9 @@ private:
 
     std::vector<std::vector<float>> log { {}, {} };
 
-    float delta_avg_l = 0.0f;
-    float delta_avg_r = 0.0f;
-    float alpha = 0.2;
+    float delta_avg_l = 0.0F;
+    float delta_avg_r = 0.0F;
+    float alpha = 0.2F;
 
     YAML::Node config_;
 };
