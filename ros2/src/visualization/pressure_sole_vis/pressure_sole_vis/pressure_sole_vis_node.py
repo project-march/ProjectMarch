@@ -93,8 +93,8 @@ class PressureSoleVis(Node):
             marker_container_strip.scale.y = 0.02
             marker_container_strip.scale.z = 0.5/resolution
 
-            marker_container_strip.pose.position.x = self.x_coord_right[i]
-            marker_container_strip.pose.position.y = self.y_coord_right[i]
+            marker_container_strip.pose.position.y = self.y_coord_left[i]
+            marker_container_strip.pose.position.x = self.x_coord_left[i]
             marker_container_strip.pose.position.z = 0.0
 
             marker_container_strip.pose.orientation.x = 0.0
@@ -120,17 +120,17 @@ class PressureSoleVis(Node):
             marker_container_strip.frame_locked = True
             press_vis.markers.append(marker_container_strip)
 
-            for j in range(int(effective_data[i]*resolution)): #something that creates an amount of markers based on the height
+            for j in range(int(effective_data[i+8]*resolution)): #something that creates an amount of markers based on the height
                 point_container = Point()
                 color = ColorRGBA()
                 color.a = 1.0
-                normalized_z = (effective_data[i] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
+                normalized_z = (effective_data[i+8] - self.min_z) / (self.max_z - self.min_z) if self.max_z != self.min_z else 0.2
 
                 point_container.x = 0.0
                 point_container.y = 0.0
                 point_container.z = j*marker_container_strip.scale.z # the scale is from the middle of the point so move the point up
 
-                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(effective_data[i]*resolution))*j), 1.0, 1.0)
+                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(effective_data[i+8]*resolution))*j), 1.0, 1.0)
                 
                 marker_container_strip.points.append(point_container)
                 marker_container_strip.colors.append(color)
@@ -165,57 +165,57 @@ class PressureSoleVis(Node):
 
                 # press_vis.markers.append(marker_container)
 
-        # marker_left_foot = Marker()
-        # marker_left_foot.type = 10
+        marker_left_foot = Marker()
+        marker_left_foot.type = 10
 
-        # marker_left_foot.header.frame_id = "map"
-        # marker_left_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootLeft.obj"
-        # marker_left_foot.mesh_use_embedded_materials = True
+        marker_left_foot.header.frame_id = "map"
+        marker_left_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootLeft.obj"
+        marker_left_foot.mesh_use_embedded_materials = True
 
-        # marker_left_foot.action = 0
-        # marker_left_foot.frame_locked = True
-        # marker_left_foot.scale.x = 1.0
-        # marker_left_foot.scale.y = 1.0
-        # marker_left_foot.scale.z = 1.0
-        # marker_left_foot.ns = "left pressure sole"
-        # # marker_left_foot.lifetime.sec = 1;
+        marker_left_foot.action = 0
+        marker_left_foot.frame_locked = True
+        marker_left_foot.scale.x = 1.0
+        marker_left_foot.scale.y = 1.0
+        marker_left_foot.scale.z = 1.0
+        marker_left_foot.ns = "left pressure sole"
+        # marker_left_foot.lifetime.sec = 1;
 
-        # marker_left_foot.pose.position.x = 0.09
-        # marker_left_foot.pose.position.y = 0.16
-        # marker_left_foot.pose.position.z = 0.138
+        marker_left_foot.pose.position.x = 0.09
+        marker_left_foot.pose.position.y = 0.16
+        marker_left_foot.pose.position.z = 0.138
 
-        # marker_left_foot.pose.orientation.z = 0.0
-        # marker_left_foot.pose.orientation.y = 0.0
-        # marker_left_foot.pose.orientation.z = 0.0
-        # marker_left_foot.pose.orientation.w = 1.0
+        marker_left_foot.pose.orientation.z = 0.0
+        marker_left_foot.pose.orientation.y = 0.0
+        marker_left_foot.pose.orientation.z = 0.0
+        marker_left_foot.pose.orientation.w = 1.0
 
-        # press_vis.markers.append(marker_left_foot)
+        press_vis.markers.append(marker_left_foot)
 
-        marker_right_foot = Marker()
+        # marker_right_foot = Marker()
 
-        marker_right_foot.type = 10
+        # marker_right_foot.type = 10
 
-        marker_right_foot.header.frame_id = "map"
-        marker_right_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootRight.obj"
-        marker_right_foot.mesh_use_embedded_materials = True
+        # marker_right_foot.header.frame_id = "map"
+        # marker_right_foot.mesh_resource = "package://march_description/urdf/march8/obj-files/FootRight.obj"
+        # marker_right_foot.mesh_use_embedded_materials = True
 
-        marker_right_foot.action = 0;
-        marker_right_foot.frame_locked = True
-        marker_right_foot.scale.x = 1.0
-        marker_right_foot.scale.y = 1.0
-        marker_right_foot.scale.z = 1.0
-        marker_right_foot.ns = "right pressure sole"
+        # marker_right_foot.action = 0;
+        # marker_right_foot.frame_locked = True
+        # marker_right_foot.scale.x = 1.0
+        # marker_right_foot.scale.y = 1.0
+        # marker_right_foot.scale.z = 1.0
+        # marker_right_foot.ns = "right pressure sole"
 
-        marker_right_foot.pose.position.x = 0.09
-        marker_right_foot.pose.position.y = -0.16
-        marker_right_foot.pose.position.z = 0.138
+        # marker_right_foot.pose.position.x = 0.09
+        # marker_right_foot.pose.position.y = -0.16
+        # marker_right_foot.pose.position.z = 0.138
 
-        marker_right_foot.pose.orientation.z = 0.0
-        marker_right_foot.pose.orientation.y = 0.0
-        marker_right_foot.pose.orientation.z = 0.0
-        marker_right_foot.pose.orientation.w = 1.0
+        # marker_right_foot.pose.orientation.z = 0.0
+        # marker_right_foot.pose.orientation.y = 0.0
+        # marker_right_foot.pose.orientation.z = 0.0
+        # marker_right_foot.pose.orientation.w = 1.0
 
-        press_vis.markers.append(marker_right_foot)
+        # press_vis.markers.append(marker_right_foot)
 
         self.publisher.publish(press_vis)
 
