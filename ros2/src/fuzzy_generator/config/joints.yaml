@@ -11,8 +11,8 @@ joints:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 100% position 0% torque
   left_hip_fe:
-    minimum_torque: 0.2
-    maximum_torque: 0.2 # 100% position 0% torque
+    minimum_torque: 0.0
+    maximum_torque: 0.0 # 100% position 0% torque
   left_knee:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 90% position 10% torque
@@ -23,8 +23,8 @@ joints:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 100% position 0% torque
   right_hip_fe:
-    minimum_torque: 0.2
-    maximum_torque: 0.2 # 100% position 0% torque
+    minimum_torque: 0.0
+    maximum_torque: 0.0 # 100% position 0% torque
   right_knee:
     minimum_torque: 0.0
     maximum_torque: 0.0 # 90% position 10% torque

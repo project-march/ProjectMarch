@@ -233,6 +233,26 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch fuzzy
+
+    fuzzy_default_config = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
+
+    fuzzy_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("fuzzy_generator"),
+                "launch",
+                "fuzzy.launch.py",
+            )
+        ),
+        launch_arguments=[("config_path", fuzzy_default_config)]
+    )
+    # endregion
+
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -258,23 +278,7 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
-    fuzzy_default_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
-
-    # parameters
-    fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
-
     return LaunchDescription(declared_arguments + [
-        Node(
-            package='fuzzy_generator',
-            namespace='',
-            executable='fuzzy_node',
-            name='fuzzy_generator',
-            parameters=[{'config_path': fuzzy_config_path}]
-        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
@@ -284,5 +288,6 @@ def generate_launch_description() -> LaunchDescription:
         record_rosbags_action,
         safety_node,
         gait_preprocessor_node,
-        march_gait_selection_node
+        march_gait_selection_node,
+        fuzzy_node,
     ])

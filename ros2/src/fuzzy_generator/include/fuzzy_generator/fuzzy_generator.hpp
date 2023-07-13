@@ -12,11 +12,13 @@
 #include "std_msgs/msg/int32.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
+#include <math.h>
 
 class FuzzyGenerator {
 public:
     FuzzyGenerator();
-    FuzzyGenerator(std::string config_path);
+    FuzzyGenerator(rclcpp::Node::SharedPtr node);
 
     std::vector<std::tuple<std::string, float, float>>  calculateWeights(std::vector<double> both_foot_heights);
     std::vector<std::tuple<std::string, float, float>>  getTorqueRanges();
@@ -25,6 +27,8 @@ public:
 private:
     double lower_bound;
     double upper_bound;
+
+    std::shared_ptr<rclcpp::Node> node_;
 
     YAML::Node config_;
 };
