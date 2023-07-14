@@ -112,8 +112,6 @@ class InputDeviceController:
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-        self.eeg = False
-        self.eeg_override = True
         self._possible_gaits = []
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
@@ -201,17 +199,6 @@ class InputDeviceController:
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
-
-    def get_possible_gaits(self) -> Future:
-        """Returns the future for the names of possible gaits.
-
-        Returns:
-            Future. Future for the possible gaits.
-        """
-        if self.eeg and self.eeg_override:
-            return ["stop"]
-        else:
-            return self.gait_future
 
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
@@ -354,8 +341,3 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
-
-    def _update_eeg_on_off(self, msg: Bool) -> None:
-        """Update eeg value for when it is changed in the state machine."""
-        if not self._eeg_override:
-            self.eeg = msg.data

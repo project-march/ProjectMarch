@@ -68,17 +68,19 @@ class InputDeviceView(QWidget):
             for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
         self._eeg_button = None
+        self.eeg = False
+        self.eeg_override = True
         self._create_buttons()
         self._update_possible_gaits()
 
     def _eeg_alive_callback(self, msg: Bool) -> None:
         """Update the possible gaits when eeg is turned on or off."""
-        self._controller.eeg = msg.data
+        self.eeg = msg.data
         if msg.data:
             self._controller.get_node().get_logger().info("EEG is alive.")
         else:
             self._controller.get_node().get_logger().warn("EEG disconnected.")
-            self._controller.eeg_override = True
+            self.eeg_override = True
             self._controller.publish_stop()
         self.set_eeg_button_color()
         self._update_possible_gaits()
@@ -139,7 +141,7 @@ class InputDeviceView(QWidget):
     def _update_possible_gaits_view(self, future) -> None:
         """Update the buttons if the possible gaits have changed."""
         new_possible_gaits = future.result().gaits
-        if self._controller.eeg and not self._controller.eeg_override:
+        if self.eeg and not self.eeg_override:
             new_possible_gaits =  ["stop"]
         if set(self.possible_gaits) != set(new_possible_gaits):
             self._update_gait_buttons(new_possible_gaits)
@@ -169,19 +171,20 @@ class InputDeviceView(QWidget):
         self.frame.verticalScrollBar().setEnabled(True)
 
     def eeg_callback(self):
-        self._controller.eeg_override = not self._controller.eeg_override
-        if self._controller.eeg_override == True:
+        if self.eeg is True:
+            self.eeg_override = not self.eeg_override
+        if self.eeg_override == True:
             self._controller.publish_stop()
         self.set_eeg_button_color()
 
     def set_eeg_button_color(self):
-        if self._controller.eeg is False:
+        if self.eeg is False:
             self._eeg_button.setStyleSheet("QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is off."))
-        elif self._controller.eeg_override is True and self._controller.eeg is True:
+        elif self.eeg_override is True and self.eeg is True:
             self._eeg_button.setStyleSheet("QToolButton {background-color: orange; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is connected."))
-        elif self._controller.eeg_override is False and self._controller.eeg is True:
+        elif self.eeg_override is False and self.eeg is True:
             self._eeg_button.setStyleSheet("QToolButton {background-color: green; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is on!"))
     def create_button(
