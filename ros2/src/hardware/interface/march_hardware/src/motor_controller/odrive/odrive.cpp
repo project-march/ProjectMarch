@@ -42,7 +42,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        return std::chrono::seconds { 15 };
+        return std::chrono::seconds { 20 };
     } else {
         return std::chrono::nanoseconds(0);
     }
