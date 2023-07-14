@@ -44,7 +44,8 @@
     },
     {
       "name": "eeg",
-      "callback": "publish_eeg_on_off"
+      "callback": "eeg_callback",
+      "always_enabled": true
     }
   ],
   [
