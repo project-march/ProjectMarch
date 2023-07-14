@@ -486,6 +486,7 @@ void MarchExoSystemInterface::pressure_sole_read()
     auto pressure_soles = march_robot_->getPressureSoles();
     for (size_t i = 0; i < pressure_soles.size(); i++) {
         pressure_soles[i].read(pressure_soles_data_[i]);
+        RCLCPP_INFO(rclcpp::get_logger("march hwi"), "%f", pressure_soles_data_[i]);
     }
 }
 
