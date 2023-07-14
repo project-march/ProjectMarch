@@ -27,8 +27,6 @@ void PressureSole::read(PressureSoleData& pressure_sole_data) const
     data[5] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Toes, ODriveAxis::None));
     data[6] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Met5, ODriveAxis::None));
     data[7] = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Arch, ODriveAxis::None));
-
-    RCLCPP_INFO(rclcpp::get_logger("beepbeepboopboop"), "%f", data[0]);
     static_assert(PRESSURE_SOLE_DATA_LENGTH == 8);
     pressure_sole_data.update_values(data);
 }
