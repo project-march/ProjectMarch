@@ -110,7 +110,7 @@ class InputDeviceController:
             qos_profile=10,
         )
 
-    self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
+        self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
         )
@@ -221,7 +221,6 @@ class InputDeviceController:
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
         #TODO: Update this better.
-        self.publish_gait(msg.data)
 
     def get_node(self) -> Node:
         """Get function for the node.
