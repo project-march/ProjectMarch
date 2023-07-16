@@ -8,8 +8,8 @@ joints:
     minimum_torque: 0.4
     maximum_torque: 0.4 # 70% position 30% torque
   left_hip_aa:
-    minimum_torque: 0.2
-    maximum_torque: 0.2 # 100% position 0% torque
+    minimum_torque: 0.3
+    maximum_torque: 0.3 # 100% position 0% torque
   left_hip_fe:
     minimum_torque: 0.1
     maximum_torque: 0.1 # 100% position 0% torque
@@ -20,8 +20,8 @@ joints:
     minimum_torque: 0.4
     maximum_torque: 0.4 # 70% position 30% torque
   right_hip_aa:
-    minimum_torque: 0.2
-    maximum_torque: 0.2 # 100% position 0% torque
+    minimum_torque: 0.3
+    maximum_torque: 0.3 # 100% position 0% torque
   right_hip_fe:
     minimum_torque: 0.1
     maximum_torque: 0.1 # 100% position 0% torque
