@@ -110,7 +110,7 @@ march8:
           torque:
             p: 2.0
             i: 0.0
-            d: 0.0001
+            d: 0.0
 
     - left_knee:
         motor_controller:
@@ -254,7 +254,7 @@ march8:
           torque:
             p: 2.0
             i: 0.0
-            d: 0.0001
+            d: 0.0
 
     - right_knee:
         motor_controller:
