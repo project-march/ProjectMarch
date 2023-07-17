@@ -75,9 +75,9 @@ def generate_launch_description() -> LaunchDescription:
     ground_gait = LaunchConfiguration("ground_gait")
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
-    # mujoco = LaunchConfiguration("mujoco")
-    # mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
-    # tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
+    mujoco = LaunchConfiguration("mujoco")
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
+    tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation_arguments = [
         DeclareLaunchArgument(
             name="ground_gait",
@@ -95,17 +95,17 @@ def generate_launch_description() -> LaunchDescription:
             default_value="false",
             description="Whether we want to run it in simulation with Gazebo control.",
         ),
-        # DeclareLaunchArgument(
-        #     name="mujoco",
-        #     default_value="false",
-        #     description="If Mujoco simulation should be started or not",
-        #     choices=["true", "false"],
-        # ),
-        # DeclareLaunchArgument(
-        #     name="model_to_load_mujoco",
-        #     default_value="march8_v0.xml",
-        #     description="What model mujoco should load",
-        # ),
+        DeclareLaunchArgument(
+            name="mujoco",
+            default_value="false",
+            description="If Mujoco simulation should be started or not",
+            choices=["true", "false"],
+        ),
+        DeclareLaunchArgument(
+            name="model_to_load_mujoco",
+            default_value="march8_v0.xml",
+            description="What model mujoco should load",
+        ),
     ]
     # endregion
 
@@ -136,6 +136,12 @@ def generate_launch_description() -> LaunchDescription:
             "/clock topic by gazebo instead of system time.",
         ),
         DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
+        DeclareLaunchArgument(
+            name="control_yaml",
+            default_value="effort_control/march7_control.yaml",
+            description="The controller yaml file to use loaded in through the controller manager "
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+        ),
         DeclareLaunchArgument(
             name="gazebo_control_yaml",
             default_value="gazebo/march7_control.yaml",
@@ -505,13 +511,13 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch Mujoco
-    # mujoco_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
-    #     ),
-    #     launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution([get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
-    #     condition=IfCondition(mujoco),
-    # )
+    mujoco_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
+        ),
+        launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution([get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
+        condition=IfCondition(mujoco),
+    )
     # endregion
 
     # region Launch march control
@@ -523,7 +529,7 @@ def generate_launch_description() -> LaunchDescription:
                 "controllers.launch.py",
             )
         ),
-        launch_arguments=[("simulation", "false"), ("control_yaml", "effort/pressure_sole_control.yaml"), ("rviz", "false")],
+        launch_arguments=[("simulation", "true"), ("control_yaml", "mujoco/march7_control.yaml"), ("rviz", rviz)],
     )
     # endregion
 
@@ -549,32 +555,32 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # imu_nodes = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("bluespace_ai_xsens_mti_driver"),
-    #             "launch",
-    #             "imu_launch.launch.py",
-    #         )
-    #     ),
-    # )
+    imu_nodes = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("bluespace_ai_xsens_mti_driver"),
+                "launch",
+                "imu_launch.launch.py",
+            )
+        ),
+    )
 
     nodes = [
-        # rqt_input_device,
-        # wireless_ipd_node,
-        # robot_state_publisher_node,
-        # march_gait_selection_node,
-        # gait_preprocessor_node,
-        # safety_node,
-        # robot_information_node,
-        # gazebo_node,
-        # mujoco_node,
+        rqt_input_device,
+        wireless_ipd_node,
+        robot_state_publisher_node,
+        march_gait_selection_node,
+        gait_preprocessor_node,
+        safety_node,
+        robot_information_node,
+        gazebo_node,
+        mujoco_node,
         march_control,
-        # point_finder_node,
-        # camera_aligned_frame_pub_node,
-        # back_sense_node,
+        point_finder_node,
+        camera_aligned_frame_pub_node,
+        back_sense_node,
         record_rosbags_action,
-        # imu_nodes
+        imu_nodes
     ]
 
     return LaunchDescription(declared_arguments + nodes)
