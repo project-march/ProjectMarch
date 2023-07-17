@@ -46,20 +46,20 @@ class DiagnosticUpdater(Node):
         CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 4)
 
         # Control checks
-        check_joint_states = CheckJointValues(self, self.joints, "/joint_states", JointState)
-        self.updater.add("Control position values", check_joint_states.position_diagnostics)
+        # check_joint_states = CheckJointValues(self, self.joints, "/joint_states", JointState)
+        # self.updater.add("Control position values", check_joint_states.position_diagnostics)
 
         # NOTE: There are also diagnosis for velocity and effort,
         # but since the ROS code does not yet have limits for them, they are not used.
 
         # MotorController state check
-        CheckMotorControllerStatus(self, self.updater, self.joint_names)
+        # CheckMotorControllerStatus(self, self.updater, self.joint_names)
 
         # Gait information
-        CheckGaitStatus(self, self.updater)
+        # CheckGaitStatus(self, self.updater)
 
         # PDB checks
-        CheckPDBStatus(self, self.updater)
+        # CheckPDBStatus(self, self.updater)
 
     def update(self):
         """Update the DiagnosticUpdater if there are more than 0 tasks."""
