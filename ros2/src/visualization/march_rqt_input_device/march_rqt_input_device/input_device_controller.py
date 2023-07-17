@@ -319,7 +319,7 @@ class InputDeviceController:
     def publish_control_type(self, control_type):
         """Sets the allowed control type depending on the gait."""
         self._node.get_logger().info("Publishing control type " + control_type)
-        self.measure_torque()
+        # self.measure_torque() DONT DO THIS BECAUSE IT WILL MEASURE TORQUE EVEN THOUGH THE GAIT HAS STARTED!
         self._set_gait_control_type.publish(String(data=control_type))
 
     def publish_sm_to_unknown(self) -> None:
