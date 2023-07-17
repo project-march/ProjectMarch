@@ -68,7 +68,7 @@ alias right="sfox && sros2 && ros2 topic echo /march/foot_position/right | grep 
 alias run_test_setup_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_rotational rviz:=false gait_directory:=test_joint_rotational_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_rotational_control.yaml'\'''
 alias run_test_setup_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_joint_linear rviz:=false gait_directory:=test_joint_linear_gaits layout:=test_joint realsense:=false control_yaml:='\''effort_control/test_joint_linear_control.yaml'\'''
 
-alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march.launch.py robot:=test_pressure_sole rviz:=false realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'''
+alias run_test_setup_pressure_sole='sudo -v && sfox && sros2 &&  ros2 launch march_launch march8_gaitloader.launch.py robot:=test_pressure_sole rviz:=true realsense:=false control_yaml:='\''effort_control/pressure_sole_control.yaml'\'' simulation:=false'
 
 alias m8_test_rotational='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=true'
 alias m8_test_linear='sudo -v && sfox && sros2 &&  ros2 launch march_launch start_test_setup.launch.py test_rotational:=false'

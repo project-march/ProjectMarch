@@ -1,6 +1,6 @@
 pressure_soles:
   if_name: enp1s0
-  ecatCycleTime: 4
+  ecatCycleTime: 8
   ecatSlaveTimeout: 50
   pressure_soles:
     - left_side:

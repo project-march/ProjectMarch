@@ -27,7 +27,7 @@ def generate_launch_description():
     control_type = LaunchConfiguration("control_type")
     actuating = LaunchConfiguration("actuating")
 
-    rviz_condition = PythonExpression(["'", simulation, "' == 'true'", " and '", gazebo, "' == 'false'"])
+    rviz_condition = 'true'
 
     declared_arguments = [
         DeclareLaunchArgument(
@@ -93,6 +93,7 @@ def generate_launch_description():
         ],
         condition=UnlessCondition(simulation),
     )
+    #endregion
 
     motor_controller_state_broadcaster_spawner = Node(
         package="controller_manager",
@@ -118,15 +119,14 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        condition=UnlessCondition(simulation),
     )
     # endregion
 
     nodes = [
-        joint_state_broadcaster_spawner,
-        joint_trajectory_controller_spawner,
-        pdb_state_broadcaster_spawner,
-        motor_controller_state_broadcaster_spawner,
+        # joint_state_broadcaster_spawner,
+        # joint_trajectory_controller_spawner,
+        # pdb_state_broadcaster_spawner,
+        # motor_controller_state_broadcaster_spawner,
         pressure_sole_state_broadcaster_spawner,
     ]
 
@@ -141,9 +141,9 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution([FindPackageShare("march_control"), "xacro", "ros2_control.xacro"]),
             " type:=",
-            control_type,
+            'effort',
             " gazebo:=",
-            gazebo,
+            'false',
         ]
     )
     robot_desc_dict = {"robot_description": robot_desc_xacro}
