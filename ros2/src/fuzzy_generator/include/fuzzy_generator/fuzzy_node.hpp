@@ -9,11 +9,11 @@
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/torque_stamped.hpp"
 #include "march_shared_msgs/msg/weight_stamped.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <std_msgs/msg/string.hpp>
-#include "rcl_interfaces/msg/set_parameters_result.hpp"
 
 class FuzzyNode : public rclcpp::Node {
 public:
@@ -31,7 +31,6 @@ private:
     void control_type_callback(std_msgs::msg::String::SharedPtr msg);
     void publish_weights(march_shared_msgs::msg::WeightStamped msg);
     rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters);
-
 
     FuzzyGenerator m_fuzzy_generator;
 

@@ -182,7 +182,7 @@ public:
         }
     }
 
-    std::vector<JointInfo>* joints_info_;    
+    std::vector<JointInfo>* joints_info_;
 
 private:
     rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;

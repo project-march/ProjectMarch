@@ -7,13 +7,13 @@
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/torque_stamped.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <yaml-cpp/yaml.h>
-#include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include <math.h>
+#include <yaml-cpp/yaml.h>
 
 class FuzzyGenerator {
 public:

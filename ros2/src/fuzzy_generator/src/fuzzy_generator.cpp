@@ -10,7 +10,7 @@ FuzzyGenerator::FuzzyGenerator()
 }
 
 FuzzyGenerator::FuzzyGenerator(rclcpp::Node::SharedPtr node)
-    :node_(node)
+    : node_(node)
 {
     config_ = YAML::LoadFile(node_->get_parameter("config_path").as_string());
 
@@ -18,7 +18,8 @@ FuzzyGenerator::FuzzyGenerator(rclcpp::Node::SharedPtr node)
     upper_bound = config_["bounds"]["upper_bound"].as<double>();
 
     RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "got node: " << node_->get_name());
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"), "got node param: " << node_->get_parameter("left_ankle_minimum_torque"));
+    RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("fuzzy_generator"), "got node param: " << node_->get_parameter("left_ankle_minimum_torque"));
 };
 
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeights(
@@ -62,7 +63,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         }
 
         // calculate far the foot is in the 'fuzzy shifting range'
-        float height_percentage = (upper_bound - foot_height)/(upper_bound - lower_bound);
+        float height_percentage = (upper_bound - foot_height) / (upper_bound - lower_bound);
         float d = range * height_percentage;
 
         float torque_weight;
@@ -72,12 +73,13 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         rclcpp::Parameter max_torque_param;
         node_->get_parameter("absolute_max_torque", max_torque_param);
 
-        if(signbit(torque_param.as_double())){
+        if (signbit(torque_param.as_double())) {
             torque_weight = std::max(t_min, std::min(d, t_max));
-        }
-        else {
-            if(torque_param.as_double() > max_torque_param.as_double()){
-                RCLCPP_WARN_STREAM(rclcpp::get_logger("fuzzy_generator"), "The given torque weight for " << joint_name << " is too high! clamping to " << max_torque_param.as_double());
+        } else {
+            if (torque_param.as_double() > max_torque_param.as_double()) {
+                RCLCPP_WARN_STREAM(rclcpp::get_logger("fuzzy_generator"),
+                    "The given torque weight for " << joint_name << " is too high! clamping to "
+                                                   << max_torque_param.as_double());
             }
             torque_weight = std::max(0.0, std::min(torque_param.as_double(), max_torque_param.as_double()));
         }
