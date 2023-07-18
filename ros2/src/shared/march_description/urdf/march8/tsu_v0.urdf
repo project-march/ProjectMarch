@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<!-- Hennie URDF for IK solver -->
+<!-- written by Tessel 18/04/23 -->
+
+<robot name ="Hennie">
+	<!-- Robot Link Definitions -->
+	<!--     22 linkages        -->
+	<link name="L_UL">
+		<inertial>
+			<origin rpy="0 0 0" xyz="0 -0.034 0.206"/>
+			<mass value="8.566"/>
+			<inertia ixx="0.259" ixy="-0.001" ixz="0" iyy="0.256" iyz="0.036" izz="0.023"/>
+		</inertial>
+		<visual>
+            <origin xyz="0 0.03 0.2025"/>
+			<geometry>
+				<box size="0.06 0.06 0.413"/>
+			</geometry>
+			<material name="">
+				<color rgba="1.0 0.45 0.15 1"/>
+			</material>
+		</visual>
+	</link>
+	<link name="L_LL">
+		<inertial>
+			<origin rpy="0 0 0" xyz="-0.034 -0.04 0.223"/>
+			<mass value="4.159"/>
+			<inertia ixx="0.055" ixy="0.001" ixz="0.006" iyy="0.064" iyz="0.002" izz="0.019"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0.03 0.2025"/>
+			<geometry>
+				<box size="0.06 0.06 0.413"/>
+			</geometry>
+			<material name="">
+				<color rgba="1.0 0.45 0.15 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<!-- Robot Joint Definitions -->
+	<!--                         -->
+	<joint name="left_hfe" type="revolute">
+		<origin rpy="0 0 0" xyz="0 -0.06 0.413"/>
+		<axis xyz="0 1 0"/>
+		<parent link="L_UL"/>
+		<child link="L_LL"/>
+		<limit effort="250" lower="-2.00713" upper="0.20944" velocity="3.94"/>
+	</joint>
+	<!-- Robot Transmission Definitions -->
+	<!--                                -->
+  	<transmission name="L_HFETransmission">
+            <joint name="left_hfe"/>
+            <actuator>
+                    <mechanicalReduction>16</mechanicalReduction>
+                    <motorInertia>20.3</motorInertia>
+            </actuator>
+  	</transmission>
+</robot>

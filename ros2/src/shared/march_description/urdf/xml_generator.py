@@ -22,7 +22,7 @@ import copy
 import yaml
 import datetime
 
-from typing import TextIO
+from typing import TextIO, Optional
 
 from mathparser import parser as pp
 from mathparser import compute
@@ -53,6 +53,19 @@ SYMBOLS = [
     ' / ',
 ]
 
+MODES = {
+    'airgait': '',
+    'bridge':
+        ('<joint armature="0" axis="1 0 0" damping="0" limited="false" name="rootx" pos="0 0 0" stiffness="0" type="slide"/>\n'
+         '<joint armature="0" axis="0 1 0" damping="0" limited="false" name="rooty" pos="0 0 0" ref="1.25" stiffness="0" type="slide"/>\n'
+         '<joint armature="0" axis="0 0 1" damping="0" limited="false" name="rootz" pos="0 0 0" ref="1.25" stiffness="0" type="slide"/>'),
+    'free': '<freejoint/>'
+}
+
+GLOBAL_JOINT_ATTRIBUTE = '${global_joint}'
+
+def get_modes():
+    return list(MODES.keys())
 
 class XMLGenerator:
     """Generates an XML usable in MuJoCo from a description.
@@ -81,7 +94,7 @@ class XMLGenerator:
         >>> gen('march7_v1_pre.xml', 'march7_v1.yaml')
     """
 
-    def __init__(self, mark_compile_time: bool = True):
+    def __init__(self, mark_compile_time: bool = True, mode: str ='airgait'):
         """Creates an XMLGenerator.
 
         Attributes:
@@ -89,11 +102,19 @@ class XMLGenerator:
                 of when the XML was created. This conveniently also notes which pre-XML and YAML file where used.
                 Defaults to True.
         """
+
+
         self.mark = mark_compile_time
         self.prexml_fname = None
         self.yaml_fname = None
 
-        self.current_line: int = None
+        self.current_line: Optional[int] = None
+
+        if mode not in MODES.keys():
+            raise ValueError(f'Error, please select one of the '
+                             f'following modes: {", ".join(MODES.keys())}')
+
+        self.mode = mode
 
     def _main(self, xml_file: TextIO, data: dict, out: TextIO):
         """Main operation of the XMLGenerator.
@@ -111,6 +132,11 @@ class XMLGenerator:
             self.current_line = ii
 
             completed_line = copy.copy(line)
+
+            if line.strip() == GLOBAL_JOINT_ATTRIBUTE:
+                out.write(self.get_global_joint())
+                continue
+
             attributes = self._get_attributes_in_line(line)
 
             if attributes:
@@ -123,6 +149,9 @@ class XMLGenerator:
                 out.write(completed_line)
             else:
                 out.write(line)
+
+    def get_global_joint(self):
+        return MODES[self.mode]
 
     def _replace_attribute(self, attribute, completed_line, data, ii):
         prefix = self._get_prefix(attribute)
