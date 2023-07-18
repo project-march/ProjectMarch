@@ -87,11 +87,11 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
         joints.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
     }
 
-
     return joints;
 }
 
-std::vector<std::tuple<std::string, float, float>>  FuzzyGenerator::getTorqueRanges(){
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getTorqueRanges()
+{
     std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
 
     YAML::Node joints_config = config_["joints"];

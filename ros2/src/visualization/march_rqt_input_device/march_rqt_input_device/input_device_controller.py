@@ -65,12 +65,6 @@ class InputDeviceController:
             topic="/march/step_and_hold/start_side",
             qos_profile=10,
         )
-        self._node.create_subscription(
-            msg_type=Bool,
-            topic="/march/eeg/on_off",
-            qos_profile=1,
-            callback=self._update_eeg_on_off,
-        )
         self._eeg_on_off_pub = self._node.create_publisher(
             msg_type=Bool,
             topic="/march/eeg/on_off",
@@ -103,6 +97,13 @@ class InputDeviceController:
             topic="/publish_swing_leg_command",
             qos_profile=10,
         )
+        self._eeg_input_subscriber = self._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
+        )
+
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -111,7 +112,6 @@ class InputDeviceController:
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-        self.eeg = False
         self._possible_gaits = []
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
@@ -148,7 +148,6 @@ class InputDeviceController:
             self.POSSIBLE_TRANSITIONS = self.POSSIBLE_TEST_TRANSITIONS
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
-        self.eeg = False
         self._current_gait = GaitRequest.FORCE_UNKNOWN
 
         self.gait_future = None
@@ -201,13 +200,13 @@ class InputDeviceController:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
 
-    def get_possible_gaits(self) -> Future:
-        """Returns the future for the names of possible gaits.
-
-        Returns:
-            Future. Future for the possible gaits.
-        """
-        return self.gait_future
+    def _eeg_gait_request_callback(self, msg: Int32):
+        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
+        #TODO: Update this better.
+        if msg.data == 0:
+            self.publish_stop()
+        elif msg.data == 1:
+            self.publish_gait("fixed_walk", "position")
 
     def get_node(self) -> Node:
         """Get function for the node.
@@ -316,6 +315,16 @@ class InputDeviceController:
             )
         )
 
+    def switch_to_position(self) -> None:
+        """Switches between fuzzy and position control."""
+        self._node.get_logger().info("Publishing control type position")
+        self._set_gait_control_type.publish(String(data="position"))
+
+    def switch_to_fuzzy(self) -> None:
+        """Switches to fuzzy control."""
+        self._node.get_logger().info("Publishing control type fuzzy")
+        self._set_gait_control_type.publish(String(data="fuzzy"))
+        
     def publish_control_type(self, control_type):
         """Sets the allowed control type depending on the gait."""
         self._node.get_logger().info("Publishing control type " + control_type)
@@ -333,35 +342,3 @@ class InputDeviceController:
                 id=str(self._id),
             )
         )
-
-    def publish_eeg_on_off(self) -> None:
-        """Publish eeg on if its off and off if it is on."""
-        self._eeg_on_off_pub.publish(Bool(data=not self.eeg))
-
-    def publish_small_narrow(self) -> None:
-        """Publish a small_narrow gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="small_narrow"))
-
-    def publish_small_wide(self) -> None:
-        """Publish a small_wide gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="small_wide"))
-
-    def publish_large_narrow(self) -> None:
-        """Publish a large_narrow gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="large_narrow"))
-
-    def publish_large_wide(self) -> None:
-        """Publish a large_wide gait on the step_and_hold topic."""
-        self._step_and_hold_step_size_pub.publish(String(data="large_wide"))
-
-    def publish_start_with_left(self) -> None:
-        """Publish that a step_and_hold starts from left_swing."""
-        self._step_and_hold_start_side_pub.publish(String(data="left_swing"))
-
-    def publish_start_with_right(self) -> None:
-        """Publish that a step_and_hold starts from right_swing."""
-        self._step_and_hold_start_side_pub.publish(String(data="right_swing"))
-
-    def _update_eeg_on_off(self, msg: Bool) -> None:
-        """Update eeg value for when it is changed in the state machine."""
-        self.eeg = msg.data

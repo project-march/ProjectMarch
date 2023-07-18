@@ -111,7 +111,7 @@ def generate_launch_description():
             # State machine parameters:
             DeclareLaunchArgument(
                 name="scheduling_delay",
-                default_value="0.15",
+                default_value="2.0",
                 description="Duration to delay the scheduling of the gait. If 0, the gait is scheduled ASAP.",
             ),
             DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
