@@ -1,16 +1,14 @@
 """Created by: Rixt Hellinga, MVIII."""
 from launch import LaunchDescription
-from launch.actions import SetEnvironmentVariable
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.substitutions import LaunchConfiguration
-from launch.actions import Shutdown, DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument
 import os
 
 
 def generate_launch_description():
-    """Generate the launch description for the fuzzy node."""    
-
+    """Generate the launch description for the fuzzy node."""
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -60,7 +58,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="config_path",
-                default_value= os.path.join(get_package_share_directory('fuzzy_generator'),'config','joints.yaml'),
+                default_value=os.path.join(get_package_share_directory('fuzzy_generator'), 'config', 'joints.yaml'),
                 description="Path the the config file",
             ),
             DeclareLaunchArgument(
@@ -84,9 +82,8 @@ def generate_launch_description():
                     {'left_hip_aa': LaunchConfiguration("left_hip_aa")},
                     {'right_hip_aa': LaunchConfiguration("right_hip_aa")},
                     {'absolute_max_torque': LaunchConfiguration("absolute_max_torque")},
-
-            ]
-    )
+                ]
+            )
         ]
 
     )

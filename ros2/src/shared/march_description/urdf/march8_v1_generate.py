@@ -10,7 +10,7 @@ if __name__ == '__main__':
         description='Generates a Mujoco XML from a "pre-xml" containing the '
                     'structure of the exoskeleton, and a YAML that can '
                     'parametrize values like mass, intertia and constraints, '
-                    'in said XML.',)
+                    'in said XML.')
 
     parser.add_argument('mode',
                         help='Mode for which to generate an XML.',

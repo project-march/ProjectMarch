@@ -7,7 +7,6 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
@@ -266,8 +265,6 @@ def generate_launch_description() -> LaunchDescription:
         launch_arguments=[("simulation", "true")],
     )
     # endregion
-
-    
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!

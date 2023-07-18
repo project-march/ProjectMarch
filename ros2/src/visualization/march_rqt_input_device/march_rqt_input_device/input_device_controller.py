@@ -3,7 +3,6 @@ import getpass
 import socket
 
 from march_shared_msgs.msg import GaitRequest
-from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
@@ -202,7 +201,7 @@ class InputDeviceController:
 
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
-        #TODO: Update this better.
+        # TODO: Update this better.
         if msg.data == 0:
             self.publish_stop()
         elif msg.data == 1:
@@ -324,7 +323,7 @@ class InputDeviceController:
         """Switches to fuzzy control."""
         self._node.get_logger().info("Publishing control type fuzzy")
         self._set_gait_control_type.publish(String(data="fuzzy"))
-        
+
     def publish_control_type(self, control_type):
         """Sets the allowed control type depending on the gait."""
         self._node.get_logger().info("Publishing control type " + control_type)

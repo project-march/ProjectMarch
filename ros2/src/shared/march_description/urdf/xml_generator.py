@@ -65,7 +65,9 @@ MODES = {
 GLOBAL_JOINT_ATTRIBUTE = '${global_joint}'
 
 def get_modes():
+    """Get the different modes."""
     return list(MODES.keys())
+
 
 class XMLGenerator:
     """Generates an XML usable in MuJoCo from a description.
@@ -93,7 +95,6 @@ class XMLGenerator:
         >>> gen = XMLGenerator()
         >>> gen('march7_v1_pre.xml', 'march7_v1.yaml')
     """
-
     def __init__(self, mark_compile_time: bool = True, mode: str ='airgait'):
         """Creates an XMLGenerator.
 
@@ -102,8 +103,6 @@ class XMLGenerator:
                 of when the XML was created. This conveniently also notes which pre-XML and YAML file where used.
                 Defaults to True.
         """
-
-
         self.mark = mark_compile_time
         self.prexml_fname = None
         self.yaml_fname = None
@@ -151,9 +150,11 @@ class XMLGenerator:
                 out.write(line)
 
     def get_global_joint(self):
+        """Get the global joints."""
         return MODES[self.mode]
 
     def _replace_attribute(self, attribute, completed_line, data, ii):
+        """Replace attributes."""
         prefix = self._get_prefix(attribute)
 
         verbatim_placeholder = self._get_placeholders(attribute)
