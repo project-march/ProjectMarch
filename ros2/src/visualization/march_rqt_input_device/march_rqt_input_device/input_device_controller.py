@@ -203,9 +203,9 @@ class InputDeviceController:
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
         #TODO: Update this better.
-        if msg.data == 1:
+        if msg.data == 0:
             self.publish_stop()
-        elif msg.data == 2:
+        elif msg.data == 1:
             self.publish_gait("fixed_walk", "position")
 
     def get_node(self) -> Node:
