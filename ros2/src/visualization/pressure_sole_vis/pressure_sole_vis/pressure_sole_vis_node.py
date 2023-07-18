@@ -1,3 +1,9 @@
+"""
+Pressure node visualization tool written by Jack Zeng M8.
+
+This module contains the PressureSoleVisNode class, which is responsible for visualizing pressure sole data.
+"""
+
 import rclpy
 from rclpy.node import Node
 from march_shared_msgs.msg import PressureSolesData
@@ -8,11 +14,6 @@ from std_msgs.msg import ColorRGBA
 from geometry_msgs.msg import Point
 import colorsys
 
-"""
-pressure_sole_vis_node.py
-
-This module contains the PressureSoleVisNode class, which is responsible for visualizing pressure sole data.
-"""
 
 NODE_NAME = "pressure_sole_vis"
 
@@ -27,12 +28,10 @@ def main(args=None):
 
 
 class PressureSoleVis(Node):
-
     """
-    This node subscribes to the pressure sole data topic.
-    It's sole (hah) purpose is to visualize this, there is no publisher for this class.
-    The order for of the data points, 8 pads per foot.
+    This node subscribes to the pressure sole data topic, it's sole (hah) purpose is to visualize this, there is no publisher for this class.
 
+    The order for of the data points, 8 pads per foot.
     - l_heel_right
     - l_heel_left
     - l_met1
@@ -72,12 +71,14 @@ class PressureSoleVis(Node):
         self.previous_data = np.zeros(16)  # amount of pressure pads
 
     def hsv_to_rgb(self, h, s, v):
-        if h == None:
+        """Convert hsv to rgb colour pattern, where h is the magnitude of the pressure sole data."""
+        if h is None:
             h = 0
         r, g, b = colorsys.hsv_to_rgb(0.667 - (h * 0.667), s, v)
         return r, g, b
 
     def create_heatmap(self, data):
+        """Create a 3D barplot heatmap of the pressure sole data."""
         press_vis = MarkerArray()
         data = 3.5 - np.array(data)
         effective_data = data * 0.5 + self.previous_data * 0.5
@@ -85,14 +86,14 @@ class PressureSoleVis(Node):
         resolution = 150  # amount of markers that are created
 
         # create markers for all of the pressure sole values
-        for i in range(int(len(data)/2)):
+        for i in range(int(len(data) / 2)):
             marker_container_strip = Marker()
             marker_container_strip.type = 6
             marker_container_strip.header.frame_id = "map"
 
             marker_container_strip.scale.x = 0.033
             marker_container_strip.scale.y = 0.02
-            marker_container_strip.scale.z = 0.1/resolution
+            marker_container_strip.scale.z = 0.1 / resolution
 
             marker_container_strip.pose.position.y = self.y_coord_left[i]
             marker_container_strip.pose.position.x = self.x_coord_left[i]
@@ -102,16 +103,12 @@ class PressureSoleVis(Node):
             marker_container_strip.pose.orientation.y = 0.0
             marker_container_strip.pose.orientation.z = 0.0
 
-            if i == 2:
+            if i in [2, 7]:
                 marker_container_strip.pose.orientation.z = 0.08
-            elif i == 3:
-                marker_container_strip.pose.orientation.z = -0.01
-            elif i == 5:
+            elif i in [3, 5]:
                 marker_container_strip.pose.orientation.z = -0.01
             elif i == 6:
                 marker_container_strip.pose.orientation.z = -0.4
-            elif i == 7:
-                marker_container_strip.pose.orientation.z = 0.08
 
             marker_container_strip.pose.orientation.w = 1.0
             marker_container_strip.id = i
@@ -121,7 +118,7 @@ class PressureSoleVis(Node):
             marker_container_strip.frame_locked = True
             press_vis.markers.append(marker_container_strip)
 
-            for j in range(int(effective_data[i]*resolution)): #something that creates an amount of markers based on the height
+            for j in range(int(effective_data[i] * resolution)):  #something that creates an amount of markers based on the height
                 point_container = Point()
                 color = ColorRGBA()
                 color.a = 1.0
@@ -129,9 +126,9 @@ class PressureSoleVis(Node):
 
                 point_container.x = 0.0
                 point_container.y = 0.0
-                point_container.z = j * marker_container_strip.scale.z # the scale is from the middle of the point so move the point up
+                point_container.z = j * marker_container_strip.scale.z  # the scale is from the middle of the point so move the point up
 
-                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(effective_data[i] * resolution)) * j), 1.0, 1.0)
+                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z / (int(effective_data[i] * resolution)) * j), 1.0, 1.0)
                 
                 marker_container_strip.points.append(point_container)
                 marker_container_strip.colors.append(color)
@@ -150,11 +147,11 @@ class PressureSoleVis(Node):
 
             marker_container_strip.pose.orientation.x = 0.0
             marker_container_strip.pose.orientation.y = 0.0
-            marker_container_strip.pose.orientation.z = 0.0   
+            marker_container_strip.pose.orientation.z = 0.0
 
-            if ((i == 2) or (i ==7)):
+            if i in [2, 7]:
                 marker_container_strip.pose.orientation.z = -0.08
-            elif ((i == 3) or (i == 5)):
+            elif i in [3, 5]:
                 marker_container_strip.pose.orientation.z = 0.01
             elif i == 6:
                 marker_container_strip.pose.orientation.z = 0.4
@@ -167,7 +164,7 @@ class PressureSoleVis(Node):
             marker_container_strip.frame_locked = True
             press_vis.markers.append(marker_container_strip)
 
-            for j in range(int(effective_data[i + 8]*resolution)): #something that creates an amount of markers based on the height
+            for j in range(int(effective_data[i + 8] * resolution)):  # something that creates an amount of markers based on the height
                 point_container = Point()
                 color = ColorRGBA()
                 color.a = 1.0
@@ -175,10 +172,10 @@ class PressureSoleVis(Node):
 
                 point_container.x = 0.0
                 point_container.y = 0.0
-                point_container.z = j * marker_container_strip.scale.z # the scale is from the middle of the point so move the point up
+                point_container.z = j * marker_container_strip.scale.z  # the scale is from the middle of the point so move the point up
 
-                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z/(int(effective_data[i + 8]*resolution))*j), 1.0, 1.0)
-                
+                color.r, color.g, color.b = self.hsv_to_rgb((normalized_z / (int(effective_data[i + 8] * resolution)) * j), 1.0, 1.0)
+
                 marker_container_strip.points.append(point_container)
                 marker_container_strip.colors.append(color)
 
@@ -236,7 +233,8 @@ class PressureSoleVis(Node):
         self.publisher.publish(press_vis)
 
     def listener_callback(self, msg):
+        """Callback for subscriber to the pressure sole data topic."""
         self.create_heatmap(msg.pressure_values)
-    
+
     if __name__ == '__main__':
         main()
