@@ -16,7 +16,6 @@ from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
-from functools import partial
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -48,6 +47,13 @@ class InputDeviceView(QWidget):
             qos_profile=1,
         )
 
+        self._eeg_alive_subscriber = self._controller._node.create_subscription(
+            msg_type=Bool,
+            topic="/eeg_alive",
+            callback=self._eeg_alive_callback,
+            qos_profile=10,
+        )
+
         self._always_enabled_buttons = []
 
         # Extend the widget with all attributes and children from UI file
@@ -61,7 +67,22 @@ class InputDeviceView(QWidget):
             file.name
             for file in Path(get_package_share_directory("march_rqt_input_device"), "resource", "img").glob("*.png")
         ]
+        self._eeg_button = None
+        self.eeg = False
+        self.eeg_override = True
         self._create_buttons()
+        self._update_possible_gaits()
+
+    def _eeg_alive_callback(self, msg: Bool) -> None:
+        """Update the possible gaits when eeg is turned on or off."""
+        self.eeg = msg.data
+        if msg.data:
+            self._controller.get_node().get_logger().info("EEG is alive.")
+        else:
+            self._controller.get_node().get_logger().warn("EEG disconnected.")
+            self.eeg_override = True
+            self._controller.publish_stop()
+        self.set_eeg_button_color()
         self._update_possible_gaits()
 
     def _create_buttons(self) -> None:
@@ -120,6 +141,8 @@ class InputDeviceView(QWidget):
     def _update_possible_gaits_view(self, future) -> None:
         """Update the buttons if the possible gaits have changed."""
         new_possible_gaits = future.result().gaits
+        if self.eeg and not self.eeg_override:
+            new_possible_gaits =  ["stop"]
         if set(self.possible_gaits) != set(new_possible_gaits):
             self._update_gait_buttons(new_possible_gaits)
 
@@ -147,12 +170,28 @@ class InputDeviceView(QWidget):
         self.frame.setEnabled(True)
         self.frame.verticalScrollBar().setEnabled(True)
 
+    def eeg_callback(self):
+        if self.eeg is True:
+            self.eeg_override = not self.eeg_override
+        if self.eeg_override == True:
+            self._controller.publish_stop()
+        self.set_eeg_button_color()
+
+    def set_eeg_button_color(self):
+        if self.eeg is False:
+            self._eeg_button.setStyleSheet("QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setText(check_string("eeg is off."))
+        elif self.eeg_override is True and self.eeg is True:
+            self._eeg_button.setStyleSheet("QToolButton {background-color: orange; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setText(check_string("eeg is connected."))
+        elif self.eeg_override is False and self.eeg is True:
+            self._eeg_button.setStyleSheet("QToolButton {background-color: green; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setText(check_string("eeg is on!"))
     def create_button(
         self,
         name: str,
         callback: Optional[Union[str, Callable]] = None,
         control_type: Optional[str] = None,
-        param: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
         always_enabled: bool = False,
@@ -190,14 +229,16 @@ class InputDeviceView(QWidget):
         qt_button.setMaximumSize(QSize(*size))
 
         if callback is not None:
-            if callable(callback):
-                qt_button.clicked.connect(callback)
-            elif param is None:
-                qt_button.clicked.connect(getattr(self._controller, callback))
+            if hasattr(self.__class__, callback) and callable(getattr(self.__class__, callback)):
+                qt_button.clicked.connect(getattr(self, callback))
             else:
-                qt_button.clicked.connect(partial(getattr(self._controller, callback), param))
+                qt_button.clicked.connect(getattr(self._controller, callback))
         else:
             qt_button.clicked.connect(lambda: self._controller.publish_gait(name, control_type))
+
+        if name == "eeg":
+            self._eeg_button = qt_button
+            self.set_eeg_button_color()
 
         return qt_button
 

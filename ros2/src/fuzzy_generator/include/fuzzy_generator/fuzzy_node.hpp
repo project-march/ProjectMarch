@@ -13,6 +13,7 @@
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <std_msgs/msg/string.hpp>
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 
 class FuzzyNode : public rclcpp::Node {
 public:
@@ -33,5 +34,7 @@ private:
 
 
     FuzzyGenerator m_fuzzy_generator;
+
+    OnSetParametersCallbackHandle::SharedPtr callback_handle_;
 };
 #endif // MARCH_FUZZY_NODE_HPP
