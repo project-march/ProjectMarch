@@ -387,6 +387,13 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
     // Tell every joint to enable actuation.
     // TODO: Check if this needs be done for every joint or the non operational once.
     RCLCPP_INFO((*logger_), "Enabling every joint for actuation");
+    for (JointInfo& jointInfo : joints_info_) {
+        jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+        jointInfo.target_position = (float)jointInfo.joint.getPosition();
+        jointInfo.target_torque = jointInfo.joint.getTorque();
+        jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
+    }
+
     for (auto joint : joints) {
         joint->enableActuation();
     }

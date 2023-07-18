@@ -17,13 +17,11 @@
       {
          "name": "home_setup",
          "control_type": "position",
-         "gait_type": 0,
          "always_enabled": true
       },
       {
          "name": "test_joint_gait",
          "control_type": "position",
-         "gait_type": 1,
          "always_enabled": true
 
       },
@@ -50,8 +48,7 @@
          "always_enabled": true
       },
       {
-         "name":"stop",
-         "gait_type": 0
+         "name":"stop"
       },
       {
          "name":"error",

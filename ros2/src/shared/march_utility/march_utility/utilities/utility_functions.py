@@ -113,7 +113,7 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
 
     Args:
         length_names (List[str], Optional): The link length names for which lengths you wish to retrieve.
-            Default is `None`, meaning it will get all link lengths.
+            Default is `None`, meaning it will get all link lengths.get_limits_robot_from_urdf_for_inverse_kinematics
         side (Side): The side of the exoskeleton of which the lengths would like to be known. Default is `Side.both`.
 
     Returns:
@@ -181,7 +181,7 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
         float. The limit of the given joint.
     """
     # get limits from march7 yaml
-    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march8.yaml'
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/test_joint_rotational.yaml'
     with open(robot_path) as file:
         document = yaml.full_load(file)
 
@@ -240,7 +240,7 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
 
     Retrieves it from the `MARCH_URDF`.
     """
-    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march8.yaml'
+    robot_path = get_package_share_directory('march_hardware_builder') + '/robots/test_joint_rotational.yaml'
     with open(robot_path) as file:
         document = yaml.full_load(file)
 
@@ -269,7 +269,7 @@ def get_position_from_yaml(position: str):
         with open(
                 os.path.join(
                     get_package_share_directory("march_gait_files"),
-                    "airgait_vi",
+                    "test_joint_rotational_gaits",
                     "default.yaml",
                 ),
                 MODE_READING,

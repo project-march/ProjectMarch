@@ -81,7 +81,9 @@ class DynamicGaitWalk(GaitInterface):
         self.actuating_joint_names = get_joint_names_from_urdf()
         self.node.get_logger().info(str(self.actuating_joint_names))
         self.all_joint_names = get_joint_names_from_urdf(return_fixed_joints=True)
-        self.home_stand_position_all_joints = get_position_from_yaml("stand")
+        self.home_stand_position_all_joints = get_position_from_yaml("setup")
+        
+        self._logger.info("home_stand_position_all_joints" + str(self.home_stand_position_all_joints))
         self.home_stand_position_actuating_joints = {
             name: self.home_stand_position_all_joints[name] for name in self.actuating_joint_names
         }

@@ -70,7 +70,7 @@ class GaitStateMachine:
         self._previous_gait = None
         actuating_joint_names = get_joint_names_from_urdf(0)
 
-        home_stand_position_all_joints = get_position_from_yaml("stand")
+        home_stand_position_all_joints = get_position_from_yaml("setup")
         self._home_stand_position = StaticEdgePosition(
             {name: home_stand_position_all_joints[name] for name in actuating_joint_names}
         )

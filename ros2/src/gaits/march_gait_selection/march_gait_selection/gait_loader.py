@@ -104,6 +104,7 @@ class GaitLoader:
             )
             if edge_position not in self._named_positions:
                 self._named_positions[edge_position] = position_name
+                self._logger.info("position_name is: " + str(position_name))
             else:
                 self._logger.error(
                     f"Position '{position_name}' with joint values {position_values} cannot be added because it will "
