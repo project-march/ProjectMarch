@@ -1,8 +1,4 @@
-"""
-Pressure node visualization tool written by Jack Zeng M8.
-
-This module contains the PressureSoleVisNode class, which is responsible for visualizing pressure sole data.
-"""
+"""Pressure node visualization tool written by Jack Zeng M8."""
 
 import rclpy
 from rclpy.node import Node
@@ -28,8 +24,7 @@ def main(args=None):
 
 
 class PressureSoleVis(Node):
-    """
-    This node subscribes to the pressure sole data topic, it's sole (hah) purpose is to visualize this, there is no publisher for this class.
+    """This node subscribes to the pressure sole data topic, it's sole (hah) purpose is to visualize this, there is no publisher for this class.
 
     The order for of the data points, 8 pads per foot.
     - l_heel_right
@@ -118,7 +113,7 @@ class PressureSoleVis(Node):
             marker_container_strip.frame_locked = True
             press_vis.markers.append(marker_container_strip)
 
-            for j in range(int(effective_data[i] * resolution)):  #something that creates an amount of markers based on the height
+            for j in range(int(effective_data[i] * resolution)):  # something that creates an amount of markers based on the height
                 point_container = Point()
                 color = ColorRGBA()
                 color.a = 1.0
@@ -129,7 +124,7 @@ class PressureSoleVis(Node):
                 point_container.z = j * marker_container_strip.scale.z  # the scale is from the middle of the point so move the point up
 
                 color.r, color.g, color.b = self.hsv_to_rgb((normalized_z / (int(effective_data[i] * resolution)) * j), 1.0, 1.0)
-                
+
                 marker_container_strip.points.append(point_container)
                 marker_container_strip.colors.append(color)
 
