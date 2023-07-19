@@ -15,7 +15,7 @@ from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int32
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -54,6 +54,13 @@ class InputDeviceView(QWidget):
             qos_profile=10,
         )
 
+        self._eeg_input_subscriber = self._controller._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
+        )
+
         self._always_enabled_buttons = []
 
         # Extend the widget with all attributes and children from UI file
@@ -84,6 +91,15 @@ class InputDeviceView(QWidget):
             self._controller.publish_stop()
         self.set_eeg_button_color()
         self._update_possible_gaits()
+    
+    def _eeg_gait_request_callback(self, msg: Int32):
+        """Process the eeg gait request."""
+        if self.eeg and not self.eeg_override:
+            self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
+            if msg.data == 0:
+                self.publish_stop()
+            elif msg.data == 1:
+                self.publish_gait("fixed_walk", "position")
 
     def _create_buttons(self) -> None:
         """Creates all the buttons, new buttons should be added here."""
