@@ -16,15 +16,15 @@ def generate_launch_description():
 
     return LaunchDescription([
         Node(
-        package='weight_shift_buffer',
-        namespace='',
-        executable='weight_shift_buffer_node',
-        name='weight_shift_buffer_node',
-        parameters=[
-                {"weight_shift_duration": test1},
-                {"weight_shift_length": test2},
-                {"weight_shift_type": test3},
-                {"right_swing_scaling": test4},
+            package='weight_shift_buffer',
+            namespace='',
+            executable='weight_shift_buffer_node',
+            name='weight_shift_buffer_node',
+            parameters=[
+                    {"weight_shift_duration": test1},
+                    {"weight_shift_length": test2},
+                    {"weight_shift_type": test3},
+                    {"right_swing_scaling": test4},
             ]
         ),
     ])

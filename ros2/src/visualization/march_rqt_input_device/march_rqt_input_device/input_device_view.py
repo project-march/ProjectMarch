@@ -171,7 +171,7 @@ class InputDeviceView(QWidget):
         self.frame.verticalScrollBar().setEnabled(True)
 
     def eeg_button_callback(self):
-        """Callback for when the eeg button is clicked"""
+        """Callback for when the eeg button is clicked."""
         if self.eeg is True:
             self.eeg_override = not self.eeg_override
         if self.eeg_override:
@@ -179,7 +179,7 @@ class InputDeviceView(QWidget):
         self.set_eeg_button_color()
 
     def set_eeg_button_color(self):
-        """Set the correct color for the EEG button"""
+        """Set the correct color for the EEG button."""
         if self.eeg is False:
             self._eeg_button.setStyleSheet("QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is off."))
