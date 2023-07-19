@@ -96,12 +96,6 @@ class InputDeviceController:
             topic="/publish_swing_leg_command",
             qos_profile=10,
         )
-        self._eeg_input_subscriber = self._node.create_subscription(
-            msg_type=Int32,
-            topic="/eeg_gait_request",
-            callback=self._eeg_gait_request_callback,
-            qos_profile=10,
-        )
 
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
@@ -198,14 +192,6 @@ class InputDeviceController:
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
-
-    def _eeg_gait_request_callback(self, msg: Int32):
-        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
-        # TODO: Update this better.
-        if msg.data == 0:
-            self.publish_stop()
-        elif msg.data == 1:
-            self.publish_gait("fixed_walk", "position")
 
     def get_node(self) -> Node:
         """Get function for the node.
