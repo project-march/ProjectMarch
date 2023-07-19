@@ -64,6 +64,7 @@ MODES = {
 
 GLOBAL_JOINT_ATTRIBUTE = '${global_joint}'
 
+
 def get_modes():
     """Get the different modes."""
     return list(MODES.keys())
@@ -95,7 +96,7 @@ class XMLGenerator:
         >>> gen = XMLGenerator()
         >>> gen('march7_v1_pre.xml', 'march7_v1.yaml')
     """
-    def __init__(self, mark_compile_time: bool = True, mode: str ='airgait'):
+    def __init__(self, mark_compile_time: bool = True, mode: str = 'airgait'):
         """Creates an XMLGenerator.
 
         Attributes:
