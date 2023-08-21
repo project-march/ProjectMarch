@@ -92,6 +92,7 @@ class InputDeviceController:
             topic="/publish_swing_leg_command",
             qos_profile=10,
         )
+
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -133,8 +134,11 @@ class InputDeviceController:
                 clock=self._node.get_clock(),
             )
         self.POSSIBLE_TRANSITIONS = self.POSSIBLE_GAIT_TRANSITIONS
+        if testing:
+            self.POSSIBLE_TRANSITIONS = self.POSSIBLE_TEST_TRANSITIONS
 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
+        self._current_gait = GaitRequest.FORCE_UNKNOWN
 
         self.gait_future = None
         self.update_possible_gaits()
@@ -161,7 +165,7 @@ class InputDeviceController:
         self._current_gait = GaitRequest.FORCE_UNKNOWN
 
     def __del__(self):
-        """Deconstructer, that shuts down the publishers and resets the timers."""
+        """Deconstructer, that shutsdown the publishers and resets the timers."""
         self._node.destroy_publisher(self._instruction_gait_pub)
         self._node.destroy_publisher(self._error_pub)
         if self._ping:
@@ -335,6 +339,7 @@ class InputDeviceController:
     def publish_control_type(self, control_type):
         """Sets the allowed control type depending on the gait."""
         self._node.get_logger().info("Publishing control type " + control_type)
+        # self.measure_torque() DONT DO THIS BECAUSE IT WILL MEASURE TORQUE EVEN THOUGH THE GAIT HAS STARTED!
         self._set_gait_control_type.publish(String(data=control_type))
 
     def publish_sm_to_unknown(self) -> None:

@@ -7,12 +7,11 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v1.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation = LaunchConfiguration("simulation", default='true')
     rosbags = LaunchConfiguration("rosbags", default='true')
@@ -226,6 +225,26 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch fuzzy
+
+    fuzzy_default_config = os.path.join(
+        get_package_share_directory('fuzzy_generator'),
+        'config',
+        'joints.yaml'
+    )
+
+    fuzzy_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("fuzzy_generator"),
+                "launch",
+                "fuzzy.launch.py",
+            )
+        ),
+        launch_arguments=[("config_path", fuzzy_default_config)]
+    )
+    # endregion
+
     # region Launch Safety
     weight_shift_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -239,8 +258,6 @@ def generate_launch_description() -> LaunchDescription:
         launch_arguments=[("simulation", "true")],
     )
     # endregion
-
-    
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -267,23 +284,7 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
-    fuzzy_default_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
-
-    # parameters
-    fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
-
     return LaunchDescription(declared_arguments + [
-        Node(
-            package='fuzzy_generator',
-            namespace='',
-            executable='fuzzy_node',
-            name='fuzzy_generator',
-            parameters=[{'config_path': fuzzy_config_path}]
-        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
         ),
@@ -294,5 +295,6 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         gait_preprocessor_node,
         march_gait_selection_node,
+        fuzzy_node,
         weight_shift_node,
     ])

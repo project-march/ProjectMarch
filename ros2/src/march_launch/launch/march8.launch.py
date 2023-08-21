@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v1.xml')
     tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation = LaunchConfiguration("simulation", default='true')
     rosbags = LaunchConfiguration("rosbags", default='true')
@@ -274,6 +274,11 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
+    weight_shift_buffer_launch = os.path.join(
+        get_package_share_directory('weight_shift_buffer'),
+        'launch'
+    )
+
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
@@ -326,12 +331,6 @@ def generate_launch_description() -> LaunchDescription:
             name='bezier_visualization',
         ),
         Node(
-            package='footstep_generator',
-            namespace='',
-            executable='footstep_generator_node',
-            name='footstep_generator'
-        ),
-        Node(
             package='fuzzy_generator',
             namespace='',
             executable='fuzzy_node',
@@ -369,6 +368,12 @@ def generate_launch_description() -> LaunchDescription:
             executable='state_estimator_mock_node',
             name='state_estimator_mock',
             condition=IfCondition(airgait),
+        ),
+        Node(
+            package='weight_shift_buffer',
+            namespace='',
+            executable='weight_shift_buffer_node',
+            name='weight_shift_buffer_node',
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),

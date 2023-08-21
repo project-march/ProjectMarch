@@ -17,26 +17,62 @@ See <https://www.gnu.org/licenses/>.
 -->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="obj-files/v0" angle="degree" autolimits="true"/>
+  <compiler meshdir="obj-files/v1" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.0005' iterations='50' solver='PGS' gravity='0 0 -9.81'/>
 
   <asset>
-    <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>
+    <texture type="skybox" builtin="gradient" rgb1="0.05 0.05 0.05" rgb2="0.05 0.05 0.05"
+             width="512" height="512"/>
     <texture name="body" type="cube" builtin="flat" mark="cross" width="127" height="1278"
-             rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
-    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
-    <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
-    <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="Backpack.obj"/>
-    <mesh name="L_foot"      file="FootLeft.obj"/>
-    <mesh name="L_hip"       file="HipLeft.obj"/>
-    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
+             rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1"
+             random="0.01"/>
+    <texture name="grid" type="2d" builtin="checker" mark="edge" markrgb="0 0 0" width="800" height="800"
+             rgb1=".9 .9 .9" rgb2=".86 .86 .86"/>
+    <texture name="logos" file="obj-files/v1/BackPackLogos.png" type="cube" width="512" height="512"/>
+
+    <material name="grid" texture="grid" texrepeat="1 1" texuniform="false"
+              shininess=".2"/>
+    <material name="march_cover_inside" rgba=".102 .114 .129 1"
+              shininess=".2"/>
+    <material name="march_cover_outside" rgba=".102 .114 .129 1"
+              shininess=".5"/>
+    <material name="march_cover_backpack" rgba=".102 .114 .129 1"
+              shininess=".5" texture="logos" texuniform="true"/>
+    <material name="march_accent_color" rgba=".898 .294 .114 1"
+              shininess=".5"/>
+    <material name="march_aluminium" rgba=".827 .827 .827 1"
+              shininess=".5"/>
+    <material name="march_pilot" rgba=".827 .827 .827 1"/>
+
+    <mesh name="backpack"           file="BackPack.obj"/>
+    <mesh name="backpack_accent"    file="BackPackAccent.obj"/>
+    <mesh name="backpack_partners"  file="BackPackPartners.obj"/>
+    <mesh name="backpack_pilot"     file="BackPackPilot.obj"/>
+
+    <mesh name="L_foot"                 file="FootLeft.obj"/>
+    <mesh name="L_foot_pilot"           file="FootLeftPilot.obj"/>
+    <mesh name="L_hip"                  file="HipLeft.obj"/>
+    <mesh name="L_lower_leg_inside"     file="LowerLegLeftInside.obj"/>
+    <mesh name="L_lower_leg_outside"    file="LowerLegLeftOutside.obj"/>
+    <mesh name="L_lower_leg_accent"     file="LowerLegLeftAccent.obj"/>
+    <mesh name="L_lower_leg_pilot"      file="LowerLegLeftPilot.obj"/>
+    <mesh name="L_upper_leg_inside"     file="UpperLegLeftInside.obj"/>
+    <mesh name="L_upper_leg_outside"    file="UpperLegLeftOutside.obj"/>
+    <mesh name="L_upper_leg_accent"     file="UpperLegLeftAccent.obj"/>
+    <mesh name="L_upper_leg_pilot"      file="UpperLegLeftPilot.obj"/>
+    
+    <mesh name="R_foot"                 scale="1 -1 1"  file="FootLeft.obj"/>
+    <mesh name="R_foot_pilot"           scale="1 -1 1"  file="FootLeftPilot.obj"/>
+    <mesh name="R_hip"                  scale="1 -1 1"  file="HipLeft.obj"/>
+    <mesh name="R_lower_leg_inside"     scale="1 -1 1"  file="LowerLegLeftInside.obj"/>
+    <mesh name="R_lower_leg_outside"    scale="1 -1 1"  file="LowerLegLeftOutside.obj"/>
+    <mesh name="R_lower_leg_accent"     scale="1 -1 1"  file="LowerLegLeftAccent.obj"/>
+    <mesh name="R_lower_leg_pilot"      scale="1 -1 1"  file="LowerLegLeftPilot.obj"/>
+    <mesh name="R_upper_leg_inside"     scale="1 -1 1"  file="UpperLegLeftInside.obj"/>
+    <mesh name="R_upper_leg_outside"    scale="1 -1 1"  file="UpperLegLeftOutside.obj"/>
+    <mesh name="R_upper_leg_accent"     scale="1 -1 1"  file="UpperLegLeftAccent.obj"/>
+    <mesh name="R_upper_leg_pilot"      scale="1 -1 1"  file="UpperLegLeftPilot.obj"/>
   </asset>
 
   <default>
@@ -45,7 +81,7 @@ See <https://www.gnu.org/licenses/>.
     <geom contype="0" conaffinity="0" condim="1" solref="0.005 1"/>
     <equality solref="0.005 1"/>
     <default class="exoskeleton">
-      <geom material="march_grey" group="2"/>
+      <geom material="march_aluminium" group="2"/>
     </default>
     <default class="collision">
       <geom contype="1" group="3" type="capsule"/>
@@ -75,39 +111,46 @@ See <https://www.gnu.org/licenses/>.
 
   <visual>
     <map force="0.1" zfar="30"/>
-    <rgba haze="0.15 0.25 0.35 1"/>
+    <rgba haze="0.93 0.25 0.0 1"/>
     <quality shadowsize="4096"/>
     <global offwidth="800" offheight="800"/>
   </visual>
 
   <worldbody>
-    <geom name="floor" size="0 0 .05" type="plane" material="grid" conaffinity="15" condim="3"/>
+    <geom name="floor" size="0 0 .05" type="plane" material="grid" conaffinity="15" condim="3" />
     <light name="spotlight" mode="targetbodycom" target="backpack"
-           diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
+           diffuse=".3 .3 .3" specular="0.1 0.1 0.1" pos="-2 -20 10" cutoff="40"/>
 
     <body name="backpack"
           pos="0 0 0.95"
           childclass="exoskeleton">
-      <light name="top" pos="0 0 2" mode="trackcom"/>
+      <!-- <light name="top" pos="0 0 1.5" specular="0.1 0.1 0.1" mode="trackcom"/> -->
+      <light name="top2" pos="0 0 30" diffuse="0.5 0.5 0.5" mode="trackcom"/>
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
       <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
+      <camera name="custom1" pos="0.039 -4.460 0.0" xyaxes="1.000 0.009 -0.000 -0.000 0.004 1.000" mode="trackcom"/>
+      <camera name="custom2" pos="0.0 0.0 0.0" xyaxes="1.000 0.009 -0.000 -0.000 0.004 1.000" mode="trackcom"/>
+      <camera name="custom3" pos="0.0 0.0 0.0" xyaxes="0.001 0.001 -0.000 -0.000 0.001 0.001" mode="trackcom"/>
+
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
       <inertial pos="0.171 -0.006 0.342" mass="57.096"
                 fullinertia="2.931 2.492 1.522 0.023 -0.1 0.025"/>
-      <freejoint/>
-      <geom type="mesh" mesh="backpack" />
+      <geom type="mesh" mesh="backpack" material="march_cover_outside"/>
+      <geom type="mesh" mesh="backpack_accent" material="march_accent_color"/>
+      <geom type="mesh" mesh="backpack_partners" material="march_cover_inside"/>
+      <geom type="mesh" mesh="backpack_pilot" material="march_pilot"/>
       <geom name="backpack" type="box"
             size="0.051 0.189 0.165"
             pos="-0.02 0 0.13" class="collision"/>
 
-    <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
+      <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
       <!--  LEFT LEG -->
       <body name="L_hip" pos="-0.021 0.08 0.025">
         <inertial pos="0.05 0.109 0.033" mass="1.849"
                   fullinertia="0.012 0.013 0.012 -0.004 0.002 0"/>
         <joint name="L_HAA" axis="-1 0 0" range="-15 10" class="HAA_joint"/>
-        <geom type="mesh" mesh="L_hip" />
+        <geom type="mesh" mesh="L_hip" material="march_cover_outside"/>
         <geom name="L_hip" fromto="0 0 0 0.182 0.182 0"
               size="0.032" class="L_collision"/>
         <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
@@ -116,7 +159,10 @@ See <https://www.gnu.org/licenses/>.
         <inertial pos="0.012 -0.098 -0.151" mass="26.104"
                   fullinertia="0.859 0.733 0.23 0.021 -0.025 0.055"/>
           <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
-          <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
+          <geom type="mesh" mesh="L_upper_leg_outside" material="march_cover_outside"/>
+          <geom type="mesh" mesh="L_upper_leg_inside" material="march_cover_inside"/>
+          <geom type="mesh" mesh="L_upper_leg_accent"  material="march_accent_color"/>
+          <geom type="mesh" mesh="L_upper_leg_pilot"  material="march_pilot"/>
           <geom name="L_UL" fromto="0 0 0 0 -0.06 -0.413"
               size="0.069" class="L_collision"/>
           <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
@@ -125,7 +171,10 @@ See <https://www.gnu.org/licenses/>.
             <inertial pos="-0.021 -0.079 -0.157" mass="7.061"
                   fullinertia="0.12 0.117 0.034 0.003 -0.008 0.012"/>
             <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
-            <geom type="mesh" mesh="L_shin"/>
+            <geom type="mesh" mesh="L_lower_leg_outside" material="march_cover_outside"/>
+            <geom type="mesh" mesh="L_lower_leg_inside" material="march_cover_inside"/>
+            <geom type="mesh" mesh="L_lower_leg_accent" material="march_accent_color"/>
+            <geom type="mesh" mesh="L_lower_leg_pilot"  material="march_pilot"/>
             <geom name="L_LL" fromto="0 0 0 0.0 -0.037 -0.414"
               size="0.047" class="L_collision"/>
             <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
@@ -134,7 +183,8 @@ See <https://www.gnu.org/licenses/>.
               <inertial pos="0.007 -0.054 -0.035" mass="2.964"
                   fullinertia="0.023 0.031 0.019 0.004 0.011 -0.004"/>
               <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
-              <geom type="mesh" mesh="L_foot"/>
+              <geom type="mesh" mesh="L_foot" material="march_aluminium"/>
+              <geom type="mesh" mesh="L_foot_pilot"  material="march_pilot"/>
               <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -193,7 +243,7 @@ See <https://www.gnu.org/licenses/>.
         <inertial pos="0.05 -0.109 0.033" mass="1.849"
                   fullinertia="0.012 0.013 0.012 0.004 0.002 -0"/>
         <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint"/>
-        <geom type="mesh" mesh="R_hip" />
+        <geom type="mesh" mesh="R_hip" material="march_cover_outside"/>
         <geom name="R_hip" fromto="0 0 0 0.182 -0.182 0"
               size="0.032" class="R_collision"/>
         <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
@@ -202,7 +252,10 @@ See <https://www.gnu.org/licenses/>.
           <inertial pos="0.012 0.098 -0.151" mass="26.104"
                   fullinertia="0.859 0.733 0.23 -0.021 -0.025 -0.055"/>
           <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
-          <geom type="mesh" mesh="R_thigh"/>
+          <geom type="mesh" mesh="R_upper_leg_outside" material="march_cover_outside"/>
+          <geom type="mesh" mesh="R_upper_leg_inside" material="march_cover_inside"/>
+          <geom type="mesh" mesh="R_upper_leg_accent" material="march_accent_color"/>
+          <geom type="mesh" mesh="R_upper_leg_pilot"  material="march_pilot"/>
           <geom name="R_UL" fromto="0 0 0 0 0.06 -0.413"
               size="0.069" class="R_collision"/>
           <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
@@ -211,7 +264,10 @@ See <https://www.gnu.org/licenses/>.
             <inertial pos="-0.021 0.079 -0.157" mass="7.061"
                   fullinertia="0.12 0.117 0.034 -0.003 -0.008 -0.012"/>
             <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
-            <geom type="mesh" mesh="R_shin"/>
+            <geom type="mesh" mesh="R_lower_leg_outside" material="march_cover_outside"/>
+            <geom type="mesh" mesh="R_lower_leg_inside" material="march_cover_inside"/>
+            <geom type="mesh" mesh="R_lower_leg_accent" material="march_accent_color"/>
+            <geom type="mesh" mesh="R_lower_leg_pilot"  material="march_pilot"/>
             <geom name="R_LL" fromto="0 0 0 0.0 0.037 -0.414"
               size="0.047" class="R_collision"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
@@ -220,7 +276,8 @@ See <https://www.gnu.org/licenses/>.
               <inertial pos="0.007 0.054 -0.035" mass="2.964"
                   fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
               <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
-              <geom type="mesh" mesh="R_foot"/>
+              <geom type="mesh" mesh="R_foot" material="march_aluminium"/>
+              <geom type="mesh" mesh="R_foot_pilot"  material="march_pilot"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
               <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->

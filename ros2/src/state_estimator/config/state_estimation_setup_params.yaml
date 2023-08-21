@@ -40,7 +40,7 @@ state_estimator:
         IMU_exo_base_link: "hip_base"
           #POS: X, Y, Z
         IMU_exo_position: [0.0, 0.0, 0.0]
-        IMU_exo_rotation: [0.0, 0.0, 0.0]
+        IMU_exo_rotation: [0.0, 3.14, 0.0]
       upper_imu:
         IMU_exo_base_link: "hip_base"
           #POS: X, Y, Z
