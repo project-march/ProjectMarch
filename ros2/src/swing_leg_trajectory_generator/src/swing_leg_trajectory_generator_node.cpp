@@ -70,7 +70,7 @@ void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::Po
     m_swing_leg_generator.set_step_length(step_size);
 
     m_publish_curve->publish(m_swing_leg_generator.get_curve().trajectory);
-    prev_step_size = steps.at(0).position.x;
+    prev_step_size = steps.at(/*__n=*/0).position.x;
     publish_path_visualization();
 }
 
