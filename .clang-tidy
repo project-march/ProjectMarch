@@ -14,7 +14,7 @@ Checks:     -*,
   concurrency-*,
   performance-*,
   -performance-unnecessary-value-param,
-  -clang-analyzer-cplusplus.Move
+  -clang-analyzer-cplusplus,
   -hicpp-member-init,
   -clang-diagnostic-error,
   -clang-diagnostic-*
