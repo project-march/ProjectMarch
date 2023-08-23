@@ -3,12 +3,10 @@
 import diagnostic_updater
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
 
 from march_shared_msgs.msg import Alive
 
 from .diagnostic_analyzers.check_input_device import CheckInputDevice
-from .diagnostic_analyzers.control import CheckJointValues
 from .diagnostic_analyzers.gait_state import CheckGaitStatus
 from .diagnostic_analyzers.motor_controller_state import CheckMotorControllerStatus
 from .diagnostic_analyzers.pdb_state import CheckPDBStatus
@@ -44,10 +42,6 @@ class DiagnosticUpdater(Node):
 
         # Frequency checks
         CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 4)
-
-        # Control checks
-        # check_joint_states = CheckJointValues(self, self.joints, "/joint_states", JointState)
-        # self.updater.add("Control position values", check_joint_states.position_diagnostics)
 
         # NOTE: There are also diagnosis for velocity and effort,
         # but since the ROS code does not yet have limits for them, they are not used.

@@ -274,11 +274,6 @@ def generate_launch_description() -> LaunchDescription:
         'launch'
     )
 
-    weight_shift_buffer_launch = os.path.join(
-        get_package_share_directory('weight_shift_buffer'),
-        'launch'
-    )
-
     urdf_location = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',

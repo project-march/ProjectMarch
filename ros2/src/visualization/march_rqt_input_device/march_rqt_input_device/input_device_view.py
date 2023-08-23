@@ -98,7 +98,7 @@ class InputDeviceView(QWidget):
             self._controller.publish_stop()
         self.set_eeg_button_color()
         self._update_possible_gaits()
-    
+
     def _eeg_gait_request_callback(self, msg: Int32):
         """Process the eeg gait request."""
         if self.eeg and not self.eeg_override:
@@ -107,15 +107,6 @@ class InputDeviceView(QWidget):
                 self.publish_stop()
             elif msg.data == 1:
                 self.publish_gait("fixed_walk", "position")
-
-    def _eeg_gait_request_callback(self, msg: Int32):
-        # TODO: Update this better.
-        if self.eeg and not self.eeg_override:
-            self._controller._node.get_logger().info("EEG requested gait: " + str(msg.data))
-            if msg.data == 0:
-                self._controller.publish_stop()
-            elif msg.data == 1:
-                self._controller.publish_gait("fixed_walk", "position")
 
     def _create_buttons(self) -> None:
         """Creates all the buttons, new buttons should be added here."""
