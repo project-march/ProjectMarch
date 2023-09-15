@@ -46,8 +46,8 @@ class DiagnosticUpdater(Node):
         CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 4)
 
         # Control checks
-        check_joint_states = CheckJointValues(self, self.joints, "/joint_states", JointState)
-        self.updater.add("Control position values", check_joint_states.position_diagnostics)
+        # check_joint_states = CheckJointValues(self, self.joints, "/joint_states", JointState)
+        # self.updater.add("Control position values", check_joint_states.position_diagnostics)
 
         # NOTE: There are also diagnosis for velocity and effort,
         # but since the ROS code does not yet have limits for them, they are not used.

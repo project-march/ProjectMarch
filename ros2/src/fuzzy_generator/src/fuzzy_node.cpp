@@ -10,12 +10,9 @@ using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 FuzzyNode::FuzzyNode()
-    : Node("fuzzy_node")
+    : Node("fuzzy_node",
+        rclcpp::NodeOptions().allow_undeclared_parameters(true).automatically_declare_parameters_from_overrides(true))
 {
-    declare_parameter("config_path", std::string(""));
-    std::string config_path = this->get_parameter("config_path").as_string();
-    m_fuzzy_generator = FuzzyGenerator(config_path);
-
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
         "robot_feet_height", 10, std::bind(&FuzzyNode::height_callback, this, _1));
 
@@ -24,7 +21,10 @@ FuzzyNode::FuzzyNode()
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10);
 
-    this->declare_parameter("allowed_control_type", "position");
+    callback_handle_
+        = this->add_on_set_parameters_callback(std::bind(&FuzzyNode::parametersCallback, this, std::placeholders::_1));
+
+    m_fuzzy_generator = FuzzyGenerator(std::shared_ptr<FuzzyNode>(this));
 }
 
 /**
@@ -92,6 +92,20 @@ void FuzzyNode::publish_weights(march_shared_msgs::msg::WeightStamped msg)
     } else {
         RCLCPP_WARN_STREAM(this->get_logger(), "NOT A RECOGNIZED CONTROL TYPE: " << allowed_control_type);
     }
+}
+
+rcl_interfaces::msg::SetParametersResult FuzzyNode::parametersCallback(const std::vector<rclcpp::Parameter>& parameters)
+{
+    rcl_interfaces::msg::SetParametersResult result;
+    RCLCPP_INFO_STREAM(this->get_logger(), "callback! ");
+    result.successful = true;
+    result.reason = "success";
+
+    for (const rclcpp::Parameter& param : parameters) {
+        RCLCPP_INFO_STREAM(this->get_logger(), "set " << param.get_name() << " to " << param);
+    }
+
+    return result;
 }
 
 /**

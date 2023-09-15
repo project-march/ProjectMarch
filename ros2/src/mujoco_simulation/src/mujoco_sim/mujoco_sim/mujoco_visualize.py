@@ -25,18 +25,18 @@ class MujocoVisualizer:
         self.opt = mujoco.MjvOption()
 
         mujoco.glfw.glfw.init()
-        self.window = mujoco.glfw.glfw.create_window(1200, 900, "Sim", None, None)
+        self.window = mujoco.glfw.glfw.create_window(1800, 1350, "Sim", None, None)
         mujoco.glfw.glfw.make_context_current(self.window)
         mujoco.glfw.glfw.swap_interval(1)
 
         mujoco.mjv_defaultCamera(self.cam)
         mujoco.mjv_defaultOption(self.opt)
         # Manually adjust the base camera distance to make the entire model visible
-        self.cam.distance = 3.0
-        self.cam.azimuth = 90.0
+        self.cam.distance = 4.0
+        self.cam.azimuth = 135.0
         self.cam.trackbodyid = 1
-        self.cam.elevation = 1
-        self.cam.lookat[2] += 0.1
+        self.cam.elevation = -4.5
+        self.cam.lookat[2] += 0.7
 
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
@@ -50,7 +50,7 @@ class MujocoVisualizer:
             model (Mujoco struct): Refers to the simulated body in Mujoco
             data (Mujoco struct): Refers to the data struct containing all model data in Mujoco
         """
-        viewport = mujoco.MjrRect(0, 0, 1200, 900)
+        viewport = mujoco.MjrRect(0, 0, 1800, 1350)
 
         mujoco.mjv_updateScene(model, data, self.opt, None, self.cam, mujoco.mjtCatBit.mjCAT_ALL.value, self.scene)
         mujoco.mjr_render(viewport, self.scene, self.context)

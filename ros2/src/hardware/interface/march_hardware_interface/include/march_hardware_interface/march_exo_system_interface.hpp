@@ -136,12 +136,8 @@ public:
     void setJointWeight(std::string joint_name, float position_weight, float torque_weight)
     {
 
-        // RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
-
         bool found_joint = false;
         for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-            // RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
-            // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
                 if (jointInfo.torque_weight > std::numeric_limits<float>::epsilon()
                     && (!jointInfo.target_torque || std::isnan(jointInfo.target_torque))) {
@@ -156,14 +152,12 @@ public:
             }
         }
         if (!found_joint) {
-            RCLCPP_INFO_STREAM(this->get_logger(), "we have not found joint " << joint_name);
+            RCLCPP_FATAL_STREAM(this->get_logger(), "we have not found joint " << joint_name);
         }
     }
 
     void average_torque_callback(std_msgs::msg::Int32::SharedPtr msg)
     {
-
-        RCLCPP_INFO_STREAM(this->get_logger(), "test log");
 
         std::map<std::string, std::vector<float>> measured_torques;
         for (auto j : *joints_info_) {
@@ -172,8 +166,6 @@ public:
         auto now = std::chrono::steady_clock::now;
         auto work_duration = std::chrono::seconds { msg->data };
         auto start = now();
-        // RCLCPP_INFO_STREAM(this->get_logger(), "start: " <<  std::chrono::system_clock::to_time_t(start) << "
-        // duration: " << work_duration);
         while ((now() - start) < work_duration) {
             for (auto j : *joints_info_) {
                 measured_torques[j.name].push_back(j.torque);
@@ -186,21 +178,11 @@ public:
             RCLCPP_INFO_STREAM(this->get_logger(),
                 "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size()
                          << " values");
-            // FIXME: BEUNFIX
-            // if (jointInfo.name.compare("left_ankle") == 0 || jointInfo.name.compare("right_ankle") == 0) {
-            //     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
-            //     jointInfo.target_torque = avg_torque;
-            //     jointInfo.torque_weight = 0.4;
-            //     jointInfo.position_weight = 0.6;
-            // }
             jointInfo.target_torque = avg_torque;
-            // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to
-            // hardcode it
         }
     }
 
     std::vector<JointInfo>* joints_info_;
-    std::optional<float> delta;
 
 private:
     rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;

@@ -15,7 +15,7 @@ from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int32
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -45,6 +45,13 @@ class InputDeviceView(QWidget):
             topic="/march/eeg/on_off",
             callback=self._eeg_cb,
             qos_profile=1,
+        )
+
+        self._eeg_input_subscriber = self._controller._node.create_subscription(
+            msg_type=Int32,
+            topic="/eeg_gait_request",
+            callback=self._eeg_gait_request_callback,
+            qos_profile=10,
         )
 
         self._eeg_alive_subscriber = self._controller._node.create_subscription(
@@ -84,6 +91,15 @@ class InputDeviceView(QWidget):
             self._controller.publish_stop()
         self.set_eeg_button_color()
         self._update_possible_gaits()
+
+    def _eeg_gait_request_callback(self, msg: Int32):
+        # TODO: Update this better.
+        if self.eeg and not self.eeg_override:
+            self._controller._node.get_logger().info("EEG requested gait: " + str(msg.data))
+            if msg.data == 0:
+                self._controller.publish_stop()
+            elif msg.data == 1:
+                self._controller.publish_gait("fixed_walk", "position")
 
     def _create_buttons(self) -> None:
         """Creates all the buttons, new buttons should be added here."""
@@ -142,7 +158,7 @@ class InputDeviceView(QWidget):
         """Update the buttons if the possible gaits have changed."""
         new_possible_gaits = future.result().gaits
         if self.eeg and not self.eeg_override:
-            new_possible_gaits =  ["stop"]
+            new_possible_gaits = ["stop"]
         if set(self.possible_gaits) != set(new_possible_gaits):
             self._update_gait_buttons(new_possible_gaits)
 
@@ -170,14 +186,16 @@ class InputDeviceView(QWidget):
         self.frame.setEnabled(True)
         self.frame.verticalScrollBar().setEnabled(True)
 
-    def eeg_callback(self):
+    def eeg_button_callback(self):
+        """Callback for when the eeg button is clicked."""
         if self.eeg is True:
             self.eeg_override = not self.eeg_override
-        if self.eeg_override == True:
+        if self.eeg_override:
             self._controller.publish_stop()
         self.set_eeg_button_color()
 
     def set_eeg_button_color(self):
+        """Set the correct color for the EEG button."""
         if self.eeg is False:
             self._eeg_button.setStyleSheet("QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is off."))
@@ -187,6 +205,7 @@ class InputDeviceView(QWidget):
         elif self.eeg_override is False and self.eeg is True:
             self._eeg_button.setStyleSheet("QToolButton {background-color: green; font-size: 13px; font: 'Times New Roman'}")
             self._eeg_button.setText(check_string("eeg is on!"))
+
     def create_button(
         self,
         name: str,

@@ -44,7 +44,7 @@
     },
     {
       "name": "eeg",
-      "callback": "eeg_callback",
+      "callback": "eeg_button_callback",
       "always_enabled": true
     }
   ],
@@ -59,13 +59,13 @@
       "callback": "switch_to_position",
       "control_type": "position",
       "always_enabled": true
-    },
-    {
+   },
+   {
       "name": "switch_to_fuzzy",
       "callback": "switch_to_fuzzy",
       "control_type": "fuzzy",
       "always_enabled": true
-    },
+   },
     {
       "name": "measure-torque",
       "callback": "measure_torque",

@@ -3,7 +3,6 @@ import getpass
 import socket
 
 from march_shared_msgs.msg import GaitRequest
-from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
@@ -95,12 +94,6 @@ class InputDeviceController:
         self._swing_leg_command_pub = self._node.create_publisher(
             msg_type=Int32,
             topic="/publish_swing_leg_command",
-            qos_profile=10,
-        )
-        self._eeg_input_subscriber = self._node.create_subscription(
-            msg_type=Int32,
-            topic="/eeg_gait_request",
-            callback=self._eeg_gait_request_callback,
             qos_profile=10,
         )
 
@@ -199,14 +192,6 @@ class InputDeviceController:
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
-
-    def _eeg_gait_request_callback(self, msg: Int32):
-        self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
-        #TODO: Update this better.
-        if msg.data == 1:
-            self.publish_stop()
-        elif msg.data == 2:
-            self.publish_gait("fixed_walk", "position")
 
     def get_node(self) -> Node:
         """Get function for the node.
@@ -328,6 +313,7 @@ class InputDeviceController:
     def publish_control_type(self, control_type):
         """Sets the allowed control type depending on the gait."""
         self._node.get_logger().info("Publishing control type " + control_type)
+        # self.measure_torque() DONT DO THIS BECAUSE IT WILL MEASURE TORQUE EVEN THOUGH THE GAIT HAS STARTED!
         self._set_gait_control_type.publish(String(data=control_type))
 
     def publish_sm_to_unknown(self) -> None:

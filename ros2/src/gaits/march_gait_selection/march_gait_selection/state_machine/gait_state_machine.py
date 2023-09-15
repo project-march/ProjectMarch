@@ -14,7 +14,6 @@ from march_utility.gait.edge_position import UnknownEdgePosition, EdgePosition, 
 from march_utility.utilities.shutdown import shutdown_system
 from march_utility.utilities.node_utils import DEFAULT_HISTORY_DEPTH
 from march_utility.exceptions.gait_exceptions import GaitError
-from march_utility.utilities.duration import Duration
 
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
