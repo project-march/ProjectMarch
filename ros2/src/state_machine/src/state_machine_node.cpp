@@ -3,6 +3,7 @@
 //
 #include "state_machine/state_machine_node.hpp"
 #include "state_machine/state_machine.hpp"
+#include <functional>
 using std::placeholders::_1;
 using std::placeholders::_2;
 using namespace std::chrono_literals;
@@ -18,14 +19,14 @@ using namespace std::chrono_literals;
 StateMachineNode::StateMachineNode()
     : Node("state_machine_node")
 {
-    m_reset_publisher = this->create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
+    m_reset_publisher = create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
     m_gait_response_publisher
-        = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
-    m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
-        "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
-    m_footstep_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+        = create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
+    m_gait_request_subscriber = create_subscription<march_shared_msgs::msg::GaitRequest>(
+        "/march/gait_request", 10, std::bind(&StateMachineNode::gaitCommandCallback, this, _1));
+    m_footstep_client = create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
 
-    m_gait_client = this->create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
+    m_gait_client = create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
 
     m_state_machine = StateMachine();
     m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
@@ -56,7 +57,7 @@ StateMachineNode::StateMachineNode()
  * If something went wrong this is also logged and the safety node should be notified.
  * @param response
  */
-void StateMachineNode::response_footstep_callback(
+void StateMachineNode::responseFootstepCallback(
     const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
 {
     if (future.get()->status) {
@@ -73,10 +74,10 @@ void StateMachineNode::response_footstep_callback(
  * If something went wrong this is also logged and the safety node should be notified.
  * @param response
  */
-void StateMachineNode::response_gait_callback(
-    const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future)
+void StateMachineNode::responseGaitCallback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture& future)
 {
-    RCLCPP_INFO(this->get_logger(), "response_gait_callback");
+    RCLCPP_INFO(get_logger(), "response_gait_callback");
     if (future.get()->status) {
         RCLCPP_INFO(rclcpp::get_logger("state_machine"), "Gait request received successful!");
     } else {
@@ -90,12 +91,11 @@ void StateMachineNode::response_gait_callback(
  * @param desired_state
  * @return succes of failure
  */
-void StateMachineNode::send_request(exoState desired_state)
+void StateMachineNode::sendRequest(const exoState& desired_state)
 {
-    int requested_gait = (int)desired_state;
-    int current_state = this->m_state_machine.getCurrentState();
+    int current_state = m_state_machine.getCurrentState();
     auto reset_msg = std_msgs::msg::Int32();
-    if (requested_gait == 1) {
+    if (desired_state == 1) {
         if (current_state == 0) {
             m_gait_request->home = false;
         } else {
@@ -105,14 +105,14 @@ void StateMachineNode::send_request(exoState desired_state)
         m_reset_publisher->publish(reset_msg);
         m_gait_request->gait_type = 1;
         m_gait_future = m_gait_client->async_send_request(
-            m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
+            m_gait_request, std::bind(&StateMachineNode::responseGaitCallback, this, _1));
 
         m_reset_publisher->publish(reset_msg);
-        m_footstep_request->gait_type = requested_gait;
+        m_footstep_request->gait_type = desired_state;
         m_footstep_future = m_footstep_client->async_send_request(
-            m_footstep_request, std::bind(&StateMachineNode::response_footstep_callback, this, _1));
+            m_footstep_request, std::bind(&StateMachineNode::responseFootstepCallback, this, _1));
 
-    } else if (requested_gait == 0) {
+    } else if (desired_state == 0) {
         if (current_state == 0 || current_state == 4) {
             m_gait_request->home = true;
         } else {
@@ -122,16 +122,16 @@ void StateMachineNode::send_request(exoState desired_state)
         m_reset_publisher->publish(reset_msg);
         m_gait_request->gait_type = 0;
         m_gait_future = m_gait_client->async_send_request(
-            m_gait_request, std::bind(&StateMachineNode::response_gait_callback, this, _1));
-    } else if (requested_gait == 5) {
+            m_gait_request, std::bind(&StateMachineNode::responseGaitCallback, this, _1));
+    } else if (desired_state == 5) {
         // NOTE: Make sure that everything of hte high level control and the gait selection stops.
         return;
     } else {
         //        reset_msg.data = 1;
         m_reset_publisher->publish(reset_msg);
-        m_footstep_request->gait_type = requested_gait;
+        m_footstep_request->gait_type = desired_state;
         m_footstep_future = m_footstep_client->async_send_request(
-            m_footstep_request, std::bind(&StateMachineNode::response_footstep_callback, this, _1));
+            m_footstep_request, std::bind(&StateMachineNode::responseFootstepCallback, this, _1));
     }
 }
 
@@ -140,13 +140,13 @@ void StateMachineNode::send_request(exoState desired_state)
  * then the request for the new gait is send.
  * @param msg
  */
-void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
+void StateMachineNode::gaitCommandCallback(march_shared_msgs::msg::GaitRequest::SharedPtr msg)
 {
     auto response_msg = march_shared_msgs::msg::GaitResponse();
     if (m_state_machine.isValidTransition((exoState)msg->gait_type)) {
         response_msg.gait_type = msg->gait_type;
         m_gait_response_publisher->publish(response_msg);
-        send_request((exoState)msg->gait_type);
+        sendRequest((exoState)msg->gait_type);
         m_state_machine.performTransition((exoState)msg->gait_type);
     } else {
         response_msg.gait_type = m_state_machine.getCurrentState();
