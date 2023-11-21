@@ -217,17 +217,8 @@ def generate_launch_description() -> LaunchDescription:
             name='gait_selection',
             parameters=[('robot', str(robot))],
         ),
-        Node(
-            package='state_estimator_mock',
-            namespace='',
-            executable='state_estimator_mock_node',
-            name='state_estimator_mock',
-            condition=IfCondition(airgait),
-        ),
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
-            condition=UnlessCondition(airgait),
-
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']), 
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
