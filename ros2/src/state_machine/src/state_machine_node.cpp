@@ -93,7 +93,7 @@ void StateMachineNode::response_gait_callback(
 void StateMachineNode::send_request(exoState desired_state)
 {
     int requested_gait = (int)desired_state;
-    int current_state = this->m_state_machine.get_current_state();
+    int current_state = this->m_state_machine.getCurrentState();
     auto reset_msg = std_msgs::msg::Int32();
     if (requested_gait == 1) {
         if (current_state == 0) {
@@ -149,7 +149,7 @@ void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest
         send_request((exoState)msg->gait_type);
         m_state_machine.performTransition((exoState)msg->gait_type);
     } else {
-        response_msg.gait_type = m_state_machine.get_current_state();
+        response_msg.gait_type = m_state_machine.getCurrentState();
         m_gait_response_publisher->publish(response_msg);
     }
 }
