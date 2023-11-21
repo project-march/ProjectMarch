@@ -26,8 +26,6 @@ public:
 
 private:
     rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_com_pos_publisher;
-    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_pos_publisher;
-    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_foot_pos_publisher;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_stance_foot_publisher;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_publisher;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_publisher;

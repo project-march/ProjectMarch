@@ -22,8 +22,6 @@ StateEstimatorMockNode::StateEstimatorMockNode()
 
     // publishers
     m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
-    m_zmp_pos_publisher = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 100);
-    m_foot_pos_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 100);
     m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
     m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
     m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
@@ -55,8 +53,6 @@ void StateEstimatorMockNode::publishtrajectories()
 {
 
     m_com_pos_publisher->publish(m_state_estimator_mock.get_current_com());
-    m_zmp_pos_publisher->publish(m_state_estimator_mock.get_current_zmp());
-    m_foot_pos_publisher->publish(m_state_estimator_mock.get_previous_foot());
     m_stance_foot_publisher->publish(m_state_estimator_mock.get_current_stance_foot());
     m_right_foot_on_ground_publisher->publish(m_state_estimator_mock.get_right_foot_ground());
     m_left_foot_on_ground_publisher->publish(m_state_estimator_mock.get_left_foot_ground());
