@@ -192,12 +192,6 @@ def generate_launch_description() -> LaunchDescription:
             name='swing_leg_generator',
         ),
         Node(
-            package='zmp_mpc_solver',
-            namespace='',
-            executable='zmp_mpc_solver',
-            name='zmp_mpc_solver',
-        ),
-        Node(
             package='ik_solver_buffer',
             namespace='',
             executable='ik_solver_buffer_node',
