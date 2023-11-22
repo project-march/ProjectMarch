@@ -75,7 +75,7 @@ void StateMachineNode::responseFootstepCallback(
  * @param response
  */
 void StateMachineNode::responseGaitCallback(
-    const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture& future)
+    const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future)
 {
     RCLCPP_INFO(get_logger(), "response_gait_callback");
     if (future.get()->status) {
@@ -92,10 +92,11 @@ void StateMachineNode::responseGaitCallback(
  * @return succes of failure
  */
 void StateMachineNode::sendRequest(const exoState& desired_state)
-{
+{   
+    int requested_gait = (int)desired_state;
     int current_state = m_state_machine.getCurrentState();
     auto reset_msg = std_msgs::msg::Int32();
-    if (desired_state == 1) {
+    if (requested_gait == 1) {
         if (current_state == 0) {
             m_gait_request->home = false;
         } else {
@@ -108,11 +109,11 @@ void StateMachineNode::sendRequest(const exoState& desired_state)
             m_gait_request, std::bind(&StateMachineNode::responseGaitCallback, this, _1));
 
         m_reset_publisher->publish(reset_msg);
-        m_footstep_request->gait_type = desired_state;
+        m_footstep_request->gait_type = requested_gait;
         m_footstep_future = m_footstep_client->async_send_request(
             m_footstep_request, std::bind(&StateMachineNode::responseFootstepCallback, this, _1));
 
-    } else if (desired_state == 0) {
+    } else if (requested_gait == 0) {
         if (current_state == 0 || current_state == 4) {
             m_gait_request->home = true;
         } else {
@@ -123,13 +124,13 @@ void StateMachineNode::sendRequest(const exoState& desired_state)
         m_gait_request->gait_type = 0;
         m_gait_future = m_gait_client->async_send_request(
             m_gait_request, std::bind(&StateMachineNode::responseGaitCallback, this, _1));
-    } else if (desired_state == 5) {
+    } else if (requested_gait == 5) {
         // NOTE: Make sure that everything of hte high level control and the gait selection stops.
         return;
     } else {
         //        reset_msg.data = 1;
         m_reset_publisher->publish(reset_msg);
-        m_footstep_request->gait_type = desired_state;
+        m_footstep_request->gait_type = requested_gait;
         m_footstep_future = m_footstep_client->async_send_request(
             m_footstep_request, std::bind(&StateMachineNode::responseFootstepCallback, this, _1));
     }

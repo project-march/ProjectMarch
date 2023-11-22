@@ -21,7 +21,7 @@ public:
     explicit StateMachineNode();
 
 private:
-    void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr& msg);
+    void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
     void sendRequest(const exoState& desired_state);
     void responseFootstepCallback(
