@@ -2,7 +2,6 @@
 // Created by marco on 13-2-23.
 //
 #pragma once
-
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
@@ -38,6 +37,8 @@ private:
     march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
     march_shared_msgs::srv::RequestGait::Request::SharedPtr m_gait_request;
 
+    
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
+
     StateMachine m_state_machine;
 };
-

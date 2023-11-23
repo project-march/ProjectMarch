@@ -153,6 +153,11 @@ void StateMachineNode::gaitCommandCallback(march_shared_msgs::msg::GaitRequest::
         m_gait_response_publisher->publish(response_msg);
     }
 }
+
+ void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    }
 /**
  * Main function to run the node.
  * @param argc
