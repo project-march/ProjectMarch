@@ -68,7 +68,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcMsg.msg"
   "msg/CenterOfMass.msg"
   "msg/RobotState.msg"
-  "msg/IkSolverCommand.msg"
   "msg/GaitRequest.msg"
   "msg/GaitResponse.msg"
   "msg/GaitType.msg"
