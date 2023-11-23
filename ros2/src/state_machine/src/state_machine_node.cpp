@@ -23,6 +23,8 @@ StateMachineNode::StateMachineNode()
         = this->create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = this->create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gait_command_callback, this, _1));
+    m_new_state_subscriber = create_subscription<std_msgs::msg::Int32>(
+        "new_state", 10, std::bind(&StateMachineNode::newStateCallback, _1));
     m_footstep_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
 
     m_gait_client = this->create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
@@ -153,6 +155,11 @@ void StateMachineNode::gait_command_callback(march_shared_msgs::msg::GaitRequest
         m_gait_response_publisher->publish(response_msg);
     }
 }
+
+ void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    }
 /**
  * Main function to run the node.
  * @param argc

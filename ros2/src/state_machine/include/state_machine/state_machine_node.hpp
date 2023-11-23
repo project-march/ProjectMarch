@@ -1,9 +1,7 @@
 //
 // Created by marco on 13-2-23.
 //
-
-#ifndef BUILD_STATE_MACHINE_NODE_H
-#define BUILD_STATE_MACHINE_NODE_H
+#pragma once
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
@@ -28,7 +26,8 @@ private:
     void response_footstep_callback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void response_gait_callback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
-
+    void newStateCallback(march_shared_msgs::msg::GaitRequest::SharedPtr msg);
+    
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_reset_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
     rclcpp::Subscription<march_shared_msgs::msg::GaitRequest>::SharedPtr m_gait_request_subscriber;
@@ -39,7 +38,8 @@ private:
     march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
     march_shared_msgs::srv::RequestGait::Request::SharedPtr m_gait_request;
 
+    
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
+
     StateMachine m_state_machine;
 };
-
-#endif // BUILD_STATE_MACHINE_NODE_H
