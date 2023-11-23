@@ -1,0 +1,9 @@
+string side
+float32 heel_right
+float32 heel_left
+float32 met1
+float32 hallux
+float32 met3
+float32 toes
+float32 met5
+float32 arch
