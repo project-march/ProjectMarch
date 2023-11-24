@@ -13,16 +13,19 @@
 #include <utility>
 
 namespace march {
-Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
+Joint::Joint(
+    std::string name,
+    int net_number, std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid,
+    std::unique_ptr<std::array<double, 3>> torque_pid,
     std::shared_ptr<march_logger::BaseLogger> logger)
-    : name_(std::move(name))
-    , net_number_(net_number)
-    , last_read_time_(std::chrono::steady_clock::now())
-    , motor_controller_(std::move(motor_controller))
-    , position_pid(std::move(position_pid))
-    , torque_pid(std::move(torque_pid))
-    , logger_(std::move(logger))
+    :name_(std::move(name)),
+    net_number_(net_number),
+    last_read_time_(std::chrono::steady_clock::now()),
+    motor_controller_(std::move(motor_controller)),
+    position_pid(std::move(position_pid)),
+    torque_pid(std::move(torque_pid)),
+    logger_(std::move(logger))
 
 {
     if (!motor_controller_) {
@@ -31,17 +34,21 @@ Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> 
     }
 }
 
-Joint::Joint(std::string name, int net_number, std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<std::array<double, 3>> position_pid, std::unique_ptr<std::array<double, 3>> torque_pid,
-    std::unique_ptr<TemperatureGES> temperature_ges, std::shared_ptr<march_logger::BaseLogger> logger)
-    : name_(std::move(name))
-    , net_number_(net_number)
-    , last_read_time_(std::chrono::steady_clock::now())
-    , motor_controller_(std::move(motor_controller))
-    , position_pid(std::move(position_pid))
-    , torque_pid(std::move(torque_pid))
-    , temperature_ges_(std::move(temperature_ges))
-    , logger_(std::move(logger))
+Joint::Joint(
+    std::string name, int net_number,
+    std::unique_ptr<MotorController> motor_controller,
+    std::unique_ptr<std::array<double, 3>> position_pid,
+    std::unique_ptr<std::array<double, 3>> torque_pid,
+    std::unique_ptr<TemperatureGES> temperature_ges,
+    std::shared_ptr<march_logger::BaseLogger> logger)
+    : name_(std::move(name)),
+    net_number_(net_number),
+    last_read_time_(std::chrono::steady_clock::now()),
+    motor_controller_(std::move(motor_controller)),
+    position_pid(std::move(position_pid)),
+    torque_pid(std::move(torque_pid)),
+    temperature_ges_(std::move(temperature_ges)),
+    logger_(std::move(logger))
 {
 }
 
@@ -121,6 +128,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
         initial_torque_ = motor_controller_->getTorque();
         logger_->warn(logger_->fstring("get initial torque: %f", initial_torque_));
         torque_ = initial_torque_;
+        
         // Comment back in after debugging
         if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(initial_torque_)) {
             throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
@@ -246,16 +254,16 @@ std::unique_ptr<MotorController>& Joint::getMotorController()
     return motor_controller_;
 }
 
-std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
-{
-    if (hasTemperatureGES()) {
-        return temperature_ges_;
-    } else {
-        logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-        throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
-            "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-    }
-}
+// std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
+// {
+//     if (hasTemperatureGES()) {
+//         return temperature_ges_;
+//     } else {
+//         logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+//         throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
+//             "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+//     }
+// }
 
 bool Joint::isWithinSoftLimits() const
 {
