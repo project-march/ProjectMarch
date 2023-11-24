@@ -24,7 +24,7 @@ march8:
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
-            countsPerRotation: 6400
+            resolution: 13
             transmission: 204
             direction: 1
           torqueSensor:
@@ -90,7 +90,7 @@ march8:
             resolution: 20
             minPositionIU: 343782  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 707902  # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 419553
+            zeroPositionIU: 378735
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
@@ -168,7 +168,7 @@ march8:
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
-            countsPerRotation: 6400
+            resolution: 13
             transmission: 204
             direction: 1
           torqueSensor:
@@ -234,7 +234,7 @@ march8:
             resolution: 20
             minPositionIU: 295500  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 666956  # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 382007
+            zeroPositionIU: 330453
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
