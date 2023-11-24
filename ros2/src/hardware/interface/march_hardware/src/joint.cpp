@@ -254,16 +254,16 @@ std::unique_ptr<MotorController>& Joint::getMotorController()
     return motor_controller_;
 }
 
-// std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
-// {
-//     if (hasTemperatureGES()) {
-//         return temperature_ges_;
-//     } else {
-//         logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-//         throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
-//             "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-//     }
-// }
+std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
+{
+    if (hasTemperatureGES()) {
+        return temperature_ges_;
+    } else {
+        logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+        throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
+            "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+    }
+}
 
 bool Joint::isWithinSoftLimits() const
 {
