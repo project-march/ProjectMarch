@@ -1,26 +1,26 @@
 # The software department will always be marked as a CODEOWNER.
 [Software department]
-* @sahand_w @MarcoBak @RixtHellinga
+* @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
 
 [Software license]
-LICENSE @ThijsRay @wnederpel
-LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel
+LICENSE @ThijsRay @wnederpel @AlexanderJamesBecoy
+LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel @AlexanderJamesBecoy
 
 [CI/CD and Pipeline]
-.catkin_lint @MarcoBak @George_Vegelien
-.clang-format @MarcoBak @George_Vegelien
-.clang-format-ignore @MarcoBak @George_Vegelien
-.clang-tidy @MarcoBak @George_Vegelien
-.gitlab-ci.yml @MarcoBak @George_Vegelien
-Dockerfile @MarcoBak @George_Vegelien
-/.scripts/ @MarcoBak @George_Vegelien
-.flake8 @MarcoBak @George_Vegelien
+.catkin_lint @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-format @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-format-ignore @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-tidy @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.gitlab-ci.yml @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+Dockerfile @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+/.scripts/ @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.flake8 @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 
 ^[C/C++]
-*.cpp @sahand_w @MarcoBak @RixtHellinga
-*.hpp @sahand_w @MarcoBak @RixtHellinga
-*.c @sahand_w @MarcoBak @RixtHellinga
-*.h @sahand_w @MarcoBak @RixtHellinga
+*.cpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+*.hpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+*.c @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+*.h @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
 
 [Movement]
 /ros2/src/gaits/march_gait_files @floorheijs @wnederpel
