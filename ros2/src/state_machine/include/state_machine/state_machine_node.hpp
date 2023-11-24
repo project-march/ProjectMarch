@@ -15,17 +15,19 @@
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
 
-class StateMachineNode : public rclcpp::Node {
+class StateMachineNode : public rclcpp::Node 
+{
 public:
     explicit StateMachineNode();
 
 private:
-    void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr& msg);
+    void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
     void sendRequest(const exoState& desired_state);
     void responseFootstepCallback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
+    void newStateCallback(const std_msgs::msg::Int32::SharedPtr msg);
 
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_reset_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
