@@ -19,7 +19,6 @@
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/power_distribution_board/power_distribution_board.h>
-#include <march_hardware/pressure_sole/pressure_sole.h>
 #include <march_hardware/temperature/temperature_ges.h>
 #include <march_hardware/torque_sensor/torque_sensor.h>
 #include <march_logger_cpp/base_logger.hpp>
@@ -73,8 +72,6 @@ public:
         const YAML::Node& torque_sensor_config, const march::MotorControllerType motor_controller_type);
 
     std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config) const;
-    std::vector<march::PressureSole> createPressureSoles(const YAML::Node& pressure_soles_config) const;
-    march::PressureSole createPressureSole(const YAML::Node& pressure_sole_config) const;
     std::optional<march::PowerDistributionBoard> createPowerDistributionBoard(
         const YAML::Node& power_distribution_config) const;
 
@@ -102,7 +99,6 @@ public:
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
     static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
-    static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
     static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
 
 private:
