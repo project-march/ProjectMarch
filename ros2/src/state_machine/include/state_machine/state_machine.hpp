@@ -19,6 +19,7 @@ public:
     bool performTransition(const exoState& desired_state);
     bool isValidTransition(const exoState& desired_state) const;
     int getCurrentState() const;
+    std::set<exoState> getAvailableStates(exoState currentState) const;
 
 private:
     exoState m_current_state;

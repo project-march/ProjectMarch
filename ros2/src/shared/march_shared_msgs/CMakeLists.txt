@@ -39,6 +39,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CurrentIPDState.msg"
   "msg/CurrentState.msg"
   "msg/Error.msg"
+  "msg/ExoState.msg"
+  "msg/ExoStateArray.msg"
   "msg/FeetHeightStamped.msg"
   "msg/FollowJointTrajectoryGoal.msg"
   "msg/FollowJointTrajectoryActionGoal.msg"

@@ -4,9 +4,12 @@ project(march_input_device)
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(march_shared_msgs REQUIRED)
+find_package(Curses REQUIRED)
 
 # Include directories
 include_directories(include)
+include_directories(${CURSES_INCLUDE_DIR})
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
@@ -20,7 +23,10 @@ add_executable(input_device_node
 # Link against ROS 2 dependencies
 ament_target_dependencies(input_device_node
   rclcpp
+  march_shared_msgs
 )
+
+target_link_libraries(input_device_node ${CURSES_LIBRARIES})
 
 # Install the executable
 install(TARGETS input_device_node
