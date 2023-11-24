@@ -12,7 +12,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # clang-tidy is used in a different pipeline stage
 # We need git and git-lfs to get repo information from
 # inside the container.
-RUN apt update && apt install -y python3-pip clang clang-tidy git git-lfs
+RUN apt-get update && apt-get install -y python3-pip clang clang-tidy git git-lfs
 
 # RealSense C++ SDK
 RUN apt-get install -y software-properties-common && apt update
