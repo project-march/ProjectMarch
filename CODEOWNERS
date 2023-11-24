@@ -7,14 +7,14 @@ LICENSE @ThijsRay @wnederpel @AlexanderJamesBecoy
 LICENSE-ADDITIONAL-TERMS.md @ThijsRay @wnederpel @AlexanderJamesBecoy
 
 [CI/CD and Pipeline]
-.catkin_lint @MarcoBak @George_Vegelien @alexandar.andonov
-.clang-format @MarcoBak @George_Vegelien @alexandar.andonov
-.clang-format-ignore @MarcoBak @George_Vegelien @alexandar.andonov
-.clang-tidy @MarcoBak @George_Vegelien @alexandar.andonov
-.gitlab-ci.yml @MarcoBak @George_Vegelien @alexandar.andonov
-Dockerfile @MarcoBak @George_Vegelien @alexandar.andonov
-/.scripts/ @MarcoBak @George_Vegelien @alexandar.andonov
-.flake8 @MarcoBak @George_Vegelien @alexandar.andonov
+.catkin_lint @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-format @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-format-ignore @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.clang-tidy @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.gitlab-ci.yml @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+Dockerfile @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+/.scripts/ @MarcoBak @George_Vegelien @AlexanderJamesBecoy
+.flake8 @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 
 ^[C/C++]
 *.cpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
