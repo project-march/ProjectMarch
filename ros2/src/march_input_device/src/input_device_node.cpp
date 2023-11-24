@@ -35,7 +35,10 @@ inputDeviceNode::~inputDeviceNode()
 
 void inputDeviceNode::availableStatesCallback(const march_shared_msgs::msg::ExoStateArray::SharedPtr msg)
 {
-  printw("Received available states: %d", msg->states);
+  // Iterate over the states vector and print each state
+    for (const auto& state : msg->states) {
+        printw("Received available state: %d \n", state.state);
+    }
   refresh();
 }
 
