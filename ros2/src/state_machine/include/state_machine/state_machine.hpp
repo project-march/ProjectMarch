@@ -2,8 +2,7 @@
 // Created by Marco Bak, march8 on 1-2-23.
 //
 
-#ifndef BUILD_STATE_MACHINE_HPP
-#define BUILD_STATE_MACHINE_HPP
+#pragma once
 
 #include "march_shared_msgs/srv/gait_command.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -16,15 +15,12 @@ enum class exoState { Sit = 0, Stand = 1, Walk = 2, StepClose = 3, ForceUnknown 
 
 class StateMachine {
 public:
-    StateMachine();
-    bool performTransition(exoState desired_state);
-    int get_current_state();
-
-    bool isValidTransition(exoState desired_state);
+    explicit StateMachine();
+    bool performTransition(const exoState& desired_state);
+    bool isValidTransition(const exoState& desired_state) const;
+    int getCurrentState() const;
 
 private:
     exoState m_current_state;
     std::map<exoState, std::set<exoState>> m_exo_transitions;
 };
-
-#endif // BUILD_STATE_MACHINE_HPP

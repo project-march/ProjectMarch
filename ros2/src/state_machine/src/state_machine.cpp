@@ -2,8 +2,6 @@
 // Created by Marco Bak march8 on 1-2-23.
 //
 #include "state_machine/state_machine.hpp"
-using std::placeholders::_1;
-using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 /**
@@ -41,7 +39,7 @@ StateMachine::StateMachine()
  *
  * @param desired_state
  */
-bool StateMachine::performTransition(exoState desired_state)
+bool StateMachine::performTransition(const exoState& desired_state)
 {
     if (isValidTransition(desired_state)) {
         m_current_state = desired_state;
@@ -63,7 +61,7 @@ bool StateMachine::performTransition(exoState desired_state)
  * @param desired_state
  * @return  true for valid transition and false for invalid transition.
  */
-bool StateMachine::isValidTransition(exoState desired_state)
+bool StateMachine::isValidTransition(const exoState& desired_state) const
 {
     std::set<exoState> possibleTransitions = m_exo_transitions.at(m_current_state);
     return possibleTransitions.count(desired_state) == 1;
@@ -74,7 +72,7 @@ bool StateMachine::isValidTransition(exoState desired_state)
  *
  * @return the current state.
  */
-int StateMachine::get_current_state()
+int StateMachine::getCurrentState() const
 {
     return (int)m_current_state;
 }
