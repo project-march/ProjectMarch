@@ -1,12 +1,13 @@
 """Author: MVIII."""
 
 
-class LowLvlController():
+class LowLvlController:
     """A Baseclass which imitates the low-level control of the robot.
 
     Functions as a PID right now which directly applies control
     to the Mujoco simulation
     """
+
     def __init__(self, node, model):
         """A class which imitates the low-level control of the robot.
 

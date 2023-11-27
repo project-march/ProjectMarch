@@ -34,7 +34,7 @@ class InputDeviceController:
         GaitRequest.WALK: ["stop"],
         GaitRequest.STEP_CLOSE: ["walk", "stand", "stop"],
         GaitRequest.FORCE_UNKNOWN: ["home_stand", "home_sit", "stop"],
-        GaitRequest.ERROR: []
+        GaitRequest.ERROR: [],
     }
 
     # Valid transition that can be made from the current state
@@ -42,7 +42,7 @@ class InputDeviceController:
         0: ["home_setup", "test_joint_gait", "stop"],
         1: ["home_setup"],
         GaitRequest.FORCE_UNKNOWN: ["home_setup", "stop"],
-        GaitRequest.ERROR: []
+        GaitRequest.ERROR: [],
     }
 
     def __init__(self, node: Node, testing: Bool):
@@ -133,11 +133,7 @@ class InputDeviceController:
             )
 
         if self._ping:
-            self._alive_pub = self._node.create_publisher(
-                Alive,
-                "/march/input_device/alive",
-                10
-            )
+            self._alive_pub = self._node.create_publisher(Alive, "/march/input_device/alive", 10)
             self._alive_timer = self._node.create_timer(
                 timer_period_sec=0.1,
                 callback=self._timer_callback,
@@ -202,7 +198,7 @@ class InputDeviceController:
 
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
-        #TODO: Update this better.
+        # TODO: Update this better.
         if msg.data == 1:
             self.publish_stop()
         elif msg.data == 2:
@@ -249,11 +245,7 @@ class InputDeviceController:
         """Measure the torque values coming in for a few seconds."""
         seconds = 3
         self._node.get_logger().info("Measuring torque for " + str(seconds) + " seconds")
-        self.measure_torque_pub.publish(
-            Int32(
-                data=seconds
-            )
-        )
+        self.measure_torque_pub.publish(Int32(data=seconds))
 
     def publish_gait(self, string, control_type) -> None:
         """Publish a message on `/march/input_device/instruction` to publish the gait."""

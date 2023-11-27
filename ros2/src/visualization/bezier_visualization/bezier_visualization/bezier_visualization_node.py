@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
+
 NODE_NAME = "bezier_plotter"
 
 
@@ -44,21 +45,25 @@ class BezierCurve(Node):
     def __init__(self):
         super().__init__(NODE_NAME)
 
-        self.publish_points = self.create_publisher(
-            PoseArray,
-            '/bezier_points',
-            10
-        )
+        self.publish_points = self.create_publisher(PoseArray, "/bezier_points", 10)
 
         self.plot_x = []
         self.plot_y = []
 
-        self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = None, None, None, None, None, None, None
+        self.dragging_point, self.line, self.codes, self.path, self.patch, self.legend_handles, self.labels = (
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
         self.figure = plt.figure("Bezier Curve")
 
         self.points = {}
-        self.point_config_location = os.path.join(os.path.dirname(__file__), '..', 'config', 'bezier_points.yaml')
-        with open(self.point_config_location, 'r') as points_file:
+        self.point_config_location = os.path.join(os.path.dirname(__file__), "..", "config", "bezier_points.yaml")
+        with open(self.point_config_location, "r") as points_file:
             try:
                 points_yaml = yaml.safe_load(points_file)
             except yaml.YAMLError as exc:
@@ -91,19 +96,19 @@ class BezierCurve(Node):
 
         # Draw the initial line
         x, y = zip(*sorted(self.points.items()))
-        self.line, = self.axes.plot(x, y, "b", marker="o", markersize=10)
+        (self.line,) = self.axes.plot(x, y, "b", marker="o", markersize=10)
 
         # Draw the initial Bézier curve
         self.codes = [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4]
         points_tuple = [(x, y) for x, y in self.points.items()]
         self.path = Path(points_tuple, self.codes)
-        self.patch = patches.PathPatch(self.path, facecolor='none', lw=2)
+        self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
         self.axes.add_patch(self.patch)
 
         # Connect the events
-        self.figure.canvas.mpl_connect('button_press_event', self._on_click)
-        self.figure.canvas.mpl_connect('motion_notify_event', self._on_motion)
-        self.figure.canvas.mpl_connect('button_release_event', self._on_release)
+        self.figure.canvas.mpl_connect("button_press_event", self._on_click)
+        self.figure.canvas.mpl_connect("motion_notify_event", self._on_motion)
+        self.figure.canvas.mpl_connect("button_release_event", self._on_release)
 
         # Show the plot
         self.figure.canvas.draw()
@@ -145,7 +150,7 @@ class BezierCurve(Node):
             self.points.pop(self.dragging_point[0]) if self.dragging_point[0] in self.points else None
             self.axes.patches.remove(self.patch)
         except ValueError:
-            raise ValueError('Don\'t drag the points to close to each other. Restart the visualisation.')
+            raise ValueError("Don't drag the points to close to each other. Restart the visualisation.")
 
         # Recalculate the points
         if isinstance(event, MouseEvent):
@@ -157,7 +162,7 @@ class BezierCurve(Node):
         # Recalculate the Bezier curve
         points_tuple = [(x, y) for x, y in sorted(self.points.items())]
         self.path = Path(points_tuple, self.codes)
-        self.patch = patches.PathPatch(self.path, facecolor='none', lw=2)
+        self.patch = patches.PathPatch(self.path, facecolor="none", lw=2)
 
         # Now redraw the points and the Bezier curve on the plot
         self.line.set_data(x, y)
@@ -184,7 +189,7 @@ class BezierCurve(Node):
         self.publish_points.publish(msg)
 
         points_dict = {"points": points_list}
-        with open(self.point_config_location, 'w') as points_file:
+        with open(self.point_config_location, "w") as points_file:
             try:
                 yaml.dump(points_dict, points_file)
             except yaml.YAMLError as exc:
@@ -198,5 +203,5 @@ class BezierCurve(Node):
         self.plot_y = []
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -23,14 +23,21 @@ class GaitSelectionNode(Node):
     """
 
     def __init__(self):
-        super().__init__('gait_selection_node')
+        super().__init__("gait_selection_node")
         self.gait_package = "gait_files"
         self.directory_name = "airgait_vi"
         self.joint_names = [
-            "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-            "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]
+            "left_ankle",
+            "left_hip_aa",
+            "left_hip_fe",
+            "left_knee",
+            "right_ankle",
+            "right_hip_aa",
+            "right_hip_fe",
+            "right_knee",
+        ]
         self.gait_loader = GaitLoader(self)
-        self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
+        self.publisher_ = self.create_publisher(JointTrajectory, "joint_trajectory_controller/joint_trajectory", 10)
 
         self._action_client_to_controller = ActionClient(
             self, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory"
@@ -122,7 +129,8 @@ class GaitSelectionNode(Node):
         """
         if future.result().result.error_code != future.result().result.SUCCESSFUL:
             self.get_logger().error(
-                "Failed to execute trajectory:" + str(future.result().result.error_code.error_string))
+                "Failed to execute trajectory:" + str(future.result().result.error_code.error_string)
+            )
             self._gait_executed = True
         else:
             self.get_logger().info("Trajectory executed correctly.")
@@ -144,5 +152,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

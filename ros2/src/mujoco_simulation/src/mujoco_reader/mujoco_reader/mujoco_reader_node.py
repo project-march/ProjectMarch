@@ -57,8 +57,24 @@ class MujocoReaderNode(Node):
         torso_imu.header.frame_id = "imu_link"
         self.torso_imu_publisher.publish(torso_imu)
 
-        names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
-                 "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
+        names = [
+            "l_heel_right",
+            "l_heel_left",
+            "l_met1",
+            "l_hallux",
+            "l_met3",
+            "l_toes",
+            "l_met5",
+            "l_arch",
+            "r_heel_right",
+            "r_heel_left",
+            "r_met1",
+            "r_hallux",
+            "r_met3",
+            "r_toes",
+            "r_met5",
+            "r_arch",
+        ]
         pressure_values = msg.pressure_soles
         pressure_sole_msg = PressureSolesData()
         pressure_sole_msg.header.stamp = self.get_clock().now().to_msg()

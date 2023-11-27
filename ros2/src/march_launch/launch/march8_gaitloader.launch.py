@@ -12,10 +12,10 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
-    tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
-    simulation = LaunchConfiguration("simulation", default='true')
-    rosbags = LaunchConfiguration("rosbags", default='true')
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
+    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
+    simulation = LaunchConfiguration("simulation", default="true")
+    rosbags = LaunchConfiguration("rosbags", default="true")
 
     # Gait selection arguments
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -42,7 +42,7 @@ def generate_launch_description() -> LaunchDescription:
             name="use_sim_time",
             default_value="false",
             description="Whether to use simulation time as published on the "
-                        "/clock topic by gazebo instead of system time.",
+            "/clock topic by gazebo instead of system time.",
         ),
         DeclareLaunchArgument(
             name="gait_package",
@@ -73,13 +73,13 @@ def generate_launch_description() -> LaunchDescription:
             name="middle_point_height",
             default_value="0.15",
             description="Height of the middle setpoint of dynamic gait "
-                        "relative to the desired position, given in meters.",
+            "relative to the desired position, given in meters.",
         ),
         DeclareLaunchArgument(
             name="minimum_stair_height",
             default_value="0.15",
             description="A step lower or higher than the minimum_stair_height"
-                        "will change the gait type to stairs_like instead of walk_like.",
+            "will change the gait type to stairs_like instead of walk_like.",
         ),
         DeclareLaunchArgument(
             name="push_off_fraction",
@@ -105,7 +105,7 @@ def generate_launch_description() -> LaunchDescription:
             name="use_position_queue",
             default_value="false",
             description="Uses the values in position_queue.yaml for the half step if True, otherwise uses "
-                        "points given by (simulated) covid.",
+            "points given by (simulated) covid.",
         ),
         DeclareLaunchArgument(
             name="add_cybathlon_gaits",
@@ -116,24 +116,22 @@ def generate_launch_description() -> LaunchDescription:
             name="first_subgait_delay",
             default_value="0.0",
             description="Duration to wait before starting first subgait."
-                        "If 0 then the first subgait is started immediately,"
-                        "dropping the first setpoint in the process.",
+            "If 0 then the first subgait is started immediately,"
+            "dropping the first setpoint in the process.",
         ),
         DeclareLaunchArgument(
             name="scheduling_delay",
             default_value="0.15",
             description="Duration to schedule next subgait early. If 0 then the"
-                        "next subgait is never scheduled early.",
+            "next subgait is never scheduled early.",
         ),
         DeclareLaunchArgument(name="timer_period", default_value="0.004", description=""),
-
-
         DeclareLaunchArgument(
             name="rosbags",
             default_value="true",
             description="Whether the rosbags should stored.",
             choices=["true", "false"],
-        )
+        ),
     ]
     # region Launch March gait selection
     march_gait_selection_node = IncludeLaunchDescription(
@@ -180,11 +178,16 @@ def generate_launch_description() -> LaunchDescription:
 
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
-        ),
-        launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution(
-            [get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
+        PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
+        launch_arguments=[
+            ("model_to_load", mujoco_toload),
+            (
+                "tunings_to_load_path",
+                PathJoinSubstitution(
+                    [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
+                ),
+            ),
+        ],
         condition=IfCondition(simulation),
     )
     # endregion
@@ -247,8 +250,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    
-
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -269,37 +270,33 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    state_estimator_launch_dir = os.path.join(
-        get_package_share_directory('state_estimator'),
-        'launch'
-    )
+    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
 
-    fuzzy_default_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
+    fuzzy_default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
 
     # parameters
     fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
 
-    return LaunchDescription(declared_arguments + [
-        Node(
-            package='fuzzy_generator',
-            namespace='',
-            executable='fuzzy_node',
-            name='fuzzy_generator',
-            parameters=[{'config_path': fuzzy_config_path}]
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
-        ),
-        mujoco_node,
-        rqt_input_device,
-        march_control,
-        record_rosbags_action,
-        safety_node,
-        gait_preprocessor_node,
-        march_gait_selection_node,
-        weight_shift_node,
-    ])
+    return LaunchDescription(
+        declared_arguments
+        + [
+            Node(
+                package="fuzzy_generator",
+                namespace="",
+                executable="fuzzy_node",
+                name="fuzzy_generator",
+                parameters=[{"config_path": fuzzy_config_path}],
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([state_estimator_launch_dir, "/state_estimator_launch.py"]),
+            ),
+            mujoco_node,
+            rqt_input_device,
+            march_control,
+            record_rosbags_action,
+            safety_node,
+            gait_preprocessor_node,
+            march_gait_selection_node,
+            weight_shift_node,
+        ]
+    )

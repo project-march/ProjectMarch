@@ -10,18 +10,20 @@ def generate_launch_description():
     This node is started when the ik solver is ran
     """
     # parameters
-    n_footsteps = LaunchConfiguration("n_footsteps", default='20')
-    step_length = LaunchConfiguration("step_length", default='0.2')
+    n_footsteps = LaunchConfiguration("n_footsteps", default="20")
+    step_length = LaunchConfiguration("step_length", default="0.2")
 
-    return LaunchDescription([
-        Node(
-            package='footstep_generator',
-            namespace='',
-            executable='footstep_generator_node',
-            name='footstep_generator',
-            parameters=[
-                {"n_footsteps", n_footsteps},
-                {"step_length", step_length},
-            ]
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="footstep_generator",
+                namespace="",
+                executable="footstep_generator_node",
+                name="footstep_generator",
+                parameters=[
+                    {"n_footsteps", n_footsteps},
+                    {"step_length", step_length},
+                ],
+            ),
+        ]
+    )

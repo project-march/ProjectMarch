@@ -10,7 +10,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='false')
+    test_rotational = LaunchConfiguration("test_rotational", default="false")
 
     # region Launch march control
     march_control = IncludeLaunchDescription(
@@ -21,9 +21,7 @@ def generate_launch_description() -> LaunchDescription:
                 "control_test_setup.launch.py",
             )
         ),
-        launch_arguments=[
-            ("test_rotational", test_rotational)
-        ],
+        launch_arguments=[("test_rotational", test_rotational)],
     )
     # endregion
 
@@ -44,27 +42,27 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
 
-    return LaunchDescription([
-        Node(
-            package='state_machine',
-            namespace='',
-            executable='state_machine_node',
-            name='state_machine',
-        ),
-        Node(
-            package='test_setup_gait_selection',
-            namespace='',
-            executable='test_setup_gait_selection_node',
-            name='test_setup_gait_selection',
-            parameters=[
-                {"test_rotational": test_rotational}
-            ],
-        ),
-        Node(
-            package='fuzzy_generator',
-            executable='fuzzy_node',
-            name='fuzzy_node',
-        ),
-        rqt_input_device,
-        march_control,
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="state_machine",
+                namespace="",
+                executable="state_machine_node",
+                name="state_machine",
+            ),
+            Node(
+                package="test_setup_gait_selection",
+                namespace="",
+                executable="test_setup_gait_selection_node",
+                name="test_setup_gait_selection",
+                parameters=[{"test_rotational": test_rotational}],
+            ),
+            Node(
+                package="fuzzy_generator",
+                executable="fuzzy_node",
+                name="fuzzy_node",
+            ),
+            rqt_input_device,
+            march_control,
+        ]
+    )

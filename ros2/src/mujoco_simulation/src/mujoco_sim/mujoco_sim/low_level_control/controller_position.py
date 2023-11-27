@@ -12,6 +12,7 @@ class PositionController(LowLvlController):
     Args:
         LowLvlController (Class): Low level controller baseclass
     """
+
     def __init__(self, node, model, p, d, i, joint_desired=None):
         """A class which imitates the low-level control of the robot.
 
