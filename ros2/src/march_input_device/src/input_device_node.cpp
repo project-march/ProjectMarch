@@ -86,7 +86,9 @@ exoState inputDeviceNode::askState() const
 
     // Get the user input
     char str[100];
+    echo(); // Enable echoing of characters
     getstr(str);
+    noecho(); // Disable echoing of characters
     std::string input(str);
 
     return state_map[input];
