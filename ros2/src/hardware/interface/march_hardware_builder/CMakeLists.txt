@@ -17,6 +17,7 @@ find_package(march_logger_cpp REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
+include_directories(include)
 
 if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)

@@ -2,11 +2,14 @@
 #ifndef MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
 #define MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include "rclcpp/rclcpp.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include <yaml-cpp/yaml.h>
 
 #include <march_hardware/encoder/absolute_encoder.h>
@@ -22,6 +25,13 @@
 #include <march_hardware/temperature/temperature_ges.h>
 #include <march_hardware/torque_sensor/torque_sensor.h>
 #include <march_logger_cpp/base_logger.hpp>
+#include <march_hardware/error/error_type.h>
+#include <march_hardware/error/hardware_exception.h>
+#include <march_hardware/ethercat/pdo_interface.h>
+#include <march_hardware/ethercat/sdo_interface.h>
+#include <march_hardware/motor_controller/motor_controller_type.h>
+#include <march_hardware/motor_controller/odrive/odrive_state.h>
+#include <march_logger_cpp/ros_logger.hpp>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.

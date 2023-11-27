@@ -2,19 +2,7 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
-#include <algorithm>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include <march_hardware/error/error_type.h>
-#include <march_hardware/error/hardware_exception.h>
-#include <march_hardware/ethercat/pdo_interface.h>
-#include <march_hardware/ethercat/sdo_interface.h>
-#include <march_hardware/motor_controller/motor_controller_type.h>
-#include <march_hardware/motor_controller/odrive/odrive_state.h>
-#include <march_logger_cpp/ros_logger.hpp>
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
     = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
