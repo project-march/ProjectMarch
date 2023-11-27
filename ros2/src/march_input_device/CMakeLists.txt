@@ -24,7 +24,7 @@ add_executable(input_device_node
 ament_target_dependencies(input_device_node
   rclcpp
   march_shared_msgs
-)
+  )
 
 target_link_libraries(input_device_node ${CURSES_LIBRARIES})
 
