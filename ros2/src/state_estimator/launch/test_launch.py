@@ -11,19 +11,19 @@ def generate_launch_description():
     This node is started when the state estimator is run
     """
     config = os.path.join(
-        get_package_share_directory('state_estimator'),
-        'config',
-        'state_estimation_setup_params.yaml'
+        get_package_share_directory("state_estimator"), "config", "state_estimation_setup_params.yaml"
     )
 
-    return LaunchDescription([
-        Node(
-            package='state_estimator',
-            namespace='',
-            executable='state_estimator_node',
-            name='state_estimator',
-            parameters=[
-                config,
-            ]
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="state_estimator",
+                namespace="",
+                executable="state_estimator_node",
+                name="state_estimator",
+                parameters=[
+                    config,
+                ],
+            ),
+        ]
+    )

@@ -100,6 +100,4 @@ class GaitLoader:
     def _load_sit_and_stand_gaits(self) -> None:
         """Loads the sit and stand gaits."""
         for gait in self._gait_version_map:
-            self._loaded_gaits[gait] = SetpointsGait.from_file(
-                gait, self._gait_directory, self._gait_version_map
-            )
+            self._loaded_gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._gait_version_map)

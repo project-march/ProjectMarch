@@ -27,8 +27,8 @@ class GaitLoader:
     """
 
     def __init__(
-            self,
-            node: Node,
+        self,
+        node: Node,
     ):
         """Init the gait loader for the gait_selection."""
         self._node = node
@@ -103,6 +103,4 @@ class GaitLoader:
         """Loads the sit and stand gaits."""
         for gait in self._gait_version_map:
             self._node.get_logger().info("gait is: " + str(gait))
-            self.loaded_gaits[gait] = SetpointsGait.from_file(
-                gait, self._gait_directory, self._gait_version_map
-            )
+            self.loaded_gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._gait_version_map)

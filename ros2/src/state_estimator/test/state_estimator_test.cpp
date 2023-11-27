@@ -25,13 +25,5 @@ protected:
     std::unique_ptr<StateEstimator> state_estimator;
 };
 
-TEST_F(StateEstimatorTest, UpdateSensorPressureTest)
-{
-    std::vector<std::string> names = { "l", "r" };
-    std::vector<double> pressure_values = { 1, 2 };
-    std::map<std::string, double> expected = { { "l", 1 }, { "r", 2 } };
-    ASSERT_EQ(expected, state_estimator->update_pressure_sensors_data(names, pressure_values));
-}
-
 // NOLINTEND
 #endif

@@ -8,11 +8,13 @@ def generate_launch_description():
 
     This node is started when the state estimator is run
     """
-    return LaunchDescription([
-        Node(
-            package='state_machine',
-            namespace='',
-            executable='state_machine_node',
-            name='state_machine',
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="state_machine",
+                namespace="",
+                executable="state_machine_node",
+                name="state_machine",
+            ),
+        ]
+    )

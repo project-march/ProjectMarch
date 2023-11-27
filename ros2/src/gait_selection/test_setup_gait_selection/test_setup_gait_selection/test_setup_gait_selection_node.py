@@ -16,7 +16,7 @@ class TestSetupGaitSelectionNode(Node):
     """
 
     def __init__(self):
-        super().__init__('TestSetupGaitSelectionNode')
+        super().__init__("TestSetupGaitSelectionNode")
 
         self.declare_parameter("test_rotational")
         test_rotational = self.get_parameter("test_rotational").get_parameter_value().bool_value
@@ -33,7 +33,7 @@ class TestSetupGaitSelectionNode(Node):
         self.get_logger().info("Possible gaits are: " + str(self.gait_loader.gaits))
         self.get_logger().info("Possible gaits are: " + str(self.gait_loader._named_positions.values()))
 
-        self.publisher_ = self.create_publisher(JointTrajectory, 'joint_trajectory_controller/joint_trajectory', 10)
+        self.publisher_ = self.create_publisher(JointTrajectory, "joint_trajectory_controller/joint_trajectory", 10)
 
         self.gait_service = self.create_service(RequestGait, "gait_selection", self.gait_service_callback)
         self.service = self.create_service(RequestFootsteps, "footstep_generator", self.footstep_service_callback)
@@ -76,5 +76,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

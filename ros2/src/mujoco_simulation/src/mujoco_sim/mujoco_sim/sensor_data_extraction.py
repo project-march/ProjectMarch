@@ -76,7 +76,7 @@ class SensorDataExtraction:
             torque_x = self.sensordata[adr]
             torque_y = self.sensordata[adr + 1]
             torque_z = self.sensordata[adr + 2]
-            torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
+            torque_res = math.sqrt(torque_x ** 2 + torque_y ** 2 + torque_z ** 2)
             joint_acc.append(torque_res)
         return joint_acc
 
@@ -100,7 +100,7 @@ class SensorDataExtraction:
             force_x = self.sensordata[adr]
             force_y = self.sensordata[adr + 1]
             force_z = self.sensordata[adr + 2]
-            force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
+            force_res = math.sqrt(force_x ** 2 + force_y ** 2 + force_z ** 2)
             pressure_soles.append(force_res)
         return pressure_soles
 

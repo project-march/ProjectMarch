@@ -21,7 +21,7 @@ public:
 
     // weight shift before
     trajectory_msgs::msg::JointTrajectory return_final_traj_with_weight_shift(trajectory_msgs::msg::JointTrajectory);
-    
+
     std::string swing_leg; // which leg does the step
 
     // weight shift during
@@ -30,7 +30,7 @@ public:
     // For Koen's asymmetry, we try to make the right step trajectory more extreme
     // as we see he has more trouble making a nice step with his right leg.
     trajectory_msgs::msg::JointTrajectory fix_asymmetry(trajectory_msgs::msg::JointTrajectory);
-    
+
     // dynamic parameter tuning
     void set_weight_shift_duration(double);
     void set_step_size(double);
@@ -48,7 +48,6 @@ private:
     double m_right_swing_scaling;
 
     float m_hip_aa_position; // position HAA's go to during weight_shift
-
 };
 
 #endif

@@ -29,9 +29,7 @@ class MujocoWriterNode(Node):
         )
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.
-        self.reset_subscription = self.create_subscription(
-            Bool, "/mujoco_reset_trajectory", self.reset_callback, 10
-        )
+        self.reset_subscription = self.create_subscription(Bool, "/mujoco_reset_trajectory", self.reset_callback, 10)
         self.reset = False
         # self.subscription  # prevent unused variable warning
 

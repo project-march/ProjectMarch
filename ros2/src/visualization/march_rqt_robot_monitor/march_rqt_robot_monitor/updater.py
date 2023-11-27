@@ -32,7 +32,7 @@ class DiagnosticUpdater(Node):
         self.updater = diagnostic_updater.Updater(node=self, period=PERIOD)
         self.updater.setHardwareID(HARDWARE_ID)
 
-        robot_path = get_package_share_directory('march_hardware_builder') + '/robots/march8.yaml'
+        robot_path = get_package_share_directory("march_hardware_builder") + "/robots/march8.yaml"
         with open(robot_path) as file:
             document = yaml.full_load(file)
 
