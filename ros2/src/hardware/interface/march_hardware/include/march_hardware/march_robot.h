@@ -5,7 +5,6 @@
 #include "march_hardware/ethercat/ethercat_master.h"
 #include "march_hardware/joint.h"
 #include "march_hardware/power_distribution_board/power_distribution_board.h"
-#include "march_hardware/pressure_sole/pressure_sole.h"
 #include "march_logger_cpp/base_logger.hpp"
 
 #include <cstdint>
@@ -18,7 +17,6 @@ class MarchRobot {
 private:
     ::std::vector<Joint> joint_list_;
     EthercatMaster ethercat_master_;
-    std::vector<PressureSole> pressure_soles_;
     std::optional<PowerDistributionBoard> power_distribution_board_;
     std::shared_ptr<march_logger::BaseLogger> logger_;
 
@@ -29,10 +27,7 @@ public:
         int ecatCycleTime, int ecatSlaveTimeout);
 
     MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout);
-
-    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
+        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
         std::optional<PowerDistributionBoard>);
 
     ~MarchRobot();
@@ -74,9 +69,6 @@ public:
 
     iterator begin();
     iterator end();
-
-    bool hasPressureSoles() const;
-    std::vector<PressureSole> getPressureSoles() const;
 
     bool hasPowerDistributionBoard() const;
     PowerDistributionBoard getPowerDistributionBoard() const;

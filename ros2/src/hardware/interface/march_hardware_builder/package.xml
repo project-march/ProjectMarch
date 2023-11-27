@@ -16,6 +16,7 @@
   <depend>urdf</depend>
   <depend>yaml-cpp</depend>
   <depend>ament_index_cpp</depend>
+  <depend>rclcpp</depend>
 
 <!--  <test_depend>code_coverage</test_depend>-->
 <!--  <test_depend>rosunit</test_depend>-->
