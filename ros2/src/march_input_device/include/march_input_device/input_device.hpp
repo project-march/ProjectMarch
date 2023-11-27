@@ -35,6 +35,8 @@ public:
     exoState getCurrentState() const;
     std::set<exoState> getAvailableStates() const;
     void askNewState() const;
+    void setCurrentState(const exoState& current_state);
+    void setAvailableStates(const std::set<exoState>& available_states);
 
 private:
     exoState m_current_state;

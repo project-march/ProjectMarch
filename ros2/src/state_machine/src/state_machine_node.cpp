@@ -194,7 +194,7 @@ void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr ms
             m_state_machine.performTransition((exoState)msg->data);
         } else 
         {
-            RCLCPP_INFO(get_logger(), "Invalid state transition!");
+            RCLCPP_WARN(get_logger(), "Invalid state transition! Ignoring new state.");
         }
         march_shared_msgs::msg::ExoStateArray::SharedPtr publishMsg = std::make_shared<march_shared_msgs::msg::ExoStateArray>();;  
         //TODO: the publish message is still incorrect.

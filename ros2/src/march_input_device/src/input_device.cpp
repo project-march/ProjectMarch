@@ -31,3 +31,13 @@ void IPD::askNewState() const
 
     std::cout << '\n';
 }
+
+void IPD::setCurrentState(const exoState& current_state)
+{
+    m_current_state = current_state;
+}
+
+void IPD::setAvailableStates(const std::set<exoState>& available_states)
+{
+    m_available_states = available_states;
+}

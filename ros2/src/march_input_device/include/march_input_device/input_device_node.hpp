@@ -19,6 +19,7 @@ private:
 
     void availableStatesCallback(const march_shared_msgs::msg::ExoStateArray::SharedPtr msg);
     void sendNewState(const exoState& desired_state);
+    exoState askState() const;
 
     IPD m_ipd;
     pid_t m_terminal_pid; // Process ID of the terminal that is opened

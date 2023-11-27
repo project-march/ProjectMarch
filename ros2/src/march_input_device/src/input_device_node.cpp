@@ -23,7 +23,8 @@ inputDeviceNode::inputDeviceNode()
   cbreak();
   noecho();
 
-  sendNewState(exoState::Stand);
+  sendNewState(m_ipd.getCurrentState());
+  m_ipd.setCurrentState(exoState::Stand);
 
 }
 
@@ -36,10 +37,21 @@ inputDeviceNode::~inputDeviceNode()
 void inputDeviceNode::availableStatesCallback(const march_shared_msgs::msg::ExoStateArray::SharedPtr msg)
 {
   // Iterate over the states vector and print each state
-    for (const auto& state : msg->states) {
-        printw("Received available state: %d \n", state.state);
-    }
+  for (const auto& state : msg->states) {
+    printw("Received available state: %d \n", state.state);
+  }
   refresh();
+
+  std::set<exoState> exo_states_set;
+  for (const auto& exo_state_msg : msg->states) {
+    exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
+  }
+  m_ipd.setAvailableStates(exo_states_set);
+
+  exoState desired_state = askState();
+  sendNewState(desired_state);
+  m_ipd.setCurrentState(desired_state);
+
 }
 
 void inputDeviceNode::sendNewState(const exoState& desired_state)
@@ -53,6 +65,33 @@ void inputDeviceNode::sendNewState(const exoState& desired_state)
 
   // Refresh the screen
   refresh();
+}
+
+exoState inputDeviceNode::askState() const
+{
+  std::set<exoState> available_states = m_ipd.getAvailableStates();
+
+  std::map<std::string, exoState> state_map;
+  for (const auto& state : available_states) {
+    state_map[toString(state)] = state;
+  }
+
+  while (true){
+    printw("Available states are: ");
+    for (const auto& state : available_states) {
+      printw("%s, ", toString(state).c_str());
+    }
+    printw("\n Please input new state:");
+    refresh();
+
+    // Get the user input
+    char str[100];
+    getstr(str);
+    std::string input(str);
+
+    return state_map[input];
+    
+  }
 }
 
 
