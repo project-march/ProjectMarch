@@ -89,7 +89,6 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
     m_joint_state_publisher->publish(*msg);
 }
 
-
 void StateEstimator::initialize_imus()
 {
     IMU imu_to_set;
@@ -192,7 +191,7 @@ void StateEstimator::publish_robot_frames()
     // instead, we choose a placeholder value 0 for the stance foot (left = -1, right = 1, double = 0)
 
     // double stance
-     m_current_stance_foot = 0;
+    m_current_stance_foot = 0;
 
     std_msgs::msg::Int32 stance_foot_msg;
     stance_foot_msg.data = m_current_stance_foot;

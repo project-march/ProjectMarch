@@ -25,6 +25,5 @@ protected:
     std::unique_ptr<StateEstimator> state_estimator;
 };
 
-
 // NOLINTEND
 #endif
