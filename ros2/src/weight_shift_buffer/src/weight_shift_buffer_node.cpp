@@ -108,27 +108,26 @@ void WeightShiftBufferNode::request_feedback(control_msgs::action::FollowJointTr
     auto goal_msg = goal;
     if (m_gait_type == 1) {
         RCLCPP_ERROR(this->get_logger(), "I am walking");
-        switch(m_weight_shift_type)
-        {
+        switch (m_weight_shift_type) {
             case 0:
-            //Do nothing
-            break;
+                // Do nothing
+                break;
 
             case 1:
-            // Make right step more extreme than left
-            goal_msg.trajectory = m_weight_shift_buffer.fix_asymmetry(goal.trajectory);
-            break;
+                // Make right step more extreme than left
+                goal_msg.trajectory = m_weight_shift_buffer.fix_asymmetry(goal.trajectory);
+                break;
 
             case 2:
-            // Add weight shift during step
-            m_weight_shift_buffer.set_incoming_joint_trajectory(goal.trajectory);
-            goal_msg.trajectory = m_weight_shift_buffer.add_weight_shift_during_gait();
-            break;
+                // Add weight shift during step
+                m_weight_shift_buffer.set_incoming_joint_trajectory(goal.trajectory);
+                goal_msg.trajectory = m_weight_shift_buffer.add_weight_shift_during_gait();
+                break;
 
             case 3:
-            // Add weight shift inbetween steps
-            goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
-            break;
+                // Add weight shift inbetween steps
+                goal_msg.trajectory = m_weight_shift_buffer.return_final_traj_with_weight_shift(goal.trajectory);
+                break;
         }
     }
 

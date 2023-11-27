@@ -33,21 +33,18 @@ def generate_launch_description():
             description="Whether the exoskeleton is ran physically or in simulation.",
             choices=["true", "false"],
         ),
-
         # region set control type. (This section set the control types for either gazebo, exo, or simulation control)
         DeclareLaunchArgument(
             name="control_type",
             default_value="effort",
-            description="Decides which controller is being used. "
-                        "'Effort' when you are running the real exo",
+            description="Decides which controller is being used. " "'Effort' when you are running the real exo",
             choices=["simulation", "effort"],
             condition=UnlessCondition(simulation),
         ),
         DeclareLaunchArgument(
             name="control_type",
             default_value="simulation",
-            description="Decides which controller is being used. "
-                        "'simulation' when you are running the simulation",
+            description="Decides which controller is being used. " "'simulation' when you are running the simulation",
             choices=["simulation", "effort"],
             condition=IfCondition(simulation),
         ),
@@ -55,14 +52,14 @@ def generate_launch_description():
             name="control_yaml",
             default_value="effort_control/march8_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=UnlessCondition(simulation),
         ),
         DeclareLaunchArgument(
             name="control_yaml",
             default_value="mujoco/march8_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=IfCondition(simulation),
         ),
         # endregion

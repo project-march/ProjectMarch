@@ -299,7 +299,6 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value="low_level_controller_tunings.xml",
             description="tunings for the low level controller in mujoco",
         ),
-
         DeclareLaunchArgument(
             name="rosbags",
             default_value="false",

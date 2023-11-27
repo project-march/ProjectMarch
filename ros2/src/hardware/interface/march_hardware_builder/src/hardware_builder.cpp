@@ -2,20 +2,7 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
-#include <algorithm>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include <march_hardware/error/error_type.h>
-#include <march_hardware/error/hardware_exception.h>
-#include <march_hardware/ethercat/pdo_interface.h>
-#include <march_hardware/ethercat/sdo_interface.h>
-#include <march_hardware/motor_controller/motor_controller_type.h>
-#include <march_hardware/motor_controller/odrive/odrive_state.h>
-#include <march_hardware/pressure_sole/pressure_sole.h>
-#include <march_logger_cpp/ros_logger.hpp>
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
     = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
@@ -26,7 +13,6 @@ const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS = { "axis",
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "motor_controller" };
 const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS = { "slaveIndex", "type" };
-const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS = { "slaveIndex", "byteOffset", "side" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 
 HardwareBuilder::HardwareBuilder(const std::string& yaml_path)
@@ -51,13 +37,11 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot(const std::
 
     std::vector<march::Joint> joints = this->createJoints(config["joints"], active_joint_names);
     logger_->info("Finished creating joints.");
-    auto pressure_soles = createPressureSoles(config["pressure_soles"]);
     auto power_distribution_board = createPowerDistributionBoard(config["power_distribution_board"]);
     logger_->info("Finished.");
     return std::make_unique<march::MarchRobot>(
         /*joint_list_=*/std::move(joints),
         /*logger=*/std::make_shared<march_logger::RosLogger>("march_robot"),
-        /*pressure_soles_=*/std::move(pressure_soles),
         /*if_name=*/if_name_,
         /*ecatCycleTime=*/config["ecatCycleTime"].as<int>(),
         /*ecatSlaveTimeout=*/config["ecatSlaveTimeout"].as<int>(),
@@ -367,33 +351,6 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(
         march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }
 
-std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML::Node& pressure_soles_config) const
-{
-    logger_->info("Createing pressure solesssss");
-    std::vector<march::PressureSole> pressure_soles;
-    if (!pressure_soles_config) {
-        return pressure_soles;
-    }
-    for (const YAML::Node& pressure_sole_config : pressure_soles_config) {
-        pressure_soles.push_back(HardwareBuilder::createPressureSole(
-            /*pressure_sole_config=*/pressure_sole_config[pressure_sole_config.begin()->first.as<std::string>()]));
-    }
-    return pressure_soles;
-}
-
-march::PressureSole HardwareBuilder::createPressureSole(const YAML::Node& pressure_sole_config) const
-{
-    logger_->info("Creating pressure soleeeee");
-    HardwareBuilder::validateRequiredKeysExist(
-        pressure_sole_config, HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS, "pressure_sole");
-
-    const auto slave_index = pressure_sole_config["slaveIndex"].as<int>();
-    const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
-    const auto side = pressure_sole_config["side"].as<std::string>();
-    return march::PressureSole(march::Slave(slave_index, pdo_interface_, sdo_interface_),
-        /*byte_offset=*/byte_offset,
-        /*side=*/side);
-}
 
 std::optional<march::PowerDistributionBoard> HardwareBuilder::createPowerDistributionBoard(
     const YAML::Node& power_distribution_board_config) const

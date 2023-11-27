@@ -11,7 +11,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='true')
+    test_rotational = LaunchConfiguration("test_rotational", default="true")
 
     # region Launch march control
     march_control = IncludeLaunchDescription(
@@ -22,13 +22,11 @@ def generate_launch_description() -> LaunchDescription:
                 "control_test_setup.launch.py",
             )
         ),
-        launch_arguments=[
-            ("test_rotational", test_rotational)
-        ],
+        launch_arguments=[("test_rotational", test_rotational)],
     )
     # endregion
 
-    rosbags = LaunchConfiguration("rosbags", default='true')
+    rosbags = LaunchConfiguration("rosbags", default="true")
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -56,11 +54,7 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(rosbags),
     )
 
-    default_fuzzy_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
+    default_fuzzy_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
 
     # parameters
     fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
@@ -83,29 +77,29 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    return LaunchDescription([
-        Node(
-            package='state_machine',
-            namespace='',
-            executable='state_machine_node',
-            name='state_machine',
-        ),
-        Node(
-            package='test_setup_gait_selection',
-            namespace='',
-            executable='test_setup_gait_selection_node',
-            name='test_setup_gait_selection',
-            parameters=[
-                {"test_rotational": test_rotational}
-            ],
-        ),
-        Node(
-            package='fuzzy_generator',
-            executable='fuzzy_node',
-            name='fuzzy_node',
-            parameters=[{'config_path': fuzzy_config_path}]
-        ),
-        rqt_input_device,
-        march_control,
-        record_rosbags_action,
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="state_machine",
+                namespace="",
+                executable="state_machine_node",
+                name="state_machine",
+            ),
+            Node(
+                package="test_setup_gait_selection",
+                namespace="",
+                executable="test_setup_gait_selection_node",
+                name="test_setup_gait_selection",
+                parameters=[{"test_rotational": test_rotational}],
+            ),
+            Node(
+                package="fuzzy_generator",
+                executable="fuzzy_node",
+                name="fuzzy_node",
+                parameters=[{"config_path": fuzzy_config_path}],
+            ),
+            rqt_input_device,
+            march_control,
+            record_rosbags_action,
+        ]
+    )

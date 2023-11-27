@@ -8,11 +8,13 @@ def generate_launch_description():
 
     This node is started when the swing leg trajectory generator  has be run.
     """
-    return LaunchDescription([
-        Node(
-            package='swing_leg_trajectory_generator',
-            namespace='',
-            executable='swing_leg_trajectory_generator_node',
-            name='swing_leg_trajectory_generator',
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="swing_leg_trajectory_generator",
+                namespace="",
+                executable="swing_leg_trajectory_generator_node",
+                name="swing_leg_trajectory_generator",
+            ),
+        ]
+    )
