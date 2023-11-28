@@ -142,7 +142,7 @@ class InputDeviceView(QWidget):
         """Update the buttons if the possible gaits have changed."""
         new_possible_gaits = future.result().gaits
         if self.eeg and not self.eeg_override:
-            new_possible_gaits =  ["stop"]
+            new_possible_gaits = ["stop"]
         if set(self.possible_gaits) != set(new_possible_gaits):
             self._update_gait_buttons(new_possible_gaits)
 
@@ -179,14 +179,21 @@ class InputDeviceView(QWidget):
 
     def set_eeg_button_color(self):
         if self.eeg is False:
-            self._eeg_button.setStyleSheet("QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setStyleSheet(
+                "QToolButton {background-color: red; font-size: 13px; font: 'Times New Roman'}"
+            )
             self._eeg_button.setText(check_string("eeg is off."))
         elif self.eeg_override is True and self.eeg is True:
-            self._eeg_button.setStyleSheet("QToolButton {background-color: orange; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setStyleSheet(
+                "QToolButton {background-color: orange; font-size: 13px; font: 'Times New Roman'}"
+            )
             self._eeg_button.setText(check_string("eeg is connected."))
         elif self.eeg_override is False and self.eeg is True:
-            self._eeg_button.setStyleSheet("QToolButton {background-color: green; font-size: 13px; font: 'Times New Roman'}")
+            self._eeg_button.setStyleSheet(
+                "QToolButton {background-color: green; font-size: 13px; font: 'Times New Roman'}"
+            )
             self._eeg_button.setText(check_string("eeg is on!"))
+
     def create_button(
         self,
         name: str,

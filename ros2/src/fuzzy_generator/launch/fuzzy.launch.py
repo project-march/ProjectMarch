@@ -12,23 +12,16 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Set env var to print messages to stdout immediately
-    arg = SetEnvironmentVariable('RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1')
+    arg = SetEnvironmentVariable("RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED", "1")
     ld.add_action(arg)
 
-    default_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
+    default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
 
     # parameters
     config_path = LaunchConfiguration("config_path", default=default_config)
 
     fuzzy_node = Node(
-        package='fuzzy_generator',
-        executable='fuzzy_node',
-        name='fuzzy_node',
-        parameters=[{'config_path': config_path}]
+        package="fuzzy_generator", executable="fuzzy_node", name="fuzzy_node", parameters=[{"config_path": config_path}]
     )
     ld.add_action(fuzzy_node)
 

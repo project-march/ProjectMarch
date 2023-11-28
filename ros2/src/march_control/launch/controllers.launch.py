@@ -50,7 +50,7 @@ def generate_launch_description():
             name="control_type",
             default_value="effort",
             description="Decides which controller is being used. "
-                        "'Effort' when you are running either gazebo or the real exo",
+            "'Effort' when you are running either gazebo or the real exo",
             choices=["rviz", "effort"],
             condition=UnlessCondition(rviz_condition),
         ),
@@ -58,7 +58,7 @@ def generate_launch_description():
             name="control_type",
             default_value="rviz",
             description="Decides which controller is being used. "
-                        "'Rviz' when you are not running either gazebo or the real exo",
+            "'Rviz' when you are not running either gazebo or the real exo",
             choices=["rviz", "effort"],
             condition=IfCondition(rviz_condition),
         )

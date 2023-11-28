@@ -42,19 +42,23 @@ void WeightShiftBuffer::add_weight_shift()
 {
     trajectory_msgs::msg::JointTrajectoryPoint point_to_add = m_first_traj_point;
     m_final_joint_trajectory.points.push_back(point_to_add);
-    
-    if (swing_leg == "R"){
-        for (int i = 1; i<m_duration_weight_shift*10; i++){
-            point_to_add.positions[1] +=  (m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
-            point_to_add.positions[5] +=  (-m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
+
+    if (swing_leg == "R") {
+        for (int i = 1; i < m_duration_weight_shift * 10; i++) {
+            point_to_add.positions[1]
+                += (m_hip_aa_position - m_first_traj_point.positions[1]) / (m_duration_weight_shift * 10);
+            point_to_add.positions[5]
+                += (-m_hip_aa_position - m_first_traj_point.positions[5]) / (m_duration_weight_shift * 10);
 
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "L";
         }
-    } else if (swing_leg == "L"){
-        for (int i = 1; i<m_duration_weight_shift*10; i++){
-            point_to_add.positions[1] +=  (-m_hip_aa_position-m_first_traj_point.positions[1])/(m_duration_weight_shift*10);
-            point_to_add.positions[5] +=  (m_hip_aa_position-m_first_traj_point.positions[5])/(m_duration_weight_shift*10);
+    } else if (swing_leg == "L") {
+        for (int i = 1; i < m_duration_weight_shift * 10; i++) {
+            point_to_add.positions[1]
+                += (-m_hip_aa_position - m_first_traj_point.positions[1]) / (m_duration_weight_shift * 10);
+            point_to_add.positions[5]
+                += (m_hip_aa_position - m_first_traj_point.positions[5]) / (m_duration_weight_shift * 10);
 
             m_final_joint_trajectory.points.push_back(point_to_add);
             swing_leg = "R";
@@ -70,42 +74,45 @@ void WeightShiftBuffer::reset_HAA_at_end()
     trajectory_msgs::msg::JointTrajectoryPoint last_point_of_step
         = m_final_joint_trajectory.points[(m_final_joint_trajectory.points.size() - 1)];
     trajectory_msgs::msg::JointTrajectoryPoint point_to_add = last_point_of_step;
-    
-    for (int i = 0; i<m_duration_weight_shift*10; i++){
-       point_to_add.positions[1] += (m_first_traj_point.positions[1]-last_point_of_step.positions[1])/(m_duration_weight_shift*10);
-       point_to_add.positions[5] += (m_first_traj_point.positions[5]-last_point_of_step.positions[5])/(m_duration_weight_shift*10);
-       m_final_joint_trajectory.points.push_back(point_to_add);
+
+    for (int i = 0; i < m_duration_weight_shift * 10; i++) {
+        point_to_add.positions[1]
+            += (m_first_traj_point.positions[1] - last_point_of_step.positions[1]) / (m_duration_weight_shift * 10);
+        point_to_add.positions[5]
+            += (m_first_traj_point.positions[5] - last_point_of_step.positions[5]) / (m_duration_weight_shift * 10);
+        m_final_joint_trajectory.points.push_back(point_to_add);
     }
 }
 
 // Add correct time_from_start to all points in the trajectory
 void WeightShiftBuffer::fix_timings_traj()
 {
-    double total_duration_traj = 2.0*m_duration_weight_shift + m_duration_step;
+    double total_duration_traj = 2.0 * m_duration_weight_shift + m_duration_step;
     RCLCPP_INFO(rclcpp::get_logger("total duration"), "%f", total_duration_traj);
-    double duration_one_point = total_duration_traj/(m_final_joint_trajectory.points.size()-1);
-    for (int i =0; i<m_duration_weight_shift*10; i++){
-        m_final_joint_trajectory.points[i].time_from_start.sec = (int) floor(i * duration_one_point);
-        m_final_joint_trajectory.points[i].time_from_start.nanosec = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
+    double duration_one_point = total_duration_traj / (m_final_joint_trajectory.points.size() - 1);
+    for (int i = 0; i < m_duration_weight_shift * 10; i++) {
+        m_final_joint_trajectory.points[i].time_from_start.sec = (int)floor(i * duration_one_point);
+        m_final_joint_trajectory.points[i].time_from_start.nanosec
+            = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
     }
     for (int i = m_duration_weight_shift * 10;
-        i < (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size()); i++) {
+         i < (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size()); i++) {
         int old_time_sec = m_final_joint_trajectory.points[i].time_from_start.sec;
         uint old_time_nanosec = m_final_joint_trajectory.points[i].time_from_start.nanosec;
 
         int converted_duration = (int)(10 * m_duration_weight_shift);
-        int new_time_sec = (int) floor(old_time_sec + (old_time_nanosec + converted_duration * 100000000)/1e9);
-        uint new_time_nanosec = (old_time_nanosec + converted_duration*100000000)%1000000000;
-        
+        int new_time_sec = (int)floor(old_time_sec + (old_time_nanosec + converted_duration * 100000000) / 1e9);
+        uint new_time_nanosec = (old_time_nanosec + converted_duration * 100000000) % 1000000000;
+
         m_final_joint_trajectory.points[i].time_from_start.sec = new_time_sec;
         m_final_joint_trajectory.points[i].time_from_start.nanosec = new_time_nanosec;
     }
     for (int i = (m_duration_weight_shift * 10 + m_incoming_joint_trajectory.points.size());
          i < m_final_joint_trajectory.points.size(); i++) {
         m_final_joint_trajectory.points[i].time_from_start.sec = i * duration_one_point;
-        m_final_joint_trajectory.points[i].time_from_start.nanosec = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
+        m_final_joint_trajectory.points[i].time_from_start.nanosec
+            = (i * duration_one_point - floorf(i * duration_one_point)) * 1e9;
     }
-    
 }
 
 // Combine everything for weight shift before step, into one function.
@@ -118,7 +125,7 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::return_final_traj_with_
     add_weight_shift();
     reset_HAA_at_end();
     fix_timings_traj();
-    
+
     return m_final_joint_trajectory;
 }
 
@@ -144,8 +151,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
 
         for (int i = m_duration_weight_shift * 10;
              i < m_incoming_joint_trajectory.points.size() - (m_duration_weight_shift * 10); i++) {
-            m_incoming_joint_trajectory.points[i].positions[1] = base_offset+(m_hip_aa_position);
-            m_incoming_joint_trajectory.points[i].positions[5] = base_offset-(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[1] = base_offset + (m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[5] = base_offset - (m_hip_aa_position);
         }
 
         swing_leg = "L";
@@ -165,8 +172,8 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
 
         for (int i = m_duration_weight_shift * 10;
              i < m_incoming_joint_trajectory.points.size() - (m_duration_weight_shift * 10); i++) {
-            m_incoming_joint_trajectory.points[i].positions[5] = base_offset+(m_hip_aa_position);
-            m_incoming_joint_trajectory.points[i].positions[1] = base_offset-(m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[5] = base_offset + (m_hip_aa_position);
+            m_incoming_joint_trajectory.points[i].positions[1] = base_offset - (m_hip_aa_position);
         }
 
         swing_leg = "R";
@@ -175,7 +182,6 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::add_weight_shift_during
 
     return m_final_joint_trajectory;
 }
-
 
 // some set functions for parameters
 void WeightShiftBuffer::set_weight_shift_duration(double duration)
@@ -204,10 +210,12 @@ trajectory_msgs::msg::JointTrajectory WeightShiftBuffer::fix_asymmetry(trajector
 
     if (swing_leg == "R") {
         for (int i = 0; i < m_incoming_joint_trajectory.points.size(); i++) {
-            m_incoming_joint_trajectory.points[i].positions[6] =  m_right_swing_scaling* m_incoming_joint_trajectory.points[i].positions[6];
-            m_incoming_joint_trajectory.points[i].positions[7] =  m_right_swing_scaling* m_incoming_joint_trajectory.points[i].positions[7];
+            m_incoming_joint_trajectory.points[i].positions[6]
+                = m_right_swing_scaling * m_incoming_joint_trajectory.points[i].positions[6];
+            m_incoming_joint_trajectory.points[i].positions[7]
+                = m_right_swing_scaling * m_incoming_joint_trajectory.points[i].positions[7];
         }
-    } 
+    }
     m_final_joint_trajectory = m_incoming_joint_trajectory;
     return m_final_joint_trajectory;
 }

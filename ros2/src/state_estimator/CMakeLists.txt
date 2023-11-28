@@ -38,16 +38,8 @@ add_library(${PROJECT_NAME}
   src/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
   src/joint_estimator.cpp
-  include/${PROJECT_NAME}/com_estimator.hpp
-  src/com_estimator.cpp
-  include/${PROJECT_NAME}/cop_estimator.hpp
-  src/cop_estimator.cpp
-  include/${PROJECT_NAME}/zmp_estimator.hpp
-  src/zmp_estimator.cpp
   include/${PROJECT_NAME}/imu_estimator.hpp
   src/imu_estimator.cpp
-  include/${PROJECT_NAME}/footstep_estimator.hpp
-  src/footstep_estimator.cpp
 )
 
 ament_target_dependencies(
@@ -71,17 +63,9 @@ add_executable(state_estimator_node
   src/state_estimator.cpp
   include/${PROJECT_NAME}/joint_estimator.hpp
   src/joint_estimator.cpp
-  include/${PROJECT_NAME}/com_estimator.hpp
-  src/com_estimator.cpp
-  include/${PROJECT_NAME}/cop_estimator.hpp
-  src/cop_estimator.cpp
-  include/${PROJECT_NAME}/zmp_estimator.hpp
-  src/zmp_estimator.cpp
   include/${PROJECT_NAME}/imu_estimator.hpp
-  src/imu_estimator.cpp
-  include/${PROJECT_NAME}/footstep_estimator.hpp
-  src/footstep_estimator.cpp
-  )
+  src/imu_estimator.cpp)
+
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
@@ -121,12 +105,8 @@ if(BUILD_TESTING)
 
   ament_add_gmock(${PROJECT_NAME}_test
   # test/joint_estimator_test.cpp
-  test/cop_estimator_test.cpp
-  test/com_estimator_test.cpp
 #  test/state_estimator_test.cpp
-#  test/footstep_estimator_test.cpp
   test/imu_estimator_test.cpp
-  test/zmp_estimator_test.cpp
   test/test_runner.cpp
   # test/mocks/mock_state_estimator.hpp
   # include

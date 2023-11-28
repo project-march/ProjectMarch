@@ -11,32 +11,31 @@
 #include <vector>
 
 namespace march {
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
-    : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
-    , logger_(std::move(logger))
+MarchRobot::MarchRobot(
+    ::std::vector<Joint> jointList,
+    std::shared_ptr<march_logger::BaseLogger> logger,
+    ::std::string if_name,
+    int ecatCycleTime,
+    int ecatSlaveTimeout)
+    : joint_list_(std::move(jointList)),
+    ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
+    logger_(std::move(logger))
 
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
-    : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
-    , pressure_soles_(std::move(pressureSoles))
-    , logger_(std::move(logger))
-{
-}
-
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-    std::vector<PressureSole> pressureSoles, ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
+MarchRobot::MarchRobot(
+    ::std::vector<Joint> jointList,
+    std::shared_ptr<march_logger::BaseLogger> logger,
+    ::std::string if_name,
+    int ecatCycleTime,
+    int ecatSlaveTimeout,
     std::optional<PowerDistributionBoard> power_distribution_board)
-    : joint_list_(std::move(jointList))
-    , ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger)
-    , pressure_soles_(std::move(pressureSoles))
-    , power_distribution_board_(std::move(power_distribution_board))
-    , logger_(std::move(logger))
+    : joint_list_(std::move(jointList)),
+    ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
+    power_distribution_board_(std::move(power_distribution_board)),
+    logger_(std::move(logger))
+
 {
     for (const auto& joint : joint_list_) {
         logger_->info(logger_->fstring("Robot with joint: %s", joint.getName().c_str()));
@@ -105,7 +104,6 @@ bool MarchRobot::hasValidSlaves()
     ::std::vector<int> motorControllerIndices;
     ::std::vector<int> temperatureSlaveIndices;
     ::std::vector<int> pdbSlaveIndices;
-    ::std::vector<int> pressureSolesSlaveIndices;
 
     for (auto& joint : joint_list_) {
         if (joint.hasTemperatureGES()) {
@@ -122,13 +120,6 @@ bool MarchRobot::hasValidSlaves()
         pdbSlaveIndices.push_back(index);
     }
 
-    if (hasPressureSoles()) {
-        for (auto& pressure_sole : getPressureSoles()) {
-            int index = pressure_sole.getSlaveIndex();
-            pressureSolesSlaveIndices.push_back(index);
-        }
-    }
-
     // Multiple temperature sensors may be connected to the same slave.
     // Remove duplicate temperatureSlaveIndices so they don't trigger as
     // duplicates later.
@@ -143,7 +134,6 @@ bool MarchRobot::hasValidSlaves()
     slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
     slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
-    slaveIndices.insert(slaveIndices.end(), pressureSolesSlaveIndices.begin(), pressureSolesSlaveIndices.end());
 
     logger_->info(logger_->fstring("Found configuration for %lu slaves.", slaveIndices.size()));
 
@@ -240,16 +230,6 @@ MarchRobot::iterator MarchRobot::begin()
 MarchRobot::iterator MarchRobot::end()
 {
     return this->joint_list_.end();
-}
-
-bool MarchRobot::hasPressureSoles() const
-{
-    return pressure_soles_.size() > 0;
-}
-
-std::vector<PressureSole> MarchRobot::getPressureSoles() const
-{
-    return pressure_soles_;
 }
 
 bool MarchRobot::hasPowerDistributionBoard() const

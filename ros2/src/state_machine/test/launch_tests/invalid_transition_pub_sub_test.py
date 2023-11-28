@@ -20,9 +20,10 @@ import launch_testing.util
 
 import pytest
 
+
 @pytest.mark.launch_test
 def generate_test_description():
-    """ Specifiy nodes or processes to launch for test
+    """Specifiy nodes or processes to launch for test
         :param
         :return dut [ros2 node] node to be tested (device under test)
         :return ...,... specifications for launch_testing
@@ -30,39 +31,31 @@ def generate_test_description():
 
     # dut -> device under test is the node to be tested in this example
     dut = Node(
-        package='state_machine',
-        executable='state_machine_node',
-        name='state_machine',
+        package="state_machine",
+        executable="state_machine_node",
+        name="state_machine",
     )
 
     footstep_gen_node = Node(
-        package='footstep_generator',
-        namespace='',
-        executable='footstep_generator_node',
-        name='footstep_generator'
+        package="footstep_generator", namespace="", executable="footstep_generator_node", name="footstep_generator"
     )
 
     gait_select_node = Node(
-        package='gait_selection',
-        namespace='',
-        executable='gait_selection_node',
-        name='gait_selection'
+        package="gait_selection", namespace="", executable="gait_selection_node", name="gait_selection"
     )
 
-    context = {'dut': dut  }
+    context = {"dut": dut}
 
-    return (launch.LaunchDescription([
-        dut,
-        footstep_gen_node,
-        gait_select_node,
-        launch_testing.actions.ReadyToTest()]
-    ) , context
+    return (
+        launch.LaunchDescription([dut, footstep_gen_node, gait_select_node, launch_testing.actions.ReadyToTest()]),
+        context,
     )
+
 
 class TestProcessOutput(unittest.TestCase):
     """Details to use this class in the context of launch_testing:
-        nodes: https://github.com/ros2/launch_ros
-        process: https://github.com/ros2/launch/tree/master/launch_testing"""
+    nodes: https://github.com/ros2/launch_ros
+    process: https://github.com/ros2/launch/tree/master/launch_testing"""
 
     @classmethod
     def setUpClass(cls):
@@ -71,13 +64,13 @@ class TestProcessOutput(unittest.TestCase):
 
     def setUp(self):
         # Create a ROS node for tests
-        self.node = rclpy.create_node('input_output_node')
+        self.node = rclpy.create_node("input_output_node")
 
     def t1_callback(self):
-        """ Reads a file and publish the data from this file to ros2
-                :param -
-                :return -
-            """
+        """Reads a file and publish the data from this file to ros2
+        :param -
+        :return -
+        """
         # Read input data that is send to dut
         msg = GaitRequest()
         msg.gait_type = 2
@@ -85,12 +78,12 @@ class TestProcessOutput(unittest.TestCase):
         # self.node.get_logger().info('Publishing: ' + str(msg))
 
     def test_dut_output_invalid_transition(self, dut, proc_output):
-        """ Listen for a message published by dut and compare message to expected value
-                :param
-                :return dut [ros2 node] node to be tested (device under test)
-                :return proc_output [ActiveIoHandler] data output of dut as shown in terminal (stdout)
-                :return -
-            """
+        """Listen for a message published by dut and compare message to expected value
+        :param
+        :return dut [ros2 node] node to be tested (device under test)
+        :return proc_output [ActiveIoHandler] data output of dut as shown in terminal (stdout)
+        :return -
+        """
         # Get current functionname
         frame = inspect.currentframe()
         function_name = inspect.getframeinfo(frame).function
@@ -104,12 +97,9 @@ class TestProcessOutput(unittest.TestCase):
         expected_data = 4
 
         # Setup for listening to dut messages
-        received_data =  []
+        received_data = []
         sub = self.node.create_subscription(
-            GaitResponse,
-            '/march/gait_response',
-            lambda msg: received_data.append(msg.gait_type),
-            10
+            GaitResponse, "/march/gait_response", lambda msg: received_data.append(msg.gait_type), 10
         )
 
         try:
@@ -123,8 +113,8 @@ class TestProcessOutput(unittest.TestCase):
 
             else:
 
-                print (f"\n[{function_name}] [INFO] expected_data:\n"+ str(expected_data))
-                print (f"\n[{function_name}] [INFO] received_data:\n"+ str(received_data[0]))
+                print(f"\n[{function_name}] [INFO] expected_data:\n" + str(expected_data))
+                print(f"\n[{function_name}] [INFO] received_data:\n" + str(received_data[0]))
                 test_data = received_data[0]
 
             # test actual output for expected output
@@ -140,4 +130,3 @@ class TestProcessOutput(unittest.TestCase):
     def tearDownClass(cls):
         # Shutdown the ROS context
         rclpy.shutdown()
-

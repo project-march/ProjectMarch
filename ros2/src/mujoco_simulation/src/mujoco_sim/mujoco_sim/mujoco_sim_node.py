@@ -106,8 +106,9 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
-                                                           self.model.sensor_adr)
+        self.sensor_data_extraction = SensorDataExtraction(
+            self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+        )
 
         self.set_init_joint_qpos(None)
 
@@ -115,8 +116,7 @@ class MujocoSimNode(Node):
         joint_val = self.sensor_data_extraction.get_joint_pos()
         for index, name in enumerate(self.actuator_names):
             joint_val_dict[name] = joint_val[index]
-        self.get_logger().info(f"Keeping initial joint positions, "
-                               f"set desired positions to {joint_val_dict}")
+        self.get_logger().info(f"Keeping initial joint positions, " f"set desired positions to {joint_val_dict}")
 
         # This list of controllers contains all active controllers
         self.controller_mode = 0
@@ -139,8 +139,9 @@ class MujocoSimNode(Node):
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
-                                                           self.model.sensor_adr)
+        self.sensor_data_extraction = SensorDataExtraction(
+            self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+        )
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
