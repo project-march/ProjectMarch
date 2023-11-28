@@ -16,8 +16,6 @@ inputDeviceNode::inputDeviceNode()
   m_exo_state_array_subscriber = create_subscription<march_shared_msgs::msg::ExoStateArray>(
     "available_states", 10, std::bind(&inputDeviceNode::availableStatesCallback, this, _1));
 
-  // system("gnome-terminal &");
-
   // Initialize ncurses
   initscr();
   cbreak();
@@ -30,7 +28,6 @@ inputDeviceNode::inputDeviceNode()
 
 inputDeviceNode::~inputDeviceNode()
 {
-  // system("pkill gnome-terminal");
   endwin();
 }
 
