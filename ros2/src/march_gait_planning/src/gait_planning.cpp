@@ -64,8 +64,11 @@ void GaitPlanning::createBezierTrajectory(){
     m_bezier_trajectory = points;
 }
 
-void GaitPlanning::setFootPositions(const int &new_stance_foot, const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) {
+void GaitPlanning::setStanceFoot(const int &new_stance_foot){
     m_current_stance_foot = new_stance_foot; 
+}
+
+void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) { 
     m_current_left_foot_position = new_left_foot_position; 
     m_current_right_foot_position = new_right_foot_position; 
 }
