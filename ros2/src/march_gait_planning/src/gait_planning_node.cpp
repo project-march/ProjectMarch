@@ -10,7 +10,7 @@ GaitPlanningNode::GaitPlanningNode()
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("iks_foot_positions", 10);
     std::cout << "iks foot positions publisher created" << std::endl; 
     m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
-        "new_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1)); // Should come from State Machine, IPD doesn't check validity
+        "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1));
     std::cout << "exo state subscriber created" << std::endl; 
     m_current_stance_foot_subscriber = create_subscription<std_msgs::msg::Int32>(
         "current_stance_foot", 10, std::bind(&GaitPlanningNode::currentStanceFootCallback, this, _1)); 
