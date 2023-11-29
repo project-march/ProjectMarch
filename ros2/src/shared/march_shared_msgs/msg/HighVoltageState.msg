@@ -1,5 +1,0 @@
-float32 total_current
-float32 hv1_current
-float32 hv2_current
-float32 hv3_current
-float32 hv4_current
