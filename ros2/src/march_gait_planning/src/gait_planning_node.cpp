@@ -17,12 +17,12 @@ GaitPlanningNode::GaitPlanningNode()
     std::cout << "current stance foot subscriber created" << std::endl; 
  }
 
-void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr &msg){
+void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
     m_gait_planning.setGaitType((exoState)msg->state); 
 }
 
-void GaitPlanningNode::currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr &msg){
+void GaitPlanningNode::currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current stance foot: %d", msg->data); 
     m_gait_planning.setStanceFoot(msg->data); 
 }

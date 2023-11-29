@@ -5,9 +5,7 @@
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
 #include "march_shared_msgs/msg/exo_state.hpp"
 #include "std_msgs/msg/int32.hpp"
-#include <string>
-#include <memory>
-#include <iostream>  
+
 
 class GaitPlanningNode:public rclcpp::Node {
     public: 
@@ -18,8 +16,8 @@ class GaitPlanningNode:public rclcpp::Node {
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; // exo_state == gait_type 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_current_stance_foot_subscriber; 
 
-    void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr &msg); 
-    void currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr &msg); 
+    void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg); 
+    void currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr msg); 
 
     GaitPlanning m_gait_planning; 
 
