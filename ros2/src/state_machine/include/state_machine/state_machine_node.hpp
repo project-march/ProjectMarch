@@ -46,6 +46,7 @@ private:
     
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
     rclcpp::Publisher<march_shared_msgs::msg::ExoStateArray>::SharedPtr m_exo_state_array_publisher;
+    rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
 
     StateMachine m_state_machine;
 };

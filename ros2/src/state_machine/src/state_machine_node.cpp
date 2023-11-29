@@ -20,39 +20,49 @@ StateMachineNode::StateMachineNode()
     : Node("state_machine_node")
 {
     //TODO: change all topic names to not include "/march/", to avoid grouping all march topics.
-    m_reset_publisher = create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
-    m_gait_response_publisher
-        = create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
-    m_gait_request_subscriber = create_subscription<march_shared_msgs::msg::GaitRequest>(
-        "/march/gait_request", 10, std::bind(&StateMachineNode::gaitCommandCallback, this, _1));
     m_new_state_subscriber = create_subscription<std_msgs::msg::Int32>(
         "new_state", 10, std::bind(&StateMachineNode::newStateCallback, this, _1));
-    m_footstep_client = create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
 
     m_exo_state_array_publisher = create_publisher<march_shared_msgs::msg::ExoStateArray>("available_states", 10);
 
     m_gait_client = create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
 
+    m_state_publisher = create_publisher<march_shared_msgs::msg::ExoState>("current_state", 10);
+
     m_state_machine = StateMachine();
+
+    /**
+     * TODO: This might come in handy later, but for now it is not used.
+     * 
+    
+    m_reset_publisher = create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
+    m_gait_response_publisher
+        = create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
+    m_gait_request_subscriber = create_subscription<march_shared_msgs::msg::GaitRequest>(
+        "/march/gait_request", 10, std::bind(&StateMachineNode::gaitCommandCallback, this, _1));
     m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
     m_gait_request = std::make_shared<march_shared_msgs::srv::RequestGait::Request>();
-    // while (!m_gait_client->wait_for_service(1s)) {
-    //     if (!rclcpp::ok()) {
-    //         RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
-    //         return;
-    //     }
-    //     RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service not available, waiting again...");
-    // }
-    // RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service connected");
+    m_footstep_client = create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+    
+    while (!m_gait_client->wait_for_service(1s)) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service not available, waiting again...");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "gait_selection service connected");
 
-    // while (!m_footstep_client->wait_for_service(1s)) {
-    //     if (!rclcpp::ok()) {
-    //         RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
-    //         return;
-    //     }
-    //     RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service not available, waiting again...");
-    // }
-    // RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service connected");
+    while (!m_footstep_client->wait_for_service(1s)) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service not available, waiting again...");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service connected");
+
+    */
 }
 
 /**
@@ -192,6 +202,10 @@ void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr ms
         {
             sendRequest((exoState)msg->data);
             m_state_machine.performTransition((exoState)msg->data);
+
+            auto state_msg = march_shared_msgs::msg::ExoState();
+            state_msg.state = m_state_machine.getCurrentState();
+            m_state_publisher->publish(state_msg);
         } else 
         {
             RCLCPP_WARN(get_logger(), "Invalid state transition! Ignoring new state.");
