@@ -196,23 +196,22 @@ void StateMachineNode::publishAvailableExoStates(march_shared_msgs::msg::ExoStat
 }
 
 void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
+{
+    RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    if (m_state_machine.isValidTransition((exoState)msg->data)) 
     {
-        RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
-        if (m_state_machine.isValidTransition((exoState)msg->data)) 
-        {
-            sendRequest((exoState)msg->data);
-            m_state_machine.performTransition((exoState)msg->data);
+        m_state_machine.performTransition((exoState)msg->data);
 
-            auto state_msg = march_shared_msgs::msg::ExoState();
-            state_msg.state = m_state_machine.getCurrentState();
-            m_state_publisher->publish(state_msg);
-        } else 
-        {
-            RCLCPP_WARN(get_logger(), "Invalid state transition! Ignoring new state.");
-        }
-        march_shared_msgs::msg::ExoStateArray::SharedPtr publishMsg = std::make_shared<march_shared_msgs::msg::ExoStateArray>();  
-        publishAvailableExoStates(publishMsg);
+        auto state_msg = march_shared_msgs::msg::ExoState();
+        state_msg.state = m_state_machine.getCurrentState();
+        m_state_publisher->publish(state_msg);
+    } else 
+    {
+        RCLCPP_WARN(get_logger(), "Invalid state transition! Ignoring new state.");
     }
+    march_shared_msgs::msg::ExoStateArray::SharedPtr publishMsg = std::make_shared<march_shared_msgs::msg::ExoStateArray>();  
+    publishAvailableExoStates(publishMsg);
+}
 /**
  * Main function to run the node.
  * @param argc
