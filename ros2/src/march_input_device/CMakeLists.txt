@@ -5,11 +5,9 @@ project(march_input_device)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(Curses REQUIRED)
 
 # Include directories
 include_directories(include)
-include_directories(${CURSES_INCLUDE_DIR})
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
