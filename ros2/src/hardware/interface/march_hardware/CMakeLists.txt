@@ -67,7 +67,6 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
     include/${PROJECT_NAME}/torque_sensor/torque_sensor.h
-    include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
     include/${PROJECT_NAME}/power_distribution_board/power_distribution_board.h
     src/encoder/absolute_encoder.cpp
     src/encoder/encoder.cpp
@@ -84,7 +83,6 @@ add_library(${PROJECT_NAME}
     src/march_robot.cpp
     src/temperature/temperature_ges.cpp
     src/torque_sensor/torque_sensor.cpp
-    src/pressure_sole/pressure_sole.cpp
     src/power_distribution_board/power_distribution_board.cpp
 )
 
@@ -126,7 +124,6 @@ ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
          test/mocks/mock_temperature_ges.h
          test/power_distribution_board/power_distribution_board_test.cpp
          test/temperature/temperature_ges_test.cpp
-#         test/pressure_sole/pressure_sole_test.cpp
          test/torque_sensor/torque_sensor_test.cpp
          test/test_runner.cpp
      )
