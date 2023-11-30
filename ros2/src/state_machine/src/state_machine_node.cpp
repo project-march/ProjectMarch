@@ -19,18 +19,31 @@ using namespace std::chrono_literals;
 StateMachineNode::StateMachineNode()
     : Node("state_machine_node")
 {
+    //TODO: change all topic names to not include "/march/", to avoid grouping all march topics.
+    m_new_state_subscriber = create_subscription<std_msgs::msg::Int32>(
+        "new_state", 10, std::bind(&StateMachineNode::newStateCallback, this, _1));
+
+    m_exo_state_array_publisher = create_publisher<march_shared_msgs::msg::ExoStateArray>("available_states", 10);
+
+    m_gait_client = create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
+
+    m_state_publisher = create_publisher<march_shared_msgs::msg::ExoState>("current_state", 10);
+
+    m_state_machine = StateMachine();
+
+    /**
+     * TODO: This might come in handy later, but for now it is not used.
+     * 
+    
     m_reset_publisher = create_publisher<std_msgs::msg::Int32>("/trajectory_reset_gate", 10);
     m_gait_response_publisher
         = create_publisher<march_shared_msgs::msg::GaitResponse>("/march/gait_response", 10);
     m_gait_request_subscriber = create_subscription<march_shared_msgs::msg::GaitRequest>(
         "/march/gait_request", 10, std::bind(&StateMachineNode::gaitCommandCallback, this, _1));
-    m_footstep_client = create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
-
-    m_gait_client = create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
-
-    m_state_machine = StateMachine();
     m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
     m_gait_request = std::make_shared<march_shared_msgs::srv::RequestGait::Request>();
+    m_footstep_client = create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+    
     while (!m_gait_client->wait_for_service(1s)) {
         if (!rclcpp::ok()) {
             RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Interrupted while waiting for the service. Exiting.");
@@ -48,6 +61,8 @@ StateMachineNode::StateMachineNode()
         RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service not available, waiting again...");
     }
     RCLCPP_INFO(rclcpp::get_logger("state_machine"), "footstep_planner service connected");
+
+    */
 }
 
 /**
@@ -92,7 +107,7 @@ void StateMachineNode::responseGaitCallback(
  * @return succes of failure
  */
 void StateMachineNode::sendRequest(const exoState& desired_state)
-{   
+{
     int requested_gait = (int)desired_state;
     int current_state = m_state_machine.getCurrentState();
     auto reset_msg = std_msgs::msg::Int32();
@@ -153,6 +168,49 @@ void StateMachineNode::gaitCommandCallback(march_shared_msgs::msg::GaitRequest::
         response_msg.gait_type = m_state_machine.getCurrentState();
         m_gait_response_publisher->publish(response_msg);
     }
+}
+
+void StateMachineNode::fillExoStateArray(march_shared_msgs::msg::ExoStateArray::SharedPtr msg) const
+{
+    std::set<exoState> available_states = m_state_machine.getAvailableStates((exoState)m_state_machine.getCurrentState());
+
+    // Clear the existing states in the msg
+    msg->states.clear();
+
+    // Iterate over the available_states set and add each state to the msg
+    for (const auto& state : available_states) {
+        march_shared_msgs::msg::ExoState exoStateMsg;
+        exoStateMsg.state = static_cast<int8_t>(state);
+        msg->states.push_back(exoStateMsg);
+    }
+}
+
+void StateMachineNode::publishAvailableExoStates(march_shared_msgs::msg::ExoStateArray::SharedPtr msg) const
+{
+    StateMachineNode::fillExoStateArray(msg);
+    m_exo_state_array_publisher->publish(*msg);
+    // Iterate over the states vector and print each state
+    for (const auto& state : msg->states) {
+        RCLCPP_INFO(get_logger(), "Sent available state: %d", state.state);
+    }
+}
+
+void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
+{
+    RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    if (m_state_machine.isValidTransition((exoState)msg->data)) 
+    {
+        m_state_machine.performTransition((exoState)msg->data);
+
+        auto state_msg = march_shared_msgs::msg::ExoState();
+        state_msg.state = m_state_machine.getCurrentState();
+        m_state_publisher->publish(state_msg);
+    } else 
+    {
+        RCLCPP_WARN(get_logger(), "Invalid state transition! Ignoring new state.");
+    }
+    march_shared_msgs::msg::ExoStateArray::SharedPtr publishMsg = std::make_shared<march_shared_msgs::msg::ExoStateArray>();  
+    publishAvailableExoStates(publishMsg);
 }
 /**
  * Main function to run the node.

@@ -36,8 +36,6 @@ def generate_launch_description() -> LaunchDescription:
     The settable ros parameters are:
         use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
             Default is True.
-        wireless_ipd (bool): Whether the wireless IPD connection manager node should be started.
-            Default is False.
         ...
     """
     # region LaunchConfigurations
@@ -53,7 +51,6 @@ def generate_launch_description() -> LaunchDescription:
 
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
-    wireless_ipd = LaunchConfiguration("wireless_ipd")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
     layout = LaunchConfiguration("layout")
 
@@ -76,8 +73,8 @@ def generate_launch_description() -> LaunchDescription:
     to_world_transform = LaunchConfiguration("to_world_transform")
     gazebo = LaunchConfiguration("gazebo")
     mujoco = LaunchConfiguration("mujoco")
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
-    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
+    tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
     simulation_arguments = [
         DeclareLaunchArgument(
             name="ground_gait",
@@ -162,11 +159,6 @@ def generate_launch_description() -> LaunchDescription:
             name="rqt_input",
             default_value="true",
             description="If this argument is false, the rqt input device will not be launched.",
-        ),
-        DeclareLaunchArgument(
-            name="wireless_ipd",
-            default_value="false",
-            description="If this argument is false, the wireless input device will not be launched.",
         ),
         DeclareLaunchArgument(
             name="layout",
@@ -352,19 +344,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch wireless input device if not wireless_ipd:=false
-    wireless_ipd_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_wireless_ipd"),
-                "launch",
-                "wireless_ipd.launch.py",
-            )
-        ),
-        condition=IfCondition(wireless_ipd),
-    )
-    # endregion
-
     # region Launch robot description publisher (from march_description) if not robot_state_publisher:=false
     robot_state_publisher_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -512,16 +491,10 @@ def generate_launch_description() -> LaunchDescription:
 
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
-        launch_arguments=[
-            ("model_to_load", mujoco_toload),
-            (
-                "tunings_to_load_path",
-                PathJoinSubstitution(
-                    [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
-                ),
-            ),
-        ],
+        PythonLaunchDescriptionSource(
+            [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
+        ),
+        launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution([get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
         condition=IfCondition(mujoco),
     )
     # endregion
@@ -573,7 +546,6 @@ def generate_launch_description() -> LaunchDescription:
 
     nodes = [
         rqt_input_device,
-        wireless_ipd_node,
         robot_state_publisher_node,
         march_gait_selection_node,
         gait_preprocessor_node,
@@ -586,7 +558,7 @@ def generate_launch_description() -> LaunchDescription:
         camera_aligned_frame_pub_node,
         back_sense_node,
         record_rosbags_action,
-        imu_nodes,
+        imu_nodes
     ]
 
     return LaunchDescription(declared_arguments + nodes)
