@@ -10,8 +10,8 @@
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
+#include "state_machine/exo_state.hpp"
 
-enum class exoState { Sit = 0, Stand = 1, Walk = 2, StepClose = 3, ForceUnknown = 4, Error = 5 };
 
 class StateMachine {
 public:
@@ -19,6 +19,7 @@ public:
     bool performTransition(const exoState& desired_state);
     bool isValidTransition(const exoState& desired_state) const;
     int getCurrentState() const;
+    std::set<exoState> getAvailableStates(exoState currentState) const;
 
 private:
     exoState m_current_state;

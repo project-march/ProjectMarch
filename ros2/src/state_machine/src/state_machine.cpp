@@ -76,3 +76,8 @@ int StateMachine::getCurrentState() const
 {
     return (int)m_current_state;
 }
+
+std::set<exoState> StateMachine::getAvailableStates(exoState currentState) const
+{
+    return m_exo_transitions.at(currentState);
+}
