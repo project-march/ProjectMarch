@@ -2,7 +2,6 @@
 
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState, Imu
-from march_shared_msgs.msg import PressureSolesData
 import rclpy
 from rclpy.node import Node
 
@@ -32,7 +31,6 @@ class MujocoReaderNode(Node):
         """
         super().__init__("mujoco_reader")
         self.state_publisher = self.create_publisher(JointState, "joint_states", 10)
-        self.pressure_sole_publisher = self.create_publisher(PressureSolesData, "march/pressure_sole_data", 10)
         self.torso_imu_publisher = self.create_publisher(Imu, "upper_imu", 10)
         self.backpack_imu_publisher = self.create_publisher(Imu, "lower_imu", 10)
 
@@ -57,31 +55,9 @@ class MujocoReaderNode(Node):
         torso_imu.header.frame_id = "imu_link"
         self.torso_imu_publisher.publish(torso_imu)
 
-        names = [
-            "l_heel_right",
-            "l_heel_left",
-            "l_met1",
-            "l_hallux",
-            "l_met3",
-            "l_toes",
-            "l_met5",
-            "l_arch",
-            "r_heel_right",
-            "r_heel_left",
-            "r_met1",
-            "r_hallux",
-            "r_met3",
-            "r_toes",
-            "r_met5",
-            "r_arch",
-        ]
-        pressure_values = msg.pressure_soles
-        pressure_sole_msg = PressureSolesData()
-        pressure_sole_msg.header.stamp = self.get_clock().now().to_msg()
-        pressure_sole_msg.header.frame_id = "pressure_soles_link"
-        pressure_sole_msg.names = names
-        pressure_sole_msg.pressure_values = pressure_values
-        self.pressure_sole_publisher.publish(pressure_sole_msg)
+        names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
+                 "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
+    
 
 
 def main(args=None):
