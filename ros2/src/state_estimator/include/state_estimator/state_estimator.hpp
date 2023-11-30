@@ -5,7 +5,6 @@
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/feet.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
-#include "march_shared_msgs/msg/pressure_soles_data.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
