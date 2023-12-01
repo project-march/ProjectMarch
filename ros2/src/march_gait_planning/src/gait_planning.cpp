@@ -22,11 +22,11 @@ GaitPlanning::GaitPlanning()
 
 std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
     // should be for both swing and stance leg. 
-    // define as xyz coordinates, but translate to exo frame
+    // define as xyz coordinates, but translate to exo frame 
     std::array<double, 3> final_swing_leg_position; 
     std::array<double, 3> final_stance_leg_position;
-    // final array has left foot first 
-    std::vector<std::array<double, 3>> final_array;  
+    // final array has left foot first
+        std::vector<std::array<double, 3>> final_array;  
     if (m_current_stance_foot == 2){
         // from home stand, both legs are together. Right leg will take half a step first. 
         final_swing_leg_position = m_current_right_foot_position; 
@@ -57,8 +57,8 @@ std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
     return final_array; 
 }
 
-//TODO: convert foot end positions to end positions in base (exo) frame. These get sent to the IKS.
-// Use state estimator for this. 
+//TODO: create function that publishes the bezier curve points per time point. 
+// This function should also publish the stance foot movement to final position in linear steps. 
 
 void GaitPlanning::setStepSize(const double &step_size) {
     m_step_size = step_size; 
@@ -66,11 +66,10 @@ void GaitPlanning::setStepSize(const double &step_size) {
 
 void GaitPlanning::createBezierTrajectory(){
     //TODO: optimize to prevent for loop for every time step
-    double step_size = getStepSize(); 
     std::pair<double, double> p0(0, 0);
     std::pair<double, double> p1(0.05, 0.12);
-    std::pair<double, double> p2(step_size / 3, 0.12);
-    std::pair<double, double> p3(step_size, 0);
+    std::pair<double, double> p2(m_step_size / 3, 0.12);
+    std::pair<double, double> p3(m_step_size, 0);
     std::vector<std::array<double, 3>> points;
     double z; 
     for (int i = 0; i <= NUMBER_OF_TIME_STEPS; ++i) {

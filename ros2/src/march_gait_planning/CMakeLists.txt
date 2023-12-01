@@ -5,6 +5,7 @@ project(march_gait_planning)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 # Include directories
 include_directories(include)
@@ -22,6 +23,7 @@ add_executable(gait_planning_node
 ament_target_dependencies(gait_planning_node
   rclcpp
   march_shared_msgs
+  geometry_msgs
   )
 
 # Install the executable

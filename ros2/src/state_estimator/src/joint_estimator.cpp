@@ -230,6 +230,35 @@ std::vector<double> JointEstimator::get_feet_height()
     return { left_transformed_point.point.z, right_transformed_point.point.z };
 }
 
+std::vector<std::array<double, 3>> JointEstimator::transformFeetPositionsToExoFrame() const{
+
+    std::array<double, 3> left_foot; 
+    std::array<double, 3> right_foot; 
+    std::vector<std::array<double, 3>> map_foot_positions; 
+
+    geometry_msgs::msg::PointStamped foot_point;
+    foot_point.point.x = 0;
+    foot_point.point.y = 0;
+    foot_point.point.z = 0;
+
+    // Get transform left foot.
+    geometry_msgs::msg::TransformStamped left_foot_transform = m_owner->get_frame_transform("map", "left_ankle");
+    geometry_msgs::msg::PointStamped left_transformed_point;
+    tf2::doTransform(foot_point, left_transformed_point, left_foot_transform);
+
+    // Get transform right foot.
+    geometry_msgs::msg::TransformStamped right_foot_transform = m_owner->get_frame_transform("map", "right_ankle");
+    geometry_msgs::msg::PointStamped right_transformed_point;
+    tf2::doTransform(foot_point, right_transformed_point, right_foot_transform);
+
+    left_foot = {left_transformed_point.point.x, left_transformed_point.point.y, left_transformed_point.point.z};
+    right_foot = {right_transformed_point.point.x, right_transformed_point.point.y, right_transformed_point.point.z};
+
+    map_foot_positions.push_back(left_foot); 
+    map_foot_positions.push_back(right_foot); 
+
+}
+
 const std::vector<JointContainer> JointEstimator::get_joints()
 {
     return m_joints;

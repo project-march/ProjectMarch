@@ -36,6 +36,8 @@ StateEstimator::StateEstimator()
 
     m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
 
+    m_feet_position_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("estimated_baseframe_foot_positions", 100);
+
     declare_parameter("state_estimator_config.refresh_rate", 1000);
     auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
     timer_ = this->create_wall_timer(
@@ -88,6 +90,24 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
 }
+
+void StateEstimator::publishFootPositions(){
+
+    std::vector<std::array<double, 3>> map_foot_positions = m_joint_estimator.transformFeetPositionsToExoFrame();
+
+    march_shared_msgs::msg::IksFootPositions msg; 
+
+    msg.left_foot_position.x = map_foot_positions[0][0];
+    msg.left_foot_position.y = map_foot_positions[0][1];
+    msg.left_foot_position.z = map_foot_positions[0][2];
+
+    msg.right_foot_position.x = map_foot_positions[1][0];
+    msg.right_foot_position.y = map_foot_positions[1][1];
+    msg.right_foot_position.z = map_foot_positions[1][2];
+
+    m_feet_position_publisher->publish(msg); 
+}
+
 
 void StateEstimator::initialize_imus()
 {
