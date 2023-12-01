@@ -14,30 +14,54 @@ GaitPlanning::GaitPlanning()
   m_current_left_foot_position(), 
   m_current_right_foot_position(), 
   m_path_to_yaml(), 
-  m_bezier_trajectory()
+  m_bezier_trajectory(), 
+  m_step_size()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
   }
 
-std::vector<double> GaitPlanning::getFootEndPositions() const {
-    // get stance leg, we need to find foot end positiosn for swing leg only! 
-    // import yaml 
-    // get data from yaml 
-    // store data in vector<double> 
+std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
+    // should be for both swing and stance leg. 
+    // define as xyz coordinates, but translate to exo frame
+    std::array<double, 3> final_swing_leg_position; 
+    std::array<double, 3> final_stance_leg_position;
+    // final array has left foot first 
+    std::vector<std::array<double, 3>> final_array;  
+    if (m_current_stance_foot == 2){
+        // from home stand, both legs are together. Right leg will take half a step first. 
+        final_swing_leg_position = m_current_right_foot_position; 
+        final_swing_leg_position[0] += m_step_size/2.0;
+        final_stance_leg_position = m_current_left_foot_position; 
+        final_stance_leg_position[0] -= m_step_size/2.0; 
+        final_array.push_back(final_stance_leg_position); 
+        final_array.push_back(final_swing_leg_position); 
+    }
+    else if (m_current_stance_foot == 0){
+        // left stance foot, right is assumed to be behind left foot. 
+        final_swing_leg_position = m_current_right_foot_position; 
+        final_swing_leg_position[0] += m_step_size;
+        final_stance_leg_position = m_current_left_foot_position; 
+        final_stance_leg_position[0] -= m_step_size;
+        final_array.push_back(final_stance_leg_position); 
+        final_array.push_back(final_swing_leg_position); 
+    }
+    else if (m_current_stance_foot == 1){
+        // right stand foot, left is assumed to be behind left foot. 
+        final_swing_leg_position = m_current_left_foot_position; 
+        final_swing_leg_position[0] += m_step_size;
+        final_stance_leg_position = m_current_right_foot_position; 
+        final_stance_leg_position[0] -= m_step_size;
+        final_array.push_back(final_swing_leg_position); 
+        final_array.push_back(final_stance_leg_position); 
+    }
+    return final_array; 
 }
 
-double GaitPlanning::getStepSize() const{
-    std::vector<double> next_foot_position = getFootEndPositions(); 
-    // TODO: define CLEARLY if 1/0 is l/r, now assuming 1 = right and 0 = left 
-    // Now, stance foot is defined as right, thus swing leg is LEFT and step size should be for left foot.  
-    double step_size; 
-    if (m_current_stance_foot){
-        step_size = next_foot_position[0] - m_current_left_foot_position[0];  
-    }
-    else {
-        step_size = next_foot_position[0] - m_current_right_foot_position[0]; 
-    }
-    return step_size;
+//TODO: convert foot end positions to end positions in base (exo) frame. These get sent to the IKS.
+// Use state estimator for this. 
+
+void GaitPlanning::setStepSize(const double &step_size) {
+    m_step_size = step_size; 
 }
 
 void GaitPlanning::createBezierTrajectory(){
