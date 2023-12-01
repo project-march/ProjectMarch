@@ -1,0 +1,5 @@
+uint8 task_id
+---
+float64[] joint_position
+float64[] current_pose
+float64[] jacobian

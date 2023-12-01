@@ -10,6 +10,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "march_shared_msgs/msg/iks_foot_positions.hpp"
+#include "geometry_msgs/msg/point.hpp"
 
 class IKSolverNode : public rclcpp::Node
 {
@@ -17,13 +19,16 @@ class IKSolverNode : public rclcpp::Node
         IKSolverNode();
 
     private:
-        void timer_callback();
-        void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg);
+        void timerCallback();
+        void IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
+        void publishJointState(const Eigen::VectorXd joint_config);
+
+        // void getJacobian();
         
         IKSolver ik_solver_;
         rclcpp::TimerBase::SharedPtr timer_;
-        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
-        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+        rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr ik_solver_command_sub_;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
         std::vector<std::string> joint_configs_;
         std::string model_name_;
 };

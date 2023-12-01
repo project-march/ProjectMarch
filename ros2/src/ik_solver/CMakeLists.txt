@@ -20,15 +20,18 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 include_directories(include)
 
-add_library(${PROJECT_NAME}
-  STATIC
+add_library(${PROJECT_NAME} STATIC
+  include/${PROJECT_NAME}/ik_solver_command.hpp
   include/${PROJECT_NAME}/task.hpp
   src/task.cpp
   include/${PROJECT_NAME}/ik_solver.hpp
@@ -37,35 +40,53 @@ add_library(${PROJECT_NAME}
   src/ik_solver_node.cpp
 )
 
-ament_target_dependencies(
-  ${PROJECT_NAME}
+ament_target_dependencies(${PROJECT_NAME}
   rclcpp
+  rclcpp_action
+  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
   sensor_msgs
+  march_shared_msgs
 )
 
 add_executable(ik_solver_node src/ik_solver_node.cpp src/ik_solver.cpp src/task.cpp)
 target_include_directories(ik_solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(
-  ik_solver_node
+ament_target_dependencies(ik_solver_node
   rclcpp
+  rclcpp_action
+  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
   sensor_msgs
+  march_shared_msgs
 )
-
 install(TARGETS ik_solver_node
+  DESTINATION lib/${PROJECT_NAME})
+
+add_executable(task_server src/task_server.cpp)
+ament_target_dependencies(task_server 
+  rclcpp
+  march_shared_msgs
+  Eigen3)
+
+add_executable(task_client src/task_client.cpp)
+ament_target_dependencies(task_client 
+  rclcpp
+  march_shared_msgs
+  Eigen3)
+
+install(TARGETS
+  task_server
+  task_client
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

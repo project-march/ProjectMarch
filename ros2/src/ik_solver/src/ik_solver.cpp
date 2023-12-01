@@ -2,48 +2,52 @@
 
 IKSolver::IKSolver()
 {
-    task_ = Task(1, "Test", 3, 4);
-
-    // Define the proportional gain.
-    task_.setGainP(1.0);
-
-    // Calculate the Jacobian.
-    task_.calculateJacobian();
-
-    // Define the desired pose.
-    Eigen::VectorXf desired_pose;
-    desired_pose.resize(task_.getTaskM());
-    desired_pose << 4.0, 5.0, 6.0;
-
-    // Define the current pose.
-    Eigen::VectorXf current_pose;
-    current_pose.resize(task_.getTaskM());
-    current_pose << 1.0, 2.0, 3.0;
-
-    // Set the desired pose.
-    task_.setDesiredPose(&desired_pose);
-
-    // Set the current pose.
-    task_.setCurrentPose(&current_pose);
-
-    // Solve the task.
-    joint_config_ = task_.solve();
+    n_joints_ = 8;      // TODO: Load this from a YAML file
+    configureTasks();
 }
 
-Eigen::VectorXf IKSolver::getJointConfig()
+IKSolver::~IKSolver()
 {
-    // Return the joint configuration.
-    return joint_config_;
+    delete &tasks_;
+    // delete &desired_poses_;
 }
 
-Eigen::MatrixXf IKSolver::getJacobian()
+Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
 {
-    // Return the Jacobian.
-    return *task_.getJacobian();
+    // Solve the IK problem
+    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(n_joints_);
+    // TODO: Uncomment code after MVP.
+    // Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(n_joints_, n_joints_);
+
+    // Calculate the joint velocities from the tasks
+    for (long unsigned int i = 0; i < tasks_.size(); i++) // TODO: Zip the tasks and desired poses.
+    {
+        // const Eigen::MatrixXd * J_ptr = task.getJacobianPtr();
+        // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
+        // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
+        tasks_[i].setDesiredPose(&desired_poses[i]);
+        joint_velocities += tasks_[i].solve();
+    }
+
+    return joint_velocities;
 }
 
-Eigen::MatrixXf IKSolver::getJacobianInverse()
+void IKSolver::configureTasks()
 {
-    // Return the inverse of Jacobian.
-    return *task_.getJacobianInverse();
+    // TODO: Load the tasks from a YAML file.
+    Task task = {0, "motion", 6, 8};
+    task.setGainP(1.0);
+    tasks_.push_back(task);
+}
+
+const Eigen::MatrixXd * IKSolver::getJacobianPtr(int task_id)
+{
+    // Get the Jacobian of a task
+    return tasks_[task_id].getJacobianPtr();
+}
+
+const Eigen::MatrixXd * IKSolver::getJacobianInversePtr(int task_id)
+{
+    // Get the inverse of Jacobian of a task
+    return tasks_[task_id].getJacobianInversePtr();
 }
