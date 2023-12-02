@@ -36,6 +36,7 @@ class Task
         void setGainP(float gain_p);                    // Set the proportional gain
         // void setGainI(float gain_i);                    // Set the integral gain
         // void setGainD(float gain_d);                    // Set the derivative gain
+        void setDampingCoefficient(float damping_coefficient);  // Set the damping coefficient
 
         const Eigen::MatrixXd * getJacobianPtr();           // Get the Jacobian
         const Eigen::MatrixXd * getJacobianInversePtr();    // Get the inverse of Jacobian
@@ -63,6 +64,7 @@ class Task
         float gain_p_ = 0.0;                    // Proportional gain. Default value is 0.0
         float gain_i_ = 0.0;                    // Integral gain. Default value is 0.0
         float gain_d_ = 0.0;                    // Derivative gain. Default value is 0.0
+        float damping_coefficient_ = 0.0;       // Damping coefficient. Default value is 0.0
         Eigen::MatrixXd jacobian_;              // Jacobian matrix. TODO: Load this from State Estimation Server.
         Eigen::MatrixXd jacobian_inverse_;      // Inverse of Jacobian matrix.
         // Eigen::VectorXd previous_error_;        // Previous error

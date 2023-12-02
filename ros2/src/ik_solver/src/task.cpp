@@ -125,6 +125,12 @@ void Task::setGainP(float gain_p)
 //     gain_d_ = gain_d_;
 // }
 
+void Task::setDampingCoefficient(float damping_coefficient)
+{
+    // Set the damping coefficient
+    damping_coefficient_ = damping_coefficient;
+}
+
 const Eigen::MatrixXd * Task::getJacobianPtr()
 {
     // Return the pointer of Jacobian
@@ -147,13 +153,19 @@ void Task::calculateJacobianInverse()
     // If the system is underdetermined.
     if (task_m_ < task_n_)
     {
+        // Damping matrix.
+        Eigen::MatrixXd damping_matrix = damping_coefficient_ * Eigen::MatrixXd::Identity(task_m_, task_m_);
+
         // Calculate the inverse using the pseudo-inverse.
-        jacobian_inverse_ = jacobian_transpose * (jacobian_ * jacobian_transpose).inverse();
+        jacobian_inverse_ = jacobian_transpose * (jacobian_ * jacobian_transpose + damping_matrix).inverse();
     }
     else // if the system is overdetermined.
     {
+        // Damping matrix.
+        Eigen::MatrixXd damping_matrix = damping_coefficient_ * Eigen::MatrixXd::Identity(task_n_, task_n_);
+
         // Calculate the inverse using the pseudo-inverse.
-        jacobian_inverse_ = (jacobian_transpose * jacobian_).inverse() * jacobian_transpose;
+        jacobian_inverse_ = (jacobian_transpose * jacobian_ + damping_matrix).inverse() * jacobian_transpose;
     }
 
     // jacobian_inverse_ = (jacobian_transpose * (jacobian_ * jacobian_transpose).inverse()) * (task_m_ < task_n_) +

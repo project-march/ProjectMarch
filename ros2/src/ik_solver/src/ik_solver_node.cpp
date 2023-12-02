@@ -4,34 +4,33 @@ using std::placeholders::_1;
 IKSolverNode::IKSolverNode()
   : Node("ik_solver")
 {
-  timer_ = this->create_wall_timer(std::chrono::milliseconds(5000), std::bind(&IKSolverNode::timerCallback, this));
+  // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&IKSolverNode::timerCallback, this));
   RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
   // Eigen::VectorXd joint_config = ik_solver_.getJointConfig();
   // RCLCPP_INFO(this->get_logger(), "Joint configuration: %f, %f, %f, %f", joint_config(0), joint_config(1), joint_config(2), joint_config(3));
 
   ik_solver_command_sub_ = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
-    "topic", 10, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
-
+    "iks_foot_positions", 10, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
+  // joint_state_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 }
 
 void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
   RCLCPP_INFO(this->get_logger(), "IKSolverCommand received.");
-  // std::vector<Eigen::VectorXd> desired_poses;
-  // // TODO: Apply for loop after MVP.
-  // geometry_msgs::msg::Point desired_pose_left = msg->desired_pose_left;
-  // geometry_msgs::msg::Point desired_pose_right = msg->desired_pose_right;
-  // Eigen::VectorXd desired_pose = Eigen::VectorXd(
-  //   desired_pose_left.x, desired_pose_left.y, desired_pose_left.z,
-  //   desired_pose_right.x, desired_pose_right.y, desired_pose_right.z);
-  // desired_poses.push_back(desired_pose);
+  std::vector<Eigen::VectorXd> desired_poses;
+  // TODO: Apply for loop after MVP.
+  geometry_msgs::msg::Point desired_pose_left = msg->left_foot_position[0];
+  geometry_msgs::msg::Point desired_pose_right = msg->right_foot_position[0];
+  Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(6);
+  desired_pose << desired_pose_left.x, desired_pose_left.y, desired_pose_left.z,
+                  desired_pose_right.x, desired_pose_right.y, desired_pose_right.z;
+  desired_poses.push_back(desired_pose);
 
-  // ik_solver_.updateDesiredPoses(desired_poses);
-  // Eigen::VectorXd joint_config = ik_solver_.solve();
-  // RCLCPP_INFO(this->get_logger(), 
-  //   "Joint configuration: %f, %f, %f, %f, %f, %f, %f, %f", 
-  //   joint_config(0), joint_config(1), joint_config(2), joint_config(3),
-  //   joint_config(4), joint_config(5), joint_config(6), joint_config(7));
+  Eigen::VectorXd joint_config = ik_solver_.solve(desired_poses);
+  RCLCPP_INFO(this->get_logger(), 
+    "Joint configuration: %f, %f, %f, %f, %f, %f, %f, %f", 
+    joint_config(0), joint_config(1), joint_config(2), joint_config(3),
+    joint_config(4), joint_config(5), joint_config(6), joint_config(7));
 }
 
 void IKSolverNode::timerCallback()

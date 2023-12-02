@@ -18,17 +18,16 @@ void TaskServer::handle_request(const std::shared_ptr<march_shared_msgs::srv::Ge
 {
     int task_id = request->task_id;
     Eigen::MatrixXd jacobian = Eigen::MatrixXd(6, 8);
-    int counter = 0;
+    double counter = 0.0;
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            jacobian(i, j) = (float) counter;
-            counter++;
+            jacobian(i, j) = (double) (j + 1);
+            // counter = counter + 1e-3;
         }
     }
     // jacobian.resize(1, jacobian.size());
-    jacobian = 1e-3 * jacobian;
     Eigen::VectorXd jacobian_vector = Eigen::Map<Eigen::VectorXd>(jacobian.data(), jacobian.size());
     for (int i = 0; i < jacobian_vector.size(); i++)
     {
