@@ -1,4 +1,4 @@
-#include "ik_solver/ik_solver_node.hpp"
+#include "march_ik_solver/ik_solver_node.hpp"
 using std::placeholders::_1;
 
 IKSolverNode::IKSolverNode()
@@ -60,11 +60,6 @@ void IKSolverNode::timerCallback()
     desired_joint_velocities(0), desired_joint_velocities(1), desired_joint_velocities(2), desired_joint_velocities(3),
     desired_joint_velocities(4), desired_joint_velocities(5), desired_joint_velocities(6), desired_joint_velocities(7));
 }
-
-// void IKSolverNode::getJacobian()
-// {
-//   Eigen::MatrixXd jacobian = *ik_solver_.getJacobianPtr(0);
-// }
 
 int main(int argc, char ** argv)
 {

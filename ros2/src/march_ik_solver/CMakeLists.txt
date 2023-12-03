@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ik_solver)
+project(march_ik_solver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -31,7 +31,6 @@ find_package(march_shared_msgs REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
-  include/${PROJECT_NAME}/ik_solver_command.hpp
   include/${PROJECT_NAME}/task.hpp
   src/task.cpp
   include/${PROJECT_NAME}/ik_solver.hpp

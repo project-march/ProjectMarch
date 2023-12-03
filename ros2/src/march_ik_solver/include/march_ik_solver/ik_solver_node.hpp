@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "ik_solver/ik_solver.hpp"
+#include "march_ik_solver/ik_solver.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -22,15 +22,11 @@ class IKSolverNode : public rclcpp::Node
         void timerCallback();
         void IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
         void publishJointState(const Eigen::VectorXd joint_config);
-
-        // void getJacobian();
         
         IKSolver ik_solver_;
         rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr ik_solver_command_sub_;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-        std::vector<std::string> joint_configs_;
-        std::string model_name_;
 };
 
 #endif  // IK_SOLVER__IK_SOLVER_NODE_HPP_

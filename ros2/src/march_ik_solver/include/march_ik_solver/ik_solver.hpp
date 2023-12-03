@@ -5,8 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "ik_solver/task.hpp"
-#include "ik_solver/ik_solver_command.hpp"
+#include "march_ik_solver/task.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
