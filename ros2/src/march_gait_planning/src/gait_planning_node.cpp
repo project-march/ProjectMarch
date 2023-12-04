@@ -21,6 +21,8 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_stance_leg_request = std::make_shared<march_shared_msgs::srv::GetCurrentStanceLeg::Request>();
     m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("current_stance_leg_service");
+ 
+    footPositionsPublish(); 
  }
 
 void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
@@ -46,9 +48,9 @@ void GaitPlanningNode::responseStanceLegCallback(
     auto response = future.get();
     
     if (response){
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_selection"), "Stance leg request received successful!");
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Stance leg response received successful!");
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("march_gait_selection"), "Stance leg request was not successful!"); 
+        RCLCPP_ERROR(rclcpp::get_logger("march_gait_planning"), "Stance leg response was not successful!"); 
     }
 }
 
@@ -56,13 +58,20 @@ void GaitPlanningNode::sendRequest(const bool& gait_complete){
     if (gait_complete){
         m_stance_leg_request->gait_complete = gait_complete; 
         auto future = m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Request sent!"); 
+        future.wait(); 
+        auto response = future.get(); 
+        auto stance_leg = response->stance_leg; 
+        std::cout << stance_leg << std::endl; 
     } else {
         return; 
     }
 }
 
 void GaitPlanningNode::footPositionsPublish(){
-
+    bool gait_complete = true; 
+    std::cout << "gait complete = " << gait_complete << std::endl; 
+    sendRequest(gait_complete);
 }
 
 //TODO: create function that adds y values to foot coordinates, based on stance foot. 
