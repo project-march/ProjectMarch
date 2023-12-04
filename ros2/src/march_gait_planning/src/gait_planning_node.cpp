@@ -40,8 +40,12 @@ void GaitPlanningNode::currentFeetPositionsCallback(const march_shared_msgs::msg
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
 }
 
-void GaitPlanningNode::responseStanceLegCallback(const rclcpp::Client<march_shared_msgs::srv::GetCurrentStanceLeg>::Response msg){
-    if (msg.get()->gait_complete){
+void GaitPlanningNode::responseStanceLegCallback(
+    std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future){
+    // Get the response from the future
+    auto response = future.get();
+    
+    if (response){
         RCLCPP_INFO(rclcpp::get_logger("march_gait_selection"), "Stance leg request received successful!");
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("march_gait_selection"), "Stance leg request was not successful!"); 
@@ -50,8 +54,8 @@ void GaitPlanningNode::responseStanceLegCallback(const rclcpp::Client<march_shar
 
 void GaitPlanningNode::sendRequest(const bool& gait_complete){
     if (gait_complete){
-        m_stance_leg_request = gait_complete; 
-        m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
+        m_stance_leg_request->gait_complete = gait_complete; 
+        auto future = m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
     } else {
         return; 
     }

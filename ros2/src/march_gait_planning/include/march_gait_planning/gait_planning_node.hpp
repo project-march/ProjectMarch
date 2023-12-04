@@ -27,7 +27,7 @@ class GaitPlanningNode:public rclcpp::Node {
     void currentFeetPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg); 
     void footPositionsPublish(); 
 
-    void responseStanceLegCallback(const rclcpp::Client<march_shared_msgs::srv::GetCurrentStanceLeg>::SharedPtr msg);
+    void responseStanceLegCallback(std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future);
     void sendRequest(const bool& gait_complete); 
 
     GaitPlanning m_gait_planning; 
