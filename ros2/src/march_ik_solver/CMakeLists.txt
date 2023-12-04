@@ -64,8 +64,6 @@ ament_target_dependencies(ik_solver_node
   sensor_msgs
   march_shared_msgs
 )
-install(TARGETS ik_solver_node
-  DESTINATION lib/${PROJECT_NAME})
 
 add_executable(task_server src/task_server.cpp)
 ament_target_dependencies(task_server 
@@ -80,6 +78,7 @@ ament_target_dependencies(task_client
   Eigen3)
 
 install(TARGETS
+  ik_solver_node
   task_server
   task_client
   DESTINATION lib/${PROJECT_NAME})
