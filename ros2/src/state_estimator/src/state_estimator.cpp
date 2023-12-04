@@ -38,6 +38,9 @@ StateEstimator::StateEstimator()
 
     m_feet_position_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("estimated_baseframe_foot_positions", 100);
 
+    m_current_stance_foot_service = create_service<march_shared_msgs::srv::GetCurrentStanceLeg>(
+        "current_stance_leg_service", std::bind(&StateEstimator::stanceFootServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
+
     declare_parameter("state_estimator_config.refresh_rate", 1000);
     auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
     timer_ = this->create_wall_timer(
@@ -171,6 +174,36 @@ void StateEstimator::update_foot_frames()
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
+}
+
+void StateEstimator::setStanceFoot(){
+    std::vector<std::array<double, 3>> map_foot_positions = 
+        m_joint_estimator.transformFeetPositionsToExoFrame();
+    
+    double margin = 0.005; // 5 mm
+    if (abs(map_foot_positions[0][0] - map_foot_positions[1][0]) <= margin){
+        // Feet are next to each other
+        m_current_stance_foot = 0;
+    }
+    else if (map_foot_positions[0][0] + margin < map_foot_positions[1][0])
+    {
+        // Right foot is in front, so right foot is stance foot
+        m_current_stance_foot = 1;
+    }
+    else if (map_foot_positions[0][0] - margin > map_foot_positions[1][0])
+    {
+        // Left foot is in front, so left foot is stance foot
+        m_current_stance_foot = -1;
+    }
+    
+}
+
+void StateEstimator::stanceFootServiceCallback(
+    const std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Request>,
+    std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Response> response)
+{
+    setStanceFoot();
+    response->stance_leg = m_current_stance_foot;
 }
 
 void StateEstimator::publish_robot_frames()

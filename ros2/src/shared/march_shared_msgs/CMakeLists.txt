@@ -55,6 +55,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RobotState.msg"
   "msg/TorqueStamped.msg"
   "msg/WeightStamped.msg"
+  "srv/GetCurrentStanceLeg.srv"
   "srv/GetJointNames.srv"
   "srv/GaitCommand.srv"
   "srv/RequestFootsteps.srv"
