@@ -24,21 +24,26 @@ def cubic_bezier(array_size, step_length, x_curr):
 
 
     t_values = np.linspace(0, 1, array_size)
-    points = np.zeros((array_size, 2))
+    points = np.zeros((array_size, 4))
+
+    x_stance_leg = np.linspace(-x_curr[0], -x_curr[0] - step_length, array_size)
+    points[:, 2] = x_stance_leg
+    points[:, 3] = [x_curr[1]] * array_size
 
     for i, t in enumerate(t_values):
         x = (1 - t)**3 * p0[0] + 3 * (1 - t)**2 * t * p1[0] + 3 * (1 - t) * t**2 * p2[0] + t**3 * p3[0]
         z = (1 - t)**3 * p0[1] + 3 * (1 - t)**2 * t * p1[1] + 3 * (1 - t) * t**2 * p2[1] + t**3 * p3[1]
-        points[i] = [x, z]
+        points[i, :2] = [x, z]
 
-    # # Plot the points
-    # plt.figure()
-    # plt.plot(points[:, 0], points[:, 1])
-    # plt.title('Cubic Bézier Curve')
-    # plt.xlabel('x')
-    # plt.ylabel('z')
-    # plt.grid(True)
-    # plt.show()
+    # Plot the points
+    plt.figure()
+    plt.plot(points[:, 0], points[:, 1])
+    plt.plot(points[:, 2], points[:, 3])
+    plt.title('Cubic Bézier Curve')
+    plt.xlabel('x')
+    plt.ylabel('z')
+    plt.grid(True)
+    plt.show()
 
     return points
 
@@ -50,5 +55,6 @@ first_step = cubic_bezier(1000, 0.10, (0, -0.95))
 normal_gait = cubic_bezier(1000, 0.20, (-.1, -0.95))
 
 # Save the arrays to separate CSV files
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/first_step.csv', first_step, delimiter=',')
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/normal_gait.csv', normal_gait, delimiter=',')
+column_names = ['x', 'z']
+np.savetxt('src/march_gait_planning/m9_gait_files/first_step.csv', first_step, delimiter=',')
+np.savetxt('src/march_gait_planning/m9_gait_files/normal_gait.csv', normal_gait, delimiter=',')
