@@ -49,10 +49,10 @@ def cubic_bezier(array_size, step_length, x_curr):
 
 
 # Generate the first step array
-first_step = cubic_bezier(1000, 0.10, (0, -0.95))
+first_step = cubic_bezier(40, 0.10, (0, -0.95))
 
 # Generate the normal gait array
-normal_gait = cubic_bezier(1000, 0.20, (-.1, -0.95))
+normal_gait = cubic_bezier(40, 0.20, (-.1, -0.95))
 
 # Save the arrays to separate CSV files
 column_names = ['x', 'z']
