@@ -179,7 +179,7 @@ void StateEstimator::update_foot_frames()
 void StateEstimator::setStanceFoot(){
     std::vector<std::array<double, 3>> map_foot_positions = 
         m_joint_estimator.transformFeetPositionsToExoFrame();
-    
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Test3");
     double margin = 0.005; // 5 mm
     if (abs(map_foot_positions[0][0] - map_foot_positions[1][0]) <= margin){
         // Feet are next to each other
@@ -204,7 +204,9 @@ void StateEstimator::stanceFootServiceCallback(
 {
     RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Request Received!"); 
     setStanceFoot();
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Test1");
     response->stance_leg = m_current_stance_foot;
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Current stance foot is %d", response->stance_leg);
     
 }
 

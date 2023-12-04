@@ -46,6 +46,8 @@ void GaitPlanningNode::responseStanceLegCallback(
     std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future){
     // Get the response from the future
     auto response = future.get();
+
+    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), std::to_string(response->stance_leg) + " is the stance leg");
     
     if (response){
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Stance leg response received successful!");
@@ -59,10 +61,6 @@ void GaitPlanningNode::sendRequest(const bool& gait_complete){
         m_stance_leg_request->gait_complete = gait_complete; 
         auto future = m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Request sent!"); 
-        future.wait(); 
-        auto response = future.get(); 
-        auto stance_leg = response->stance_leg; 
-        std::cout << stance_leg << std::endl; 
     } else {
         return; 
     }

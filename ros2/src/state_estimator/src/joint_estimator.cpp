@@ -257,6 +257,7 @@ std::vector<std::array<double, 3>> JointEstimator::transformFeetPositionsToExoFr
     map_foot_positions.push_back(left_foot); 
     map_foot_positions.push_back(right_foot); 
 
+    return map_foot_positions;
 }
 
 const std::vector<JointContainer> JointEstimator::get_joints()
