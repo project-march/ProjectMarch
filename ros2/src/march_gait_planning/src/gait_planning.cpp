@@ -18,11 +18,12 @@ GaitPlanning::GaitPlanning()
   m_current_stance_foot(), 
   m_current_left_foot_position(), 
   m_current_right_foot_position(), 
-  m_path_to_yaml(), 
   m_bezier_trajectory(), 
   m_step_size()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
+    setBezierGait(); 
+    std::cout << "Bezier CSV created" << std::endl; 
   }
 
 std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
@@ -96,7 +97,6 @@ void GaitPlanning::setBezierGait(){
     file.close();
 
     for (const auto& row : data) {
-        std::cout << "Swing leg x: " << row.x_swing << "Swing leg z: " << row.z_swing << std::endl; 
         m_first_step_trajectory.push_back({std::stod(row.x_swing), std::stod(row.z_swing), std::stod(row.x_stance), std::stod(row.z_stance)}); 
     }
 
@@ -122,9 +122,16 @@ void GaitPlanning::setBezierGait(){
     } 
 }
 
+std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
+    if (m_current_stance_foot == 0){
+        return m_first_step_trajectory; 
+    } else {
+        return m_bezier_trajectory; 
+    }
+}
+
 void GaitPlanning::setStanceFoot(const int &new_stance_foot){
-    m_current_stance_foot = new_stance_foot; 
-    setBezierGait(); 
+    m_current_stance_foot = new_stance_foot;  
 }
 
 void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) { 
@@ -136,10 +143,19 @@ void GaitPlanning::setGaitType(const exoState &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanning::setPathToYaml(const std::string &path_to_yaml){
-    m_path_to_yaml = path_to_yaml; 
+int GaitPlanning::getCurrentStanceFoot() const {
+    return m_current_stance_foot; 
 }
 
+
+std::array<double, 3> GaitPlanning::getCurrentLeftFootPos() const{
+    return m_current_left_foot_position; 
+}
+
+
+std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
+    return m_current_right_foot_position; 
+}
 
 
 

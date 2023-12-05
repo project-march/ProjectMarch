@@ -6,22 +6,19 @@ GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning())
  {
-    std::cout << "gait planning node created" << std::endl; 
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("iks_foot_positions", 10);
-    std::cout << "iks foot positions publisher created" << std::endl; 
     m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
         "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1));
-    std::cout << "exo state subscriber created" << std::endl; 
-    m_current_stance_foot_subscriber = create_subscription<std_msgs::msg::Int32>(
-        "current_stance_foot", 10, std::bind(&GaitPlanningNode::currentStanceFootCallback, this, _1)); 
-    std::cout << "current stance foot subscriber created" << std::endl; 
+    // m_current_stance_foot_subscriber = create_subscription<std_msgs::msg::Int32>(
+        // "current_stance_foot", 10, std::bind(&GaitPlanningNode::currentStanceFootCallback, this, _1)); 
     m_feet_position_subscriber = create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "estimated_baseframe_foot_positions", 100, std::bind(&GaitPlanningNode::currentFeetPositionsCallback, this, _1)); 
-    std::cout << "current baseframe foot positions subscriber created" << std::endl; 
 
     m_stance_leg_request = std::make_shared<march_shared_msgs::srv::GetCurrentStanceLeg::Request>();
     m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("current_stance_leg_service");
- 
+    std::cout << "Request and client created " << std::endl; 
+
+    // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     footPositionsPublish(); 
  }
 
@@ -48,9 +45,12 @@ void GaitPlanningNode::responseStanceLegCallback(
     auto response = future.get();
 
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), std::to_string(response->stance_leg) + " is the stance leg");
-    
+
     if (response){
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Stance leg response received successful!");
+        m_gait_planning.setStanceFoot(response->stance_leg);
+        m_current_trajectory = m_gait_planning.getTrajectory(); 
+        footPositionsPublish();
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("march_gait_planning"), "Stance leg response was not successful!"); 
     }
@@ -67,17 +67,38 @@ void GaitPlanningNode::sendRequest(const bool& gait_complete){
 }
 
 void GaitPlanningNode::footPositionsPublish(){
-    bool gait_complete = true; 
-    std::cout << "gait complete = " << gait_complete << std::endl; 
-    sendRequest(gait_complete);
+    while (true) {
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "empty yes no %d", m_current_trajectory.empty());
+        if (m_current_trajectory.empty()) {
+            sendRequest(true);
+            break;
+        }
+        std::array<double, 4> current_step = m_current_trajectory.front();
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "current variable created");
+        m_current_trajectory.erase(m_current_trajectory.begin());
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "first element trajectory erased, length = %d", m_current_trajectory.size());
+        if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = left");
+            m_current_step_msg->left_foot_position.x = current_step[2];
+            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
+            m_current_step_msg->left_foot_position.z = current_step[3]; 
+            m_current_step_msg->right_foot_position.x = current_step[0]; 
+            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
+            m_current_step_msg->right_foot_position.z = current_step[1];
+        } else if (m_gait_planning.getCurrentStanceFoot() == 1){
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = right");
+            m_current_step_msg->left_foot_position.x = current_step[0];
+            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
+            m_current_step_msg->left_foot_position.z = current_step[1]; 
+            m_current_step_msg->right_foot_position.x = current_step[2]; 
+            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
+            m_current_step_msg->right_foot_position.z = current_step[3];
+        }
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "exited loop");
+        m_iks_foot_positions_publisher->publish(*m_current_step_msg);
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Msg published! Length of array = %d", m_current_trajectory.size()); 
+    }
 }
-
-//TODO: create function that adds y values to foot coordinates, based on stance foot. 
-// if stance leg is both, take right foot to complete initial 10cm step first. 
-// if stance leg is either left or right, take the other foot to complete the 20cm step. 
-
-//TODO: create function that publishes the bezier curve points per time point. 
-
 
 int main(int argc, char *argv[]){
     

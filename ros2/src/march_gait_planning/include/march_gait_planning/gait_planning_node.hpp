@@ -32,4 +32,8 @@ class GaitPlanningNode:public rclcpp::Node {
 
     GaitPlanning m_gait_planning; 
 
+    std::vector<std::array<double, 4>> m_current_trajectory; 
+    march_shared_msgs::msg::IksFootPositions::SharedPtr m_current_step_msg; 
+
+
 };
