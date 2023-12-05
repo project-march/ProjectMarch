@@ -27,6 +27,7 @@ StateMachine::StateMachine()
         { exoState::Error, {} },
 
     };
+    std::cout << "State machine created" << std::endl;
 }
 
 /**

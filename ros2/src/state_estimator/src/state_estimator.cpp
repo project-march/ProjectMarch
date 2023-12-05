@@ -202,11 +202,8 @@ void StateEstimator::stanceFootServiceCallback(
     const std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Request>,
     std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Response> response)
 {
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Request Received!"); 
     setStanceFoot();
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Test1");
     response->stance_leg = m_current_stance_foot;
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Current stance foot is %d", response->stance_leg);
     
 }
 
