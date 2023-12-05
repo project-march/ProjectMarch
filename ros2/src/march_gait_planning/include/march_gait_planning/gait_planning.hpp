@@ -13,15 +13,19 @@ class GaitPlanning {
     explicit GaitPlanning(); 
     std::vector<std::array<double, 3>> getFootEndPositions() const; 
 
+    // Setters
     void setStanceFoot(const int &new_stance_foot);
     void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position); // set foot positions (l+r) and current stance leg 
     void setGaitType(const exoState &new_gait_type); 
     void setStepSize(const double &step_size); 
     void setBezierGait();
+
+    // Getters
     std::vector<std::array<double, 4>> getTrajectory() const;
     int getCurrentStanceFoot() const; 
     std::array<double, 3> getCurrentLeftFootPos() const; 
     std::array<double, 3> getCurrentRightFootPos() const; 
+    exoState getGaitType() const; 
 
     //ADD STANCE FOOT COORDINATES AS OUTPUT 
 

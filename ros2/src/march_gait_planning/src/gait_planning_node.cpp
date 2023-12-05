@@ -22,13 +22,16 @@ GaitPlanningNode::GaitPlanningNode()
     m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("current_stance_leg_service");
     std::cout << "Request and client created " << std::endl; 
 
+    m_gait_planning.setGaitType(exoState::Stand); // make service between gait planning and state machine for gait type
+
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     footPositionsPublish(); 
  }
 
 void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
-    m_gait_planning.setGaitType((exoState)msg->state); 
+    m_gait_planning.setGaitType((exoState)msg->state);
+    footPositionsPublish();  
 }
 
 void GaitPlanningNode::currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr msg){
@@ -78,36 +81,50 @@ void GaitPlanningNode::sendRequest(const bool& gait_complete){
 }
 
 void GaitPlanningNode::footPositionsPublish(){
-    while (true) {
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "empty yes no %d", m_current_trajectory.empty());
-        if (m_current_trajectory.empty()) {
-            sendRequest(true);
-            break;
-        }
-        std::array<double, 4> current_step = m_current_trajectory.front();
-        m_current_trajectory.erase(m_current_trajectory.begin());
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
-        if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = left");
-            m_current_step_msg->left_foot_position.x = current_step[2];
-            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
-            m_current_step_msg->left_foot_position.z = current_step[3]; 
-            m_current_step_msg->right_foot_position.x = current_step[0]; 
-            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
-            m_current_step_msg->right_foot_position.z = current_step[1];
-        } else if (m_gait_planning.getCurrentStanceFoot() == 1){
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = right");
-            m_current_step_msg->left_foot_position.x = current_step[0];
-            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
-            m_current_step_msg->left_foot_position.z = current_step[1]; 
-            m_current_step_msg->right_foot_position.x = current_step[2]; 
-            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
-            m_current_step_msg->right_foot_position.z = current_step[3];
-        }
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "exited loop");
+    // Two gait options, standing still and walking
+    if (m_gait_planning.getGaitType() != exoState::Walk){
+        m_current_step_msg->left_foot_position.x = 0.0;
+        m_current_step_msg->left_foot_position.y = 0.16; 
+        m_current_step_msg->left_foot_position.z = -0.95; 
+        m_current_step_msg->right_foot_position.x = 0.0; 
+        m_current_step_msg->right_foot_position.y = -0.16; 
+        m_current_step_msg->right_foot_position.z = -0.95;
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Set stand values in msg"); 
         m_iks_foot_positions_publisher->publish(*m_current_step_msg);
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Msg published! Length of array = %d", m_current_trajectory.size()); 
-        rclcpp::sleep_for(std::chrono::milliseconds(50));
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Sent msg to IKS");
+    }
+    else if (m_gait_planning.getGaitType() == exoState::Walk){
+        while (true) {
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "empty yes no %d", m_current_trajectory.empty());
+            if (m_current_trajectory.empty()) {
+                sendRequest(true);
+                break;
+            }
+            std::array<double, 4> current_step = m_current_trajectory.front();
+            m_current_trajectory.erase(m_current_trajectory.begin());
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
+            if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
+                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = left");
+                m_current_step_msg->left_foot_position.x = current_step[2];
+                m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
+                m_current_step_msg->left_foot_position.z = current_step[3]; 
+                m_current_step_msg->right_foot_position.x = current_step[0]; 
+                m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
+                m_current_step_msg->right_foot_position.z = current_step[1];
+            } else if (m_gait_planning.getCurrentStanceFoot() == 1){
+                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "stance foot = right");
+                m_current_step_msg->left_foot_position.x = current_step[0];
+                m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
+                m_current_step_msg->left_foot_position.z = current_step[1]; 
+                m_current_step_msg->right_foot_position.x = current_step[2]; 
+                m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
+                m_current_step_msg->right_foot_position.z = current_step[3];
+            }
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "exited loop");
+            m_iks_foot_positions_publisher->publish(*m_current_step_msg);
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Msg published! Length of array = %d", m_current_trajectory.size()); 
+            rclcpp::sleep_for(std::chrono::milliseconds(50));
+        }
     }
 }
 

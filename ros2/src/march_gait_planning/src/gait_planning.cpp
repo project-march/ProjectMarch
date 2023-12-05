@@ -159,5 +159,6 @@ std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
     return m_current_right_foot_position; 
 }
 
-
-
+exoState GaitPlanning::getGaitType() const{
+    return m_gait_type; 
+}
