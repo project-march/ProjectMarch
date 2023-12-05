@@ -17,7 +17,6 @@
   <depend>geometry_msgs</depend>
   <depend>control_msgs</depend>
   <depend>march_shared_msgs</depend>
-  <depend>example_interface</depend>
 
   <exec_depend>ros2launch</exec_depend>
 
