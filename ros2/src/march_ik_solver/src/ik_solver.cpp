@@ -16,7 +16,7 @@ IKSolver::~IKSolver()
 Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
 {
     // Solve the IK problem
-    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(n_joints_);
+    Eigen::VectorXd desired_joint_velocities = Eigen::VectorXd::Zero(n_joints_);
     // TODO: Uncomment code after MVP.
     // Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(n_joints_, n_joints_);
 
@@ -27,18 +27,17 @@ Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
         // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
         tasks_[i].setDesiredPose(&desired_poses[i]);
-        joint_velocities += tasks_[i].solve();
+        desired_joint_velocities += tasks_[i].solve();
     }
 
-    Eigen::VectorXd desired_joint_positions = integrateJointVelocities(joint_velocities);
-    return desired_joint_positions;
+    return desired_joint_velocities;
 }
 
-Eigen::VectorXd IKSolver::integrateJointVelocities(Eigen::VectorXd joint_velocities)
+Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
     Eigen::VectorXd current_joint_positions = *current_joint_positions_ptr_;
-    current_joint_positions += joint_velocities * dt_;
+    current_joint_positions += *desired_joint_velocities_ptr_ * dt_;
     return current_joint_positions;
 }
 
@@ -70,6 +69,18 @@ void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd * current_joint_posit
 {
     // Set the pointer to the current joint positions
     current_joint_positions_ptr_ = current_joint_positions_ptr;
+}
+
+void IKSolver::setDesiredJointPositionsPtr(Eigen::VectorXd * desired_joint_positions_ptr)
+{
+    // Set the pointer to the desired joint positions
+    desired_joint_positions_ptr_ = desired_joint_positions_ptr;
+}
+
+void IKSolver::setDesiredJointVelocitiesPtr(Eigen::VectorXd * desired_joint_velocities_ptr)
+{
+    // Set the pointer to the desired joint velocities
+    desired_joint_velocities_ptr_ = desired_joint_velocities_ptr;
 }
 
 // const Eigen::MatrixXd * IKSolver::getJacobianPtr(int task_id)

@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
+find_package(ament_cmake_gtest REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -65,6 +66,12 @@ ament_target_dependencies(ik_solver_node
   march_shared_msgs
 )
 
+add_executable(current_joint_positions_server src/current_joint_positions_server.cpp)
+ament_target_dependencies(current_joint_positions_server 
+  rclcpp
+  march_shared_msgs
+  Eigen3)
+
 add_executable(task_server src/task_server.cpp)
 ament_target_dependencies(task_server 
   rclcpp
@@ -79,6 +86,7 @@ ament_target_dependencies(task_client
 
 install(TARGETS
   ik_solver_node
+  current_joint_positions_server
   task_server
   task_client
   DESTINATION lib/${PROJECT_NAME})
