@@ -94,6 +94,12 @@ install(TARGETS
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 
+# Install launch files.
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
