@@ -4,12 +4,12 @@ using std::placeholders::_1;
 IKSolverNode::IKSolverNode()
   : Node("ik_solver")
 {
-  // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&IKSolverNode::timerCallback, this));
   ik_solver_command_sub_ = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
     "iks_foot_positions", 10, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
-  robot_state_sub_ = this->create_subscription<march_shared_msgs::msg::RobotState>(
-    "current_robot_state", 10, std::bind(&IKSolverNode::RobotStateCallback, this, std::placeholders::_1));
-  robot_state_pub_ = this->create_publisher<march_shared_msgs::msg::RobotState>("desired_robot_state", 1); // TODO: Change queue.
+  // robot_state_sub_ = this->create_subscription<march_shared_msgs::msg::RobotState>(
+  //   "current_robot_state", 10, std::bind(&IKSolverNode::RobotStateCallback, this, std::placeholders::_1));
+  joint_trajectory_controller_state_pub_ = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
+    "joint_trajectory_controller/state", 1); // TODO: Change queue.
   current_joint_positions_client_ = this->create_client<march_shared_msgs::srv::GetCurrentJointPositions>("get_current_joint_positions");
 
   // Configure IK solver.
@@ -66,21 +66,75 @@ void IKSolverNode::RobotStateCallback(const march_shared_msgs::msg::RobotState::
     current_joint_positions_(4), current_joint_positions_(5), current_joint_positions_(6), current_joint_positions_(7));
 }
 
-void IKSolverNode::publishJointState(const Eigen::VectorXd desired_joint_positions, const Eigen::VectorXd desired_joint_velocities)
+void IKSolverNode::publishJointTrajectoryControllerState()
 {
-  // Convert Eigen::VectorXd to a vector of doubles.
-  std::vector<double> positions_vector(desired_joint_positions.data(), desired_joint_positions.data() + desired_joint_positions.size());
-  std::vector<double> velocities_vector(desired_joint_velocities.data(), desired_joint_velocities.data() + desired_joint_velocities.size());
+  // Create the message to be published.
+  control_msgs::msg::JointTrajectoryControllerState joint_trajectory_controller_state = 
+    convertToJointTrajectoryControllerStateMsg();
 
-  // Publish the desired joint positions and velocities.
-  march_shared_msgs::msg::RobotState robot_state;
-  robot_state.joint_pos = positions_vector;
-  robot_state.joint_vel = velocities_vector;
-  robot_state_pub_->publish(robot_state);
+  // Publish the message.
+  joint_trajectory_controller_state_pub_->publish(joint_trajectory_controller_state);
 }
 
-  void IKSolverNode::calculateDesiredJointStates()
-  {
+std::vector<Eigen::VectorXd> IKSolverNode::calculateError()
+{
+  // Define a vector of Eigen::VectorXd to store the error.
+  std::vector<Eigen::VectorXd> error;
+
+  // Calculate error.
+  Eigen::VectorXd error_joint_positions_ = desired_joint_positions_ - current_joint_positions_;
+  Eigen::VectorXd error_joint_velocities_ = desired_joint_velocities_ - current_joint_velocities_;
+
+  // Push the error to the vector.
+  error.push_back(error_joint_positions_);
+  error.push_back(error_joint_velocities_);
+
+  return error;
+}
+
+control_msgs::msg::JointTrajectoryControllerState IKSolverNode::convertToJointTrajectoryControllerStateMsg()
+{
+  // Calculate the error.
+  std::vector<Eigen::VectorXd> error_joints = calculateError();
+
+  // Convert Eigen::VectorXd to a vector of doubles.
+  std::vector<double> desired_positions_vector(
+    desired_joint_positions_.data(), desired_joint_positions_.data() + desired_joint_positions_.size());
+  std::vector<double> desired_velocities_vector(
+    desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
+  std::vector<double> current_positions_vector(
+    current_joint_positions_.data(), current_joint_positions_.data() + current_joint_positions_.size());
+  std::vector<double> current_velocities_vector(
+    current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
+  std::vector<double> error_positions_vector(
+    error_joints[0].data(), error_joints[0].data() + error_joints[0].size());
+  std::vector<double> error_velocities_vector(
+    error_joints[1].data(), error_joints[1].data() + error_joints[1].size());
+
+  // Create the message.
+  control_msgs::msg::JointTrajectoryControllerState joint_trajectory_controller_state;
+  joint_trajectory_controller_state.header.stamp = this->now();
+  joint_trajectory_controller_state.joint_names = {
+    "L_HAA", "L_HFE", "L_KFE", "L_ADPF",
+    "R_HAA", "R_HFE", "R_KFE", "R_ADPF"};
+
+  // Publish the desired joint positions and velocities.
+  joint_trajectory_controller_state.desired.positions = desired_positions_vector;
+  joint_trajectory_controller_state.desired.velocities = desired_velocities_vector;
+
+  // Publish the actual joint positions and velocities.
+  joint_trajectory_controller_state.actual.positions = current_positions_vector;
+  joint_trajectory_controller_state.actual.velocities = current_velocities_vector;
+
+  // Publish the error joint positions and velocities.
+  joint_trajectory_controller_state.error.positions = error_positions_vector;
+  joint_trajectory_controller_state.error.velocities = error_velocities_vector;
+
+  return joint_trajectory_controller_state;
+}
+
+void IKSolverNode::calculateDesiredJointStates()
+{
   //Get the current joint positions from the state estimation node.
   current_joint_positions_request_ = std::make_shared<march_shared_msgs::srv::GetCurrentJointPositions::Request>();
   current_joint_positions_future_ = current_joint_positions_client_->async_send_request(
@@ -99,6 +153,10 @@ void IKSolverNode::currentJointPositionsCallback(
       current_joint_positions_future_.get()->joint_positions.data(), 
       current_joint_positions_future_.get()->joint_positions.size());
 
+    current_joint_velocities_ = Eigen::Map<Eigen::VectorXd>(
+      current_joint_positions_future_.get()->joint_velocities.data(), 
+      current_joint_positions_future_.get()->joint_velocities.size());
+
     RCLCPP_INFO(this->get_logger(), "Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f", 
       current_joint_positions_(0), current_joint_positions_(1), current_joint_positions_(2), current_joint_positions_(3),
       current_joint_positions_(4), current_joint_positions_(5), current_joint_positions_(6), current_joint_positions_(7));
@@ -114,42 +172,13 @@ void IKSolverNode::currentJointPositionsCallback(
 
     // Publish the desired joint positions and velocities.
     RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
-    publishJointState(desired_joint_positions_, desired_joint_velocities_);
+    publishJointTrajectoryControllerState();
   }
   else
   {
     RCLCPP_ERROR(this->get_logger(), "Failed to get current joint positions.");
   }
 }
-
-// void IKSolverNode::timerCallback()
-// {
-//   // A test function that requests the task server per time step.
-//   RCLCPP_INFO(this->get_logger(), "IKSolverNode.");
-//   Eigen::MatrixXd jacobian = *ik_solver_.getJacobianPtr(0);
-//   for (int i = 0; i < jacobian.rows(); i++) {
-//     RCLCPP_INFO(this->get_logger(), "[ %f, %f, %f, %f, %f, %f, %f, %f]", 
-//       jacobian(i, 0), jacobian(i, 1), jacobian(i, 2), jacobian(i, 3), 
-//       jacobian(i, 4), jacobian(i, 5), jacobian(i, 6), jacobian(i, 7));
-//   }
-//   RCLCPP_INFO(this->get_logger(), "----------------------------------------");
-//   Eigen::MatrixXd jacobian_inverse = *ik_solver_.getJacobianInversePtr(0);
-//   for (int i = 0; i < jacobian_inverse.rows(); i++) {
-//     RCLCPP_INFO(this->get_logger(), "[ %f, %f, %f, %f, %f, %f]", 
-//       jacobian_inverse(i, 0), jacobian_inverse(i, 1), jacobian_inverse(i, 2),
-//       jacobian_inverse(i, 3), jacobian_inverse(i, 4), jacobian_inverse(i, 5));
-//   }
-//   RCLCPP_INFO(this->get_logger(), "----------------------------------------");
-
-//   std::vector<Eigen::VectorXd> desired_poses;  
-//   Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(6);
-//   desired_pose << 4.0, 5.0, 6.0, 4.0, 5.0, 6.0;
-//   desired_poses.push_back(desired_pose);
-//   auto desired_joint_velocities = ik_solver_.solve(desired_poses);
-//   RCLCPP_INFO(this->get_logger(), "Desired joint velocities: [%f, %f, %f, %f, %f, %f, %f, %f]", 
-//     desired_joint_velocities(0), desired_joint_velocities(1), desired_joint_velocities(2), desired_joint_velocities(3),
-//     desired_joint_velocities(4), desired_joint_velocities(5), desired_joint_velocities(6), desired_joint_velocities(7));
-// }
 
 int main(int argc, char ** argv)
 {
