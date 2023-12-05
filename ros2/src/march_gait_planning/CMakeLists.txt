@@ -41,5 +41,11 @@ install(FILES package.xml
   DESTINATION share/${PROJECT_NAME}
 )
 
+#Install launch file
+install(DIRECTORY 
+launch
+DESTINATION share/${PROJECT_NAME}/ 
+)
+
 # Add the necessary Python modules
 ament_package()
