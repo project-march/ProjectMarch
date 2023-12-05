@@ -1,3 +1,5 @@
+"Authors: Femke Buiks and Andrew Hutani, MIX"
+
 #include "march_gait_planning/gait_planning.hpp"
 #include <tuple>
 #include <cmath>

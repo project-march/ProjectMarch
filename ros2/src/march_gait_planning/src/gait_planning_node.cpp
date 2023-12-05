@@ -1,3 +1,5 @@
+"Authors: Femke Buiks and Andrew Hutani, MIX"
+
 #include "march_gait_planning/gait_planning_node.hpp"
 
 using std::placeholders::_1; 
