@@ -1,0 +1,6 @@
+uint8 task_id
+float64 timestamp
+---
+float64 operation_time
+float64[] current_pose
+float64[] jacobian
