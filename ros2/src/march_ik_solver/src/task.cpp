@@ -42,7 +42,7 @@ int Task::getTaskN()
     return task_n_;
 }
 
-void Task::setDesiredPose(Eigen::VectorXd * desired_pose_ptr)
+void Task::setDesiredPose(Eigen::VectorXd* desired_pose_ptr)
 {
     // Set the desired pose of the task
     desired_pose_ptr_ = desired_pose_ptr;
@@ -131,14 +131,14 @@ void Task::setDampingCoefficient(float damping_coefficient)
     damping_coefficient_ = damping_coefficient;
 }
 
-const Eigen::MatrixXd * Task::getJacobianPtr()
+const Eigen::MatrixXd* Task::getJacobianPtr()
 {
     // Return the pointer of Jacobian
     sendRequest();
     return &jacobian_;
 }
 
-const Eigen::MatrixXd * Task::getJacobianInversePtr()
+const Eigen::MatrixXd* Task::getJacobianInversePtr()
 {
     // Return the pointer of inverse of Jacobian
     calculateJacobianInverse();
@@ -151,15 +151,13 @@ void Task::calculateJacobianInverse()
     Eigen::MatrixXd jacobian_transpose = jacobian_.transpose();
 
     // If the system is underdetermined.
-    if (task_m_ < task_n_)
-    {
+    if (task_m_ < task_n_) {
         // Damping matrix.
         Eigen::MatrixXd damping_matrix = damping_coefficient_ * Eigen::MatrixXd::Identity(task_m_, task_m_);
 
         // Calculate the inverse using the pseudo-inverse.
         jacobian_inverse_ = jacobian_transpose * (jacobian_ * jacobian_transpose + damping_matrix).inverse();
-    }
-    else // if the system is overdetermined.
+    } else // if the system is overdetermined.
     {
         // Damping matrix.
         Eigen::MatrixXd damping_matrix = damping_coefficient_ * Eigen::MatrixXd::Identity(task_n_, task_n_);
@@ -170,7 +168,6 @@ void Task::calculateJacobianInverse()
 
     // jacobian_inverse_ = (jacobian_transpose * (jacobian_ * jacobian_transpose).inverse()) * (task_m_ < task_n_) +
     //     ((jacobian_transpose * jacobian_).inverse() * jacobian_transpose) * (task_m_ >= task_n_);
-
 }
 
 void Task::sendRequest()
@@ -178,10 +175,8 @@ void Task::sendRequest()
     auto request = std::make_shared<march_shared_msgs::srv::GetTaskReport::Request>();
 
     // TODO: To remove the following lines.
-    while (!client_->wait_for_service(std::chrono::seconds(1)))
-    {
-        if (!rclcpp::ok())
-        {
+    while (!client_->wait_for_service(std::chrono::seconds(1))) {
+        if (!rclcpp::ok()) {
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
@@ -191,20 +186,19 @@ void Task::sendRequest()
     auto result = client_->async_send_request(request);
 
     // TODO: Add error handling.
-    if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS)
-    {
+    if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result)
+        == rclcpp::FutureReturnCode::SUCCESS) {
         // Eigen::MatrixXd jacobian = Eigen::MatrixXd::Zero(task_m_, task_n_);
-        // Eigen::Map<const Eigen::VectorXd> jacobian_vector(result.get()->jacobian.data(), result.get()->jacobian.size());
-        // std::vector<float> jacobian_vector(result.get()->jacobian.begin(), result.get()->jacobian.end());
+        // Eigen::Map<const Eigen::VectorXd> jacobian_vector(result.get()->jacobian.data(),
+        // result.get()->jacobian.size()); std::vector<float> jacobian_vector(result.get()->jacobian.begin(),
+        // result.get()->jacobian.end());
         Eigen::MatrixXd jacobian = Eigen::Map<Eigen::MatrixXd>(result.get()->jacobian.data(), task_m_, task_n_);
         jacobian_ = jacobian;
 
         // std::vector<float> current_pose_vector(result.get()->current_pose.begin(), result.get()->current_pose.end());
         Eigen::VectorXd current_pose = Eigen::Map<Eigen::VectorXd>(result.get()->current_pose.data(), task_m_);
         current_pose_ = current_pose;
-    }
-    else
-    {
+    } else {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_task_report");
     }
 }

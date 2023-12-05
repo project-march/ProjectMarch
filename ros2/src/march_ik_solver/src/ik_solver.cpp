@@ -2,8 +2,8 @@
 
 IKSolver::IKSolver()
 {
-    n_joints_ = 8;      // TODO: Load this from a YAML file
-    dt_ = 0.001;        // TODO: Load this from a YAML file
+    n_joints_ = 8; // TODO: Load this from a YAML file
+    dt_ = 0.001; // TODO: Load this from a YAML file
     configureTasks();
 }
 
@@ -59,25 +59,25 @@ std::vector<uint8_t> IKSolver::getTasksM()
 void IKSolver::configureTasks()
 {
     // TODO: Load the tasks from a YAML file.
-    Task task = {0, "motion", 6, 8};
+    Task task = { 0, "motion", 6, 8 };
     task.setGainP(1.0);
     task.setDampingCoefficient(1e-2);
     tasks_.push_back(task);
 }
 
-void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd * current_joint_positions_ptr)
+void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)
 {
     // Set the pointer to the current joint positions
     current_joint_positions_ptr_ = current_joint_positions_ptr;
 }
 
-void IKSolver::setDesiredJointPositionsPtr(Eigen::VectorXd * desired_joint_positions_ptr)
+void IKSolver::setDesiredJointPositionsPtr(Eigen::VectorXd* desired_joint_positions_ptr)
 {
     // Set the pointer to the desired joint positions
     desired_joint_positions_ptr_ = desired_joint_positions_ptr;
 }
 
-void IKSolver::setDesiredJointVelocitiesPtr(Eigen::VectorXd * desired_joint_velocities_ptr)
+void IKSolver::setDesiredJointVelocitiesPtr(Eigen::VectorXd* desired_joint_velocities_ptr)
 {
     // Set the pointer to the desired joint velocities
     desired_joint_velocities_ptr_ = desired_joint_velocities_ptr;
