@@ -1,16 +1,46 @@
 #include "march_ik_solver/ik_solver.hpp"
 
+#include <string>
+#include <algorithm>
+#include <math.h>
+#include <boost/algorithm/clamp.hpp>
+
 IKSolver::IKSolver()
 {
     n_joints_ = 8; // TODO: Load this from a YAML file
     dt_ = 0.001; // TODO: Load this from a YAML file
     configureTasks();
+
+    // Set the joint limits.
+    // TODO: Load this from a YAML file instead of this hard-coded array.
+    std::array<double,2> joint_limits_LHAA = { -15.0, 10.0 };
+    std::array<double,2> joint_limits_LHFE = { -10.0, 112.5 };
+    std::array<double,2> joint_limits_LKFE = {  0.0, 125.0 };
+    std::array<double,2> joint_limits_LADPF = { -25.0, 10.0 };
+    std::array<double,2> joint_limits_RHAA = { -15.0, 10.0 };
+    std::array<double,2> joint_limits_RHFE = { -10.0, 112.5 };
+    std::array<double,2> joint_limits_RKFE = {  0.0, 125.0 };
+    std::array<double,2> joint_limits_RADPF = { -25.0, 10.0 };
+    joint_limits_.push_back(joint_limits_LHAA);
+    joint_limits_.push_back(joint_limits_LHFE);
+    joint_limits_.push_back(joint_limits_LKFE);
+    joint_limits_.push_back(joint_limits_LADPF);
+    joint_limits_.push_back(joint_limits_RHAA);
+    joint_limits_.push_back(joint_limits_RHFE);
+    joint_limits_.push_back(joint_limits_RKFE);
+    joint_limits_.push_back(joint_limits_RADPF);
+
+    // Convert the joint limits from degrees to radians.
+    for (long unsigned int i = 0; i < joint_limits_.size(); i++)
+    {
+        joint_limits_[i][0] = M_PI * joint_limits_[i][0] / 180.0;
+        joint_limits_[i][1] = M_PI * joint_limits_[i][1] / 180.0;
+    }
 }
 
 IKSolver::~IKSolver()
 {
     delete &tasks_;
-    // delete &desired_poses_;
 }
 
 Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
@@ -37,8 +67,12 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
     Eigen::VectorXd current_joint_positions = *current_joint_positions_ptr_;
-    current_joint_positions += *desired_joint_velocities_ptr_ * dt_;
-    return current_joint_positions;
+    Eigen::VectorXd desired_joint_positions = current_joint_positions + *desired_joint_velocities_ptr_ * dt_;
+
+    // Set the joint limits
+    desired_joint_positions = setJointLimits(desired_joint_positions);
+
+    return desired_joint_positions;
 }
 
 uint8_t IKSolver::getNumberOfTasks()
@@ -63,6 +97,18 @@ void IKSolver::configureTasks()
     task.setGainP(1.0);
     task.setDampingCoefficient(1e-2);
     tasks_.push_back(task);
+}
+
+Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions)
+{
+    // Set the joint limits
+    Eigen::VectorXd joint_limits = Eigen::VectorXd::Zero(desired_joint_positions.size());
+    for (unsigned int i = 0; i < (unsigned int) desired_joint_positions.size(); i++)
+    {
+        joint_limits(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
+    }
+    return joint_limits;
+
 }
 
 void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)

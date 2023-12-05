@@ -1,8 +1,7 @@
 #ifndef IK_SOLVER__IK_SOLVER_HPP_
 #define IK_SOLVER__IK_SOLVER_HPP_
 
-#include <algorithm>
-#include <string>
+#pragma once
 #include <vector>
 
 #include "march_ik_solver/task.hpp"
@@ -35,10 +34,12 @@ public:
 
 private:
     void configureTasks(); // Configure the tasks
+    Eigen::VectorXd setJointLimits(Eigen::VectorXd desired_joint_positions); // Set the joint limits
 
     int n_joints_; // Number of joints. TODO: Load this from a YAML file?
     double dt_; // Time step. TODO: Load this from a YAML file?
     std::vector<Task> tasks_; // A stack of tasks, the order of which is the priority of the tasks.
+    std::vector<std::array<double,2>> joint_limits_; // Joint limits. TODO: Load this from a YAML file? Or from the robot description?
     Eigen::VectorXd* current_joint_positions_ptr_; // Pointer to the current joint positions.
     Eigen::VectorXd* desired_joint_positions_ptr_; // Pointer to the desired joint positions.
     Eigen::VectorXd* desired_joint_velocities_ptr_; // Pointer to the desired joint velocities.
