@@ -1,3 +1,5 @@
+/*Authors: Femke Buiks and Andrew Hutani, MIX*/
+
 #pragma once
 
 #include <string>
