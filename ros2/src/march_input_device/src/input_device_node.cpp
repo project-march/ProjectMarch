@@ -8,7 +8,10 @@
 #include <ncurses.h>
 using std::placeholders::_1;
 
-inputDeviceNode::inputDeviceNode()
+inputDeviceNode::inputDeviceNode(
+  // declare_parameter("IPD_new_terminal", true),
+  // bool ipd_new_terminal = get_parameter("IPD_new_terminal").as_bool()
+)
   : Node("march_input_device_node"),
   m_ipd (IPD())
 {
