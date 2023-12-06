@@ -19,10 +19,9 @@ inputDeviceNode::inputDeviceNode(
   m_exo_state_array_subscriber = create_subscription<march_shared_msgs::msg::ExoStateArray>(
     "available_states", 10, std::bind(&inputDeviceNode::availableStatesCallback, this, _1));
 
-  // Initialize ncurses
-
+  m_ipd.setCurrentState(exoState::BootUp);
   sendNewState(m_ipd.getCurrentState());
-  m_ipd.setCurrentState(exoState::Stand);
+  
 
 }
 
@@ -32,11 +31,6 @@ inputDeviceNode::~inputDeviceNode()
 
 void inputDeviceNode::availableStatesCallback(const march_shared_msgs::msg::ExoStateArray::SharedPtr msg)
 {
-  // Iterate over the states vector and print each state
-  for (const auto& state : msg->states) {
-    std::cout << "Received available state: "<< state.state<< std::endl;
-  }
-
   std::set<exoState> exo_states_set;
   for (const auto& exo_state_msg : msg->states) {
     exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
@@ -56,7 +50,7 @@ void inputDeviceNode::sendNewState(const exoState& desired_state)
   m_new_state_publisher->publish(msg);
 
   // Print the new state
-  std::cout << "Sent new state: "<<msg.data << std::endl;
+  std::cout << "Sent new state: "<< toString(exoState(msg.data)) << std::endl;
 }
 
 exoState inputDeviceNode::askState() const
@@ -71,7 +65,7 @@ exoState inputDeviceNode::askState() const
   while (true){
     std::cout << "Available states are: ";
     for (const auto& state : available_states) {
-      toString(state).c_str();
+      std::cout << toString(state) << " ";
     }
     std::cout<<std::endl;
     std::cout << "Enter desired state: ";

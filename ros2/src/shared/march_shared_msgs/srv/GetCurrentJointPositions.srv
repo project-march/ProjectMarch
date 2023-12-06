@@ -1,0 +1,6 @@
+float64 timestamp
+---
+bool status
+float64 operation_time
+float64[] joint_positions
+float64[] joint_velocities
