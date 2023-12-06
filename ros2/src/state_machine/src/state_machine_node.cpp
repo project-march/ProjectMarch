@@ -17,7 +17,8 @@ using namespace std::chrono_literals;
  * The state machine node also has an statemachine to validate the wanted transitions.
  */
 StateMachineNode::StateMachineNode()
-    : Node("state_machine_node")
+    : Node("state_machine_node"),
+    m_state_machine(StateMachine())
 {
     //TODO: change all topic names to not include "/march/", to avoid grouping all march topics.
     m_new_state_subscriber = create_subscription<std_msgs::msg::Int32>(
@@ -28,8 +29,6 @@ StateMachineNode::StateMachineNode()
     m_gait_client = create_client<march_shared_msgs::srv::RequestGait>("gait_selection");
 
     m_state_publisher = create_publisher<march_shared_msgs::msg::ExoState>("current_state", 10);
-
-    m_state_machine = StateMachine();
 
     /**
      * TODO: This might come in handy later, but for now it is not used.
@@ -189,15 +188,11 @@ void StateMachineNode::publishAvailableExoStates(march_shared_msgs::msg::ExoStat
 {
     StateMachineNode::fillExoStateArray(msg);
     m_exo_state_array_publisher->publish(*msg);
-    // Iterate over the states vector and print each state
-    for (const auto& state : msg->states) {
-        RCLCPP_INFO(get_logger(), "Sent available state: %d", state.state);
-    }
 }
 
 void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
 {
-    RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    RCLCPP_INFO(get_logger(), "Received new state: %s", toString(exoState(msg->data)));
     if (m_state_machine.isValidTransition((exoState)msg->data)) 
     {
         m_state_machine.performTransition((exoState)msg->data);
