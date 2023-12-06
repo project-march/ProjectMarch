@@ -1,195 +1,89 @@
-"""Author: MARCH IX"""
+"""Author: MARCH."""
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
-from launch.conditions import IfCondition
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
-
-from march_utility.utilities.utility_functions import (
-    get_lengths_robot_from_urdf_for_inverse_kinematics,
-)
+from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
-    """Generates the default launch file for the exo.
-
-    Todo:
-        - Fill in the settable ros parameters.
-
-    Implemented launch files:
-        - "[march_rqt_input_device]/launch/input_device.launch.py"
-        - "[march_description]/launch/march_description.launch.py"
-        - "[march_gait_selection]/launch/gait_selection.launch.py"
-        - "[march_fake_covid]/launch/march_fake_covid.launch.py"
-        - "[march_safety]/launch/march_safety.launch.py"
-        - "[march_robot_information]/launch/robot_information.launch.py"
-
-    The settable ros parameters are:
-        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
-            Default is True.
-        wireless_ipd (bool): Whether the wireless IPD connection manager node should be started.
-            Default is False.
-        ...
-    """
-
-    # region LaunchConfigurations
-
-    declared_arguments = []
-
-    # General arguments
-    use_sim_time = LaunchConfiguration("use_sim_time")
+    """Generates the launch file for the march8 node structure."""
+    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
+    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
+    simulation = LaunchConfiguration("simulation", default="true")
+    rosbags = LaunchConfiguration("rosbags", default="true")
+    airgait = LaunchConfiguration("airgait", default="false")
     robot = LaunchConfiguration("robot")
-    rosbags = LaunchConfiguration("rosbags")
-    rviz = LaunchConfiguration("rviz")
 
-    # Input device arguments
+    DeclareLaunchArgument(
+        name="rosbags",
+        default_value="true",
+        description="Whether the rosbags should stored.",
+        choices=["true", "false"],
+    )
 
-    # TODO: Add input device arguments based on new IPD launch file
+    DeclareLaunchArgument(
+        name="airgait",
+        default_value="false",
+        description="Whether we want to do an airgait or not",
+        choices=["true", "false"],
+    )
 
-    # Robot state publisher arguments
-    robot_state_publisher = LaunchConfiguration("robot_state_publisher")
-    robot_description = LaunchConfiguration("robot_description")
-    use_imu_data = LaunchConfiguration("use_imu_data")
-    imu_topic = LaunchConfiguration("imu_topic")
-    simulation = LaunchConfiguration("simulation")
-    jointless = LaunchConfiguration("jointless")
+    DeclareLaunchArgument(
+        name="robot",
+        default_value="march8",
+        description="The name of the yaml that will be used for retrieving info about the exo.",
+    )
 
-    # RealSense/simulation argument
-    # TODO: Change gait launch based on new gait launch file
-    ground_gait = LaunchConfiguration("ground_gait")
-
+    # region Launch Mujoco
+    mujoco_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
+        launch_arguments=[
+            ("model_to_load", mujoco_toload),
+            (
+                "tunings_to_load_path",
+                PathJoinSubstitution(
+                    [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
+                ),
+            ),
+        ],
+        condition=IfCondition(simulation),
+    )
     # endregion
 
-    # region Simulation arguments
-    ground_gait = LaunchConfiguration("ground_gait")
-    to_world_transform = LaunchConfiguration("to_world_transform")
-    mujoco = LaunchConfiguration("mujoco")
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default='march8_v0.xml')
-    tunings_to_load = LaunchConfiguration('tunings_to_load', default='low_level_controller_tunings.yaml')
-    simulation_arguments = [
-        DeclareLaunchArgument(
-            name="ground_gait",
-            default_value="false",
-            description="Whether the simulation should be simulating ground_gaiting instead of airgaiting.",
-        ),
-        DeclareLaunchArgument(
-            name="to_world_transform",
-            default_value=ground_gait,
-            description="Whether a transform from the world to base_link is necessary, "
-            "this is the case when you are groundgaiting.",
-        ),
-        DeclareLaunchArgument(
-            name="mujoco",
-            default_value="false",
-            description="If Mujoco simulation should be started or not",
-            choices=["true", "false"],
-        ),
-        DeclareLaunchArgument(
-            name="model_to_load_mujoco",
-            default_value="march8_v0.xml",
-            description="What model mujoco should load",
-        ),
-    ]
-    # endregion
-
-# Gait selection arguments
-#TODO: Change gait launch based on new gait launch file
-
-    declared_arguments = simulation_arguments + [
-        # GENERAL ARGUMENTS
-        DeclareLaunchArgument(
-            name="use_sim_time",
-            default_value="false",
-            description="Whether to use simulation time as published on the "
-            "/clock topic by gazebo instead of system time.",
-        ),
-        DeclareLaunchArgument(name="robot", default_value="march7", description="Robot to use."),
-        DeclareLaunchArgument(
-            name="control_yaml",
-            default_value="effort_control/march7_control.yaml",
-            description="The controller yaml file to use loaded in through the controller manager "
-            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-        ),
-        DeclareLaunchArgument(
-            name="rosbags",
-            default_value="true",
-            description="Whether the rosbags should stored.",
-            choices=["true", "false"],
-        ),
-        DeclareLaunchArgument(
-            name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
-        ),
-        # INPUT DEVICE ARGUMENTS
-        # TODO: Add input based on new IPD launch file
-
-        # ROBOT STATE PUBLISHER ARGUMENTS
-        DeclareLaunchArgument(
-            name="robot_state_publisher",
-            default_value="true",
-            description="Whether or not to launch the robot state publisher,"
-            "this allows nodes to get the urdf and to subscribe to"
-            "potential urdf updates. This is necesary for gait selection"
-            "to be able to launch",
-        ),
-        DeclareLaunchArgument(
-            name="robot_description",
-            default_value=robot,
-            description="Which <robot_description>.xacro file to use. "
-            "This file must be available in the march_desrciption/urdf/ folder",
-        ),
-        DeclareLaunchArgument(
-            "jointless",
-            default_value="false",
-            description="If true, no joints will be actuated",
-        ),
-        DeclareLaunchArgument(
-            name="simulation",
-            default_value="false",
-            description="Whether the exoskeleton is ran physically or in simulation.",
-        ),
-        # GAIT SELECTION ARGUMENTS
-        # TODO: Change gait selection arguments based on new gait launch file
-
-    ]
-
-    # region Launch robot description publisher (from march_description) if not robot_state_publisher:=false
-    robot_state_publisher_node = IncludeLaunchDescription(
+    # region Launch march control
+    march_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("march_description"),
+                get_package_share_directory("march_control"),
                 "launch",
-                "march_description.launch.py",
+                "march8_controllers.launch.py",
+            )
+        ),
+        launch_arguments=[("simulation", simulation)],
+    )
+    # endregion
+
+    # region rqt input device
+    rqt_input_device = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_rqt_input_device"),
+                "launch",
+                "input_device.launch.py",
             )
         ),
         launch_arguments=[
-            ("robot_description", robot_description),
-            ("use_sim_time", use_sim_time),
-            ("ground_gait", ground_gait),
-            ("to_world_transform", to_world_transform),
-            ("use_imu_data", use_imu_data),
-            ("imu_topic", imu_topic),
-            ("simulation", simulation),
-            ("jointless", jointless),
+            ("ping_safety_node", "true"),
+            ("use_sim_time", "false"),
+            ("layout", "training"),
+            ("testing", "false"),
         ],
-        condition=IfCondition(robot_state_publisher),
     )
-    # endregion
-
-    # region Launch March gait planning
-
-    march_gait_selection_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(   
-                get_package_share_directory("march_gait_planning"),
-                "launch",
-                "march_gait_planning.launch.py",
-            )
-        ),
-    )
-
     # endregion
 
     # region Launch Safety
@@ -201,32 +95,36 @@ def generate_launch_description() -> LaunchDescription:
                 "march_safety.launch.py",
             )
         ),
-        launch_arguments=[("use_sim_time", use_sim_time), ("simulation", simulation)],
+        launch_arguments=[("simulation", "true")],
     )
     # endregion
 
-    # region Launch Mujoco
-    mujoco_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]
-        ),
-        launch_arguments=[("model_to_load", mujoco_toload), ("tunings_to_load_path", PathJoinSubstitution([get_package_share_directory('march_control'), 'config', 'mujoco', tunings_to_load]))],
-        condition=IfCondition(mujoco),
-    )
-    # endregion
-
-    # region Launch march control
-    march_control = IncludeLaunchDescription(
+    # region Launch IMU
+    imu_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("march_control"),
+                get_package_share_directory("bluespace_ai_xsens_mti_driver"),
                 "launch",
-                "controllers.launch.py",
+                "imu_launch.launch.py",
             )
         ),
-        launch_arguments=[("simulation", "true"), ("control_yaml", "mujoco/march7_control.yaml"), ("rviz", rviz)],
     )
     # endregion
+
+    ik_solver_launch_dir = os.path.join(get_package_share_directory("ik_solver"), "launch")
+
+    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
+
+    footstep_generator_launch_dir = os.path.join(get_package_share_directory("footstep_generator"), "launch")
+
+    urdf_location = os.path.join(
+        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
+    )
+
+    fuzzy_default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
+
+    # parameters
+    fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -238,8 +136,6 @@ def generate_launch_description() -> LaunchDescription:
             "-o",
             '~/rosbags2/$(date -d "today" +"%Y-%m-%d-%H-%M-%S")',
             "-a",
-            "-x",
-            "'.*camera_.*'",
         ],
         output={
             "stdout": "log",
@@ -250,14 +146,84 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    nodes = [
-    robot_state_publisher_node,
-    march_gait_selection_node,
-    safety_node,
-    mujoco_node,
-    march_control,
-    record_rosbags_action,
-    ]
+    # declare parameters
+    # in ms
+    trajectory_dt = 50
 
+    # region footstep_generation parameters
+    n_footsteps = 20
+    step_length = 0.2
+    # endregion
 
-    return LaunchDescription(declared_arguments + nodes)
+    return LaunchDescription([
+        Node(
+            package='bezier_visualization',
+            executable='bezier_visualization_node',
+            name='bezier_visualization',
+        ),
+        Node(
+            package='footstep_generator',
+            namespace='',
+            executable='footstep_generator_node',
+            name='footstep_generator'
+        ),
+        Node(
+            package='fuzzy_generator',
+            namespace='',
+            executable='fuzzy_node',
+            name='fuzzy_generator',
+            parameters=[{'config_path': fuzzy_config_path}]
+        ),
+        Node(
+            package='swing_leg_trajectory_generator',
+            namespace='',
+            executable='swing_leg_trajectory_generator_node',
+            name='swing_leg_generator',
+        ),
+        Node(
+            package='ik_solver_buffer',
+            namespace='',
+            executable='ik_solver_buffer_node',
+            name='ik_solver_buffer',
+            parameters=[('timestep', str(trajectory_dt))],
+        ),
+        Node(
+            package='state_machine',
+            namespace='',
+            executable='state_machine_node',
+            name='state_machine',
+        ),
+        Node(
+            package='gait_selection',
+            namespace='',
+            executable='gait_selection_node',
+            name='gait_selection',
+            parameters=[('robot', str(robot))],
+        ),
+        Node(
+            package='state_estimator_mock',
+            namespace='',
+            executable='state_estimator_mock_node',
+            name='state_estimator_mock',
+            condition=IfCondition(airgait),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_launch.py']),
+            condition=UnlessCondition(airgait),
+
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver_launch.py']),
+            launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator_launch.py']),
+            launch_arguments={'n_footsteps': str(n_footsteps), "step_length": str(step_length)}.items(),
+        ),
+        mujoco_node,
+        rqt_input_device,
+        march_control,
+        record_rosbags_action,
+        safety_node,
+        imu_nodes,
+    ])
