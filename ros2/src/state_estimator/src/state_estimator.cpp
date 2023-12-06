@@ -19,15 +19,11 @@ StateEstimator::StateEstimator()
 
     m_tf_joint_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
-    m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
-
-    m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
-
-    m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
-
-    m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
-
-    m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("foot_impact", 100);
+    // m_com_pos_publisher = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 100);
+    // m_stance_foot_publisher = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 100);
+    // m_right_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("right_foot_on_ground", 100);
+    // m_left_foot_on_ground_publisher = this->create_publisher<std_msgs::msg::Bool>("left_foot_on_ground", 100);
+    // m_foot_impact_publisher = this->create_publisher<march_shared_msgs::msg::Feet>("foot_impact", 100);
 
     m_feet_height_publisher
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("robot_feet_height", 100);
@@ -62,7 +58,7 @@ StateEstimator::StateEstimator()
 
     std_msgs::msg::Int32 stance_foot_msg;
     stance_foot_msg.data = m_current_stance_foot;
-    m_stance_foot_publisher->publish(stance_foot_msg);
+    // m_stance_foot_publisher->publish(stance_foot_msg);
 
     initialize_imus();
 
@@ -207,7 +203,7 @@ void StateEstimator::publish_robot_frames()
 
     std_msgs::msg::Int32 stance_foot_msg;
     stance_foot_msg.data = m_current_stance_foot;
-    m_stance_foot_publisher->publish(stance_foot_msg);
+    // m_stance_foot_publisher->publish(stance_foot_msg);
 
     // Update and publish feet height
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
