@@ -64,7 +64,7 @@ def copy_subdir(dir_path: str, file_extension: str, package_name: str) -> List[T
 #     robot_descr_file, ground_gait, realsense_simulation, simulation, jointless, gazebo_control_yaml
 # ):
 def generate_robot_desc_command(
-    robot_descr_file, ground_gait, , simulation, jointless
+    robot_descr_file, ground_gait, simulation, jointless
 ):
     """Generates the robot description command to load in the xacro file with arguments.
 
