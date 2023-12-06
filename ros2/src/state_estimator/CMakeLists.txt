@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -29,6 +30,9 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
+find_package(pinocchio REQUIRED)
 
 include_directories(include)
 
@@ -45,6 +49,7 @@ add_library(${PROJECT_NAME}
 ament_target_dependencies(
   ${PROJECT_NAME}
   "rclcpp"
+  "ament_index_cpp"
   "geometry_msgs"
   "sensor_msgs"
   "march_description"
@@ -55,6 +60,8 @@ ament_target_dependencies(
   "tf2"
   "tf2_kdl"
   "tf2_geometry_msgs"
+  "Eigen3"
+  "pinocchio"
 )
 
 add_executable(state_estimator_node 
@@ -64,7 +71,10 @@ add_executable(state_estimator_node
   include/${PROJECT_NAME}/joint_estimator.hpp
   src/joint_estimator.cpp
   include/${PROJECT_NAME}/imu_estimator.hpp
-  src/imu_estimator.cpp)
+  src/imu_estimator.cpp
+  include/${PROJECT_NAME}/exo_estimator.hpp
+  src/exo_estimator.cpp
+)
 
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
@@ -74,6 +84,7 @@ target_include_directories(state_estimator_node PUBLIC
 ament_target_dependencies(
   state_estimator_node
   "rclcpp"
+  "ament_index_cpp"
   "geometry_msgs"
   "sensor_msgs"
   "march_description"
@@ -84,6 +95,8 @@ ament_target_dependencies(
   "tf2"
   "tf2_kdl"
   "tf2_geometry_msgs"
+  "Eigen3"
+  "pinocchio"
 )
 
 install(TARGETS state_estimator_node
@@ -131,6 +144,9 @@ endif()
 
 # EXPORT
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 ament_export_dependencies(
         "rclcpp"

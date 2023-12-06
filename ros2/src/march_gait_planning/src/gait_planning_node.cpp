@@ -13,9 +13,7 @@ GaitPlanningNode::GaitPlanningNode()
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("iks_foot_positions", 10);
     m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
-        "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1));
-    // m_current_stance_foot_subscriber = create_subscription<std_msgs::msg::Int32>(
-        // "current_stance_foot", 10, std::bind(&GaitPlanningNode::currentStanceFootCallback, this, _1)); 
+        "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1)); 
     m_feet_position_subscriber = create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "estimated_baseframe_foot_positions", 100, std::bind(&GaitPlanningNode::currentFeetPositionsCallback, this, _1)); 
 
