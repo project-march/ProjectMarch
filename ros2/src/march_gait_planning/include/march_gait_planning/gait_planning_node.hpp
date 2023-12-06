@@ -18,7 +18,6 @@ class GaitPlanningNode:public rclcpp::Node {
     private: 
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; // exo_state == gait_type 
-    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_current_stance_foot_subscriber; 
     rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_feet_position_subscriber; 
     
     rclcpp::Client<march_shared_msgs::srv::GetCurrentStanceLeg>::SharedPtr m_stance_leg_client; 
