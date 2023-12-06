@@ -42,3 +42,4 @@ void ExoEstimator::setJointPositions(std::vector<double> joint_positions)
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint %d: %f", i, q_(i));
     }
 }
+

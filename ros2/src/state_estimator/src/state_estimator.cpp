@@ -65,6 +65,14 @@ StateEstimator::StateEstimator()
     m_stance_foot_publisher->publish(stance_foot_msg);
 
     initialize_imus();
+
+    // Initialize ROS2 services
+    task_report_service_ = this->create_service<march_shared_msgs::srv::GetTaskReport>(
+        "get_task_report", std::bind(&StateEstimator::handleTaskReportRequest, this, std::placeholders::_1, std::placeholders::_2));
+    RCLCPP_INFO(this->get_logger(), "Task report service initialized");
+    joint_positions_service_ = this->create_service<march_shared_msgs::srv::GetCurrentJointPositions>(
+        "get_current_joint_positions", std::bind(&StateEstimator::handleJointPositionsRequest, this, std::placeholders::_1, std::placeholders::_2));
+    RCLCPP_INFO(this->get_logger(), "Joint positions service initialized");
 }
 
 void StateEstimator::lower_imu_callback(sensor_msgs::msg::Imu::SharedPtr msg)
@@ -250,4 +258,70 @@ void StateEstimator::visualize_joints()
     joint_markers.lifetime.sec = 1;
     joint_markers.color.a = 1.0;
     m_rviz_publisher->publish(joint_markers);
+}
+
+void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response)
+{
+    int task_id = request->task_id;
+    Eigen::MatrixXd jacobian = Eigen::MatrixXd(6, 8);
+    double counter = 0.0;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 8; j++) {
+            jacobian(i, j) = (double)(j + 1);
+            // counter = counter + 1e-3;
+        }
+    }
+    // jacobian.resize(1, jacobian.size());
+    Eigen::VectorXd jacobian_vector = Eigen::Map<Eigen::VectorXd>(jacobian.data(), jacobian.size());
+    for (int i = 0; i < jacobian_vector.size(); i++) {
+        response->jacobian.push_back(jacobian_vector(i));
+    }
+    RCLCPP_INFO(this->get_logger(), "Incoming request\nm: %d\nn: %d", 6, 8);
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->jacobian.size());
+    for (int i = 0; i < response->jacobian.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "jacobian[%d]: %f", i, response->jacobian[i]);
+    }
+
+    Eigen::VectorXd current_pose = Eigen::VectorXd(6);
+    current_pose << 1.0, 2.0, 3.0, 1.0, 2.0, 3.0;
+    for (int i = 0; i < current_pose.size(); i++) {
+        response->current_pose.push_back(current_pose(i));
+    }
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
+    for (int i = 0; i < response->current_pose.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
+    }
+}
+
+void StateEstimator::handleJointPositionsRequest(
+    const std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response)
+{
+    // Request current joint positions from the robot at the given timestamp.
+    RCLCPP_INFO(this->get_logger(), "Incoming request");
+    RCLCPP_INFO(this->get_logger(), "Current joint positions at timestamp: %f", request->timestamp);
+
+    // Generate current joint positions.
+    Eigen::VectorXd current_joint_positions = Eigen::VectorXd(8);
+    current_joint_positions << 1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0;
+    std::vector<double> current_joint_positions_vector(
+        current_joint_positions.data(), current_joint_positions.data() + current_joint_positions.size());
+
+    // Generate current joint velocities.
+    Eigen::VectorXd current_joint_velocities = Eigen::VectorXd(8);
+    current_joint_velocities << 1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0;
+    std::vector<double> current_joint_velocities_vector(
+        current_joint_velocities.data(), current_joint_velocities.data() + current_joint_velocities.size());
+
+    // Response current joint positions and velocities.
+    response->status = true;
+    response->joint_positions = current_joint_positions_vector;
+    response->joint_velocities = current_joint_velocities_vector;
+
+    // Print current joint positions.
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->joint_positions.size());
+    for (int i = 0; i < (int)response->joint_positions.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "current_joint_positions[%d]: %f", i, response->joint_positions[i]);
+    }
 }

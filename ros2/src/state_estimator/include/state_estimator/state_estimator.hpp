@@ -25,6 +25,10 @@
 #include <string>
 
 #include "state_estimator/exo_estimator.hpp"
+#include "march_shared_msgs/srv/get_task_report.hpp"
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Geometry>
 
 using std::placeholders::_1;
 #ifndef STATE_ESTIMATOR
@@ -51,6 +55,11 @@ private:
 
     void visualize_joints();
 
+    void handleTaskReportRequest(const std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Request> request,
+        std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response);
+    void handleJointPositionsRequest(const std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request> request,
+        std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response);
+
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_upper_imu_subscriber;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_lower_imu_subscriber;
@@ -65,6 +74,9 @@ private:
 
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;
+
+    rclcpp::Service<march_shared_msgs::srv::GetTaskReport>::SharedPtr task_report_service_;
+    rclcpp::Service<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr joint_positions_service_;
 
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
