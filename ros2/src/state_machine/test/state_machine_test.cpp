@@ -19,7 +19,7 @@ private:
 
 TEST_F(StateMachineTest, getCurrentStateTest)
 {
-    ASSERT_EQ(this->state_machine->getCurrentState(), (int)exoState::ForceUnknown);
+    ASSERT_EQ(this->state_machine->getCurrentState(), (int)exoState::BootUp);
 }
 
 TEST_F(StateMachineTest, performTransitionSucces)
@@ -32,7 +32,7 @@ TEST_F(StateMachineTest, performTransitionSucces)
 TEST_F(StateMachineTest, performInvalidTansitionStateDontChange)
 {
     this->state_machine->performTransition(exoState::Walk);
-    exoState expectedState = exoState::ForceUnknown;
+    exoState expectedState = exoState::BootUp;
     ASSERT_EQ(this->state_machine->getCurrentState(), (int)expectedState);
 }
 

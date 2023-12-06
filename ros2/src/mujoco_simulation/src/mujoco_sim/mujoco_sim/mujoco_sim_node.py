@@ -106,9 +106,8 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(
-            self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
-        )
+        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+                                                           self.model.sensor_adr)
 
         self.set_init_joint_qpos(None)
 
@@ -116,7 +115,8 @@ class MujocoSimNode(Node):
         joint_val = self.sensor_data_extraction.get_joint_pos()
         for index, name in enumerate(self.actuator_names):
             joint_val_dict[name] = joint_val[index]
-        self.get_logger().info(f"Keeping initial joint positions, " f"set desired positions to {joint_val_dict}")
+        self.get_logger().info(f"Keeping initial joint positions, "
+                               f"set desired positions to {joint_val_dict}")
 
         # This list of controllers contains all active controllers
         self.controller_mode = 0
@@ -251,8 +251,6 @@ class MujocoSimNode(Node):
         state_msg.position = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
-
-        sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
 
         backpack_imu, torso_imu = self.sensor_data_extraction.get_imu_data()
         sensor_msg.joint_state = state_msg
