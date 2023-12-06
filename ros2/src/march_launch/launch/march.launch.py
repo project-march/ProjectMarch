@@ -1,7 +1,7 @@
 """Author: MARCH."""
 import os
 from ament_index_python import get_package_share_directory
-from launch import LaunchDescription
+from launch import LaunchDescription, condition
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -126,20 +126,32 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_input_device"),
                 "launch",
-                "march_input_device.launch.py",
+                "input_device.launch.py",
             )
         ),
     ),
     #endregion
-    
+
+
+
     # region Launch State Estimator
+    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
+
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
         condition=UnlessCondition(airgait),
-    ),
+        ),
     # endregion
 
     # region Launch IK Solver
+    ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
+    urdf_location = os.path.join(
+        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
+    )
+    # declare parameters
+    # in ms
+    trajectory_dt = 50
+
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
         launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
@@ -147,13 +159,6 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
 
-    ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
-
-    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
-
-    urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
-    )
 
     fuzzy_default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
 
@@ -180,9 +185,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # declare parameters
-    # in ms
-    trajectory_dt = 50
 
     # region footstep_generation parameters
     # n_footsteps = 20
@@ -209,7 +211,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_planning_node', 
             name='march_gait_planning', 
         ), 
-
         ipd_node, 
         mujoco_node,
         march_control,
