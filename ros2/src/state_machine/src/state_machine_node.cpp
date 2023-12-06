@@ -192,7 +192,7 @@ void StateMachineNode::publishAvailableExoStates(march_shared_msgs::msg::ExoStat
 
 void StateMachineNode::newStateCallback(const std_msgs::msg::Int32::SharedPtr msg)
 {
-    RCLCPP_INFO(get_logger(), "Received new state: %d", msg->data);
+    RCLCPP_INFO(get_logger(), "Received new state: %s", toString(exoState(msg->data)));
     if (m_state_machine.isValidTransition((exoState)msg->data)) 
     {
         m_state_machine.performTransition((exoState)msg->data);

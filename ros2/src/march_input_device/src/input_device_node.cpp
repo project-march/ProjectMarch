@@ -16,7 +16,7 @@ inputDeviceNode::inputDeviceNode()
   m_exo_state_array_subscriber = create_subscription<march_shared_msgs::msg::ExoStateArray>(
     "available_states", 10, std::bind(&inputDeviceNode::availableStatesCallback, this, _1));
 
-  m_ipd.setCurrentState(exoState::Stand);
+  m_ipd.setCurrentState(exoState::BootUp);
   sendNewState(m_ipd.getCurrentState());
   
 
@@ -47,7 +47,7 @@ void inputDeviceNode::sendNewState(const exoState& desired_state)
   m_new_state_publisher->publish(msg);
 
   // Print the new state
-  std::cout << "Sent new state: "<<msg.data << std::endl;
+  std::cout << "Sent new state: "<< toString(exoState(msg.data)) << std::endl;
 }
 
 exoState inputDeviceNode::askState() const

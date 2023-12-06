@@ -32,10 +32,14 @@ class GaitPlanningNode:public rclcpp::Node {
     void responseStanceLegCallback(std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future);
     void sendRequest(const bool& gait_complete); 
 
+    void timerCallback();
+
     GaitPlanning m_gait_planning; 
 
     std::vector<std::array<double, 4>> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_current_step_msg; 
+    rclcpp::TimerBase::SharedPtr m_timer;
+    bool m_response_received;
 
 
 };

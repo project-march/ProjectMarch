@@ -14,16 +14,16 @@ using namespace std::chrono_literals;
  */
 StateMachine::StateMachine()
 {
-    m_current_state = exoState::ForceUnknown;
+    m_current_state = exoState::BootUp;
     // NOTE: Possible improvement is that the states and allowed transitions are loaded from a config file.
     m_exo_transitions = {
         /*{CurrentState, PossibleStates}*/
-        { exoState::Sit, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
+        { exoState::Sit, { exoState::Stand, exoState::BootUp, exoState::Error } },
         { exoState::Stand,
-            { exoState::Sit, exoState::Walk, exoState::StepClose, exoState::ForceUnknown, exoState::Error } },
-        { exoState::Walk, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::StepClose, { exoState::Stand, exoState::ForceUnknown, exoState::Error } },
-        { exoState::ForceUnknown, { exoState::Stand, exoState::Sit, exoState::Error } },
+            { exoState::Sit, exoState::Walk, exoState::StepClose, exoState::BootUp, exoState::Error } },
+        { exoState::Walk, { exoState::Stand, exoState::Error } },
+        { exoState::StepClose, { exoState::Stand, exoState::BootUp, exoState::Error } },
+        { exoState::BootUp, { exoState::Stand, exoState::Sit, exoState::Error, exoState::BootUp } },
         { exoState::Error, {} },
 
     };
