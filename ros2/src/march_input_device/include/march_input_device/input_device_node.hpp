@@ -22,5 +22,8 @@ private:
     exoState askState() const;
 
     IPD m_ipd;
-    pid_t m_terminal_pid; // Process ID of the terminal that is opened
+
+    bool ipd_new_terminal; // Parameter to control whether a new terminal is opened or not
+
+
 };

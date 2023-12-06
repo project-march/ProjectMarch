@@ -31,13 +31,8 @@ install(TARGETS input_device_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# Install include directory
-install(DIRECTORY include/
-  DESTINATION include
-)
-
-# Install package.xml
-install(FILES package.xml
+# Install the launch files
+install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 

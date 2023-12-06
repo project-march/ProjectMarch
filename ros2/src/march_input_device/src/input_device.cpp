@@ -1,6 +1,4 @@
-//
-// Created by andrew on 23-11-23.
-//
+/*Authors: Pleuntje Brons and Andrew Hutani, MIX*/
 
 #include "march_input_device/input_device.hpp"
 #include <iostream>
