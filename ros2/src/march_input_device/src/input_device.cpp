@@ -6,7 +6,7 @@
 #include <iostream>
 
 IPD::IPD()
-    : m_current_state (exoState::ForceUnknown)
+    : m_current_state (exoState::BootUp)
 {
     std::cout << "IPD succesfully started" << std::endl;
 }
