@@ -19,7 +19,8 @@ ExoEstimator::ExoEstimator()
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Model njoints: %d", model_.njoints);
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Model nframes: %d", model_.nframes);
 
-    q_ = Eigen::VectorXd::Zero(model_.nq);
+    // q_ = Eigen::VectorXd::Zero(model_.nq);
+    q_ = pinocchio::neutral(model_);
 }
 
 // ExoEstimator::~ExoEstimator()
@@ -43,3 +44,37 @@ void ExoEstimator::setJointPositions(std::vector<double> joint_positions)
     }
 }
 
+std::vector<double> ExoEstimator::getFeetPositions()
+{
+    std::vector<double> feet_positions;
+
+    pinocchio::forwardKinematics(model_, data_, q_);
+
+    pinocchio::SE3 T_left_foot_backpack = pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("L_foot")).inverse()
+        * pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("backpack"));
+    pinocchio::SE3 T_right_foot_backpack = pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("R_foot")).inverse()
+        * pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("backpack"));
+
+    Eigen::Vector3d left_foot_position = T_left_foot_backpack.translation();
+    Eigen::Vector3d right_foot_position = T_right_foot_backpack.translation();
+
+    for (int i = 0; i < 3; i++)
+    {
+        feet_positions.push_back(left_foot_position(i));
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        feet_positions.push_back(right_foot_position(i));
+    }
+
+    return feet_positions;
+}
+
+std::vector<double> ExoEstimator::getJacobian()
+{
+    std::vector<double> jacobian;
+
+    
+
+    return jacobian;
+}

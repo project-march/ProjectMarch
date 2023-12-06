@@ -284,11 +284,13 @@ void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_
         RCLCPP_INFO(this->get_logger(), "jacobian[%d]: %f", i, response->jacobian[i]);
     }
 
-    Eigen::VectorXd current_pose = Eigen::VectorXd(6);
-    current_pose << 1.0, 2.0, 3.0, 1.0, 2.0, 3.0;
-    for (int i = 0; i < current_pose.size(); i++) {
-        response->current_pose.push_back(current_pose(i));
-    }
+    // Eigen::VectorXd current_pose = Eigen::VectorXd(6);
+    // current_pose << 1.0, 2.0, 3.0, 1.0, 2.0, 3.0;
+    // for (int i = 0; i < current_pose.size(); i++) {
+    //     response->current_pose.push_back(current_pose(i));
+    // }
+    response->current_pose = m_exo_estimator.getFeetPositions();
+
     RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
     for (int i = 0; i < response->current_pose.size(); i++) {
         RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
