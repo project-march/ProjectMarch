@@ -51,8 +51,7 @@ def generate_launch_description() -> LaunchDescription:
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
         launch_arguments=[
             ("model_to_load", mujoco_toload),
-            (
-                "tunings_to_load_path",
+            ("tunings_to_load_path",
                 PathJoinSubstitution(
                     [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
                 ),
@@ -129,7 +128,8 @@ def generate_launch_description() -> LaunchDescription:
                 "input_device.launch.py",
             )
         ),
-    ),
+        launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+    )
     #endregion
 
 
@@ -140,7 +140,7 @@ def generate_launch_description() -> LaunchDescription:
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
         condition=UnlessCondition(airgait),
-        ),
+        )
     # endregion
 
     # region Launch IK Solver
@@ -155,7 +155,7 @@ def generate_launch_description() -> LaunchDescription:
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
         launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
-    ),
+    )
     # endregion
 
 
@@ -218,5 +218,5 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         imu_nodes,
         ik_solver,
-        state_estimator
+        state_estimator,
     ])
