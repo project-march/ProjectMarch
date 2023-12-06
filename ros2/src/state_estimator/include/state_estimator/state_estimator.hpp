@@ -24,6 +24,8 @@
 #include <cstdio>
 #include <string>
 
+#include "state_estimator/exo_estimator.hpp"
+
 using std::placeholders::_1;
 #ifndef STATE_ESTIMATOR
 #define STATE_ESTIMATOR
@@ -67,6 +69,7 @@ private:
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_joint_broadcaster;
     JointEstimator m_joint_estimator;
     ImuEstimator m_imu_estimator;
+    ExoEstimator m_exo_estimator;
 
     int m_current_stance_foot;
 

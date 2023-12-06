@@ -84,6 +84,9 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
     //         return;
     //     }
     // }
+    std::vector<double> joint_positions = msg->position;
+    m_exo_estimator.setJointPositions(joint_positions);
+
     this->m_joint_estimator.set_joint_states(msg);
     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
