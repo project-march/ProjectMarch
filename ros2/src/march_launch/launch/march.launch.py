@@ -20,32 +20,33 @@ def generate_launch_description() -> LaunchDescription:
     robot = LaunchConfiguration("robot")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
 
-    DeclareLaunchArgument(
-        name="rosbags",
-        default_value="true",
-        description="Whether the rosbags should stored.",
-        choices=["true", "false"],
-    )
+    declared_arguments = [
+        DeclareLaunchArgument(
+            name="rosbags",
+            default_value="true",
+            description="Whether the rosbags should stored.",
+            choices=["true", "false"],
+        ),
 
-    DeclareLaunchArgument(
-        name="airgait",
-        default_value="false",
-        description="Whether we want to do an airgait or not",
-        choices=["true", "false"],
-    )
+        DeclareLaunchArgument(
+            name="airgait",
+            default_value="false",
+            description="Whether we want to do an airgait or not",
+            choices=["true", "false"],
+        ),
 
-    DeclareLaunchArgument(
-        name="robot",
-        default_value="march8",
-        description="The name of the yaml that will be used for retrieving info about the exo.",
-    )
+        DeclareLaunchArgument(
+            name="robot",
+            default_value="march8",
+            description="The name of the yaml that will be used for retrieving info about the exo.",
+        ),
 
-    DeclareLaunchArgument(
-        name="IPD_new_terminal",
-        default_value="true",
-        description="Whether a new terminal should be openened, allowing you to give input.",
-    )
-
+        DeclareLaunchArgument(
+            name="IPD_new_terminal",
+            default_value="true",
+            description="Whether a new terminal should be openened, allowing you to give input.",
+        )
+    ]
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
@@ -191,7 +192,7 @@ def generate_launch_description() -> LaunchDescription:
     # step_length = 0.2
     # endregion
 
-    return LaunchDescription([
+    return LaunchDescription(declared_arguments + [
         Node(
             package='fuzzy_generator',
             namespace='',
