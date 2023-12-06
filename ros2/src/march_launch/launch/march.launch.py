@@ -18,6 +18,7 @@ def generate_launch_description() -> LaunchDescription:
     rosbags = LaunchConfiguration("rosbags", default="true")
     airgait = LaunchConfiguration("airgait", default="false")
     robot = LaunchConfiguration("robot")
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
 
     DeclareLaunchArgument(
         name="rosbags",
@@ -37,6 +38,12 @@ def generate_launch_description() -> LaunchDescription:
         name="robot",
         default_value="march8",
         description="The name of the yaml that will be used for retrieving info about the exo.",
+    )
+
+    DeclareLaunchArgument(
+        name="IPD_new_terminal",
+        default_value="true",
+        description="Whether a new terminal should be openened, allowing you to give input.",
     )
 
     # region Launch Mujoco
@@ -113,6 +120,32 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch IPD
+    ipd_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_input_device"),
+                "launch",
+                "march_input_device.launch.py",
+            )
+        ),
+    ),
+    #endregion
+    
+    # region Launch State Estimator
+    state_estimator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
+        condition=UnlessCondition(airgait),
+    ),
+    # endregion
+
+    # region Launch IK Solver
+    ik_solver = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
+        launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+    ),
+    # endregion
+
     ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
 
     state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
@@ -175,18 +208,13 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_planning_node', 
             name='march_gait_planning', 
         ), 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
-            condition=UnlessCondition(airgait),
 
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-            launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
-        ),
+        ipd_node
         mujoco_node,
         march_control,
         record_rosbags_action,
         safety_node,
         imu_nodes,
+        ik_solver,
+        state_estimator
     ])
