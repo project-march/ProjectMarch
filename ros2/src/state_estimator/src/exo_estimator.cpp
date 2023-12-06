@@ -49,6 +49,7 @@ std::vector<double> ExoEstimator::getFeetPositions()
     std::vector<double> feet_positions;
 
     pinocchio::forwardKinematics(model_, data_, q_);
+    // pinocchio::updateFramePlacements(m_model, m_model_data);
 
     pinocchio::SE3 T_left_foot_backpack = pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("L_foot")).inverse()
         * pinocchio::updateFramePlacement(model_, data_, model_.getFrameId("backpack"));
@@ -74,7 +75,45 @@ std::vector<double> ExoEstimator::getJacobian()
 {
     std::vector<double> jacobian;
 
-    
+    int left_foot_id = model_.getFrameId("L_foot");
+    int right_foot_id = model_.getFrameId("R_foot");
+    int backpack_id = model_.getFrameId("backpack");
+
+    pinocchio::Data::Matrix6x J_left_foot(6, model_.nv); 
+    pinocchio::Data::Matrix6x J_right_foot(6, model_.nv);
+    J_left_foot.setZero();
+    J_right_foot.setZero();
+
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Forward kinematics...");
+    pinocchio::forwardKinematics(model_, data_, q_);
+    pinocchio::updateFramePlacements(model_, data_);
+
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Calculating Jacobians...");
+    pinocchio::computeFrameJacobian(model_, data_, q_, left_foot_id, J_left_foot);
+    pinocchio::computeFrameJacobian(model_, data_, q_, right_foot_id, J_right_foot);
+
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            jacobian.push_back(J_left_foot(i, j));
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            jacobian.push_back(0.0);
+        }
+    }
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            jacobian.push_back(J_right_foot(i, j));
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            jacobian.push_back(0.0);
+        }
+    }
 
     return jacobian;
 }
