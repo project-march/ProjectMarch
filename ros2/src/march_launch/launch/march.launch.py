@@ -146,6 +146,7 @@ def generate_launch_description() -> LaunchDescription:
     ),
     # endregion
 
+
     ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
 
     state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
@@ -209,7 +210,7 @@ def generate_launch_description() -> LaunchDescription:
             name='march_gait_planning', 
         ), 
 
-        ipd_node
+        ipd_node, 
         mujoco_node,
         march_control,
         record_rosbags_action,
