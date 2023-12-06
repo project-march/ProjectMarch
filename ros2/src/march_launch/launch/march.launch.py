@@ -2,10 +2,10 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription, condition
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
@@ -108,6 +108,18 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch state machine
+    state_machine = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("state_machine"),
+                "launch",
+                "state_machine.launch.py",
+            )
+        ),
+    )
+    # endregion
+
     # region Launch IMU
     imu_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -201,23 +213,22 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[{'config_path': fuzzy_config_path}]
         ),
         Node(
-            package='state_machine',
-            namespace='',
-            executable='state_machine_node',
-            name='state_machine',
-        ),
-        Node(
             package='march_gait_planning', 
             namespace='', 
             executable='gait_planning_node', 
             name='march_gait_planning', 
         ), 
-        ipd_node, 
+
         mujoco_node,
         march_control,
+        state_machine,
         record_rosbags_action,
         safety_node,
         imu_nodes,
         ik_solver,
         state_estimator,
+        TimerAction(
+            period=PythonExpression(['8.0']),  # Delay in seconds
+            actions=[ipd_node],
+    ),
     ])
