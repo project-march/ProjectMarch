@@ -84,6 +84,8 @@ private:
     ExoEstimator m_exo_estimator;
 
     int m_current_stance_foot;
+    std::vector<double> m_current_joint_positions;
+    std::vector<double> m_current_joint_velocities;
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_joint_listener;

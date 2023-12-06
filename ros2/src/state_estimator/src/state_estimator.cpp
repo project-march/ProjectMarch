@@ -92,8 +92,9 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
     //         return;
     //     }
     // }
-    std::vector<double> joint_positions = msg->position;
-    m_exo_estimator.setJointPositions(joint_positions);
+    m_current_joint_positions = msg->position;
+    m_current_joint_velocities = msg->velocity;
+    m_exo_estimator.setJointPositions(msg->position);
 
     this->m_joint_estimator.set_joint_states(msg);
     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
@@ -302,22 +303,10 @@ void StateEstimator::handleJointPositionsRequest(
     RCLCPP_INFO(this->get_logger(), "Incoming request");
     RCLCPP_INFO(this->get_logger(), "Current joint positions at timestamp: %f", request->timestamp);
 
-    // Generate current joint positions.
-    Eigen::VectorXd current_joint_positions = Eigen::VectorXd(8);
-    current_joint_positions << 1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0;
-    std::vector<double> current_joint_positions_vector(
-        current_joint_positions.data(), current_joint_positions.data() + current_joint_positions.size());
-
-    // Generate current joint velocities.
-    Eigen::VectorXd current_joint_velocities = Eigen::VectorXd(8);
-    current_joint_velocities << 1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0;
-    std::vector<double> current_joint_velocities_vector(
-        current_joint_velocities.data(), current_joint_velocities.data() + current_joint_velocities.size());
-
     // Response current joint positions and velocities.
     response->status = true;
-    response->joint_positions = current_joint_positions_vector;
-    response->joint_velocities = current_joint_velocities_vector;
+    response->joint_positions = m_current_joint_positions;
+    response->joint_velocities = m_current_joint_velocities;
 
     // Print current joint positions.
     RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->joint_positions.size());
