@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Script to load in the xacro and make it usable by ros."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import (
@@ -6,49 +7,12 @@ from launch.substitutions import (
     Command,
 )
 from launch_ros.actions import Node
-from march_utility.utilities.build_tool_functions import generate_robot_desc_command
-
 
 from march_utility.utilities.build_tool_functions import generate_robot_desc_command
+
 
 def generate_launch_description() -> LaunchDescription:
-    # region Xacro arquments
-    # Which <robot_description>.xacro file to use. This file must be available in the `march_description/urdf/` folder.
-    robot_description = LaunchConfiguration("robot_description")
-    # Whether the simulation should be simulating ground_gaiting instead of airgaiting.
-    ground_gait = LaunchConfiguration("ground_gait")
-    # If true, no joints will be actuated.
-    jointless = LaunchConfiguration("jointless")
-    # Whether the exoskeleton is ran physically or in simulation.
-    simulation = LaunchConfiguration("simulation")
-    # endregion
-    march_state_publisher_node = Node(
-        package="march_robot_state_publisher",
-        executable="march_robot_state_publisher_node",
-        name="robot_state_publisher",
-        # Might be nice to add march namespace later on but /robot description should then be remapped.
-        # namespace="march",  # noqa: E800
-        output="screen",
-        parameters=[
-            {
-                "robot_description": Command(
-                    generate_robot_desc_command(
-                        robot_descr_file=robot_description,
-                        ground_gait=ground_gait,
-                        simulation=simulation,
-                        jointless=jointless,
-                    )
-                ),
-                "simulation": simulation,
-            }
-        ],
-    )
-    declared_arguments = []
-    march_state_publisher_node = Node()
-    return LaunchDescription(declared_arguments + [march_state_publisher_node])
-
-
-"""The launch file for the exo description.
+    """The launch file for the exo description.
 
     This makes sure the urdf is loaded in and published by the node `march_robot_state_publisher`.
 
@@ -97,15 +61,15 @@ def generate_launch_description() -> LaunchDescription:
             "publish the rotation of the exoskeleton.",
         ),
         DeclareLaunchArgument(
-            name="imu_topic",
-            default_value="/camera_front/imu/data",
-            description="The topic that should be used to determine the orientation.",
-        ),
-        DeclareLaunchArgument(
             name="to_world_transform",
             default_value="False",
             description="Whether a transform from the world to base_link is necessary, "
             "this is the case when you are groundgaiting in rviz.",
+        ),
+        DeclareLaunchArgument(
+            "balance",
+            default_value="False",
+            description="Whether balance is being used.",
         ),
     ]
     # endregion

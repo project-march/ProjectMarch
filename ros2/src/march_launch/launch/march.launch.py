@@ -114,12 +114,6 @@ def generate_launch_description() -> LaunchDescription:
             "(not used if gazebo control is used). Must be in: `march_control/config/`.",
         ),
         DeclareLaunchArgument(
-            name="gazebo_control_yaml",
-            default_value="gazebo/march7_control.yaml",
-            description="The gazebo controller yaml file to use this is added in through the urdf published "
-            "on /robot_description. Must be in: `march_control/config/`.",
-        ),
-        DeclareLaunchArgument(
             name="rosbags",
             default_value="true",
             description="Whether the rosbags should stored.",
@@ -128,8 +122,8 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             name="rviz", default_value="false", description="Whether we should startup rviz.", choices=["true", "false"]
         ),
-        # RQT INPUT DEVICE ARGUMENTS
-        # TODO: Add RQT input based on new IPD launch file
+        # INPUT DEVICE ARGUMENTS
+        # TODO: Add input based on new IPD launch file
 
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
@@ -186,18 +180,15 @@ def generate_launch_description() -> LaunchDescription:
 
     # region Launch March gait planning
 
-    ##### TODO: Uncomment when gait planning launch file is implemented #####
-
-    # march_gait_selection_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(   
-    #             get_package_share_directory("march_gait_planning"),
-    #             "launch",
-    #             "march_gait_planning.launch.py",
-    #         )
-    #     ),
-    # )
-
+    march_gait_selection_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(   
+                get_package_share_directory("march_gait_planning"),
+                "launch",
+                "march_gait_planning.launch.py",
+            )
+        ),
+    )
 
     # endregion
 
@@ -261,7 +252,7 @@ def generate_launch_description() -> LaunchDescription:
 
     nodes = [
     robot_state_publisher_node,
-    # march_gait_selection_node,
+    march_gait_selection_node,
     safety_node,
     mujoco_node,
     march_control,
