@@ -33,8 +33,8 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     // TODO: Apply for loop after MVP.
     RCLCPP_INFO(this->get_logger(), "Processing the desired pose for both feet...");
-    geometry_msgs::msg::Point desired_pose_left = msg->left_foot_position[0];
-    geometry_msgs::msg::Point desired_pose_right = msg->right_foot_position[0];
+    geometry_msgs::msg::Point desired_pose_left = msg->left_foot_position;
+    geometry_msgs::msg::Point desired_pose_right = msg->right_foot_position;
     Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(6);
     desired_pose << desired_pose_left.x, desired_pose_left.y, desired_pose_left.z, desired_pose_right.x,
         desired_pose_right.y, desired_pose_right.z;

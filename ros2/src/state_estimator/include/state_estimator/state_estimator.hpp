@@ -6,6 +6,8 @@
 #include "march_shared_msgs/msg/feet.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/robot_state.hpp"
+#include "march_shared_msgs/msg/iks_foot_positions.hpp"
+#include "march_shared_msgs/srv/get_current_stance_leg.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -49,6 +51,8 @@ private:
 
     void publish_robot_frames();
 
+    void publishFootPositions(); 
+
     void initialize_imus();
 
     void update_foot_frames();
@@ -59,6 +63,10 @@ private:
         std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response);
     void handleJointPositionsRequest(const std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response);
+        
+    void setStanceFoot();
+    void stanceFootServiceCallback(const std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Request>,
+        std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Response> response);
 
     rclcpp::Publisher<march_shared_msgs::msg::RobotState>::SharedPtr m_state_publisher;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_upper_imu_subscriber;
@@ -72,6 +80,12 @@ private:
     // rclcpp::Publisher<march_shared_msgs::msg::Feet>::SharedPtr m_foot_impact_publisher;
 
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_publisher;
+
+    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_feet_position_publisher; 
+
+    rclcpp::Service<march_shared_msgs::srv::GetCurrentStanceLeg>::SharedPtr m_current_stance_foot_service;
+
+
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_rviz_publisher;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_publisher;
 

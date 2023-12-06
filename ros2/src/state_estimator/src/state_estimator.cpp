@@ -32,10 +32,15 @@ StateEstimator::StateEstimator()
 
     m_rviz_publisher = this->create_publisher<visualization_msgs::msg::Marker>("joint_visualizations", 100);
 
+    m_feet_position_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("estimated_baseframe_foot_positions", 100);
+
+    m_current_stance_foot_service = create_service<march_shared_msgs::srv::GetCurrentStanceLeg>(
+        "current_stance_leg_service", std::bind(&StateEstimator::stanceFootServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
+
     declare_parameter("state_estimator_config.refresh_rate", 1000);
-    auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
-    timer_ = this->create_wall_timer(
-        std::chrono::milliseconds(refresh_rate), std::bind(&StateEstimator::publish_robot_frames, this));
+    // auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
+    // timer_ = this->create_wall_timer(
+    //     std::chrono::milliseconds(refresh_rate), std::bind(&StateEstimator::publish_robot_frames, this));
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
@@ -96,6 +101,24 @@ void StateEstimator::state_callback(sensor_msgs::msg::JointState::SharedPtr msg)
     // m_joint_estimator.set_individual_joint_state("right_knee", 0.5);
     m_joint_state_publisher->publish(*msg);
 }
+
+void StateEstimator::publishFootPositions(){
+
+    std::vector<std::array<double, 3>> map_foot_positions = m_joint_estimator.transformFeetPositionsToExoFrame();
+
+    march_shared_msgs::msg::IksFootPositions msg; 
+
+    msg.left_foot_position.x = map_foot_positions[0][0];
+    msg.left_foot_position.y = map_foot_positions[0][1];
+    msg.left_foot_position.z = map_foot_positions[0][2];
+
+    msg.right_foot_position.x = map_foot_positions[1][0];
+    msg.right_foot_position.y = map_foot_positions[1][1];
+    msg.right_foot_position.z = map_foot_positions[1][2];
+
+    m_feet_position_publisher->publish(msg); 
+}
+
 
 void StateEstimator::initialize_imus()
 {
@@ -159,6 +182,39 @@ void StateEstimator::update_foot_frames()
     } catch (const tf2::TransformException& ex) {
         RCLCPP_WARN(this->get_logger(), "error in update_foot_frames: %s", ex.what());
     }
+}
+
+void StateEstimator::setStanceFoot(){
+    std::vector<std::array<double, 3>> map_foot_positions = 
+        m_joint_estimator.transformFeetPositionsToExoFrame();
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Test3");
+    double margin = 0.005; // 5 mm
+    if (abs(map_foot_positions[0][0] - map_foot_positions[1][0]) <= margin){
+        // Feet are next to each other
+        m_current_stance_foot = 0;
+    }
+    else if (map_foot_positions[0][0] + margin < map_foot_positions[1][0])
+    {
+        // Right foot is in front, so right foot is stance foot
+        m_current_stance_foot = 1;
+    }
+    else if (map_foot_positions[0][0] - margin > map_foot_positions[1][0])
+    {
+        // Left foot is in front, so left foot is stance foot
+        m_current_stance_foot = -1;
+    }
+    
+}
+
+void StateEstimator::stanceFootServiceCallback(
+    const std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Request>,
+    std::shared_ptr<march_shared_msgs::srv::GetCurrentStanceLeg::Response> response)
+{
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Request received!");
+    setStanceFoot();
+    response->stance_leg = m_current_stance_foot;
+    RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Response sent!");
+    
 }
 
 void StateEstimator::publish_robot_frames()
