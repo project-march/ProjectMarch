@@ -6,7 +6,6 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess, DeclareLaunchArgument
 
-
 def generate_launch_description():
     """Launch description of the input device.
 
@@ -20,20 +19,22 @@ def generate_launch_description():
             description="Whether a new terminal should be openened, allowing you to give input.",
         ),
     ]
-    node = Node(
+
+    node_in_current_terminal = Node(
         package="march_input_device",
         namespace="",
         executable="input_device_node",
         name="input_device",
-        parameters=[{"IPD_new_terminal": IPD_new_terminal}]
-    )  
-    
-    open_new_terminal = ExecuteProcess(
+        parameters=[{"IPD_new_terminal": IPD_new_terminal}],
+        condition=conditions.UnlessCondition(IPD_new_terminal)
+    )
+
+    node_in_new_terminal = ExecuteProcess(
         cmd=['gnome-terminal', '--', 'ros2', 'run', 'march_input_device', 'input_device_node'],
         output='screen',
         condition=conditions.IfCondition(IPD_new_terminal)
     )
 
     return LaunchDescription(
-        arguments + [node, open_new_terminal]
+        arguments + [node_in_current_terminal, node_in_new_terminal]
     )

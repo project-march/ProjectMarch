@@ -1,12 +1,12 @@
-//
-// Created by andrew on 23-11-23.
-//
+/*Authors: Pleuntje Brons and Andrew Hutani, MIX*/
 
 #include "march_input_device/input_device_node.hpp"
 #include "march_input_device/input_device.hpp"
 #include <cstdlib>
 #include <ncurses.h>
 using std::placeholders::_1;
+
+std::array<exoState, 6> all_possible_states = {exoState::Sit, exoState::Stand, exoState::Walk, exoState::StepClose, exoState::BootUp, exoState::Error};
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
@@ -47,7 +47,7 @@ void inputDeviceNode::sendNewState(const exoState& desired_state)
   m_new_state_publisher->publish(msg);
 
   // Print the new state
-  std::cout << "Sent new state: "<< toString(exoState(msg.data)) << std::endl;
+  std::cout << "Sent new state: "<< toString(exoState(msg.data)) << "\n" << std::endl;
 }
 
 exoState inputDeviceNode::askState() const
@@ -55,11 +55,11 @@ exoState inputDeviceNode::askState() const
   std::set<exoState> available_states = m_ipd.getAvailableStates();
 
   std::map<std::string, exoState> state_map;
-  for (const auto& state : available_states) {
+  for (const auto& state : all_possible_states) {
     state_map[toString(state)] = state;
   }
 
-  while (true){
+  while (rclcpp::ok()){
     std::cout << "Available states are: ";
     for (const auto& state : available_states) {
       std::cout << toString(state) << " ";
@@ -69,10 +69,16 @@ exoState inputDeviceNode::askState() const
 
     std::string userInput;
     std::cin >> userInput;
-
-    return state_map[userInput];
     
+    auto it = state_map.find(userInput);
+    if (it != state_map.end()) {
+        return it->second;
+    } else {
+        std::cout << "Invalid state. Please enter a valid state." << std::endl;
+    }
   }
+  rclcpp::shutdown();
+  return exoState::BootUp;
 }
 
 
