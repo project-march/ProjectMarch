@@ -184,47 +184,21 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch March gait selection
-    march_gait_selection_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(   
-                get_package_share_directory("march_gait_selection"),
-                "launch",
-                "gait_selection.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("gait_directory", gait_directory),
-            ("use_sim_time", use_sim_time),
-            ("gait_package", gait_package),
-            ("balance", balance),
-            ("dynamic_gait", dynamic_gait),
-            ("middle_point_fraction", middle_point_fraction),
-            ("middle_point_height", middle_point_height),
-            ("minimum_stair_height", minimum_stair_height),
-            ("push_off_fraction", push_off_fraction),
-            ("push_off_position", push_off_position),
-            ("add_push_off", add_push_off),
-            ("amount_of_steps", amount_of_steps),
-            ("use_position_queue", use_position_queue),
-            ("add_cybathlon_gaits", add_cybathlon_gaits),
-            ("scheduling_delay", scheduling_delay),
-            ("first_subgait_delay", first_subgait_delay),
-            ("timer_period", timer_period),
-        ],
-    )
-    # endregion
+    # region Launch March gait planning
 
-    # region Launch Gait preprocessor
-    gait_preprocessor_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_gait_preprocessor"),
-                "launch",
-                "march_gait_preprocessor.launch.py",
-            )
-        ),
-    )
+    ##### TODO: Uncomment when gait planning launch file is implemented #####
+
+    # march_gait_selection_node = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(   
+    #             get_package_share_directory("march_gait_planning"),
+    #             "launch",
+    #             "march_gait_planning.launch.py",
+    #         )
+    #     ),
+    # )
+
+
     # endregion
 
     # region Launch Safety
@@ -237,27 +211,6 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[("use_sim_time", use_sim_time), ("simulation", simulation)],
-    )
-    # endregion
-
-    # region Launch March robot information
-    robot_information_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_robot_information"),
-                "launch",
-                "robot_information.launch.py",
-            )
-        )
-    )
-    # endregion
-
-    # region Launch Gazebo
-    gazebo_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [PathJoinSubstitution([FindPackageShare("march_simulation"), "launch", "gazebo.launch.py"])]
-        ),
-        condition=IfCondition(gazebo),
     )
     # endregion
 
@@ -306,24 +259,10 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    imu_nodes = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("bluespace_ai_xsens_mti_driver"),
-                "launch",
-                "imu_launch.launch.py",
-            )
-        ),
-    )
-
     nodes = [
-    rqt_input_device,
-    wireless_ipd_node,
     robot_state_publisher_node,
-    march_gait_selection_node,
-    gait_preprocessor_node,
+    # march_gait_selection_node,
     safety_node,
-    robot_information_node,
     mujoco_node,
     march_control,
     record_rosbags_action,
