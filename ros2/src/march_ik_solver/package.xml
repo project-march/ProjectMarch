@@ -16,7 +16,7 @@
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>control_msgs</depend>
+  <depend>trajectory_msgs</depend>
   <depend>march_shared_msgs</depend>
 
   <exec_depend>ros2launch</exec_depend>
