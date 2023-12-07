@@ -227,8 +227,5 @@ def generate_launch_description() -> LaunchDescription:
         imu_nodes,
         ik_solver,
         state_estimator,
-        TimerAction(
-            period=PythonExpression(['8.0']),  # Delay in seconds
-            actions=[ipd_node],
-    ),
+        ipd_node,
     ])

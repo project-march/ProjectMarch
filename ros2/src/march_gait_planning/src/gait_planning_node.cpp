@@ -81,10 +81,10 @@ void GaitPlanningNode::footPositionsPublish(){
         m_current_trajectory.clear();
         m_current_step_msg->left_foot_position.x = 0.0;
         m_current_step_msg->left_foot_position.y = 0.16; 
-        m_current_step_msg->left_foot_position.z = -0.95; 
+        m_current_step_msg->left_foot_position.z = -0.802; 
         m_current_step_msg->right_foot_position.x = 0.0; 
         m_current_step_msg->right_foot_position.y = -0.16; 
-        m_current_step_msg->right_foot_position.z = -0.95;
+        m_current_step_msg->right_foot_position.z = -0.802;
         m_iks_foot_positions_publisher->publish(*m_current_step_msg);
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
     }
