@@ -90,7 +90,7 @@ void GaitPlanningNode::footPositionsPublish(){
     }
 
     else if (m_gait_planning.getGaitType() == exoState::BootUp){
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp state entered, waiting for new state."); 
+        // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp state entered, waiting for new state."); 
     }
 
     else if (m_gait_planning.getGaitType() == exoState::Walk){
