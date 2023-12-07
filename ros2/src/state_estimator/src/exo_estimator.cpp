@@ -37,11 +37,11 @@ void ExoEstimator::initialize_model()
 void ExoEstimator::setJointPositions(std::vector<double> joint_positions)
 {
     q_ = Eigen::VectorXd::Map(joint_positions.data(), joint_positions.size());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint positions set");
-    for (int i = 0; i < q_.size(); i++)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint %d: %f", i, q_(i));
-    }
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint positions set");
+    // for (int i = 0; i < q_.size(); i++)
+    // {
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint %d: %f", i, q_(i));
+    // }
 }
 
 std::vector<double> ExoEstimator::getFeetPositions()
