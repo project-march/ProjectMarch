@@ -15,6 +15,7 @@
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
 #include "march_shared_msgs/msg/exo_state_array.hpp"
+#include "march_shared_msgs/srv/get_exo_state_array.hpp"
 
 class StateMachineNode : public rclcpp::Node 
 {
@@ -30,8 +31,11 @@ private:
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
     void newStateCallback(const std_msgs::msg::Int32::SharedPtr msg);
 
-    void fillExoStateArray(march_shared_msgs::msg::ExoStateArray::SharedPtr msg) const;
+    void fillExoStateArray(march_shared_msgs::srv::GetExoStateArray_Response::SharedPtr response) const;
     void publishAvailableExoStates(march_shared_msgs::msg::ExoStateArray::SharedPtr msg) const;
+
+    void handleGetExoStateArray(const std::shared_ptr<march_shared_msgs::srv::GetExoStateArray::Request> request,
+        std::shared_ptr<march_shared_msgs::srv::GetExoStateArray::Response> response);
 
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_reset_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
@@ -47,6 +51,8 @@ private:
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
     rclcpp::Publisher<march_shared_msgs::msg::ExoStateArray>::SharedPtr m_exo_state_array_publisher;
     rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
+
+    rclcpp::Service<march_shared_msgs::srv::GetExoStateArray>::SharedPtr m_get_exo_state_array_service;
 
     StateMachine m_state_machine;
 };

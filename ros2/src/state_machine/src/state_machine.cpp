@@ -14,6 +14,7 @@ using namespace std::chrono_literals;
  */
 StateMachine::StateMachine()
 {
+    RCLCPP_WARN(rclcpp::get_logger("state_machine"), "State Machine created");
     m_current_state = exoState::BootUp;
     // NOTE: Possible improvement is that the states and allowed transitions are loaded from a config file.
     m_exo_transitions = {
@@ -27,7 +28,7 @@ StateMachine::StateMachine()
         { exoState::Error, {} },
 
     };
-    std::cout << "State machine created" << std::endl;
+    
 }
 
 /**

@@ -12,9 +12,13 @@ inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
   m_ipd (IPD())
 {
-  m_new_state_publisher = create_publisher<std_msgs::msg::Int32>("new_state", 10);
-  m_exo_state_array_subscriber = create_subscription<march_shared_msgs::msg::ExoStateArray>(
-    "available_states", 10, std::bind(&inputDeviceNode::availableStatesCallback, this, _1));
+  m_get_exo_state_array_client = 
+    create_client<march_shared_msgs::srv::GetExoStateArray>("get_exo_state_array");
+  while (!m_get_exo_state_array_client->wait_for_service(std::chrono::seconds(5))) {
+    RCLCPP_WARN(this->get_logger(), "Waiting for service get_exo_state_array to become available...");
+  }
+
+  RCLCPP_INFO(this->get_logger(), "Connected to service get_exo_state_array");
 
   m_ipd.setCurrentState(exoState::BootUp);
   sendNewState(m_ipd.getCurrentState());
@@ -22,32 +26,31 @@ inputDeviceNode::inputDeviceNode()
 
 }
 
-inputDeviceNode::~inputDeviceNode()
-{
-}
-
-void inputDeviceNode::availableStatesCallback(const march_shared_msgs::msg::ExoStateArray::SharedPtr msg)
-{
-  std::set<exoState> exo_states_set;
-  for (const auto& exo_state_msg : msg->states) {
-    exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
-  }
-  m_ipd.setAvailableStates(exo_states_set);
-
-  exoState desired_state = askState();
-  sendNewState(desired_state);
-  m_ipd.setCurrentState(desired_state);
-
-}
-
 void inputDeviceNode::sendNewState(const exoState& desired_state)
 {
-  auto msg = std_msgs::msg::Int32();
-  msg.data = static_cast<int32_t>(desired_state);
-  m_new_state_publisher->publish(msg);
+    auto request = std::make_shared<march_shared_msgs::srv::GetExoStateArray::Request>();
+    request->desired_state.state = static_cast<int32_t>(desired_state);
 
-  // Print the new state
-  std::cout << "Sent new state: "<< toString(exoState(msg.data)) << "\n" << std::endl;
+    auto result_future = m_get_exo_state_array_client->async_send_request(request);
+
+
+    // Wait for the result
+    if (rclcpp::spin_until_future_complete(get_node_base_interface(), result_future) ==
+        rclcpp::executor::FutureReturnCode::SUCCESS)
+    {
+        auto result = result_future.get();
+        // Do something with the result
+        std::set<exoState> exo_states_set;
+        for (const auto& exo_state_msg : result->state_array.states) {
+            exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
+        }
+        m_ipd.setAvailableStates(exo_states_set);
+        exoState desired_state = askState();
+        sendNewState(desired_state);
+    }
+    else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service GetExoStateArray");
+    }
 }
 
 exoState inputDeviceNode::askState() const
