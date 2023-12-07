@@ -16,11 +16,11 @@ def cubic_bezier(array_size, step_length, x_curr):
         np.ndarray: Array of points on the Bézier curve.
     """
     p0 = x_curr
-    p1 = (x_curr[0], -0.82)
+    p1 = (x_curr[0], -0.70)
     
     p3 = tuple(np.add(x_curr, (step_length, 0)))
     print(p3)
-    p2 = (p3[0], -0.89)
+    p2 = (p3[0], -0.75)
 
 
     t_values = np.linspace(0, 1, array_size)
@@ -49,10 +49,10 @@ def cubic_bezier(array_size, step_length, x_curr):
 
 
 # Generate the first step array
-first_step = cubic_bezier(20, 0.10, (0, -0.95))
+first_step = cubic_bezier(20, 0.10, (0, -0.78))
 
 # Generate the normal gait array
-normal_gait = cubic_bezier(40, 0.20, (-.1, -0.95))
+normal_gait = cubic_bezier(40, 0.20, (-.1, -0.78))
 
 # Save the arrays to separate CSV files
 column_names = ['x', 'z']

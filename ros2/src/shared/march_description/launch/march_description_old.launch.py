@@ -33,7 +33,7 @@ def generate_launch_description() -> LaunchDescription:
     # Whether the simulation should be simulating ground_gaiting instead of airgaiting.
     ground_gait = LaunchConfiguration("ground_gait")
     # Whether the simulation camera or the physical camera should be used.
-    # realsense_simulation = LaunchConfiguration("realsense_simulation")
+    realsense_simulation = LaunchConfiguration("realsense_simulation")
     # If true, no joints will be actuated.
     jointless = LaunchConfiguration("jointless")
     # Whether the exoskeleton is ran physically or in simulation.
@@ -59,6 +59,11 @@ def generate_launch_description() -> LaunchDescription:
             default_value="False",
             description="Whether the data from the physical imu should be used to"
             "publish the rotation of the exoskeleton.",
+        ),
+        DeclareLaunchArgument(
+            name="imu_topic",
+            default_value="/camera_front/imu/data",
+            description="The topic that should be used to determine the orientation.",
         ),
         DeclareLaunchArgument(
             name="to_world_transform",
@@ -87,7 +92,7 @@ def generate_launch_description() -> LaunchDescription:
                     generate_robot_desc_command(
                         robot_descr_file=robot_description,
                         ground_gait=ground_gait,
-                        # realsense_simulation=realsense_simulation,
+                        realsense_simulation=realsense_simulation,
                         simulation=simulation,
                         jointless=jointless,
                         gazebo_control_yaml=gazebo_control_yaml,
