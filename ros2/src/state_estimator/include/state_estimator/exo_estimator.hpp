@@ -11,6 +11,11 @@
 #include "pinocchio/algorithm/geometry.hpp"
 #include "pinocchio/algorithm/jacobian.hpp"
 
+#include "tf2_kdl/tf2_kdl.h"
+#include "kdl_parser/kdl_parser.hpp"
+#include "kdl/chain.hpp"
+#include "kdl/chainjnttojacsolver.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
@@ -33,6 +38,13 @@ class ExoEstimator
         pinocchio::Data data_;
         std::string urdf_path_;
         Eigen::VectorXd q_;
+
+        KDL::Tree kdl_tree_;
+        std::string root_link_;
+        std::string left_foot_link_;
+        std::string right_foot_link_;
+        KDL::Chain kdl_chain_left_foot_;
+        KDL::Chain kdl_chain_right_foot_;
 
         // rclcpp::TimerBase::SharedPtr timer_;
         // void timer_callback();

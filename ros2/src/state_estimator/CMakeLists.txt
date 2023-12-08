@@ -33,6 +33,8 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(kdl_parser REQUIRED)
+find_package(urdf REQUIRED)
 
 include_directories(include)
 
@@ -62,6 +64,8 @@ ament_target_dependencies(
   "tf2_geometry_msgs"
   "Eigen3"
   "pinocchio"
+  "kdl_parser"
+  "urdf"
 )
 
 add_executable(state_estimator_node 
@@ -97,6 +101,8 @@ ament_target_dependencies(
   "tf2_geometry_msgs"
   "Eigen3"
   "pinocchio"
+  "kdl_parser"
+  "urdf"
 )
 
 install(TARGETS state_estimator_node

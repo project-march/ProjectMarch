@@ -22,6 +22,8 @@
   <depend>visualization_msgs</depend>
   <depend>eigen</depend>
   <depend>pinocchio</depend>
+  <depend>kdl_parser</depend>
+  <depend>urdf</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>launch_testing_ament_cmake</test_depend>

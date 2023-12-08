@@ -181,7 +181,7 @@ trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg(
     // Publish the current joint positions and velocities.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
     joint_trajectory_point_current.positions = current_positions_vector;
-    joint_trajectory_point_current.velocities = current_velocities_vector;
+    joint_trajectory_point_current.velocities = zeros_vector; //current_velocities_vector;
     joint_trajectory_point_current.accelerations = zeros_vector;
     joint_trajectory_point_current.effort = zeros_vector;
     joint_trajectory_point_current.time_from_start.sec = 0;
@@ -191,7 +191,7 @@ trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg(
     // Publish the desired joint positions and velocities.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
     joint_trajectory_point_desired.positions = desired_positions_vector;
-    joint_trajectory_point_desired.velocities = desired_velocities_vector;
+    joint_trajectory_point_desired.velocities = zeros_vector; //desired_velocities_vector;
     joint_trajectory_point_desired.accelerations = zeros_vector;
     joint_trajectory_point_desired.effort = zeros_vector;
     joint_trajectory_point_desired.time_from_start.sec = 0;
