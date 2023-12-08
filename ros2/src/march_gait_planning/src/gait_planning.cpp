@@ -65,10 +65,6 @@ std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
     return final_array; 
 }
 
-void GaitPlanning::setStepSize(const double &step_size) {
-    m_step_size = step_size; 
-}
-
 void GaitPlanning::setBezierGait(){
     std::vector<CSVRow> data;
     std::vector<CSVRow> data2; 

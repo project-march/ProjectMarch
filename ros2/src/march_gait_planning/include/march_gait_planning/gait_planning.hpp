@@ -17,7 +17,6 @@ class GaitPlanning {
     void setStanceFoot(const int &new_stance_foot);
     void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position); // set foot positions (l+r) and current stance leg 
     void setGaitType(const exoState &new_gait_type); 
-    void setStepSize(const double &step_size); 
     void setBezierGait();
 
     // Getters
