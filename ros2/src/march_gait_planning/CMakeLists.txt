@@ -6,6 +6,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 
 # Include directories
 include_directories(include)
@@ -31,14 +32,14 @@ install(TARGETS gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# Create the test_gait_planning executable in the test_setup_gait_selection folder
-add_executable(test_gait_planning
-  src/test_setup_gait_selection/test_gait_planning_node.cpp
-  src/test_setup_gait_selection/test_gait_planning.cpp
+# Create the test_gait_planning executable in the test_setup_gait_planning folder
+add_executable(test_gait_planning_node
+  src/test_gait_planning_node.cpp
+  src/test_gait_planning.cpp
 )
 
 # Link against ROS 2 dependencies
-ament_target_dependencies(test_gait_planning
+ament_target_dependencies(test_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
@@ -46,7 +47,7 @@ ament_target_dependencies(test_gait_planning
 
 # Install the test_gait_planning_node executable
 install(TARGETS test_gait_planning_node
-  DESTINATION lib/${PROJECT_NAME}/test_setup_gait_selection
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 # Install include directory
