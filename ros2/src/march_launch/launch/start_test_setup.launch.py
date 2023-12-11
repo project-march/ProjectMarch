@@ -12,9 +12,7 @@ from launch_ros.actions import Node
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     test_rotational = LaunchConfiguration("test_rotational", default='true')
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
-
-    # endregion
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default ='true')
 
     rosbags = LaunchConfiguration("rosbags", default='true')
 
@@ -73,6 +71,21 @@ def generate_launch_description() -> LaunchDescription:
     
     # endregion
 
+    # region Launch march control
+    march_control = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_control"),
+                "launch",
+                "control_test_setup.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("test_rotational", test_rotational)
+        ],
+    )
+    # endregion
+
     return LaunchDescription([
         Node(
             package='state_machine',
@@ -95,13 +108,13 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_node',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
-        Node(
-            package='march_input_device',
-            executable='input_device_node',
-            name='input_device_node',
-            # parameters=[{"IPD_new_terminal": IPD_new_terminal}]
-        ),
+        # Node(
+        #     package='march_input_device',
+        #     executable='input_device_node',
+        #     name='input_device_node',
+        #     parameters=[{"IPD_new_terminal": IPD_new_terminal}]
+        # ),
         # ipd_node,
-        # march_control,
+        march_control,
         record_rosbags_action,
     ])
