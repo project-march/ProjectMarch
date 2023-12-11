@@ -61,7 +61,7 @@ class PositionController(LowLvlController):
                 ie_prev = (e - self.e_prev[index]) * dt
 
                 ctrl_input = self.p[index] * e + self.d[index] * de_prev + self.i[index] * ie_prev
-                data.ctrl[index] += ctrl_input
+                data.ctrl[index] = ctrl_input
 
                 self.e_prev[index] = e
         except IndexError:
