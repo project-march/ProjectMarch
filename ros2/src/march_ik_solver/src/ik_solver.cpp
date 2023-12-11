@@ -94,8 +94,8 @@ void IKSolver::configureTasks()
 {
     // TODO: Load the tasks from a YAML file.
     Task task = { 0, "motion", 6, 8 };
-    task.setGainP(1.0);
-    task.setDampingCoefficient(1e-2);
+    task.setGainP(1e-1);
+    task.setDampingCoefficient(1e-6);
     tasks_.push_back(task);
 }
 

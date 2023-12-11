@@ -55,6 +55,7 @@ Eigen::VectorXd Task::solve()
 
     // Calculate the error.
     Eigen::VectorXd error = calculateError();
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Error: %f, %f, %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5), error(6), error(7));
 
     // Calculate the inverse of Jacobian.
     calculateJacobianInverse();
