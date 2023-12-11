@@ -11,8 +11,24 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='true')
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default ='true')
+    test_rotational = LaunchConfiguration("test_rotational", default='false')
+    
+    # region Launch march control
+    march_control = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_control"),
+                "launch",
+                "control_test_setup.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("test_rotational", test_rotational)
+        ],
+    )
+    # endregion
+    
+    # IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default ='true')
 
     rosbags = LaunchConfiguration("rosbags", default='true')
 
@@ -23,11 +39,18 @@ def generate_launch_description() -> LaunchDescription:
         choices=["true", "false"],
     )
 
-    DeclareLaunchArgument(
-        name="IPD_new_terminal",
-        default_value="true",
-        description="Whether a new terminal should be openened, allowing you to give input.",
-    )
+    # DeclareLaunchArgument(
+    #     name="IPD_new_terminal",
+    #     default_value="true",
+    #     description="Whether a new terminal should be openened, allowing you to give input.",
+    # )
+    
+    # DeclareLaunchArgument(
+    #     name="test_rotational",
+    #     default_value="false",
+    #     description="Which joint to test on the test setup.",
+    #     choices=["true", "false"],
+    # )
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -71,20 +94,7 @@ def generate_launch_description() -> LaunchDescription:
     
     # endregion
 
-    # region Launch march control
-    march_control = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_control"),
-                "launch",
-                "control_test_setup.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("test_rotational", test_rotational)
-        ],
-    )
-    # endregion
+    
 
     return LaunchDescription([
         Node(

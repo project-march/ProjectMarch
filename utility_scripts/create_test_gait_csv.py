@@ -1,7 +1,7 @@
 import csv
 import math
 
-total_time = 10  # seconds
+total_time = 5  # seconds
 step_time = 0.05  # seconds
 total_steps = int(total_time / step_time)
 

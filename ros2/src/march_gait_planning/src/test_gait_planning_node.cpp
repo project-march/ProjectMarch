@@ -16,6 +16,7 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     previous_point.positions.push_back(0.0);
     current_point.time_from_start = rclcpp::Duration(0, 50000000); //50 ms
 
+    // m_current_joint_angles_msg->points.push_back([]);
     m_current_joint_angles_msg->points.push_back(previous_point);
     m_current_joint_angles_msg->points.push_back(current_point);
 
@@ -30,9 +31,16 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
-
-    m_test_rotational = true;
     get_parameter("test_rotational", m_test_rotational);
+
+    if (m_test_rotational){ 
+        m_current_joint_angles_msg->joint_names.push_back("rotational_joint");
+        RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Rotational Joint");
+    }
+    else {
+        m_current_joint_angles_msg->joint_names.push_back("linear_joint");
+        RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Linear Joint");
+    }
 }
 
 void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
@@ -42,7 +50,6 @@ void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::Ex
 
 void TestGaitPlanningNode::footPositionsPublish(){
     if (m_test_rotational){ //Use rotational joint -0.3 to 0.3
-    m_current_joint_angles_msg->joint_names.assign(1, "rotational_joint");
         if (m_gait_planning.getGaitType() == exoState::Stand){
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);
@@ -52,6 +59,7 @@ void TestGaitPlanningNode::footPositionsPublish(){
         }
         else if (m_gait_planning.getGaitType() == exoState::Walk){
             if (m_current_trajectory.empty()) {
+                // This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
@@ -83,7 +91,7 @@ void TestGaitPlanningNode::footPositionsPublish(){
             }
         }
     }
-    m_current_joint_angles_msg->points[0] = m_current_joint_angles_msg->points[1]; //Set current point as previous point for next iteration
+    m_current_joint_angles_msg->points[0].positions = m_current_joint_angles_msg->points[1].positions; //Set current point as previous point for next iteration
     m_current_joint_angles_msg->points[1].positions.clear();
 }
 
