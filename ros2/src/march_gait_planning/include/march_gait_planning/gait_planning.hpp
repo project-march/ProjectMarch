@@ -11,7 +11,6 @@ class GaitPlanning {
     
     public:
     explicit GaitPlanning(); 
-    std::vector<std::array<double, 3>> getFootEndPositions() const; 
 
     // Setters
     void setStanceFoot(const int &new_stance_foot);
@@ -25,8 +24,7 @@ class GaitPlanning {
     std::array<double, 3> getCurrentLeftFootPos() const; 
     std::array<double, 3> getCurrentRightFootPos() const; 
     exoState getGaitType() const; 
-
-    //ADD STANCE FOOT COORDINATES AS OUTPUT 
+    std::vector<std::array<double, 3>> getFootEndPositions() const; 
 
     private: 
     exoState m_gait_type; 
