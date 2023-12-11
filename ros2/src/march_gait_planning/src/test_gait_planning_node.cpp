@@ -23,7 +23,7 @@ TestGaitPlanningNode::TestGaitPlanningNode()
         "current_state", 10, std::bind(&TestGaitPlanningNode::currentStateCallback, this, _1)); 
     
     m_test_joint_trajectory_controller_state_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
-        "joint_trajectory_controller/state", 10);
+        "joint_trajectory_controller/joint_trajectory", 10);
 
     m_gait_planning.setGaitType(exoState::BootUp); // make service between gait planning and state machine for gait type
 
