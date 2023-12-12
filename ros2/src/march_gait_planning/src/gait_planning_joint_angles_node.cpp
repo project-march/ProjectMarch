@@ -13,58 +13,41 @@ struct CSVRow {
     std::string right_ankle;
 };
 
-JointAngleGaitNode::JointAngleGaitNode()
- : Node("joint_angle_gait_node")
-{ 
-    joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
+GaitPlanningAnglesNode::GaitPlanningAnglesNode()
+ : Node("gait_planning_angles_node"), 
+   m_gait_planning(GaitPlanningAngles())
+{
+    m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>("current_state", 10, std::bind(&GaitPlanningAnglesNode::currentStateCallback, this, _1)); 
+    m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
     std::cout << "Joint trajectory publisher created" << std::endl; 
-    getAngleCSV(); 
-    std::cout << "Angle file read and saved" << std::endl; 
-    auto timer_publish = std::bind(&JointAngleGaitNode::publishJointTrajectory, this);
+    
+    auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
+    
     std::cout << "Timer function created" << std::endl; 
+
+    m_gait_planning.setGaitType(exoState::BootUp);
 }
 
-void JointAngleGaitNode::getAngleCSV(){
-    std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/q_data.csv"); 
-    if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
-    }
-    std::string line; 
-    while (std::getline(file, line)){
-        std::istringstream iss(line); 
-        CSVRow row; 
-        std::getline(iss, row.left_hip_aa, ','); 
-        std::getline(iss, row.left_hip_fe, ',');
-        std::getline(iss, row.left_knee, ',');
-        std::getline(iss, row.left_ankle, ',');
-        std::getline(iss, row.right_hip_aa, ',');
-        std::getline(iss, row.right_hip_fe, ',');
-        std::getline(iss, row.right_knee, ',');
-        std::getline(iss, row.right_ankle, ','); 
-        data.push_back(row); 
-    }
-
-    file.close(); 
-
-    for (const auto& row : data){
-        m_data_gait.push_back({std::stod(row.left_hip_aa), std::stod(row.left_hip_fe), std::stod(row.left_knee), std::stod(row.left_ankle), std::stod(row.right_hip_aa), std::stod(row.right_hip_fe), std::stod(row.right_knee), std::stod(row.right_ankle)}); 
-    }
-
-    m_counter = 0; 
-    m_prev_point = m_data_gait.at(0); 
+void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
+    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current state: %d", msg->state); 
+    m_gait_planning.setGaitType((exoState)msg->state); 
 }
 
-void JointAngleGaitNode::publishJointTrajectory(){
-    if (!m_data_gait.empty()){
+
+void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
+    if (m_gait_planning.getGaitType() == exoState::Walk){
+        if (!m_gait_planning.getAngleTrajectory().empty()){
 
         trajectory_msgs::msg::JointTrajectory msg;
 
         msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"}; 
 
+        std::vector<std::vector<double>> trajectory = m_gait_planning.getAngleTrajectory();
+        int count = m_gait_planning.getCounter();  
+
         trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point; 
-        trajectory_prev_point.positions = m_prev_point; 
+        trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
         trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
         trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
         trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
@@ -73,7 +56,7 @@ void JointAngleGaitNode::publishJointTrajectory(){
         msg.points.push_back(trajectory_prev_point); 
 
         trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point; 
-        trajectory_des_point.positions = m_data_gait[m_counter]; 
+        trajectory_des_point.positions = trajectory[count]; 
         trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
         trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
         trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
@@ -81,16 +64,19 @@ void JointAngleGaitNode::publishJointTrajectory(){
         trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
         msg.points.push_back(trajectory_des_point);
 
-        m_prev_point = m_data_gait[m_counter];
+        m_gait_planning.setPrevPoint(trajectory[count]); 
 
-        joint_angle_trajectory_publisher->publish(msg);
+        m_joint_angle_trajectory_publisher->publish(msg);
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Message published!"); 
 
-        if (m_counter >= (m_data_gait.size()-1)){
-            m_counter = 0;
+        if (count >= (m_gait_planning.getAngleTrajectory().size()-1)){
+            m_gait_planning.setCounter(0); 
         } else {
-            m_counter += 1; 
+            m_gait_planning.setCounter(count+1);
         }
+    }
+    } else {
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Waiting to walk"); 
     }
 }
 
@@ -98,7 +84,7 @@ int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
 
-    rclcpp::spin(std::make_shared<JointAngleGaitNode>()); 
+    rclcpp::spin(std::make_shared<GaitPlanningAnglesNode>()); 
     rclcpp::shutdown(); 
 
     return 0; 
