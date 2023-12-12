@@ -38,13 +38,13 @@ void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::
 
 void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
     if (m_gait_planning.getGaitType() == exoState::Walk){
-        if (!m_gait_planning.getAngleTrajectory().empty()){
+        if (!m_gait_planning.getFirstStepAngleTrajectory().empty()){
 
         trajectory_msgs::msg::JointTrajectory msg;
 
         msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"}; 
 
-        std::vector<std::vector<double>> trajectory = m_gait_planning.getAngleTrajectory();
+        std::vector<std::vector<double>> trajectory = m_gait_planning.getFirstStepAngleTrajectory();
         int count = m_gait_planning.getCounter();  
 
         trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point; 
@@ -70,7 +70,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
         m_joint_angle_trajectory_publisher->publish(msg);
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Message published!"); 
 
-        if (count >= (m_gait_planning.getAngleTrajectory().size()-1)){
+        if (count >= (m_gait_planning.getFirstStepAngleTrajectory().size()-1)){
             m_gait_planning.setCounter(0); 
         } else {
             m_gait_planning.setCounter(count+1);

@@ -11,7 +11,8 @@ class GaitPlanningAngles{
     explicit GaitPlanningAngles(); 
 
     // Setters 
-    void setAngleCSV(); 
+    void setFirstStepAngleCSV(); 
+    void setCompleteStepAngleCSV(); 
     void setGaitType(const exoState &new_gait_type); 
     void setCounter(const int &count); 
     void setPrevPoint(const std::vector<double> &point); 
@@ -20,11 +21,13 @@ class GaitPlanningAngles{
     exoState getGaitType() const; 
     std::vector<double> getPrevPoint() const; 
     int getCounter() const;
-    std::vector<std::vector<double>> getAngleTrajectory() const; 
+    std::vector<std::vector<double>> getFirstStepAngleTrajectory() const; 
+    std::vector<std::vector<double>> getCompleteStepAngleTrajectory() const; 
 
     private: 
     exoState m_gait_type; 
-    std::vector<std::vector<double>> m_angle_trajectory; 
+    std::vector<std::vector<double>> m_first_step_angle_trajectory; 
+    std::vector<std::vector<double>> m_complete_step_angle_trajectory; 
     std::vector<double> m_prev_point; 
     int m_counter; 
 };
