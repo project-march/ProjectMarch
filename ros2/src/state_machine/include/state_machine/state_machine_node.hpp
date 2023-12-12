@@ -21,6 +21,7 @@ class StateMachineNode : public rclcpp::Node
 {
 public:
     explicit StateMachineNode();
+    ~StateMachineNode();
 
 private:
     void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr msg);

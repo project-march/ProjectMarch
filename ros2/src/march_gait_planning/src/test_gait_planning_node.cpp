@@ -13,7 +13,7 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     previous_point.time_from_start = rclcpp::Duration(0, 0);
 
     trajectory_msgs::msg::JointTrajectoryPoint current_point;
-    previous_point.positions.push_back(0.0);
+    current_point.positions.push_back(0.0);
     current_point.time_from_start = rclcpp::Duration(0, 50000000); //50 ms
 
     // m_current_joint_angles_msg->points.push_back([]);
@@ -31,7 +31,10 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
+
     get_parameter("test_rotational", m_test_rotational);
+
+    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Test rotational is: %s", m_test_rotational);
 
     if (m_test_rotational){ 
         m_current_joint_angles_msg->joint_names.push_back("rotational_joint");
@@ -83,7 +86,7 @@ void TestGaitPlanningNode::footPositionsPublish(){
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
-                double new_angle = 0.1*m_current_trajectory.front();
+                double new_angle = 0.05*m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
                 m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
