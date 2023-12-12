@@ -8,7 +8,7 @@
 IKSolver::IKSolver()
 {
     n_joints_ = 8; // TODO: Load this from a YAML file
-    dt_ = 0.001; // TODO: Load this from a YAML file
+    dt_ = 0.1; // TODO: Load this from a YAML file
     configureTasks();
 
     // Set the joint limits.
@@ -94,8 +94,8 @@ void IKSolver::configureTasks()
 {
     // TODO: Load the tasks from a YAML file.
     Task task = { 0, "motion", 6, 8 };
-    task.setGainP(1e-1);
-    task.setDampingCoefficient(1e-6);
+    task.setGainP(50.0);
+    task.setDampingCoefficient(1e-2);
     tasks_.push_back(task);
 }
 
@@ -108,7 +108,7 @@ Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions
         joint_limits(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
     }
     return joint_limits;
-
+    // return desired_joint_positions;
 }
 
 void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)

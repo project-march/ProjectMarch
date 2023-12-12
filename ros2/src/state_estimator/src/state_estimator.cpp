@@ -332,10 +332,10 @@ void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_
     // }
     response->current_pose = m_exo_estimator.getFeetPositions();
 
-    RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
-    for (int i = 0; i < response->current_pose.size(); i++) {
-        RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
-    }
+    // RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
+    // for (int i = 0; i < response->current_pose.size(); i++) {
+    //     RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
+    // }
 }
 
 void StateEstimator::handleJointPositionsRequest(
@@ -347,9 +347,31 @@ void StateEstimator::handleJointPositionsRequest(
     // RCLCPP_INFO(this->get_logger(), "Current joint positions at timestamp: %f", request->timestamp);
 
     // Response current joint positions and velocities.
+    std::vector<double> joint_positions;
+    std::vector<double> joint_velocities;
+
+    joint_positions.push_back(m_current_joint_positions[3]);
+    joint_positions.push_back(m_current_joint_positions[0]);
+    joint_positions.push_back(m_current_joint_positions[1]);
+    joint_positions.push_back(m_current_joint_positions[2]);
+    joint_positions.push_back(m_current_joint_positions[7]);
+    joint_positions.push_back(m_current_joint_positions[4]);
+    joint_positions.push_back(m_current_joint_positions[5]);
+    joint_positions.push_back(m_current_joint_positions[6]);
+
+    joint_velocities.push_back(m_current_joint_velocities[3]);
+    joint_velocities.push_back(m_current_joint_velocities[0]);
+    joint_velocities.push_back(m_current_joint_velocities[1]);
+    joint_velocities.push_back(m_current_joint_velocities[2]);
+    joint_velocities.push_back(m_current_joint_velocities[7]);
+    joint_velocities.push_back(m_current_joint_velocities[4]);
+    joint_velocities.push_back(m_current_joint_velocities[5]);
+    joint_velocities.push_back(m_current_joint_velocities[6]);
+
     response->status = true;
-    response->joint_positions = m_current_joint_positions;
-    response->joint_velocities = m_current_joint_velocities;
+    response->joint_positions = joint_positions;
+    response->joint_velocities = joint_velocities;
+    m_exo_estimator.resetJointPositions();
 
     // Print current joint positions.
     // RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->joint_positions.size());

@@ -42,8 +42,8 @@ public:
 
 private:
     Eigen::VectorXd calculateError(); // Calculate the error
-    // Eigen::Vector3f calculateIntegralError();       // Calculate the integral error
-    // Eigen::Vector3f calculateDerivativeError();     // Calculate the derivative error
+    // Eigen::VectorXd calculateIntegralError();       // Calculate the integral error
+    // Eigen::VectorXd calculateDerivativeError();     // Calculate the derivative error
     void calculateJacobianInverse(); // Calculate the inverse of Jacobian
     void sendRequest(); // Send a request to the task server in the state estimation node
 

@@ -69,6 +69,19 @@ ament_target_dependencies(ik_solver_node
   march_shared_msgs
 )
 
+add_executable(ik_solver_buffer_node src/ik_solver_buffer_node.cpp)
+target_include_directories(ik_solver_buffer_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(ik_solver_buffer_node
+  rclcpp
+  Eigen3
+  std_msgs
+  sensor_msgs
+  trajectory_msgs
+  march_shared_msgs
+)
+
 add_executable(current_joint_positions_server src/current_joint_positions_server.cpp)
 ament_target_dependencies(current_joint_positions_server 
   rclcpp
@@ -89,6 +102,7 @@ ament_target_dependencies(task_client
 
 install(TARGETS
   ik_solver_node
+  ik_solver_buffer_node
   current_joint_positions_server
   task_server
   task_client
