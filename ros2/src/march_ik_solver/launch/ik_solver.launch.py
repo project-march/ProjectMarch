@@ -10,15 +10,15 @@ def generate_launch_description():
             name='ik_solver',
             output='screen',
         ),
-        # Node(
-        #     package='march_ik_solver',
-        #     # namespace='march_ik_solver',
-        #     executable='ik_solver_buffer_node',
-        #     name='ik_solver_buffer',
-        #     output='screen',
-        #     parameters=[
-        #         {'dt': 1e-3},
-        #         {'convergence_threshold': 0.5},
-        #     ],
-        # ),
+        Node(
+            package='march_ik_solver',
+            # namespace='march_ik_solver',
+            executable='ik_solver_buffer_node',
+            name='ik_solver_buffer',
+            output='screen',
+            parameters=[
+                {'dt': 1e-3},
+                {'convergence_threshold': 0.05},
+            ],
+        ),
     ])

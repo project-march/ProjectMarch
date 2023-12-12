@@ -8,7 +8,7 @@
 IKSolver::IKSolver()
 {
     n_joints_ = 8; // TODO: Load this from a YAML file
-    dt_ = 0.1; // TODO: Load this from a YAML file
+    dt_ = 0.05; // TODO: Load this from a YAML file
     configureTasks();
 
     // Set the joint limits.

@@ -5,8 +5,11 @@ using std::placeholders::_1;
 IKSolverNode::IKSolverNode()
     : Node("ik_solver")
 {
+    // Configure the node.
+    exo_state_sub_ = this->create_subscription<march_shared_msgs::msg::ExoState>(
+        "current_state", 1, std::bind(&IKSolverNode::exoStateCallback, this, std::placeholders::_1));
     ik_solver_command_sub_ = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
-        "ik_solver/buffer/input", 100, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
+        "ik_solver/buffer/output", 100, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
     joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 1, std::bind(&IKSolverNode::jointStateCallback, this, std::placeholders::_1));
     joint_trajectory_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
@@ -41,6 +44,19 @@ IKSolverNode::IKSolverNode()
     current_joint_velocities_ = Eigen::VectorXd::Zero(8);
     desired_joint_positions_ = Eigen::VectorXd::Zero(8);
     desired_joint_velocities_ = Eigen::VectorXd::Zero(8);
+
+    // Configure exo state.
+    gait_reset_ = false;
+    gait_type_ = -1;
+}
+
+void IKSolverNode::exoStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg)
+{
+    // RCLCPP_INFO(this->get_logger(), "ExoState received.");
+    gait_type_ = msg->state;
+    gait_reset_ = true;
+    // RCLCPP_INFO(this->get_logger(), "Gait type: %d", gait_type_);
+    // RCLCPP_INFO(this->get_logger(), "Gait reset: %d", gait_reset_);
 }
 
 void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
@@ -183,16 +199,24 @@ trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg(
     //     joint_trajectory_msg.points.push_back(joint_trajectory_point);
     // }
 
-    // Publish the current joint positions and velocities.
-    trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
-    joint_trajectory_point_current.positions = current_positions_vector;
-    joint_trajectory_point_current.velocities = zeros_vector; //current_velocities_vector;
-    joint_trajectory_point_current.accelerations = zeros_vector;
-    joint_trajectory_point_current.effort = zeros_vector;
-    joint_trajectory_point_current.time_from_start.sec = 0;
-    joint_trajectory_point_current.time_from_start.nanosec = 0;
-    joint_trajectory_msg.points.push_back(joint_trajectory_point_current);
-    // joint_trajectory_msg.points.push_back(joint_trajectory_point_prev_);
+    if (gait_reset_)
+    {
+        // Publish the current joint positions and velocities.
+        trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
+        joint_trajectory_point_current.positions = current_positions_vector;
+        joint_trajectory_point_current.velocities = zeros_vector; //current_velocities_vector;
+        joint_trajectory_point_current.accelerations = zeros_vector;
+        joint_trajectory_point_current.effort = zeros_vector;
+        joint_trajectory_point_current.time_from_start.sec = 0;
+        joint_trajectory_point_current.time_from_start.nanosec = 0;
+        joint_trajectory_msg.points.push_back(joint_trajectory_point_current);
+        gait_reset_ = false;
+    }
+    else
+    {
+        // Publish the previous joint positions and velocities.
+        joint_trajectory_msg.points.push_back(joint_trajectory_point_prev_);
+    }
 
     // Publish the desired joint positions and velocities.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;

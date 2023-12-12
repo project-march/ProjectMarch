@@ -13,6 +13,7 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "march_ik_solver/ik_solver.hpp"
+#include "march_shared_msgs/msg/exo_state.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
 #include "march_shared_msgs/srv/get_current_joint_positions.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -22,6 +23,7 @@ public:
     IKSolverNode();
 
 private:
+    void exoStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
     void IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void publishJointTrajectory();
@@ -38,8 +40,11 @@ private:
     Eigen::VectorXd desired_joint_velocities_;
     std::vector<Eigen::VectorXd> desired_poses_;
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_prev_;
+    bool gait_reset_;
+    int8_t gait_type_;
 
     // rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr exo_state_sub_;
     rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr ik_solver_command_sub_;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr joint_trajectory_pub_;

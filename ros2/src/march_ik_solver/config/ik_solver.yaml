@@ -1,0 +1,23 @@
+ik_solver_node:
+  ros_parameters:
+    n_joints: 8
+    joint_names: [
+      'left_hip_aa', 'left_hip_fe', 'left_knee_fe', 'left_ankle_fe', 
+      'right_hip_aa', 'right_hip_fe', 'right_knee_fe', 'right_ankle_fe']
+    joint_limits: [
+      [-15.0,10.0],[-10.0, 112.5],[0.0,125.0],[-25.0,10.0],
+      [-15.0,10.0],[-10.0, 112.5],[0.0,125.0],[-25.0,10.0]]
+    dt: 0.05
+    no_tasks: 1
+    tasks_names: ['motion']
+    tasks_m: [6]
+    tasks_n: [8]
+    tasks_gain_p: [1.0]
+    # tasks_gain_d: [0.0]
+    # tasks_gain_i: [0.0]
+    tasks_damping_coefficient: [0.01]
+
+ik_solver_buffer_node:
+  ros_parameters:
+    n_joints: 8
+    dt: 0.01
