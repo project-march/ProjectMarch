@@ -32,6 +32,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current state: %d", msg->state); 
     m_gait_planning.setGaitType((exoState)msg->state); 
+    publishJointTrajectoryPoints(); 
 }
 
 
@@ -74,7 +75,30 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
         } else {
             m_gait_planning.setCounter(count+1);
         }
-    }
+        }
+    } else if (m_gait_planning.getGaitType() == exoState::Stand){
+        m_gait_planning.setPrevPoint({0.006, 0.042, -0.0, -0.016, -0.006, 0.042, -0.0, -0.016});
+        trajectory_msgs::msg::JointTrajectory msg;
+        msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+        trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point;
+        trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
+        trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_prev_point.time_from_start.sec = 0;
+        trajectory_prev_point.time_from_start.nanosec = 0;
+        msg.points.push_back(trajectory_prev_point);
+        trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point;
+        trajectory_des_point.positions = {0.006, 0.042, -0.0, -0.016, -0.006, 0.042, -0.0, -0.016};
+        trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0};
+        trajectory_des_point.time_from_start.sec = 0;
+        trajectory_des_point.time_from_start.nanosec = int(50*1e6);
+        msg.points.push_back(trajectory_des_point);
+        m_joint_angle_trajectory_publisher->publish(msg);
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
+    
     } else {
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Waiting to walk"); 
     }

@@ -24,7 +24,7 @@ GaitPlanningAngles::GaitPlanningAngles()
 
 void GaitPlanningAngles::setAngleCSV(){
     std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/q_first_steps.csv"); 
+    std::ifstream file("src/march_gait_planning/m9_gait_files/q_first_step .csv"); 
     if (!file.is_open()){
         std::cerr << "Error opening file" << std::endl; 
     }
