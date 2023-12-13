@@ -156,20 +156,20 @@ def generate_launch_description() -> LaunchDescription:
         )
     # endregion
 
-    # region Launch IK Solver
-    ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
-    urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
-    )
-    # declare parameters
-    # in ms
-    trajectory_dt = 50
+    # # region Launch IK Solver
+    # ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
+    # urdf_location = os.path.join(
+    #     get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
+    # )
+    # # declare parameters
+    # # in ms
+    # trajectory_dt = 50
 
-    ik_solver = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-        launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
-    )
-    # endregion
+    # ik_solver = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
+    #     launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+    # )
+    # # endregion
 
 
 
@@ -225,7 +225,7 @@ def generate_launch_description() -> LaunchDescription:
         record_rosbags_action,
         safety_node,
         imu_nodes,
-        ik_solver,
+        # ik_solver,
         state_estimator,
         ipd_node,
     ])

@@ -61,7 +61,7 @@ void GaitPlanningAngles::setFirstStepAngleCSV(){
 // Function to save the joint angles from the complete step csv in a member variable 
 void GaitPlanningAngles::setFullGaitAngleCSV(){
     std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/one_step_q.csv"); 
+    std::ifstream file("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv"); 
     if (!file.is_open()){
         std::cerr << "Error opening file" << std::endl; 
     }
