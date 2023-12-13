@@ -13,6 +13,7 @@
 
 
 class GaitPlanningAnglesNode:public rclcpp::Node {
+    
     public: 
     explicit GaitPlanningAnglesNode(); 
 

@@ -23,7 +23,6 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     
     auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
-    
     std::cout << "Timer function created" << std::endl; 
 
     m_gait_planning.setGaitType(exoState::BootUp);
@@ -33,38 +32,40 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current state: %d", msg->state); 
     m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
+    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "set prev gait type: %d", m_gait_planning.getPrevGaitType()); 
     m_gait_planning.setGaitType((exoState)msg->state); 
+    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "set current gait type: %d", m_gait_planning.getGaitType()); 
     publishJointTrajectoryPoints(); 
 }
 
 
 void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
+    trajectory_msgs::msg::JointTrajectory msg;
+    msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};             
+    trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point; 
+    trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point; 
+    trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_prev_point.time_from_start.sec = 0; 
+    trajectory_prev_point.time_from_start.nanosec = 0;
+    trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
+    trajectory_des_point.time_from_start.sec = 0; 
+    trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
+
+
     if (m_gait_planning.getGaitType() == exoState::Walk && m_gait_planning.getPrevGaitType() == exoState::Walk){
         if (!m_gait_planning.getFullGaitAngleCSV().empty()){
-
-            trajectory_msgs::msg::JointTrajectory msg;
-
-            msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"}; 
 
             std::vector<std::vector<double>> trajectory = m_gait_planning.getFullGaitAngleCSV();
             int count = m_gait_planning.getCounter();  
 
-            trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point; 
             trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-            trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.time_from_start.sec = 0; 
-            trajectory_prev_point.time_from_start.nanosec = 0; 
             msg.points.push_back(trajectory_prev_point); 
 
-            trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point; 
             trajectory_des_point.positions = trajectory[count]; 
-            trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.time_from_start.sec = 0; 
-            trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
             msg.points.push_back(trajectory_des_point);
 
             m_gait_planning.setPrevPoint(trajectory[count]); 
@@ -73,12 +74,12 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Complete gait message published!"); 
 
             if (count >= (m_gait_planning.getFullGaitAngleCSV().size()-1)){
-                m_gait_planning.setCounter(0); 
+                m_gait_planning.setCounter(0);
             } else {
                 m_gait_planning.setCounter(count+1);
             }
         }
-    } else if (m_gait_planning.getGaitType() == exoState::Walk && m_gait_planning.getPrevGaitType() == exoState::Stand) {
+    } else if (m_gait_planning.getGaitType() == exoState::Walk && (m_gait_planning.getPrevGaitType() == exoState::Stand || m_gait_planning.getPrevGaitType() == exoState::Sit)) {
         if (!m_gait_planning.getFirstStepAngleTrajectory().empty()){
 
             trajectory_msgs::msg::JointTrajectory msg;
@@ -88,22 +89,10 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             std::vector<std::vector<double>> trajectory = m_gait_planning.getFirstStepAngleTrajectory();
             int count = m_gait_planning.getCounter();  
 
-            trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point; 
             trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-            trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_prev_point.time_from_start.sec = 0; 
-            trajectory_prev_point.time_from_start.nanosec = 0; 
             msg.points.push_back(trajectory_prev_point); 
 
-            trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point; 
             trajectory_des_point.positions = trajectory[count]; 
-            trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0}; 
-            trajectory_des_point.time_from_start.sec = 0; 
-            trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
             msg.points.push_back(trajectory_des_point);
 
             m_gait_planning.setPrevPoint(trajectory[count]); 
@@ -122,34 +111,42 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
 
         m_gait_planning.setPrevPoint({0.006, 0.042, -0.0, -0.016, -0.006, 0.042, -0.0, -0.016});
 
-        trajectory_msgs::msg::JointTrajectory msg;
-
-        msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
-
-        trajectory_msgs::msg::JointTrajectoryPoint trajectory_prev_point;
         trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
-        trajectory_prev_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_prev_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_prev_point.effort = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_prev_point.time_from_start.sec = 0;
-        trajectory_prev_point.time_from_start.nanosec = 0;
         msg.points.push_back(trajectory_prev_point);
 
-        trajectory_msgs::msg::JointTrajectoryPoint trajectory_des_point;
         trajectory_des_point.positions = {0.006, 0.042, -0.0, -0.016, -0.006, 0.042, -0.0, -0.016};
-        trajectory_des_point.velocities = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_des_point.accelerations = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_des_point.effort = {0, 0, 0, 0, 0, 0, 0, 0};
-        trajectory_des_point.time_from_start.sec = 0;
-        trajectory_des_point.time_from_start.nanosec = int(50*1e6);
         msg.points.push_back(trajectory_des_point);
 
         m_joint_angle_trajectory_publisher->publish(msg);
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
+        m_gait_planning.setCounter(0); 
 
-        m_gait_planning.setPrevGaitType(exoState::Stand);
+    } else if (m_gait_planning.getGaitType() == exoState::Sit){
+        if (!m_gait_planning.getStandToSitGait().empty()){
+
+            std::vector<std::vector<double>> trajectory = m_gait_planning.getStandToSitGait();
+            int count = m_gait_planning.getCounter();  
+
+            trajectory_prev_point.positions = m_gait_planning.getPrevPoint();  
+            msg.points.push_back(trajectory_prev_point); 
+
+            trajectory_des_point.positions = trajectory[count]; 
+            msg.points.push_back(trajectory_des_point);
+
+            m_gait_planning.setPrevPoint(trajectory[count]); 
+
+            m_joint_angle_trajectory_publisher->publish(msg);
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Stand to sit message published!");
+            
+            if (count >= (m_gait_planning.getStandToSitGait().size()-1)){
+                m_gait_planning.setCounter(0); 
+            } else {
+                m_gait_planning.setCounter(count+1);
+            }
+        }
+    }
     
-    } else {
+    else {
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Waiting to walk"); 
     }
 }
