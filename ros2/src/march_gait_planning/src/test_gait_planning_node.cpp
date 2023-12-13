@@ -32,12 +32,20 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
 
-    this->declare_parameter<bool>("test_rotational", true);
+
+    // this->declare_parameter<std::string>("test_rotational", "true");
+    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"),
+        "FIRST CHECK"
+    );
     this->get_parameter("test_rotational", m_test_rotational);
 
-    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Test rotational is: %s", m_test_rotational ? "true" : "false");
+    RCLCPP_INFO(
+        rclcpp::get_logger("march_test_gait_planning_node"),
+        "Test rotational is: %s",
+        m_test_rotational.c_str()  // Convert the std::string to a C-style string for logging
+    );
 
-    if (m_test_rotational){ 
+    if (m_test_rotational == "true"){ 
         m_current_joint_angles_msg->joint_names.push_back("rotational_joint");
         RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Rotational Joint");
     }
@@ -53,7 +61,7 @@ void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::Ex
 }
 
 void TestGaitPlanningNode::footPositionsPublish(){
-    if (m_test_rotational){ //Use rotational joint -0.3 to 0.3
+    if (m_test_rotational == "true"){ //Use rotational joint -0.3 to 0.3
         if (m_gait_planning.getGaitType() == exoState::Stand){
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);

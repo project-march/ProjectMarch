@@ -11,7 +11,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default=True)
+    test_rotational = LaunchConfiguration("test_rotational", default="true")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
     
     # region Launch march control

@@ -25,9 +25,11 @@ def generate_launch_description():
 
     control_yaml = LaunchConfiguration("control_yaml")
 
-    control_xacro = "test_rotational_control.xacro"
-    if test_rotational == "true":
-        control_xacro = "test_rotational_control.xacro"
+    print("CHECK THIS ASSHOLE: {}".format(test_rotational))
+
+    control_xacro = "test_rotational_control.xacro" if (test_rotational == "true") else "test_linear_control.xacro"
+    
+    print("CHECK THIS ASSSHOLE PART 2 {}".format(control_xacro))
 
     declared_arguments = [
         DeclareLaunchArgument(
