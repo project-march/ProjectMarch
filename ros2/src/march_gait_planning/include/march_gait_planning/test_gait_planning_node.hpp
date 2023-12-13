@@ -24,7 +24,7 @@ private:
     TestGaitPlanning m_gait_planning;
     std::vector<double> m_current_trajectory;
     trajectory_msgs::msg::JointTrajectory::SharedPtr m_current_joint_angles_msg;
-    std::string m_test_rotational;
+    bool m_test_rotational;
 };
 
 #endif // TEST_GAIT_PLANNING_NODE_HPP

@@ -3,10 +3,11 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description() -> LaunchDescription:
@@ -15,19 +16,47 @@ def generate_launch_description() -> LaunchDescription:
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
     
     # region Launch march control
-    march_control = IncludeLaunchDescription(
+    rotational_launch_file = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("march_control"),
+                FindPackageShare("march_control").find("march_control"),
                 "launch",
-                "control_test_setup.launch.py",
+                "rotational_control.launch.py",
             )
         ),
         launch_arguments=[
             ("test_rotational", test_rotational)
         ],
+        condition=IfCondition(test_rotational),
+    )
+
+    linear_launch_file = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                FindPackageShare("march_control").find("march_control"),
+                "launch",
+                "linear_control.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("test_rotational", test_rotational)
+        ],
+        condition=UnlessCondition(test_rotational),
     )
     # endregion
+    # march_control = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("march_control"),
+    #             "launch",
+    #             "control_test_setup.launch.py",
+    #         )
+    #     ),
+    #     launch_arguments=[
+    #         ("test_rotational", test_rotational)
+    #     ],
+    # )
+    
 
     # region Launch input device
     input_device = IncludeLaunchDescription(
@@ -104,6 +133,7 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[{'config_path': fuzzy_config_path}]
         ),
         input_device,
-        march_control,
+        rotational_launch_file,
+        linear_launch_file,
         record_rosbags_action,
     ])
