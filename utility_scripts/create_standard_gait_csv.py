@@ -56,5 +56,5 @@ normal_gait = cubic_bezier(40, 0.20, (-.1, -0.78))
 
 # Save the arrays to separate CSV files
 column_names = ['x', 'z']
-np.savetxt('src/march_gait_planning/m9_gait_files/first_step.csv', first_step, delimiter=',')
-np.savetxt('src/march_gait_planning/m9_gait_files/normal_gait.csv', normal_gait, delimiter=',')
+np.savetxt('src/march_gait_planning/m9_gait_files/cartesian/first_step.csv', first_step, delimiter=',')
+np.savetxt('src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv', normal_gait, delimiter=',')

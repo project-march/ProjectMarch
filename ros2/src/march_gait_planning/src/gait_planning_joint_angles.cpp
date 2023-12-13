@@ -15,11 +15,13 @@ struct CSVRow {
 // Constructor for the GaitPlanningAngles class (functionality of joint angle trajectory)
 GaitPlanningAngles::GaitPlanningAngles()
  : m_gait_type(), 
+   m_prev_gait_type(), 
    m_first_step_angle_trajectory(), 
    m_prev_point(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
+    setFullGaitAngleCSV(); 
     setFirstStepAngleCSV(); 
     std::cout << "Angle trajectory CSV created" << std::endl; 
    }
@@ -27,7 +29,7 @@ GaitPlanningAngles::GaitPlanningAngles()
 // Function to save the joint angles from the first step csv in a member variable 
 void GaitPlanningAngles::setFirstStepAngleCSV(){
     std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/q_first_step .csv"); 
+    std::ifstream file("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv"); 
     if (!file.is_open()){
         std::cerr << "Error opening file" << std::endl; 
     }
@@ -57,9 +59,9 @@ void GaitPlanningAngles::setFirstStepAngleCSV(){
 }
 
 // Function to save the joint angles from the complete step csv in a member variable 
-void GaitPlanningAngles::setCompleteStepAngleCSV(){
+void GaitPlanningAngles::setFullGaitAngleCSV(){
     std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/q_complete_step.csv"); 
+    std::ifstream file("src/march_gait_planning/m9_gait_files/one_step_q.csv"); 
     if (!file.is_open()){
         std::cerr << "Error opening file" << std::endl; 
     }
@@ -92,6 +94,10 @@ void GaitPlanningAngles::setGaitType(const exoState &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
+void GaitPlanningAngles::setPrevGaitType(const exoState &prev_gait_type){
+    m_prev_gait_type = prev_gait_type; 
+}
+
 void GaitPlanningAngles::setCounter(const int &count){
     m_counter = count; 
 }
@@ -102,6 +108,10 @@ void GaitPlanningAngles::setPrevPoint(const std::vector<double> &point){
 
 exoState GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
+}
+
+exoState GaitPlanningAngles::getPrevGaitType() const {
+    return m_prev_gait_type; 
 }
 
 std::vector<double> GaitPlanningAngles::getPrevPoint() const{
@@ -116,7 +126,7 @@ std::vector<std::vector<double>> GaitPlanningAngles::getFirstStepAngleTrajectory
     return m_first_step_angle_trajectory; 
 }
 
-std::vector<std::vector<double>> GaitPlanningAngles::getCompleteStepAngleTrajectory() const{
+std::vector<std::vector<double>> GaitPlanningAngles::getFullGaitAngleCSV() const{
     return m_complete_step_angle_trajectory; 
 }
 

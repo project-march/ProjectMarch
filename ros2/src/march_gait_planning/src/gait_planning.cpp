@@ -68,8 +68,8 @@ std::vector<std::array<double, 3>> GaitPlanning::getFootEndPositions() const {
 void GaitPlanning::setBezierGait(){
     std::vector<CSVRow> data;
     std::vector<CSVRow> data2; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/first_step.csv");
-    std::ifstream file2("src/march_gait_planning/m9_gait_files/normal_gait.csv"); 
+    std::ifstream file("src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
+    std::ifstream file2("src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv"); 
 
     if (!file.is_open() || !file2.is_open()) {
         std::cerr << "Error opening file." << std::endl;
