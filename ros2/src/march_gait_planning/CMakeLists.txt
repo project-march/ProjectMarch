@@ -6,6 +6,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 
 # Include directories
 include_directories(include)
@@ -18,8 +19,9 @@ add_executable(gait_planning_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
-add_executable(joint_angle_gait_node
+add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles_node.cpp
+  src/gait_planning_joint_angles.cpp
 )
 
 # Link against ROS 2 dependencies
@@ -29,9 +31,10 @@ ament_target_dependencies(gait_planning_node
   geometry_msgs
   )
 
-ament_target_dependencies(joint_angle_gait_node
+ament_target_dependencies(gait_planning_angles_node
   rclcpp
   trajectory_msgs
+  march_shared_msgs
   )
 
 # Install the executable
@@ -39,7 +42,7 @@ install(TARGETS gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS joint_angle_gait_node
+install(TARGETS gait_planning_angles_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
