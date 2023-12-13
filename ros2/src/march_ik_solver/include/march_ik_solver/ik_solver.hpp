@@ -18,6 +18,11 @@ public:
     Eigen::VectorXd solve(std::vector<Eigen::VectorXd> desired_poses); // Solve the IK problem.
     Eigen::VectorXd integrateJointVelocities(); // Integrate the joint velocities
 
+    void setDt(double dt);
+    void setNJoints(int n_joints); // Set the number of joints.
+    void setJointLimits(std::vector<std::array<double,2>> joint_limits); // Set the joint limits.
+    void setTasks(std::vector<Task> tasks); // Set the tasks.
+
     uint8_t getNumberOfTasks(); // Get the number of tasks.
     std::vector<uint8_t> getTasksM(); // Get the dimension of each task.
 

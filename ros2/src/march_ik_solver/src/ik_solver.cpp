@@ -9,7 +9,7 @@ IKSolver::IKSolver()
 {
     n_joints_ = 8; // TODO: Load this from a YAML file
     dt_ = 0.05; // TODO: Load this from a YAML file
-    configureTasks();
+    // configureTasks();
 
     // Set the joint limits.
     // TODO: Load this from a YAML file instead of this hard-coded array.
@@ -66,13 +66,34 @@ Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
-    Eigen::VectorXd current_joint_positions = *current_joint_positions_ptr_;
-    Eigen::VectorXd desired_joint_positions = current_joint_positions + *desired_joint_velocities_ptr_ * dt_;
-
-    // Set the joint limits
-    desired_joint_positions = setJointLimits(desired_joint_positions);
+    Eigen::VectorXd desired_joint_positions = *current_joint_positions_ptr_ + *desired_joint_velocities_ptr_ * dt_;
+    // desired_joint_positions = setJointLimits(desired_joint_positions);
 
     return desired_joint_positions;
+}
+
+void IKSolver::setDt(double dt)
+{
+    // Set the time step
+    dt_ = dt;
+}
+
+void IKSolver::setNJoints(int n_joints)
+{
+    // Set the number of joints
+    n_joints_ = n_joints;
+}
+
+void IKSolver::setJointLimits(std::vector<std::array<double,2>> joint_limits)
+{
+    // Set the joint limits
+    joint_limits_ = joint_limits;
+}
+
+void IKSolver::setTasks(std::vector<Task> tasks)
+{
+    // Set the tasks
+    tasks_ = tasks;
 }
 
 uint8_t IKSolver::getNumberOfTasks()
@@ -95,7 +116,7 @@ void IKSolver::configureTasks()
     // TODO: Load the tasks from a YAML file.
     Task task = { 0, "motion", 6, 8 };
     task.setGainP(50.0);
-    task.setDampingCoefficient(1e-2);
+    task.setDampingCoefficient(1e-3);
     tasks_.push_back(task);
 }
 

@@ -12,6 +12,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
   <depend>rclcpp_components</depend>
+  <depend>ament_index_python</depend>
   <depend>std_msgs</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>

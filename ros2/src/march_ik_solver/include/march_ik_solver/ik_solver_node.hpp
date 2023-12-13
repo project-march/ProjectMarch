@@ -34,6 +34,7 @@ private:
     trajectory_msgs::msg::JointTrajectory convertToJointTrajectoryMsg();
 
     IKSolver ik_solver_;
+    std::vector<std::string> joints_names_;
     Eigen::VectorXd current_joint_positions_;
     Eigen::VectorXd current_joint_velocities_;
     Eigen::VectorXd desired_joint_positions_;

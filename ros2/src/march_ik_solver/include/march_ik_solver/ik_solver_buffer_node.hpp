@@ -45,6 +45,7 @@ class IKSolverBufferNode : public rclcpp::Node
         unsigned int n_joints_;
         double dt_;
         double convergence_threshold_;
+        long unsigned int early_stopping_threshold_;
         Eigen::VectorXd current_joint_positions_;
         Eigen::VectorXd desired_joint_positions_;
         std::vector<march_shared_msgs::msg::IksFootPositions> ik_solver_foot_positions_buffer_;

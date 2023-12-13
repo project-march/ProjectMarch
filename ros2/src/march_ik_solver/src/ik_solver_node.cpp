@@ -1,10 +1,72 @@
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-using std::placeholders::_1;
 
 IKSolverNode::IKSolverNode()
-    : Node("ik_solver")
+    : Node("ik_solver", rclcpp::NodeOptions())
 {
+    // Initialize the node parameters.
+    declare_parameter("dt", 0.05);
+    declare_parameter("joints.size", 0);
+    declare_parameter("joints.names", std::vector<std::string>());
+    declare_parameter("joints.limits.positions.upper", std::vector<double>());
+    declare_parameter("joints.limits.positions.lower", std::vector<double>());
+    declare_parameter("tasks.size", 0);
+    declare_parameter("tasks.names", std::vector<std::string>());
+    declare_parameter("tasks.m", std::vector<long int>());
+    declare_parameter("tasks.n", std::vector<long int>());
+    declare_parameter("tasks.kp", std::vector<double>());
+    declare_parameter("tasks.kd", std::vector<double>());
+    declare_parameter("tasks.ki", std::vector<double>());
+    declare_parameter("tasks.damp_coeff", std::vector<double>());
+
+    // Get the node parameters.
+    double dt = get_parameter("dt").as_double();
+    long unsigned int joints_size = get_parameter("joints.size").as_int();
+    joints_names_ = get_parameter("joints.names").as_string_array();
+    std::vector<double> joints_limits_upper = get_parameter("joints.limits.positions.upper").as_double_array();
+    std::vector<double> joints_limits_lower = get_parameter("joints.limits.positions.lower").as_double_array();
+    long unsigned int tasks_size = get_parameter("tasks.size").as_int();
+    std::vector<std::string> tasks_names = get_parameter("tasks.names").as_string_array();
+    std::vector<long int> tasks_m = get_parameter("tasks.m").as_integer_array();
+    std::vector<long int> tasks_n = get_parameter("tasks.n").as_integer_array();
+    std::vector<double> tasks_kp = get_parameter("tasks.kp").as_double_array();
+    std::vector<double> tasks_kd = get_parameter("tasks.kd").as_double_array();
+    std::vector<double> tasks_ki = get_parameter("tasks.ki").as_double_array();
+    std::vector<double> tasks_damp_coeff = get_parameter("tasks.damp_coeff").as_double_array();
+
+    RCLCPP_INFO(this->get_logger(), "dt: %f", dt);
+    RCLCPP_INFO(this->get_logger(), "joints_size: %lu", joints_size);
+    for (long unsigned int i = 0; i < joints_names_.size(); i++)
+    {
+        RCLCPP_INFO(this->get_logger(), "joint %d name: %s", i, joints_names_[i].c_str());
+        RCLCPP_INFO(this->get_logger(), "joints %d upper limit: %f", i, joints_limits_upper[i]);
+        RCLCPP_INFO(this->get_logger(), "joints %d lower limit: %f", i, joints_limits_lower[i]);
+    }
+    RCLCPP_INFO(this->get_logger(), "tasks_size: %lu", tasks_size);
+    for (long unsigned int i = 0; i < tasks_names.size(); i++)
+    {
+        RCLCPP_INFO(this->get_logger(), "task %d name: %s", i, tasks_names[i].c_str());
+        RCLCPP_INFO(this->get_logger(), "task %d m: %d", i, tasks_m[i]);
+        RCLCPP_INFO(this->get_logger(), "task %d n: %d", i, tasks_n[i]);
+        RCLCPP_INFO(this->get_logger(), "task %d kp: %f", i, tasks_kp[i]);
+        RCLCPP_INFO(this->get_logger(), "task %d kd: %f", i, tasks_kd[i]);
+        RCLCPP_INFO(this->get_logger(), "task %d ki: %f", i, tasks_ki[i]);
+        RCLCPP_INFO(this->get_logger(), "task %d damp_coeff: %f", i, tasks_damp_coeff[i]);
+    }
+
+    // Configure the tasks.
+    std::vector<Task> tasks_;
+    for (long unsigned int i = 0; i < tasks_size; i++)
+    {
+        Task task = Task(i, tasks_names[i], tasks_m[i], tasks_n[i]);
+        task.setGainP(tasks_kp[i]);
+        // task.setKd(tasks_kd[i]);
+        // task.setKi(tasks_ki[i]);
+        task.setDampingCoefficient(tasks_damp_coeff[i]);
+        tasks_.push_back(task);
+    }
+    ik_solver_.setTasks(tasks_);
+
     // Configure the node.
     exo_state_sub_ = this->create_subscription<march_shared_msgs::msg::ExoState>(
         "current_state", 1, std::bind(&IKSolverNode::exoStateCallback, this, std::placeholders::_1));
@@ -18,8 +80,9 @@ IKSolverNode::IKSolverNode()
         = this->create_client<march_shared_msgs::srv::GetCurrentJointPositions>("get_current_joint_positions");
 
     // Configure IK solver.
-    std::vector<uint8_t> tasks_m = ik_solver_.getTasksM();
-    for (auto task_m : tasks_m) {
+    // std::vector<uint8_t> tasks_m = ik_solver_.getTasksM();
+    for (auto task_m : tasks_m)
+    {
         Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(task_m);
         desired_poses_.push_back(desired_pose);
     }
@@ -30,7 +93,7 @@ IKSolverNode::IKSolverNode()
     RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
 
     // Configure previous joint trajectory point.
-    Eigen::VectorXd zeros = Eigen::VectorXd::Zero(8);
+    Eigen::VectorXd zeros = Eigen::VectorXd::Zero(joints_size);
     std::vector<double> zeros_vector(zeros.data(), zeros.data() + zeros.size());
     joint_trajectory_point_prev_ = trajectory_msgs::msg::JointTrajectoryPoint();
     joint_trajectory_point_prev_.positions = zeros_vector;
@@ -40,10 +103,10 @@ IKSolverNode::IKSolverNode()
     joint_trajectory_point_prev_.time_from_start.sec = 0;
     joint_trajectory_point_prev_.time_from_start.nanosec = 0;
 
-    current_joint_positions_ = Eigen::VectorXd::Zero(8);
-    current_joint_velocities_ = Eigen::VectorXd::Zero(8);
-    desired_joint_positions_ = Eigen::VectorXd::Zero(8);
-    desired_joint_velocities_ = Eigen::VectorXd::Zero(8);
+    current_joint_positions_ = Eigen::VectorXd::Zero(joints_size);
+    current_joint_velocities_ = Eigen::VectorXd::Zero(joints_size);
+    desired_joint_positions_ = Eigen::VectorXd::Zero(joints_size);
+    desired_joint_velocities_ = Eigen::VectorXd::Zero(joints_size);
 
     // Configure exo state.
     gait_reset_ = false;
@@ -97,7 +160,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     //     desired_joint_positions_(7));
 
     // Publish the desired joint positions and velocities.
-    RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
+    // RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
     publishJointTrajectory();    
 }
 
@@ -183,9 +246,7 @@ trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg(
     // Create the message.
     trajectory_msgs::msg::JointTrajectory joint_trajectory_msg;
     joint_trajectory_msg.header.stamp = this->now();
-    joint_trajectory_msg.joint_names
-    = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
-        "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle" };
+    joint_trajectory_msg.joint_names = joints_names_;
     // joint_trajectory_msg.points.push_back(joint_trajectory_point_prev_);
 
     // for (long unsigned int i = 0; i < joint_trajectory_msg.joint_names.size(); i++)
@@ -225,7 +286,7 @@ trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg(
     joint_trajectory_point_desired.accelerations = zeros_vector;
     joint_trajectory_point_desired.effort = zeros_vector;
     joint_trajectory_point_desired.time_from_start.sec = 0;
-    joint_trajectory_point_desired.time_from_start.nanosec = (uint32_t) 50 * 1e6;
+    joint_trajectory_point_desired.time_from_start.nanosec = (uint32_t) 1 * 1e6;
     joint_trajectory_msg.points.push_back(joint_trajectory_point_desired);
 
     joint_trajectory_point_prev_ = joint_trajectory_point_desired;
@@ -248,10 +309,18 @@ void IKSolverNode::currentJointPositionsCallback(
 {
     // RCLCPP_INFO(this->get_logger(), "Receiving response from /get_current_joint_positions...");
     if (future.get()->status) {
-        RCLCPP_INFO(this->get_logger(), "Current joint positions received.");
-        current_joint_positions_
-            = Eigen::Map<Eigen::VectorXd>(current_joint_positions_future_.get()->joint_positions.data(),
+        // RCLCPP_INFO(this->get_logger(), "Current joint positions received.");
+        if (gait_reset_)
+        {
+            current_joint_positions_ = Eigen::Map<Eigen::VectorXd>(
+                current_joint_positions_future_.get()->joint_positions.data(),
                 current_joint_positions_future_.get()->joint_positions.size());
+        }
+        else
+        {
+            // TODO: Check if this is necessary.
+            current_joint_positions_ = desired_joint_positions_;
+        }
 
         current_joint_velocities_
             = Eigen::Map<Eigen::VectorXd>(current_joint_positions_future_.get()->joint_velocities.data(),
@@ -272,7 +341,7 @@ void IKSolverNode::currentJointPositionsCallback(
         //     desired_joint_positions_(7));
 
         // Publish the desired joint positions and velocities.
-        RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
+        // RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
         publishJointTrajectory();
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to get current joint positions.");
