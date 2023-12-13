@@ -32,9 +32,10 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
 
-    get_parameter("test_rotational", m_test_rotational);
+    this->declare_parameter<bool>("test_rotational", true);
+    this->get_parameter("test_rotational", m_test_rotational);
 
-    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Test rotational is: %s", m_test_rotational);
+    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Test rotational is: %s", m_test_rotational ? "true" : "false");
 
     if (m_test_rotational){ 
         m_current_joint_angles_msg->joint_names.push_back("rotational_joint");
