@@ -12,6 +12,7 @@ from launch_ros.actions import Node
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     test_rotational = LaunchConfiguration("test_rotational", default=True)
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
     
     # region Launch march control
     march_control = IncludeLaunchDescription(
@@ -27,8 +28,21 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
     # endregion
-    
-    # IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default ='true')
+
+    # region Launch input device
+    input_device = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_input_device"),
+                "launch",
+                "input_device.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("IPD_new_terminal", IPD_new_terminal)
+        ],
+    )
+    # endregion
 
     rosbags = LaunchConfiguration("rosbags", default='true')
 
@@ -38,19 +52,6 @@ def generate_launch_description() -> LaunchDescription:
         description="Whether the rosbags should stored.",
         choices=["true", "false"],
     )
-
-    # DeclareLaunchArgument(
-    #     name="IPD_new_terminal",
-    #     default_value="true",
-    #     description="Whether a new terminal should be openened, allowing you to give input.",
-    # )
-    
-    # DeclareLaunchArgument(
-    #     name="test_rotational",
-    #     default_value="false",
-    #     description="Which joint to test on the test setup.",
-    #     choices=["true", "false"],
-    # )
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -80,22 +81,6 @@ def generate_launch_description() -> LaunchDescription:
     # parameters
     fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
 
-    # # region Launch input device
-    # ipd_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_input_device"),
-    #             "launch",
-    #             "input_device.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
-    # )
-    
-    # endregion
-
-    
-
     return LaunchDescription([
         Node(
             package='state_machine',
@@ -118,13 +103,7 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_node',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
-        # Node(
-        #     package='march_input_device',
-        #     executable='input_device_node',
-        #     name='input_device_node',
-        #     parameters=[{"IPD_new_terminal": IPD_new_terminal}]
-        # ),
-        # ipd_node,
+        input_device,
         march_control,
         record_rosbags_action,
     ])
