@@ -181,7 +181,10 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_planning_angles_node', 
             name='march_gait_planning', 
         ), 
-
+        # Node(
+        #     package='plotjuggler',
+        #     executable='plotjuggler',
+        # ),
         mujoco_node,
         march_control,
         state_machine,
