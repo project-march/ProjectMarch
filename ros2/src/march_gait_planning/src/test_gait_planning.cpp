@@ -1,43 +1,25 @@
-//TODO: Fix the header files
 #include "march_gait_planning/test_gait_planning.hpp"
-#include <tuple>
-#include <cmath>
 #include <iostream>
 #include <fstream>
-#include <sstream>
-
-struct CSVRow {
-    double angle;
-};
 
 TestGaitPlanning::TestGaitPlanning()
-: m_gait_type(), 
-  m_trajectory()
   {
     std::cout << "Test Gait Planning Class created" << std::endl; 
-    setTrajectory(); 
+    loadTrajectoryFromCSV(); 
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
-void TestGaitPlanning::setTrajectory(){
-    std::vector<CSVRow> data;
-    
-    //TODO: Change the files for the gaits
+void TestGaitPlanning::loadTrajectoryFromCSV() {
     std::ifstream file("src/march_gait_planning/m9_gait_files/test_trajectory.csv");
-
-    if (!file.is_open()) {
+    if (!file) {
         std::cerr << "Error opening file." << std::endl;
+        return;
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        double angle;
-        if (!(iss >> angle)) { break; }  // error
-        // push angle to the vector.
+    double angle;
+    while (file >> angle) {
         m_trajectory.push_back(angle);
     }
-
 }
 
 std::vector<double> TestGaitPlanning::getTrajectory() const{
