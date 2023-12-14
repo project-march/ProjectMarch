@@ -11,10 +11,14 @@ class TestGaitPlanningNode : public rclcpp::Node
 {
 public:
     explicit TestGaitPlanningNode();
+    ~TestGaitPlanningNode() = default;
+
 
 private:
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
     void footPositionsPublish();
+    void executeRotationalJointGait();
+    void executeLinearJointGait();
     void timerCallback();
 
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber;
