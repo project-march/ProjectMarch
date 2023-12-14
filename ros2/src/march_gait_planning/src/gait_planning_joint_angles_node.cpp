@@ -32,9 +32,8 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current state: %d", msg->state); 
     m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "set prev gait type: %d", m_gait_planning.getPrevGaitType()); 
     m_gait_planning.setGaitType((exoState)msg->state); 
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "set current gait type: %d", m_gait_planning.getGaitType()); 
+    m_gait_planning.setCounter(0); 
     publishJointTrajectoryPoints(); 
 }
 
@@ -79,7 +78,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 m_gait_planning.setCounter(count+1);
             }
         }
-    } else if (m_gait_planning.getGaitType() == exoState::Walk && (m_gait_planning.getPrevGaitType() == exoState::Stand || m_gait_planning.getPrevGaitType() == exoState::Sit)) {
+    } else if (m_gait_planning.getGaitType() == exoState::Walk && (m_gait_planning.getPrevGaitType() == exoState::Stand)) {
         if (!m_gait_planning.getFirstStepAngleTrajectory().empty()){
 
             trajectory_msgs::msg::JointTrajectory msg;
@@ -139,7 +138,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Stand to sit message published!");
             
             if (count >= (m_gait_planning.getStandToSitGait().size()-1)){
-                m_gait_planning.setCounter(0); 
+                m_gait_planning.setCounter(m_gait_planning.getStandToSitGait().size()-1); 
             } else {
                 m_gait_planning.setCounter(count+1);
             }
