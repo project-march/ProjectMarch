@@ -18,15 +18,20 @@ class GaitPlanningAnglesNode:public rclcpp::Node {
     explicit GaitPlanningAnglesNode(); 
 
     private: 
-
+    // Callback for the current exoState
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
+
+    // Functions to generalize and refactor code 
     void initializeConstantsPoints(trajectory_msgs::msg::JointTrajectoryPoint &point); 
-    void processContinuousWalkingGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message);
-    void processFirstStepWalkingGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message); 
+
+    // Process various types of gaits 
     void processHomeStandGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message);
-    void processStandToSitGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message); 
+    void processMovingGaits(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message, std::vector<std::vector<double>> &angle_trajectory, const int &counter);     
+    
+    // Final joint angle trajectory publisher
     void publishJointTrajectoryPoints(); 
 
+    // Member variables 
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     rclcpp::TimerBase::SharedPtr m_timer;
