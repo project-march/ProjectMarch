@@ -6,7 +6,7 @@
 #include <ncurses.h>
 using std::placeholders::_1;
 
-std::array<exoState, 6> all_possible_states = {exoState::Sit, exoState::Stand, exoState::Walk, exoState::StepClose, exoState::BootUp, exoState::Error};
+std::array<exoState, 4> all_possible_states = {exoState::Sit, exoState::Stand, exoState::Walk, exoState::BootUp};
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),

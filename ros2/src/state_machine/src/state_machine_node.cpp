@@ -29,6 +29,12 @@ StateMachineNode::StateMachineNode()
     RCLCPP_WARN(rclcpp::get_logger("state_machine"), "State Machine Node succesfully initialized");
 }
 
+StateMachineNode::~StateMachineNode()
+{
+    RCLCPP_WARN(rclcpp::get_logger("state_machine"), "Deconstructor of State Machine node called");
+}
+
+
 void StateMachineNode::fillExoStateArray(march_shared_msgs::srv::GetExoStateArray_Response::SharedPtr response) const
 {
     std::set<exoState> available_states = m_state_machine.getAvailableStates((exoState)m_state_machine.getCurrentState());

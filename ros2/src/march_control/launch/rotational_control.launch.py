@@ -1,6 +1,6 @@
 """Author: Marco Bak, MVIII."""
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import (
     Command,
@@ -24,12 +24,8 @@ def generate_launch_description():
     # region Launch Controller manager, Extra configuration if simulation is `false`
 
     control_yaml = LaunchConfiguration("control_yaml")
-
-    print("CHECK THIS ASSHOLE: {}".format(test_rotational))
-
-    control_xacro = "test_rotational_control.xacro" if (test_rotational == "true") else "test_linear_control.xacro"
-    
-    print("CHECK THIS ASSSHOLE PART 2 {}".format(control_xacro))
+    control_xacro = "test_rotational_control.xacro"
+    print("CHECK THIS ASSHOLE: {}".format(control_xacro))
 
     declared_arguments = [
         DeclareLaunchArgument(
