@@ -42,8 +42,8 @@ void GaitPlanning::setGaitType(const exoState &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_first_step_trajectory = processCSV("src/march_gait_planning/m9_gait_files/first_step.csv");
-    m_bezier_trajectory = processCSV("src/march_gait_planning/m9_gait_files/normal_gait.csv");
+    m_first_step_trajectory = processCSV("src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
+    m_bezier_trajectory = processCSV("src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
