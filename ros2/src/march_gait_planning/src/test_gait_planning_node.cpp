@@ -64,6 +64,10 @@ void TestGaitPlanningNode::executeRotationalJointGait(){
 
     switch (m_gait_planning.getGaitType()){
 
+        case exoState::BootUp: {
+            break;
+        }
+
         case exoState::Stand: {
 
             m_current_trajectory.clear();
@@ -101,6 +105,10 @@ void TestGaitPlanningNode::executeRotationalJointGait(){
 void TestGaitPlanningNode::executeLinearJointGait(){
 
     switch (m_gait_planning.getGaitType()){
+
+        case exoState::BootUp: {
+        break;
+        }
 
         case exoState::Stand: {
 
