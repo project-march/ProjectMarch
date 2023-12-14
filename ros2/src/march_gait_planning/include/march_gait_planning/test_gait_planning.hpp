@@ -9,7 +9,7 @@ class TestGaitPlanning
 {
 public:
     TestGaitPlanning();
-    void setTrajectory();
+    void loadTrajectoryFromCSV();
     std::vector<double> getTrajectory() const;
     void setGaitType(const exoState &new_gait_type);
     exoState getGaitType() const;

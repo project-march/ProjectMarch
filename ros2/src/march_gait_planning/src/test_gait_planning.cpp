@@ -5,11 +5,11 @@
 TestGaitPlanning::TestGaitPlanning()
   {
     std::cout << "Test Gait Planning Class created" << std::endl; 
-    setTrajectory(); 
+    loadTrajectoryFromCSV(); 
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
-void TestGaitPlanning::setTrajectory() {
+void TestGaitPlanning::loadTrajectoryFromCSV() {
     std::ifstream file("src/march_gait_planning/m9_gait_files/test_trajectory.csv");
     if (!file) {
         std::cerr << "Error opening file." << std::endl;
