@@ -20,6 +20,11 @@ class GaitPlanningAnglesNode:public rclcpp::Node {
     private: 
 
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
+    void initializeConstantsPoints(trajectory_msgs::msg::JointTrajectoryPoint &point); 
+    void processContinuousWalkingGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message);
+    void processFirstStepWalkingGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message); 
+    void processHomeStandGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message);
+    void processStandToSitGait(trajectory_msgs::msg::JointTrajectoryPoint &prev_point, trajectory_msgs::msg::JointTrajectoryPoint &des_point, trajectory_msgs::msg::JointTrajectory &message); 
     void publishJointTrajectoryPoints(); 
 
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; 
