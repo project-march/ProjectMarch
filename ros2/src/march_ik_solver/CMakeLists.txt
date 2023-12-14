@@ -28,7 +28,7 @@ find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(control_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 include_directories(include)
 
@@ -49,7 +49,7 @@ ament_target_dependencies(${PROJECT_NAME}
   Eigen3
   geometry_msgs
   sensor_msgs
-  control_msgs
+  trajectory_msgs
   march_shared_msgs
 )
 
@@ -65,7 +65,7 @@ ament_target_dependencies(ik_solver_node
   Eigen3
   geometry_msgs
   sensor_msgs
-  control_msgs
+  trajectory_msgs
   march_shared_msgs
 )
 

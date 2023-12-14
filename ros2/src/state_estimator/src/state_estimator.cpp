@@ -303,7 +303,7 @@ void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_
     std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response)
 {
     int task_id = request->task_id;
-    RCLCPP_INFO(this->get_logger(), "Incoming request\nm: %d\nn: %d", 6, 8);
+    // RCLCPP_INFO(this->get_logger(), "Incoming request\nm: %d\nn: %d", 6, 8);
 
     // Eigen::MatrixXd jacobian = Eigen::MatrixXd(6, 8);
     // double counter = 0.0;
@@ -332,10 +332,10 @@ void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_
     // }
     response->current_pose = m_exo_estimator.getFeetPositions();
 
-    // RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
-    // for (int i = 0; i < response->current_pose.size(); i++) {
-    //     RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
-    // }
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->current_pose.size());
+    for (int i = 0; i < response->current_pose.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "current_pose[%d]: %f", i, response->current_pose[i]);
+    }
 }
 
 void StateEstimator::handleJointPositionsRequest(

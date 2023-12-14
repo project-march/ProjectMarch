@@ -19,16 +19,28 @@ add_executable(gait_planning_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
+add_executable(joint_angle_gait_node
+  src/gait_planning_joint_angles_node.cpp
+)
 
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  )
+
+ament_target_dependencies(joint_angle_gait_node
+  rclcpp
+  trajectory_msgs
+  )
+
+# Install the executable
+install(TARGETS gait_planning_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
-# Install the gait_planning_node executable
-install(TARGETS gait_planning_node
+install(TARGETS joint_angle_gait_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
