@@ -11,6 +11,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
 class Task {
@@ -24,13 +25,15 @@ public:
     );
 
     std::string getTaskName(); // Get the name of the task
-    int getTaskID(); // Get the ID of the task
+    unsigned int getTaskID(); // Get the ID of the task
     int getTaskM(); // Get the dimension of the task
     int getTaskN(); // Get the dimension of the joint space
 
     Eigen::VectorXd solve(); // Solve the task
 
-    void setDesiredPose(Eigen::VectorXd* desired_pose); // Set the desired pose of the task
+    Eigen::VectorXd getPose(const Eigen::VectorXd * joint_positions);
+    void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions); // Set the current joint positions
+    void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr); // Set the desired pose of the task
 
     void setGainP(float gain_p); // Set the proportional gain
     // void setGainI(float gain_i);                    // Set the integral gain
@@ -44,6 +47,8 @@ private:
     Eigen::VectorXd calculateError(); // Calculate the error
     // Eigen::VectorXd calculateIntegralError();       // Calculate the integral error
     // Eigen::VectorXd calculateDerivativeError();     // Calculate the derivative error
+    void calculateCurrentPose(); // Calculate the current pose of the task
+    void calculateJacobian(); // Calculate the Jacobian
     void calculateJacobianInverse(); // Calculate the inverse of Jacobian
     void sendRequest(); // Send a request to the task server in the state estimation node
 
@@ -57,7 +62,8 @@ private:
     uint8_t task_m_; // Dimension of the task
     uint8_t task_n_; // Dimension of the joint space
 
-    Eigen::VectorXd* desired_pose_ptr_; // Pointer to desired pose of the task
+    Eigen::VectorXd * current_joint_positions_ptr_; // Pointer to current joint positions
+    std::vector<Eigen::VectorXd> * desired_poses_ptr_; // Pointer to desired pose of the task
     Eigen::VectorXd current_pose_; // Current pose of the task
     float gain_p_ = 0.0; // Proportional gain. Default value is 0.0
     float gain_i_ = 0.0; // Integral gain. Default value is 0.0

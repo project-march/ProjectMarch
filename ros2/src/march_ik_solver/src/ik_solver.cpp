@@ -7,10 +7,6 @@
 
 IKSolver::IKSolver()
 {
-    n_joints_ = 8; // TODO: Load this from a YAML file
-    dt_ = 0.05; // TODO: Load this from a YAML file
-    // configureTasks();
-
     // Set the joint limits.
     // TODO: Load this from a YAML file instead of this hard-coded array.
     std::array<double,2> joint_limits_LHAA = { -15.0, 10.0 };
@@ -38,12 +34,7 @@ IKSolver::IKSolver()
     }
 }
 
-IKSolver::~IKSolver()
-{
-    delete &tasks_;
-}
-
-Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
+Eigen::VectorXd IKSolver::solve()
 {
     // Solve the IK problem
     Eigen::VectorXd desired_joint_velocities = Eigen::VectorXd::Zero(n_joints_);
@@ -56,8 +47,10 @@ Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
         // const Eigen::MatrixXd * J_ptr = task.getJacobianPtr();
         // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
-        tasks_[i].setDesiredPose(&desired_poses[i]);
+        // tasks_[i].setDesiredPose(&desired_poses[i]);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", tasks_[i].getTaskName().c_str());
         desired_joint_velocities += tasks_[i].solve();
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", tasks_[i].getTaskName().c_str());
     }
 
     return desired_joint_velocities;
@@ -66,16 +59,12 @@ Eigen::VectorXd IKSolver::solve(std::vector<Eigen::VectorXd> desired_poses)
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
-    Eigen::VectorXd desired_joint_positions = *current_joint_positions_ptr_ + *desired_joint_velocities_ptr_ * dt_;
-    // desired_joint_positions = setJointLimits(desired_joint_positions);
-
+    double dt = 0.0005;
+    Eigen::VectorXd desired_joint_positions = (*current_joint_positions_ptr_) + (*desired_joint_velocities_ptr_) * dt;
     return desired_joint_positions;
-}
 
-void IKSolver::setDt(double dt)
-{
-    // Set the time step
-    dt_ = dt;
+    // Eigen::VectorXd limited_desired_joint_positions = setJointLimits(desired_joint_positions);
+    // return limited_desired_joint_positions;
 }
 
 void IKSolver::setNJoints(int n_joints)
@@ -96,39 +85,39 @@ void IKSolver::setTasks(std::vector<Task> tasks)
     tasks_ = tasks;
 }
 
-uint8_t IKSolver::getNumberOfTasks()
+void IKSolver::configureTasks(std::vector<Eigen::VectorXd> * desired_poses_ptr)
 {
-    // Get the number of tasks
-    return tasks_.size();
+    // Set the current and desired pose.
+    for (long unsigned int i = 0; i < tasks_.size(); i++)
+    {
+        tasks_[i].setCurrentJointPositionsPtr(current_joint_positions_ptr_);
+        tasks_[i].setDesiredPosesPtr(desired_poses_ptr);
+    }
 }
 
-std::vector<uint8_t> IKSolver::getTasksM()
+void IKSolver::setIntegralDtPtr(uint32_t* integral_dt_ptr)
 {
-    // Get the dimension of each task
-    std::vector<uint8_t> tasks_m;
-    for (auto task : tasks_)
-        tasks_m.push_back(task.getTaskM());
-    return tasks_m;
-}
-
-void IKSolver::configureTasks()
-{
-    // TODO: Load the tasks from a YAML file.
-    Task task = { 0, "motion", 6, 8 };
-    task.setGainP(50.0);
-    task.setDampingCoefficient(1e-3);
-    tasks_.push_back(task);
+    // Set the pointer to the integral time step
+    integral_dt_ptr_ = integral_dt_ptr;
 }
 
 Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions)
 {
     // Set the joint limits
-    Eigen::VectorXd joint_limits = Eigen::VectorXd::Zero(desired_joint_positions.size());
-    for (unsigned int i = 0; i < (unsigned int) desired_joint_positions.size(); i++)
+    Eigen::VectorXd limited_joint_positions = Eigen::VectorXd::Zero(n_joints_);
+    for (int i = 0; i < n_joints_; i++)
     {
-        joint_limits(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
+        // limited_joint_positions(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
+        if (desired_joint_positions(i) < joint_limits_[i][0])
+        {
+            limited_joint_positions(i) = joint_limits_[i][0];
+        }
+        else if (desired_joint_positions(i) > joint_limits_[i][1])
+        {
+            limited_joint_positions(i) = joint_limits_[i][1];
+        }
     }
-    return joint_limits;
+    return limited_joint_positions;
     // return desired_joint_positions;
 }
 
@@ -161,3 +150,10 @@ void IKSolver::setDesiredJointVelocitiesPtr(Eigen::VectorXd* desired_joint_veloc
 //     // Get the inverse of Jacobian of a task
 //     return tasks_[task_id].getJacobianInversePtr();
 // }
+
+std::vector<double> IKSolver::getPose(const Eigen::VectorXd * joint_positions)
+{
+    // Get the pose of the end-effector
+    Eigen::VectorXd pose = tasks_[tasks_.size() - 1].getPose(joint_positions);
+    return std::vector<double>(pose.data(), pose.data() + pose.size());
+}

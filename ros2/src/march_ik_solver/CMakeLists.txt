@@ -30,6 +30,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(urdf REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -114,11 +115,6 @@ ament_export_dependencies(Eigen3)
 # Install launch files.
 install(DIRECTORY
 launch
-DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install config files.
-install(DIRECTORY
 config
 DESTINATION share/${PROJECT_NAME}/
 )
