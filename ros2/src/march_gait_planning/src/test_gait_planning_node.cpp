@@ -1,6 +1,11 @@
 #include "march_gait_planning/test_gait_planning_node.hpp"
 
 using std::placeholders::_1; 
+// Make time_to_start a constant variable?
+// Make the rot and linear joint ranges configurable as a parameter or in config?
+constexpr double rotational_range = 0.3;
+constexpr double linear_range = 0.1;
+
 
 TestGaitPlanningNode::TestGaitPlanningNode()
  : Node("march_test_gait_planning_node"), 
@@ -14,9 +19,8 @@ TestGaitPlanningNode::TestGaitPlanningNode()
 
     trajectory_msgs::msg::JointTrajectoryPoint current_point;
     current_point.positions.push_back(0.0);
-    current_point.time_from_start = rclcpp::Duration(0, 50000000); //50 ms
-
-    // m_current_joint_angles_msg->points.push_back([]);
+    current_point.time_from_start = rclcpp::Duration(0, 50000000);  //50 ms
+    
     m_current_joint_angles_msg->points.push_back(previous_point);
     m_current_joint_angles_msg->points.push_back(current_point);
 
@@ -26,25 +30,18 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     m_test_joint_trajectory_controller_state_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
-    m_gait_planning.setGaitType(exoState::BootUp); // make service between gait planning and state machine for gait type
+    m_gait_planning.setGaitType(exoState::BootUp); 
 
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
 
-
-    // Get parameters from parameter server
+    // Get parameters from parameter server and use that joint
     this->declare_parameter<bool>("test_rotational", true);
     this->get_parameter("test_rotational", m_test_rotational);
-
-    if (m_test_rotational){ 
-        m_current_joint_angles_msg->joint_names.push_back("rotational_joint");
-        RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Rotational Joint");
-    }
-    else {
-        m_current_joint_angles_msg->joint_names.push_back("linear_joint");
-        RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Linear Joint");
-    }
+    const std::string joint_name = m_test_rotational ? "rotational_joint" : "linear_joint";
+    m_current_joint_angles_msg->joint_names.push_back(joint_name);
+    RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "%s Joint", m_test_rotational ? "Rotational" : "Linear");
 }
 
 void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
@@ -53,50 +50,87 @@ void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::Ex
 }
 
 void TestGaitPlanningNode::footPositionsPublish(){
-    if (m_test_rotational){ //Use rotational joint -0.3 to 0.3
-        if (m_gait_planning.getGaitType() == exoState::Stand){
+    if (m_test_rotational){
+        executeRotationalJointGait();
+    }
+    else{ 
+        executeLinearJointGait();
+    }
+    m_current_joint_angles_msg->points[0].positions = m_current_joint_angles_msg->points[1].positions; 
+    m_current_joint_angles_msg->points[1].positions.clear();
+}
+
+void TestGaitPlanningNode::executeRotationalJointGait(){
+
+    switch (m_gait_planning.getGaitType()){
+
+        case exoState::Stand: {
+
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Joint angles assigned");
             m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Home stand position published!");
+            break;
         }
-        else if (m_gait_planning.getGaitType() == exoState::Walk){
+        case exoState::Walk: {
+
             if (m_current_trajectory.empty()) {
-                // This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
+                //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
-                double new_angle = 0.3*m_current_trajectory.front();
+                double new_angle = rotational_range * m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
                 m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
+                
             }
+            break;
+        }
+        default: {
+
+            //TODO: Connect this to the Safety node
+            RCLCPP_INFO(get_logger(), "Unsupported gait type");
+            break;
         }
     }
-    else{ //Use linear joint -0.1 to 0.1
-        if (m_gait_planning.getGaitType() == exoState::Stand){
+}
+
+void TestGaitPlanningNode::executeLinearJointGait(){
+
+    switch (m_gait_planning.getGaitType()){
+
+        case exoState::Stand: {
+
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);
             m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Home stand position published!");
+            break;
         }
-        else if (m_gait_planning.getGaitType() == exoState::Walk){
+        case exoState::Walk: {
+
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
-                double new_angle = 0.05*m_current_trajectory.front();
+                double new_angle = linear_range * m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
                 m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
             }
+            break;
+        }
+        default: {
+
+            //TODO: Connect this to the Safety node
+            RCLCPP_INFO(get_logger(), "Unsupported gait type");
+            break;
         }
     }
-    m_current_joint_angles_msg->points[0].positions = m_current_joint_angles_msg->points[1].positions; //Set current point as previous point for next iteration
-    m_current_joint_angles_msg->points[1].positions.clear();
 }
 
 void TestGaitPlanningNode::timerCallback() {
