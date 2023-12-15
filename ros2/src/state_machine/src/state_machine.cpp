@@ -21,11 +21,10 @@ StateMachine::StateMachine()
         /*{CurrentState, PossibleStates}*/
         { exoState::Sit, { exoState::Stand, exoState::BootUp, exoState::Error } },
         { exoState::Stand,
-            { exoState::Sit, exoState::Walk, exoState::StepClose, exoState::BootUp, exoState::Error } },
-        { exoState::Walk, { exoState::Stand, exoState::Error } },
-        { exoState::StepClose, { exoState::Stand, exoState::BootUp, exoState::Error } },
-        { exoState::BootUp, { exoState::Stand, exoState::Sit, exoState::Error, exoState::BootUp } },
-        { exoState::Error, {} },
+            { exoState::Sit, exoState::Walk, exoState::BootUp, exoState::Error} },
+        { exoState::Walk, { exoState::Stand, exoState::Error} },
+        { exoState::BootUp, { exoState::Stand, exoState::Sit, exoState::BootUp, exoState::Error } },
+        { exoState::Error, {}}
 
     };
     
@@ -48,8 +47,6 @@ bool StateMachine::performTransition(const exoState& desired_state)
         return true;
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("state_machine"), "Invalid State transition!");
-        // do ERROR Stuff
-        //        m_current_state = exoState::Error;
         return false;
     }
 }

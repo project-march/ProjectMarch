@@ -7,7 +7,7 @@ from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
-from march_shared_msgs.srv import PossibleGaits
+from march_shared_msgs.srv import PossibleGaits, GetExoStateArray
 from rclpy.node import Node
 
 
@@ -104,6 +104,12 @@ class InputDeviceController:
             qos_profile=10,
         )
 
+        self._get_exo_state_array_client = self.create_client(
+            srv_type = GetExoStateArray, 
+            srv_name = 'get_exo_state_array'
+            )
+        self._new_state = None
+
         self._error_pub = self._node.create_publisher(msg_type=Error, topic="/march/error", qos_profile=10)
         self._possible_gait_client = self._node.create_client(
             srv_type=PossibleGaits, srv_name="/march/gait_selection/get_possible_gaits"
@@ -148,6 +154,9 @@ class InputDeviceController:
 
         self.gait_future = None
         self.update_possible_gaits()
+
+        self.available_gaits = []
+        self.get_possible_gaits()
 
     def __del__(self):
         """Deconstructer, that shutsdown the publishers and resets the timers."""
@@ -195,6 +204,18 @@ class InputDeviceController:
         else:
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn("Failed to contact possible gaits service")
+
+    def get_possible_gaits(self) -> list:
+        """
+        Request avaialable gaits from the gait selection node, by sending the new state.
+        """
+        if self._get_exo_state_array_client.service_is_ready():
+            request = GetExoStateArray.Request()
+            request.state = self._new_state
+            self.available_gaits = self._get_exo_state_array_client.call_async(request)
+        else:
+            while not self._get_exo_state_array_client.wait_for_service(timeout_sec=1):
+                self._node.get_logger().warn("Waiting for service get_exo_state_array to become available...")
 
     def _eeg_gait_request_callback(self, msg: Int32):
         self.get_node().get_logger().info("EEG requested gait: " + str(msg.data))
