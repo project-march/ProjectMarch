@@ -214,7 +214,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 // }
 void IKSolverNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
 {
-    RCLCPP_INFO(this->get_logger(), "JointState received.");
+    // RCLCPP_INFO(this->get_logger(), "JointState received.");
     // Update the current joint positions.
     actual_joint_positions_ = Eigen::VectorXd::Zero((int) msg->position.size());
     actual_joint_positions_(0) = msg->position[3];

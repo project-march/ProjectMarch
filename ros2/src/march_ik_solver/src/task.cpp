@@ -54,9 +54,9 @@ Eigen::VectorXd Task::getPose(const Eigen::VectorXd * joint_positions)
     double q_LHFE = q(1);
     double q_LKFE = q(2);
     double q_LADPF = q(3);
-    double q_RHAA = q(4);
+    double q_RHAA = -q(4);
     double q_RHFE = q(5);
-    double q_RKFE = -q(6);
+    double q_RKFE = q(6);
     double q_RADPF = q(7);
 
     // x(0) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.0562224*sin(q_LADPF + q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA) + 0.0562224*cos(q_LADPF + q_LHFE - q_LKFE) + 0.014;
@@ -194,12 +194,12 @@ void Task::setDampingCoefficient(float damping_coefficient)
     damping_coefficient_ = damping_coefficient;
 }
 
-const Eigen::MatrixXd* Task::getJacobianPtr()
-{
-    // Return the pointer of Jacobian
-    sendRequest();
-    return &jacobian_;
-}
+// const Eigen::MatrixXd* Task::getJacobianPtr()
+// {
+//     // Return the pointer of Jacobian
+//     sendRequest();
+//     return &jacobian_;
+// }
 
 const Eigen::MatrixXd* Task::getJacobianInversePtr()
 {
@@ -219,9 +219,9 @@ void Task::calculateCurrentPose()
     double q_LHFE = q(1);
     double q_LKFE = q(2);
     double q_LADPF = q(3);
-    double q_RHAA = q(4);
+    double q_RHAA = -q(4);
     double q_RHFE = q(5);
-    double q_RKFE = -q(6);
+    double q_RKFE = q(6);
     double q_RADPF = q(7);
 
     // x(0) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.0562224*sin(q_LADPF + q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA) + 0.0562224*cos(q_LADPF + q_LHFE - q_LKFE) + 0.014;
@@ -230,8 +230,15 @@ void Task::calculateCurrentPose()
     // x(3) = 0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.0562224*sin(q_RADPF + q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA) + 0.0562224*cos(q_RADPF + q_RHFE - q_RKFE) + 0.014;
     // x(4) = 0.8662224*sin(q_RHAA) - 0.16;
     // x(5) = 0.0562224*sin(q_RADPF + q_RHFE - q_RKFE) - 0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA) - 0.0562224*cos(q_RADPF + q_RHFE - q_RKFE)*cos(q_RHAA) - 0.4*cos(q_RHAA)*cos(q_RHFE) - 0.144;
+    // current_pose(0) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA) + 0.014;
+    // current_pose(1) = 0.81*sin(q_LHAA) + 0.16;
+    // current_pose(2) = -0.41*cos(q_LHFE - q_LKFE)*cos(q_LHAA) - 0.4*cos(q_LHAA)*cos(q_LHFE) - 0.144;
+    // current_pose(3) = 0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA) + 0.014;
+    // current_pose(4) = 0.81*sin(q_RHAA) - 0.16;
+    // current_pose(5) = -0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA) - 0.4*cos(q_RHAA)*cos(q_RHFE) - 0.144;
+
     current_pose(0) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA) + 0.014;
-    current_pose(1) = 0.81*sin(q_LHAA) + 0.16;
+    current_pose(1) = -0.81*sin(q_LHAA) + 0.16;
     current_pose(2) = -0.41*cos(q_LHFE - q_LKFE)*cos(q_LHAA) - 0.4*cos(q_LHAA)*cos(q_LHFE) - 0.144;
     current_pose(3) = 0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA) + 0.014;
     current_pose(4) = 0.81*sin(q_RHAA) - 0.16;
@@ -252,10 +259,32 @@ void Task::calculateJacobian()
     double q_LHFE = q(1);
     double q_LKFE = q(2);
     double q_LADPF = q(3);
-    double q_RHAA = q(4);
+    double q_RHAA = -q(4);
     double q_RHFE = q(5);
-    double q_RKFE = -q(6);
+    double q_RKFE = q(6);
     double q_RADPF = q(7);
+
+    // // Left foot Jacobian.
+    // jacobian(0,0) = -0.41*sin(q_LHFE - q_LKFE)*sin(q_LHAA) - 0.4*sin(q_LHAA)*sin(q_LHFE);
+    // jacobian(0,1) = 0.41*cos(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*cos(q_LHAA)*cos(q_LHFE);
+    // jacobian(0,2) = -0.41*cos(q_LHFE - q_LKFE)*cos(q_LHAA);
+
+    // jacobian(1,0) = 0.81*cos(q_LHAA);
+
+    // jacobian(2,0) = 0.41*sin(q_LHAA)*cos(q_LHFE - q_LKFE) + 0.4*sin(q_LHAA)*cos(q_LHFE);
+    // jacobian(2,1) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA);
+    // jacobian(2,2) = -0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA);
+
+    // // Right foot Jacobian.
+    // jacobian(3,4) = -0.41*sin(q_RHFE - q_RKFE)*sin(q_RHAA) - 0.4*sin(q_RHAA)*sin(q_RHFE);
+    // jacobian(3,5) = 0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*cos(q_RHAA)*cos(q_RHFE);
+    // jacobian(3,6) = -0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA);
+
+    // jacobian(4,4) = 0.81*cos(q_RHAA);
+
+    // jacobian(5,4) = .41*sin(q_RHAA)*cos(q_RHFE - q_RKFE) + 0.4*sin(q_RHAA)*cos(q_RHFE);
+    // jacobian(5,6) = .41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA);
+    // jacobian(5,7) = -0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA);
 
     // Left foot Jacobian.
     jacobian(0,0) = -0.41*sin(q_LHFE - q_LKFE)*sin(q_LHAA) - 0.4*sin(q_LHAA)*sin(q_LHFE);
@@ -268,23 +297,22 @@ void Task::calculateJacobian()
     jacobian(2,1) = 0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA) + 0.4*sin(q_LHFE)*cos(q_LHAA);
     jacobian(2,2) = -0.41*sin(q_LHFE - q_LKFE)*cos(q_LHAA);
 
-    // Right foot Jacobian.
     jacobian(3,4) = -0.41*sin(q_RHFE - q_RKFE)*sin(q_RHAA) - 0.4*sin(q_RHAA)*sin(q_RHFE);
     jacobian(3,5) = 0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*cos(q_RHAA)*cos(q_RHFE);
     jacobian(3,6) = -0.41*cos(q_RHFE - q_RKFE)*cos(q_RHAA);
 
     jacobian(4,4) = 0.81*cos(q_RHAA);
 
-    jacobian(5,4) = .41*sin(q_RHAA)*cos(q_RHFE - q_RKFE) + 0.4*sin(q_RHAA)*cos(q_RHFE);
-    jacobian(5,6) = .41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA);
-    jacobian(5,7) = -0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA);
+    jacobian(5,4) = 0.41*sin(q_RHAA)*cos(q_RHFE - q_RKFE) + 0.4*sin(q_RHAA)*cos(q_RHFE);
+    jacobian(5,5) = 0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA) + 0.4*sin(q_RHFE)*cos(q_RHAA);
+    jacobian(5,6) = -0.41*sin(q_RHFE - q_RKFE)*cos(q_RHAA);
 
     // Round the Jacobian to zero if it is very small.
     for (int i = 0; i < task_m_; i++)
     {
         for (int j = 0; j < task_n_; j++)
         {
-            if (jacobian(i,j) < 1e-6 && jacobian(i,j) > -1e-6)
+            if (abs(jacobian(i,j)) < 1e-6)
             {
                 jacobian(i,j) = 0.0;
             }
@@ -292,10 +320,10 @@ void Task::calculateJacobian()
     }
 
     // Print the Jacobian.
-    // for (int i = 0; i < task_m_; i++)
-    // {
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, jacobian(i,0), jacobian(i,1), jacobian(i,2), jacobian(i,3), jacobian(i,4), jacobian(i,5), jacobian(i,6), jacobian(i,7));
-    // }
+    for (long unsigned int i = 0; i < (long unsigned int) task_m_; i++)
+    {
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, jacobian(i,0), jacobian(i,1), jacobian(i,2), jacobian(i,3), jacobian(i,4), jacobian(i,5), jacobian(i,6), jacobian(i,7));
+    }
 
     // Update the Jacobian.
     jacobian_ = jacobian;
@@ -330,7 +358,7 @@ void Task::calculateJacobianInverse()
     {
         for (int j = 0; j < task_m_; j++)
         {
-            if (jacobian_inverse_(i,j) < 1e-6 && jacobian_inverse_(i,j) > -1e-6)
+            if (abs(jacobian_inverse_(i,j)) < 1e-6)
             {
                 jacobian_inverse_(i,j) = 0.0;
             }
@@ -338,41 +366,41 @@ void Task::calculateJacobianInverse()
     }
 
     // Print the Jacobian inverse.
-    // for (int i = 0; i < task_n_; i++)
-    // {
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, jacobian_inverse_(i,0), jacobian_inverse_(i,1), jacobian_inverse_(i,2), jacobian_inverse_(i,3), jacobian_inverse_(i,4), jacobian_inverse_(i,5));
-    // }
-}
-
-void Task::sendRequest()
-{
-    auto request = std::make_shared<march_shared_msgs::srv::GetTaskReport::Request>();
-
-    // TODO: To remove the following lines.
-    while (!client_->wait_for_service(std::chrono::seconds(1))) {
-        if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-            return;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-    }
-
-    auto result = client_->async_send_request(request);
-
-    // TODO: Add error handling.
-    if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result)
-        == rclcpp::FutureReturnCode::SUCCESS) {
-        // Eigen::MatrixXd jacobian = Eigen::MatrixXd::Zero(task_m_, task_n_);
-        // Eigen::Map<const Eigen::VectorXd> jacobian_vector(result.get()->jacobian.data(),
-        // result.get()->jacobian.size()); std::vector<float> jacobian_vector(result.get()->jacobian.begin(),
-        // result.get()->jacobian.end());
-        Eigen::MatrixXd jacobian = Eigen::Map<Eigen::MatrixXd>(result.get()->jacobian.data(), task_m_, task_n_);
-        jacobian_ = jacobian;
-
-        // std::vector<float> current_pose_vector(result.get()->current_pose.begin(), result.get()->current_pose.end());
-        Eigen::VectorXd current_pose = Eigen::Map<Eigen::VectorXd>(result.get()->current_pose.data(), task_m_);
-        current_pose_ = current_pose;
-    } else {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_task_report");
+    for (int i = 0; i < task_n_; i++)
+    {
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, jacobian_inverse_(i,0), jacobian_inverse_(i,1), jacobian_inverse_(i,2), jacobian_inverse_(i,3), jacobian_inverse_(i,4), jacobian_inverse_(i,5));
     }
 }
+
+// void Task::sendRequest()
+// {
+//     auto request = std::make_shared<march_shared_msgs::srv::GetTaskReport::Request>();
+
+//     // TODO: To remove the following lines.
+//     while (!client_->wait_for_service(std::chrono::seconds(1))) {
+//         if (!rclcpp::ok()) {
+//             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+//             return;
+//         }
+//         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+//     }
+
+//     auto result = client_->async_send_request(request);
+
+//     // TODO: Add error handling.
+//     if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result)
+//         == rclcpp::FutureReturnCode::SUCCESS) {
+//         // Eigen::MatrixXd jacobian = Eigen::MatrixXd::Zero(task_m_, task_n_);
+//         // Eigen::Map<const Eigen::VectorXd> jacobian_vector(result.get()->jacobian.data(),
+//         // result.get()->jacobian.size()); std::vector<float> jacobian_vector(result.get()->jacobian.begin(),
+//         // result.get()->jacobian.end());
+//         Eigen::MatrixXd jacobian = Eigen::Map<Eigen::MatrixXd>(result.get()->jacobian.data(), task_m_, task_n_);
+//         jacobian_ = jacobian;
+
+//         // std::vector<float> current_pose_vector(result.get()->current_pose.begin(), result.get()->current_pose.end());
+//         Eigen::VectorXd current_pose = Eigen::Map<Eigen::VectorXd>(result.get()->current_pose.data(), task_m_);
+//         current_pose_ = current_pose;
+//     } else {
+//         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_task_report");
+//     }
+// }

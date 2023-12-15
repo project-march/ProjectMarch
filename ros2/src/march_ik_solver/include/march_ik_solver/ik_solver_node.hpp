@@ -33,6 +33,7 @@ private:
         const rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedFuture future);
     std::vector<Eigen::VectorXd> calculateError();
     trajectory_msgs::msg::JointTrajectory convertToJointTrajectoryMsg();
+    std::vector<std::array<double,2>> getJointLimits();
 
     IKSolver ik_solver_;
     double convergence_threshold_;

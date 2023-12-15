@@ -114,14 +114,6 @@ Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions
     for (int i = 0; i < n_joints_; i++)
     {
         limited_joint_positions(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
-        // if (desired_joint_positions(i) < joint_limits_[i][0])
-        // {
-        //     limited_joint_positions(i) = joint_limits_[i][0];
-        // }
-        // if (desired_joint_positions(i) > joint_limits_[i][1])
-        // {
-        //     limited_joint_positions(i) = joint_limits_[i][1];
-        // }
     }
     return limited_joint_positions;
     // return desired_joint_positions;
