@@ -44,6 +44,10 @@ alias m8_sim_gaitloader='sfox && sros2 && ros2 launch march_launch march8_gaitlo
 alias training='march_run_ros2_training'
 alias gits='git status'
 
+# NEW M9 ALIASES
+alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
+alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py'
+
 # Alias to build one package, appended with specified pakage
 alias mbp='mba --packages-select'
 

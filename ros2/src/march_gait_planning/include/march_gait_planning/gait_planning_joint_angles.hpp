@@ -9,11 +9,10 @@
 class GaitPlanningAngles{
     public:
     explicit GaitPlanningAngles(); 
+ 
+    void processCSVFile(const std::string &path, std::vector<std::vector<double>> &member_variable);
 
-    // Setters 
-    void setFirstStepAngleCSV(); 
-    void setFullGaitAngleCSV(); 
-    void setStandtoSitGait(); 
+    // Setters
     void setGaitType(const exoState &new_gait_type); 
     void setPrevGaitType(const exoState &prev_gait_type); 
     void setCounter(const int &count); 

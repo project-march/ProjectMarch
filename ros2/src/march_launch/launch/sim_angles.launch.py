@@ -75,26 +75,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    #TODO: implement own input device M9 
-
-    # region rqt input device
-    # rqt_input_device = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_rqt_input_device"),
-    #             "launch",
-    #             "input_device.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[
-    #         ("ping_safety_node", "true"),
-    #         ("use_sim_time", "false"),
-    #         ("layout", "training"),
-    #         ("testing", "false"),
-    #     ],
-    # )
-    # endregion
-
     # region Launch Safety
     safety_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -201,13 +181,17 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_planning_angles_node', 
             name='march_gait_planning', 
         ), 
-
         mujoco_node,
         march_control,
         state_machine,
         record_rosbags_action,
-        safety_node,
         imu_nodes,
         state_estimator,
         ipd_node,
+        Node(
+            package='plotjuggler',
+            executable='plotjuggler',
+            name='plotjuggler',
+        #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
+        ),
     ])

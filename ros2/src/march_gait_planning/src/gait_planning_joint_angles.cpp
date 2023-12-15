@@ -21,16 +21,15 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
-    setFullGaitAngleCSV(); 
-    setFirstStepAngleCSV(); 
-    setStandtoSitGait(); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
-// Function to save the joint angles from the first step csv in a member variable 
-void GaitPlanningAngles::setFirstStepAngleCSV(){
+void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std::vector<double>> &member_variable){
     std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv"); 
+    std::ifstream file(path); 
     if (!file.is_open()){
         std::cerr << "Error opening file" << std::endl; 
     }
@@ -52,74 +51,11 @@ void GaitPlanningAngles::setFirstStepAngleCSV(){
     file.close(); 
 
     for (const auto& row : data){
-        m_first_step_angle_trajectory.push_back({std::stod(row.left_hip_aa), std::stod(row.left_hip_fe), std::stod(row.left_knee), std::stod(row.left_ankle), std::stod(row.right_hip_aa), std::stod(row.right_hip_fe), std::stod(row.right_knee), std::stod(row.right_ankle)}); 
+        member_variable.push_back({std::stod(row.left_hip_aa), std::stod(row.left_hip_fe), std::stod(row.left_knee), std::stod(row.left_ankle), std::stod(row.right_hip_aa), std::stod(row.right_hip_fe), std::stod(row.right_knee), std::stod(row.right_ankle)}); 
     }
 
     m_counter = 0; 
-    m_prev_point = m_first_step_angle_trajectory[0]; 
-}
-
-// Function to save the joint angles from the complete step csv in a member variable 
-void GaitPlanningAngles::setFullGaitAngleCSV(){
-    std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv"); 
-    if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
-    }
-    std::string line; 
-    while (std::getline(file, line)){
-        std::istringstream iss(line); 
-        CSVRow row; 
-        std::getline(iss, row.left_hip_aa, ','); 
-        std::getline(iss, row.left_hip_fe, ',');
-        std::getline(iss, row.left_knee, ',');
-        std::getline(iss, row.left_ankle, ',');
-        std::getline(iss, row.right_hip_aa, ',');
-        std::getline(iss, row.right_hip_fe, ',');
-        std::getline(iss, row.right_knee, ',');
-        std::getline(iss, row.right_ankle, ','); 
-        data.push_back(row); 
-    }
-
-    file.close(); 
-
-    for (const auto& row : data){
-        m_complete_step_angle_trajectory.push_back({std::stod(row.left_hip_aa), std::stod(row.left_hip_fe), std::stod(row.left_knee), std::stod(row.left_ankle), std::stod(row.right_hip_aa), std::stod(row.right_hip_fe), std::stod(row.right_knee), std::stod(row.right_ankle)}); 
-    }
-
-    m_counter = 0; 
-    m_prev_point = m_complete_step_angle_trajectory[0];
-}
-
-void GaitPlanningAngles::setStandtoSitGait(){
-    std::vector<CSVRow> data; 
-    std::ifstream file("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv"); 
-    if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
-    }
-    std::string line; 
-    while (std::getline(file, line)){
-        std::istringstream iss(line); 
-        CSVRow row; 
-        std::getline(iss, row.left_hip_aa, ','); 
-        std::getline(iss, row.left_hip_fe, ',');
-        std::getline(iss, row.left_knee, ',');
-        std::getline(iss, row.left_ankle, ',');
-        std::getline(iss, row.right_hip_aa, ',');
-        std::getline(iss, row.right_hip_fe, ',');
-        std::getline(iss, row.right_knee, ',');
-        std::getline(iss, row.right_ankle, ','); 
-        data.push_back(row); 
-    }
-
-    file.close(); 
-
-    for (const auto& row : data){
-        m_stand_to_sit_trajectory.push_back({std::stod(row.left_hip_aa), std::stod(row.left_hip_fe), std::stod(row.left_knee), std::stod(row.left_ankle), std::stod(row.right_hip_aa), std::stod(row.right_hip_fe), std::stod(row.right_knee), std::stod(row.right_ankle)}); 
-    }
-
-    m_counter = 0; 
-    m_prev_point = m_stand_to_sit_trajectory[0];
+    m_prev_point = member_variable[0];
 }
 
 void GaitPlanningAngles::setGaitType(const exoState &new_gait_type){

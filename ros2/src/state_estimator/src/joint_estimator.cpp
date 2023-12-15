@@ -242,12 +242,12 @@ std::vector<std::array<double, 3>> JointEstimator::transformFeetPositionsToExoFr
     foot_point.point.z = 0;
 
     // Get transform left foot.
-    geometry_msgs::msg::TransformStamped left_foot_transform = m_owner->get_frame_transform("map", "left_ankle");
+    geometry_msgs::msg::TransformStamped left_foot_transform = m_owner->get_frame_transform("hip_base", "left_ankle");
     geometry_msgs::msg::PointStamped left_transformed_point;
     tf2::doTransform(foot_point, left_transformed_point, left_foot_transform);
 
     // Get transform right foot.
-    geometry_msgs::msg::TransformStamped right_foot_transform = m_owner->get_frame_transform("map", "right_ankle");
+    geometry_msgs::msg::TransformStamped right_foot_transform = m_owner->get_frame_transform("hip_base", "right_ankle");
     geometry_msgs::msg::PointStamped right_transformed_point;
     tf2::doTransform(foot_point, right_transformed_point, right_foot_transform);
 
