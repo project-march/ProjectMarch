@@ -36,5 +36,15 @@ install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
+if (BUILD_TESTING) 
+  find_package(ament_cmake_gtest REQUIRED)
+
+  ament_add_gtest(${PROJECT_NAME}_test     
+    test/inpud_device_test.cpp
+    test/test_runner.cpp)
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+  ament_target_dependencies(${PROJECT_NAME}_test)
+endif()
+
 # Add the necessary Python modules
 ament_package()
