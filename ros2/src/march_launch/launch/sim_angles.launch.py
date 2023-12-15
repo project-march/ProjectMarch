@@ -181,10 +181,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='gait_planning_angles_node', 
             name='march_gait_planning', 
         ), 
-        # Node(
-        #     package='plotjuggler',
-        #     executable='plotjuggler',
-        # ),
         mujoco_node,
         march_control,
         state_machine,
@@ -192,4 +188,10 @@ def generate_launch_description() -> LaunchDescription:
         imu_nodes,
         state_estimator,
         ipd_node,
+        Node(
+            package='plotjuggler',
+            executable='plotjuggler',
+            name='plotjuggler',
+        #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
+        ),
     ])
