@@ -32,6 +32,11 @@ IKSolver::IKSolver()
         joint_limits_[i][0] = M_PI * joint_limits_[i][0] / 180.0;
         joint_limits_[i][1] = M_PI * joint_limits_[i][1] / 180.0;
     }
+
+    for (long unsigned int i = 0; i < joint_limits_.size(); i++)
+    {
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::IKSolver(): Joint %d limits: %f, %f", i, joint_limits_[i][0], joint_limits_[i][1]);
+    }
 }
 
 Eigen::VectorXd IKSolver::solve()
@@ -61,10 +66,10 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
     // Integrate the joint velocities
     double dt = 0.0005;
     Eigen::VectorXd desired_joint_positions = (*current_joint_positions_ptr_) + (*desired_joint_velocities_ptr_) * dt;
-    return desired_joint_positions;
+    // return desired_joint_positions;
 
-    // Eigen::VectorXd limited_desired_joint_positions = setJointLimits(desired_joint_positions);
-    // return limited_desired_joint_positions;
+    Eigen::VectorXd limited_desired_joint_positions = setJointLimits(desired_joint_positions);
+    return limited_desired_joint_positions;
 }
 
 void IKSolver::setNJoints(int n_joints)
@@ -104,18 +109,19 @@ void IKSolver::setIntegralDtPtr(uint32_t* integral_dt_ptr)
 Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions)
 {
     // Set the joint limits
-    Eigen::VectorXd limited_joint_positions = Eigen::VectorXd::Zero(n_joints_);
+    // Eigen::VectorXd limited_joint_positions = Eigen::VectorXd::Zero(n_joints_);
+    Eigen::VectorXd limited_joint_positions = desired_joint_positions;
     for (int i = 0; i < n_joints_; i++)
     {
-        // limited_joint_positions(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
-        if (desired_joint_positions(i) < joint_limits_[i][0])
-        {
-            limited_joint_positions(i) = joint_limits_[i][0];
-        }
-        else if (desired_joint_positions(i) > joint_limits_[i][1])
-        {
-            limited_joint_positions(i) = joint_limits_[i][1];
-        }
+        limited_joint_positions(i) = boost::algorithm::clamp(desired_joint_positions(i), joint_limits_[i][0], joint_limits_[i][1]);
+        // if (desired_joint_positions(i) < joint_limits_[i][0])
+        // {
+        //     limited_joint_positions(i) = joint_limits_[i][0];
+        // }
+        // if (desired_joint_positions(i) > joint_limits_[i][1])
+        // {
+        //     limited_joint_positions(i) = joint_limits_[i][1];
+        // }
     }
     return limited_joint_positions;
     // return desired_joint_positions;
