@@ -32,9 +32,9 @@ StateEstimator::StateEstimator()
         "current_stance_leg_service", std::bind(&StateEstimator::stanceFootServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
 
     declare_parameter("state_estimator_config.refresh_rate", 1000);
-    // auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
-    // timer_ = this->create_wall_timer(
-    //     std::chrono::milliseconds(refresh_rate), std::bind(&StateEstimator::publish_robot_frames, this));
+    auto refresh_rate = this->get_parameter("state_estimator_config.refresh_rate").as_int();
+    timer_ = this->create_wall_timer(
+        std::chrono::milliseconds(refresh_rate), std::bind(&StateEstimator::publish_robot_frames, this));
 
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     m_tf_joint_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
@@ -202,6 +202,7 @@ void StateEstimator::stanceFootServiceCallback(
 {
     RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Request received!");
     setStanceFoot();
+    publishFootPositions();
     response->stance_leg = m_current_stance_foot;
     RCLCPP_INFO(rclcpp::get_logger("state_estimator"), "Response sent!");
     
