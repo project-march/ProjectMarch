@@ -25,7 +25,7 @@ class GaitPlanningNode:public rclcpp::Node {
 
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg); 
     void currentFeetPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg); 
-    void setFootPositions(double left_x, double left_y, double left_z, 
+    void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
 
