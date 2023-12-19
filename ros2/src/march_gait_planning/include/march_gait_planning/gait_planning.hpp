@@ -24,7 +24,6 @@ public:
     std::array<double, 3> getCurrentLeftFootPos() const; 
     std::array<double, 3> getCurrentRightFootPos() const; 
     exoState getGaitType() const; 
-    std::vector<std::array<double, 3>> getFootEndPositions() const; 
 
 private: 
     exoState m_gait_type; 
