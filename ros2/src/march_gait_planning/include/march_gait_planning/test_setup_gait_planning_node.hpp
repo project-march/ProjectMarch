@@ -7,11 +7,11 @@
 #include "march_gait_planning/test_setup_gait_planning.hpp"
 #include "march_shared_msgs/msg/exo_state.hpp"
 
-class TestGaitPlanningNode : public rclcpp::Node
+class TestSetupGaitPlanningNode : public rclcpp::Node
 {
 public:
-    explicit TestGaitPlanningNode();
-    ~TestGaitPlanningNode() = default;
+    explicit TestSetupGaitPlanningNode();
+    ~TestSetupGaitPlanningNode() = default;
 
 
 private:
@@ -25,7 +25,7 @@ private:
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_test_joint_trajectory_controller_state_pub_;
     rclcpp::TimerBase::SharedPtr m_timer;
 
-    TestGaitPlanning m_gait_planning;
+    TestSetupGaitPlanning m_gait_planning;
     std::vector<double> m_current_trajectory;
     trajectory_msgs::msg::JointTrajectory::SharedPtr m_current_joint_angles_msg;
     bool m_test_rotational;

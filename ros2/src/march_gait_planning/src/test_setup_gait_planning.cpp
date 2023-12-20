@@ -2,14 +2,14 @@
 #include <iostream>
 #include <fstream>
 
-TestGaitPlanning::TestGaitPlanning()
+TestSetupGaitPlanning::TestSetupGaitPlanning()
   {
     std::cout << "Test Gait Planning Class created" << std::endl; 
     loadTrajectoryFromCSV(); 
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
-void TestGaitPlanning::loadTrajectoryFromCSV() {
+void TestSetupGaitPlanning::loadTrajectoryFromCSV() {
     std::ifstream file("src/march_gait_planning/m9_gait_files/test_trajectory.csv");
     if (!file) {
         std::cerr << "Error opening file." << std::endl;
@@ -22,14 +22,14 @@ void TestGaitPlanning::loadTrajectoryFromCSV() {
     }
 }
 
-std::vector<double> TestGaitPlanning::getTrajectory() const{
+std::vector<double> TestSetupGaitPlanning::getTrajectory() const{
     return m_trajectory;
 }
 
-void TestGaitPlanning::setGaitType(const exoState &new_gait_type){
+void TestSetupGaitPlanning::setGaitType(const exoState &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-exoState TestGaitPlanning::getGaitType() const{
+exoState TestSetupGaitPlanning::getGaitType() const{
     return m_gait_type; 
 }

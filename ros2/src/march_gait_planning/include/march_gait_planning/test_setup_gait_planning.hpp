@@ -5,10 +5,10 @@
 #include <array>
 #include "../../state_machine/include/state_machine/exo_state.hpp"
 
-class TestGaitPlanning
+class TestSetupGaitPlanning
 {
 public:
-    TestGaitPlanning();
+    TestSetupGaitPlanning();
     void loadTrajectoryFromCSV();
     std::vector<double> getTrajectory() const;
     void setGaitType(const exoState &new_gait_type);
