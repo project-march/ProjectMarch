@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
-#include "march_gait_planning/test_gait_planning.hpp"
+#include "march_gait_planning/test_setup_gait_planning.hpp"
 #include "march_shared_msgs/msg/exo_state.hpp"
 
 class TestGaitPlanningNode : public rclcpp::Node

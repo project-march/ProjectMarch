@@ -1,4 +1,4 @@
-#include "march_gait_planning/test_gait_planning_node.hpp"
+#include "march_gait_planning/test_setup_gait_planning_node.hpp"
 
 using std::placeholders::_1; 
 // Make time_to_start a constant variable?

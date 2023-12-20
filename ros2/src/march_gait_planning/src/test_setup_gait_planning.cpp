@@ -1,4 +1,4 @@
-#include "march_gait_planning/test_gait_planning.hpp"
+#include "march_gait_planning/test_setup_gait_planning.hpp"
 #include <iostream>
 #include <fstream>
 

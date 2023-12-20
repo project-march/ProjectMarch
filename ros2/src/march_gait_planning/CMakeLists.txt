@@ -50,13 +50,13 @@ install(TARGETS gait_planning_angles_node
 )
 
 # Create the test_gait_planning executable in the test_setup_gait_planning folder
-add_executable(test_gait_planning_node
-  src/test_gait_planning_node.cpp
-  src/test_gait_planning.cpp
+add_executable(test_setup_gait_planning_node
+  src/test_setup_gait_planning_node.cpp
+  src/test_setup_gait_planning.cpp
 )
 
 # Link against ROS 2 dependencies
-ament_target_dependencies(test_gait_planning_node
+ament_target_dependencies(test_setup_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
@@ -64,7 +64,7 @@ ament_target_dependencies(test_gait_planning_node
 )
 
 # Install the test_gait_planning_node executable
-install(TARGETS test_gait_planning_node
+install(TARGETS test_setup_gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
