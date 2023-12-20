@@ -7,7 +7,7 @@ MarchStateEstimatorNode::MarchStateEstimatorNode()
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "MarchStateEstimatorNode constructor");
     robot_description_ = std::make_shared<RobotDescription>();
-    robot_description_->parse(ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
+    robot_description_->parseURDF(ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
 }
 
 int main(int argc, char * argv[])

@@ -10,14 +10,15 @@
 class RobotDescription
 {
 public:
-  RobotDescription();
-  ~RobotDescription() = default;
+  RobotDescription() = default;
+  ~RobotDescription();
 
-  void parse(const std::string & urdf_path);  
+  void parseURDF(const std::string & urdf_path);  
 
 private:
     
     urdf::Model urdf_model_;
+    std::vector<RobotNode*> robot_nodes_;
 
 };
 

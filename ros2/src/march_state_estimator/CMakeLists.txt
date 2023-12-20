@@ -15,6 +15,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# # Set external library directories
+# set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build")
+# set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build/ginac/libginac.so")
+# set(cln "${PROJECT_SOURCE_DIR}/../libraries/ginac/cln/include")
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
@@ -28,6 +33,9 @@ find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(urdf REQUIRED)
 include_directories(include)
+
+include_directories(${GINAC_BUILD_DIR})
+include_directories(${cln})
 
 add_library(${PROJECT_NAME} STATIC
   src/march_state_estimator_node.cpp
@@ -47,6 +55,9 @@ add_executable(march_state_estimator_node
   src/march_state_estimator_node.cpp
   src/urdf_parser.cpp
   src/robot_description.cpp
+  src/robot_node.cpp
+  src/robot_mass.cpp
+  src/robot_joint.cpp
 )
 target_include_directories(march_state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -58,10 +69,17 @@ ament_target_dependencies(march_state_estimator_node
   sensor_msgs
   march_description
   urdf
+  Eigen3
 )
+
+# target_link_libraries(march_state_estimator_node
+#   ${PROJECT_NAME}
+#   ${GINAC_LIB}
+# )
 
 install(TARGETS
   march_state_estimator_node
+  EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(eigen3_cmake_module)
