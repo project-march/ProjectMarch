@@ -39,7 +39,10 @@ ament_target_dependencies(
   "mujoco_interfaces"
 )
 
-add_executable(state_machine_node src/state_machine_node.cpp src/state_machine.cpp include/${PROJECT_NAME}/state_machine.hpp
+add_executable(state_machine_node 
+        src/state_machine_node.cpp 
+        src/state_machine.cpp 
+        include/${PROJECT_NAME}/state_machine.hpp
         include/${PROJECT_NAME}/state_machine_node.hpp)
 target_include_directories(state_machine_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -64,8 +67,6 @@ DESTINATION share/${PROJECT_NAME}/
 
 if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake)
-  # add_launch_test(test/launch_tests/invalid_transition_pub_sub_test.py )
-#  add_launch_test(test/launch_tests/valid_transition_pub_sub_test.py)
   ament_add_gmock(${PROJECT_NAME}_test
     test/state_machine_test.cpp
     test/test_runner.cpp
