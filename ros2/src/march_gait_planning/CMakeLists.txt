@@ -92,7 +92,13 @@ endif()
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(${PROJECT_NAME}_test test/gait_planning_test.cpp src/gait_planning.cpp)
+  ament_add_gtest(${PROJECT_NAME}_test 
+    test/gait_planning_test.cpp 
+    src/gait_planning.cpp
+    test/test_setup_gait_planning_test.cpp
+    src/test_setup_gait_planning.cpp
+    test/all_gait_planning_test_runner.cpp
+    )
   target_include_directories(${PROJECT_NAME}_test PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

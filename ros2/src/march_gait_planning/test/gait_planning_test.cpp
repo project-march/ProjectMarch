@@ -61,8 +61,3 @@ TEST_F(GaitPlanningTest, FullStepTrajectoryGetterTest){
     test_gait_planning.setStanceFoot(1); 
     ASSERT_EQ(test_gait_planning.getTrajectory().size(), 40) << "Full step trajectory was not returned whilst no double stance"; 
 }
-
-int main(int argc, char** argv){
-    testing::InitGoogleTest(&argc, argv); 
-    return RUN_ALL_TESTS(); 
-}
