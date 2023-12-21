@@ -13,8 +13,10 @@
   <depend>ament_index_cpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>urdf</depend>
   <depend>march_description</depend>
+  <depend>march_shared_msgs</depend>
   <depend>eigen</depend>
   <depend>ginac</depend>
 

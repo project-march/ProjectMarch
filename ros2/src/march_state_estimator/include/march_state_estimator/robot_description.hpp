@@ -15,6 +15,10 @@ public:
 
   void parseURDF(const std::string & urdf_path);
   void configureRobotNodes();
+  std::vector<std::string> getNodeNames();
+  std::vector<std::string> getParentNames();
+  std::vector<Eigen::Vector3d> getNodesPosition();
+  std::vector<Eigen::Matrix3d> getNodesRotation();
 
 private:
     
