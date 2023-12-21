@@ -54,6 +54,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PowerDistributionBoardData.msg"
   "msg/RobotState.msg"
   "msg/TorqueStamped.msg"
+  "msg/StateEstimatorVisualization.msg"
   "msg/WeightStamped.msg"
   "srv/GetCurrentStanceLeg.srv"
   "srv/GetExoStateArray.srv"
