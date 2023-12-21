@@ -13,7 +13,8 @@ public:
   RobotDescription() = default;
   ~RobotDescription();
 
-  void parseURDF(const std::string & urdf_path);  
+  void parseURDF(const std::string & urdf_path);
+  void configureRobotNodes();
 
 private:
     

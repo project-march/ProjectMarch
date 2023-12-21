@@ -6,8 +6,7 @@
 class RobotMass : public RobotNode
 {
 public:
-    RobotMass() = default;
-    RobotMass(const std::string & name, const double & mass);
+    RobotMass(const std::string & name, const uint64_t & id, const double & mass);
     ~RobotMass() = default;
 
 };

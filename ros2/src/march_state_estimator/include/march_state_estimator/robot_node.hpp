@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "ginac/ginac.h"
 // #include <eigen3/Eigen/Core>
 // #include <eigen3/Eigen/Geometry>
 
@@ -16,14 +17,30 @@ public:
     RobotNode() = default;
     ~RobotNode() = default;
 
+    void setInertia(const std::vector<double> inertia);
+    void setParent(RobotNode* parent);
+    void addChild(RobotNode* child);
+
+    std::string getName() const;
+    uint64_t getId() const;
+    uint64_t getId(const std::string & name) const;
+    char getType() const;
+    double getMass() const;
+    double getLength() const;
+    std::vector<double> getInertia() const;
+    RobotNode* getParent() const;
+    std::vector<RobotNode*> getChildren() const;
+
 protected:
 
     std::string name_;
+    uint64_t id_;
+    char type_;
     double mass_;
     double length_;
     double inertia_[NO_INERTIA_PARAMS];
-    std::shared_ptr<RobotNode> parent_;
-    std::shared_ptr<RobotNode> child_;
+    RobotNode* parent_ = nullptr;
+    std::vector<RobotNode*> children_;
 
 };
 

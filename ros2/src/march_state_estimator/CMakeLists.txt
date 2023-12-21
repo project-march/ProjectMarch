@@ -15,9 +15,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# # Set external library directories
-# set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build")
-# set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build/ginac/libginac.so")
+# Set external library directories
+set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build")
+set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build/ginac/libginac.so")
 # set(cln "${PROJECT_SOURCE_DIR}/../libraries/ginac/cln/include")
 
 # find dependencies
@@ -72,10 +72,10 @@ ament_target_dependencies(march_state_estimator_node
   Eigen3
 )
 
-# target_link_libraries(march_state_estimator_node
-#   ${PROJECT_NAME}
-#   ${GINAC_LIB}
-# )
+target_link_libraries(march_state_estimator_node
+  ${PROJECT_NAME}
+  ${GINAC_LIB}
+)
 
 install(TARGETS
   march_state_estimator_node
