@@ -9,6 +9,7 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
 
+#define WORKSPACE_DIM 3
 #define NO_INERTIA_PARAMS 6
 
 class RobotNode
@@ -30,15 +31,25 @@ public:
     double getMass() const;
     double getLength() const;
     std::vector<double> getInertia() const;
-    Eigen::Vector3d getOriginPosition() const;
-    Eigen::Matrix3d getOriginRotation() const;
+    GiNaC::matrix getOriginPosition() const;
+    GiNaC::matrix getOriginRotation() const;
+    GiNaC::symbol getJointAngle() const;
+    Eigen::Vector3d getGlobalPosition() const;
+    Eigen::Matrix3d getGlobalRotation() const;
     RobotNode* getParent() const;
     std::vector<RobotNode*> getChildren() const;
 
-    Eigen::Vector3d getGlobalPosition() const;
-    Eigen::Matrix3d getGlobalRotation() const;
+    void expressKinematics();
+    void expressDynamics();
 
 protected:
+
+    std::vector<GiNaC::symbol> getJointAngles() const;
+    GiNaC::matrix expressGlobalPosition() const;
+    GiNaC::matrix expressGlobalRotation() const;
+
+    GiNaC::matrix utilConvertEigenToGiNaC(const Eigen::MatrixXd & matrix) const;
+    Eigen::Matrix3d utilConvertGiNaCToEigen(const GiNaC::matrix & matrix) const;
 
     std::string name_;
     uint64_t id_;
@@ -46,10 +57,15 @@ protected:
     double mass_;
     double length_;
     double inertia_[NO_INERTIA_PARAMS];
-    Eigen::Vector3d origin_position_;
-    Eigen::Matrix3d origin_rotation_;
     RobotNode* parent_ = nullptr;
     std::vector<RobotNode*> children_;
+
+    GiNaC::symbol joint_angle_;
+    GiNaC::matrix global_position_vector_;
+    GiNaC::matrix global_rotation_matrix_;
+    GiNaC::matrix origin_position_vector_;
+    GiNaC::matrix origin_rotation_matrix_;
+    std::vector<GiNaC::symbol> joint_angles_;
 
 };
 

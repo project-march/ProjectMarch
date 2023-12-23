@@ -61,7 +61,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "joint: %s", joint.first.c_str());
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint origin: %f %f %f", joint.second->parent_to_joint_origin_transform.position.x, joint.second->parent_to_joint_origin_transform.position.y, joint.second->parent_to_joint_origin_transform.position.z);
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint origin: %f %f %f %f", joint.second->parent_to_joint_origin_transform.rotation.x, joint.second->parent_to_joint_origin_transform.rotation.y, joint.second->parent_to_joint_origin_transform.rotation.z, joint.second->parent_to_joint_origin_transform.rotation.w);
-        if (joint.second->type == JOINT_TYPE_REVOLUTE || joint.second->type == JOINT_TYPE_CONTINUOUS)
+        if (joint.second->type == JOINT_TYPE_REVOLUTE)
         {
             // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "joint is revolute or continuous");
             std::vector<double> joint_axis = {joint.second->axis.x, joint.second->axis.y, joint.second->axis.z};
@@ -103,26 +103,31 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
 
 void RobotDescription::configureRobotNodes()
 {
+    // for (auto & robot_node : robot_nodes_)
+    // {
+    //     std::string name = robot_node->getName();
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "robot_node: %s", name.c_str());
+    //     if (robot_node->getParent() != nullptr)
+    //     {
+    //         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Parent: %s", robot_node->getParent()->getName().c_str());
+    //     }
+    //     for (auto & child : robot_node->getChildren())
+    //     {
+    //         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Child: %s", child->getName().c_str());
+    //     }
+    //     Eigen::Vector3d origin_position = robot_node->getOriginPosition();
+    //     Eigen::Matrix3d origin_rotation = robot_node->getOriginRotation();
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Origin position: %f %f %f", origin_position.x(), origin_position.y(), origin_position.z());
+    //     for (int i = 0; i < origin_rotation.rows(); i++)
+    //     {
+    //         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Origin rotation: %f %f %f", origin_rotation(i, 0), origin_rotation(i, 1), origin_rotation(i, 2));
+    //     }
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "---------------------");
+    // }
+
     for (auto & robot_node : robot_nodes_)
     {
-        std::string name = robot_node->getName();
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "robot_node: %s", name.c_str());
-        if (robot_node->getParent() != nullptr)
-        {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Parent: %s", robot_node->getParent()->getName().c_str());
-        }
-        for (auto & child : robot_node->getChildren())
-        {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Child: %s", child->getName().c_str());
-        }
-        Eigen::Vector3d origin_position = robot_node->getOriginPosition();
-        Eigen::Matrix3d origin_rotation = robot_node->getOriginRotation();
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Origin position: %f %f %f", origin_position.x(), origin_position.y(), origin_position.z());
-        for (int i = 0; i < origin_rotation.rows(); i++)
-        {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Origin rotation: %f %f %f", origin_rotation(i, 0), origin_rotation(i, 1), origin_rotation(i, 2));
-        }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "---------------------");
+        robot_node->expressKinematics();
     }
 }
 

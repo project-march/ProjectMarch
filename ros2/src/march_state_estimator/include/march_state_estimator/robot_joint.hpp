@@ -16,8 +16,18 @@ public:
     RobotJoint(const std::string & name, const uint64_t & id, const std::vector<double> & axis);
     ~RobotJoint() = default;
 
+    void setLimits(const double & lower_limit, const double & upper_limit);
+    void setOriginRotation(const Eigen::Matrix3d & rotation);
+
 private:
+    GiNaC::matrix utilRotate(std::vector<double> & axis);
+    GiNaC::matrix utilRotateX(const GiNaC::ex & angle) const;
+    GiNaC::matrix utilRotateY(const GiNaC::ex & angle) const;
+    GiNaC::matrix utilRotateZ(const GiNaC::ex & angle) const;
+
     std::vector<double> axis_;
+    double lower_limit_;
+    double upper_limit_;
 
 };
 
