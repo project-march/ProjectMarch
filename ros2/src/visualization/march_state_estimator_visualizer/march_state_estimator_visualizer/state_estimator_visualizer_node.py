@@ -16,6 +16,8 @@ class StateEstimatorVisualizerNode(Node):
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
+        self.figure = plt.figure()
+        self.ax = Axes3D(self.figure)
 
     def listener_callback(self, msg):
         self.get_logger().info('I heard: "%s"' % msg)
@@ -31,26 +33,27 @@ class StateEstimatorVisualizerNode(Node):
         self.plot(nodes)
 
     def plot(self, nodes):
-        fig = plt.figure()
-        ax = Axes3D(fig)
         # ax.scatter(points[:,0], points[:,1], points[:,2])
         # for i, name in enumerate(names):
         #     ax.text(points[i,0], points[i,1], points[i,2], name)
         for name, item in nodes.items():
             # ax.scatter(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z)
             if item['parent'] != 'none':
-                ax.plot(
+                self.ax.plot(
                     [nodes[item['parent']]['pose'].position.x, item['pose'].position.x], 
                     [nodes[item['parent']]['pose'].position.y, item['pose'].position.y], 
                     [nodes[item['parent']]['pose'].position.z, item['pose'].position.z],
                     c='red'
                 )
-            ax.scatter(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, c='black')
-            ax.text(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, name, alpha=0.5)
-        ax.set_xlim(-0.5, 0.5)
-        ax.set_ylim(-0.5, 0.5)
-        ax.set_zlim(-1.0, 0.0)
-        plt.show()
+            self.ax.scatter(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, c='black')
+            self.ax.text(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, name, alpha=0.5)
+        self.ax.set_xlim(-0.5, 0.5)
+        self.ax.set_ylim(-0.5, 0.5)
+        self.ax.set_zlim(-1.0, 0.0)
+        self.figure.canvas.draw()
+        plt.pause(1e-9)
+        self.figure.canvas.flush_events()
+        self.ax.clear()
 
 def main(args=None):
     rclpy.init(args=args)

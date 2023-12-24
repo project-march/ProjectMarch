@@ -34,7 +34,7 @@ public:
     GiNaC::matrix getOriginPosition() const;
     GiNaC::matrix getOriginRotation() const;
     GiNaC::symbol getJointAngle() const;
-    Eigen::Vector3d getGlobalPosition() const;
+    Eigen::Vector3d getGlobalPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles) const;
     Eigen::Matrix3d getGlobalRotation() const;
     RobotNode* getParent() const;
     std::vector<RobotNode*> getChildren() const;

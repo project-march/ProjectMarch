@@ -158,12 +158,18 @@ std::vector<std::string> RobotDescription::getParentNames()
     return parent_names;
 }
 
-std::vector<Eigen::Vector3d> RobotDescription::getNodesPosition()
+std::vector<Eigen::Vector3d> RobotDescription::getNodesPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles)
 {
     std::vector<Eigen::Vector3d> nodes_position;
     for (auto & robot_node : robot_nodes_)
     {
-        nodes_position.push_back(robot_node->getGlobalPosition());
+        // std::vector<std::string> joint_names = {
+        //     "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+        //     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+        // std::vector<double> joint_angles = {
+        //     0.0, 0.0, 0.0, 0.0, 
+        //     0.0, 0.0, 0.0, 0.0};
+        nodes_position.push_back(robot_node->getGlobalPosition(joint_names, joint_angles));
     }
     return nodes_position;
 }

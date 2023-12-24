@@ -2,6 +2,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <sstream>
+#include "math.h"
 
 void RobotNode::setParent(RobotNode * parent)
 {
@@ -70,47 +71,67 @@ std::vector<RobotNode*> RobotNode::getChildren() const
     return children_;
 }
 
-Eigen::Vector3d RobotNode::getGlobalPosition() const
+Eigen::Vector3d RobotNode::getGlobalPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles) const
 {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1, %s", name_.c_str());
-    GiNaC::lst substitutions;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 2");
-    for (long unsigned int i = 0; i < joint_angles_.size(); i++)
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1, %s", name_.c_str());
+    GiNaC::lst substitutions = GiNaC::lst();
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 2");
+    // for (long unsigned int i = 0; i < joint_angles_.size(); i++)
+    // {
+    //     // std::stringstream ss;
+    //     // ss << "Joint angle: " << joint_angles_[i];
+    //     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
+    //     substitutions.append(joint_angles_[i] == M_PI_4f64);
+    // }
+    for (long unsigned int i = 0; i < joint_names.size(); i++)
     {
-        std::stringstream ss;
-        ss << "Joint angle: " << joint_angles_[i];
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
-        substitutions.append(joint_angles_[i] == 0.0);
+        // TODO: This is a hack. The joint angle should be a symbol, not a string.
+        // TODO: Replace joint_angles_ with vector of RobotJoint objects.
+        std::stringstream q_name;
+        for (auto & joint_angle : joint_angles_)
+        {
+            q_name.str("");
+            q_name << joint_angle;
+            std::string j_name = "q_{" + joint_names[i] + "}";
+            // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
+            // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint name: %f", j_name);
+            if (q_name.str() == j_name)
+            {
+                substitutions.append(joint_angle == joint_angles[i]);
+                // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
+                // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle value: %f", joint_angles[i]);
+            }
+        }
     }
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3");
 
     Eigen::Vector3d global_position = Eigen::Vector3d::Zero();
     for (int i = 0; i < WORKSPACE_DIM; i++)
     {
-        std::stringstream ss;
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.1", i);
-        ss << global_position_vector_(i, 0);
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
+        // std::stringstream ss;
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.1", i);
+        // ss << global_position_vector_(i, 0);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
         GiNaC::ex global_position_component = GiNaC::evalf(global_position_vector_(i, 0).subs(substitutions));
-        ss.str("");
-        ss << global_position_component;
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.2", i);
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
+        // ss.str("");
+        // ss << global_position_component;
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.2", i);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
         global_position(i) = GiNaC::ex_to<GiNaC::numeric>(global_position_component).to_double();
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.3", i);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 3.%d.3", i);
     }
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 4");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 4");
 
     return global_position;
 }
 
 Eigen::Matrix3d RobotNode::getGlobalRotation() const
 {
-    double dummy_joint_angle = 0.0;
+    double dummy_joint_angle = M_PI;
     GiNaC::lst substitutions = GiNaC::lst();
     for (long unsigned int i = 0; i < joint_angles_.size(); i++)
     {
-        substitutions.append(joint_angles_[i] == dummy_joint_angle);
+        substitutions.append(joint_angles_[i] == 1.0);
     }
 
     Eigen::Matrix3d global_rotation = Eigen::Matrix3d::Zero();
@@ -162,13 +183,13 @@ void RobotNode::expressKinematics()
     global_position_vector_ = global_position;
     global_rotation_matrix_ = global_rotation;
 
-    std::stringstream temp_stringstream;
+    // std::stringstream temp_stringstream;
 
-    temp_stringstream << "Global position: " 
-        << global_position_vector_(0, 0) << ", " 
-        << global_position_vector_(1, 0) << ", " 
-        << global_position_vector_(2, 0);
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), temp_stringstream.str().c_str());
+    // temp_stringstream << "Global position: " 
+    //     << global_position_vector_(0, 0) << ", " 
+    //     << global_position_vector_(1, 0) << ", " 
+    //     << global_position_vector_(2, 0);
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), temp_stringstream.str().c_str());
 
     // temp_stringstream.str("");
     // temp_stringstream << "Global rotation: " 

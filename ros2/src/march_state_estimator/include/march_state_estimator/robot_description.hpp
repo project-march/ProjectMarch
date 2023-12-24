@@ -17,7 +17,7 @@ public:
   void configureRobotNodes();
   std::vector<std::string> getNodeNames();
   std::vector<std::string> getParentNames();
-  std::vector<Eigen::Vector3d> getNodesPosition();
+  std::vector<Eigen::Vector3d> getNodesPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles);
   std::vector<Eigen::Matrix3d> getNodesRotation();
 
 private:
