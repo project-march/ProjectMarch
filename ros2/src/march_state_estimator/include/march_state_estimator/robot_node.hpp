@@ -45,6 +45,7 @@ public:
 protected:
 
     std::vector<GiNaC::symbol> getJointAngles() const;
+    std::vector<RobotNode*> getJointNodes() const;
     GiNaC::matrix expressGlobalPosition() const;
     GiNaC::matrix expressGlobalRotation() const;
 
@@ -59,6 +60,7 @@ protected:
     double inertia_[NO_INERTIA_PARAMS];
     RobotNode* parent_ = nullptr;
     std::vector<RobotNode*> children_;
+    std::vector<RobotNode*> joint_nodes_;
 
     GiNaC::symbol joint_angle_;
     GiNaC::matrix global_position_vector_;

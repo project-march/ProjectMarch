@@ -12,7 +12,7 @@ The source is released under a TODO: Insert license.
 
 **Author: Alexander James Becoy, Alexander Andonov <br/>
 Affiliation: [Project MARCH](https://www.projectmarch.nl)<br/>
-Maintainer:**
+Maintainers:**
 
 - **Alexander James Becoy, alexanderjames.becoy@projectmarch.nl**
 - **Alexander Andonov, alexander.andonov@projectmarch.nl**
@@ -99,7 +99,7 @@ Config file folder/set 1
 
 - **state_estimator.launch.py**: TODO: shortly explain what is launched (e.g. standard simulation, simulation with gdb, ...)
     Argument set 1
-        - `**argument_1**` Short description (e.g. as commented in launch file). Default: `default_value`.
+        - `argument_1` Short description (e.g. as commented in launch file). Default: `default_value`.
 
 ## Nodes
 
@@ -109,7 +109,7 @@ TODO: Provide description of this node
 
 **Subscribed Topics**
 
-- `**/joint_state**` ([sensor_msgs/JointState](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/JointState.html))
+- `/joint_state` ([sensor_msgs/JointState](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/JointState.html))
     The measured state of each joint in the robot which consists the joint position, joint velocity and joint effort.
 
 **Published Topics**

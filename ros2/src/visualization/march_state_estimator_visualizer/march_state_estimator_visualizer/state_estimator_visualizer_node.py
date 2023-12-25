@@ -14,13 +14,13 @@ class StateEstimatorVisualizerNode(Node):
             StateEstimatorVisualization,
             'node_positions',
             self.listener_callback,
-            10)
+            1)
         self.subscription  # prevent unused variable warning
         self.figure = plt.figure()
         self.ax = Axes3D(self.figure)
 
     def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg)
+        # self.get_logger().info('I heard: "%s"' % msg)
         nodes = {
             name: {
                 'pose': pose, 

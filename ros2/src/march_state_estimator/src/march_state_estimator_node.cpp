@@ -13,8 +13,8 @@ MarchStateEstimatorNode::MarchStateEstimatorNode()
     robot_description_->configureRobotNodes();
 
     joint_state_subscription_ = this->create_subscription<sensor_msgs::msg::JointState>(
-        "new_joint_states", 10, std::bind(&MarchStateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
-    node_positions_publisher_ = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("node_positions", 10);
+        "new_joint_states", 1, std::bind(&MarchStateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
+    node_positions_publisher_ = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("node_positions", 1);
     // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&MarchStateEstimatorNode::publishNodePositions, this));
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "MarchStateEstimatorNode constructor done");
 }

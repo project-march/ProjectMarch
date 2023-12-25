@@ -83,23 +83,52 @@ Eigen::Vector3d RobotNode::getGlobalPosition(std::vector<std::string> joint_name
     //     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss.str().c_str());
     //     substitutions.append(joint_angles_[i] == M_PI_4f64);
     // }
-    for (long unsigned int i = 0; i < joint_names.size(); i++)
+    // for (long unsigned int i = 0; i < joint_names.size(); i++)
+    // {
+    //     // TODO: This is a hack. The joint angle should be a symbol, not a string.
+    //     // TODO: Replace joint_angles_ with vector of RobotJoint objects.
+    //     std::stringstream q_name;
+    //     for (auto & joint_angle : joint_angles_)
+    //     {
+    //         q_name.str("");
+    //         q_name << joint_angle;
+    //         std::string j_name = "q_{" + joint_names[i] + "}";
+    //         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
+    //         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint name: %f", j_name);
+    //         if (q_name.str() == j_name)
+    //         {
+    //             substitutions.append(joint_angle == joint_angles[i]);
+    //             // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
+    //             // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle value: %f", joint_angles[i]);
+    //         }
+    //     }
+    // }
+
+    // for (long unsigned int i = 0; i < joint_names.size(); i++)
+    // {
+    //     // TODO: This is a hack. The joint angle should be a symbol, not a string.
+    //     // TODO: Replace joint_angles_ with vector of RobotJoint objects.
+    //     std::stringstream q_name;
+    //     for (auto & joint_angle : joint_angles_)
+    //     {
+    //         q_name.str("");
+    //         q_name << joint_angle;
+    //         std::string j_name = "q_{" + joint_names[i] + "}";
+    //         if (q_name.str() == j_name)
+    //         {
+    //             substitutions.append(joint_angle == joint_angles[i]);
+    //         }
+    //     }
+    // }
+
+    for (auto & joint_node : joint_nodes_)
     {
-        // TODO: This is a hack. The joint angle should be a symbol, not a string.
-        // TODO: Replace joint_angles_ with vector of RobotJoint objects.
-        std::stringstream q_name;
-        for (auto & joint_angle : joint_angles_)
+        for (long unsigned int i = 0; i < joint_names.size(); i++)
         {
-            q_name.str("");
-            q_name << joint_angle;
-            std::string j_name = "q_{" + joint_names[i] + "}";
-            // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
-            // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint name: %f", j_name);
-            if (q_name.str() == j_name)
+            if (joint_node->getName() == joint_names[i])
             {
-                substitutions.append(joint_angle == joint_angles[i]);
-                // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle: %s", q_name.str().c_str());
-                // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint angle value: %f", joint_angles[i]);
+                substitutions.append(joint_node->getJointAngle() == joint_angles[i]);
+                break;
             }
         }
     }
@@ -162,6 +191,21 @@ std::vector<GiNaC::symbol> RobotNode::getJointAngles() const
     return joint_angles;
 }
 
+std::vector<RobotNode*> RobotNode::getJointNodes() const
+{
+    std::vector<RobotNode*> joint_nodes;
+    RobotNode * parent = parent_;
+    while (parent != nullptr)
+    {
+        if (parent->getType() == 'J')
+        {
+            joint_nodes.push_back(parent);
+        }
+        parent = parent->getParent();
+    }
+    return joint_nodes;
+}
+
 void RobotNode::expressKinematics()
 {
     GiNaC::matrix global_position = expressGlobalPosition();
@@ -179,7 +223,8 @@ void RobotNode::expressKinematics()
     //     }
     // }
 
-    joint_angles_ = getJointAngles();
+    // joint_angles_ = getJointAngles();
+    joint_nodes_ = getJointNodes();
     global_position_vector_ = global_position;
     global_rotation_matrix_ = global_rotation;
 
