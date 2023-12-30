@@ -121,6 +121,7 @@ Eigen::Vector3d RobotNode::getGlobalPosition(std::vector<std::string> joint_name
     //     }
     // }
 
+    // TODO: Optimize this using std::find.
     for (auto & joint_node : joint_nodes_)
     {
         for (long unsigned int i = 0; i < joint_names.size(); i++)
@@ -160,7 +161,7 @@ Eigen::Matrix3d RobotNode::getGlobalRotation() const
     GiNaC::lst substitutions = GiNaC::lst();
     for (long unsigned int i = 0; i < joint_angles_.size(); i++)
     {
-        substitutions.append(joint_angles_[i] == 1.0);
+        substitutions.append(joint_angles_[i] == dummy_joint_angle);
     }
 
     Eigen::Matrix3d global_rotation = Eigen::Matrix3d::Zero();
@@ -174,6 +175,34 @@ Eigen::Matrix3d RobotNode::getGlobalRotation() const
     }
 
     return global_rotation;
+}
+
+Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(std::vector<std::string> joint_names, std::vector<double> joint_angles) const
+{
+    GiNaC::lst substitutions = GiNaC::lst();
+    for (auto & joint_node : joint_nodes_)
+    {
+        for (long unsigned int i = 0; i < joint_names.size(); i++)
+        {
+            if (joint_node->getName() == joint_names[i])
+            {
+                substitutions.append(joint_node->getJointAngle() == joint_angles[i]);
+                break;
+            }
+        }
+    }
+
+    Eigen::MatrixXd global_position_jacobian = Eigen::MatrixXd::Zero(WORKSPACE_DIM, joint_nodes_.size());
+    for (int i = 0; i < WORKSPACE_DIM; i++)
+    {
+        for (long unsigned int j = 0; j < joint_nodes_.size(); j++)
+        {
+            GiNaC::ex global_position_component = GiNaC::evalf(global_position_jacobian_matrix_(i, j).subs(substitutions));
+            global_position_jacobian(i, j) = GiNaC::ex_to<GiNaC::numeric>(global_position_component).to_double();
+        }
+    }
+
+    return global_position_jacobian;
 }
 
 std::vector<GiNaC::symbol> RobotNode::getJointAngles() const
@@ -228,6 +257,9 @@ void RobotNode::expressKinematics()
     global_position_vector_ = global_position;
     global_rotation_matrix_ = global_rotation;
 
+    global_position_jacobian_matrix_ = expressGlobalPositionJacobian();
+    global_rotation_jacobian_matrix_ = expressGlobalRotationJacobian();
+
     // std::stringstream temp_stringstream;
 
     // temp_stringstream << "Global position: " 
@@ -277,6 +309,40 @@ GiNaC::matrix RobotNode::expressGlobalRotation() const
         parent = parent->getParent();
     }
     return global_rotation;
+}
+
+GiNaC::matrix RobotNode::expressGlobalPositionJacobian() const
+{
+    GiNaC::matrix global_position_jacobian(WORKSPACE_DIM, joint_nodes_.size());
+
+    // TODO: Replace this into a util function.
+    for (int i = 0; i < WORKSPACE_DIM; i++)
+    {
+        for (long unsigned int j = 0; j < joint_nodes_.size(); j++)
+        {
+            GiNaC::ex global_position_component = global_position_vector_(i, 0).diff(joint_nodes_[j]->getJointAngle());
+            global_position_jacobian(i, j) = global_position_component;
+        }
+    }   
+
+    return global_position_jacobian;
+}
+
+GiNaC::matrix RobotNode::expressGlobalRotationJacobian() const
+{
+    GiNaC::matrix global_rotation_jacobian(WORKSPACE_DIM, joint_nodes_.size());
+
+    // TODO: Replace this into a util function.
+    for (int i = 0; i < WORKSPACE_DIM; i++)
+    {
+        for (long unsigned int j = 0; j < joint_nodes_.size(); j++)
+        {
+            GiNaC::ex global_rotation_component = global_rotation_matrix_(i, 0).diff(joint_nodes_[j]->getJointAngle());
+            global_rotation_jacobian(i, j) = global_rotation_component;
+        }
+    }   
+
+    return global_rotation_jacobian;
 }
 
 GiNaC::matrix RobotNode::utilConvertEigenToGiNaC(const Eigen::MatrixXd & matrix) const

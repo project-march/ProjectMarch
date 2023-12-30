@@ -40,7 +40,7 @@ include_directories(${GINAC_BUILD_DIR})
 include_directories(${cln})
 
 add_library(${PROJECT_NAME} STATIC
-  src/march_state_estimator_node.cpp
+  src/robot_description_node.cpp
   src/urdf_parser.cpp
 )
 
@@ -55,18 +55,18 @@ ament_target_dependencies(${PROJECT_NAME}
   urdf
 )
 
-add_executable(march_state_estimator_node
-  src/march_state_estimator_node.cpp
+add_executable(robot_description_node
+  src/robot_description_node.cpp
   src/urdf_parser.cpp
   src/robot_description.cpp
   src/robot_node.cpp
   src/robot_mass.cpp
   src/robot_joint.cpp
 )
-target_include_directories(march_state_estimator_node PUBLIC
+target_include_directories(robot_description_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(march_state_estimator_node
+ament_target_dependencies(robot_description_node
   rclcpp
   ament_index_cpp
   std_msgs
@@ -78,13 +78,13 @@ ament_target_dependencies(march_state_estimator_node
   Eigen3
 )
 
-target_link_libraries(march_state_estimator_node
+target_link_libraries(robot_description_node
   ${PROJECT_NAME}
   ${GINAC_LIB}
 )
 
 install(TARGETS
-  march_state_estimator_node
+  robot_description_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 

@@ -36,6 +36,8 @@ public:
     GiNaC::symbol getJointAngle() const;
     Eigen::Vector3d getGlobalPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles) const;
     Eigen::Matrix3d getGlobalRotation() const;
+    Eigen::MatrixXd getGlobalPositionJacobian(std::vector<std::string> joint_names, std::vector<double> joint_angles) const;
+    Eigen::MatrixXd getGlobalRotationJacobian(std::vector<std::string> joint_names, std::vector<double> joint_angles) const;
     RobotNode* getParent() const;
     std::vector<RobotNode*> getChildren() const;
 
@@ -48,6 +50,8 @@ protected:
     std::vector<RobotNode*> getJointNodes() const;
     GiNaC::matrix expressGlobalPosition() const;
     GiNaC::matrix expressGlobalRotation() const;
+    GiNaC::matrix expressGlobalPositionJacobian() const;
+    GiNaC::matrix expressGlobalRotationJacobian() const;
 
     GiNaC::matrix utilConvertEigenToGiNaC(const Eigen::MatrixXd & matrix) const;
     Eigen::Matrix3d utilConvertGiNaCToEigen(const GiNaC::matrix & matrix) const;
@@ -67,6 +71,8 @@ protected:
     GiNaC::matrix global_rotation_matrix_;
     GiNaC::matrix origin_position_vector_;
     GiNaC::matrix origin_rotation_matrix_;
+    GiNaC::matrix global_position_jacobian_matrix_;
+    GiNaC::matrix global_rotation_jacobian_matrix_;
     std::vector<GiNaC::symbol> joint_angles_;
 
 };

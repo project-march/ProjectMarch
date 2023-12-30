@@ -34,6 +34,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         }
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f", link.second->inertial->origin.position.x, link.second->inertial->origin.position.y, link.second->inertial->origin.position.z);
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f %f", link.second->inertial->origin.rotation.x, link.second->inertial->origin.rotation.y, link.second->inertial->origin.rotation.z, link.second->inertial->origin.rotation.w);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "")
         RobotMass * robot_mass = new RobotMass(link.first, robot_nodes_.size(), link.second->inertial->mass);
         
         Eigen::Vector3d position;
@@ -156,6 +157,33 @@ std::vector<std::string> RobotDescription::getParentNames()
         }
     }
     return parent_names;
+}
+
+std::vector<RobotNode*> RobotDescription::findNodes(std::vector<std::string> names)
+{
+    /*
+     * Return a list of pointers to robot nodes given a list of specified names.
+     * This is a utility function for Task Service.
+     */
+    std::vector<RobotNode*> robot_nodes;
+
+    // TODO: Find std library for searching nodes given the names
+    // TODO: Find mapping of name to vector
+    for (auto & name : names)
+    {
+        for (auto & robot_node : robot_nodes_)
+        {
+            if (robot_node->getName() != name)
+            {
+                continue;
+            }
+            
+            robot_nodes.push_back(robot_node);
+            break;
+        }
+    }
+
+    return robot_nodes;
 }
 
 std::vector<Eigen::Vector3d> RobotDescription::getNodesPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles)

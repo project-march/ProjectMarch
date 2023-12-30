@@ -1,0 +1,8 @@
+robot_description_node:
+  ros__parameters:
+    tasks:
+      names: ["motion"]
+      nodes:
+        motion: [
+          "L_foot,R_foot"
+          ]
