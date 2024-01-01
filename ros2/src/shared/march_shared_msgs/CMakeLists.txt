@@ -59,6 +59,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetCurrentStanceLeg.srv"
   "srv/GetExoStateArray.srv"
   "srv/GetJointNames.srv"
+  "srv/GetNodePosition.srv"
+  "srv/GetNodeJacobian.srv"
   "srv/GaitCommand.srv"
   "srv/GetCurrentJointPositions.srv"
   "srv/GetTaskReport.srv"

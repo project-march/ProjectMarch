@@ -1,5 +1,7 @@
 #include "march_state_estimator/robot_description_node.hpp"
 
+#include "geometry_msgs/msg/point.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include <functional>
 #include <chrono>
@@ -19,10 +21,17 @@ RobotDescriptionNode::RobotDescriptionNode()
         "new_joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
     node_positions_publisher_ = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("node_positions", 1);
     // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&RobotDescriptionNode::publishNodePositions, this));
+
     m_service_task_report = this->create_service<march_shared_msgs::srv::GetTaskReport>(
         "get_task_report", 
         std::bind(&RobotDescriptionNode::handleTaskReportRequest, this, std::placeholders::_1, std::placeholders::_2));
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor done");
+    m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
+        "get_node_position", 
+        std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2));
+    m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
+        "get_node_jacobian", 
+        std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2));
 
     // Temporary
     m_joint_state_msg = std::make_shared<sensor_msgs::msg::JointState>();
@@ -89,6 +98,7 @@ void RobotDescriptionNode::handleTaskReportRequest(const std::shared_ptr<march_s
                     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest: %f", 0.0);
                     response->jacobians.push_back(0.0);
                 }
+                // TODO: Replace with Eigen::Map + add additional fields in GetTaskReport.srv (m and n per node)
             }
         }
     }
@@ -96,25 +106,59 @@ void RobotDescriptionNode::handleTaskReportRequest(const std::shared_ptr<march_s
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest done");
 }
 
-// void RobotDescriptionNode::publishNodePositions()
-// {
-//     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::publishNodePositions");
-//     auto message = march_shared_msgs::msg::StateEstimatorVisualization();
-//     message.node_names = robot_description_->getNodeNames();
-//     message.parent_node_names = robot_description_->getParentNames();
+void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
+{
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest");
+    std::vector<RobotNode*> robot_nodes = robot_description_->findNodes(request->node_names);
 
-//     for (auto & node_position : robot_description_->getNodesPosition())
-//     {
-//         geometry_msgs::msg::Pose pose;
-//         pose.position.x = node_position[0];
-//         pose.position.y = node_position[1];
-//         pose.position.z = node_position[2];
-//         message.node_poses.push_back(pose);
-//     }
+    for (auto & robot_node : robot_nodes)
+    {
+        Eigen::Vector3d pose = robot_node->getGlobalPosition(request->joint_names, request->joint_positions);
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: %f %f %f", pose(0), pose(1), pose(2));
+        
+        geometry_msgs::msg::Point node_position;
+        node_position.x = pose(0);
+        node_position.y = pose(1);
+        node_position.z = pose(2);
 
-//     node_positions_publisher_->publish(message);
-//     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::publishNodePositions done");
-// }
+        response->node_positions.push_back(node_position);
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest done");
+}
+
+void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
+    std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response)
+{
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest");
+
+    std::vector<RobotNode*> robot_nodes = robot_description_->findNodes(request->node_names);
+
+    for (auto & robot_node : robot_nodes)
+    {
+        std::vector<double> node_size;
+        std::vector<double> node_jacobian;
+
+        Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(m_joint_state_msg->name, m_joint_state_msg->position);
+        node_size.push_back(jacobian.rows());
+        node_size.push_back(jacobian.cols());
+
+        for (int j = 0; j < jacobian.cols(); j++)
+        {
+            for (int i = 0; i < jacobian.rows(); i++)
+            {
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian(i, j));
+                node_jacobian.push_back(jacobian(i, j));
+            }
+        }
+
+        response->node_sizes.data.insert(response->node_sizes.data.end(), node_size.begin(), node_size.end());
+        response->node_jacobians.data.insert(response->node_jacobians.data.end(), node_jacobian.begin(), node_jacobian.end());
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest done");
+}
 
 int main(int argc, char * argv[])
 {

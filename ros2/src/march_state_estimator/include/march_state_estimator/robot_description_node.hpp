@@ -10,9 +10,10 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "march_shared_msgs/msg/state_estimator_visualization.hpp"
 #include "march_shared_msgs/srv/get_task_report.hpp"
+#include "march_shared_msgs/srv/get_node_position.hpp"
+#include "march_shared_msgs/srv/get_node_jacobian.hpp"
 
 #include "march_state_estimator/robot_description.hpp"
-
 
 class RobotDescriptionNode : public rclcpp::Node
 {
@@ -24,6 +25,10 @@ private:
     void publishNodePositions();
     void handleTaskReportRequest(const std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response);
+    void handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
+        std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response);
+    void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
+        std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response);
 
     std::shared_ptr<RobotDescription> robot_description_;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscription_;
@@ -39,6 +44,8 @@ private:
     sensor_msgs::msg::JointState::SharedPtr m_joint_state_msg;
 
     rclcpp::Service<march_shared_msgs::srv::GetTaskReport>::SharedPtr m_service_task_report;
+    rclcpp::Service<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_service_node_position;
+    rclcpp::Service<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_service_node_jacobian;
 
 };
 
