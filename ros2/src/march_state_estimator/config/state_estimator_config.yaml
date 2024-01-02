@@ -1,0 +1,3 @@
+state_estimator_node:
+  ros__parameters:
+    dt: 50    # The time between two state estimation steps in milliseconds.

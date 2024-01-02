@@ -7,19 +7,18 @@
 StateEstimatorNode::StateEstimatorNode()
     : Node("state_estimator_node")
 {
-    // Create a timer that calls the timerCallback() function every 10 ms
-    m_timer = this->create_wall_timer(std::chrono::milliseconds(10), std::bind(&StateEstimatorNode::timerCallback, this));
+    // Declare the parameters
+    this->declare_parameter<float>("dt", 50.0);
 
-    // Create a subscription to the joint_states topic
+    // Get the parameters
+    m_dt = this->get_parameter("dt").as_float();
+
+    m_timer = this->create_wall_timer(std::chrono::milliseconds(m_dt), std::bind(&StateEstimatorNode::timerCallback, this));
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 10, std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
-
-    // Create a subscription to the imu topic
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "imu", 10, std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1));
-
-    // Create a publisher for the state_estimation topic
-    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation", 10);
+    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
 }
 
 void StateEstimatorNode::timerCallback()

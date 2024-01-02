@@ -22,6 +22,7 @@ private:
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
     void publishStateEstimation();
 
+    float m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
     sensor_msgs::msg::Imu::SharedPtr m_imu;
     
