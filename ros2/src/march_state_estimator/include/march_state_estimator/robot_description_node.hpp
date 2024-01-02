@@ -35,7 +35,6 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr node_positions_publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
 
-    // TODO: Rename this to robot_descriptor_node
     // IMPLEMENTATION: persistent ROS2 services
     // IMPLEMENTATION: function to set up ROS2 services once and persistently connect
     // SOURCE: http://wiki.ros.org/roscpp/Overview/Services#Persistent_Connections

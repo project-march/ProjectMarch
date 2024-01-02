@@ -88,6 +88,12 @@ install(TARGETS
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
+# Install launch files.
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 
