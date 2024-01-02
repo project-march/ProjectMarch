@@ -3,7 +3,6 @@
 #include "march_input_device/input_device_node.hpp"
 #include "march_input_device/input_device.hpp"
 #include <cstdlib>
-#include <ncurses.h>
 using std::placeholders::_1;
 
 std::array<exoState, 4> all_possible_states = {exoState::Sit, exoState::Stand, exoState::Walk, exoState::BootUp};

@@ -80,3 +80,13 @@ std::set<exoState> StateMachine::getAvailableStates(exoState currentState) const
 {
     return m_exo_transitions.at(currentState);
 }
+
+void StateMachine::setCurrentState(const exoState& state)
+{
+        m_current_state = state;
+}
+
+void StateMachine::setExoTransitions(const std::map<exoState, std::set<exoState>>& transitions)
+{
+        m_exo_transitions = transitions;
+}

@@ -1,3 +1,5 @@
 march_shared_msgs/ExoState desired_state
+std_msgs/String actuated_joint
 ---
 march_shared_msgs/ExoStateArray state_array
+march_shared_msgs/ExoState current_state

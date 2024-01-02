@@ -18,16 +18,29 @@ add_executable(input_device_node
   src/input_device.cpp
 )
 
+add_executable(test_joints_input_device_node
+  src/test_joints_input_device_node.cpp
+  src/test_joints_input_device.cpp
+)
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(input_device_node
   rclcpp
   march_shared_msgs
   )
 
-target_link_libraries(input_device_node ${CURSES_LIBRARIES})
+# Link against ROS 2 dependencies
+ament_target_dependencies(test_joints_input_device_node
+  rclcpp
+  march_shared_msgs
+  )
 
 # Install the executable
 install(TARGETS input_device_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS test_joints_input_device_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

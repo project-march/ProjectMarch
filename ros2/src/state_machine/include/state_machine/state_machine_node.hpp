@@ -23,6 +23,10 @@ public:
     explicit StateMachineNode();
     ~StateMachineNode();
 
+protected:
+    rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
+    StateMachine m_state_machine;
+
 private:
     void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
@@ -51,9 +55,8 @@ private:
     
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
     rclcpp::Publisher<march_shared_msgs::msg::ExoStateArray>::SharedPtr m_exo_state_array_publisher;
-    rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
+    
 
     rclcpp::Service<march_shared_msgs::srv::GetExoStateArray>::SharedPtr m_get_exo_state_array_service;
 
-    StateMachine m_state_machine;
 };
