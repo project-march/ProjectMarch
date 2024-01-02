@@ -25,9 +25,9 @@ private:
     GiNaC::matrix utilRotateY(const GiNaC::ex & angle) const;
     GiNaC::matrix utilRotateZ(const GiNaC::ex & angle) const;
 
-    std::vector<double> axis_;
-    double lower_limit_;
-    double upper_limit_;
+    std::vector<double> m_axis;
+    double m_lower_limit;
+    double m_upper_limit;
 
 };
 

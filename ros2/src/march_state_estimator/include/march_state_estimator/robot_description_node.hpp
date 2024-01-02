@@ -30,10 +30,10 @@ private:
     void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response);
 
-    std::shared_ptr<RobotDescription> robot_description_;
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscription_;
-    rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr node_positions_publisher_;
-    rclcpp::TimerBase::SharedPtr timer_;
+    std::shared_ptr<RobotDescription> m_robot_description;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_subscription;
+    rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr m_node_positions_publisher;
+    // rclcpp::TimerBase::SharedPtr timer_;
 
     // IMPLEMENTATION: persistent ROS2 services
     // IMPLEMENTATION: function to set up ROS2 services once and persistently connect

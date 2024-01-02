@@ -17,13 +17,13 @@ RobotDescriptionNode::RobotDescriptionNode()
     declare_parameter<std::string>("urdf_path", ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
     std::string urdf_path = get_parameter("urdf_path").as_string();
 
-    robot_description_ = std::make_shared<RobotDescription>();
-    robot_description_->parseURDF(urdf_path);
-    robot_description_->configureRobotNodes();
+    m_robot_description = std::make_shared<RobotDescription>();
+    m_robot_description->parseURDF(urdf_path);
+    m_robot_description->configureRobotNodes();
 
-    joint_state_subscription_ = this->create_subscription<sensor_msgs::msg::JointState>(
+    m_joint_state_subscription = this->create_subscription<sensor_msgs::msg::JointState>(
         "new_joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
-    node_positions_publisher_ = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("state_estimator/node_positions", 1);
+    m_node_positions_publisher = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("state_estimator/node_positions", 1);
     // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&RobotDescriptionNode::publishNodePositions, this));
 
     m_service_task_report = this->create_service<march_shared_msgs::srv::GetTaskReport>(
@@ -46,10 +46,10 @@ void RobotDescriptionNode::jointStateCallback(const sensor_msgs::msg::JointState
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::jointStateCallback");
 
     auto message = march_shared_msgs::msg::StateEstimatorVisualization();
-    message.node_names = robot_description_->getNodeNames();
-    message.parent_node_names = robot_description_->getParentNames();
+    message.node_names = m_robot_description->getNodeNames();
+    message.parent_node_names = m_robot_description->getParentNames();
 
-    for (auto & node_position : robot_description_->getNodesPosition(msg->name, msg->position))
+    for (auto & node_position : m_robot_description->getNodesPosition(msg->name, msg->position))
     {
         geometry_msgs::msg::Pose pose;
         pose.position.x = node_position[0];
@@ -58,7 +58,7 @@ void RobotDescriptionNode::jointStateCallback(const sensor_msgs::msg::JointState
         message.node_poses.push_back(pose);
     }
 
-    node_positions_publisher_->publish(message);
+    m_node_positions_publisher->publish(message);
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::jointStateCallback done");
 
     // Temporary
@@ -69,7 +69,7 @@ void RobotDescriptionNode::handleTaskReportRequest(const std::shared_ptr<march_s
     std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response)
 {
     std::vector<std::string> names = {"left_ankle", "right_ankle"};
-    std::vector<RobotNode*> robot_nodes = robot_description_->findNodes(names);
+    std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(names);
     uint8_t task_m = 6;
     uint8_t task_n = 8;
     uint8_t task_m_unit = (uint8_t) (task_m / names.size());
@@ -111,7 +111,7 @@ void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest");
-    std::vector<RobotNode*> robot_nodes = robot_description_->findNodes(request->node_names);
+    std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(request->node_names);
 
     for (auto & robot_node : robot_nodes)
     {
@@ -134,7 +134,7 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest");
 
-    std::vector<RobotNode*> robot_nodes = robot_description_->findNodes(request->node_names);
+    std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(request->node_names);
 
     for (auto & robot_node : robot_nodes)
     {

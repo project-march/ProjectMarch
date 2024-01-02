@@ -10,7 +10,7 @@
 RobotDescription::~RobotDescription()
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Destructing RobotDescription...");
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Deleting robot_node %s ...", robot_node->getName().c_str());
         delete robot_node;
@@ -21,10 +21,10 @@ RobotDescription::~RobotDescription()
 void RobotDescription::parseURDF(const std::string & urdf_path)
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescription::parse");
-    urdf_model_.initFile(urdf_path);
+    m_urdf_model.initFile(urdf_path);
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescription::parse done");
 
-    for (auto & link : urdf_model_.links_)
+    for (auto & link : m_urdf_model.links_)
     {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "link: %s", link.first.c_str());
         if (link.second->inertial == nullptr)
@@ -35,7 +35,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f", link.second->inertial->origin.position.x, link.second->inertial->origin.position.y, link.second->inertial->origin.position.z);
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f %f", link.second->inertial->origin.rotation.x, link.second->inertial->origin.rotation.y, link.second->inertial->origin.rotation.z, link.second->inertial->origin.rotation.w);
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "")
-        RobotMass * robot_mass = new RobotMass(link.first, robot_nodes_.size(), link.second->inertial->mass);
+        RobotMass * robot_mass = new RobotMass(link.first, m_robot_nodes.size(), link.second->inertial->mass);
         
         Eigen::Vector3d position;
         Eigen::Quaterniond orientation;
@@ -54,10 +54,10 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         robot_mass->setOriginPosition(position);
         robot_mass->setOriginRotation(rotation);
 
-        robot_nodes_.push_back(robot_mass);
+        m_robot_nodes.push_back(robot_mass);
     }
 
-    for (auto & joint : urdf_model_.joints_)
+    for (auto & joint : m_urdf_model.joints_)
     {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "joint: %s", joint.first.c_str());
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint origin: %f %f %f", joint.second->parent_to_joint_origin_transform.position.x, joint.second->parent_to_joint_origin_transform.position.y, joint.second->parent_to_joint_origin_transform.position.z);
@@ -66,8 +66,8 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         {
             // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "joint is revolute or continuous");
             std::vector<double> joint_axis = {joint.second->axis.x, joint.second->axis.y, joint.second->axis.z};
-            RobotJoint * robot_joint = new RobotJoint(joint.first, robot_nodes_.size(), joint_axis);
-            for (auto & robot_node : robot_nodes_)
+            RobotJoint * robot_joint = new RobotJoint(joint.first, m_robot_nodes.size(), joint_axis);
+            for (auto & robot_node : m_robot_nodes)
             {
                 if (robot_node->getName() == joint.second->parent_link_name)
                 {
@@ -86,11 +86,11 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
             robot_joint->setOriginPosition(position);
             robot_joint->setOriginRotation(rotation);
 
-            robot_nodes_.push_back(robot_joint);
+            m_robot_nodes.push_back(robot_joint);
         }
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Size of robot_links_: %d", robot_nodes_.size());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Size of robot_links_: %d", m_robot_nodes.size());
 
     // GiNaC::symbol x("x"), y("y");
     // GiNaC::ex ex = x + y;
@@ -104,7 +104,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
 
 void RobotDescription::configureRobotNodes()
 {
-    // for (auto & robot_node : robot_nodes_)
+    // for (auto & robot_node : m_robot_nodes)
     // {
     //     std::string name = robot_node->getName();
     //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "robot_node: %s", name.c_str());
@@ -126,7 +126,7 @@ void RobotDescription::configureRobotNodes()
     //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "---------------------");
     // }
 
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         robot_node->expressKinematics();
     }
@@ -135,7 +135,7 @@ void RobotDescription::configureRobotNodes()
 std::vector<std::string> RobotDescription::getNodeNames()
 {
     std::vector<std::string> node_names;
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         node_names.push_back(robot_node->getName());
     }
@@ -145,7 +145,7 @@ std::vector<std::string> RobotDescription::getNodeNames()
 std::vector<std::string> RobotDescription::getParentNames()
 {
     std::vector<std::string> parent_names;
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         if (robot_node->getParent() != nullptr)
         {
@@ -171,7 +171,7 @@ std::vector<RobotNode*> RobotDescription::findNodes(std::vector<std::string> nam
     // TODO: Find mapping of name to vector
     for (auto & name : names)
     {
-        for (auto & robot_node : robot_nodes_)
+        for (auto & robot_node : m_robot_nodes)
         {
             if (robot_node->getName() != name)
             {
@@ -189,7 +189,7 @@ std::vector<RobotNode*> RobotDescription::findNodes(std::vector<std::string> nam
 std::vector<Eigen::Vector3d> RobotDescription::getNodesPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles)
 {
     std::vector<Eigen::Vector3d> nodes_position;
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         // std::vector<std::string> joint_names = {
         //     "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
@@ -205,7 +205,7 @@ std::vector<Eigen::Vector3d> RobotDescription::getNodesPosition(std::vector<std:
 std::vector<Eigen::Matrix3d> RobotDescription::getNodesRotation()
 {
     std::vector<Eigen::Matrix3d> nodes_rotation;
-    for (auto & robot_node : robot_nodes_)
+    for (auto & robot_node : m_robot_nodes)
     {
         nodes_rotation.push_back(robot_node->getGlobalRotation());
     }

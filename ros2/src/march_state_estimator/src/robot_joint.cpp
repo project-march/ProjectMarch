@@ -4,25 +4,25 @@
 
 RobotJoint::RobotJoint(const std::string & name, const uint64_t & id, const std::vector<double> & axis)
 {
-    name_ = name;
-    id_ = id;
-    type_ = 'J';
+    m_name = name;
+    m_id = id;
+    m_type = 'J';
 
-    axis_ = axis;
-    joint_angle_ = GiNaC::symbol("q_{" + name + "}");
+    m_axis = axis;
+    m_joint_angle = GiNaC::symbol("q_{" + name + "}");
 }
 
 void RobotJoint::setLimits(const double & lower_limit, const double & upper_limit)
 {
-    lower_limit_ = lower_limit;
-    upper_limit_ = upper_limit;
+    m_lower_limit = lower_limit;
+    m_upper_limit = upper_limit;
 }
 
 void RobotJoint::setOriginRotation(const Eigen::Matrix3d & rotation)
 {
     GiNaC::matrix origin_rotation_matrix = utilConvertEigenToGiNaC(rotation);
-    GiNaC::matrix angle_rotation_matrix = utilRotate(axis_);
-    origin_rotation_matrix_ = angle_rotation_matrix.mul(origin_rotation_matrix);
+    GiNaC::matrix angle_rotation_matrix = utilRotate(m_axis);
+    m_origin_rotation_matrix = angle_rotation_matrix.mul(origin_rotation_matrix);
 
     // std::stringstream ss;
 
@@ -50,9 +50,9 @@ void RobotJoint::setOriginRotation(const Eigen::Matrix3d & rotation)
 GiNaC::matrix RobotJoint::utilRotate(std::vector<double> & axis)
 {
     GiNaC::matrix rotation_matrix(WORKSPACE_DIM, WORKSPACE_DIM);
-    rotation_matrix = utilRotateX(axis[0] * joint_angle_);
-    rotation_matrix = utilRotateY(axis[1] * joint_angle_).mul(rotation_matrix);
-    rotation_matrix = utilRotateZ(axis[2] * joint_angle_).mul(rotation_matrix);
+    rotation_matrix = utilRotateX(axis[0] * m_joint_angle);
+    rotation_matrix = utilRotateY(axis[1] * m_joint_angle).mul(rotation_matrix);
+    rotation_matrix = utilRotateZ(axis[2] * m_joint_angle).mul(rotation_matrix);
     return rotation_matrix;
 }
 

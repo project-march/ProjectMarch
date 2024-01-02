@@ -2,9 +2,9 @@
 
 RobotMass::RobotMass(const std::string & name, const uint64_t & id, const double & mass)
 {
-    name_ = name;
-    id_ = id;
-    type_ = 'M';
+    m_name = name;
+    m_id = id;
+    m_type = 'M';
 
-    mass_ = mass;
+    m_mass = mass;
 }

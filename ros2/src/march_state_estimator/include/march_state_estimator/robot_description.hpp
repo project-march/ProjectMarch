@@ -23,8 +23,8 @@ public:
 
 private:
     
-    urdf::Model urdf_model_;
-    std::vector<RobotNode*> robot_nodes_;
+    urdf::Model m_urdf_model;
+    std::vector<RobotNode*> m_robot_nodes;
 
 };
 

@@ -56,24 +56,24 @@ protected:
     GiNaC::matrix utilConvertEigenToGiNaC(const Eigen::MatrixXd & matrix) const;
     Eigen::Matrix3d utilConvertGiNaCToEigen(const GiNaC::matrix & matrix) const;
 
-    std::string name_;
-    uint64_t id_;
-    char type_;
-    double mass_;
-    double length_;
-    double inertia_[NO_INERTIA_PARAMS];
-    RobotNode* parent_ = nullptr;
-    std::vector<RobotNode*> children_;
-    std::vector<RobotNode*> joint_nodes_;
+    std::string m_name;
+    uint64_t m_id;
+    char m_type;
+    double m_mass;
+    double m_length;
+    double m_inertia[NO_INERTIA_PARAMS];
+    RobotNode* m_parent = nullptr;
+    std::vector<RobotNode*> m_children;
+    std::vector<RobotNode*> m_joint_nodes;
 
-    GiNaC::symbol joint_angle_;
-    GiNaC::matrix global_position_vector_;
-    GiNaC::matrix global_rotation_matrix_;
-    GiNaC::matrix origin_position_vector_;
-    GiNaC::matrix origin_rotation_matrix_;
-    GiNaC::matrix global_position_jacobian_matrix_;
-    GiNaC::matrix global_rotation_jacobian_matrix_;
-    std::vector<GiNaC::symbol> joint_angles_;
+    GiNaC::symbol m_joint_angle;
+    GiNaC::matrix m_global_position_vector;
+    GiNaC::matrix m_global_rotation_matrix;
+    GiNaC::matrix m_origin_position_vector;
+    GiNaC::matrix m_origin_rotation_matrix;
+    GiNaC::matrix m_global_position_jacobian_matrix;
+    GiNaC::matrix m_global_rotation_jacobian_matrix;
+    std::vector<GiNaC::symbol> m_joint_angles;
 
 };
 
