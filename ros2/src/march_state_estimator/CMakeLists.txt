@@ -16,8 +16,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # Set external library directories
-set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build")
-set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/ginac_build/ginac/libginac.so")
+set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/build")
+set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/build/ginac/libginac.so")
 # set(cln "${PROJECT_SOURCE_DIR}/../libraries/ginac/cln/include")
 
 # find dependencies
@@ -41,7 +41,6 @@ include_directories(${cln})
 
 add_library(${PROJECT_NAME} STATIC
   src/robot_description_node.cpp
-  src/urdf_parser.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -57,7 +56,6 @@ ament_target_dependencies(${PROJECT_NAME}
 
 add_executable(robot_description_node
   src/robot_description_node.cpp
-  src/urdf_parser.cpp
   src/robot_description.cpp
   src/robot_node.cpp
   src/robot_mass.cpp
@@ -105,6 +103,29 @@ if(BUILD_TESTING)
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)
+  
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(robot_description_node_test test/robot_description_node_test.cpp)
+  target_include_directories(robot_description_node_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  ament_target_dependencies(robot_description_node_test
+    rclcpp
+    ament_index_cpp
+    std_msgs
+    sensor_msgs
+    geometry_msgs
+    march_description
+    march_shared_msgs
+    urdf
+    Eigen3
+  )
+
+  target_link_libraries(robot_description_node_test
+    ${PROJECT_NAME}
+    ${GINAC_LIB}
+  )
+  
   ament_lint_auto_find_test_dependencies()
 endif()
 
