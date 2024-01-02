@@ -42,10 +42,27 @@ sudo rosdep install --from-paths src
 
 This package makes full use of a C++ library called **GiNaC**, which is not readily available in **ROS**/**ROS2**. Therefore, it is required to build this library separately.
 
-First, go to the libraries folder that is found in the source folder of the ROS2 workspace of `march`.
+First, update the git submodules.
 
 ```Linux
-cd ~/march/ros2/src/libraries
+cd ~/march
+git submodule init
+git submodule update
+```
+
+Go to the GiNaC folder and build the library.
+
+```Linux
+cd ~/march/ros2/src/libraries/ginac
+mkdir build && cd build
+cmake ..
+make
+```
+
+This is not strictly necessary, but it is strongly recommended to test the library.
+
+```Linux
+make check
 ```
 
 ### Building from Source
