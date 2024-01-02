@@ -54,6 +54,7 @@ ament_target_dependencies(${PROJECT_NAME}
   urdf
 )
 
+# Create robot_description_node executable
 add_executable(robot_description_node
   src/robot_description_node.cpp
   src/robot_description.cpp
@@ -81,8 +82,28 @@ target_link_libraries(robot_description_node
   ${GINAC_LIB}
 )
 
+# Create state_estimator_node executable
+add_executable(state_estimator_node
+  src/state_estimator_node.cpp
+)
+
+target_include_directories(state_estimator_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(state_estimator_node
+  rclcpp
+  ament_index_cpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  march_shared_msgs
+)
+
+# Install targets and executables
 install(TARGETS
   robot_description_node
+  state_estimator_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
