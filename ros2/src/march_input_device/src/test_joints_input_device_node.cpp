@@ -9,8 +9,7 @@ using std::placeholders::_1;
 
 std::array<exoState, 3> all_possible_states = { exoState::Stand, exoState::Walk, exoState::BootUp};
 std::vector<std::string> all_possible_joints = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
-                                            "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle",
-                                            "test_rotational", "test_linear"};
+                                            "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
 
 TestJointsInputDeviceNode::TestJointsInputDeviceNode()
     : Node("march_input_device_node"),

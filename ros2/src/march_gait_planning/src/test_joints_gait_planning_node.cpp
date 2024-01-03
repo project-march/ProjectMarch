@@ -6,6 +6,8 @@ using std::placeholders::_1;
 constexpr double rotational_range = 0.3;
 constexpr double linear_range = 0.1;
 
+std::vector<std::string> all_possible_joints = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+                                            "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
 
 TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
  : Node("march_test_joints_gait_planning_node"), 
@@ -21,6 +23,7 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
     current_point.positions.push_back(0.0);
     current_point.time_from_start = rclcpp::Duration(0, 50000000);  //50 ms
     
+    m_current_joint_angles_msg->joint_names = all_possible_joints;
     m_current_joint_angles_msg->points.push_back(previous_point);
     m_current_joint_angles_msg->points.push_back(current_point);
 
@@ -45,7 +48,6 @@ void TestJointsGaitPlanningNode::currentStateCallback(const march_shared_msgs::m
 }
 
 void TestJointsGaitPlanningNode::footPositionsPublish(){
-    m_current_joint_angles_msg->joint_names.push_back(getActuatedJoint());
     switch (m_gait_planning.getGaitType()){
         case exoState::BootUp: {
             break;
@@ -53,7 +55,16 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
 
         case exoState::Stand: {
             m_current_trajectory.clear();
-            m_current_joint_angles_msg->points[1].positions.push_back(0.0);
+            for (size_t i = 0; i < m_current_joint_angles_msg->joint_names.size(); ++i) {
+                    if (m_current_joint_angles_msg->joint_names[i] == getActuatedJoint()) {
+                        // This is the joint we want to actuate, set the new position
+                        m_current_joint_angles_msg->points[1].positions.push_back(0.0);
+                    } else {
+                        // This is not the joint we want to actuate, set the current position
+                        m_current_joint_angles_msg->points[1].positions.push_back(
+                            m_current_joint_angles_msg->points[0].positions[i]);
+                    }
+                }
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Joint angles assigned");
             m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Home stand position published!");
@@ -67,12 +78,20 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
-                double new_angle = 0.2 * m_current_trajectory.front();
+                double new_angle = 0.1* m_current_trajectory.front() + 0.1;
                 m_current_trajectory.erase(m_current_trajectory.begin());
-                m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
+                for (size_t i = 0; i < m_current_joint_angles_msg->joint_names.size(); ++i) {
+                    if (m_current_joint_angles_msg->joint_names[i] == getActuatedJoint()) {
+                        // This is the joint we want to actuate, set the new position
+                        m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
+                    } else {
+                        // This is not the joint we want to actuate, set the current position
+                        m_current_joint_angles_msg->points[1].positions.push_back(
+                            m_current_joint_angles_msg->points[0].positions[i]);
+                    }
+                }
                 m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
-                
             }
             break;
         }
@@ -80,7 +99,6 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
     }
     m_current_joint_angles_msg->points[0].positions = m_current_joint_angles_msg->points[1].positions; 
     m_current_joint_angles_msg->points[1].positions.clear();
-    m_current_joint_angles_msg->joint_names.clear();
 }
 
 
