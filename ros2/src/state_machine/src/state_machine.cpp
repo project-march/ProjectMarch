@@ -21,10 +21,11 @@ StateMachine::StateMachine()
         /*{CurrentState, PossibleStates}*/
         { exoState::Sit, { exoState::Stand, exoState::BootUp, exoState::Error } },
         { exoState::Stand,
-            { exoState::Sit, exoState::Walk, exoState::BootUp, exoState::Error} },
+            { exoState::Sit, exoState::Walk, exoState::BootUp, exoState::Error, exoState::Sideways} },
         { exoState::Walk, { exoState::Stand, exoState::Error} },
         { exoState::BootUp, { exoState::Stand, exoState::Sit, exoState::BootUp, exoState::Error } },
-        { exoState::Error, {}}
+        { exoState::Error, {}}, 
+        { exoState::Sideways, { exoState::Stand, exoState::Error}}
 
     };
     

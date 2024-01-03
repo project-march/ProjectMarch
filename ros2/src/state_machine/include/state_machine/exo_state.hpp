@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-enum class exoState { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4};
+enum class exoState { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4, Sideways = 5};
 
 // toString function
 inline std::string toString(exoState state) {
@@ -11,6 +11,7 @@ inline std::string toString(exoState state) {
         case exoState::Walk: return "Walk";
         case exoState::BootUp: return "BootUp";
         case exoState::Error: return "Error";
+        case exoState::Sideways: return "Sideways"; 
         default: return "Unknown";
     }
 }

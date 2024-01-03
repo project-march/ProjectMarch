@@ -26,6 +26,9 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getFirstStepAngleTrajectory() const; 
     std::vector<std::vector<double>> getFullGaitAngleCSV() const; 
     std::vector<std::vector<double>> getStandToSitGait() const; 
+    
+    //test sideways gait 
+    std::vector<std::vector<double>> getSidewaysGait() const; 
 
     private: 
     exoState m_gait_type; 
@@ -33,6 +36,10 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_first_step_angle_trajectory; 
     std::vector<std::vector<double>> m_complete_step_angle_trajectory; 
     std::vector<std::vector<double>> m_stand_to_sit_trajectory; 
+
+    //test sideways gait
+    std::vector<std::vector<double>> m_sideways_trajectory; 
+
     std::vector<double> m_prev_point; 
     int m_counter; 
 };

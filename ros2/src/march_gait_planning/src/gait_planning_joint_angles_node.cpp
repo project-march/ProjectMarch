@@ -119,6 +119,15 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             }
             break;
         
+        case exoState::Sideways :
+            m_current_trajectory = m_gait_planning.getSidewaysGait(); 
+            processMovingGaits(count); 
+            if (count >= (m_current_trajectory.size()-1)){
+                m_gait_planning.setCounter(0); 
+            } else {
+                m_gait_planning.setCounter(count+1); 
+            }
+        
         default :
             // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Waiting for command"); 
             break;
