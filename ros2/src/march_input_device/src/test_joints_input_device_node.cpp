@@ -23,18 +23,18 @@ TestJointsInputDeviceNode::TestJointsInputDeviceNode()
     }
     
     RCLCPP_INFO(this->get_logger(), "Connected to service get_exo_state_array");
-    
-    
+    m_request = std::make_shared<march_shared_msgs::srv::GetExoStateArray::Request>();
+
+    m_request->actuated_joint.data = askJoint();    
     m_ipd.setCurrentState(exoState::BootUp);
     sendNewStateAndJoint(m_ipd.getCurrentState());
 }
 
 void TestJointsInputDeviceNode::sendNewStateAndJoint(const exoState& desired_state)
 {
-    auto request = std::make_shared<march_shared_msgs::srv::GetExoStateArray::Request>();
-    request->desired_state.state = static_cast<int32_t>(desired_state);
+    m_request->desired_state.state = static_cast<int32_t>(desired_state);
 
-    auto result_future = m_get_exo_state_array_client->async_send_request(request);
+    auto result_future = m_get_exo_state_array_client->async_send_request(m_request);
     
     // Wait for the result
     if (rclcpp::spin_until_future_complete(get_node_base_interface(), result_future) ==
@@ -47,12 +47,12 @@ void TestJointsInputDeviceNode::sendNewStateAndJoint(const exoState& desired_sta
             exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
         }
         m_ipd.setAvailableStates(exo_states_set);
-        m_ipd.setCurrentState((exoState)result->current_state.state); 
+        m_ipd.setCurrentState((exoState)m_request->desired_state.state); 
 
         exoState desired_state = askState();
         if (desired_state == exoState::BootUp){
             m_ipd.setActuatedJoint(askJoint());
-            request->actuated_joint.data = m_ipd.getActuatedJoint();
+            m_request->actuated_joint.data = m_ipd.getActuatedJoint();
         }
         sendNewStateAndJoint(desired_state);
     }

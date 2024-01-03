@@ -23,6 +23,7 @@ private:
     std::string askJoint() const;
 
     TestJointsIPD m_ipd;
+    std::shared_ptr<march_shared_msgs::srv::GetExoStateArray::Request> m_request;
 
     bool ipd_new_terminal; // Parameter to control whether a new terminal is opened or not
 
