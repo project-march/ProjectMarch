@@ -68,6 +68,25 @@ install(TARGETS test_setup_gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# Create the test_gait_planning executable in the test_setup_gait_planning folder
+add_executable(test_joints_gait_planning_node
+  src/test_joints_gait_planning_node.cpp
+  src/test_setup_gait_planning.cpp
+)
+
+# Link against ROS 2 dependencies
+ament_target_dependencies(test_joints_gait_planning_node
+  rclcpp
+  march_shared_msgs
+  geometry_msgs
+  # filesystem
+)
+
+# Install the test_gait_planning_node executable
+install(TARGETS test_joints_gait_planning_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 # Install include directory
 install(DIRECTORY include/
   DESTINATION include
