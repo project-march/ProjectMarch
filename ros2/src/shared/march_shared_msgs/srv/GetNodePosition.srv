@@ -1,0 +1,6 @@
+string[] node_names
+string ref_frame
+string[] joint_names
+float64[] joint_positions
+---
+geometry_msgs/Point[] node_positions
