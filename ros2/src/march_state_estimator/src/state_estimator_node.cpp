@@ -8,10 +8,10 @@ StateEstimatorNode::StateEstimatorNode()
     : Node("state_estimator_node")
 {
     // Declare the parameters
-    this->declare_parameter<float>("dt", 50.0);
+    this->declare_parameter<int64_t>("dt", 50);
 
     // Get the parameters
-    m_dt = this->get_parameter("dt").as_float();
+    m_dt = this->get_parameter("dt").as_int();
 
     m_timer = this->create_wall_timer(std::chrono::milliseconds(m_dt), std::bind(&StateEstimatorNode::timerCallback, this));
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>(
@@ -19,6 +19,36 @@ StateEstimatorNode::StateEstimatorNode()
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "imu", 10, std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1));
     m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+
+    sensor_msgs::msg::JointState init_jointstate_msg;
+    // Set the initial joint state message to zero data
+    init_jointstate_msg.header.stamp = this->now();
+    init_jointstate_msg.header.frame_id = "backpack";
+    init_jointstate_msg.name = {};
+    init_jointstate_msg.position = {};
+    init_jointstate_msg.velocity = {};
+    init_jointstate_msg.effort = {};
+
+    m_joint_state = std::make_shared<sensor_msgs::msg::JointState>(init_jointstate_msg);
+
+    sensor_msgs::msg::Imu init_imu_msg;
+    // Set the initial imu message to zero data
+    init_imu_msg.header.stamp = this->now();
+    init_imu_msg.header.frame_id = "backpack";
+    init_imu_msg.orientation.x = 0.0;
+    init_imu_msg.orientation.y = 0.0;
+    init_imu_msg.orientation.z = 0.0;
+    init_imu_msg.orientation.w = 1.0;
+    init_imu_msg.angular_velocity.x = 0.0;
+    init_imu_msg.angular_velocity.y = 0.0;
+    init_imu_msg.angular_velocity.z = 0.0;
+    init_imu_msg.linear_acceleration.x = 0.0;
+    init_imu_msg.linear_acceleration.y = 0.0;
+    init_imu_msg.linear_acceleration.z = 0.0;
+
+    m_imu = std::make_shared<sensor_msgs::msg::Imu>(init_imu_msg);
+
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
 
 void StateEstimatorNode::timerCallback()
@@ -46,7 +76,7 @@ void StateEstimatorNode::publishStateEstimation()
 
     // Fill the message with data
     state_estimation_msg.header.stamp = this->now();
-    state_estimation_msg.header.frame_id = "odom";
+    state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.imu = *m_imu;
 
