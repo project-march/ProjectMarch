@@ -12,7 +12,7 @@ class StateEstimatorVisualizerNode(Node):
         super().__init__('state_estimator_visualizer_node')
         self.subscription = self.create_subscription(
             StateEstimatorVisualization,
-            'node_positions',
+            'state_estimator/node_positions',
             self.listener_callback,
             1)
         self.subscription  # prevent unused variable warning
