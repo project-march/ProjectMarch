@@ -23,12 +23,7 @@ public:
     explicit StateMachineNode();
     ~StateMachineNode();
 
-protected:
-    rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
-    StateMachine m_state_machine;
-
 private:
-    void gaitCommandCallback(const march_shared_msgs::msg::GaitRequest::SharedPtr msg);
 
     void sendRequest(const exoState& desired_state);
     void responseFootstepCallback(
@@ -42,21 +37,9 @@ private:
     void handleGetExoStateArray(const std::shared_ptr<march_shared_msgs::srv::GetExoStateArray::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetExoStateArray::Response> response);
 
-    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_reset_publisher;
-    rclcpp::Publisher<march_shared_msgs::msg::GaitResponse>::SharedPtr m_gait_response_publisher;
-    rclcpp::Subscription<march_shared_msgs::msg::GaitRequest>::SharedPtr m_gait_request_subscriber;
-    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_footstep_client;
-    rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedPtr m_gait_client;
-    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture m_footstep_future;
-    rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture m_gait_future;
-    march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
-    march_shared_msgs::srv::RequestGait::Request::SharedPtr m_gait_request;
-
-    
-    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_new_state_subscriber;
-    rclcpp::Publisher<march_shared_msgs::msg::ExoStateArray>::SharedPtr m_exo_state_array_publisher;
-    
+    rclcpp::Publisher<march_shared_msgs::msg::ExoState>::SharedPtr m_state_publisher;
 
     rclcpp::Service<march_shared_msgs::srv::GetExoStateArray>::SharedPtr m_get_exo_state_array_service;
 
+    StateMachine m_state_machine;
 };

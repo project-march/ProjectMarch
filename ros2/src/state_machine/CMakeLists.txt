@@ -43,7 +43,6 @@ add_executable(state_machine_node
 add_executable(test_joints_state_machine_node
   src/test_joints_state_machine_node.cpp
   src/test_joints_state_machine.cpp
-  src/state_machine_node.cpp
 )
 
 # Link the state_machine library to the test_joints_state_machine_node executable
