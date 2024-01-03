@@ -11,9 +11,10 @@ StateEstimatorNode::StateEstimatorNode()
     this->declare_parameter<int64_t>("dt", 50);
 
     // Get the parameters
-    m_dt = this->get_parameter("dt").as_int();
+    int64_t dt = this->get_parameter("dt").as_int();
+    m_dt = static_cast<double>(dt) / 1000.0;
 
-    m_timer = this->create_wall_timer(std::chrono::milliseconds(m_dt), std::bind(&StateEstimatorNode::timerCallback, this));
+    m_timer = this->create_wall_timer(std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this));
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 10, std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
@@ -72,11 +73,12 @@ void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 void StateEstimatorNode::publishStateEstimation()
 {
     // Create a state estimation message
-    auto state_estimation_msg = march_shared_msgs::msg::StateEstimation();
+    march_shared_msgs::msg::StateEstimation state_estimation_msg;
 
     // Fill the message with data
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
+    state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.imu = *m_imu;
 

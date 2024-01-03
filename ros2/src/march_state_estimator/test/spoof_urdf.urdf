@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot name="two_joint_arm">
+
+  <!-- Define the joints -->
+  <joint name="shoulder_joint" type="revolute">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="3.14"/>
+  </joint>
+
+  <joint name="elbow_joint" type="revolute">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+    <parent link="shoulder_link"/>
+    <child link="elbow_link"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="3.14"/>
+  </joint>
+
+  <!-- Define the links -->
+  <link name="base_link"/>
+
+  <link name="shoulder_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="elbow_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Define the transmission -->
+  <transmission name="trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="shoulder_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+</robot>
