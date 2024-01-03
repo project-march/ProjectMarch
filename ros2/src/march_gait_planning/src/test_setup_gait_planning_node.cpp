@@ -146,14 +146,6 @@ void TestSetupGaitPlanningNode::timerCallback() {
     footPositionsPublish();    
 }
 
-void TestSetupGaitPlanningNode::setActuatedJoint(const std::string &actuated_joint){
-    m_actuated_joint = actuated_joint; 
-}
-
-std::string TestSetupGaitPlanningNode::getActuatedJoint() const{
-    return m_actuated_joint; 
-}
-
 int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
