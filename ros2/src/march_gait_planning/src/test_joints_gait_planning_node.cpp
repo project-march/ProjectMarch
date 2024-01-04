@@ -62,16 +62,9 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
 
         case exoState::Stand: {
             m_current_trajectory.clear();
-            for (size_t i = 0; i < m_current_joint_angles_msg->joint_names.size(); ++i) {
-                    if (m_current_joint_angles_msg->joint_names[i] == getActuatedJoint()) {
-                        // This is the joint we want to actuate, set the new position
-                        m_current_joint_angles_msg->points[1].positions.push_back(0.0);
-                    } else {
-                        // This is not the joint we want to actuate, set the current position
-                        m_current_joint_angles_msg->points[1].positions.push_back(
-                            m_current_joint_angles_msg->points[0].positions[i]);
-                    }
-                }
+            m_current_joint_angles_msg->points[1].positions = {-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016};
+            m_current_joint_angles_msg->points[0].positions = {-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016};
+
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Joint angles assigned");
             m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Home stand position published!");
