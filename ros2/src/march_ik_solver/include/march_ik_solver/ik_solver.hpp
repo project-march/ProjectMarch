@@ -33,7 +33,7 @@ public:
         Eigen::VectorXd* desired_joint_velocities_ptr); // Set the pointer to the desired joint velocities.
     // void setDesiredPoses(std::vector<Eigen::VectorXd> * desired_poses); // Set the desired poses of the tasks.
 
-    std::vector<double> getPose(const Eigen::VectorXd * joint_positions); // Get the pose of the end-effector.
+    // std::vector<double> getPose(const Eigen::VectorXd * joint_positions); // Get the pose of the end-effector.
     // const Eigen::MatrixXd * getJacobianPtr(int task_id); // Get the Jacobian of a task
     // const Eigen::MatrixXd * getJacobianInversePtr(int task_id); // Get the inverse of Jacobian of a task
 

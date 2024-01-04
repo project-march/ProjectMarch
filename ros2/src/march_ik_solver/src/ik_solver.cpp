@@ -64,7 +64,7 @@ Eigen::VectorXd IKSolver::solve()
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
-    double dt = 0.0005;
+    double dt = 0.001;
     Eigen::VectorXd desired_joint_positions = (*current_joint_positions_ptr_) + (*desired_joint_velocities_ptr_) * dt;
     // return desired_joint_positions;
 
@@ -161,9 +161,9 @@ void IKSolver::setDesiredJointVelocitiesPtr(Eigen::VectorXd* desired_joint_veloc
 //     return tasks_[task_id].getJacobianInversePtr();
 // }
 
-std::vector<double> IKSolver::getPose(const Eigen::VectorXd * joint_positions)
-{
-    // Get the pose of the end-effector
-    Eigen::VectorXd pose = tasks_[tasks_.size() - 1].getPose(joint_positions);
-    return std::vector<double>(pose.data(), pose.data() + pose.size());
-}
+// std::vector<double> IKSolver::getPose(const Eigen::VectorXd * joint_positions)
+// {
+//     // Get the pose of the end-effector
+//     Eigen::VectorXd pose = tasks_[tasks_.size() - 1].getPose(joint_positions);
+//     return std::vector<double>(pose.data(), pose.data() + pose.size());
+// }

@@ -35,7 +35,7 @@ public:
 
     Eigen::VectorXd solve(); // Solve the task
 
-    Eigen::VectorXd getPose(const Eigen::VectorXd * joint_positions);
+    // Eigen::VectorXd getPose(const Eigen::VectorXd * joint_positions);
     void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names); // Set the current joint names
     void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions); // Set the current joint positions
     void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr); // Set the desired pose of the task

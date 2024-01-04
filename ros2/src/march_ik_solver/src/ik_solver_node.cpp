@@ -186,21 +186,21 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     // RCLCPP_INFO(this->get_logger(), "Integrating the joint velocities.");
     desired_joint_positions_ = ik_solver_.integrateJointVelocities();
 
-    // Publish desired pose.
-    // RCLCPP_INFO(this->get_logger(), "Publishing the desired pose.");
-    std::vector<double> new_desired_pose = ik_solver_.getPose(&desired_joint_positions_);
-    march_shared_msgs::msg::IksFootPositions desired_pose_msg;
-    desired_pose_msg.header.stamp = this->now();
-    desired_pose_msg.left_foot_position.x = new_desired_pose[0];
-    desired_pose_msg.left_foot_position.y = new_desired_pose[1];
-    desired_pose_msg.left_foot_position.z = new_desired_pose[2];
-    desired_pose_msg.right_foot_position.x = new_desired_pose[3];
-    desired_pose_msg.right_foot_position.y = new_desired_pose[4];
-    desired_pose_msg.right_foot_position.z = new_desired_pose[5];
-    desired_pose_msg.time_from_start.sec = 0;
-    desired_pose_msg.time_from_start.nanosec = msg->time_from_start.nanosec;
+    // // Publish desired pose.
+    // // RCLCPP_INFO(this->get_logger(), "Publishing the desired pose.");
+    // std::vector<double> new_desired_pose = ik_solver_.getPose(&desired_joint_positions_);
+    // march_shared_msgs::msg::IksFootPositions desired_pose_msg;
+    // desired_pose_msg.header.stamp = this->now();
+    // desired_pose_msg.left_foot_position.x = new_desired_pose[0];
+    // desired_pose_msg.left_foot_position.y = new_desired_pose[1];
+    // desired_pose_msg.left_foot_position.z = new_desired_pose[2];
+    // desired_pose_msg.right_foot_position.x = new_desired_pose[3];
+    // desired_pose_msg.right_foot_position.y = new_desired_pose[4];
+    // desired_pose_msg.right_foot_position.z = new_desired_pose[5];
+    // desired_pose_msg.time_from_start.sec = 0;
+    // desired_pose_msg.time_from_start.nanosec = msg->time_from_start.nanosec;
 
-    desired_pose_pub_->publish(desired_pose_msg);
+    // desired_pose_pub_->publish(desired_pose_msg);
 
     // Print the desired joint positions.
     // RCLCPP_INFO(this->get_logger(), "Joint positions: %f, %f, %f, %f, %f, %f, %f, %f", desired_joint_positions_(0),
@@ -289,11 +289,22 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     state_estimation_msg_ = msg;
 
     // TODO: Optimize this function using a map.
+    // TODO: Do this only once because the difference in the order of the joints never changes.
+
+    // RCLCPP_INFO(this->get_logger(), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s",
+    //     msg->joint_state.name[0].c_str(), msg->joint_state.name[1].c_str(), msg->joint_state.name[2].c_str(), msg->joint_state.name[3].c_str(),
+    //     msg->joint_state.name[4].c_str(), msg->joint_state.name[5].c_str(), msg->joint_state.name[6].c_str(), msg->joint_state.name[7].c_str());
+    // RCLCPP_INFO(this->get_logger(), "Joint angles: %f, %f, %f, %f, %f, %f, %f, %f",
+    //     msg->joint_state.position[0], msg->joint_state.position[1], msg->joint_state.position[2], msg->joint_state.position[3],
+    //     msg->joint_state.position[4], msg->joint_state.position[5], msg->joint_state.position[6], msg->joint_state.position[7]);
+
     std::vector<long unsigned int> joints_ids;
     for (long unsigned int i = 0; i < joints_names_.size(); i++)
     {
+        RCLCPP_INFO(this->get_logger(), "Joint name: %s", joints_names_[i].c_str());
         for (long unsigned int j = 0; j < msg->joint_state.name.size(); j++)
         {
+            RCLCPP_INFO(this->get_logger(), "Joint state name: %s", msg->joint_state.name[j].c_str());
             if (joints_names_[i] == msg->joint_state.name[j])
             {
                 joints_ids.push_back(j);
@@ -310,10 +321,17 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
         actual_joint_positions_(i) = msg->joint_state.position[joints_ids[i]];
         actual_joint_velocities_(i) = msg->joint_state.velocity[joints_ids[i]];
     }
+    
+    // RCLCPP_INFO(this->get_logger(), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s",
+    //     joints_names_[0].c_str(), joints_names_[1].c_str(), joints_names_[2].c_str(), joints_names_[3].c_str(),
+    //     joints_names_[4].c_str(), joints_names_[5].c_str(), joints_names_[6].c_str(), joints_names_[7].c_str());
+    // RCLCPP_INFO(this->get_logger(), "Joint positions: %f, %f, %f, %f, %f, %f, %f, %f", actual_joint_positions_(0),
+    //     actual_joint_positions_(1), actual_joint_positions_(2), actual_joint_positions_(3),
+    //     actual_joint_positions_(4), actual_joint_positions_(5), actual_joint_positions_(6),
+    //     actual_joint_positions_(7));
 
     // Publish actual pose.
     // RCLCPP_INFO(this->get_logger(), "Publishing the actual pose.");
-    
 
     // RCLCPP_INFO(this->get_logger(), "Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f",
     //     current_joint_positions_(0), current_joint_positions_(1), current_joint_positions_(2),
@@ -346,7 +364,7 @@ void IKSolverNode::publishJointTrajectory(bool reset)
         // Add new point.
         trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
         joint_trajectory_point_current.positions = std::vector<double>(current_joint_positions_.data(), current_joint_positions_.data() + current_joint_positions_.size());
-        joint_trajectory_point_current.velocities = std::vector<double>(current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
+        joint_trajectory_point_current.velocities = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; //std::vector<double>(current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
         joint_trajectory_point_current.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
         joint_trajectory_point_current.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
         joint_trajectory_point_current.time_from_start.sec = 0;
@@ -357,23 +375,23 @@ void IKSolverNode::publishJointTrajectory(bool reset)
     }
     else
     {
-        // Determine if the desired joint positions and velocities are reached.
-        std::vector<double> desired_pose = ik_solver_.getPose(&desired_joint_positions_);
-        Eigen::VectorXd desired_pose_eigen = Eigen::Map<Eigen::VectorXd>(desired_pose.data(), desired_pose.size());
-        Eigen::VectorXd error = desired_poses_[0] - desired_pose_eigen;
-        double error_norm = error.norm();
-        RCLCPP_INFO(this->get_logger(), "Error norm: %f", error_norm);
-        if (error_norm < convergence_threshold_)
-        {
-            RCLCPP_INFO(this->get_logger(), "Desired joint positions and velocities reached.");
-            return;
-        }
+        // // Determine if the desired joint positions and velocities are reached.
+        // std::vector<double> desired_pose = ik_solver_.getPose(&desired_joint_positions_);
+        // Eigen::VectorXd desired_pose_eigen = Eigen::Map<Eigen::VectorXd>(desired_pose.data(), desired_pose.size());
+        // Eigen::VectorXd error = desired_poses_[0] - desired_pose_eigen;
+        // double error_norm = error.norm();
+        // RCLCPP_INFO(this->get_logger(), "Error norm: %f", error_norm);
+        // if (error_norm < convergence_threshold_)
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "Desired joint positions and velocities reached.");
+        //     return;
+        // }
 
         // Add new point.
         uint32_t previous_time = joint_trajectory_points_.back().time_from_start.nanosec;
         trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point;
         joint_trajectory_point.positions = std::vector<double>(desired_joint_positions_.data(), desired_joint_positions_.data() + desired_joint_positions_.size());
-        joint_trajectory_point.velocities = std::vector<double>(desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
+        joint_trajectory_point.velocities = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; //std::vector<double>(desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
         joint_trajectory_point.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
         joint_trajectory_point.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
         joint_trajectory_point.time_from_start.sec = 0;
@@ -410,7 +428,7 @@ void IKSolverNode::publishJointTrajectory(bool reset)
 //     // Create current trajectory point.
 //     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
 //     joint_trajectory_point_current.positions = std::vector<double>(current_joint_positions_.data(), current_joint_positions_.data() + current_joint_positions_.size());
-//     joint_trajectory_point_current.velocities = std::vector<double>(current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
+//     joint_trajectory_point_current.velocities = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; //std::vector<double>(current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
 //     joint_trajectory_point_current.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
 //     joint_trajectory_point_current.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
 //     joint_trajectory_point_current.time_from_start.sec = 0;
@@ -420,7 +438,7 @@ void IKSolverNode::publishJointTrajectory(bool reset)
 //     // Create desired trajectory point.
 //     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
 //     joint_trajectory_point_desired.positions = std::vector<double>(desired_joint_positions_.data(), desired_joint_positions_.data() + desired_joint_positions_.size());
-//     joint_trajectory_point_desired.velocities = std::vector<double>(desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
+//     joint_trajectory_point_desired.velocities = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; //std::vector<double>(desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
 //     joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
 //     joint_trajectory_point_desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
 //     joint_trajectory_point_desired.time_from_start.sec = 0;
