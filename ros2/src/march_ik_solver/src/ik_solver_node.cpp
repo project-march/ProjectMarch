@@ -155,10 +155,11 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         desired_pose_right.y, desired_pose_right.z;
     desired_poses_.push_back(desired_pose);
 
-    // RCLCPP_INFO(this->get_logger(), "Setting the current joint positions...");
+    RCLCPP_INFO(this->get_logger(), "Setting the current joint positions...");
     if (gait_reset_)
     {
         current_joint_positions_ = actual_joint_positions_;
+        current_joint_velocities_ = Eigen::VectorXd::Zero((int)actual_joint_velocities_.size());
         current_joint_velocities_ = actual_joint_velocities_;
         gait_reset_ = false;
     }
@@ -197,7 +198,8 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     desired_pose_msg.right_foot_position.y = new_desired_pose[4];
     desired_pose_msg.right_foot_position.z = new_desired_pose[5];
     desired_pose_msg.time_from_start.sec = 0;
-    desired_pose_msg.time_from_start.nanosec = desired_poses_dt_;
+    desired_pose_msg.time_from_start.nanosec = msg->time_from_start.nanosec;
+
     desired_pose_pub_->publish(desired_pose_msg);
 
     // Print the desired joint positions.
@@ -209,6 +211,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     // Publish the desired joint positions and velocities.
     // RCLCPP_INFO(this->get_logger(), "Publishing the desired joint positions and velocities.");
     publishJointTrajectory(msg->new_point);
+    // publishJointTrajectory();
 }
 
 // void IKSolverNode::RobotStateCallback(const march_shared_msgs::msg::RobotState::SharedPtr msg)
@@ -300,12 +303,17 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     }
 
     // Update the current joint positions.
-    current_joint_positions_ = Eigen::VectorXd::Zero((int) joints_names_.size());
+    actual_joint_positions_ = Eigen::VectorXd::Zero((int) joints_names_.size());
+    actual_joint_velocities_ = Eigen::VectorXd::Zero((int) joints_names_.size());
     for (long unsigned int i = 0; i < joints_names_.size(); i++)
     {
-        current_joint_positions_(i) = msg->joint_state.position[joints_ids[i]];
-        current_joint_velocities_(i) = msg->joint_state.velocity[joints_ids[i]];
+        actual_joint_positions_(i) = msg->joint_state.position[joints_ids[i]];
+        actual_joint_velocities_(i) = msg->joint_state.velocity[joints_ids[i]];
     }
+
+    // Publish actual pose.
+    // RCLCPP_INFO(this->get_logger(), "Publishing the actual pose.");
+    
 
     // RCLCPP_INFO(this->get_logger(), "Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f",
     //     current_joint_positions_(0), current_joint_positions_(1), current_joint_positions_(2),
@@ -376,21 +384,52 @@ void IKSolverNode::publishJointTrajectory(bool reset)
     }
 }
 
-std::vector<Eigen::VectorXd> IKSolverNode::calculateError()
-{
-    // Define a vector of Eigen::VectorXd to store the error.
-    std::vector<Eigen::VectorXd> error;
+// std::vector<Eigen::VectorXd> IKSolverNode::calculateError()
+// {
+//     // Define a vector of Eigen::VectorXd to store the error.
+//     std::vector<Eigen::VectorXd> error;
 
-    // Calculate error.
-    Eigen::VectorXd error_joint_positions_ = desired_joint_positions_ - current_joint_positions_;
-    Eigen::VectorXd error_joint_velocities_ = desired_joint_velocities_ - current_joint_velocities_;
+//     // Calculate error.
+//     Eigen::VectorXd error_joint_positions_ = desired_joint_positions_ - current_joint_positions_;
+//     Eigen::VectorXd error_joint_velocities_ = desired_joint_velocities_ - current_joint_velocities_;
 
-    // Push the error to the vector.
-    error.push_back(error_joint_positions_);
-    error.push_back(error_joint_velocities_);
+//     // Push the error to the vector.
+//     error.push_back(error_joint_positions_);
+//     error.push_back(error_joint_velocities_);
 
-    return error;
-}
+//     return error;
+// }
+
+// void IKSolverNode::publishJointTrajectory()
+// {
+//     // Create the message to be published.
+//     trajectory_msgs::msg::JointTrajectory joint_trajectory_msg;
+//     joint_trajectory_msg.header.stamp = this->now();
+//     joint_trajectory_msg.joint_names = joints_names_;
+    
+//     // Create current trajectory point.
+//     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
+//     joint_trajectory_point_current.positions = std::vector<double>(current_joint_positions_.data(), current_joint_positions_.data() + current_joint_positions_.size());
+//     joint_trajectory_point_current.velocities = std::vector<double>(current_joint_velocities_.data(), current_joint_velocities_.data() + current_joint_velocities_.size());
+//     joint_trajectory_point_current.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_point_current.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_point_current.time_from_start.sec = 0;
+//     joint_trajectory_point_current.time_from_start.nanosec = 0;
+//     joint_trajectory_msg.points.push_back(joint_trajectory_point_current);
+
+//     // Create desired trajectory point.
+//     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
+//     joint_trajectory_point_desired.positions = std::vector<double>(desired_joint_positions_.data(), desired_joint_positions_.data() + desired_joint_positions_.size());
+//     joint_trajectory_point_desired.velocities = std::vector<double>(desired_joint_velocities_.data(), desired_joint_velocities_.data() + desired_joint_velocities_.size());
+//     joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
+//     joint_trajectory_point_desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_point_desired.time_from_start.sec = 0;
+//     joint_trajectory_point_desired.time_from_start.nanosec = desired_poses_dt_;
+//     joint_trajectory_msg.points.push_back(joint_trajectory_point_desired);
+
+//     // Publish the message.
+//     joint_trajectory_pub_->publish(joint_trajectory_msg);
+// }
 
 // trajectory_msgs::msg::JointTrajectory IKSolverNode::convertToJointTrajectoryMsg()
 // {

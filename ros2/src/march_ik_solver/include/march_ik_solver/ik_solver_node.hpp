@@ -27,6 +27,7 @@ private:
     // void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void publishJointTrajectory(bool reset);
+    // void publishJointTrajectory();
     void calculateDesiredJointStates();
     void currentJointPositionsCallback(
         const rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedFuture future);

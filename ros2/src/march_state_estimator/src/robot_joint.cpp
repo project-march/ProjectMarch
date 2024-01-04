@@ -50,6 +50,8 @@ void RobotJoint::setOriginRotation(const Eigen::Matrix3d & rotation)
 GiNaC::matrix RobotJoint::utilRotate(std::vector<double> & axis)
 {
     GiNaC::matrix rotation_matrix(WORKSPACE_DIM, WORKSPACE_DIM);
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotJoint name: %s", m_name.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotJoint::utilRotate: Axis: %f %f %f", axis[0], axis[1], axis[2]);
     rotation_matrix = utilRotateX(axis[0] * m_joint_angle);
     rotation_matrix = utilRotateY(axis[1] * m_joint_angle).mul(rotation_matrix);
     rotation_matrix = utilRotateZ(axis[2] * m_joint_angle).mul(rotation_matrix);

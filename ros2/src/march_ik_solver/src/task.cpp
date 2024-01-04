@@ -457,6 +457,7 @@ void Task::sendRequestNodePosition()
         }
 
         current_pose_ = Eigen::Map<Eigen::VectorXd>(current_pose_vector.data(), task_m_);
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Current pose: %f, %f, %f, %f, %f, %f", current_pose_(0), current_pose_(1), current_pose_(2), current_pose_(3), current_pose_(4), current_pose_(5));
     }
     else
     {
@@ -512,6 +513,10 @@ void Task::sendRequestNodeJacobian()
         }
 
         jacobian_ = jacobian;
+        for (int i = 0; i < task_m_; i++)
+        {
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, jacobian_(i,0), jacobian_(i,1), jacobian_(i,2), jacobian_(i,3), jacobian_(i,4), jacobian_(i,5), jacobian_(i,6), jacobian_(i,7));
+        }
     }
     else
     {

@@ -2,6 +2,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <sstream>
+#include <algorithm>
 #include "math.h"
 
 void RobotNode::setParent(RobotNode * parent)
@@ -243,6 +244,7 @@ std::vector<RobotNode*> RobotNode::getJointNodes() const
         }
         parent = parent->getParent();
     }
+    std::reverse(joint_nodes.begin(), joint_nodes.end());
     return joint_nodes;
 }
 

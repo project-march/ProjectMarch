@@ -143,8 +143,18 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
 
         // TODO: Create a function that returns the joint names of a node in robot_node.hpp
         node_jacobian_msg.joint_names = robot_node->getJointNames();
+        std::vector<std::string> joint_names = robot_node->getJointNames();
 
         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(request->joint_names, request->joint_positions);
+
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
+        for (int i = 0; i < jacobian.rows(); i++)
+        {
+            for (int j = 0; j < jacobian.cols(); j++)
+            {
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", joint_names[j].c_str(), jacobian(i, j));
+            }
+        }
 
         node_jacobian_msg.rows = jacobian.rows();
         node_jacobian_msg.cols = jacobian.cols();
