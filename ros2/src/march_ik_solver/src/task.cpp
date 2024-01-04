@@ -1,22 +1,23 @@
 #include "march_ik_solver/task.hpp"
 #include "math.h"
 
-Task::Task()
-{
-    // Empty default constructor.
-}
+#include "geometry_msgs/msg/point.hpp"
+#include "march_shared_msgs/msg/node_jacobian.hpp"
 
-Task::Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n)
+Task::Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n, std::vector<std::string> node_names)
 {
     // Initialize the task ID, task name, dimension of the task, and dimension of the joint space.
     task_id_ = task_id;
     task_name_ = task_name;
     task_m_ = task_m;
     task_n_ = task_n;
+    node_names_ = node_names;
 
     // Initialize the task client to communicate with the task server in the state estimation node.
     node_ = std::make_shared<rclcpp::Node>("task_" + task_name_ + "_client");
     client_ = node_->create_client<march_shared_msgs::srv::GetTaskReport>("get_task_report");
+    client_node_position_ = node_->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimator/get_node_position");
+    client_node_jacobian_ = node_->create_client<march_shared_msgs::srv::GetNodeJacobian>("state_estimator/get_node_jacobian");
 }
 
 std::string Task::getTaskName()
@@ -75,6 +76,12 @@ Eigen::VectorXd Task::getPose(const Eigen::VectorXd * joint_positions)
     return pose;
 }
 
+void Task::setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names_ptr)
+{
+    // Set the current joint names
+    current_joint_names_ptr_ = current_joint_names_ptr;
+}
+
 void Task::setCurrentJointPositionsPtr(Eigen::VectorXd * current_joint_positions_ptr)
 {
     // Set the current joint positions
@@ -91,14 +98,18 @@ Eigen::VectorXd Task::solve()
 {
     // Send request to the task server in the state estimation node.
     // sendRequest();
-    calculateCurrentPose();
+    // calculateCurrentPose();
 
     // Calculate the error.
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node position...");
+    sendRequestNodePosition();
     Eigen::VectorXd error = calculateError();
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Error: %f, %f, %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5), error(6), error(7));
 
     // Calculate the inverse of Jacobian.
-    calculateJacobian();
+    // calculateJacobian();
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node Jacobian...");
+    sendRequestNodeJacobian();
     calculateJacobianInverse();
 
     // Print the sizes
@@ -108,6 +119,7 @@ Eigen::VectorXd Task::solve()
 
     // Calculate the joint velocities.
     // Eigen::VectorXd joint_velocities = jacobian_inverse_ * error;
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Calculating joint velocities...");
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(task_n_);
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint velocities size: %d", joint_velocities.size());
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint velocities: %f, %f, %f, %f, %f, %f, %f, %f", joint_velocities(0), joint_velocities(1), joint_velocities(2), joint_velocities(3), joint_velocities(4), joint_velocities(5), joint_velocities(6), joint_velocities(7));
@@ -404,3 +416,105 @@ void Task::calculateJacobianInverse()
 //         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_task_report");
 //     }
 // }
+
+void Task::sendRequestNodePosition()
+{
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
+    auto request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
+    request->node_names = node_names_;
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node names: %s, %s", node_names_[0].c_str(), node_names_[1].c_str());
+    // request->joint_names = *current_joint_names_ptr_;
+    request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", current_joint_names_ptr_->at(0), current_joint_names_ptr_->at(1), current_joint_names_ptr_->at(2), current_joint_names_ptr_->at(3), current_joint_names_ptr_->at(4), current_joint_names_ptr_->at(5), current_joint_names_ptr_->at(6), current_joint_names_ptr_->at(7));
+    request->joint_positions = std::vector<double>(current_joint_positions_ptr_->data(), current_joint_positions_ptr_->data() + current_joint_positions_ptr_->size());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 2");
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for service get_node_position...");
+    while (!client_node_position_->wait_for_service(std::chrono::seconds(1))) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
+    auto result = client_node_position_->async_send_request(request);
+
+    if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result)
+        == rclcpp::FutureReturnCode::SUCCESS) {
+
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received node position...");
+        std::vector<double> current_pose_vector;
+
+        for (auto node_position : result.get()->node_positions)
+        {
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
+            current_pose_vector.push_back(node_position.x);
+            current_pose_vector.push_back(node_position.y);
+            current_pose_vector.push_back(node_position.z);
+        }
+
+        current_pose_ = Eigen::Map<Eigen::VectorXd>(current_pose_vector.data(), task_m_);
+    }
+    else
+    {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_node_position");
+    }
+}
+
+void Task::sendRequestNodeJacobian()
+{
+    auto request = std::make_shared<march_shared_msgs::srv::GetNodeJacobian::Request>();
+    request->node_names = node_names_;
+    // request->joint_names = *current_joint_names_ptr_;
+    request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+    request->joint_positions = std::vector<double>(current_joint_positions_ptr_->data(), current_joint_positions_ptr_->data() + current_joint_positions_ptr_->size());
+
+    while (!client_node_jacobian_->wait_for_service(std::chrono::seconds(1))) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+    }
+
+    auto result = client_node_jacobian_->async_send_request(request);
+    std::vector<std::string> joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+
+    if (rclcpp::spin_until_future_complete(node_->get_node_base_interface(), result)
+        == rclcpp::FutureReturnCode::SUCCESS) {
+
+        Eigen::MatrixXd jacobian = Eigen::MatrixXd::Zero(task_m_, task_n_);
+        int total_rows = 0;
+
+        for (auto & node_jacobian : result.get()->node_jacobians)
+        {
+            Eigen::MatrixXd jacobian_temp = Eigen::Map<Eigen::MatrixXd>(node_jacobian.jacobian.data(), node_jacobian.rows, node_jacobian.cols);
+            for (int i = 0; i < node_jacobian.rows; i++)
+            {
+                long unsigned int counter = 0;
+                for (long unsigned int j = 0; j < joint_names.size(); j++)
+                {
+                    if (node_jacobian.joint_names[counter] == joint_names[j])
+                    {
+                        jacobian(i + total_rows, j) = jacobian_temp(i, counter);
+                        counter++;
+                    }
+                    else
+                    {
+                        jacobian(i + total_rows, j) = 0.0;
+                    }
+                }
+            }
+            total_rows += node_jacobian.rows;
+        }
+
+        jacobian_ = jacobian;
+    }
+    else
+    {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_node_jacobian");
+    }
+}

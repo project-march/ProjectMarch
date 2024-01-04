@@ -25,7 +25,8 @@ public:
     void configureTasks(std::vector<Eigen::VectorXd> * desired_poses_ptr); // Configure the tasks.
     void setIntegralDtPtr(uint32_t* integral_dt_ptr); // Set the pointer to the integral time step.
     void setCurrentJointPositionsPtr(
-        Eigen::VectorXd* current_joint_positions_ptr); // Set the pointer to the current joint positions.
+        Eigen::VectorXd* current_joint_positions_ptr,
+        std::vector<std::string> * joint_names_ptr); // Set the pointer to the current joint positions.
     void setDesiredJointPositionsPtr(
         Eigen::VectorXd* desired_joint_positions_ptr); // Set the pointer to the desired joint positions.
     void setDesiredJointVelocitiesPtr(

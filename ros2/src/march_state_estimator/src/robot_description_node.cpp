@@ -1,7 +1,7 @@
 #include "march_state_estimator/robot_description_node.hpp"
 
 #include "geometry_msgs/msg/point.hpp"
-#include "std_msgs/msg/float64_multi_array.hpp"
+#include "march_shared_msgs/msg/node_jacobian.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include <functional>
 #include <chrono>
@@ -10,7 +10,7 @@
 #include "eigen3/Eigen/Geometry"
 
 RobotDescriptionNode::RobotDescriptionNode()
-: Node("march_state_estimator_node")
+: Node("robot_description")
 {
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor");
 
@@ -22,7 +22,7 @@ RobotDescriptionNode::RobotDescriptionNode()
     m_robot_description->configureRobotNodes();
 
     m_joint_state_subscription = this->create_subscription<sensor_msgs::msg::JointState>(
-        "new_joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
+        "joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
     m_node_positions_publisher = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("state_estimator/node_positions", 1);
     // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&RobotDescriptionNode::publishNodePositions, this));
 
@@ -135,29 +135,27 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest");
 
     std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(request->node_names);
+    std::vector<march_shared_msgs::msg::NodeJacobian> node_jacobians;
 
     for (auto & robot_node : robot_nodes)
     {
-        std::vector<double> node_size;
-        std::vector<double> node_jacobian;
+        march_shared_msgs::msg::NodeJacobian node_jacobian_msg;
 
-        Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(m_joint_state_msg->name, m_joint_state_msg->position);
-        node_size.push_back(jacobian.rows());
-        node_size.push_back(jacobian.cols());
+        // TODO: Create a function that returns the joint names of a node in robot_node.hpp
+        node_jacobian_msg.joint_names = robot_node->getJointNames();
 
-        for (int j = 0; j < jacobian.cols(); j++)
-        {
-            for (int i = 0; i < jacobian.rows(); i++)
-            {
-                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian(i, j));
-                node_jacobian.push_back(jacobian(i, j));
-            }
-        }
+        Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(request->joint_names, request->joint_positions);
 
-        response->node_sizes.data.insert(response->node_sizes.data.end(), node_size.begin(), node_size.end());
-        response->node_jacobians.data.insert(response->node_jacobians.data.end(), node_jacobian.begin(), node_jacobian.end());
+        node_jacobian_msg.rows = jacobian.rows();
+        node_jacobian_msg.cols = jacobian.cols();
+
+        std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
+        node_jacobian_msg.jacobian = jacobian_vector;
+
+        node_jacobians.push_back(node_jacobian_msg);
     }
 
+    response->node_jacobians = node_jacobians;
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest done");
 }
 

@@ -40,6 +40,7 @@ public:
     Eigen::MatrixXd getGlobalRotationJacobian(std::vector<std::string> joint_names, std::vector<double> joint_angles) const;
     RobotNode* getParent() const;
     std::vector<RobotNode*> getChildren() const;
+    std::vector<std::string> getJointNames() const;
 
     void expressKinematics();
     void expressDynamics();

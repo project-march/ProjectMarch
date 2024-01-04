@@ -71,6 +71,16 @@ std::vector<RobotNode*> RobotNode::getChildren() const
     return m_children;
 }
 
+std::vector<std::string> RobotNode::getJointNames() const
+{
+    std::vector<std::string> joint_names;
+    for (auto & joint_node : m_joint_nodes)
+    {
+        joint_names.push_back(joint_node->getName());
+    }
+    return joint_names;
+}
+
 Eigen::Vector3d RobotNode::getGlobalPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles) const
 {
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1, %s", m_name.c_str());
@@ -198,8 +208,8 @@ Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(std::vector<std::string> jo
     {
         for (long unsigned int j = 0; j < m_joint_nodes.size(); j++)
         {
-            GiNaC::ex global_position_component = GiNaC::evalf(m_global_position_jacobian_matrix(i, j).subs(substitutions));
-            global_position_jacobian(i, j) = GiNaC::ex_to<GiNaC::numeric>(global_position_component).to_double();
+            GiNaC::ex global_position_jacobian_component = GiNaC::evalf(m_global_position_jacobian_matrix(i, j).subs(substitutions));
+            global_position_jacobian(i, j) = GiNaC::ex_to<GiNaC::numeric>(global_position_jacobian_component).to_double();
         }
     }
 

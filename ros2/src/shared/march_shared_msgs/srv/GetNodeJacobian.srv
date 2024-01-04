@@ -2,5 +2,4 @@ string[] node_names
 string[] joint_names
 float64[] joint_positions
 ---
-std_msgs/Float64MultiArray node_sizes
-std_msgs/Float64MultiArray node_jacobians
+march_shared_msgs/NodeJacobian[] node_jacobians

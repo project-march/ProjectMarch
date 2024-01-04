@@ -119,10 +119,22 @@ Eigen::VectorXd IKSolver::setJointLimits(Eigen::VectorXd desired_joint_positions
     // return desired_joint_positions;
 }
 
-void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)
+void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr, std::vector<std::string> * joint_names_ptr)
 {
     // Set the pointer to the current joint positions
     current_joint_positions_ptr_ = current_joint_positions_ptr;
+
+    // Set the current joint names
+    for (int i = 0; i < n_joints_; i++)
+    {
+        tasks_[i].setCurrentJointNamesPtr(joint_names_ptr);
+    }
+
+    // Set the pointer to the joint names in each task
+    for (auto & task : tasks_)
+    {
+        task.setCurrentJointNamesPtr(joint_names_ptr);
+    }
 }
 
 void IKSolver::setDesiredJointPositionsPtr(Eigen::VectorXd* desired_joint_positions_ptr)
