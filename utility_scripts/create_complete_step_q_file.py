@@ -29,14 +29,14 @@ import numpy as np
 df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
 
 
-df_gait_joint = df_gait_joint.assign(LHAA=0.006)
-df_gait_joint = df_gait_joint.assign(RHAA=-0.006)
+df_gait_joint = df_gait_joint.assign(LHAA=-0.03)
+df_gait_joint = df_gait_joint.assign(RHAA=-0.03)
 
 
 df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
 df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
-df_gait_joint['LHFE'] = df_gait_joint['LHFE'] - 0.1
-df_gait_joint['RHFE'] = df_gait_joint['RHFE'] - 0.1
+df_gait_joint['LHFE'] = df_gait_joint['LHFE']
+df_gait_joint['RHFE'] = df_gait_joint['RHFE']
 df_gait_joint['LADPF'] = df_gait_joint['LADPF'] - 0.25
 df_gait_joint['RADPF'] = df_gait_joint['RADPF'] - 0.25
 
