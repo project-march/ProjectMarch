@@ -1,3 +1,10 @@
+/*
+Authors: Femke Buiks, MIX
+
+This is the header file for the GaitPlanningAngles class. 
+
+*/ 
+
 #include "march_shared_msgs/msg/exo_state.hpp"
 #include "../../state_machine/include/state_machine/exo_state.hpp"
 #include <vector>

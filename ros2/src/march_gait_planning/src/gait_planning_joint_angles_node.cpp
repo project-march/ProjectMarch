@@ -1,3 +1,11 @@
+/*
+Authors: Femke Buiks, MIX
+
+This file contains the functionality of the GaitPlanningAnglesNode. This node serves to supply gaits to the exo that are predetermined joint angles (from csv files).
+Gait logic is mainly located here, as the publishing of gaits is dependent on callbacks from the state machine. 
+
+*/ 
+
 #include "march_gait_planning/gait_planning_joint_angles_node.hpp"
 
 using std::placeholders::_1; 

@@ -1,3 +1,9 @@
+/*
+Authors: Femke Buiks, MIX
+
+This is the header file for the GaitPlanningAnglesNode class. 
+
+*/ 
 
 #include "rclcpp/rclcpp.hpp" 
 #include "trajectory_msgs/msg/joint_trajectory.hpp"

@@ -1,3 +1,10 @@
+/*
+Authors: Femke Buiks, MIX
+
+This file contains the functionality of the GaitPlanningAngles class.  This class allows the definition of a gait in joint angles. 
+
+*/ 
+
 #include "march_gait_planning/gait_planning_joint_angles.hpp"
 
 // Struct to keep track of all columns in the angle trajectory .csv files 
