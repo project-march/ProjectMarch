@@ -1,3 +1,11 @@
+/*Authors: Andrew Hutani, MIX
+
+This class is a seperate StateMachine for the testing of single joints. It is a child class of the normal StateMachine class, where only the constructor (i.e. the initialization of the transitions) is different.
+
+This class is only used in the test_joints launch file.
+
+*/
+
 #include "state_machine/test_joints_state_machine.hpp"
 #include <set>
 #include <map>

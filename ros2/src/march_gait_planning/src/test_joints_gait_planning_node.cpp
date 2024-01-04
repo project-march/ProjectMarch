@@ -1,3 +1,10 @@
+/*Authors: Andrew Hutani, MIX
+
+This node is used to test the gait planning for each joint seperately; it will send a sinusoidal wave to a single joint while keeping the other nodes in the home stand position.
+This node is only called in the test_joints launch file.
+
+*/
+
 #include "march_gait_planning/test_joints_gait_planning_node.hpp"
 
 using std::placeholders::_1; 
@@ -78,6 +85,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
+                //TODO: This does not work for the HAA, since positive is defined to be adduction.
                 double new_angle = 0.1* m_current_trajectory.front() + 0.1;
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 for (size_t i = 0; i < m_current_joint_angles_msg->joint_names.size(); ++i) {

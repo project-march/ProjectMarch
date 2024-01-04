@@ -1,4 +1,11 @@
-/*Authors: Pleuntje Brons and Andrew Hutani, MIX*/
+/*Authors: Andrew Hutani, MIX
+
+This node is a seperate IPD for the testing of single joints. It only uses states BootUp, Stand, and Walk, where BootUp is used to switch joints and 
+Walk to send a sinusoidal wave to the joint.
+
+This node is only called in the test_joints launch file.
+
+*/
 
 #include "march_input_device/test_joints_input_device_node.hpp"
 #include "march_input_device/test_joints_input_device.hpp"

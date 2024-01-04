@@ -1,4 +1,8 @@
-"""Author: MARCH."""
+"""
+Author: Andrew Hutani, MIX
+
+This launch file launches all the necessary nodes to test each joint using a sinusoidal trajectory. This helps to check if the joints are working properly.
+"""
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription, condition

@@ -1,4 +1,10 @@
-/*Authors: Pleuntje Brons and Andrew Hutani, MIX*/
+/*Authors: Andrew Hutani, MIX
+
+This class is a seperate IPD for the testing of single joints. It has an additional member variable to store the actuated joint.
+
+This class is only used in the test_joints launch file.
+
+*/
 
 #include "march_input_device/test_joints_input_device.hpp"
 #include <iostream>

@@ -1,3 +1,13 @@
+/*Authors: Andrew Hutani, MIX
+
+This node is a seperate State Machine for the testing of single joints. It only uses states BootUp, Stand, and Walk, where BootUp is used to switch joints and 
+Walk to send a sinusoidal wave to the joint.
+This node will send the actuated joint alongside the state to the gait planning node.
+
+This node is only called in the test_joints launch file.
+
+*/
+
 #include "state_machine/test_joints_state_machine_node.hpp"
 using std::placeholders::_1;
 using std::placeholders::_2;
