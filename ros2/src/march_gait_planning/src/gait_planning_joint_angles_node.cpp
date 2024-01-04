@@ -77,10 +77,10 @@ void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
 } 
 
 void GaitPlanningAnglesNode::processHomeStandGait(){
-    m_gait_planning.setPrevPoint({-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016});
+    m_gait_planning.setPrevPoint({-0.06, 0.042, -0.0, -0.016, -0.06, 0.042, -0.0, -0.016});
     m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
     m_joints_msg.points.push_back(m_trajectory_prev_point);
-    m_trajectory_des_point.positions = {-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016};
+    m_trajectory_des_point.positions = {-0.06, 0.042, -0.0, -0.016, -0.06, 0.042, -0.0, -0.016};
     m_joints_msg.points.push_back(m_trajectory_des_point);
     m_joint_angle_trajectory_publisher->publish(m_joints_msg);
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
