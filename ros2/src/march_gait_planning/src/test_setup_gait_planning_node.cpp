@@ -8,7 +8,7 @@ constexpr double linear_range = 0.1;
 
 
 TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
- : Node("march_test_gait_planning_node"), 
+ : Node("march_test_setup_gait_planning_node"), 
    m_gait_planning(TestSetupGaitPlanning()),
    m_current_trajectory(),
    m_current_joint_angles_msg(std::make_shared<trajectory_msgs::msg::JointTrajectory>())

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <string>
 #include "../../state_machine/include/state_machine/exo_state.hpp"
 
 class TestSetupGaitPlanning
