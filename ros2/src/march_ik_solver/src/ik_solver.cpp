@@ -64,12 +64,23 @@ Eigen::VectorXd IKSolver::solve()
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     // Integrate the joint velocities
-    double dt = 0.001;
+    double dt = 0.05;
     Eigen::VectorXd desired_joint_positions = (*current_joint_positions_ptr_) + (*desired_joint_velocities_ptr_) * dt;
     // return desired_joint_positions;
 
     Eigen::VectorXd limited_desired_joint_positions = setJointLimits(desired_joint_positions);
     return limited_desired_joint_positions;
+}
+
+std::vector<double> IKSolver::getTasksError()
+{
+    // Get the error of the tasks
+    std::vector<double> tasks_error;
+    for (long unsigned int i = 0; i < tasks_.size(); i++)
+    {
+        tasks_error.push_back(tasks_[i].getErrorNorm());
+    }
+    return tasks_error;
 }
 
 void IKSolver::setNJoints(int n_joints)

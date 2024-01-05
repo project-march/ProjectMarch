@@ -50,10 +50,16 @@ git submodule init
 git submodule update
 ```
 
-Go to the GiNaC folder and build the library.
+Go to the GiNaC folder and clone CLN.
 
 ```Linux
 cd ~/march/ros2/src/libraries/ginac
+git clone git://www.ginac.de/cln.git
+```
+
+Then create a build folder build the GiNaC library.
+
+```Linux
 mkdir build && cd build
 cmake ..
 make

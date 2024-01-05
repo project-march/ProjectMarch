@@ -44,6 +44,12 @@ int Task::getTaskN()
     return task_n_;
 }
 
+double Task::getErrorNorm()
+{
+    // Return the norm of the error
+    return error_norm_;
+}
+
 // Eigen::VectorXd Task::getPose(const Eigen::VectorXd * joint_positions)
 // {
 //     // Return the current pose of the task
@@ -148,6 +154,7 @@ Eigen::VectorXd Task::calculateError()
 
     // Calculate the proportional error.
     error = gain_p_ * error; // + calculateIntegralError() + calculateDerivativeError();
+    error_norm_ = error.norm();
 
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Proportional error: %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5));
 
@@ -378,10 +385,10 @@ void Task::calculateJacobianInverse()
     }
 
     // Print the Jacobian inverse.
-    for (int i = 0; i < task_n_; i++)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, jacobian_inverse_(i,0), jacobian_inverse_(i,1), jacobian_inverse_(i,2), jacobian_inverse_(i,3), jacobian_inverse_(i,4), jacobian_inverse_(i,5));
-    }
+    // for (int i = 0; i < task_n_; i++)
+    // {
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, jacobian_inverse_(i,0), jacobian_inverse_(i,1), jacobian_inverse_(i,2), jacobian_inverse_(i,3), jacobian_inverse_(i,4), jacobian_inverse_(i,5));
+    // }
 }
 
 // void Task::sendRequest()
@@ -422,13 +429,13 @@ void Task::sendRequestNodePosition()
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
     auto request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
     request->node_names = node_names_;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node names: %s, %s", node_names_[0].c_str(), node_names_[1].c_str());
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node names: %s, %s", node_names_[0].c_str(), node_names_[1].c_str());
     // request->joint_names = *current_joint_names_ptr_;
     request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 1");
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", current_joint_names_ptr_->at(0), current_joint_names_ptr_->at(1), current_joint_names_ptr_->at(2), current_joint_names_ptr_->at(3), current_joint_names_ptr_->at(4), current_joint_names_ptr_->at(5), current_joint_names_ptr_->at(6), current_joint_names_ptr_->at(7));
     request->joint_positions = std::vector<double>(current_joint_positions_ptr_->data(), current_joint_positions_ptr_->data() + current_joint_positions_ptr_->size());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 2");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Test 2");
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for service get_node_position...");
     while (!client_node_position_->wait_for_service(std::chrono::seconds(1))) {
@@ -457,7 +464,7 @@ void Task::sendRequestNodePosition()
         }
 
         current_pose_ = Eigen::Map<Eigen::VectorXd>(current_pose_vector.data(), task_m_);
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Current pose: %f, %f, %f, %f, %f, %f", current_pose_(0), current_pose_(1), current_pose_(2), current_pose_(3), current_pose_(4), current_pose_(5));
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Current pose: %f, %f, %f, %f, %f, %f", current_pose_(0), current_pose_(1), current_pose_(2), current_pose_(3), current_pose_(4), current_pose_(5));
     }
     else
     {
@@ -513,10 +520,10 @@ void Task::sendRequestNodeJacobian()
         }
 
         jacobian_ = jacobian;
-        for (int i = 0; i < task_m_; i++)
-        {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, jacobian_(i,0), jacobian_(i,1), jacobian_(i,2), jacobian_(i,3), jacobian_(i,4), jacobian_(i,5), jacobian_(i,6), jacobian_(i,7));
-        }
+        // for (int i = 0; i < task_m_; i++)
+        // {
+        //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, jacobian_(i,0), jacobian_(i,1), jacobian_(i,2), jacobian_(i,3), jacobian_(i,4), jacobian_(i,5), jacobian_(i,6), jacobian_(i,7));
+        // }
     }
     else
     {

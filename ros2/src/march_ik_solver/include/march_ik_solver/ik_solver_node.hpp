@@ -26,8 +26,8 @@ private:
     void IksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     // void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
-    void publishJointTrajectory(bool reset);
-    // void publishJointTrajectory();
+    // void publishJointTrajectory(bool reset);
+    void publishJointTrajectory();
     void calculateDesiredJointStates();
     void currentJointPositionsCallback(
         const rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedFuture future);
@@ -39,6 +39,7 @@ private:
 
     IKSolver ik_solver_; // TODO: make this a pointer using std::unique_ptr<IKSolver> ik_solver_;
     double convergence_threshold_;
+    uint32_t max_iterations_;
     std::vector<std::string> joints_names_;
     Eigen::VectorXd current_joint_positions_;
     Eigen::VectorXd current_joint_velocities_;

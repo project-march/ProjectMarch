@@ -32,6 +32,7 @@ public:
     unsigned int getTaskID(); // Get the ID of the task
     int getTaskM(); // Get the dimension of the task
     int getTaskN(); // Get the dimension of the joint space
+    double getErrorNorm(); // Get the norm of the error
 
     Eigen::VectorXd solve(); // Solve the task
 
@@ -76,6 +77,7 @@ private:
     Eigen::VectorXd * current_joint_positions_ptr_; // Pointer to current joint positions
     std::vector<Eigen::VectorXd> * desired_poses_ptr_; // Pointer to desired pose of the task
     Eigen::VectorXd current_pose_; // Current pose of the task
+    double error_norm_; // Norm of the error
     float gain_p_ = 0.0; // Proportional gain. Default value is 0.0
     float gain_i_ = 0.0; // Integral gain. Default value is 0.0
     float gain_d_ = 0.0; // Derivative gain. Default value is 0.0

@@ -17,6 +17,7 @@ public:
 
     Eigen::VectorXd solve(); // Solve the IK problem.
     Eigen::VectorXd integrateJointVelocities(); // Integrate the joint velocities
+    std::vector<double> getTasksError(); // Get the error of the tasks.
 
     void setNJoints(int n_joints); // Set the number of joints.
     void setJointLimits(std::vector<std::array<double,2>> joint_limits); // Set the joint limits.
