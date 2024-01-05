@@ -15,8 +15,12 @@ This node is only called in the test_joints launch file.
 using std::placeholders::_1;
 
 std::array<exoState, 3> all_possible_states = { exoState::Stand, exoState::Walk, exoState::BootUp};
-std::vector<std::string> all_possible_joints = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
-                                            "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+//TODO: Re-enable these joints once the issue with hip_aa's is fixed.
+// std::vector<std::string> all_possible_joints = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+//                                             "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+
+std::vector<std::string> all_possible_joints = {"left_hip_fe", "left_knee", "left_ankle", 
+                                            "right_hip_fe", "right_knee", "right_ankle"};
 
 TestJointsInputDeviceNode::TestJointsInputDeviceNode()
     : Node("march_input_device_node"),
