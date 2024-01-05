@@ -27,7 +27,8 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
    m_joints_msg(),
    m_trajectory_prev_point(),
    m_trajectory_des_point(),
-   m_current_trajectory()
+   m_current_trajectory(),
+   m_incremental_steps_to_home_stand()
 {
     m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
                         "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
@@ -45,6 +46,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 
     m_gait_planning.setGaitType(exoState::BootUp);
     m_gait_planning.setPrevGaitType(exoState::BootUp); 
+    m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
 }
 
 void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
@@ -77,16 +79,44 @@ void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
 } 
 
 void GaitPlanningAnglesNode::processHomeStandGait(){
-    m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
-    m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand()); 
-    m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
-    m_joints_msg.points.push_back(m_trajectory_prev_point);
-    m_trajectory_des_point.positions = m_gait_planning.getHomeStand(); 
+    if (m_gait_planning.getCounter() == 0){ // When switching to homestand
+        m_incremental_steps_to_home_stand.clear();
+        for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
+                m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / 40); // 40 iterations to reach the target, i.e. in 2 seconds
+        }
+    }
+
+    m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
+    m_joints_msg.points.push_back(m_trajectory_prev_point); 
+
+    if (m_gait_planning.getCounter() < 40){
+        m_trajectory_des_point.positions.clear();
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
+        for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
+            m_trajectory_des_point.positions.push_back(m_gait_planning.getPrevPoint()[i] + m_incremental_steps_to_home_stand[i]);
+        } 
+    }
+    else{
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position reached!");
+        m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
+    }
+
     m_joints_msg.points.push_back(m_trajectory_des_point);
     m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
-    m_gait_planning.setCounter(0);
-    m_joints_msg.points.clear();
+    
+    m_joints_msg.points.clear();   
+    m_gait_planning.setPrevPoint(m_trajectory_des_point.positions); 
+    m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
+
+    // m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand()); 
+    // m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
+    // m_joints_msg.points.push_back(m_trajectory_prev_point);
+    // m_trajectory_des_point.positions = m_gait_planning.getHomeStand(); 
+    // m_joints_msg.points.push_back(m_trajectory_des_point);
+    // m_joint_angle_trajectory_publisher->publish(m_joints_msg);
+    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
+    // m_gait_planning.setCounter(0);
+    // m_joints_msg.points.clear();
 }
 
 

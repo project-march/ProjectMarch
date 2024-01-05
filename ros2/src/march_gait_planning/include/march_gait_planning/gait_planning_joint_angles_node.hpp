@@ -49,5 +49,6 @@ private:
     std::vector<std::vector<double>> m_current_trajectory; 
 
     GaitPlanningAngles m_gait_planning; 
+    std::vector<double> m_incremental_steps_to_home_stand;
 
 };
