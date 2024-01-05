@@ -33,7 +33,6 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
-
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sideways_walking_gait_dataset.csv", m_sideways_trajectory); 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -85,6 +84,10 @@ void GaitPlanningAngles::setPrevPoint(const std::vector<double> &point){
     m_prev_point = point; 
 }
 
+void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
+    m_home_stand = stand; 
+}
+
 exoState GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
@@ -99,6 +102,10 @@ std::vector<double> GaitPlanningAngles::getPrevPoint() const{
 
 int GaitPlanningAngles::getCounter() const{
     return m_counter; 
+}
+
+std::vector<double> GaitPlanningAngles::getHomeStand() const{
+    return m_home_stand; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getFirstStepAngleTrajectory() const{
