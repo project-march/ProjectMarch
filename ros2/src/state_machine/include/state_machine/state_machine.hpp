@@ -20,8 +20,13 @@ public:
     bool isValidTransition(const exoState& desired_state) const;
     int getCurrentState() const;
     std::set<exoState> getAvailableStates(exoState currentState) const;
+    void setCurrentState(const exoState& state);
+    void setExoTransitions(const std::map<exoState, std::set<exoState>>& transitions);
+
+protected:
+    std::map<exoState, std::set<exoState>> m_exo_transitions;
 
 private:
     exoState m_current_state;
-    std::map<exoState, std::set<exoState>> m_exo_transitions;
+
 };

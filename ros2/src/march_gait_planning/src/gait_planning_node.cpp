@@ -1,17 +1,18 @@
 /*Authors: Femke Buiks and Andrew Hutani, MIX*/
 
 #include "march_gait_planning/gait_planning_node.hpp"
+#include "../../state_machine/include/state_machine/exo_state.hpp"
 
 using std::placeholders::_1; 
 
 GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
-   m_current_trajectory(),
-   m_current_step_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
+   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
    m_response_received(true)
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("iks_foot_positions", 10);
+
     m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
         "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1)); 
     m_feet_position_subscriber = create_subscription<march_shared_msgs::msg::IksFootPositions>(
@@ -21,9 +22,8 @@ GaitPlanningNode::GaitPlanningNode()
     m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("current_stance_leg_service");
     std::cout << "Request and client created " << std::endl; 
 
-    m_gait_planning.setGaitType(exoState::BootUp); // make service between gait planning and state machine for gait type
+    m_gait_planning.setGaitType(exoState::BootUp); 
 
-    // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
  }
@@ -31,11 +31,6 @@ GaitPlanningNode::GaitPlanningNode()
 void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
     m_gait_planning.setGaitType((exoState)msg->state);
-}
-
-void GaitPlanningNode::currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current stance foot: %d", msg->data); 
-    m_gait_planning.setStanceFoot(msg->data); 
 }
 
 void GaitPlanningNode::currentFeetPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg){
@@ -76,51 +71,54 @@ void GaitPlanningNode::sendRequest(const bool& gait_complete){
     }
 }
 
+void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
+                                        double right_x, double right_y, double right_z) 
+{
+    m_desired_footpositions_msg->left_foot_position.x = left_x;
+    m_desired_footpositions_msg->left_foot_position.y = left_y;
+    m_desired_footpositions_msg->left_foot_position.z = left_z; 
+    m_desired_footpositions_msg->right_foot_position.x = right_x; 
+    m_desired_footpositions_msg->right_foot_position.y = right_y;
+    m_desired_footpositions_msg->right_foot_position.z = right_z;
+}
+
 void GaitPlanningNode::footPositionsPublish(){
-    if (m_gait_planning.getGaitType() == exoState::Stand){
-        m_current_trajectory.clear();
-        m_current_step_msg->left_foot_position.x = 0.0;
-        m_current_step_msg->left_foot_position.y = 0.16; 
-        m_current_step_msg->left_foot_position.z = -0.802; 
-        m_current_step_msg->right_foot_position.x = 0.0; 
-        m_current_step_msg->right_foot_position.y = -0.16; 
-        m_current_step_msg->right_foot_position.z = -0.802;
-        m_iks_foot_positions_publisher->publish(*m_current_step_msg);
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
-    }
+    switch (m_gait_planning.getGaitType()){
+        case exoState::Stand :
+            m_current_trajectory.clear();
+            setFootPositionsMessage(0.0, 0.16, -0.802, 0.0, -0.16, -0.802);
+            m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
+            break;
 
-    else if (m_gait_planning.getGaitType() == exoState::BootUp){
-        // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp state entered, waiting for new state."); 
-    }
-
-    else if (m_gait_planning.getGaitType() == exoState::Walk){
-        if (m_current_trajectory.empty()) {
-            sendRequest(true);
-        }
-        else{
-        std::array<double, 4> current_step = m_current_trajectory.front();
-        m_current_trajectory.erase(m_current_trajectory.begin());
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
-        if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
-            m_current_step_msg->left_foot_position.x = current_step[2];
-            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
-            m_current_step_msg->left_foot_position.z = current_step[3]; 
-            m_current_step_msg->right_foot_position.x = current_step[0]; 
-            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
-            m_current_step_msg->right_foot_position.z = current_step[1];
-        } else if (m_gait_planning.getCurrentStanceFoot() == 1){
-            m_current_step_msg->left_foot_position.x = current_step[0];
-            m_current_step_msg->left_foot_position.y = m_gait_planning.getCurrentLeftFootPos()[1];
-            m_current_step_msg->left_foot_position.z = current_step[1]; 
-            m_current_step_msg->right_foot_position.x = current_step[2]; 
-            m_current_step_msg->right_foot_position.y = m_gait_planning.getCurrentRightFootPos()[1];
-            m_current_step_msg->right_foot_position.z = current_step[3];
-        }
-        m_iks_foot_positions_publisher->publish(*m_current_step_msg);
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
-        }
+        case exoState::BootUp :
+            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp state entered, waiting for new state."); 
+            break;
+        
+        case exoState::Walk :
+            if (m_current_trajectory.empty()) {
+                sendRequest(true);
+            }
+            else{
+                std::array<double, 4> current_step = m_current_trajectory.front();
+                m_current_trajectory.erase(m_current_trajectory.begin());
+                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
+                if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){ 
+                    // -1 is left stance leg, 0 is both
+                    setFootPositionsMessage(current_step[2], 0.16, current_step[3], 
+                                    current_step[0], -0.16, current_step[1]);
+                } else if (m_gait_planning.getCurrentStanceFoot() == 1){
+                    // 1 is right stance leg
+                    setFootPositionsMessage(current_step[0], 0.16, current_step[1], 
+                                    current_step[2], -0.16, current_step[3]);
+                }
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
+            }
+            break;
     }
 }
+
 
 void GaitPlanningNode::timerCallback() {
     // This code will be executed every 50 milliseconds

@@ -24,8 +24,9 @@ class GaitPlanningNode:public rclcpp::Node {
     march_shared_msgs::srv::GetCurrentStanceLeg::Request::SharedPtr m_stance_leg_request;
 
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg); 
-    void currentStanceFootCallback(const std_msgs::msg::Int32::SharedPtr msg); 
     void currentFeetPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg); 
+    void setFootPositionsMessage(double left_x, double left_y, double left_z, 
+                            double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
 
     void responseStanceLegCallback(std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future);
@@ -36,7 +37,7 @@ class GaitPlanningNode:public rclcpp::Node {
     GaitPlanning m_gait_planning; 
 
     std::vector<std::array<double, 4>> m_current_trajectory; 
-    march_shared_msgs::msg::IksFootPositions::SharedPtr m_current_step_msg; 
+    march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
     bool m_response_received;
 

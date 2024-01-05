@@ -7,8 +7,8 @@ def generate_launch_description():
         [
             Node(
                 package="march_gait_planning",
-                executable="test_gait_planning_node",
-                name="test_gait_planning_node", 
+                executable="test_setup_gait_planning_node",
+                name="test_setup_gait_planning_node", 
             ), 
         ]
     )

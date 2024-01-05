@@ -1,4 +1,4 @@
-#include "march_gait_planning/test_gait_planning_node.hpp"
+#include "march_gait_planning/test_setup_gait_planning_node.hpp"
 
 using std::placeholders::_1; 
 // Make time_to_start a constant variable?
@@ -7,9 +7,9 @@ constexpr double rotational_range = 0.3;
 constexpr double linear_range = 0.1;
 
 
-TestGaitPlanningNode::TestGaitPlanningNode()
- : Node("march_test_gait_planning_node"), 
-   m_gait_planning(TestGaitPlanning()),
+TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
+ : Node("march_test_setup_gait_planning_node"), 
+   m_gait_planning(TestSetupGaitPlanning()),
    m_current_trajectory(),
    m_current_joint_angles_msg(std::make_shared<trajectory_msgs::msg::JointTrajectory>())
 {
@@ -25,7 +25,7 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     m_current_joint_angles_msg->points.push_back(current_point);
 
     m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
-        "current_state", 10, std::bind(&TestGaitPlanningNode::currentStateCallback, this, _1)); 
+        "current_state", 10, std::bind(&TestSetupGaitPlanningNode::currentStateCallback, this, _1)); 
     
     m_test_joint_trajectory_controller_state_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
@@ -33,7 +33,7 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     m_gait_planning.setGaitType(exoState::BootUp); 
 
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
-    auto timer_callback = std::bind(&TestGaitPlanningNode::timerCallback, this);
+    auto timer_callback = std::bind(&TestSetupGaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
 
     // Get parameters from parameter server and use that joint
@@ -44,12 +44,12 @@ TestGaitPlanningNode::TestGaitPlanningNode()
     RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "%s Joint", m_test_rotational ? "Rotational" : "Linear");
 }
 
-void TestGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
+void TestSetupGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
     m_gait_planning.setGaitType((exoState)msg->state);
 }
 
-void TestGaitPlanningNode::footPositionsPublish(){
+void TestSetupGaitPlanningNode::footPositionsPublish(){
     if (m_test_rotational){
         executeRotationalJointGait();
     }
@@ -60,7 +60,7 @@ void TestGaitPlanningNode::footPositionsPublish(){
     m_current_joint_angles_msg->points[1].positions.clear();
 }
 
-void TestGaitPlanningNode::executeRotationalJointGait(){
+void TestSetupGaitPlanningNode::executeRotationalJointGait(){
 
     switch (m_gait_planning.getGaitType()){
 
@@ -102,7 +102,7 @@ void TestGaitPlanningNode::executeRotationalJointGait(){
     }
 }
 
-void TestGaitPlanningNode::executeLinearJointGait(){
+void TestSetupGaitPlanningNode::executeLinearJointGait(){
 
     switch (m_gait_planning.getGaitType()){
 
@@ -141,7 +141,7 @@ void TestGaitPlanningNode::executeLinearJointGait(){
     }
 }
 
-void TestGaitPlanningNode::timerCallback() {
+void TestSetupGaitPlanningNode::timerCallback() {
     // This code will be executed every 50 milliseconds
     footPositionsPublish();    
 }
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
 
-    rclcpp::spin(std::make_shared<TestGaitPlanningNode>()); 
+    rclcpp::spin(std::make_shared<TestSetupGaitPlanningNode>()); 
     rclcpp::shutdown(); 
 
     return 0; 

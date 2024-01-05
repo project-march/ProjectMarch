@@ -26,9 +26,6 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  include/${PROJECT_NAME}/state_machine.hpp
-  include/${PROJECT_NAME}/state_machine_node.hpp
-  src/state_machine_node.cpp
   src/state_machine.cpp
 )
 
@@ -39,8 +36,26 @@ ament_target_dependencies(
   "mujoco_interfaces"
 )
 
-add_executable(state_machine_node src/state_machine_node.cpp src/state_machine.cpp include/${PROJECT_NAME}/state_machine.hpp
-        include/${PROJECT_NAME}/state_machine_node.hpp)
+add_executable(state_machine_node 
+  src/state_machine_node.cpp 
+  src/state_machine.cpp)
+
+add_executable(test_joints_state_machine_node
+  src/test_joints_state_machine_node.cpp
+  src/test_joints_state_machine.cpp
+)
+
+# Link the state_machine library to the test_joints_state_machine_node executable
+target_link_libraries(test_joints_state_machine_node
+  ${PROJECT_NAME}
+)
+
+# Link against ROS 2 dependencies
+ament_target_dependencies(test_joints_state_machine_node
+  rclcpp
+  march_shared_msgs
+  )
+
 target_include_directories(state_machine_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -52,7 +67,9 @@ ament_target_dependencies(
         "mujoco_interfaces"
 )
 
-install(TARGETS state_machine_node
+install(TARGETS 
+  state_machine_node
+  test_joints_state_machine_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
