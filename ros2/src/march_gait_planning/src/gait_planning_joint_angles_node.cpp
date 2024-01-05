@@ -47,6 +47,8 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     m_gait_planning.setGaitType(exoState::BootUp);
     m_gait_planning.setPrevGaitType(exoState::BootUp); 
     m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
+    m_gait_planning.setPrevPoint({0.008436894044280052, 0.09779127687215805, 0.07870040833950043, 0.009119994938373566,
+                            -0.009970875456929207, -0.04832039400935173, 0.08061788231134415, 0.007340337615460157});
 }
 
 void GaitPlanningAnglesNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
