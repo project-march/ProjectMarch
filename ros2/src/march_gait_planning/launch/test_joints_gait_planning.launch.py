@@ -1,3 +1,8 @@
+"""
+Authors: Andrew Hutani, MIX
+
+"""
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
@@ -7,8 +12,8 @@ def generate_launch_description():
         [
             Node(
                 package="march_gait_planning",
-                executable="test_setup_gait_planning_node",
-                name="test_setup_gait_planning_node", 
+                executable="test_joints_gait_planning_node",
+                name="test_joints_gait_planning_node", 
             ), 
         ]
     )

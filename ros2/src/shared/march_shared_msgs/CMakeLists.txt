@@ -40,6 +40,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Error.msg"
   "msg/Feet.msg"
   "msg/ExoState.msg"
+  "msg/ExoStateAndJoint.msg"
   "msg/ExoStateArray.msg"
   "msg/FeetHeightStamped.msg"
   "msg/FootPosition.msg"

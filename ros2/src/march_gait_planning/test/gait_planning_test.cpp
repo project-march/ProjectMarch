@@ -12,19 +12,28 @@ TEST_F(GaitPlanningTest, AssertObjectCreated){
 
 TEST_F(GaitPlanningTest, SetDoubleStanceCorrect){
     test_gait_planning.setStanceFoot(0);
-    EXPECT_EQ(test_gait_planning.getCurrentStanceFoot(), 0) << "Current stance foot is not initialized correctly";
+    ASSERT_NE(test_gait_planning.getCurrentStanceFoot(), 1) << "Current stance foot is wrong"; 
+    ASSERT_NE(test_gait_planning.getCurrentStanceFoot(), -1) << "Current stance foot is wrong"; 
+    ASSERT_EQ(test_gait_planning.getCurrentStanceFoot(), 0) << "Current stance foot is not initialized correctly";
+}
+
+TEST_F(GaitPlanningTest, SetLeftStanceCorrect){
+    test_gait_planning.setStanceFoot(-1);
+    ASSERT_NE(test_gait_planning.getCurrentStanceFoot(), 1) << "Current stance foot is wrong"; 
+    ASSERT_NE(test_gait_planning.getCurrentStanceFoot(), 0) << "Current stance foot is wrong"; 
+    ASSERT_EQ(test_gait_planning.getCurrentStanceFoot(), -1) << "Current stance foot is not initialized correctly"; 
 }
 
 TEST_F(GaitPlanningTest, AssertErrorWrongInputSetStanceFoot){
-    // assert an error is caught when doubles, floats or strings are used as input
+    // assert an error is caught when wrong ints are used as input
 }
 
 TEST_F(GaitPlanningTest, CorrectSetFootPositions){
     std::array<double, 3> left_foot_pos = {1.2, 1.3, 1.4}; 
     std::array<double, 3> right_foot_pos = {0.1, 0.2, 0.3}; 
     test_gait_planning.setFootPositions(left_foot_pos, right_foot_pos);
-    EXPECT_EQ(test_gait_planning.getCurrentLeftFootPos(), left_foot_pos) << "Left foot position is not initialized correctly";
-    EXPECT_EQ(test_gait_planning.getCurrentRightFootPos(), right_foot_pos) << "Right foot position is not initialized correctly";
+    ASSERT_EQ(test_gait_planning.getCurrentLeftFootPos(), left_foot_pos) << "Left foot position is not initialized correctly";
+    ASSERT_EQ(test_gait_planning.getCurrentRightFootPos(), right_foot_pos) << "Right foot position is not initialized correctly";
 }
 
 TEST_F(GaitPlanningTest, AssertErrorWrongInputSetFootPositions){
@@ -34,24 +43,21 @@ TEST_F(GaitPlanningTest, AssertErrorWrongInputSetFootPositions){
 TEST_F(GaitPlanningTest, SetGaitTypeCorrect){
     exoState state = exoState::Walk;
     test_gait_planning.setGaitType(state);
-    EXPECT_EQ(test_gait_planning.getGaitType(), state) << "Current stance foot is not initialized correctly";
+    ASSERT_EQ(test_gait_planning.getGaitType(), state) << "Current stance foot is not initialized correctly";
 }
 
 TEST_F(GaitPlanningTest, AssertErrorWrongInputSetGaitType){
     // assert error is caught when input is not an exoState
 }
 
-TEST_F(GaitPlanningTest, BezierFileCreated){
-    // test if bezier file exists and is not empty
+TEST_F(GaitPlanningTest, FirstStepTrajectoryGetterTest){
+    // test that correct member trajectory is got when double stance foot 
+    test_gait_planning.setStanceFoot(0); 
+    ASSERT_EQ(test_gait_planning.getTrajectory().size(), 20) << "First step trajectory was not returned whilst double stance"; 
 }
 
-TEST_F(GaitPlanningTest, BezierTimeStepsCorrect){
-    // assert the bezier files have lengths of 20 and 40 
-}
-
-// TEST all getters 
-
-int main(int argc, char** argv){
-    testing::InitGoogleTest(&argc, argv); 
-    return RUN_ALL_TESTS(); 
+TEST_F(GaitPlanningTest, FullStepTrajectoryGetterTest){
+    // test that correct member trajectory is got when double stance foot 
+    test_gait_planning.setStanceFoot(1); 
+    ASSERT_EQ(test_gait_planning.getTrajectory().size(), 40) << "Full step trajectory was not returned whilst no double stance"; 
 }

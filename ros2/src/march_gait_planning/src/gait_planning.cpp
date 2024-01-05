@@ -29,7 +29,7 @@ GaitPlanning::GaitPlanning()
   }
 
 void GaitPlanning::setStanceFoot(const int &new_stance_foot){
-    m_current_stance_foot = new_stance_foot;  
+    m_current_stance_foot = new_stance_foot; 
 }
 
 void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) { 
@@ -42,8 +42,8 @@ void GaitPlanning::setGaitType(const exoState &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_first_step_trajectory = processCSV("src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
-    m_bezier_trajectory = processCSV("src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv");
+    m_first_step_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
+    m_bezier_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
