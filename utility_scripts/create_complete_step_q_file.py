@@ -31,14 +31,16 @@ df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_
 
 df_gait_joint = df_gait_joint.assign(LHAA=-0.06)
 df_gait_joint = df_gait_joint.assign(RHAA=-0.06)
+df_gait_joint = df_gait_joint.assign(LADPF=0.119176)
+df_gait_joint = df_gait_joint.assign(RADPF=0.077083)
 
 
 df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
 df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
 df_gait_joint['LHFE'] = df_gait_joint['LHFE']
 df_gait_joint['RHFE'] = df_gait_joint['RHFE']
-df_gait_joint['LADPF'] = df_gait_joint['LADPF'] - 0.25
-df_gait_joint['RADPF'] = df_gait_joint['RADPF'] - 0.25
+# df_gait_joint['LADPF'] = df_gait_joint['LADPF'] - 0.25
+# df_gait_joint['RADPF'] = df_gait_joint['RADPF'] - 0.25
 
 df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
 df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
