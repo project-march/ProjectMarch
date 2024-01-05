@@ -43,7 +43,7 @@
 	path = ros2/src/libraries/ginac
 	url = git://www.ginac.de/ginac.git/
 	branch = master
-# [submodule "ros2/src/libraries/ginac/cln"]
-# 	path = ros2/src/libraries/ginac/cln
-# 	url = https://www.ginac.de/cln.git
-# 	branch = master
+[submodule "ros2/src/libraries/ginac/cln"]
+	path = ros2/src/libraries/ginac/cln
+	url = git://www.ginac.de/cln.git
+	branch = master
