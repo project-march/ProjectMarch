@@ -41,9 +41,5 @@
 	branch = ros2_0_foxy
 [submodule "ros2/src/libraries/ginac"]
 	path = ros2/src/libraries/ginac
-	url = git://www.ginac.de/ginac.git/
-	branch = master
-[submodule "ros2/src/libraries/ginac/cln"]
-	path = ros2/src/libraries/ginac/cln
-	url = git://www.ginac.de/cln.git
+	url = ../libraries/ginac.git
 	branch = master
