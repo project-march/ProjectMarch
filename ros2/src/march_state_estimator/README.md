@@ -29,7 +29,7 @@ Firstly, we need to install the necessary deb packages:
 
 ```Linux
 sudo apt-get update
-sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev
+sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev libginac-dev
 ```
 
 To install all packages from this repository as Debian packages, use:
@@ -76,6 +76,12 @@ This is not strictly necessary, but it is strongly recommended to test the libra
 
 ```Linux
 make check
+```
+
+Finally, complete the build make installing the make file.
+
+```Linux
+make install
 ```
 
 ### Building from Source
