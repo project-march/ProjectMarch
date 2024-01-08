@@ -222,7 +222,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         iteration++;
     }
 
-    RCLCPP_INFO(this->get_logger(), "Number of iterations: %d", iteration);
+    // RCLCPP_INFO(this->get_logger(), "Number of iterations: %d", iteration);
 
 
     // // Publish desired pose.
@@ -340,10 +340,10 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     std::vector<long unsigned int> joints_ids;
     for (long unsigned int i = 0; i < m_joints_names.size(); i++)
     {
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s", m_joints_names[i].c_str());
+        // RCLCPP_INFO(this->get_logger(), "Joint name: %s", m_joints_names[i].c_str());
         for (long unsigned int j = 0; j < msg->joint_state.name.size(); j++)
         {
-            RCLCPP_INFO(this->get_logger(), "Joint state name: %s", msg->joint_state.name[j].c_str());
+            // RCLCPP_INFO(this->get_logger(), "Joint state name: %s", msg->joint_state.name[j].c_str());
             if (m_joints_names[i] == msg->joint_state.name[j])
             {
                 joints_ids.push_back(j);

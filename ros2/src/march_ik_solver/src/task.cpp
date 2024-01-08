@@ -107,14 +107,14 @@ Eigen::VectorXd Task::solve()
     // calculateCurrentPose();
 
     // Calculate the error.
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node position...");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node position...");
     sendRequestNodePosition();
     Eigen::VectorXd error = calculateError();
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Error: %f, %f, %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5), error(6), error(7));
 
     // Calculate the inverse of Jacobian.
     // calculateJacobian();
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node Jacobian...");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Getting node Jacobian...");
     sendRequestNodeJacobian();
     calculateJacobianInverse();
 
@@ -125,7 +125,7 @@ Eigen::VectorXd Task::solve()
 
     // Calculate the joint velocities.
     // Eigen::VectorXd joint_velocities = m_jacobian_inverse * error;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Calculating joint velocities...");
+    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Calculating joint velocities...");
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_task_n);
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint velocities size: %d", joint_velocities.size());
     // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint velocities: %f, %f, %f, %f, %f, %f, %f, %f", joint_velocities(0), joint_velocities(1), joint_velocities(2), joint_velocities(3), joint_velocities(4), joint_velocities(5), joint_velocities(6), joint_velocities(7));
