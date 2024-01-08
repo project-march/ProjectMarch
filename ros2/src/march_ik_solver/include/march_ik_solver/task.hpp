@@ -18,74 +18,57 @@
 
 class Task {
 public:
-    Task() = default; // Default constructor.
-    Task( // Constructor. TODO: Load the task parameters from a YAML file
-        uint8_t task_id, // ID of the task
-        std::string task_name, // Name of the task
-        uint8_t task_m, // Dimension of the task
-        uint8_t task_n, // Dimension of the joint space
-        std::vector<std::string> node_names // Names of the nodes
-    );
-    ~Task() = default; // Default destructor.
+    Task() = default;
+    Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n, std::vector<std::string> node_names);
+    ~Task() = default;
 
-    std::string getTaskName(); // Get the name of the task
-    unsigned int getTaskID(); // Get the ID of the task
-    int getTaskM(); // Get the dimension of the task
-    int getTaskN(); // Get the dimension of the joint space
-    double getErrorNorm(); // Get the norm of the error
+    std::string getTaskName();
+    unsigned int getTaskID();
+    int getTaskM();
+    int getTaskN();
+    double getErrorNorm();
 
-    Eigen::VectorXd solve(); // Solve the task
+    Eigen::VectorXd solve();
 
-    // Eigen::VectorXd getPose(const Eigen::VectorXd * joint_positions);
-    void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names); // Set the current joint names
-    void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions); // Set the current joint positions
-    void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr); // Set the desired pose of the task
+    void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names);
+    void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions);
+    void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr);
 
-    void setGainP(float gain_p); // Set the proportional gain
-    // void setGainI(float gain_i);                    // Set the integral gain
-    // void setGainD(float gain_d);                    // Set the derivative gain
-    void setDampingCoefficient(float damping_coefficient); // Set the damping coefficient
+    void setGainP(float gain_p);
+    void setDampingCoefficient(float damping_coefficient);
 
-    const Eigen::MatrixXd* getJacobianPtr(); // Get the Jacobian
-    const Eigen::MatrixXd* getJacobianInversePtr(); // Get the inverse of Jacobian
+    const Eigen::MatrixXd* getJacobianPtr();
+    const Eigen::MatrixXd* getJacobianInversePtr();
 
 private:
-    Eigen::VectorXd calculateError(); // Calculate the error
-    // Eigen::VectorXd calculateIntegralError();       // Calculate the integral error
-    // Eigen::VectorXd calculateDerivativeError();     // Calculate the derivative error
-    void calculateCurrentPose(); // Calculate the current pose of the task
-    void calculateJacobian(); // Calculate the Jacobian
-    void calculateJacobianInverse(); // Calculate the inverse of Jacobian
-    void sendRequest(); // Send a request to the task server in the state estimation node
-    void sendRequestNodePosition(); // Send a request to the node position server in the state estimation node
-    void sendRequestNodeJacobian(); // Send a request to the node Jacobian server in the state estimation node
+    Eigen::VectorXd calculateError();
+    void calculateCurrentPose();
+    void calculateJacobian();
+    void calculateJacobianInverse();
+    void sendRequest();
+    void sendRequestNodePosition();
+    void sendRequestNodeJacobian();
 
-    // Create a ROS2 client to communicate with the task server in the state estimation node.
-    rclcpp::Node::SharedPtr node_;
-    rclcpp::Client<march_shared_msgs::srv::GetTaskReport>::SharedPtr client_;
-    rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr client_node_position_;
-    rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr client_node_jacobian_;
+    rclcpp::Node::SharedPtr m_node;
+    rclcpp::Client<march_shared_msgs::srv::GetTaskReport>::SharedPtr m_client;
+    rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_client_node_position;
+    rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_client_node_jacobian;
 
-    // Declare variables that define the task.
-    std::string task_name_; // Name of the task
-    uint8_t task_id_; // ID of the task
-    uint8_t task_m_; // Dimension of the task
-    uint8_t task_n_; // Dimension of the joint space
-    std::vector<std::string> node_names_; // Names of the nodes
+    std::string m_task_name;
+    uint8_t m_task_id;
+    uint8_t m_task_m;
+    uint8_t m_task_n;
+    std::vector<std::string> m_node_names;
 
-    std::vector<std::string> * current_joint_names_ptr_; // Pointer to current joint names
-    Eigen::VectorXd * current_joint_positions_ptr_; // Pointer to current joint positions
-    std::vector<Eigen::VectorXd> * desired_poses_ptr_; // Pointer to desired pose of the task
-    Eigen::VectorXd current_pose_; // Current pose of the task
-    double error_norm_; // Norm of the error
-    float gain_p_ = 0.0; // Proportional gain. Default value is 0.0
-    float gain_i_ = 0.0; // Integral gain. Default value is 0.0
-    float gain_d_ = 0.0; // Derivative gain. Default value is 0.0
-    float damping_coefficient_ = 0.0; // Damping coefficient. Default value is 0.0
-    Eigen::MatrixXd jacobian_; // Jacobian matrix. TODO: Load this from State Estimation Server.
-    Eigen::MatrixXd jacobian_inverse_; // Inverse of Jacobian matrix.
-    // Eigen::VectorXd previous_error_;        // Previous error
-    // Eigen::VectorXd integral_error_;        // Integral error
+    std::vector<std::string> * m_current_joint_names_ptr;
+    Eigen::VectorXd * m_current_joint_positions_ptr;
+    std::vector<Eigen::VectorXd> * m_desired_poses_ptr;
+    Eigen::VectorXd m_current_pose;
+    double m_error_norm;
+    float m_gain_p = 0.0;
+    float m_damping_coefficient = 0.0;
+    Eigen::MatrixXd m_jacobian;
+    Eigen::MatrixXd m_jacobian_inverse;
 };
 
 #endif // IK_SOLVER__TASK_HPP

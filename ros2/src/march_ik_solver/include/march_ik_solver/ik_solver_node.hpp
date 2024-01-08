@@ -35,40 +35,38 @@ private:
     trajectory_msgs::msg::JointTrajectory convertToJointTrajectoryMsg();
     std::vector<std::array<double,2>> getJointLimits();
 
+    IKSolver m_ik_solver; // TODO: make this a pointer using std::unique_ptr<IKSolver> ik_solver_;
+    double m_convergence_threshold;
+    uint32_t m_max_iterations;
+    std::vector<std::string> m_joints_names;
+    Eigen::VectorXd m_current_joint_positions;
+    Eigen::VectorXd m_current_joint_velocities;
+    Eigen::VectorXd m_actual_joint_positions;
+    Eigen::VectorXd m_actual_joint_velocities;
+    Eigen::VectorXd m_desired_joint_positions;
+    Eigen::VectorXd m_desired_joint_velocities;
+    std::vector<Eigen::VectorXd> m_desired_poses;
+    std::vector<trajectory_msgs::msg::JointTrajectoryPoint> m_joint_trajectory_points;
+    trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
+    uint32_t m_desired_poses_dt;
+    bool m_gait_reset;
+    int8_t m_gait_type;
 
+    march_shared_msgs::msg::StateEstimation::SharedPtr m_state_estimation_msg;
 
-    IKSolver ik_solver_; // TODO: make this a pointer using std::unique_ptr<IKSolver> ik_solver_;
-    double convergence_threshold_;
-    uint32_t max_iterations_;
-    std::vector<std::string> joints_names_;
-    Eigen::VectorXd current_joint_positions_;
-    Eigen::VectorXd current_joint_velocities_;
-    Eigen::VectorXd actual_joint_positions_;
-    Eigen::VectorXd actual_joint_velocities_;
-    Eigen::VectorXd desired_joint_positions_;
-    Eigen::VectorXd desired_joint_velocities_;
-    std::vector<Eigen::VectorXd> desired_poses_;
-    std::vector<trajectory_msgs::msg::JointTrajectoryPoint> joint_trajectory_points_;
-    trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_prev_;
-    uint32_t desired_poses_dt_;
-    bool gait_reset_;
-    int8_t gait_type_;
+    // rclcpp::TimerBase::SharedPtr timer;
+    rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_command_sub;
+    // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
 
-    march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg_;
+    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_desired_pose_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_actual_pose_pub;
 
-    // rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr exo_state_sub_;
-    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr ik_solver_command_sub_;
-    // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
-    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr state_estimation_sub_;
-
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr joint_trajectory_pub_;
-    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr desired_pose_pub_;
-    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr actual_pose_pub_;
-
-    rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr current_joint_positions_client_;
-    rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedFuture current_joint_positions_future_;
-    march_shared_msgs::srv::GetCurrentJointPositions::Request::SharedPtr current_joint_positions_request_;
+    rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_current_joint_positions_client;
+    rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedFuture m_current_joint_positions_future;
+    march_shared_msgs::srv::GetCurrentJointPositions::Request::SharedPtr m_current_joint_positions_request;
 
 };
 

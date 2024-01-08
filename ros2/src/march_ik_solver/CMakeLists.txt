@@ -83,30 +83,9 @@ ament_target_dependencies(ik_solver_buffer_node
   march_shared_msgs
 )
 
-add_executable(current_joint_positions_server src/current_joint_positions_server.cpp)
-ament_target_dependencies(current_joint_positions_server 
-  rclcpp
-  march_shared_msgs
-  Eigen3)
-
-add_executable(task_server src/task_server.cpp)
-ament_target_dependencies(task_server 
-  rclcpp
-  march_shared_msgs
-  Eigen3)
-
-add_executable(task_client src/task_client.cpp)
-ament_target_dependencies(task_client 
-  rclcpp
-  march_shared_msgs
-  Eigen3)
-
 install(TARGETS
   ik_solver_node
   ik_solver_buffer_node
-  current_joint_positions_server
-  task_server
-  task_client
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(eigen3_cmake_module)
