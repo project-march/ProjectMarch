@@ -2,30 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
 
-# df = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/q_complete_step.csv')
-# # print(df)
-
-# def convert(column):
-#     for ind, item in enumerate(column): 
-#         if item < 0: 
-#             column[ind] = abs(item)
-#         else: 
-#             column[ind] = -item
-
-# dfcopy = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/q_complete_step.csv')
-# dfcopy = dfcopy.iloc[:,[4,5,6,7,0,1,2,3]]
-
-# convert(dfcopy['RHAA'])
-# convert(dfcopy['RHFE'])
-# convert(dfcopy['LHAA'])
-# convert(dfcopy['LHFE'])
-
-# dfcopy.rename(columns={'RHAA':'LHAA', 'RHFE':'LHFE', 'RKFE':'LKFE','RADPF':'LADPF','LHAA':'RHAA','LHFE':'RHFE','LKFE':'RKFE','LADPF':'RADPF'}, inplace=True)
-
-# df = pd.concat([df, dfcopy], axis=0, ignore_index=True)
-
-# df.to_csv('./ros2/src/march_gait_planning/m9_gait_files/q_test.csv', sep=',', header=False, index=False)
-
 df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
 
 
@@ -39,8 +15,6 @@ df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
 df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
 df_gait_joint['LHFE'] = df_gait_joint['LHFE']
 df_gait_joint['RHFE'] = df_gait_joint['RHFE']
-# df_gait_joint['LADPF'] = df_gait_joint['LADPF'] - 0.25
-# df_gait_joint['RADPF'] = df_gait_joint['RADPF'] - 0.25
 
 df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
 df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
@@ -49,13 +23,6 @@ df_gait_joint = df_gait_joint.reset_index(drop=True)
 
 print(f"Index of max RHFE: ", df_gait_joint[['RHFE']].idxmax())
 print(f"Index of 2nd max RHFE: ", df_gait_joint[['RHFE']].iloc[150:250].idxmax())
-
-# plt.plot(df_gait_joint['LKFE'], label='LKFE')
-# plt.plot(df_gait_joint['RKFE'], label='RKFE')
-# plt.plot(df_gait_joint['LHFE'], label='LHFE')
-# plt.plot(df_gait_joint['RHFE'], label='RHFE')
-# plt.legend()
-# plt.show()
 
 first_step = df_gait_joint.iloc[0:72]
 first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
@@ -80,15 +47,15 @@ df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/
 
 def stand_to_sit():
     time_points = 100
-    lhaa = np.linspace(0, -0.3, time_points)
-    lhfe = np.linspace(0, 1.5, time_points)
-    lkfe = np.linspace(0, 1.2, time_points)
-    ladpf = np.linspace(0, -0.5, time_points)
+    lhaa = np.linspace(-0.06, -0.3, time_points)
+    lhfe = np.linspace(0.351166, 1.5, time_points)
+    lkfe = np.linspace(0.372236, 1.2, time_points)
+    ladpf = np.linspace(0.119176, -0.5, time_points)
 
-    rhaa = np.linspace(0, 0.3, time_points)
-    rhfe = np.linspace(0, 1.5, time_points)
-    rkfe = np.linspace(0, 1.2, time_points)
-    radpf = np.linspace(0, -0.5, time_points)
+    rhaa = np.linspace(-0.06, 0.3, time_points)
+    rhfe = np.linspace(0.274982, 1.5, time_points)
+    rkfe = np.linspace(0.286291, 1.2, time_points)
+    radpf = np.linspace(0.077083, -0.5, time_points)
 
     joint_angles_dataset = np.column_stack([
         lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
@@ -96,5 +63,26 @@ def stand_to_sit():
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv', 
                joint_angles_dataset, delimiter=',')
+
+def sit_to_stand():
+    time_points = 100
+    lhaa = np.linspace(-0.3, -0.06, time_points)
+    lhfe = np.linspace(1.5, 0.351166, time_points)
+    lkfe = np.linspace(1.2, 0.372236, time_points)
+    ladpf = np.linspace(-0.5, 0.119176, time_points)
+
+    rhaa = np.linspace(0.3, -0.06, time_points)
+    rhfe = np.linspace(1.5, 0.274982, time_points)
+    rkfe = np.linspace(1.2, 0.286291, time_points)
+    radpf = np.linspace(-0.5, 0.077083, time_points)
+
+    sit_to_stand = np.column_stack([
+        lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
+    ])
+
+    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
+               sit_to_stand, delimiter=',')
+
     
 stand_to_sit()
+sit_to_stand()

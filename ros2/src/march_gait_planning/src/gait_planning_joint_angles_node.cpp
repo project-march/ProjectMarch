@@ -110,15 +110,6 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
     m_gait_planning.setPrevPoint(m_trajectory_des_point.positions); 
     m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
 
-    // m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand()); 
-    // m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint();
-    // m_joints_msg.points.push_back(m_trajectory_prev_point);
-    // m_trajectory_des_point.positions = m_gait_planning.getHomeStand(); 
-    // m_joints_msg.points.push_back(m_trajectory_des_point);
-    // m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand message published!");
-    // m_gait_planning.setCounter(0);
-    // m_joints_msg.points.clear();
 }
 
 
@@ -147,8 +138,19 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             break;
         
         case exoState::Stand :
-            processHomeStandGait(); 
-            break;
+            if (m_gait_planning.getPrevGaitType() == exoState::Sit){
+                m_current_trajectory = m_gait_planning.getSitToStandGait(); 
+                processMovingGaits(count);
+                if (count >= (m_current_trajectory.size()-1)){
+                    m_gait_planning.setCounter(m_current_trajectory.size()-1);
+                    m_gait_planning.setPrevGaitType(exoState::Stand); 
+                } else {
+                    m_gait_planning.setCounter(count+1);
+                } 
+            } else {
+                processHomeStandGait(); 
+            }
+            break; 
         
         case exoState::Sit :
             m_current_trajectory = m_gait_planning.getStandToSitGait(); 

@@ -28,6 +28,7 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_counter(), 
    m_complete_step_angle_trajectory(), 
    m_sideways_trajectory(),
+   m_sit_to_stand_trajectory(), 
    m_home_stand()
    {
     std::cout << "Angle Gait Class created" << std::endl;
@@ -35,6 +36,9 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sideways_walking_gait_dataset.csv", m_sideways_trajectory); 
+
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
+
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
@@ -123,6 +127,10 @@ std::vector<std::vector<double>> GaitPlanningAngles::getStandToSitGait() const{
 
 std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysGait() const{
     return m_sideways_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
+    return m_sit_to_stand_trajectory; 
 }
 
 
