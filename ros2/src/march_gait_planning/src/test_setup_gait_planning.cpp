@@ -10,7 +10,7 @@ TestSetupGaitPlanning::TestSetupGaitPlanning()
   }
 
 void TestSetupGaitPlanning::loadTrajectoryFromCSV() {
-    std::ifstream file("src/march_gait_planning/m9_gait_files/test_trajectory.csv");
+    std::ifstream file("src/march_gait_planning/m9_gait_files/white_noise_gait.csv");
     if (!file) {
         std::cerr << "Error opening file." << std::endl;
         return;

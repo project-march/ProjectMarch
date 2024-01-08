@@ -79,7 +79,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
             }
             else{
                 //TODO: This does not work for the HAA, since positive is defined to be adduction.
-                double new_angle = 0.1* m_current_trajectory.front() + 0.1;
+                double new_angle =  m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 for (size_t i = 0; i < m_current_joint_angles_msg->joint_names.size(); ++i) {
                     if (m_current_joint_angles_msg->joint_names[i] == getActuatedJoint()) {

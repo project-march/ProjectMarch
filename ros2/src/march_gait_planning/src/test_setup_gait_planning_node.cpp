@@ -84,7 +84,7 @@ void TestSetupGaitPlanningNode::executeRotationalJointGait(){
                 m_current_trajectory = m_gait_planning.getTrajectory();
             }
             else{
-                double new_angle = rotational_range * m_current_trajectory.front();
+                double new_angle =  m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 m_current_joint_angles_msg->points[1].positions.push_back(new_angle);
                 m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);

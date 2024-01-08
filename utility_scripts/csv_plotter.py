@@ -11,4 +11,4 @@ def plot_csv_data(file_path):
     # Show the graph
     plt.show()
 
-plot_csv_data('/home/mick/march/ros2/src/march_gait_planning/m9_gait_files/static_white_noise.csv')
+plot_csv_data('ros2/src/march_gait_planning/m9_gait_files/white_noise_gait.csv')

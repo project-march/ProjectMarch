@@ -9,15 +9,14 @@ def generate_white_noise(amplitude, duration, sample_rate):
 def save_to_csv(filename, data):
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Time', 'Amplitude'])
         for i, amplitude in enumerate(data):
             time = i / sample_rate
-            writer.writerow([time, amplitude])
+            writer.writerow([amplitude])
 
-amplitude = 0.5  # Adjust the amplitude as needed
-duration = 10.0  # Adjust the duration in seconds
-sample_rate = 44100  # Adjust the sample rate as needed
+amplitude = 0.3  # Adjust the amplitude as needed
+duration = 5.0  # Adjust the duration in seconds
+sample_rate = 20 # Adjust the sample rate as needed
 
 data = generate_white_noise(amplitude, duration, sample_rate)
-filename = '/home/mick/march/ros2/src/march_gait_planning/m9_gait_files/static_white_noise.csv'  # Replace with your desired file path
+filename = 'ros2/src/march_gait_planning/m9_gait_files/white_noise_gait.csv'  # Replace with your desired file path
 save_to_csv(filename, data)
