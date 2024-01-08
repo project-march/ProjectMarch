@@ -25,6 +25,13 @@ The MARCH State Estimator package has been tested under ROS2 Foxy on Ubuntu 20.0
 
 ### Installation from Packages
 
+Firstly, we need to install the necessary deb packages:
+
+```Linux
+sudo apt-get update
+sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev
+```
+
 To install all packages from this repository as Debian packages, use:
 
 ```Linux
