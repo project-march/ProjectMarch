@@ -1,5 +1,7 @@
 #include "march_state_estimator/state_estimator_node.hpp"
 
+#include "geometry_msgs/msg/pose.hpp"
+
 #include <chrono>
 #include <memory>
 #include <functional>
@@ -49,6 +51,8 @@ StateEstimatorNode::StateEstimatorNode()
 
     m_imu = std::make_shared<sensor_msgs::msg::Imu>(init_imu_msg);
 
+    m_node_feet_names = {"L_foot", "R_foot"};
+
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
 
@@ -70,10 +74,56 @@ void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
     m_imu = msg;
 }
 
+void StateEstimatorNode::nodePositionCallback(
+    const rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture future)
+{
+    // Get the response
+    march_shared_msgs::srv::GetNodePosition::Response::SharedPtr response_msg = future.get();
+
+    // Store the node positions
+    m_foot_positions = response_msg->node_positions;
+}
+
+void StateEstimatorNode::requestNodePositions()
+{
+    // Create a request message
+    march_shared_msgs::srv::GetNodePosition::Request::SharedPtr request =
+        std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
+
+    // Fill the request message with data
+    request->node_names = m_node_feet_names;
+    request->joint_names = m_joint_state->name;
+    request->joint_positions = m_joint_state->position;
+
+    // Send the request
+    m_get_node_position_future = m_get_node_position_client->async_send_request(request);
+
+    // // Wait for the response
+    // if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), m_get_node_position_future) !=
+    //     rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    //     RCLCPP_ERROR(this->get_logger(), "Failed to get node positions");
+    //     return;
+    // }
+}
+
 void StateEstimatorNode::publishStateEstimation()
 {
     // Create a state estimation message
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
+
+    // Convert the node positions to poses
+    std::vector<geometry_msgs::msg::Pose> foot_poses;
+    for (auto foot_position : m_foot_positions)
+    {
+        geometry_msgs::msg::Pose foot_pose;
+        foot_pose.position = foot_position;
+        foot_pose.orientation.x = 0.0;
+        foot_pose.orientation.y = 0.0;
+        foot_pose.orientation.z = 0.0;
+        foot_pose.orientation.w = 1.0;
+        foot_poses.push_back(foot_pose);
+    }
 
     // Fill the message with data
     state_estimation_msg.header.stamp = this->now();
@@ -81,6 +131,7 @@ void StateEstimatorNode::publishStateEstimation()
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.imu = *m_imu;
+    state_estimation_msg.foot_pose = foot_poses;
 
     // Publish the message
     m_state_estimation_pub->publish(state_estimation_msg);
