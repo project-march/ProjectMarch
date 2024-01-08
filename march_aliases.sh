@@ -19,7 +19,7 @@ alias march_run_ros2_sim='sfox && sros2 && ros2 launch march_launch march_simula
 alias march_run_ros2_training='sudo -v && sfox && sros2 && ros2 launch march_launch march.launch.py rqt_input:=false'
 
 alias march_build_all='sfox && cm2 && pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd \
-&& mkdir src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && popd && colcon build --symlink-install'
+&& mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && popd && colcon build --symlink-install'
 alias march_build='march_build_all --packages-skip control_msgs control_toolbox \
 controller_interface controller_manager controller_manager_msgs diagnostic_updater diff_drive_controller effort_controllers \
 force_torque_sensor_broadcaster forward_command_controller gazebo_ros2_control gazebo_ros2_control_demos gripper_controllers \
