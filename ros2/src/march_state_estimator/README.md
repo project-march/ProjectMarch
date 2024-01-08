@@ -78,10 +78,22 @@ This is not strictly necessary, but it is strongly recommended to test the libra
 make check
 ```
 
-Finally, complete the build make installing the make file.
+**Installing GiNaC**
+
+Finally, complete the build make by installing the make file.
 
 ```Linux
-make install
+sudo make install
+```
+
+**Uninstalling GiNaC**
+
+**NOTE:** To remove GiNaC, it is mandatory to clean the generated files before deleting the library.
+
+```Linux
+cd ~/march/ros2/src/libraries/ginac
+make clean
+make uninstall
 ```
 
 ### Building from Source
