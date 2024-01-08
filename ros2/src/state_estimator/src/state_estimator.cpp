@@ -317,13 +317,13 @@ void StateEstimator::handleTaskReportRequest(const std::shared_ptr<march_shared_
     // jacobian.resize(1, jacobian.size());
     // Eigen::VectorXd jacobian_vector = Eigen::Map<Eigen::VectorXd>(jacobian.data(), jacobian.size());
     // for (int i = 0; i < jacobian_vector.size(); i++) {
-    //     response->jacobian.push_back(jacobian_vector(i));
+    //     response->jacobians.push_back(jacobian_vector(i));
     // }
-    response->jacobian = m_exo_estimator.getJacobian();
+    response->jacobians = m_exo_estimator.getJacobian();
     
     // RCLCPP_INFO(this->get_logger(), "Sending back response: [%d]", response.get()->jacobian.size());
-    // for (int i = 0; i < response->jacobian.size(); i++) {
-    //     RCLCPP_INFO(this->get_logger(), "jacobian[%d]: %f", i, response->jacobian[i]);
+    // for (int i = 0; i < response->jacobians.size(); i++) {
+    //     RCLCPP_INFO(this->get_logger(), "jacobian[%d]: %f", i, response->jacobians[i]);
     // }
 
     // Eigen::VectorXd current_pose = Eigen::VectorXd(6);
