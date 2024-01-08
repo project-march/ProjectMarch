@@ -1,6 +1,7 @@
 uint8 task_id
-float64 timestamp
+string[] joint_names
+float64[] joint_angles
 ---
 float64 operation_time
 float64[] current_pose
-float64[] jacobian
+float64[] jacobians
