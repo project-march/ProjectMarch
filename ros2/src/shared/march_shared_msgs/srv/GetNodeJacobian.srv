@@ -1,0 +1,5 @@
+string[] node_names
+string[] joint_names
+float64[] joint_positions
+---
+march_shared_msgs/NodeJacobian[] node_jacobians

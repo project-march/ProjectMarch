@@ -1,35 +1,29 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>march_ik_solver</name>
+  <name>march_state_estimator</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="alexanderjames.becoy@projectmarch.nl">Alexander James Becoy</maintainer>
+  <maintainer email="gungnir@todo.todo">gungnir</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>rclcpp_action</depend>
-  <depend>rclcpp_components</depend>
-  <depend>ament_index_python</depend>
+  <depend>ament_index_cpp</depend>
   <depend>std_msgs</depend>
-  <depend>eigen</depend>
-  <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>trajectory_msgs</depend>
-  <depend>march_shared_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>urdf</depend>
+  <depend>march_description</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>eigen</depend>
 
   <exec_depend>ros2launch</exec_depend>
-  <!-- <exec_depend>urdf_launch</exec_depend> -->
-  <exec_depend>joint_state_publisher</exec_depend>
-  <exec_depend>robot_state_publisher</exec_depend>
-  <!-- <exec_depend>rviz</exec_depend> -->
-  <exec_depend>xacro</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gmock</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
 
   <export>

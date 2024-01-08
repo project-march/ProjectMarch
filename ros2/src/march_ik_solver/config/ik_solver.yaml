@@ -1,0 +1,32 @@
+ik_solver:
+  ros__parameters:
+    dt: 0.05
+    convergence_threshold: 0.01
+    max_iterations: 1
+    joints:
+      size: 8
+      names: ["left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"]
+      limits:
+        positions:
+          lower: [-15.0, -10.0, 0.0, -25.0, -15.0, -10.0, 0.0, -25.0]
+          upper: [10.0, 112.5, 125.0, 10.0, 10.0, 112.5, 125.0, 10.0]
+        velocities:
+          lower: [-15.0, -10.0, 0.0, -25.0, -15.0, -10.0, 0.0, -25.0]
+          upper: [10.0, 112.5, 125.0, 10.0, 10.0, 112.5, 125.0, 10.0]
+    tasks:
+      size: 1
+      names: ["motion"]
+      m: [6]
+      n: [8]
+      kp: [10.0]
+      kd: [0.0]
+      ki: [0.0]
+      damp_coeff: [0.01]
+
+ik_solver_buffer:
+  ros__parameters:
+    dt: 0.001
+    joints_size: 8
+    convergence_threshold: 0.01
+    early_stopping: false
+    early_stopping_threshold: 20
