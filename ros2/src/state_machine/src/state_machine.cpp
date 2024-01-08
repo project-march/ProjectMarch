@@ -19,11 +19,11 @@ StateMachine::StateMachine()
     // NOTE: Possible improvement is that the states and allowed transitions are loaded from a config file.
     m_exo_transitions = {
         /*{CurrentState, PossibleStates}*/
-        { exoState::Sit, { exoState::Stand, exoState::BootUp, exoState::Error } },
+        { exoState::Sit, { exoState::Stand, exoState::Error } },
         { exoState::Stand,
             { exoState::Sit, exoState::Walk, exoState::BootUp, exoState::Error, exoState::Sideways} },
         { exoState::Walk, { exoState::Stand, exoState::Error} },
-        { exoState::BootUp, { exoState::Stand, exoState::Sit, exoState::BootUp, exoState::Error } },
+        { exoState::BootUp, { exoState::Stand} },
         { exoState::Error, {}}, 
         { exoState::Sideways, { exoState::Stand, exoState::Error}}
 
