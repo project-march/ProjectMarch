@@ -25,6 +25,13 @@ The MARCH State Estimator package has been tested under ROS2 Foxy on Ubuntu 20.0
 
 ### Installation from Packages
 
+Firstly, we need to install the necessary deb packages:
+
+```Linux
+sudo apt-get update
+sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev libginac-dev
+```
+
 To install all packages from this repository as Debian packages, use:
 
 ```Linux
@@ -69,6 +76,24 @@ This is not strictly necessary, but it is strongly recommended to test the libra
 
 ```Linux
 make check
+```
+
+**Installing GiNaC**
+
+Finally, complete the build make by installing the make file.
+
+```Linux
+sudo make install
+```
+
+**Uninstalling GiNaC**
+
+**NOTE:** To remove GiNaC, it is mandatory to clean the generated files before deleting the library.
+
+```Linux
+cd ~/march/ros2/src/libraries/ginac
+make clean
+make uninstall
 ```
 
 ### Building from Source

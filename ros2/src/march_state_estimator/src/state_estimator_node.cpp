@@ -24,7 +24,8 @@ StateEstimatorNode::StateEstimatorNode()
         "joint_states", 10, std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "imu", 10, std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1));
-    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimator/state", 10);
+    m_get_node_position_client = this->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimator/get_node_position");
 
     m_get_current_joint_angles_service = create_service<march_shared_msgs::srv::GetCurrentJointPositions>(
         "get_current_joint_positions",
@@ -73,6 +74,9 @@ void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::
 {
     // Store the joint state message
     m_joint_state = msg;
+
+    // Request the node positions
+    requestNodePositions();
 }
 
 void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
@@ -84,11 +88,19 @@ void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 void StateEstimatorNode::nodePositionCallback(
     const rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture future)
 {
+    RCLCPP_DEBUG(this->get_logger(), "Received node positions");
+
     // Get the response
     march_shared_msgs::srv::GetNodePosition::Response::SharedPtr response_msg = future.get();
 
     // Store the node positions
     m_foot_positions = response_msg->node_positions;
+
+    // Print the node positions
+    for (auto node_position : m_foot_positions)
+    {
+        RCLCPP_DEBUG(this->get_logger(), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
+    }
 }
 
 void StateEstimatorNode::requestNodePositions()
@@ -103,7 +115,8 @@ void StateEstimatorNode::requestNodePositions()
     request->joint_positions = m_joint_state->position;
 
     // Send the request
-    m_get_node_position_future = m_get_node_position_client->async_send_request(request);
+    m_get_node_position_future = m_get_node_position_client->async_send_request(request,
+        std::bind(&StateEstimatorNode::nodePositionCallback, this, std::placeholders::_1));
 
     // // Wait for the response
     // if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), m_get_node_position_future) !=

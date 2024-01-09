@@ -41,7 +41,7 @@
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
-    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && popd
+    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
     # - git submodule update --remote src/libraries/acados
     # - colcon build --packages-select acados
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+

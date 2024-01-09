@@ -30,12 +30,12 @@ class MujocoReaderNode(Node):
         Creates all data needed in the node object.
         """
         super().__init__("mujoco_reader")
-        self.state_publisher = self.create_publisher(JointState, "joint_states", 10)
-        self.torso_imu_publisher = self.create_publisher(Imu, "upper_imu", 10)
-        self.backpack_imu_publisher = self.create_publisher(Imu, "lower_imu", 10)
+        self.state_publisher = self.create_publisher(JointState, "joint_states", 1000)
+        self.torso_imu_publisher = self.create_publisher(Imu, "upper_imu", 100)
+        self.backpack_imu_publisher = self.create_publisher(Imu, "lower_imu", 100)
 
         self.sensor_subscription = self.create_subscription(
-            MujocoDataSensing, "mujoco_sensor_output", self.sensor_listener_callback, 10
+            MujocoDataSensing, "mujoco_sensor_output", self.sensor_listener_callback, 1000
         )
 
     def sensor_listener_callback(self, msg):
