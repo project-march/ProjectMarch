@@ -13,7 +13,7 @@ public:
     explicit GaitPlanning();
 
     // Setters
-    void setStanceFoot(const int &new_stance_foot);
+    void setStanceFoot(const uint8_t &new_stance_foot);
     void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position);
     void setGaitType(const exoState &new_gait_type);  
     void setBezierGait();

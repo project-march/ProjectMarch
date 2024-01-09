@@ -28,7 +28,7 @@ GaitPlanning::GaitPlanning()
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
-void GaitPlanning::setStanceFoot(const int &new_stance_foot){
+void GaitPlanning::setStanceFoot(const uint8_t &new_stance_foot){
     m_current_stance_foot = new_stance_foot; 
 }
 
@@ -47,7 +47,8 @@ void GaitPlanning::setBezierGait(){
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
-    return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
+    return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
+    // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
 }
 
 int GaitPlanning::getCurrentStanceFoot() const {
