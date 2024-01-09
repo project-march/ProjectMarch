@@ -25,7 +25,7 @@ class MujocoWriterNode(Node):
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(MujocoInput, "mujoco_input", 10)
         self.subscription = self.create_subscription(
-            JointTrajectoryControllerState, "joint_trajectory_controller/state", self.listener_callback, 1000
+            JointTrajectoryControllerState, "joint_trajectory_controller/state", self.listener_callback, 100
         )
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.

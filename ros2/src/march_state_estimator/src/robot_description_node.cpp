@@ -21,21 +21,26 @@ RobotDescriptionNode::RobotDescriptionNode()
     m_robot_description->parseURDF(urdf_path);
     m_robot_description->configureRobotNodes();
 
-    m_joint_state_subscription = this->create_subscription<sensor_msgs::msg::JointState>(
-        "joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
-    m_node_positions_publisher = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("state_estimator/node_positions", 1);
+    m_node_positions_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_node_jacobian_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
+    // m_joint_state_subscription = this->create_subscription<sensor_msgs::msg::JointState>(
+    //     "joint_states", 1, std::bind(&RobotDescriptionNode::jointStateCallback, this, std::placeholders::_1));
+    // m_node_positions_publisher = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>("state_estimation/node_positions", 1);
     // timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&RobotDescriptionNode::publishNodePositions, this));
 
-    m_service_task_report = this->create_service<march_shared_msgs::srv::GetTaskReport>(
-        "state_estimator/get_task_report", 
-        std::bind(&RobotDescriptionNode::handleTaskReportRequest, this, std::placeholders::_1, std::placeholders::_2));
+    // m_service_task_report = this->create_service<march_shared_msgs::srv::GetTaskReport>(
+    //     "state_estimation/get_task_report", 
+    //     std::bind(&RobotDescriptionNode::handleTaskReportRequest, this, std::placeholders::_1, std::placeholders::_2));
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor done");
     m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
-        "state_estimator/get_node_position", 
-        std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2));
+        "state_estimation/get_node_position", 
+        std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2),
+        rmw_qos_profile_services_default, m_node_positions_callback_group);
     m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
-        "state_estimator/get_node_jacobian", 
-        std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2));
+        "state_estimation/get_node_jacobian", 
+        std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
+        rmw_qos_profile_services_default, m_node_jacobian_callback_group);
 
     // Temporary
     m_joint_state_msg = std::make_shared<sensor_msgs::msg::JointState>();
@@ -172,7 +177,11 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<RobotDescriptionNode>());
+    // rclcpp::spin(std::make_shared<RobotDescriptionNode>());
+    auto node = std::make_shared<RobotDescriptionNode>();
+    rclcpp::executors::MultiThreadedExecutor executor;
+    executor.add_node(node);
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }

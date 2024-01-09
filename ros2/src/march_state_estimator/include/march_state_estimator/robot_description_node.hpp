@@ -12,6 +12,7 @@
 #include "march_shared_msgs/srv/get_task_report.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "march_shared_msgs/srv/get_node_jacobian.hpp"
+#include "march_shared_msgs/srv/get_current_stance_leg.hpp"
 
 #include "march_state_estimator/robot_description.hpp"
 
@@ -29,6 +30,9 @@ private:
         std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response);
     void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response);
+
+    rclcpp::CallbackGroup::SharedPtr m_node_positions_callback_group;
+    rclcpp::CallbackGroup::SharedPtr m_node_jacobian_callback_group;
 
     std::shared_ptr<RobotDescription> m_robot_description;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_subscription;

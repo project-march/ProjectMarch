@@ -92,9 +92,9 @@ class MujocoSimNode(Node):
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 1000)
+        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 100)
         # Create a publisher for the reading-from-mujoco action
-        self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 1000)
+        self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
 
         # Initialize the low-level controller
         self.declare_parameters(
