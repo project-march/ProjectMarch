@@ -5,6 +5,7 @@
 #include <chrono>
 #include <memory>
 #include <functional>
+#include <future>
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -19,13 +20,22 @@ StateEstimatorNode::StateEstimatorNode()
     int64_t dt = this->get_parameter("dt").as_int();
     m_dt = static_cast<double>(dt) / 1000.0;
 
-    m_timer = this->create_wall_timer(std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this));
+    // Initialize the node
+    m_joint_state_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_imu_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_timer_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_node_position_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_joint_state_subscription_options.callback_group = m_joint_state_callback_group;
+    m_imu_subscription_options.callback_group = m_imu_callback_group;
+
+    m_timer = this->create_wall_timer(std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_timer_callback_group);
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>(
-        "joint_states", 10, std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1));
+        "joint_states", rclcpp::SensorDataQoS(), std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1), m_joint_state_subscription_options);
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
-        "imu", 10, std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1));
-    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimator/state", 10);
-    m_get_node_position_client = this->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimator/get_node_position");
+        "imu", rclcpp::SensorDataQoS(), std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1), m_imu_subscription_options);
+    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 1);
+    m_get_node_position_client = this->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position", 
+        rmw_qos_profile_services_default, m_node_position_callback_group);
 
     m_get_current_joint_angles_service = create_service<march_shared_msgs::srv::GetCurrentJointPositions>(
         "get_current_joint_positions",
@@ -76,7 +86,7 @@ void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::
     m_joint_state = msg;
 
     // Request the node positions
-    requestNodePositions();
+    requestNodePositions(msg);
 }
 
 void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
@@ -103,7 +113,7 @@ void StateEstimatorNode::nodePositionCallback(
     }
 }
 
-void StateEstimatorNode::requestNodePositions()
+void StateEstimatorNode::requestNodePositions(const sensor_msgs::msg::JointState::SharedPtr msg)
 {
     // Create a request message
     march_shared_msgs::srv::GetNodePosition::Request::SharedPtr request =
@@ -111,8 +121,8 @@ void StateEstimatorNode::requestNodePositions()
 
     // Fill the request message with data
     request->node_names = m_node_feet_names;
-    request->joint_names = m_joint_state->name;
-    request->joint_positions = m_joint_state->position;
+    request->joint_names = msg->name;
+    request->joint_positions = msg->position;
 
     // Send the request
     m_get_node_position_future = m_get_node_position_client->async_send_request(request,
@@ -134,15 +144,25 @@ void StateEstimatorNode::publishStateEstimation()
 
     // Convert the node positions to poses
     std::vector<geometry_msgs::msg::Pose> foot_poses;
-    for (auto foot_position : m_foot_positions)
+    uint8_t stance_leg = 0;
+    for (long unsigned int i = 0; i < m_foot_positions.size(); i++)
     {
+        RCLCPP_DEBUG(this->get_logger(), "Foot position: %f, %f, %f", m_foot_positions[i].x, m_foot_positions[i].y, m_foot_positions[i].z);
         geometry_msgs::msg::Pose foot_pose;
-        foot_pose.position = foot_position;
+        foot_pose.position = m_foot_positions[i];
         foot_pose.orientation.x = 0.0;
         foot_pose.orientation.y = 0.0;
         foot_pose.orientation.z = 0.0;
         foot_pose.orientation.w = 1.0;
         foot_poses.push_back(foot_pose);
+
+        // Check if the foot is on the ground. TODO: This should be done in a better way *cough* contact detection *cough*
+        if (m_foot_positions[i].x < 0.265)
+        {
+            RCLCPP_DEBUG(this->get_logger(), "%s is on the ground", m_node_feet_names[i].c_str());
+            stance_leg = stance_leg | (0b1 << i);
+        }
+        RCLCPP_DEBUG(this->get_logger(), "Stance leg: %hu", stance_leg);
     }
 
     // Fill the message with data
@@ -152,6 +172,7 @@ void StateEstimatorNode::publishStateEstimation()
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
+    state_estimation_msg.stance_leg = stance_leg;
 
     // Publish the message
     m_state_estimation_pub->publish(state_estimation_msg);
@@ -168,7 +189,11 @@ void StateEstimatorNode::handleGetCurrentJointPositions(std::shared_ptr<march_sh
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<StateEstimatorNode>());
+    // rclcpp::spin(std::make_shared<StateEstimatorNode>());
+    auto node = std::make_shared<StateEstimatorNode>();
+    rclcpp::executors::MultiThreadedExecutor executor;
+    executor.add_node(node);
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }
