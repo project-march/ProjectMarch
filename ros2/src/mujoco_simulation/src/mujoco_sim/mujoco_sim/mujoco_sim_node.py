@@ -43,14 +43,15 @@ def get_data_state_msg(actuator_names, mjc_data):
     """Create a state message from the mujoco data, where the data is linked to the correct joint name."""
     state_msg = MujocoDataState()
     state_msg.names = actuator_names
-    for data in mjc_data.qpos:
-        state_msg.qpos.append(data)
-    for data in mjc_data.qvel:
-        state_msg.qvel.append(data)
-    for data in mjc_data.qacc:
-        state_msg.qacc.append(data)
-    for data in mjc_data.act:
-        state_msg.act.append(data)
+    state_msg.qpos = mjc_data.qpos.tolist()
+    state_msg.qvel = mjc_data.qvel.tolist()
+    state_msg.qacc = mjc_data.qacc.tolist()
+    state_msg.act = mjc_data.act.tolist()
+    # for qpos, qvel, qacc, act in zip(mjc_data.qpos, mjc_data.qvel, mjc_data.qacc, mjc_data.act):
+    #     state_msg.qpos.append(qpos)
+    #     state_msg.qvel.append(qvel)
+    #     state_msg.qacc.append(qacc)
+    #     state_msg.act.append(act)
     return state_msg
 
 
@@ -91,7 +92,9 @@ class MujocoSimNode(Node):
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
+        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 1000)
+        # Create a publisher for the reading-from-mujoco action
+        self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 1000)
 
         # Initialize the low-level controller
         self.declare_parameters(
@@ -257,8 +260,8 @@ class MujocoSimNode(Node):
         sensor_msg.backpack_imu = backpack_imu
         sensor_msg.torso_imu = torso_imu
 
-        publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
-        publisher.publish(sensor_msg)
+        # publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 1000)
+        self.reader_publisher.publish(sensor_msg)
 
 
 def main(args=None):
