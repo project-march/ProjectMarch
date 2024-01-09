@@ -6,6 +6,9 @@
 #include <memory>
 #include <functional>
 
+using std::placeholders::_1;
+using std::placeholders::_2;
+
 StateEstimatorNode::StateEstimatorNode()
     : Node("state_estimator_node")
 {
@@ -22,6 +25,10 @@ StateEstimatorNode::StateEstimatorNode()
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "imu", 10, std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1));
     m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+
+    m_get_current_joint_angles_service = create_service<march_shared_msgs::srv::GetCurrentJointPositions>(
+        "get_current_joint_positions",
+        std::bind(&StateEstimatorNode::handleGetCurrentJointPositions, this, _1, _2));
 
     sensor_msgs::msg::JointState init_jointstate_msg;
     // Set the initial joint state message to zero data
@@ -136,6 +143,14 @@ void StateEstimatorNode::publishStateEstimation()
     // Publish the message
     m_state_estimation_pub->publish(state_estimation_msg);
 }
+
+void StateEstimatorNode::handleGetCurrentJointPositions(std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request>,
+    std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response)
+{
+    // Fill the response message with data
+    response->joint_positions = m_joint_state->position;
+}
+
 
 int main(int argc, char * argv[])
 {

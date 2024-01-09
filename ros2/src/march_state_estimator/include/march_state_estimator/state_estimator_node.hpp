@@ -10,6 +10,8 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+
 
 class StateEstimatorNode : public rclcpp::Node
 {
@@ -25,6 +27,8 @@ private:
         const rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture future);
     void publishStateEstimation();
     void requestNodePositions();
+    void handleGetCurrentJointPositions(std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request>,
+        std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response);
 
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
@@ -41,6 +45,8 @@ private:
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_get_node_position_client;
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture m_get_node_position_future;
     march_shared_msgs::srv::GetNodePosition::Request::SharedPtr m_get_node_position_request;
+    rclcpp::Service<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_service;
+
 };
 
 #endif  // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_

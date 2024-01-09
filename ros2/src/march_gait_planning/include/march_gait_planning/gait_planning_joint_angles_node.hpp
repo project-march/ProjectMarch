@@ -17,6 +17,7 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include <sstream> 
 #include <cmath>
 
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
 
 class GaitPlanningAnglesNode:public rclcpp::Node 
 {
@@ -24,6 +25,8 @@ public:
     explicit GaitPlanningAnglesNode(); 
 
 private: 
+    std::vector<double> getCurrentJointAngles();
+
     // Callback for the current exoState
     void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
 
@@ -41,6 +44,7 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     rclcpp::TimerBase::SharedPtr m_timer;
+    rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
 
     trajectory_msgs::msg::JointTrajectory m_joints_msg;
     trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
@@ -50,5 +54,6 @@ private:
 
     GaitPlanningAngles m_gait_planning; 
     std::vector<double> m_incremental_steps_to_home_stand;
+    bool m_first_stand;
 
 };
