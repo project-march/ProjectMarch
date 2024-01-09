@@ -28,7 +28,7 @@ void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error
     error_msg.type = error_type;
     node_->error_publisher->publish(error_msg);
     GaitMsg gait_msg;
-    gait_msg.gait_type = int(exoState::Error);
+    gait_msg.gait_type = int(exoMode::Error);
     node_->state_publisher->publish(gait_msg);
 }
 

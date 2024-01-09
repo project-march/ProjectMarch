@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <array>  
-#include "../../state_machine/include/state_machine/exo_state.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 class GaitPlanning {
     
@@ -15,7 +15,7 @@ public:
     // Setters
     void setStanceFoot(const int &new_stance_foot);
     void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position);
-    void setGaitType(const exoState &new_gait_type);  
+    void setGaitType(const exoMode &new_gait_type);  
     void setBezierGait();
 
     // Getters
@@ -23,10 +23,10 @@ public:
     int getCurrentStanceFoot() const; 
     std::array<double, 3> getCurrentLeftFootPos() const; 
     std::array<double, 3> getCurrentRightFootPos() const; 
-    exoState getGaitType() const; 
+    exoMode getGaitType() const; 
 
 private: 
-    exoState m_gait_type; 
+    exoMode m_gait_type; 
     int m_current_stance_foot; 
     double m_step_size; 
     std::array<double, 3> m_current_left_foot_position; 

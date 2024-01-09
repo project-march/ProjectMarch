@@ -18,7 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(state_machine REQUIRED)
+find_package(march_mode_machine REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -31,14 +31,14 @@ add_library(${PROJECT_NAME}
         src/temperature_safety.cpp
         src/effort_warner.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs state_machine rclcpp sensor_msgs std_msgs urdf march_utility)
+ament_target_dependencies(${PROJECT_NAME} march_shared_msgs march_mode_machine rclcpp sensor_msgs std_msgs urdf march_utility)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
 # the executable that is run in ROS and links with the library defined above
 add_executable(${PROJECT_NAME}_node src/safety_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs state_machine rclcpp sensor_msgs std_msgs urdf march_utility)
+ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs march_mode_machine rclcpp sensor_msgs std_msgs urdf march_utility)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

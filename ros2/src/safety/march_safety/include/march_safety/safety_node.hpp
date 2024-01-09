@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "state_machine/state_machine.hpp"
+#include "march_mode_machine/mode_machine.hpp"
 
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include <march_shared_msgs/msg/error.hpp>
