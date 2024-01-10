@@ -1,9 +1,9 @@
-# ExoState.msg
+# ExoMode.msg
 std_msgs/Header header
-int8 state
+int8 mode
 std_msgs/String joint
 
-# Constant types of states
+# Constant types of modes
 int8 SIT = 0
 int8 STAND = 1
 int8 WALK = 2

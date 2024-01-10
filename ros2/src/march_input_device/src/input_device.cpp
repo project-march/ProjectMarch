@@ -4,38 +4,38 @@
 #include <iostream>
 
 IPD::IPD()
-    : m_current_state (exoState::BootUp)
+    : m_current_mode (exoMode::BootUp)
 {
     std::cout << "IPD succesfully started" << std::endl;
 }
 
-exoState IPD::getCurrentState() const
+exoMode IPD::getCurrentMode() const
 {
-    return m_current_state;
+    return m_current_mode;
 }
 
-std::set<exoState> IPD::getAvailableStates() const
+std::set<exoMode> IPD::getAvailableModes() const
 {
-    return m_available_states;
+    return m_available_modes;
 }
 
-void IPD::askNewState() const
+void IPD::askNewMode() const
 {
-    std::cout << "Please enter next state. Available states are: ";
+    std::cout << "Please enter next mode. Available modes are: ";
 
-    for (const auto& state : m_available_states) {
-        std::cout << state << ", ";
+    for (const auto& mode : m_available_modes) {
+        std::cout << mode << ", ";
     }
 
     std::cout << '\n';
 }
 
-void IPD::setCurrentState(const exoState& current_state)
+void IPD::setCurrentMode(const exoMode& current_mode)
 {
-    m_current_state = current_state;
+    m_current_mode = current_mode;
 }
 
-void IPD::setAvailableStates(const std::set<exoState>& available_states)
+void IPD::setAvailableModes(const std::set<exoMode>& available_modes)
 {
-    m_available_states = available_states;
+    m_available_modes = available_modes;
 }

@@ -5,32 +5,32 @@
 #include <cstdlib>
 using std::placeholders::_1;
 
-std::array<exoState, 4> all_possible_states = {exoState::Sit, exoState::Stand, exoState::Walk, exoState::BootUp};
+std::array<exoMode, 4> all_possible_modes = {exoMode::Sit, exoMode::Stand, exoMode::Walk, exoMode::BootUp};
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
   m_ipd (IPD())
 {
-  m_get_exo_state_array_client = 
-    create_client<march_shared_msgs::srv::GetExoStateArray>("get_exo_state_array");
-  while (!m_get_exo_state_array_client->wait_for_service(std::chrono::seconds(5))) {
-    RCLCPP_WARN(this->get_logger(), "Waiting for service get_exo_state_array to become available...");
+  m_get_exo_mode_array_client = 
+    create_client<march_shared_msgs::srv::GetExoModeArray>("get_exo_mode_array");
+  while (!m_get_exo_mode_array_client->wait_for_service(std::chrono::seconds(5))) {
+    RCLCPP_WARN(this->get_logger(), "Waiting for service get_exo_mode_array to become available...");
   }
 
-  RCLCPP_INFO(this->get_logger(), "Connected to service get_exo_state_array");
+  RCLCPP_INFO(this->get_logger(), "Connected to service get_exo_mode_array");
 
-  m_ipd.setCurrentState(exoState::BootUp);
-  sendNewState(m_ipd.getCurrentState());
+  m_ipd.setCurrentMode(exoMode::BootUp);
+  sendNewMode(m_ipd.getCurrentMode());
   
 
 }
 
-void inputDeviceNode::sendNewState(const exoState& desired_state)
+void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
 {
-    auto request = std::make_shared<march_shared_msgs::srv::GetExoStateArray::Request>();
-    request->desired_state.state = static_cast<int32_t>(desired_state);
+    auto request = std::make_shared<march_shared_msgs::srv::GetExoModeArray::Request>();
+    request->desired_mode.mode = static_cast<int32_t>(desired_mode);
 
-    auto result_future = m_get_exo_state_array_client->async_send_request(request);
+    auto result_future = m_get_exo_mode_array_client->async_send_request(request);
 
 
     // Wait for the result
@@ -39,48 +39,48 @@ void inputDeviceNode::sendNewState(const exoState& desired_state)
     {
         auto result = result_future.get();
         // Do something with the result
-        std::set<exoState> exo_states_set;
-        for (const auto& exo_state_msg : result->state_array.states) {
-            exo_states_set.insert(static_cast<exoState>(exo_state_msg.state));
+        std::set<exoMode> exo_modes_set;
+        for (const auto& exo_mode_msg : result->mode_array.modes) {
+            exo_modes_set.insert(static_cast<exoMode>(exo_mode_msg.mode));
         }
-        m_ipd.setAvailableStates(exo_states_set);
-        exoState desired_state = askState();
-        sendNewState(desired_state);
+        m_ipd.setAvailableModes(exo_modes_set);
+        exoMode desired_mode = askMode();
+        sendNewMode(desired_mode);
     }
     else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to call service GetExoStateArray");
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service GetExoModeArray");
     }
 }
 
-exoState inputDeviceNode::askState() const
+exoMode inputDeviceNode::askMode() const
 {
-  std::set<exoState> available_states = m_ipd.getAvailableStates();
+  std::set<exoMode> available_modes = m_ipd.getAvailableModes();
 
-  std::map<std::string, exoState> state_map;
-  for (const auto& state : all_possible_states) {
-    state_map[toString(state)] = state;
+  std::map<std::string, exoMode> mode_map;
+  for (const auto& mode : all_possible_modes) {
+    mode_map[toString(mode)] = mode;
   }
 
   while (rclcpp::ok()){
-    std::cout << "Available states are: ";
-    for (const auto& state : available_states) {
-      std::cout << toString(state) << " ";
+    std::cout << "Available modes are: ";
+    for (const auto& mode : available_modes) {
+      std::cout << toString(mode) << " ";
     }
     std::cout<<std::endl;
-    std::cout << "Enter desired state: ";
+    std::cout << "Enter desired mode: ";
 
     std::string userInput;
     std::cin >> userInput;
     
-    auto it = state_map.find(userInput);
-    if (it != state_map.end()) {
+    auto it = mode_map.find(userInput);
+    if (it != mode_map.end()) {
         return it->second;
     } else {
-        std::cout << "Invalid state. Please enter a valid state." << std::endl;
+        std::cout << "Invalid mode. Please enter a valid mode." << std::endl;
     }
   }
   rclcpp::shutdown();
-  return exoState::BootUp;
+  return exoMode::BootUp;
 }
 
 

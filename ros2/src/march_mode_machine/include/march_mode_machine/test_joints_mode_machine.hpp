@@ -9,11 +9,11 @@
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
-#include "state_machine/exo_state.hpp"
-#include "state_machine/state_machine.hpp"
+#include "march_mode_machine/exo_mode.hpp"
+#include "march_mode_machine/mode_machine.hpp"
 
 
-class TestJointsStateMachine : public StateMachine {
+class TestJointsModeMachine : public ModeMachine {
 public:
-    explicit TestJointsStateMachine();
+    explicit TestJointsModeMachine();
 };

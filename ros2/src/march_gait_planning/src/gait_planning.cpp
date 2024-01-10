@@ -37,7 +37,7 @@ void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_p
     m_current_right_foot_position = new_right_foot_position; 
 }
 
-void GaitPlanning::setGaitType(const exoState &new_gait_type){
+void GaitPlanning::setGaitType(const exoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
@@ -62,7 +62,7 @@ std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
     return m_current_right_foot_position; 
 }
 
-exoState GaitPlanning::getGaitType() const{
+exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
 
