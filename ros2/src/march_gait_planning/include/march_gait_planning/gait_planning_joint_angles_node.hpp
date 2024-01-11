@@ -60,6 +60,7 @@ private:
 
     GaitPlanningAngles m_gait_planning; 
     std::vector<double> m_incremental_steps_to_home_stand;
+    std::vector<double> m_initial_point;
     bool m_first_stand;
 
 };
