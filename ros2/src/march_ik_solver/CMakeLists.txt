@@ -17,8 +17,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
+find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
@@ -34,11 +33,8 @@ find_package(urdf REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
-  include/${PROJECT_NAME}/task.hpp
   src/task.cpp
-  include/${PROJECT_NAME}/ik_solver.hpp
   src/ik_solver.cpp
-  include/${PROJECT_NAME}/ik_solver_node.hpp
   src/ik_solver_node.cpp
 )
 
@@ -99,14 +95,50 @@ DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
+  # find_package(ament_lint_auto REQUIRED)
+
+  ament_add_gmock(${PROJECT_NAME}_test 
+    test/task_test.cpp 
+    test/test_runner.cpp
+  )
+
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+  ament_target_dependencies(${PROJECT_NAME}_test
+    rclcpp
+    rclcpp_action
+    rclcpp_components
+    std_msgs
+    Eigen3
+    geometry_msgs
+    sensor_msgs
+    trajectory_msgs
+    march_shared_msgs
+  )
+
+  # target_link_libraries(test_runner ${PROJECT_NAME})
+
+  ament_export_dependencies(
+    rclcpp
+    rclcpp_action
+    rclcpp_components
+    std_msgs
+    Eigen3
+    geometry_msgs
+    sensor_msgs
+    trajectory_msgs
+    march_shared_msgs
+  )
+
   # the following line skips the linter which checks for copyrights
   # uncomment the line when a copyright and license is not present in all source files
   #set(ament_cmake_copyright_FOUND TRUE)
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
+  # ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()
