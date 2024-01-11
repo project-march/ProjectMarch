@@ -1,5 +1,5 @@
 # Source ROS distribution
-alias sfox='source /opt/ros/foxy/local_setup.bash'
+alias sfox='source /opt/ros/humble/local_setup.bash'
 alias svenv='source ~/march/.venv_march/bin/activate'
 
 # Source MARCH packages
@@ -98,7 +98,7 @@ export RCUTILS_COLORIZED_OUTPUT=1
 
 
 # Install dependencies
-alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-src -y --rosdistro foxy'
+alias install_dep_ros2='cm2 && sfox && rosdep install --from-paths src --ignore-src -y --rosdistro humble'
 
 
 # Format code
