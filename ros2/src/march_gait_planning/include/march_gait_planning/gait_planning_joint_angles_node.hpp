@@ -9,7 +9,7 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 #include "march_gait_planning/gait_planning_joint_angles.hpp"
-#include "march_shared_msgs/msg/exo_state.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include <vector>
 #include <array> 
@@ -28,8 +28,8 @@ public:
 private: 
     // std::vector<double> getCurrentJointAngles();
 
-    // Callback for the current exoState
-    void currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
+    // Callback for the current exoMode
+    void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
 
     // Callback for current joint angles
     void currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
@@ -45,7 +45,7 @@ private:
     void publishJointTrajectoryPoints(); 
 
     // Member variables 
-    rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_subscriber; 
+    rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;

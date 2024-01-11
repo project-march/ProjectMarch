@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(state_machine)
+project(march_mode_machine)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -26,7 +26,7 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  src/state_machine.cpp
+  src/mode_machine.cpp
 )
 
 ament_target_dependencies(
@@ -36,40 +36,40 @@ ament_target_dependencies(
   "mujoco_interfaces"
 )
 
-add_executable(state_machine_node 
-  src/state_machine_node.cpp 
-  src/state_machine.cpp)
+add_executable(mode_machine_node 
+  src/mode_machine_node.cpp 
+  src/mode_machine.cpp)
 
-add_executable(test_joints_state_machine_node
-  src/test_joints_state_machine_node.cpp
-  src/test_joints_state_machine.cpp
+add_executable(test_joints_mode_machine_node
+  src/test_joints_mode_machine_node.cpp
+  src/test_joints_mode_machine.cpp
 )
 
-# Link the state_machine library to the test_joints_state_machine_node executable
-target_link_libraries(test_joints_state_machine_node
+# Link the mode_machine library to the test_joints_mode_machine_node executable
+target_link_libraries(test_joints_mode_machine_node
   ${PROJECT_NAME}
 )
 
 # Link against ROS 2 dependencies
-ament_target_dependencies(test_joints_state_machine_node
+ament_target_dependencies(test_joints_mode_machine_node
   rclcpp
   march_shared_msgs
   )
 
-target_include_directories(state_machine_node PUBLIC
+target_include_directories(mode_machine_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 ament_target_dependencies(
-        state_machine_node
+        mode_machine_node
         "rclcpp"
         "march_shared_msgs"
         "mujoco_interfaces"
 )
 
 install(TARGETS 
-  state_machine_node
-  test_joints_state_machine_node
+  mode_machine_node
+  test_joints_mode_machine_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
@@ -84,7 +84,7 @@ if(BUILD_TESTING)
   # add_launch_test(test/launch_tests/invalid_transition_pub_sub_test.py )
 #  add_launch_test(test/launch_tests/valid_transition_pub_sub_test.py)
   ament_add_gmock(${PROJECT_NAME}_test
-    test/state_machine_test.cpp
+    test/mode_machine_test.cpp
     test/test_runner.cpp
     # include
     )

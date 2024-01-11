@@ -1,7 +1,7 @@
 /*Authors: Femke Buiks and Andrew Hutani, MIX*/
 
 #include "march_gait_planning/gait_planning_node.hpp"
-#include "../../state_machine/include/state_machine/exo_state.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 using std::placeholders::_1; 
 
@@ -13,8 +13,8 @@ GaitPlanningNode::GaitPlanningNode()
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
-    m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoState>(
-        "current_state", 10, std::bind(&GaitPlanningNode::currentStateCallback, this, _1)); 
+    m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
+        "current_mode", 10, std::bind(&GaitPlanningNode::currentModeCallback, this, _1)); 
     //Rename this to exo joint state subscriber 
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimator/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
@@ -25,15 +25,15 @@ GaitPlanningNode::GaitPlanningNode()
     // std::cout << "Request and client created " << std::endl; 
     // 
 
-    m_gait_planning.setGaitType(exoState::BootUp); 
+    m_gait_planning.setGaitType(exoMode::BootUp); 
 
     auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
     m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
  }
 
-void GaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
-    m_gait_planning.setGaitType((exoState)msg->state);
+void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    m_gait_planning.setGaitType((exoMode)msg->mode);
 }
 
 // Rename to current exo joint state callback
@@ -96,18 +96,18 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
 
 void GaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
-        case exoState::Stand :
+        case exoMode::Stand :
             m_current_trajectory.clear();
             setFootPositionsMessage(0.0, 0.16, -0.802, 0.0, -0.16, -0.802);
             m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
             break;
 
-        case exoState::BootUp :
-            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp state entered, waiting for new state."); 
+        case exoMode::BootUp :
+            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
             break;
         
-        case exoState::Walk :
+        case exoMode::Walk :
             if (m_current_trajectory.empty()) {
                 // Somewhere here include logic that uses the stance leg to set the current trajectory.
                 // Possible issue here is that the callback for stance leg is asynchronous with this function. 

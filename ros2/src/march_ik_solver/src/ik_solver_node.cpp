@@ -88,8 +88,8 @@ IKSolverNode::IKSolverNode()
     m_ik_solver.setJointLimits(joints_limits_lower, joints_limits_upper);
 
     // Configure the node.
-    // exo_state_sub_ = this->create_subscription<march_shared_msgs::msg::ExoState>(
-    //     "current_state", 1, std::bind(&IKSolverNode::exoStateCallback, this, std::placeholders::_1));
+    // exo_state_sub_ = this->create_subscription<march_shared_msgs::msg::ExoMode>(
+    //     "current_state", 1, std::bind(&IKSolverNode::exoModeCallback, this, std::placeholders::_1));
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", 10, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
     // joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
@@ -134,10 +134,10 @@ IKSolverNode::IKSolverNode()
     m_gait_type = -1;
 }
 
-void IKSolverNode::exoStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg)
+void IKSolverNode::exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
 {
-    // RCLCPP_INFO(this->get_logger(), "ExoState received.");
-    m_gait_type = msg->state;
+    // RCLCPP_INFO(this->get_logger(), "ExoMode received.");
+    m_gait_type = msg->mode;
     m_gait_reset = true;
     // RCLCPP_INFO(this->get_logger(), "Gait type: %d", m_gait_type);
     // RCLCPP_INFO(this->get_logger(), "Gait reset: %d", m_gait_reset);

@@ -89,12 +89,12 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch state machine
-    state_machine = IncludeLaunchDescription(
+    mode_machine = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("state_machine"),
+                get_package_share_directory("march_mode_machine"),
                 "launch",
-                "state_machine.launch.py",
+                "mode_machine.launch.py",
             )
         ),
     )
@@ -183,7 +183,7 @@ def generate_launch_description() -> LaunchDescription:
         ), 
         mujoco_node,
         march_control,
-        state_machine,
+        mode_machine,
         record_rosbags_action,
         imu_nodes,
         state_estimator,

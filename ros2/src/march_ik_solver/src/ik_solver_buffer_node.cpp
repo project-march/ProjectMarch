@@ -31,9 +31,9 @@ IKSolverBufferNode::IKSolverBufferNode()
     m_joint_trajectory_sub = this->create_subscription<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10, std::bind(&IKSolverBufferNode::jointTrajectoryCallback, this, std::placeholders::_1));
 
-    // Create a subscription to the Exo state.
-    m_exo_state_sub = this->create_subscription<march_shared_msgs::msg::ExoState>(
-        "current_state", 10, std::bind(&IKSolverBufferNode::exoStateCallback, this, std::placeholders::_1));
+    // Create a subscription to the Exo mode.
+    m_exo_mode_sub = this->create_subscription<march_shared_msgs::msg::ExoMode>(
+        "current_state", 10, std::bind(&IKSolverBufferNode::exoModeCallback, this, std::placeholders::_1));
 
     // Create a subscription to the IK solver foot positions.
     m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
@@ -77,10 +77,10 @@ void IKSolverBufferNode::jointTrajectoryCallback(const trajectory_msgs::msg::Joi
     m_desired_joint_positions = Eigen::Map<Eigen::VectorXd>(msg->points.back().positions.data(), m_n_joints);
 }
 
-void IKSolverBufferNode::exoStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg)
+void IKSolverBufferNode::exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
 {
     // Store the gait type.
-    m_gait_type = msg->state;
+    m_gait_type = msg->mode;
 
     // Reset the gait reset flag.
     m_gait_reset = true;

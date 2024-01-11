@@ -10,10 +10,10 @@ def generate_launch_description():
     return LaunchDescription(
         [
             Node(
-                package="state_machine",
+                package="march_mode_machine",
                 namespace="",
-                executable="state_machine_node",
-                name="state_machine",
+                executable="mode_machine_node",
+                name="mode_machine",
             ),
         ]
     )
