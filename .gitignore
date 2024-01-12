@@ -28,6 +28,7 @@ lib/
 .catkin_workspace
 
 # Binary libraries
+ros2/src/libraries/ginac/build/
 
 
 ### Python ###

@@ -31,9 +31,9 @@ def generate_test_description():
 
     # dut -> device under test is the node to be tested in this example
     dut = Node(
-        package="state_machine",
-        executable="state_machine_node",
-        name="state_machine",
+        package="mode_machine",
+        executable="mode_machine_node",
+        name="mode_machine",
     )
 
     footstep_gen_node = Node(
@@ -73,11 +73,10 @@ class TestProcessOutput(unittest.TestCase):
         """
         # Read input data that is send to dut
         msg = GaitRequest()
-        msg.gait_type = 2
+        msg.gait_type = 1
         self.publisher_.publish(msg)
-        # self.node.get_logger().info('Publishing: ' + str(msg))
 
-    def test_dut_output_invalid_transition(self, dut, proc_output):
+    def test_dut_output_valid_transition(self, dut, proc_output):
         """Listen for a message published by dut and compare message to expected value
         :param
         :return dut [ros2 node] node to be tested (device under test)
@@ -93,8 +92,8 @@ class TestProcessOutput(unittest.TestCase):
         timer_period = 0.5  # seconds
         self.timer = self.node.create_timer(timer_period, self.t1_callback)
 
-        # Expected data for this test is the force unknown state or int num 5.
-        expected_data = 4
+        # expected data for this test is the force unknown state or int num 2.
+        expected_data = 1
 
         # Setup for listening to dut messages
         received_data = []
