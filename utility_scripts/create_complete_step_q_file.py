@@ -47,12 +47,12 @@ df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/
 
 def stand_to_sit():
     time_points = 100
-    lhaa = np.linspace(-0.06, -0.3, time_points)
+    lhaa = np.linspace(-0.06, -0.06, time_points)
     lhfe = np.linspace(0.351166, 1.5, time_points)
     lkfe = np.linspace(0.372236, 1.2, time_points)
     ladpf = np.linspace(0.119176, -0.5, time_points)
 
-    rhaa = np.linspace(-0.06, 0.3, time_points)
+    rhaa = np.linspace(-0.06, -0.06, time_points)
     rhfe = np.linspace(0.274982, 1.5, time_points)
     rkfe = np.linspace(0.286291, 1.2, time_points)
     radpf = np.linspace(0.077083, -0.5, time_points)
