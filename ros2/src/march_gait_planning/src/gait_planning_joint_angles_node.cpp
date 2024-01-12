@@ -70,15 +70,15 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
     // if (m_first_stand && m_gait_planning.getGaitType() == exoMode::Stand) {
-        std::vector<double> point = msg->joint_state.position; 
-        if (point.size() >= 8) {
-            m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
-            // m_gait_planning.setPrevPoint(point); 
-            RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
-            m_first_stand = false;
-        } else {
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
-        }
+    std::vector<double> point = msg->joint_state.position; 
+    if (point.size() >= 8) {
+        m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
+        // m_gait_planning.setPrevPoint(point); 
+        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
+        m_first_stand = false;
+    } else {
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
+    }
     // }
     
 }
@@ -110,6 +110,8 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
         for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / 40); // 40 iterations to reach the target, i.e. in 2 seconds
         }
+        m_initial_point = m_gait_planning.getPrevPoint();
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Increments correctly calculated!");
     }
 
     m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
@@ -117,14 +119,16 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
 
     if (m_gait_planning.getCounter() < 40){
         m_trajectory_des_point.positions.clear();
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
         for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
-            m_trajectory_des_point.positions.push_back(m_gait_planning.getPrevPoint()[i] + m_incremental_steps_to_home_stand[i]);
+            m_initial_point[i] += m_incremental_steps_to_home_stand[i];
+            m_trajectory_des_point.positions.push_back(m_initial_point[i]);
         } 
     }
     else{
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Home stand position reached!");
+        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position reached!");
         m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
+        m_initial_point.clear();
     }
 
     m_joints_msg.points.push_back(m_trajectory_des_point);
