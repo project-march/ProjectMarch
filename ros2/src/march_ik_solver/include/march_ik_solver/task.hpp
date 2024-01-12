@@ -22,35 +22,35 @@ public:
     Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n, std::vector<std::string> node_names);
     ~Task() = default;
 
-    std::string getTaskName();
-    unsigned int getTaskID();
-    int getTaskM();
-    int getTaskN();
-    double getErrorNorm();
-
     Eigen::VectorXd solve();
+
+    std::string getTaskName() const;
+    unsigned int getTaskID() const;
+    int getTaskM() const;
+    int getTaskN() const;
+    double getErrorNorm() const;
+    const Eigen::MatrixXd * getJacobianPtr();
+    const Eigen::MatrixXd * getJacobianInversePtr();
 
     void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names);
     void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions);
     void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr);
-
-    void setGainP(float gain_p);
-    void setDampingCoefficient(float damping_coefficient);
-
-    const Eigen::MatrixXd* getJacobianPtr();
-    const Eigen::MatrixXd* getJacobianInversePtr();
+    void setCurrentPoses(const Eigen::VectorXd & current_pose);
+    void setGainP(const float & gain_p);
+    void setGainD(const float & gain_d);
+    void setGainI(const float & gain_i);
+    void setDt(const float & dt);
+    void setDampingCoefficient(const float & damping_coefficient);
 
 private:
     Eigen::VectorXd calculateError();
-    void calculateCurrentPose();
-    void calculateJacobian();
+    Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd & error);
+    Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd & error);
     void calculateJacobianInverse();
-    void sendRequest();
     void sendRequestNodePosition();
     void sendRequestNodeJacobian();
 
     rclcpp::Node::SharedPtr m_node;
-    rclcpp::Client<march_shared_msgs::srv::GetTaskReport>::SharedPtr m_client;
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_client_node_position;
     rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_client_node_jacobian;
 
@@ -65,8 +65,13 @@ private:
     std::vector<Eigen::VectorXd> * m_desired_poses_ptr;
     Eigen::VectorXd m_current_pose;
     double m_error_norm;
+    float m_dt = 0.0;
     float m_gain_p = 0.0;
+    float m_gain_d = 0.0;
+    float m_gain_i = 0.0;
     float m_damping_coefficient = 0.0;
+    Eigen::VectorXd m_integral_error;
+    Eigen::VectorXd m_previous_error;
     Eigen::MatrixXd m_jacobian;
     Eigen::MatrixXd m_jacobian_inverse;
 };
