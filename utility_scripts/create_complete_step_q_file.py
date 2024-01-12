@@ -71,7 +71,7 @@ def sit_to_stand():
     lkfe = np.linspace(1.2, 0.372236, time_points)
     ladpf = np.linspace(-0.5, 0.119176, time_points)
 
-    rhaa = np.linspace(0.06, -0.06, time_points)
+    rhaa = np.linspace(-0.06, -0.06, time_points)
     rhfe = np.linspace(1.5, 0.274982, time_points)
     rkfe = np.linspace(1.2, 0.286291, time_points)
     radpf = np.linspace(-0.5, 0.077083, time_points)
