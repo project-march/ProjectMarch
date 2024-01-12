@@ -15,7 +15,7 @@ def save_to_csv(filename, data):
 
 amplitude = 0.3  # Adjust the amplitude as needed
 duration = 5.0  # Adjust the duration in seconds
-sample_rate = 20 # Adjust the sample rate as needed
+sample_rate = 50 # Adjust the sample rate as needed
 
 data = generate_white_noise(amplitude, duration, sample_rate)
 filename = 'ros2/src/march_gait_planning/m9_gait_files/white_noise_gait.csv'  # Replace with your desired file path
