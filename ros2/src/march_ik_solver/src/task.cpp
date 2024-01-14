@@ -4,7 +4,7 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "march_shared_msgs/msg/node_jacobian.hpp"
 
-Task::Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n, std::vector<std::string> node_names)
+Task::Task(unsigned int task_id, std::string task_name, unsigned int task_m, unsigned int task_n, std::vector<std::string> node_names)
 {
     m_task_id = task_id;
     m_task_name = task_name;
@@ -19,15 +19,19 @@ Task::Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_
 
 Eigen::VectorXd Task::solve()
 {
-    sendRequestNodePosition();
-    sendRequestNodeJacobian();
+    if (!m_unit_test)
+    {
+        sendRequestNodePosition();
+        sendRequestNodeJacobian();
+    }
+
     calculateJacobianInverse();
 
     Eigen::VectorXd error = calculateError();
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_task_n);
-    for (int i = 0; i < m_task_n; i++)
+    for (unsigned int i = 0; i < m_task_n; i++)
     {
-        for (int j = 0; j < m_task_m; j++)
+        for (unsigned int j = 0; j < m_task_m; j++)
         {
             joint_velocities(i) += m_jacobian_inverse(i,j) * error(j);
         }
@@ -64,6 +68,47 @@ Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd & error)
     return m_gain_d * derivative_error;
 }
 
+void Task::calculateJacobianInverse()
+{
+    Eigen::MatrixXd jacobian_transpose = m_jacobian.transpose();
+
+    // If the system is overdetermined.
+    if (m_task_m < m_task_n) {
+        Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_m);
+        m_jacobian_inverse = jacobian_transpose * (m_jacobian * jacobian_transpose + damping_matrix).inverse();
+    } else if (m_task_m > m_task_n) // if the system is undetermined.
+    {
+        Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_n, m_task_n);
+        m_jacobian_inverse = (jacobian_transpose * m_jacobian + damping_matrix).inverse() * jacobian_transpose;
+    }
+    else // if the system is determined.
+    {
+        Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_n);
+        m_jacobian_inverse = (m_jacobian + damping_matrix).inverse();
+    }
+
+    // m_jacobian_inverse = (jacobian_transpose * (m_jacobian * jacobian_transpose).inverse()) * (m_task_m < m_task_n) +
+    //     ((jacobian_transpose * m_jacobian).inverse() * jacobian_transpose) * (m_task_m >= m_task_n);
+
+    // Round the Jacobian inverse to zero if it is very small.
+    for (unsigned int i = 0; i < m_task_n; i++)
+    {
+        for (unsigned int j = 0; j < m_task_m; j++)
+        {
+            if (abs(m_jacobian_inverse(i,j)) < 1e-6)
+            {
+                m_jacobian_inverse(i,j) = 0.0;
+            }
+        }
+    }
+
+    // Print the Jacobian inverse.
+    // for (int i = 0; i < m_task_n; i++)
+    // {
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
+    // }
+}
+
 std::string Task::getTaskName() const
 {
     return m_task_name;
@@ -74,19 +119,64 @@ unsigned int Task::getTaskID() const
     return m_task_id;
 }
 
-int Task::getTaskM() const
+unsigned int Task::getTaskM() const
 {
     return m_task_m;
 }
 
-int Task::getTaskN() const
+unsigned int Task::getTaskN() const
 {
     return m_task_n;
+}
+
+void Task::setTaskName(const std::string & task_name)
+{
+    m_task_name = task_name;
+}
+
+void Task::setTaskID(const unsigned int & task_id)
+{
+    m_task_id = task_id;
+}
+
+void Task::setTaskM(const unsigned int & task_m)
+{
+    m_task_m = task_m;
+}
+
+void Task::setTaskN(const unsigned int & task_n)
+{
+    m_task_n = task_n;
+}
+
+void Task::setNodeNames(const std::vector<std::string> & node_names)
+{
+    m_node_names = node_names;
+}
+
+std::vector<std::string> Task::getNodeNames() const
+{
+    return m_node_names;
 }
 
 double Task::getErrorNorm() const
 {
     return m_error_norm;
+}
+
+const Eigen::VectorXd * Task::getCurrentJointPositionsPtr() const
+{
+    return m_current_joint_positions_ptr;
+}
+
+const std::vector<std::string> * Task::getCurrentJointNamesPtr() const
+{
+    return m_current_joint_names_ptr;
+}
+
+const std::vector<Eigen::VectorXd> * Task::getDesiredPosesPtr() const
+{
+    return m_desired_poses_ptr;
 }
 
 void Task::setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names_ptr)
@@ -104,9 +194,14 @@ void Task::setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr)
     m_desired_poses_ptr = desired_poses_ptr;
 }
 
-void Task::setCurrentPoses(const Eigen::VectorXd & current_pose)
+void Task::setCurrentPose(const Eigen::VectorXd & current_pose)
 {
     m_current_pose = current_pose;
+}
+
+void Task::setJacobian(const Eigen::MatrixXd & jacobian)
+{
+    m_jacobian = jacobian;
 }
 
 void Task::setGainP(const float & gain_p)
@@ -139,6 +234,12 @@ void Task::setDampingCoefficient(const float & damping_coefficient)
     m_damping_coefficient = damping_coefficient;
 }
 
+void Task::setUnitTest(const bool & unit_test)
+{
+    // Set the unit test flag
+    m_unit_test = unit_test;
+}
+
 const Eigen::MatrixXd * Task::getJacobianPtr()
 {
     return &m_jacobian;
@@ -147,42 +248,6 @@ const Eigen::MatrixXd * Task::getJacobianPtr()
 const Eigen::MatrixXd * Task::getJacobianInversePtr()
 {
     return &m_jacobian_inverse;
-}
-
-void Task::calculateJacobianInverse()
-{
-    Eigen::MatrixXd jacobian_transpose = m_jacobian.transpose();
-
-    // If the system is underdetermined.
-    if (m_task_m < m_task_n) {
-        Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_m);
-        m_jacobian_inverse = jacobian_transpose * (m_jacobian * jacobian_transpose + damping_matrix).inverse();
-    } else // if the system is overdetermined.
-    {
-        Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_n, m_task_n);
-        m_jacobian_inverse = (jacobian_transpose * m_jacobian + damping_matrix).inverse() * jacobian_transpose;
-    }
-
-    // m_jacobian_inverse = (jacobian_transpose * (m_jacobian * jacobian_transpose).inverse()) * (m_task_m < m_task_n) +
-    //     ((jacobian_transpose * m_jacobian).inverse() * jacobian_transpose) * (m_task_m >= m_task_n);
-
-    // Round the Jacobian inverse to zero if it is very small.
-    for (int i = 0; i < m_task_n; i++)
-    {
-        for (int j = 0; j < m_task_m; j++)
-        {
-            if (abs(m_jacobian_inverse(i,j)) < 1e-6)
-            {
-                m_jacobian_inverse(i,j) = 0.0;
-            }
-        }
-    }
-
-    // Print the Jacobian inverse.
-    // for (int i = 0; i < m_task_n; i++)
-    // {
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
-    // }
 }
 
 void Task::sendRequestNodePosition()

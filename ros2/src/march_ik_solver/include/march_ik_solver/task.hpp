@@ -18,35 +18,48 @@
 
 class Task {
 public:
-    Task() = default;
-    Task(uint8_t task_id, std::string task_name, uint8_t task_m, uint8_t task_n, std::vector<std::string> node_names);
+    // Task() = default;
+    Task(unsigned int task_id, std::string task_name, unsigned int task_m, unsigned int task_n, std::vector<std::string> node_names);
     ~Task() = default;
 
     Eigen::VectorXd solve();
+    Eigen::VectorXd calculateError();
+    Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd & error);
+    Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd & error);
+    void calculateJacobianInverse();
 
     std::string getTaskName() const;
     unsigned int getTaskID() const;
-    int getTaskM() const;
-    int getTaskN() const;
+    unsigned int getTaskM() const;
+    unsigned int getTaskN() const;
+    std::vector<std::string> getNodeNames() const;
+
+    void setTaskName(const std::string & task_name);
+    void setTaskID(const unsigned int & task_id);
+    void setTaskM(const unsigned int & task_m);
+    void setTaskN(const unsigned int & task_n);
+    void setNodeNames(const std::vector<std::string> & node_names);
+    
     double getErrorNorm() const;
+    const Eigen::VectorXd * getCurrentJointPositionsPtr() const;
+    const std::vector<std::string> * getCurrentJointNamesPtr() const;
+    const std::vector<Eigen::VectorXd> * getDesiredPosesPtr() const;
     const Eigen::MatrixXd * getJacobianPtr();
     const Eigen::MatrixXd * getJacobianInversePtr();
 
-    void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names);
     void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions);
+    void setCurrentJointNamesPtr(std::vector<std::string> * current_joint_names);
     void setDesiredPosesPtr(std::vector<Eigen::VectorXd> * desired_poses_ptr);
-    void setCurrentPoses(const Eigen::VectorXd & current_pose);
+    void setCurrentPose(const Eigen::VectorXd & current_pose);
+    void setJacobian(const Eigen::MatrixXd & jacobian);
     void setGainP(const float & gain_p);
     void setGainD(const float & gain_d);
     void setGainI(const float & gain_i);
     void setDt(const float & dt);
     void setDampingCoefficient(const float & damping_coefficient);
+    void setUnitTest(const bool & unit_test);
 
 private:
-    Eigen::VectorXd calculateError();
-    Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd & error);
-    Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd & error);
-    void calculateJacobianInverse();
     void sendRequestNodePosition();
     void sendRequestNodeJacobian();
 
@@ -55,10 +68,11 @@ private:
     rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_client_node_jacobian;
 
     std::string m_task_name;
-    uint8_t m_task_id;
-    uint8_t m_task_m;
-    uint8_t m_task_n;
+    unsigned int m_task_id;
+    unsigned int m_task_m;
+    unsigned int m_task_n;
     std::vector<std::string> m_node_names;
+    bool m_unit_test = false;
 
     std::vector<std::string> * m_current_joint_names_ptr;
     Eigen::VectorXd * m_current_joint_positions_ptr;

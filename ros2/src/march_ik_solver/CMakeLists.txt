@@ -97,7 +97,8 @@ DESTINATION share/${PROJECT_NAME}/
 if(BUILD_TESTING)
   # find_package(ament_lint_auto REQUIRED)
 
-  ament_add_gmock(${PROJECT_NAME}_test 
+  ament_add_gmock(${PROJECT_NAME}_test
+    src/task.cpp
     test/task_test.cpp 
     test/test_runner.cpp
   )
