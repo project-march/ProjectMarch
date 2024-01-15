@@ -7,44 +7,29 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/timer.hpp"
 
-#include "march_safety/effort_warner.h"
-#include "march_safety/safety_type.hpp"
-
 #include <string>
 #include <vector>
-
-#include "state_machine/state_machine.hpp"
 
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include <march_shared_msgs/msg/error.hpp>
 #include <march_shared_msgs/msg/gait_instruction.hpp>
 
 class SafetyNode : public rclcpp::Node {
-    using JointNames = std::vector<std::string>;
-    using ErrorMsg = march_shared_msgs::msg::Error;
-    using ErrorPublisher = rclcpp::Publisher<ErrorMsg>::SharedPtr;
-    using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
-    using GaitInstructionPublisher = rclcpp::Publisher<GaitInstruction>::SharedPtr;
+    // using JointNames = std::vector<std::string>;
+    // using ErrorMsg = march_shared_msgs::msg::Error;
+    // using ErrorPublisher = rclcpp::Publisher<ErrorMsg>::SharedPtr;
+    // using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
+    // using GaitInstructionPublisher = rclcpp::Publisher<GaitInstruction>::SharedPtr;
 
 public:
     SafetyNode();
 
-    // Start the safety node
-    void start();
-
-    // Update the safety listeners
-    void update();
-
-    // Public attributes
-    JointNames joint_names;
-    std::vector<std::unique_ptr<SafetyType>> safety_list;
-
-    ErrorPublisher error_publisher;
-    rclcpp::Publisher<march_shared_msgs::msg::GaitRequest>::SharedPtr state_publisher;
-    GaitInstructionPublisher gait_instruction_publisher;
-
 private:
+    void startTimer();
+    void errorCallback(const march_shared_msgs::msg::Error::SharedPtr msg);
+    rclcpp::Subscription<march_shared_msgs::msg::Error>::SharedPtr error_subscriber;  
     rclcpp::TimerBase::SharedPtr timer;
+    void update();
 };
 
 #endif // MARCH_SAFETY_SAFETY_NODE_H

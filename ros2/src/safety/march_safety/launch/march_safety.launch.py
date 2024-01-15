@@ -9,42 +9,15 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
-    """The launch file for safety node.
-
-    Todo:
-        - Fill in the settable ros parameters.
-
-    The settable ros parameters are:
-        use_sim_time (bool): Whether the node should use the simulation time as published on the /clock topic.
-            Default is true.
-        ...
-    """
+    
     return LaunchDescription(
         [
-            DeclareLaunchArgument(
-                name="config_path",
-                default_value=os.path.join(
-                    get_package_share_directory("march_safety"),
-                    "config",
-                    "safety_settings.yaml",
-                ),
-                description="Path to the configuration for the safety settings",
-            ),
             Node(
                 package="march_safety",
                 executable="march_safety_node",
                 name="safety_node",
                 namespace="march",
                 output="screen",
-                parameters=[
-                    LaunchConfiguration("config_path"),
-                    {
-                        "simulation": LaunchConfiguration("simulation"),
-                    },
-                ],
-                # If this node exits, the entire system is shutdown
-                # This is the ROS2 equivalent of required:=true
-                # See: https://ubuntu.com/blog/ros2-launch-required-nodes
                 on_exit=Shutdown(),
             ),
         ]

@@ -3,11 +3,7 @@
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-#include "march_safety/input_device_safety.hpp"
-#include "march_safety/safety_handler.hpp"
 #include "march_safety/safety_node.hpp"
-#include "march_safety/safety_type.hpp"
-#include "march_safety/temperature_safety.hpp"
 
 #include "march_shared_msgs/msg/error.hpp"
 #include "march_shared_msgs/msg/gait_instruction.hpp"
@@ -21,17 +17,8 @@ using namespace std::chrono_literals;
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<SafetyNode>());
 
-    auto safety_node = std::make_shared<SafetyNode>();
-
-    // Add the input device and temperature safety handlers
-    auto safety_handler = std::make_shared<SafetyHandler>(safety_node);
-    safety_node->safety_list.push_back(std::make_unique<InputDeviceSafety>(safety_node, safety_handler));
-    //    safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
-
-    safety_node->start();
-
-    rclcpp::spin(safety_node);
     rclcpp::shutdown();
     return 0;
 }
@@ -41,26 +28,38 @@ SafetyNode::SafetyNode()
 {
     // Create an error publisher to notify the system (state machine) if
     // something is wrong
-    error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
-    state_publisher = this->create_publisher<march_shared_msgs::msg::GaitRequest>("/march/gait_request", 10);
+    rclcpp::Subscription<march_shared_msgs::msg::Error>::SharedPtr error_subscriber
+        = create_subscription<march_shared_msgs::msg::Error>(
+            "/march/error", 1000, std::bind(&SafetyNode::errorCallback, this, std::placeholders::_1));
 }
 
 /**
  * @brief Start the safety node
  * @details Starts a wall timer that calls the update function every 50ms.
  */
-void SafetyNode::start()
+void SafetyNode::startTimer()
 {
     // Ensure that the safety node is updated every 50 ms
-    timer = this->create_wall_timer(50ms, std::bind(&SafetyNode::update, this));
+    rclcpp::TimerBase::SharedPtr timer = create_wall_timer(50ms, std::bind(&SafetyNode::update, this));
+}
+
+void SafetyNode::update()
+{
+    // Perform safety checks and update the system accordingly
+
+    // Example: Check if there is any error message received
+    // if (error_message_received)
+    // {
+    //     // Process the error message
+    //     // processErrorMessage();
+    // }
 }
 
 /**
- * @brief Update the safety listeners
+ * @brief Callback function for the /march/error topic
+ * @param msg The received error message
  */
-void SafetyNode::update()
+void SafetyNode::errorCallback(const march_shared_msgs::msg::Error::SharedPtr msg)
 {
-    for (auto& i : safety_list) {
-        i->update();
-    }
+    RCLCPP_INFO(get_logger(), "Received error message: %s", std::to_string(msg->type).c_str());
 }

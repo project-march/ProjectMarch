@@ -12,34 +12,31 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+        add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(march_shared_msgs REQUIRED)
-find_package(state_machine REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
+find_package(march_shared_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(urdf REQUIRED)
 find_package(march_utility REQUIRED)
 
-add_library(${PROJECT_NAME}
-        src/input_device_safety.cpp
-        src/safety_handler.cpp
-        src/temperature_safety.cpp
-        src/effort_warner.cpp
-)
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs state_machine rclcpp sensor_msgs std_msgs urdf march_utility)
-target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+# add_library(${PROJECT_NAME} SHARED
+# src/safety_node.cpp
+# )
 
-# the executable that is run in ROS and links with the library defined above
 add_executable(${PROJECT_NAME}_node src/safety_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs state_machine rclcpp sensor_msgs std_msgs urdf march_utility)
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+
+ament_target_dependencies(${PROJECT_NAME}_node 
+  march_shared_msgs
+  rclcpp
+  std_msgs
+  march_utility
+)
+
+include_directories(include)
+
 target_include_directories(${PROJECT_NAME}_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
@@ -48,18 +45,32 @@ install(DIRECTORY include/${PROJECT_NAME}
         DESTINATION include/${PROJECT_NAME})
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION lib/${PROJECT_NAME})
-install(TARGETS ${PROJECT_NAME}_node
-        RUNTIME DESTINATION lib/${PROJECT_NAME})
+# install(TARGETS ${PROJECT_NAME}_node
+#         RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
-#if(BUILD_TESTING)
-#    find_package(ros_testing REQUIRED)
-#    install(DIRECTORY test
-#            DESTINATION share/${PROJECT_NAME}/)
-#    ament_python_install_package(test)
-#    add_ros_test(test/launch/march_safety_connection.launch.py)
-#    add_ros_test(test/launch/march_safety_temperature.launch.py)
-#endif()
+# if(BUILD_TESTING)
+#         find_package(ament_cmake_gtest REQUIRED)
+#         ament_add_gtest(${PROJECT_NAME}_test ${TESTFILES})
+
+#         set(TESTFILES
+#           test/test_runner.cpp
+#           test/safety_node_test.cpp
+#         )
+
+#         ament_add_gtest(${PROJECT_NAME}_test ${TESTFILES})
+
+#         target_link_directories(${PROJECT_NAME}_test my_lib)
+
+#         target_include_directories(${PROJECT_NAME}_test PUBLIC
+#           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#           $<INSTALL_INTERFACE:include>
+#         )
+#         ament_target_dependencies(${PROJECT_NAME}_test
+#           std_msgs
+#         )
+#         target_link_libraries(${PROJECT_NAME}_tutorial_test name_of_local_library)
+#       endif()
 
 ament_package()
