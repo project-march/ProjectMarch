@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot name="double_rotational_test_setup">
+
+  <!-- Define world link -->
+  <link name="link_world">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.1"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Define elbow link -->
+  <link name="link_elbow">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 1"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.1"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Define endpoint link -->
+  <link name="link_endpoint">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 1"/>
+      <mass value="10.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="10.0" iyz="0.0" izz="0.083"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="1.0" radius="0.05"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Define rotational joint -->
+  <joint name="joint_shoulder" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <parent link="link_world"/>
+    <child link="link_elbow"/>
+    <limit effort="250" lower="-0.1745329252" upper="1.9634954085" velocity="3.94"/>
+  </joint>
+
+  <!-- Define rotational joint -->
+  <joint name="joint_elbow" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 -1 0"/>
+    <parent link="link_elbow"/>
+    <child link="link_endpoint"/>
+    <limit effort="250" lower="-0.1745329252" upper="1.9634954085" velocity="3.94"/>
+  </joint>
+
+</robot>
