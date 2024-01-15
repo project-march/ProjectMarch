@@ -24,7 +24,6 @@ Eigen::VectorXd Task::solve()
         sendRequestNodePosition();
         sendRequestNodeJacobian();
     }
-
     calculateJacobianInverse();
 
     Eigen::VectorXd error = calculateError();
@@ -36,19 +35,14 @@ Eigen::VectorXd Task::solve()
             joint_velocities(i) += m_jacobian_inverse(i,j) * error(j);
         }
     }
-
     return joint_velocities;
 }
 
 Eigen::VectorXd Task::calculateError()
 {
     Eigen::VectorXd pose_error =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
-
     Eigen::VectorXd error = m_gain_p * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
     m_error_norm = error.norm();
-
-    // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Proportional error: %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5));
-
     return error;
 }
 
@@ -101,12 +95,6 @@ void Task::calculateJacobianInverse()
             }
         }
     }
-
-    // Print the Jacobian inverse.
-    // for (int i = 0; i < m_task_n; i++)
-    // {
-    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian inverse row %d: %f, %f, %f, %f, %f, %f", i, m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
-    // }
 }
 
 std::string Task::getTaskName() const
@@ -206,37 +194,31 @@ void Task::setJacobian(const Eigen::MatrixXd & jacobian)
 
 void Task::setGainP(const float & gain_p)
 {
-    // Set the proportional gain
     m_gain_p = gain_p;
 }
 
 void Task::setGainI(const float & gain_i)
 {
-    // Set the integral gain
     m_gain_i = gain_i;
 }
 
 void Task::setGainD(const float & gain_d)
 {
-    // Set the derivative gain
     m_gain_d = gain_d;
 }
 
 void Task::setDt(const float & dt)
 {
-    // Set the time step
     m_dt = dt;
 }
 
 void Task::setDampingCoefficient(const float & damping_coefficient)
 {
-    // Set the damping coefficient
     m_damping_coefficient = damping_coefficient;
 }
 
 void Task::setUnitTest(const bool & unit_test)
 {
-    // Set the unit test flag
     m_unit_test = unit_test;
 }
 

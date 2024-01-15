@@ -9,7 +9,7 @@
 #include <future>
 
 StateEstimatorNode::StateEstimatorNode()
-    : Node("state_estimator_node")
+: Node("state_estimator")
 {
     // Declare the parameters
     this->declare_parameter<int64_t>("dt", 50);
