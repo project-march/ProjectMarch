@@ -23,7 +23,7 @@ ModeMachine::ModeMachine()
         { exoMode::Stand,
             { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error} },
         { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
-        { exoMode::BootUp, { exoMode::Stand, exoMode::Sit, exoMode::BootUp, exoMode::Error } },
+        { exoMode::BootUp, { exoMode::Stand } },
         { exoMode::Error, {}}
 
     };

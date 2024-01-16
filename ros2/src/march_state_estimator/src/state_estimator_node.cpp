@@ -8,6 +8,9 @@
 #include <functional>
 #include <future>
 
+using std::placeholders::_1;
+using std::placeholders::_2;
+
 StateEstimatorNode::StateEstimatorNode()
     : Node("state_estimator_node")
 {
@@ -172,6 +175,14 @@ void StateEstimatorNode::publishStateEstimation()
     // Publish the message
     m_state_estimation_pub->publish(state_estimation_msg);
 }
+
+void StateEstimatorNode::handleGetCurrentJointPositions(std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request>,
+    std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response)
+{
+    // Fill the response message with data
+    response->joint_positions = m_joint_state->position;
+}
+
 
 int main(int argc, char * argv[])
 {
