@@ -1,6 +1,7 @@
 #include "march_state_estimator/state_estimator_node.hpp"
 
 #include "geometry_msgs/msg/pose.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 
 #include <chrono>
 #include <memory>
@@ -37,12 +38,8 @@ StateEstimatorNode::StateEstimatorNode()
     m_get_node_position_client = this->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position", 
         rmw_qos_profile_services_default, m_node_position_callback_group);
 
-    m_get_current_joint_angles_service = create_service<march_shared_msgs::srv::GetCurrentJointPositions>(
-        "get_current_joint_positions",
-        std::bind(&StateEstimatorNode::handleGetCurrentJointPositions, this, _1, _2));
-
-    sensor_msgs::msg::JointState init_jointstate_msg;
     // Set the initial joint state message to zero data
+    sensor_msgs::msg::JointState init_jointstate_msg;
     init_jointstate_msg.header.stamp = this->now();
     init_jointstate_msg.header.frame_id = "backpack";
     init_jointstate_msg.name = {};
@@ -157,6 +154,7 @@ void StateEstimatorNode::publishStateEstimation()
         foot_poses.push_back(foot_pose);
 
         // Check if the foot is on the ground. TODO: This should be done in a better way *cough* contact detection *cough*
+        // TODO: Fix this when stance leg is in front of the robot
         if (m_foot_positions[i].x < 0.265)
         {
             RCLCPP_DEBUG(this->get_logger(), "%s is on the ground", m_node_feet_names[i].c_str());

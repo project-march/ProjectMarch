@@ -19,7 +19,7 @@ public:
   std::vector<std::string> getParentNames();
   std::vector<RobotNode*> findNodes(std::vector<std::string> names);
   std::vector<Eigen::Vector3d> getNodesPosition(std::vector<std::string> joint_names, std::vector<double> joint_angles);
-  std::vector<Eigen::Matrix3d> getNodesRotation();
+  std::vector<Eigen::Matrix3d> getNodesRotation(std::vector<std::string> joint_names, std::vector<double> joint_angles);
 
 private:
     
