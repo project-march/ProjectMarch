@@ -80,7 +80,7 @@ void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::
     m_joint_state = msg;
 
     // Request the node positions
-    requestNodePositions(msg);
+    // requestNodePositions(msg);
 }
 
 void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
@@ -136,29 +136,29 @@ void StateEstimatorNode::publishStateEstimation()
     // Create a state estimation message
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
 
-    // Convert the node positions to poses
-    std::vector<geometry_msgs::msg::Pose> foot_poses;
-    uint8_t stance_leg = 0;
-    for (long unsigned int i = 0; i < m_foot_positions.size(); i++)
-    {
-        RCLCPP_DEBUG(this->get_logger(), "Foot position: %f, %f, %f", m_foot_positions[i].x, m_foot_positions[i].y, m_foot_positions[i].z);
-        geometry_msgs::msg::Pose foot_pose;
-        foot_pose.position = m_foot_positions[i];
-        foot_pose.orientation.x = 0.0;
-        foot_pose.orientation.y = 0.0;
-        foot_pose.orientation.z = 0.0;
-        foot_pose.orientation.w = 1.0;
-        foot_poses.push_back(foot_pose);
+    // // Convert the node positions to poses
+    // std::vector<geometry_msgs::msg::Pose> foot_poses;
+    // uint8_t stance_leg = 0;
+    // for (long unsigned int i = 0; i < m_foot_positions.size(); i++)
+    // {
+    //     RCLCPP_DEBUG(this->get_logger(), "Foot position: %f, %f, %f", m_foot_positions[i].x, m_foot_positions[i].y, m_foot_positions[i].z);
+    //     geometry_msgs::msg::Pose foot_pose;
+    //     foot_pose.position = m_foot_positions[i];
+    //     foot_pose.orientation.x = 0.0;
+    //     foot_pose.orientation.y = 0.0;
+    //     foot_pose.orientation.z = 0.0;
+    //     foot_pose.orientation.w = 1.0;
+    //     foot_poses.push_back(foot_pose);
 
-        // Check if the foot is on the ground. TODO: This should be done in a better way *cough* contact detection *cough*
-        // TODO: Fix this when stance leg is in front of the robot
-        if (m_foot_positions[i].x < 0.265)
-        {
-            RCLCPP_DEBUG(this->get_logger(), "%s is on the ground", m_node_feet_names[i].c_str());
-            stance_leg = stance_leg | (0b1 << i);
-        }
-        RCLCPP_DEBUG(this->get_logger(), "Stance leg: %hu", stance_leg);
-    }
+    //     // Check if the foot is on the ground. TODO: This should be done in a better way *cough* contact detection *cough*
+    //     // TODO: Fix this when stance leg is in front of the robot
+    //     if (m_foot_positions[i].x < 0.265)
+    //     {
+    //         RCLCPP_DEBUG(this->get_logger(), "%s is on the ground", m_node_feet_names[i].c_str());
+    //         stance_leg = stance_leg | (0b1 << i);
+    //     }
+    //     RCLCPP_DEBUG(this->get_logger(), "Stance leg: %hu", stance_leg);
+    // }
 
     // Fill the message with data
     state_estimation_msg.header.stamp = this->now();
@@ -166,8 +166,8 @@ void StateEstimatorNode::publishStateEstimation()
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.imu = *m_imu;
-    state_estimation_msg.foot_pose = foot_poses;
-    state_estimation_msg.stance_leg = stance_leg;
+    // state_estimation_msg.foot_pose = foot_poses;
+    // state_estimation_msg.stance_leg = stance_leg;
 
     // Publish the message
     m_state_estimation_pub->publish(state_estimation_msg);

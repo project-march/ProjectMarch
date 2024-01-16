@@ -28,6 +28,6 @@ def generate_launch_description():
             executable='transform_publisher_node',
             name='transform_publisher',
             output='screen',
-            config=[config],
+            # config=[config],
         ),
     ])

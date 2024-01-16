@@ -13,8 +13,8 @@ Task::Task(unsigned int task_id, std::string task_name, unsigned int task_m, uns
     m_node_names = node_names;
 
     m_node = std::make_shared<rclcpp::Node>("task_" + m_task_name + "_client");
-    m_client_node_position = m_node->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimator/get_node_position");
-    m_client_node_jacobian = m_node->create_client<march_shared_msgs::srv::GetNodeJacobian>("state_estimator/get_node_jacobian");
+    m_client_node_position = m_node->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position");
+    m_client_node_jacobian = m_node->create_client<march_shared_msgs::srv::GetNodeJacobian>("state_estimation/get_node_jacobian");
 }
 
 Eigen::VectorXd Task::solve()
@@ -69,32 +69,32 @@ void Task::calculateJacobianInverse()
     // If the system is overdetermined.
     if (m_task_m < m_task_n) {
         Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_m);
-        m_jacobian_inverse = jacobian_transpose * (m_jacobian * jacobian_transpose + damping_matrix).inverse();
+        m_jacobian_inverse.noalias() = jacobian_transpose * (m_jacobian * jacobian_transpose + damping_matrix).inverse();
     } else if (m_task_m > m_task_n) // if the system is undetermined.
     {
         Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_n, m_task_n);
-        m_jacobian_inverse = (jacobian_transpose * m_jacobian + damping_matrix).inverse() * jacobian_transpose;
+        m_jacobian_inverse.noalias() = (jacobian_transpose * m_jacobian + damping_matrix).inverse() * jacobian_transpose;
     }
     else // if the system is determined.
     {
         Eigen::MatrixXd damping_matrix = m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_n);
-        m_jacobian_inverse = (m_jacobian + damping_matrix).inverse();
+        m_jacobian_inverse.noalias() = (m_jacobian + damping_matrix).inverse();
     }
 
     // m_jacobian_inverse = (jacobian_transpose * (m_jacobian * jacobian_transpose).inverse()) * (m_task_m < m_task_n) +
     //     ((jacobian_transpose * m_jacobian).inverse() * jacobian_transpose) * (m_task_m >= m_task_n);
 
     // Round the Jacobian inverse to zero if it is very small.
-    for (unsigned int i = 0; i < m_task_n; i++)
-    {
-        for (unsigned int j = 0; j < m_task_m; j++)
-        {
-            if (abs(m_jacobian_inverse(i,j)) < 1e-6)
-            {
-                m_jacobian_inverse(i,j) = 0.0;
-            }
-        }
-    }
+    // for (unsigned int i = 0; i < m_task_n; i++)
+    // {
+    //     for (unsigned int j = 0; j < m_task_m; j++)
+    //     {
+    //         if (abs(m_jacobian_inverse(i,j)) < 1e-6)
+    //         {
+    //             m_jacobian_inverse(i,j) = 0.0;
+    //         }
+    //     }
+    // }
 }
 
 std::string Task::getTaskName() const
@@ -237,13 +237,17 @@ void Task::sendRequestNodePosition()
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
     auto request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
     request->node_names = m_node_names;
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node names: %s, %s", request->node_names[0].c_str(), request->node_names[1].c_str());
     
     // request->m_joint_names = *m_current_joint_names_ptr;
     request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
     request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(), m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", 
+        request->joint_names[0].c_str(), request->joint_names[1].c_str(), request->joint_names[2].c_str(), request->joint_names[3].c_str(),
+        request->joint_names[4].c_str(), request->joint_names[5].c_str(), request->joint_names[6].c_str(), request->joint_names[7].c_str());
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for service get_node_position...");
-    while (!m_client_node_position->wait_for_service(std::chrono::seconds(1))) {
+    while (!m_client_node_position->wait_for_service(std::chrono::milliseconds(10))) {
         if (!rclcpp::ok()) {
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
             return;

@@ -1,10 +1,10 @@
 ik_solver_point_evaluator:
   ros__parameters:
       desired_left_foot_position:
-        x: 0.5
-        y: 0.0
-        z: 0.0
+        x: 0.2
+        y: 0.165
+        z: -0.9
       desired_right_foot_position:
-        x: 0.5
-        y: 0.0
-        z: 0.0
+        x: 0.2
+        y: -0.165
+        z: -0.9
