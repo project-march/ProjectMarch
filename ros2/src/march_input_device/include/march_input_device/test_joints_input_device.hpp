@@ -6,24 +6,24 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "../../state_machine/include/state_machine/exo_state.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 
 class TestJointsIPD {
 public:
     explicit TestJointsIPD();
-    exoState getCurrentState() const;
-    std::set<exoState> getAvailableStates() const;
-    void askNewState() const;
-    void setCurrentState(const exoState& current_state);
-    void setAvailableStates(const std::set<exoState>& available_states);
+    exoMode getCurrentMode() const;
+    std::set<exoMode> getAvailableModes() const;
+    void askNewMode() const;
+    void setCurrentMode(const exoMode& current_mode);
+    void setAvailableModes(const std::set<exoMode>& available_modes);
     void setActuatedJoint(const std::string &actuated_joint);
     std::string getActuatedJoint() const;
     void askNewJoint() const;
 
 private:
-    exoState m_current_state;
-    std::set<exoState> m_available_states;
+    exoMode m_current_mode;
+    std::set<exoMode> m_available_modes;
     std::string m_actuated_joint;
     std::vector<std::string> m_available_joints;
 

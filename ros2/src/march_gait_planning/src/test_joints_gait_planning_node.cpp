@@ -34,13 +34,13 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
     m_current_joint_angles_msg->points.push_back(previous_point);
     m_current_joint_angles_msg->points.push_back(current_point);
 
-    m_exo_state_subscriber = create_subscription<march_shared_msgs::msg::ExoStateAndJoint>(
-        "current_state", 10, std::bind(&TestJointsGaitPlanningNode::currentStateCallback, this, _1)); 
+    m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoModeAndJoint>(
+        "current_mode", 10, std::bind(&TestJointsGaitPlanningNode::currentModeCallback, this, _1)); 
     
-    m_test_joint_trajectory_controller_state_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+    m_test_joint_trajectory_controller_mode_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
-    m_gait_planning.setGaitType(exoState::BootUp); 
+    m_gait_planning.setGaitType(exoMode::BootUp); 
 
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestJointsGaitPlanningNode::timerCallback, this);
@@ -48,30 +48,30 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 
 }
 
-void TestJointsGaitPlanningNode::currentStateCallback(const march_shared_msgs::msg::ExoStateAndJoint::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current state: %d", msg->state); 
-    m_gait_planning.setGaitType((exoState)msg->state);
+void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
+    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    m_gait_planning.setGaitType((exoMode)msg->mode);
     setActuatedJoint(msg->joint.data);
 }
 
 void TestJointsGaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
-        case exoState::BootUp: {
+        case exoMode::BootUp: {
             break;
         }
 
-        case exoState::Stand: {
+        case exoMode::Stand: {
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions = {-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016};
             m_current_joint_angles_msg->points[0].positions = {-0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0, -0.016};
 
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Joint angles assigned");
-            m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
+            m_test_joint_trajectory_controller_mode_pub_->publish(*m_current_joint_angles_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Home stand position published!");
             break;
         }
 
-        case exoState::Walk: {
+        case exoMode::Walk: {
 
             if (m_current_trajectory.empty()) {
                 //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
@@ -91,7 +91,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                             m_current_joint_angles_msg->points[0].positions[i]);
                     }
                 }
-                m_test_joint_trajectory_controller_state_pub_->publish(*m_current_joint_angles_msg);
+                m_test_joint_trajectory_controller_mode_pub_->publish(*m_current_joint_angles_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
             }
             break;

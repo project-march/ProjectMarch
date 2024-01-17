@@ -54,3 +54,5 @@ foxy:clang-tidy:
       artifacts: true
   extends:
     - .clang_tidy_base
+  artifacts:
+    expire_in: 2 weeks

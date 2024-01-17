@@ -26,10 +26,10 @@ std::vector<double> TestSetupGaitPlanning::getTrajectory() const{
     return m_trajectory;
 }
 
-void TestSetupGaitPlanning::setGaitType(const exoState &new_gait_type){
+void TestSetupGaitPlanning::setGaitType(const exoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-exoState TestSetupGaitPlanning::getGaitType() const{
+exoMode TestSetupGaitPlanning::getGaitType() const{
     return m_gait_type; 
 }

@@ -5,8 +5,8 @@
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "march_gait_planning/test_setup_gait_planning.hpp"
-#include "march_shared_msgs/msg/exo_state.hpp"
-#include "march_shared_msgs/msg/exo_state_and_joint.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
+#include "march_shared_msgs/msg/exo_mode_and_joint.hpp"
 
 class TestJointsGaitPlanningNode : public rclcpp::Node
 {
@@ -16,7 +16,7 @@ public:
 
 
 private:
-    void currentStateCallback(const march_shared_msgs::msg::ExoStateAndJoint::SharedPtr msg);
+    void currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg);
     void footPositionsPublish();
     void timerCallback();
     
@@ -24,8 +24,8 @@ private:
     void setActuatedJoint(const std::string &actuated_joint);
     std::string getActuatedJoint() const;
 
-    rclcpp::Subscription<march_shared_msgs::msg::ExoStateAndJoint>::SharedPtr m_exo_state_subscriber;
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_test_joint_trajectory_controller_state_pub_;
+    rclcpp::Subscription<march_shared_msgs::msg::ExoModeAndJoint>::SharedPtr m_exo_mode_subscriber;
+    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_test_joint_trajectory_controller_mode_pub_;
     rclcpp::TimerBase::SharedPtr m_timer;
 
     TestSetupGaitPlanning m_gait_planning;

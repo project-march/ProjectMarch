@@ -28,7 +28,7 @@ GaitPlanning::GaitPlanning()
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
-void GaitPlanning::setStanceFoot(const int &new_stance_foot){
+void GaitPlanning::setStanceFoot(const uint8_t &new_stance_foot){
     m_current_stance_foot = new_stance_foot; 
 }
 
@@ -37,7 +37,7 @@ void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_p
     m_current_right_foot_position = new_right_foot_position; 
 }
 
-void GaitPlanning::setGaitType(const exoState &new_gait_type){
+void GaitPlanning::setGaitType(const exoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
@@ -47,7 +47,8 @@ void GaitPlanning::setBezierGait(){
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
-    return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
+    return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
+    // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
 }
 
 int GaitPlanning::getCurrentStanceFoot() const {
@@ -62,7 +63,7 @@ std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
     return m_current_right_foot_position; 
 }
 
-exoState GaitPlanning::getGaitType() const{
+exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
 

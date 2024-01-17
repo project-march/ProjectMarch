@@ -1,3 +1,10 @@
+/*
+Authors: Femke Buiks, MIX
+
+This file contains the functionality of the GaitPlanningAngles class.  This class allows the definition of a gait in joint angles. 
+
+*/ 
+
 #include "march_gait_planning/gait_planning_joint_angles.hpp"
 
 // Struct to keep track of all columns in the angle trajectory .csv files 
@@ -18,12 +25,20 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_prev_gait_type(), 
    m_first_step_angle_trajectory(), 
    m_prev_point(), 
-   m_counter()
+   m_counter(), 
+   m_complete_step_angle_trajectory(), 
+   m_sideways_trajectory(),
+   m_sit_to_stand_trajectory(), 
+   m_home_stand()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sideways_walking_gait_dataset.csv", m_sideways_trajectory); 
+
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
+
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
@@ -58,11 +73,11 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoState &new_gait_type){
+void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanningAngles::setPrevGaitType(const exoState &prev_gait_type){
+void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
     m_prev_gait_type = prev_gait_type; 
 }
 
@@ -74,11 +89,15 @@ void GaitPlanningAngles::setPrevPoint(const std::vector<double> &point){
     m_prev_point = point; 
 }
 
-exoState GaitPlanningAngles::getGaitType() const {
+void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
+    m_home_stand = stand; 
+}
+
+exoMode GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
 
-exoState GaitPlanningAngles::getPrevGaitType() const {
+exoMode GaitPlanningAngles::getPrevGaitType() const {
     return m_prev_gait_type; 
 }
 
@@ -88,6 +107,10 @@ std::vector<double> GaitPlanningAngles::getPrevPoint() const{
 
 int GaitPlanningAngles::getCounter() const{
     return m_counter; 
+}
+
+std::vector<double> GaitPlanningAngles::getHomeStand() const{
+    return m_home_stand; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getFirstStepAngleTrajectory() const{
@@ -100,6 +123,14 @@ std::vector<std::vector<double>> GaitPlanningAngles::getFullGaitAngleCSV() const
 
 std::vector<std::vector<double>> GaitPlanningAngles::getStandToSitGait() const{
     return m_stand_to_sit_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysGait() const{
+    return m_sideways_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
+    return m_sit_to_stand_trajectory; 
 }
 
 

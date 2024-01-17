@@ -6,18 +6,18 @@
 #include "rclcpp/rclcpp.hpp"
 #include "march_input_device/input_device.hpp"
 #include "std_msgs/msg/int32.hpp"
-#include "march_shared_msgs/msg/exo_state_array.hpp"
-#include "march_shared_msgs/srv/get_exo_state_array.hpp"
+#include "march_shared_msgs/msg/exo_mode_array.hpp"
+#include "march_shared_msgs/srv/get_exo_mode_array.hpp"
 
 class inputDeviceNode : public rclcpp::Node {
 public:
     explicit inputDeviceNode();
 
 private:
-    rclcpp::Client<march_shared_msgs::srv::GetExoStateArray>::SharedPtr m_get_exo_state_array_client;
+    rclcpp::Client<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_client;
     
-    void sendNewState(const exoState& desired_state);
-    exoState askState() const;
+    void sendNewMode(const exoMode& desired_mode);
+    exoMode askMode() const;
 
     IPD m_ipd;
 

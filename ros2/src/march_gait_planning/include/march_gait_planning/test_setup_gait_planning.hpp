@@ -4,7 +4,7 @@
 #include <vector>
 #include <array>
 #include <string>
-#include "../../state_machine/include/state_machine/exo_state.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 class TestSetupGaitPlanning
 {
@@ -12,11 +12,11 @@ public:
     TestSetupGaitPlanning();
     void loadTrajectoryFromCSV();
     std::vector<double> getTrajectory() const;
-    void setGaitType(const exoState &new_gait_type);
-    exoState getGaitType() const;
+    void setGaitType(const exoMode &new_gait_type);
+    exoMode getGaitType() const;
 
 private:
-    exoState m_gait_type;
+    exoMode m_gait_type;
     std::vector<double> m_trajectory;
 };
 

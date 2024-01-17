@@ -7,7 +7,7 @@ from rclpy import Future
 from std_msgs.msg import Header, String, Bool, Int32
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
-from march_shared_msgs.srv import PossibleGaits, GetExoStateArray
+from march_shared_msgs.srv import PossibleGaits, GetExoModeArray
 from rclpy.node import Node
 
 
@@ -105,7 +105,7 @@ class InputDeviceController:
         )
 
         self._get_exo_state_array_client = self.create_client(
-            srv_type = GetExoStateArray, 
+            srv_type = GetExoModeArray, 
             srv_name = 'get_exo_state_array'
             )
         self._new_state = None
@@ -210,7 +210,7 @@ class InputDeviceController:
         Request avaialable gaits from the gait selection node, by sending the new state.
         """
         if self._get_exo_state_array_client.service_is_ready():
-            request = GetExoStateArray.Request()
+            request = GetExoModeArray.Request()
             request.state = self._new_state
             self.available_gaits = self._get_exo_state_array_client.call_async(request)
         else:

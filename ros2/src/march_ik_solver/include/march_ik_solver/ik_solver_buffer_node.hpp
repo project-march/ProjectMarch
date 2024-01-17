@@ -11,7 +11,7 @@
 #include "std_msgs/msg/float64.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
-#include "march_shared_msgs/msg/exo_state.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
 
 #include <eigen3/Eigen/Core>
@@ -25,7 +25,7 @@ class IKSolverBufferNode : public rclcpp::Node
     private:
         void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
         void jointTrajectoryCallback(const trajectory_msgs::msg::JointTrajectory::SharedPtr msg);
-        void exoStateCallback(const march_shared_msgs::msg::ExoState::SharedPtr msg);
+        void exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
         void ikSolverFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
         void publishIKSolverFootPositions();
         void publishIKSolverStatus();
@@ -34,7 +34,7 @@ class IKSolverBufferNode : public rclcpp::Node
         rclcpp::TimerBase::SharedPtr m_timer;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
         rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_sub;
-        rclcpp::Subscription<march_shared_msgs::msg::ExoState>::SharedPtr m_exo_state_sub;
+        rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_sub;
         rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_foot_positions_sub;
         rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_foot_positions_pub;
         rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr m_ik_solver_status_pub;
