@@ -28,7 +28,7 @@ Eigen::VectorXd IKSolver::solve()
 
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
-    double dt = 0.0005;
+    double dt = 1e-2;
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Integrating joint velocities with dt: %f", dt);
 
     Eigen::VectorXd desired_joint_velocities = *m_desired_joint_velocities_ptr;
@@ -72,7 +72,9 @@ void IKSolver::setJointLimits(std::vector<double> lower_joint_limits, std::vecto
 {
     for (int i = 0; i < m_n_joints; i++)
     {
-        m_joint_limits.push_back({lower_joint_limits[i], upper_joint_limits[i]});
+        double lower_joint_limit_rad = lower_joint_limits[i] * M_PI / 180.0;
+        double upper_joint_limit_rad = upper_joint_limits[i] * M_PI / 180.0;
+        m_joint_limits.push_back({lower_joint_limit_rad, upper_joint_limit_rad});
     }
 }
 

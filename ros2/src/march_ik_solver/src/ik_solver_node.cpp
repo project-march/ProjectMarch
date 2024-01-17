@@ -102,6 +102,8 @@ IKSolverNode::IKSolverNode()
         "state_estimation/state", 10, std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1));
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10); // TODO: Change queue.
+    // m_joint_trajectory_controller_state_pub = this->create_publisher<control_msgs::msg::JointTrajectoryControllerState>(
+    //     "joint_trajectory_controller/state", 10); // TODO: Change queue.
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>(
         "ik_solver/buffer/error_norm", 10);
 
@@ -110,13 +112,13 @@ IKSolverNode::IKSolverNode()
     // Configure previous joint trajectory point.
     // Eigen::VectorXd zeros = Eigen::VectorXd::Zero(joints_size);
     // std::vector<double> zeros_vector(zeros.data(), zeros.data() + zeros.size());
-    // m_joint_trajectory_point_prev = trajectory_msgs::msg::JointTrajectoryPoint();
-    // m_joint_trajectory_point_prev.positions = zeros_vector;
-    // m_joint_trajectory_point_prev.velocities = zeros_vector;
-    // m_joint_trajectory_point_prev.accelerations = zeros_vector;
-    // m_joint_trajectory_point_prev.effort = zeros_vector;
-    // m_joint_trajectory_point_prev.time_from_start.sec = 0;
-    // m_joint_trajectory_point_prev.time_from_start.nanosec = 0;
+    m_joint_trajectory_point_prev = trajectory_msgs::msg::JointTrajectoryPoint();
+    m_joint_trajectory_point_prev.positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    m_joint_trajectory_point_prev.velocities = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    m_joint_trajectory_point_prev.accelerations = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    m_joint_trajectory_point_prev.effort = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    m_joint_trajectory_point_prev.time_from_start.sec = 0;
+    m_joint_trajectory_point_prev.time_from_start.nanosec = 0;
 
     m_current_joint_positions = Eigen::VectorXd::Zero(joints_size);
     m_current_joint_velocities = Eigen::VectorXd::Zero(joints_size);
@@ -240,6 +242,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     // Publish the desired joint positions and velocities.
     publishJointTrajectory();
+    // publishJointTrajectoryControllerState();
 
     // Publish the error norm.
     std_msgs::msg::Float64 error_norm_msg;
@@ -270,15 +273,18 @@ void IKSolverNode::publishJointTrajectory()
     joint_trajectory_msg.header.stamp = this->now();
     joint_trajectory_msg.joint_names = m_joints_names;
     
-    // Create current trajectory point.
-    trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
-    joint_trajectory_point_current.positions = std::vector<double>(m_actual_joint_positions.data(), m_actual_joint_positions.data() + m_actual_joint_positions.size());
-    joint_trajectory_point_current.velocities = std::vector<double>(m_actual_joint_velocities.data(), m_actual_joint_velocities.data() + m_actual_joint_velocities.size());
-    joint_trajectory_point_current.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
-    joint_trajectory_point_current.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
-    joint_trajectory_point_current.time_from_start.sec = 0;
-    joint_trajectory_point_current.time_from_start.nanosec = 0;
-    joint_trajectory_msg.points.push_back(joint_trajectory_point_current);
+    // // Create current trajectory point.
+    // trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_current;
+    // joint_trajectory_point_current.positions = std::vector<double>(m_actual_joint_positions.data(), m_actual_joint_positions.data() + m_actual_joint_positions.size());
+    // joint_trajectory_point_current.velocities = std::vector<double>(m_actual_joint_velocities.data(), m_actual_joint_velocities.data() + m_actual_joint_velocities.size());
+    // joint_trajectory_point_current.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+    // joint_trajectory_point_current.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+    // joint_trajectory_point_current.time_from_start.sec = 0;
+    // joint_trajectory_point_current.time_from_start.nanosec = 0;
+    // joint_trajectory_msg.points.push_back(joint_trajectory_point_current);
+
+    // Push back the previous trajectory point.
+    joint_trajectory_msg.points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
@@ -287,12 +293,54 @@ void IKSolverNode::publishJointTrajectory()
     joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
     joint_trajectory_point_desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
     joint_trajectory_point_desired.time_from_start.sec = 0;
-    joint_trajectory_point_desired.time_from_start.nanosec = 50 * 1e6;
+    joint_trajectory_point_desired.time_from_start.nanosec = 10 * 1e6;
     joint_trajectory_msg.points.push_back(joint_trajectory_point_desired);
 
     // Publish the message.
     m_joint_trajectory_pub->publish(joint_trajectory_msg);
+
+    // Update the previous trajectory point.
+    joint_trajectory_point_desired.time_from_start.sec = 0;
+    joint_trajectory_point_desired.time_from_start.nanosec = 0;
+    m_joint_trajectory_point_prev = joint_trajectory_point_desired;
 }
+
+// void IKSolverNode::publishJointTrajectoryControllerState()
+// {
+//     // Create the message to be published.
+//     control_msgs::msg::JointTrajectoryControllerState joint_trajectory_controller_state_msg;
+//     joint_trajectory_controller_state_msg.header.stamp = this->now();
+//     joint_trajectory_controller_state_msg.joint_names = m_joints_names;
+    
+//     // Create current trajectory point.
+//     joint_trajectory_controller_state_msg.actual.positions = std::vector<double>(m_actual_joint_positions.data(), m_actual_joint_positions.data() + m_actual_joint_positions.size());
+//     joint_trajectory_controller_state_msg.actual.velocities = std::vector<double>(m_actual_joint_velocities.data(), m_actual_joint_velocities.data() + m_actual_joint_velocities.size());
+//     joint_trajectory_controller_state_msg.actual.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
+//     joint_trajectory_controller_state_msg.actual.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_controller_state_msg.actual.time_from_start.sec = 0;
+//     joint_trajectory_controller_state_msg.actual.time_from_start.nanosec = 0;
+
+//     // Create desired trajectory point.
+//     joint_trajectory_controller_state_msg.desired.positions = std::vector<double>(m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
+//     joint_trajectory_controller_state_msg.desired.velocities = std::vector<double>(m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
+//     joint_trajectory_controller_state_msg.desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
+//     joint_trajectory_controller_state_msg.desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_controller_state_msg.desired.time_from_start.sec = 0;
+//     joint_trajectory_controller_state_msg.desired.time_from_start.nanosec = 50 * 1e6;
+
+//     // Create error trajectory point.
+//     Eigen::VectorXd error = m_desired_joint_positions - m_actual_joint_positions;
+//     Eigen::VectorXd error_dot = m_desired_joint_velocities - m_actual_joint_velocities;
+//     joint_trajectory_controller_state_msg.error.positions = std::vector<double>(error.data(), error.data() + error.size());
+//     joint_trajectory_controller_state_msg.error.velocities = std::vector<double>(error_dot.data(), error_dot.data() + error_dot.size());
+//     joint_trajectory_controller_state_msg.error.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
+//     joint_trajectory_controller_state_msg.error.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+//     joint_trajectory_controller_state_msg.error.time_from_start.sec = 0;
+//     joint_trajectory_controller_state_msg.error.time_from_start.nanosec = 50 * 1e6;
+
+//     // Publish the message.
+//     m_joint_trajectory_controller_state_pub->publish(joint_trajectory_controller_state_msg);
+// }
 
 int main(int argc, char** argv)
 {

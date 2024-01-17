@@ -23,7 +23,11 @@ IKSolverPointEvaluatorNode::IKSolverPointEvaluatorNode() : Node("ik_solver_point
     m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 1, std::bind(&IKSolverPointEvaluatorNode::stateEstimationCallback, this, std::placeholders::_1));
     m_iks_foot_positions_pub = this->create_publisher<march_shared_msgs::msg::IksFootPositions>(
-        "ik_solver/buffer/input", 1);
+        "ik_solver/buffer/input", 10);
+
+    // Publish one time to initialize the IK solver.
+    // publishIKSFootPositions();
+    // publishIKSFootPositions();
 }
 
 void IKSolverPointEvaluatorNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)

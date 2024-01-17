@@ -245,6 +245,9 @@ void Task::sendRequestNodePosition()
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", 
         request->joint_names[0].c_str(), request->joint_names[1].c_str(), request->joint_names[2].c_str(), request->joint_names[3].c_str(),
         request->joint_names[4].c_str(), request->joint_names[5].c_str(), request->joint_names[6].c_str(), request->joint_names[7].c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint positions: %f, %f, %f, %f, %f, %f, %f, %f",
+        request->joint_positions[0], request->joint_positions[1], request->joint_positions[2], request->joint_positions[3],
+        request->joint_positions[4], request->joint_positions[5], request->joint_positions[6], request->joint_positions[7]);
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for service get_node_position...");
     while (!m_client_node_position->wait_for_service(std::chrono::milliseconds(10))) {
@@ -324,16 +327,17 @@ void Task::sendRequestNodeJacobian()
                     {
                         jacobian(i + total_rows, j) = 0.0;
                     }
+                    // TODO: Use BottomRightCorner, TopRightCorner, BottomLeftCorner, TopLeftCorner
                 }
             }
             total_rows += node_jacobian.rows;
         }
 
         m_jacobian = jacobian;
-        // for (int i = 0; i < m_task_m; i++)
-        // {
-        //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
-        // }
+        for (unsigned int i = 0; i < m_task_m; i++)
+        {
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
+        }
     }
     else
     {

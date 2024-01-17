@@ -10,6 +10,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "march_ik_solver/ik_solver.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
@@ -29,6 +30,7 @@ private:
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     // void publishJointTrajectory(bool reset);
     void publishJointTrajectory();
+    void publishJointTrajectoryControllerState();
 
     IKSolver m_ik_solver; // TODO: make this a pointer using std::unique_ptr<IKSolver> ik_solver_;
     double m_convergence_threshold;
@@ -55,6 +57,7 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
+    // rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_joint_trajectory_controller_state_pub;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr m_error_norm_pub;
 
 };
