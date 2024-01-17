@@ -10,6 +10,8 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+
 
 class StateEstimatorNode : public rclcpp::Node
 {
@@ -24,6 +26,12 @@ private:
     void nodePositionCallback(
         const rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture future);
     void publishStateEstimation();
+    void requestNodePositions();
+
+    //eventually delete this function 
+    void handleGetCurrentJointPositions(std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request>,
+        std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Response> response);
+        
     void requestNodePositions(const sensor_msgs::msg::JointState::SharedPtr msg);
 
     double m_dt;
@@ -40,6 +48,10 @@ private:
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_get_node_position_client;
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture m_get_node_position_future;
     march_shared_msgs::srv::GetNodePosition::Request::SharedPtr m_get_node_position_request;
+
+    //eventually delete this service
+    rclcpp::Service<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_service;
+
 
     rclcpp::CallbackGroup::SharedPtr m_joint_state_callback_group;
     rclcpp::CallbackGroup::SharedPtr m_imu_callback_group;

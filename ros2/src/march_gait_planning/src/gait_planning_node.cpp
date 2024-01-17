@@ -8,19 +8,22 @@ using std::placeholders::_1;
 GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
-   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
-   m_response_received(true)
+   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>())
+//    m_response_received(true)
  {
-    m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("iks_foot_positions", 10);
+    m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GaitPlanningNode::currentModeCallback, this, _1)); 
-    m_feet_position_subscriber = create_subscription<march_shared_msgs::msg::IksFootPositions>(
-        "estimated_baseframe_foot_positions", 100, std::bind(&GaitPlanningNode::currentFeetPositionsCallback, this, _1)); 
+    //Rename this to exo joint state subscriber 
+    m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
+        "state_estimator/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
-    m_stance_leg_request = std::make_shared<march_shared_msgs::srv::GetCurrentStanceLeg::Request>();
-    m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("current_stance_leg_service");
-    std::cout << "Request and client created " << std::endl; 
+    // We want to remove this service and client relation
+    // m_stance_leg_request = std::make_shared<march_shared_msgs::srv::GetCurrentStanceLeg::Request>();
+    // m_stance_leg_client = create_client<march_shared_msgs::srv::GetCurrentStanceLeg>("state_estimator/get_current_stance_leg");
+    // std::cout << "Request and client created " << std::endl; 
+    // 
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
@@ -33,43 +36,52 @@ void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode
     m_gait_planning.setGaitType((exoMode)msg->mode);
 }
 
-void GaitPlanningNode::currentFeetPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg){
+// Rename to current exo joint state callback
+void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current foot positions");
-    std::array<double, 3> new_left_foot_position = {msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z};
-    std::array<double, 3> new_right_foot_position = {msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z};
+    std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
+    std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
-}
-
-void GaitPlanningNode::responseStanceLegCallback(
-    std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future){
-    // Get the response from the future
-    auto response = future.get();
-    if (response){
-        m_gait_planning.setStanceFoot(response->stance_leg);
-        m_current_trajectory = m_gait_planning.getTrajectory(); 
-        m_response_received = true;
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Response received!");
-    } else {
-        RCLCPP_ERROR(rclcpp::get_logger("march_gait_planning"), "Stance leg response was not successful!"); 
+    if (m_current_trajectory.empty()){
+        // uint8_t stance_foot = msg->stance_leg;
+        m_gait_planning.setStanceFoot(msg->stance_leg); 
+        RCLCPP_INFO(get_logger(), "Received current stance foot"); 
     }
 }
 
-void GaitPlanningNode::sendRequest(const bool& gait_complete){
-    if (gait_complete){
-        m_response_received = false;
-        if (!m_stance_leg_client->wait_for_service(std::chrono::seconds(5))) {
-            RCLCPP_ERROR(this->get_logger(), "Service not available after waiting");
-            if (rclcpp::ok()) {
-                sendRequest(gait_complete);
-            }
-        }
-        m_stance_leg_request->gait_complete = gait_complete; 
-        auto future = m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Request sent!"); 
-    } else {
-        return; 
-    }
-}
+// Remove 
+// void GaitPlanningNode::responseStanceLegCallback(
+//     std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future){
+//     // Get the response from the future
+//     auto response = future.get();
+//     if (response){
+//         m_gait_planning.setStanceFoot(response->stance_leg);
+//         // Add this functionality to the logic publish function
+//         m_current_trajectory = m_gait_planning.getTrajectory(); 
+//         m_response_received = true;
+//         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Response received!");
+//     } else {
+//         RCLCPP_ERROR(rclcpp::get_logger("march_gait_planning"), "Stance leg response was not successful!"); 
+//     }
+// }
+
+// Remove 
+// void GaitPlanningNode::sendRequest(const bool& gait_complete){
+//     if (gait_complete){
+//         m_response_received = false;
+//         if (!m_stance_leg_client->wait_for_service(std::chrono::seconds(5))) {
+//             RCLCPP_ERROR(this->get_logger(), "Service not available after waiting");
+//             if (rclcpp::ok()) {
+//                 sendRequest(gait_complete);
+//             }
+//         }
+//         // m_stance_leg_request->gait_complete = gait_complete; 
+//         auto future = m_stance_leg_client->async_send_request(m_stance_leg_request, std::bind(&GaitPlanningNode::responseStanceLegCallback, this, _1)); 
+//         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Request sent!"); 
+//     } else {
+//         return; 
+//     }
+// }
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
@@ -97,18 +109,25 @@ void GaitPlanningNode::footPositionsPublish(){
         
         case exoMode::Walk :
             if (m_current_trajectory.empty()) {
-                sendRequest(true);
+                // Somewhere here include logic that uses the stance leg to set the current trajectory.
+                // Possible issue here is that the callback for stance leg is asynchronous with this function. 
+                // Trajectory is already empty, stance foot is not yet updated, old trajectory is used. 
+                // Or stance foot is already updated, trajectory is not yet empty so wrong stance foot is called. 
+                m_current_trajectory = m_gait_planning.getTrajectory(); 
+                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
+                // sendRequest(true);
             }
-            else{
+            else {
                 std::array<double, 4> current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
-                if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){ 
-                    // -1 is left stance leg, 0 is both
+                // if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
+                if (m_gait_planning.getCurrentStanceFoot() & 0b1){
+                    // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
                     setFootPositionsMessage(current_step[2], 0.16, current_step[3], 
                                     current_step[0], -0.16, current_step[1]);
-                } else if (m_gait_planning.getCurrentStanceFoot() == 1){
-                    // 1 is right stance leg
+                } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
+                    // 10 is right stance leg
                     setFootPositionsMessage(current_step[0], 0.16, current_step[1], 
                                     current_step[2], -0.16, current_step[3]);
                 }
@@ -119,17 +138,18 @@ void GaitPlanningNode::footPositionsPublish(){
     }
 }
 
-
+// Remove logic that uses response received 
 void GaitPlanningNode::timerCallback() {
     // This code will be executed every 50 milliseconds
-    if( m_response_received ){
-        // If the response from the server (current stance) has been received, publish the next foot positions.
-        footPositionsPublish();
-    }
-    else{
-        // When a request is sent, the response_received is set to false.
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Response not received yet, waiting for stance leg."); 
-    }
+    footPositionsPublish(); 
+    // if( m_response_received ){
+    //     // If the response from the server (current stance) has been received, publish the next foot positions.
+    //     footPositionsPublish();
+    // }
+    // else{
+    //     // When a request is sent, the response_received is set to false.
+    //     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Response not received yet, waiting for stance leg."); 
+    // }
     
 }
 
