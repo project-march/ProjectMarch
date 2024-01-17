@@ -182,6 +182,7 @@ def generate_launch_description() -> LaunchDescription:
             name='march_gait_planning', 
         ), 
         mujoco_node,
+        safety_node,
         march_control,
         state_machine,
         record_rosbags_action,

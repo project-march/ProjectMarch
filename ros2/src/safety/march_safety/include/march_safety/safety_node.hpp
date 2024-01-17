@@ -10,9 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "march_shared_msgs/msg/gait_request.hpp"
 #include <march_shared_msgs/msg/error.hpp>
-#include <march_shared_msgs/msg/gait_instruction.hpp>
 
 class SafetyNode : public rclcpp::Node {
     // using JointNames = std::vector<std::string>;

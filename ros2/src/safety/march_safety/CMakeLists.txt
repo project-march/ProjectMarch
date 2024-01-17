@@ -22,13 +22,9 @@ find_package(march_shared_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(march_utility REQUIRED)
 
-# add_library(${PROJECT_NAME} SHARED
-# src/safety_node.cpp
-# )
+add_executable(march_safety_node src/safety_node.cpp)
 
-add_executable(${PROJECT_NAME}_node src/safety_node.cpp)
-
-ament_target_dependencies(${PROJECT_NAME}_node 
+ament_target_dependencies(march_safety_node
   march_shared_msgs
   rclcpp
   std_msgs
@@ -37,40 +33,27 @@ ament_target_dependencies(${PROJECT_NAME}_node
 
 include_directories(include)
 
-target_include_directories(${PROJECT_NAME}_node PUBLIC
+# Include include directory of package
+target_include_directories(march_safety_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION include/${PROJECT_NAME})
-install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION lib/${PROJECT_NAME})
-# install(TARGETS ${PROJECT_NAME}_node
-#         RUNTIME DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch config
-        DESTINATION share/${PROJECT_NAME}/)
+install(TARGETS march_safety_node
+        DESTINATION lib/march_safety)
 
-# if(BUILD_TESTING)
-#         find_package(ament_cmake_gtest REQUIRED)
-#         ament_add_gtest(${PROJECT_NAME}_test ${TESTFILES})
+#add add package launch directory to ros2/install so it is visible when launching from ros2
+install(DIRECTORY
+        launch
+        DESTINATION share/march_safety/
+        )
 
-#         set(TESTFILES
-#           test/test_runner.cpp
-#           test/safety_node_test.cpp
-#         )
+# install(DIRECTORY include/
+#   DESTINATION include
+# )
 
-#         ament_add_gtest(${PROJECT_NAME}_test ${TESTFILES})
+# install(FILES package.xml
+#   DESTINATION share/march_safety
+# )
 
-#         target_link_directories(${PROJECT_NAME}_test my_lib)
-
-#         target_include_directories(${PROJECT_NAME}_test PUBLIC
-#           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#           $<INSTALL_INTERFACE:include>
-#         )
-#         ament_target_dependencies(${PROJECT_NAME}_test
-#           std_msgs
-#         )
-#         target_link_libraries(${PROJECT_NAME}_tutorial_test name_of_local_library)
-#       endif()
 
 ament_package()

@@ -16,7 +16,6 @@ def generate_launch_description() -> LaunchDescription:
                 package="march_safety",
                 executable="march_safety_node",
                 name="safety_node",
-                namespace="march",
                 output="screen",
                 on_exit=Shutdown(),
             ),
