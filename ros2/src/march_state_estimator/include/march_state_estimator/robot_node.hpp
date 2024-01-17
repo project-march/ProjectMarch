@@ -12,6 +12,8 @@
 #define WORKSPACE_DIM 3
 #define NO_INERTIA_PARAMS 6
 
+
+
 class RobotNode
 {
 public:
@@ -47,11 +49,11 @@ public:
     std::vector<RobotNode*> getChildren() const;
     std::vector<std::string> getJointNames() const;
 
+    void expressRotation();
     void expressKinematics();
     void expressDynamics();
 
 protected:
-
     std::vector<GiNaC::symbol> getJointAngles() const;
     std::vector<RobotNode*> getJointNodes(RobotNode * parent) const;
     GiNaC::matrix expressGlobalPosition() const;

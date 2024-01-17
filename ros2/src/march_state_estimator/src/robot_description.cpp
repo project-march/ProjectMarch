@@ -119,6 +119,11 @@ void RobotDescription::configureRobotNodes()
 
     for (auto & robot_node : m_robot_nodes)
     {
+        robot_node->expressRotation();
+    }
+
+    for (auto & robot_node : m_robot_nodes)
+    {
         robot_node->expressKinematics();
     }
 }

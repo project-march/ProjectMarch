@@ -246,12 +246,17 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(request->joint_names, request->joint_positions);
 
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
+        // for (int i = 0; i < jacobian.rows(); i++)
+        // {
+        //     for (int j = 0; j < jacobian.cols(); j++)
+        //     {
+        //         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", joint_names[j].c_str(), jacobian(i, j));
+        //     }
+        // }
         for (int i = 0; i < jacobian.rows(); i++)
         {
-            for (int j = 0; j < jacobian.cols(); j++)
-            {
-                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", joint_names[j].c_str(), jacobian(i, j));
-            }
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %f, %f, %f, %f",
+                jacobian(i, 0), jacobian(i, 1), jacobian(i, 2), jacobian(i, 3));
         }
 
         node_jacobian_msg.rows = jacobian.rows();
