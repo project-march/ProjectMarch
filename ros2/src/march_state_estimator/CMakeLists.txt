@@ -18,7 +18,6 @@ endif()
 # Set external library directories
 set(GINAC_BUILD_DIR "${PROJECT_SOURCE_DIR}/../libraries/ginac/build")
 set(GINAC_LIB "${PROJECT_SOURCE_DIR}/../libraries/ginac/build/ginac/libginac.so")
-# set(cln "${PROJECT_SOURCE_DIR}/../libraries/ginac/cln/include")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -39,8 +38,7 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 include_directories(include)
 
-include_directories(${GINAC_BUILD_DIR})
-include_directories(${cln})
+# include_directories(${GINAC_BUILD_DIR})
 
 add_library(${PROJECT_NAME} STATIC
   src/robot_description_node.cpp
