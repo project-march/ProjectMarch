@@ -8,13 +8,10 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     return LaunchDescription([
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('march_state_estimator'), 'launch', 'robot_description_hennie.launch.py')]),
-        ),
         Node(
             package='march_state_estimator',
-            executable='sensor_fusion_node',
-            name='sensor_fusion',
+            executable='state_estimator_node',
+            name='state_estimator',
             output='screen',
         ),
     ])
