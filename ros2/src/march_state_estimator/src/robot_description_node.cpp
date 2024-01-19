@@ -9,17 +9,19 @@
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"
 
-RobotDescriptionNode::RobotDescriptionNode()
+RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description)
 : Node("robot_description")
 {
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor");
 
-    declare_parameter<std::string>("urdf_path", ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
-    std::string urdf_path = get_parameter("urdf_path").as_string();
+    // declare_parameter<std::string>("urdf_path", ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
+    // std::string urdf_path = get_parameter("urdf_path").as_string();
 
-    m_robot_description = std::make_shared<RobotDescription>();
-    m_robot_description->parseURDF(urdf_path);
-    m_robot_description->configureRobotNodes();
+    // m_robot_description = std::make_shared<RobotDescription>();
+    // m_robot_description->parseURDF(urdf_path);
+    // m_robot_description->configureRobotNodes();
+
+    m_robot_description = robot_description;
 
     // TODO: Callback to state_estimation/state instead of /joint_states
     // m_joint_state_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -86,10 +88,6 @@ void RobotDescriptionNode::jointStateCallback(const sensor_msgs::msg::JointState
     }
 
     m_state_visualization_publisher->publish(message);
-    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::jointStateCallback done");
-
-    // Temporary
-    // m_joint_state_msg = msg;
 }
 
 void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -139,48 +137,6 @@ void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg:
     // m_state_visualization_publisher->publish(message);
     // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::stateEstimationCallback done");
 }
-
-// void RobotDescriptionNode::handleTaskReportRequest(const std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Request> request,
-//     std::shared_ptr<march_shared_msgs::srv::GetTaskReport::Response> response)
-// {
-//     std::vector<std::string> names = {"left_ankle", "right_ankle"};
-//     std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(names);
-//     uint8_t task_m = 6;
-//     uint8_t task_n = 8;
-//     uint8_t task_m_unit = (uint8_t) (task_m / names.size());
-//     uint8_t task_n_unit = (uint8_t) (task_n / names.size());
-
-//     for (auto & robot_node : robot_nodes)
-//     {
-//         Eigen::Vector3d pose = robot_node->getGlobalPosition(m_joint_state_msg->name, m_joint_state_msg->position);
-//         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest: %f %f %f", pose(0), pose(1), pose(2));
-//         response->current_pose.push_back(pose(0));  // Global position x
-//         response->current_pose.push_back(pose(1));  // Global position y
-//         response->current_pose.push_back(pose(2));  // Global position z
-
-//         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(m_joint_state_msg->name, m_joint_state_msg->position);
-//         // TODO: Switch rows and columns
-//         for (int i = 0; i < task_m_unit; i++)
-//         {
-//             for (int j = 0; j < task_n_unit; j++)
-//             {
-//                 if (i < jacobian.rows() && j < jacobian.cols())
-//                 {
-//                     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest: %f", jacobian(i, j));
-//                     response->jacobians.push_back(jacobian(i, j));
-//                 }
-//                 else
-//                 {
-//                     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest: %f", 0.0);
-//                     response->jacobians.push_back(0.0);
-//                 }
-//                 // TODO: Replace with Eigen::Map + add additional fields in GetTaskReport.srv (m and n per node)
-//             }
-//         }
-//     }
-
-//     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleTaskReportRequest done");
-// }
 
 void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
@@ -257,16 +213,4 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
 
     response->node_jacobians = node_jacobians;
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest done");
-}
-
-int main(int argc, char * argv[])
-{
-    rclcpp::init(argc, argv);
-    // rclcpp::spin(std::make_shared<RobotDescriptionNode>());
-    auto node = std::make_shared<RobotDescriptionNode>();
-    rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(node);
-    executor.spin();
-    rclcpp::shutdown();
-    return 0;
 }

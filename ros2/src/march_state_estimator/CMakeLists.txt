@@ -46,6 +46,7 @@ add_library(${PROJECT_NAME} STATIC
   src/robot_node.cpp
   src/robot_mass.cpp
   src/robot_joint.cpp
+  src/sensor_fusion_node.cpp
   src/state_estimator_node.cpp
 )
 
@@ -58,20 +59,24 @@ ament_target_dependencies(${PROJECT_NAME}
   march_description
   march_shared_msgs
   urdf
+  Eigen3
 )
 
 # Create robot_description_node executable
-add_executable(robot_description_node
+add_executable(state_estimator_node
   src/robot_description_node.cpp
   src/robot_description.cpp
   src/robot_node.cpp
   src/robot_mass.cpp
   src/robot_joint.cpp
+  src/sensor_fusion_node.cpp
+  src/state_estimator_node.cpp
 )
-target_include_directories(robot_description_node PUBLIC
+target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(robot_description_node
+  
+ament_target_dependencies(state_estimator_node
   rclcpp
   ament_index_cpp
   std_msgs
@@ -83,35 +88,13 @@ ament_target_dependencies(robot_description_node
   Eigen3
 )
 
-target_link_libraries(robot_description_node
+target_link_libraries(state_estimator_node
   ${PROJECT_NAME}
   ${GINAC_LIB}
 )
 
-# Create state_estimator_node executable
-add_executable(state_estimator_node
-  src/state_estimator_node.cpp
-)
-
-target_include_directories(state_estimator_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(state_estimator_node
-  rclcpp
-  ament_index_cpp
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-  march_shared_msgs
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
-)
-
 # Install targets and executables
 install(TARGETS
-  robot_description_node
   state_estimator_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
@@ -172,72 +155,6 @@ if(BUILD_TESTING)
     Eigen3
 
   )
-
-  # install(
-  #   DIRECTORY include/
-  #   DESTINATION include
-  # )
-  # install(
-  #   TARGETS ${PROJECT_NAME}
-  #   EXPORT ${PROJECT_NAME}Targets
-  #   LIBRARY DESTINATION lib
-  #   ARCHIVE DESTINATION lib
-  #   RUNTIME DESTINATION bin
-  #   INCLUDES DESTINATION include
-  # )
-
-  # add_executable(test_runner
-  #   test/test_runner.cpp
-  #   test/robot_node_test.cpp
-  #   test/robot_description_test.cpp
-  # )
-
-  # ament_target_dependencies(test_runner
-  #   rclcpp
-  #   ament_index_cpp
-  #   std_msgs
-  #   sensor_msgs
-  #   geometry_msgs
-  #   march_description
-  #   march_shared_msgs
-  #   urdf
-  #   Eigen3
-  # )
-
-  # target_link_libraries(test_runner
-  #   ${PROJECT_NAME}
-  #   ${GINAC_LIB}
-  # )
-
-  # find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
-  
-  # find_package(ament_cmake_gtest REQUIRED)
-  # ament_add_gtest(robot_description_node_test test/robot_description_node_test.cpp)
-  # target_include_directories(robot_description_node_test PUBLIC
-  #   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  #   $<INSTALL_INTERFACE:include>)
-  # ament_target_dependencies(robot_description_node_test
-  #   rclcpp
-  #   ament_index_cpp
-  #   std_msgs
-  #   sensor_msgs
-  #   geometry_msgs
-  #   march_description
-  #   march_shared_msgs
-  #   urdf
-  #   Eigen3
-  # )
-
-  # target_link_libraries(robot_description_node_test
-  #   ${PROJECT_NAME}
-  #   ${GINAC_LIB}
-  # )
   
   # ament_lint_auto_find_test_dependencies()
 endif()
