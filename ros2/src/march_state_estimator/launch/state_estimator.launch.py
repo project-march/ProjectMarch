@@ -13,8 +13,8 @@ def generate_launch_description():
         ),
         Node(
             package='march_state_estimator',
-            executable='state_estimator_node',
-            name='state_estimator',
+            executable='sensor_fusion_node',
+            name='sensor_fusion',
             output='screen',
         ),
     ])

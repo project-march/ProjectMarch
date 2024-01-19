@@ -19,7 +19,7 @@
 class RobotDescriptionNode : public rclcpp::Node
 {
 public:
-    RobotDescriptionNode();
+    RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
 
 private:
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
