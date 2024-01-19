@@ -1,18 +1,23 @@
 #include "march_gait_planning/test_setup_gait_planning.hpp"
 #include <iostream>
 #include <fstream>
+#include <thread> // Include this at the top of your file
 
 TestSetupGaitPlanning::TestSetupGaitPlanning()
   {
     std::cout << "Test Gait Planning Class created" << std::endl; 
+    std::this_thread::sleep_for(std::chrono::seconds(10)); // Wait for 10 seconds
+
+
     loadTrajectoryFromCSV(); 
     std::cout << "Bezier CSV created" << std::endl; 
   }
 
 void TestSetupGaitPlanning::loadTrajectoryFromCSV() {
-    std::ifstream file("src/march_gait_planning/m9_gait_files/test_trajectory.csv");
+
+    std::ifstream file("jkldfhiafhsioadfhiosudfoiasufiouasdhfiosdfhosd");
     if (!file) {
-        std::cerr << "Error opening file." << std::endl;
+        throw std::invalid_argument("Could not open CSV file");
         return;
     }
 

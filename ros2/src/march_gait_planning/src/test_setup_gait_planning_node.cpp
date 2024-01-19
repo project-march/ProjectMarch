@@ -9,10 +9,11 @@ constexpr double linear_range = 0.1;
 
 TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
  : Node("march_test_setup_gait_planning_node"), 
-   m_gait_planning(TestSetupGaitPlanning()),
+//    m_gait_planning(TestSetupGaitPlanning()),
    m_current_trajectory(),
    m_current_joint_angles_msg(std::make_shared<trajectory_msgs::msg::JointTrajectory>())
 {
+    m_error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 10);
     trajectory_msgs::msg::JointTrajectoryPoint previous_point;
     previous_point.positions.push_back(0.0);
     previous_point.time_from_start = rclcpp::Duration(0, 0);
@@ -30,7 +31,24 @@ TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
     m_test_joint_trajectory_controller_mode_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
-    m_gait_planning.setGaitType(exoMode::BootUp); 
+    try
+    {
+        m_gait_planning = TestSetupGaitPlanning();
+        m_gait_planning.setGaitType(exoMode::BootUp); 
+    }
+    catch(const std::exception& e)
+    {
+        RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Error constructing TestSetupGaitPlanningNode %s", e.what()); 
+        std::cout << "Error constructing TestSetupGaitPlanningNode" << std::endl;
+        auto message = march_shared_msgs::msg::Error();
+        message.header.stamp = this->now();
+        message.error_message = "Example error message";
+        message.error_code = 0041; // Example error code
+        message.severity = 2;    // Example severity
+        m_error_publisher->publish(message);
+    }
+
+
 
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestSetupGaitPlanningNode::timerCallback, this);

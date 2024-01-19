@@ -6,6 +6,7 @@
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "march_gait_planning/test_setup_gait_planning.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
+#include "march_shared_msgs/msg/error.hpp"
 
 class TestSetupGaitPlanningNode : public rclcpp::Node
 {
@@ -27,6 +28,8 @@ private:
 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_test_joint_trajectory_controller_mode_pub_;
+    rclcpp::Publisher<march_shared_msgs::msg::Error>::SharedPtr m_error_publisher;
+    
     rclcpp::TimerBase::SharedPtr m_timer;
 
     TestSetupGaitPlanning m_gait_planning;

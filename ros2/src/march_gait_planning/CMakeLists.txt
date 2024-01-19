@@ -16,15 +16,43 @@ include_directories(include)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
 
+# Add library
+add_library(${PROJECT_NAME} STATIC
+  src/gait_planning_joint_angles_node.cpp
+  src/gait_planning_joint_angles.cpp
+  src/gait_planning_node.cpp
+  src/gait_planning.cpp
+  src/test_joints_gait_planning_node.cpp
+  src/test_setup_gait_planning_node.cpp
+  src/test_setup_gait_planning.cpp
+)
+
+ament_target_dependencies(${PROJECT_NAME}
+  rclcpp
+  march_shared_msgs
+  geometry_msgs
+  trajectory_msgs
+  # filesystem
+)
+
 # Create the gait_planning_node executable
 add_executable(gait_planning_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
+
 add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles_node.cpp
   src/gait_planning_joint_angles.cpp
 )
+
+target_include_directories(gait_planning_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+target_include_directories(gait_planning_angles_node PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)
 
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_node
@@ -55,6 +83,10 @@ add_executable(test_setup_gait_planning_node
   src/test_setup_gait_planning.cpp
 )
 
+target_include_directories(test_setup_gait_planning_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(test_setup_gait_planning_node
   rclcpp
@@ -73,6 +105,11 @@ add_executable(test_joints_gait_planning_node
   src/test_joints_gait_planning_node.cpp
   src/test_setup_gait_planning.cpp
 )
+
+
+target_include_directories(test_joints_gait_planning_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 # Link against ROS 2 dependencies
 ament_target_dependencies(test_joints_gait_planning_node

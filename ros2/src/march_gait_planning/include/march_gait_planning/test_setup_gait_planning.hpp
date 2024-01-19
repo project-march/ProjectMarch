@@ -4,6 +4,8 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <thread> // Include this at the top of your file
+#include <chrono>
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 class TestSetupGaitPlanning

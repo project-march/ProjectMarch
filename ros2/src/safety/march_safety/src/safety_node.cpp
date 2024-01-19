@@ -14,7 +14,6 @@ int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<SafetyNode>());
-
     rclcpp::shutdown();
     return 0;
 }
@@ -54,5 +53,5 @@ void SafetyNode::update()
  */
 void SafetyNode::errorCallback(const march_shared_msgs::msg::Error::SharedPtr msg)
 {
-    RCLCPP_INFO(get_logger(), "Received error message: %s", std::to_string(msg->type).c_str());
+    RCLCPP_INFO(get_logger(), "Received error message: %s", msg->error_message.c_str());
 }
