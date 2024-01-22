@@ -23,10 +23,10 @@ def normal_large_step():
 
     first_step = df_gait_joint.iloc[0:72]
     first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
-    full_step = df_gait_joint.iloc[73:189]
+    full_step = df_gait_joint.iloc[73:182]
     full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
 
-    plot_joints(first_step)
+    # plot_joints(first_step)
     plot_joints(full_step)
 
     df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
