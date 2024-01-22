@@ -25,7 +25,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
  : Node("gait_planning_angles_node"), 
    m_gait_planning(GaitPlanningAngles()),
    m_joints_msg(),
-   m_trajectory_prev_point(),
+//    m_trajectory_prev_point(),
    m_trajectory_des_point(),
    m_current_trajectory(),
    m_incremental_steps_to_home_stand(),
@@ -34,7 +34,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 {
     m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
                         "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
-    initializeConstantsPoints(m_trajectory_prev_point);
+    // initializeConstantsPoints(m_trajectory_prev_point);
     initializeConstantsPoints(m_trajectory_des_point); 
     m_trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
 
@@ -94,11 +94,11 @@ void GaitPlanningAnglesNode::initializeConstantsPoints(trajectory_msgs::msg::Joi
 
 void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
     if (!m_current_trajectory.empty()){
-        m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-        m_joints_msg.points.push_back(m_trajectory_prev_point); 
+        // m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
+        // m_joints_msg.points.push_back(m_trajectory_prev_point); 
         m_trajectory_des_point.positions = m_current_trajectory[counter]; 
         m_joints_msg.points.push_back(m_trajectory_des_point);
-        m_gait_planning.setPrevPoint(m_current_trajectory[counter]); 
+        // m_gait_planning.setPrevPoint(m_current_trajectory[counter]); 
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait message published!"); 
         m_joints_msg.points.clear();   
@@ -115,8 +115,8 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Increments correctly calculated!");
     }
 
-    m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-    m_joints_msg.points.push_back(m_trajectory_prev_point); 
+    // m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
+    // m_joints_msg.points.push_back(m_trajectory_prev_point); 
 
     if (m_gait_planning.getCounter() < 40){
         m_trajectory_des_point.positions.clear();
@@ -136,7 +136,7 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
     m_joint_angle_trajectory_publisher->publish(m_joints_msg);
     
     m_joints_msg.points.clear();   
-    m_gait_planning.setPrevPoint(m_trajectory_des_point.positions); 
+    // m_gait_planning.setPrevPoint(m_trajectory_des_point.positions); 
     m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
 
 
