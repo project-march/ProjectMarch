@@ -20,18 +20,12 @@ class GaitPlanningNode:public rclcpp::Node {
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; // exo_mode == gait_type 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
-    
-    // rclcpp::Client<march_shared_msgs::srv::GetCurrentStanceLeg>::SharedPtr m_stance_leg_client; 
-    // march_shared_msgs::srv::GetCurrentStanceLeg::Request::SharedPtr m_stance_leg_request;
 
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
     void currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
-
-    // void responseStanceLegCallback(std::shared_future<march_shared_msgs::srv::GetCurrentStanceLeg::Response::SharedPtr> future);
-    // void sendRequest(const bool& gait_complete); 
 
     void timerCallback();
 
@@ -40,8 +34,5 @@ class GaitPlanningNode:public rclcpp::Node {
     std::vector<std::array<double, 4>> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
-    //Remove, not necessary anymore 
-    // bool m_response_received;
-
 
 };
