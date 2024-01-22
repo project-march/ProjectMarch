@@ -9,7 +9,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    # use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
     config = os.path.join(
                 get_package_share_directory('march_ik_solver'),
@@ -106,14 +106,14 @@ def generate_launch_description():
             output='screen',
             parameters=[config],
         ),
-        Node(
-            package='march_ik_solver',
-            # namespace='march_ik_solver',
-            executable='ik_solver_buffer_node',
-            name='ik_solver_buffer',
-            output='screen',
-            parameters=[config],
-        ),
+        # Node(
+        #     package='march_ik_solver',
+        #     # namespace='march_ik_solver',
+        #     executable='ik_solver_buffer_node',
+        #     name='ik_solver_buffer',
+        #     output='screen',
+        #     parameters=[config],
+        # ),
         # IncludeLaunchDescription(
         #     PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'display.launch.py']),
         #     launch_arguments={

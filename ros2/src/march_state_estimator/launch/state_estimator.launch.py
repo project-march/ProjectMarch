@@ -7,6 +7,12 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
+    config = os.path.join(
+        get_package_share_directory('march_state_estimator'),
+        'config',
+        'state_estimator_config.yaml'
+    )
+
     return LaunchDescription([
         Node(
             package='march_state_estimator',

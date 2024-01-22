@@ -9,31 +9,31 @@
 
 RobotDescription::~RobotDescription()
 {
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Destructing RobotDescription...");
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Destructing RobotDescription...");
     for (auto & robot_node : m_robot_nodes)
     {
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Deleting robot_node %s ...", robot_node->getName().c_str());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Deleting robot_node %s ...", robot_node->getName().c_str());
         delete robot_node;
     }
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Destructing RobotDescription done");
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Destructing RobotDescription done");
 }
 
 void RobotDescription::parseURDF(const std::string & urdf_path)
 {
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescription::parse");
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescription::parse");
     m_urdf_model.initFile(urdf_path);
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescription::parse done");
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescription::parse done");
 
     for (auto & link : m_urdf_model.links_)
     {
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "link: %s", link.first.c_str());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "link: %s", link.first.c_str());
         if (link.second->inertial == nullptr)
         {
-            // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "link has no inertial");
+            // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "link has no inertial");
             continue;
         }
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f", link.second->inertial->origin.position.x, link.second->inertial->origin.position.y, link.second->inertial->origin.position.z);
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Link origin: %f %f %f %f", link.second->inertial->origin.rotation.x, link.second->inertial->origin.rotation.y, link.second->inertial->origin.rotation.z, link.second->inertial->origin.rotation.w);
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Link origin: %f %f %f", link.second->inertial->origin.position.x, link.second->inertial->origin.position.y, link.second->inertial->origin.position.z);
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Link origin: %f %f %f %f", link.second->inertial->origin.rotation.x, link.second->inertial->origin.rotation.y, link.second->inertial->origin.rotation.z, link.second->inertial->origin.rotation.w);
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "")
         RobotMass * robot_mass = new RobotMass(link.first, m_robot_nodes.size(), link.second->inertial->mass);
         
@@ -59,12 +59,12 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
 
     for (auto & joint : m_urdf_model.joints_)
     {
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "joint: %s", joint.first.c_str());
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Joint origin: %f %f %f", joint.second->parent_to_joint_origin_transform.position.x, joint.second->parent_to_joint_origin_transform.position.y, joint.second->parent_to_joint_origin_transform.position.z);
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Joint origin: %f %f %f %f", joint.second->parent_to_joint_origin_transform.rotation.x, joint.second->parent_to_joint_origin_transform.rotation.y, joint.second->parent_to_joint_origin_transform.rotation.z, joint.second->parent_to_joint_origin_transform.rotation.w);
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "joint: %s", joint.first.c_str());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Joint origin: %f %f %f", joint.second->parent_to_joint_origin_transform.position.x, joint.second->parent_to_joint_origin_transform.position.y, joint.second->parent_to_joint_origin_transform.position.z);
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Joint origin: %f %f %f %f", joint.second->parent_to_joint_origin_transform.rotation.x, joint.second->parent_to_joint_origin_transform.rotation.y, joint.second->parent_to_joint_origin_transform.rotation.z, joint.second->parent_to_joint_origin_transform.rotation.w);
         if (joint.second->type == JOINT_TYPE_REVOLUTE)
         {
-            // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "joint is revolute or continuous");
+            // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "joint is revolute or continuous");
             std::vector<double> joint_axis = {joint.second->axis.x, joint.second->axis.y, joint.second->axis.z};
             RobotJoint * robot_joint = new RobotJoint(joint.first, m_robot_nodes.size(), joint_axis);
             for (auto & robot_node : m_robot_nodes)
@@ -90,7 +90,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         }
     }
 
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Size of robot_links_: %d", m_robot_nodes.size());
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Size of robot_links_: %d", m_robot_nodes.size());
 }
 
 void RobotDescription::configureRobotNodes()
@@ -98,24 +98,29 @@ void RobotDescription::configureRobotNodes()
     // for (auto & robot_node : m_robot_nodes)
     // {
     //     std::string name = robot_node->getName();
-    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "robot_node: %s", name.c_str());
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "robot_node: %s", name.c_str());
     //     if (robot_node->getParent() != nullptr)
     //     {
-    //         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Parent: %s", robot_node->getParent()->getName().c_str());
+    //         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Parent: %s", robot_node->getParent()->getName().c_str());
     //     }
     //     for (auto & child : robot_node->getChildren())
     //     {
-    //         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Child: %s", child->getName().c_str());
+    //         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Child: %s", child->getName().c_str());
     //     }
     //     Eigen::Vector3d origin_position = robot_node->getOriginPosition();
     //     Eigen::Matrix3d origin_rotation = robot_node->getOriginRotation();
-    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Origin position: %f %f %f", origin_position.x(), origin_position.y(), origin_position.z());
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Origin position: %f %f %f", origin_position.x(), origin_position.y(), origin_position.z());
     //     for (int i = 0; i < origin_rotation.rows(); i++)
     //     {
-    //         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Origin rotation: %f %f %f", origin_rotation(i, 0), origin_rotation(i, 1), origin_rotation(i, 2));
+    //         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Origin rotation: %f %f %f", origin_rotation(i, 0), origin_rotation(i, 1), origin_rotation(i, 2));
     //     }
-    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "---------------------");
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "---------------------");
     // }
+
+    for (auto & robot_node : m_robot_nodes)
+    {
+        robot_node->expressRotation();
+    }
 
     for (auto & robot_node : m_robot_nodes)
     {
