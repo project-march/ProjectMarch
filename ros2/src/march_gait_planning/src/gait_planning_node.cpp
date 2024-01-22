@@ -19,6 +19,8 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
+    m_home_stand = {0.0, 0.16, -0.802, 0.0, -0.16, -0.802}; 
+
     // auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
     // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
  }
@@ -56,7 +58,7 @@ void GaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
         case exoMode::Stand :
             m_current_trajectory.clear();
-            setFootPositionsMessage(0.0, 0.16, -0.802, 0.0, -0.16, -0.802);
+            setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
             m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
             break;
@@ -78,12 +80,12 @@ void GaitPlanningNode::footPositionsPublish(){
                 // if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
-                    setFootPositionsMessage(current_step[2], 0.16, current_step[3]-0.802, 
-                                    current_step[0], -0.16, current_step[1]-0.802);
+                    setFootPositionsMessage(current_step[2], m_home_stand[1], current_step[3] + m_home_stand[2], 
+                                    current_step[0], m_home_stand[4], current_step[1] + m_home_stand[5]);
                 } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
                     // 10 is right stance leg
-                    setFootPositionsMessage(current_step[0], 0.16, current_step[1]-0.802, 
-                                    current_step[2], -0.16, current_step[3]-0.802);
+                    setFootPositionsMessage(current_step[0], m_home_stand[1], current_step[1]+ m_home_stand[2], 
+                                    current_step[2], m_home_stand[4], current_step[3]+ m_home_stand[5]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
