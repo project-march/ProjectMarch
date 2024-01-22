@@ -9,7 +9,6 @@ GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
    m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>())
-//    m_response_received(true)
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -77,12 +76,12 @@ void GaitPlanningNode::footPositionsPublish(){
                 // if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
-                    setFootPositionsMessage(current_step[2], 0.16, current_step[3], 
-                                    current_step[0], -0.16, current_step[1]);
+                    setFootPositionsMessage(current_step[2], m_gait_planning.getCurrentLeftFootPos()[1], current_step[3], 
+                                    current_step[0], m_gait_planning.getCurrentRightFootPos()[1], current_step[1]);
                 } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
                     // 10 is right stance leg
-                    setFootPositionsMessage(current_step[0], 0.16, current_step[1], 
-                                    current_step[2], -0.16, current_step[3]);
+                    setFootPositionsMessage(current_step[0], m_gait_planning.getCurrentLeftFootPos()[1], current_step[1], 
+                                    current_step[2], m_gait_planning.getCurrentRightFootPos()[1], current_step[3]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
