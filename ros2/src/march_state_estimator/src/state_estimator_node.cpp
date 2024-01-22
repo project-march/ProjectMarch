@@ -24,8 +24,9 @@ int main(int argc, char ** argv)
     auto sensor_fusion_node = std::make_shared<SensorFusionNode>(robot_description);
     auto robot_description_node = std::make_shared<RobotDescriptionNode>(robot_description); 
 
-    // Multi-threaded executor
-    rclcpp::executors::MultiThreadedExecutor executor;
+    // TODO: Fix multi-threaded executor due to issue in service handling in RobotDescriptionNode.
+    // rclcpp::executors::MultiThreadedExecutor executor;
+    rclcpp::executors::SingleThreadedExecutor executor;
     executor.add_node(sensor_fusion_node);
     executor.add_node(robot_description_node);
     executor.spin();

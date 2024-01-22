@@ -280,7 +280,7 @@ void RobotNode::expressRotation()
         {
             std::stringstream ss_rotation_expression;
             ss_rotation_expression << "Global rotation " << m_name << " (" << i << "," << j << ") : " << m_global_rotation_matrix(i, j) << " ";
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss_rotation_expression.str().c_str());
+            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_rotation_expression.str().c_str());
         }
     }
 }
@@ -312,7 +312,7 @@ void RobotNode::expressKinematics()
     {
         std::stringstream ss_position_expression;
         ss_position_expression << "Global position " << m_name << " " << i << ": " << m_global_position_vector(i, 0) << " ";
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss_position_expression.str().c_str());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_position_expression.str().c_str());
     }
 
     // // DEBUG: Print the global position jacobian expressions.
@@ -322,7 +322,7 @@ void RobotNode::expressKinematics()
     //     {
     //         std::stringstream ss_jacobian_expression;
     //         ss_jacobian_expression << "Global position jacobian " << m_name << " (" << i << "," << j << "): " << m_global_position_jacobian_matrix(i, j) << " ";
-    //         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), ss_jacobian_expression.str().c_str());
+    //         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_jacobian_expression.str().c_str());
     //     }
     // }
 
