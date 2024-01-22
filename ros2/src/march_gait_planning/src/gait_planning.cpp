@@ -52,12 +52,14 @@ void GaitPlanning::setBezierGait(){
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
+    std::vector<std::array<double, 4>> result;  
     switch (m_gait_type){
         case exoMode::LargeWalk : 
-        return m_current_stance_foot & 0b11 ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
+        result = (m_current_stance_foot & 0b11) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
         case exoMode::SmallWalk : 
-        return m_current_stance_foot &0b11 ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
+        result =  (m_current_stance_foot &0b11) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
     }
+    return result; 
     // return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
     // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
 }
