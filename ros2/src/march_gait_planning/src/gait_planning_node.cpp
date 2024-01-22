@@ -15,7 +15,7 @@ GaitPlanningNode::GaitPlanningNode()
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GaitPlanningNode::currentModeCallback, this, _1)); 
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "state_estimator/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
+        "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
@@ -26,16 +26,17 @@ GaitPlanningNode::GaitPlanningNode()
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
+    footPositionsPublish(); 
 }
 
 void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current foot positions");
+    // RCLCPP_INFO(get_logger(), "Received current foot positions");
     std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
     std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
     if (m_current_trajectory.empty()){
         m_gait_planning.setStanceFoot(msg->stance_leg); 
-        RCLCPP_INFO(get_logger(), "Received current stance foot"); 
+        // RCLCPP_INFO(get_logger(), "Received current stance foot"); 
     }
     footPositionsPublish(); 
 }
@@ -77,12 +78,12 @@ void GaitPlanningNode::footPositionsPublish(){
                 // if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
-                    setFootPositionsMessage(current_step[2], m_gait_planning.getCurrentLeftFootPos()[1], current_step[3], 
-                                    current_step[0], m_gait_planning.getCurrentRightFootPos()[1], current_step[1]);
+                    setFootPositionsMessage(current_step[2], 0.16, current_step[3]-0.802, 
+                                    current_step[0], -0.16, current_step[1]-0.802);
                 } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
                     // 10 is right stance leg
-                    setFootPositionsMessage(current_step[0], m_gait_planning.getCurrentLeftFootPos()[1], current_step[1], 
-                                    current_step[2], m_gait_planning.getCurrentRightFootPos()[1], current_step[3]);
+                    setFootPositionsMessage(current_step[0], 0.16, current_step[1]-0.802, 
+                                    current_step[2], -0.16, current_step[3]-0.802);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 

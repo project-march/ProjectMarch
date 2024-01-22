@@ -70,15 +70,15 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
     if (m_first_stand && m_gait_planning.getGaitType() == exoMode::Stand) {
-    std::vector<double> point = msg->joint_state.position; 
-    if (point.size() >= 8) {
-        m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
-        // m_gait_planning.setPrevPoint(point); 
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
-        m_first_stand = false;
-    } else {
-        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
-    }
+        std::vector<double> point = msg->joint_state.position; 
+        if (point.size() >= 8) {
+            m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
+            // m_gait_planning.setPrevPoint(point); 
+            RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
+            m_first_stand = false;
+        } else {
+            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
+        }
     }
     publishJointTrajectoryPoints(); 
     
