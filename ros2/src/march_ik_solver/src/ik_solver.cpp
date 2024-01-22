@@ -19,7 +19,7 @@ Eigen::VectorXd IKSolver::solve()
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
         // m_tasks[i].setDesiredPose(&desired_poses[i]);
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i].getTaskName().c_str());
-        desired_joint_velocities += m_tasks[i].solve();
+        desired_joint_velocities.noalias() += m_tasks[i].solve();
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i].getTaskName().c_str());
     }
 
@@ -28,26 +28,27 @@ Eigen::VectorXd IKSolver::solve()
 
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
-    double dt = 1e-2;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Integrating joint velocities with dt: %f", dt);
+    double dt = 1e-2; // TODO: Get dt from the integral_dt_ptr.
+    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Integrating joint velocities with dt: %f", dt);
 
-    Eigen::VectorXd desired_joint_velocities = *m_desired_joint_velocities_ptr;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Desired joint velocities: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-        desired_joint_velocities(0), desired_joint_velocities(1), desired_joint_velocities(2), desired_joint_velocities(3), 
-        desired_joint_velocities(4), desired_joint_velocities(5), desired_joint_velocities(6), desired_joint_velocities(7));
+    // Eigen::VectorXd desired_joint_velocities = *m_desired_joint_velocities_ptr;
+    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Desired joint velocities: %f, %f, %f, %f, %f, %f, %f, %f, %f",
+    //     desired_joint_velocities(0), desired_joint_velocities(1), desired_joint_velocities(2), desired_joint_velocities(3), 
+    //     desired_joint_velocities(4), desired_joint_velocities(5), desired_joint_velocities(6), desired_joint_velocities(7));
 
-    Eigen::VectorXd current_joint_positions = *m_current_joint_positions_ptr;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-        current_joint_positions(0), current_joint_positions(1), current_joint_positions(2), current_joint_positions(3), 
-        current_joint_positions(4), current_joint_positions(5), current_joint_positions(6), current_joint_positions(7));
+    // Eigen::VectorXd current_joint_positions = *m_current_joint_positions_ptr;
+    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
+    //     current_joint_positions(0), current_joint_positions(1), current_joint_positions(2), current_joint_positions(3), 
+    //     current_joint_positions(4), current_joint_positions(5), current_joint_positions(6), current_joint_positions(7));
 
-    Eigen::VectorXd desired_joint_positions = (*m_current_joint_positions_ptr) + (*m_desired_joint_velocities_ptr) * dt;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Desired joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
+    Eigen::VectorXd desired_joint_positions;
+    desired_joint_positions.noalias() = (*m_current_joint_positions_ptr) + (*m_desired_joint_velocities_ptr) * dt;
+    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Desired joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
         desired_joint_positions(0), desired_joint_positions(1), desired_joint_positions(2), desired_joint_positions(3), 
         desired_joint_positions(4), desired_joint_positions(5), desired_joint_positions(6), desired_joint_positions(7));
 
     Eigen::VectorXd clamped_desired_joint_positions = clampJointLimits(desired_joint_positions);
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Limited desired joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
+    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Limited desired joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
         clamped_desired_joint_positions(0), clamped_desired_joint_positions(1), clamped_desired_joint_positions(2), clamped_desired_joint_positions(3), 
         clamped_desired_joint_positions(4), clamped_desired_joint_positions(5), clamped_desired_joint_positions(6), clamped_desired_joint_positions(7));
     return clamped_desired_joint_positions;

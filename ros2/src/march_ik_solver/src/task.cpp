@@ -28,27 +28,25 @@ Eigen::VectorXd Task::solve()
 
     Eigen::VectorXd error = calculateError();
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_task_n);
-    for (unsigned int i = 0; i < m_task_n; i++)
-    {
-        for (unsigned int j = 0; j < m_task_m; j++)
-        {
-            joint_velocities(i) += m_jacobian_inverse(i,j) * error(j);
-        }
-    }
+    joint_velocities.noalias() = m_jacobian_inverse * error;
     return joint_velocities;
 }
 
 Eigen::VectorXd Task::calculateError()
 {
-    Eigen::VectorXd pose_error =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
-    Eigen::VectorXd error = m_gain_p * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
+    Eigen::VectorXd pose_error, error;
+    pose_error.noalias() =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
+    Eigen::VectorXd gain_p_matrix = Eigen::VectorXd::Zero(m_task_m);
+    gain_p_matrix << m_gain_p, m_gain_p * 2.0, m_gain_p, m_gain_p, m_gain_p * .0, m_gain_p; // TODO
+    error.noalias() = gain_p_matrix.asDiagonal() * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
     m_error_norm = error.norm();
     return error;
 }
 
 Eigen::VectorXd Task::calculateIntegralError(const Eigen::VectorXd & error)
 {
-    Eigen::VectorXd integral_error = m_integral_error + error * m_dt;
+    Eigen::VectorXd integral_error;
+    integral_error.noalias() = m_integral_error + error * m_dt;
     m_integral_error = integral_error;
 
     return m_gain_i * integral_error;
@@ -234,53 +232,53 @@ const Eigen::MatrixXd * Task::getJacobianInversePtr()
 
 void Task::sendRequestNodePosition()
 {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Sending request to get node position...");
     auto request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
     request->node_names = m_node_names;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node names: %s, %s", request->node_names[0].c_str(), request->node_names[1].c_str());
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Node names: %s, %s", request->node_names[0].c_str(), request->node_names[1].c_str());
     
     // request->m_joint_names = *m_current_joint_names_ptr;
     request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
     request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(), m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", 
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Joint names: %s, %s, %s, %s, %s, %s, %s, %s", 
         request->joint_names[0].c_str(), request->joint_names[1].c_str(), request->joint_names[2].c_str(), request->joint_names[3].c_str(),
         request->joint_names[4].c_str(), request->joint_names[5].c_str(), request->joint_names[6].c_str(), request->joint_names[7].c_str());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Joint positions: %f, %f, %f, %f, %f, %f, %f, %f",
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Joint positions: %f, %f, %f, %f, %f, %f, %f, %f",
         request->joint_positions[0], request->joint_positions[1], request->joint_positions[2], request->joint_positions[3],
         request->joint_positions[4], request->joint_positions[5], request->joint_positions[6], request->joint_positions[7]);
 
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for service get_node_position...");
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Waiting for service get_node_position...");
     while (!m_client_node_position->wait_for_service(std::chrono::milliseconds(10))) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "service not available, waiting again...");
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending request to get node position...");
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Sending request to get node position...");
     auto result = m_client_node_position->async_send_request(request);
 
     if (rclcpp::spin_until_future_complete(m_node->get_node_base_interface(), result)
         == rclcpp::FutureReturnCode::SUCCESS) {
 
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received node position...");
+        RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Received node position...");
         std::vector<double> current_pose_vector;
 
         for (auto node_position : result.get()->node_positions)
         {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
+            RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
             current_pose_vector.push_back(node_position.x);
             current_pose_vector.push_back(node_position.y);
             current_pose_vector.push_back(node_position.z);
         }
 
         m_current_pose = Eigen::Map<Eigen::VectorXd>(current_pose_vector.data(), m_task_m);
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Current pose: %f, %f, %f, %f, %f, %f", m_current_pose(0), m_current_pose(1), m_current_pose(2), m_current_pose(3), m_current_pose(4), m_current_pose(5));
+        // RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Current pose: %f, %f, %f, %f, %f, %f", m_current_pose(0), m_current_pose(1), m_current_pose(2), m_current_pose(3), m_current_pose(4), m_current_pose(5));
     }
     else
     {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_node_position");
+        RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Failed to call service get_node_position");
     }
 }
 
@@ -295,10 +293,10 @@ void Task::sendRequestNodeJacobian()
 
     while (!m_client_node_jacobian->wait_for_service(std::chrono::seconds(1))) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "service not available, waiting again...");
     }
 
     auto result = m_client_node_jacobian->async_send_request(request);
@@ -334,13 +332,13 @@ void Task::sendRequestNodeJacobian()
         }
 
         m_jacobian = jacobian;
-        for (unsigned int i = 0; i < m_task_m; i++)
-        {
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
-        }
+        // for (unsigned int i = 0; i < m_task_m; i++)
+        // {
+        //     RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
+        // }
     }
     else
     {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service get_node_jacobian");
+        RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Failed to call service get_node_jacobian");
     }
 }
