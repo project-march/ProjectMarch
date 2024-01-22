@@ -20,7 +20,10 @@ GaitPlanning::GaitPlanning()
   m_current_stance_foot(), 
   m_current_left_foot_position(), 
   m_current_right_foot_position(), 
-  m_bezier_trajectory(), 
+  m_small_bezier_trajectory(),
+  m_large_bezier_trajectory(), 
+  m_small_first_step_trajectory(), 
+  m_large_first_step_trajectory(),  
   m_step_size()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
@@ -42,12 +45,20 @@ void GaitPlanning::setGaitType(const exoMode &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_first_step_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
-    m_bezier_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv");
+    m_large_first_step_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv");
+    m_large_bezier_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv");
+    m_small_first_step_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv");
+    m_small_bezier_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
-    return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
+    switch (m_gait_type){
+        case exoMode::LargeWalk : 
+        return m_current_stance_foot & 0b11 ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
+        case exoMode::SmallWalk : 
+        return m_current_stance_foot &0b11 ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
+    }
+    // return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
     // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
 }
 
