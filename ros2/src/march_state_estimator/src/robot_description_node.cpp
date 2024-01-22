@@ -12,21 +12,29 @@
 RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description)
 : Node("robot_description")
 {
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor");
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor");
 
     m_robot_description = robot_description;
 
-    m_node_positions_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_node_jacobian_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    // m_node_positions_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    // m_node_jacobian_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    // m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
+    //     "state_estimation/get_node_position", 
+    //     std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2),
+    //     rmw_qos_profile_services_default, m_node_positions_callback_group);
+    // m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
+    //     "state_estimation/get_node_jacobian", 
+    //     std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
+    //     rmw_qos_profile_services_default, m_node_jacobian_callback_group);
 
     m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
         "state_estimation/get_node_position", 
         std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2),
-        rmw_qos_profile_services_default, m_node_positions_callback_group);
+        rmw_qos_profile_services_default);
     m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
-        "state_estimation/get_node_jacobian", 
+        "state_estimation/get_node_jacobian",
         std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
-        rmw_qos_profile_services_default, m_node_jacobian_callback_group);
+        rmw_qos_profile_services_default);
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode constructor done");
 }
@@ -37,13 +45,25 @@ void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest");
 
     // Assert that the request is not empty
-    if (request->node_names.empty())
+    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty())
     {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
         return;
     }
 
+    // // Print request
+    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: %d", request->node_names.size());
+    // for (long unsigned int i = 0; i < request->joint_names.size(); i++)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: %s, %f", request->joint_names[i].c_str(), request->joint_positions[i]);
+    // }
+
     std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(request->node_names);
+    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: %d", robot_nodes.size());
+    // for (auto & robot_node : robot_nodes)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: node %s", robot_node->getName().c_str());
+    // }
 
     for (auto & robot_node : robot_nodes)
     {
@@ -67,13 +87,25 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest");
 
     // Assert that the request is not empty
-    if (request->node_names.empty())
+    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty())
     {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
         return;
     }
 
+    // // Print request
+    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d", request->node_names.size());
+    // for (long unsigned int i = 0; i < request->joint_names.size(); i++)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", request->joint_names[i].c_str(), request->joint_positions[i]);
+    // }
+
     std::vector<RobotNode*> robot_nodes = m_robot_description->findNodes(request->node_names);
+    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d", robot_nodes.size());
+    // for (auto & robot_node : robot_nodes)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: node %s", robot_node->getName().c_str());
+    // }
     std::vector<march_shared_msgs::msg::NodeJacobian> node_jacobians;
 
     for (auto & robot_node : robot_nodes)
@@ -83,17 +115,22 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
         // TODO: Create a function that returns the joint names of a node in robot_node.hpp
         node_jacobian_msg.joint_names = robot_node->getJointNames();
         std::vector<std::string> joint_names = robot_node->getJointNames();
+        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d", joint_names.size());
 
         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(request->joint_names, request->joint_positions);
-
         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
-        for (int i = 0; i < jacobian.rows(); i++)
-        {
-            for (int j = 0; j < jacobian.cols(); j++)
-            {
-                RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", joint_names[j].c_str(), jacobian(i, j));
-            }
-        }
+        // for (int i = 0; i < jacobian.rows(); i++)
+        // {
+        //     for (int j = 0; j < jacobian.cols(); j++)
+        //     {
+        //         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %s, %f", joint_names[j].c_str(), jacobian(i, j));
+        //     }
+        // }
+        // for (int i = 0; i < jacobian.rows(); i++)
+        // {
+        //     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotDescriptionNode::handleNodeJacobianRequest: %f, %f, %f, %f",
+        //         jacobian(i, 0), jacobian(i, 1), jacobian(i, 2), jacobian(i, 3));
+        // }
 
         node_jacobian_msg.rows = jacobian.rows();
         node_jacobian_msg.cols = jacobian.cols();

@@ -48,6 +48,7 @@ add_library(${PROJECT_NAME} STATIC
   src/robot_joint.cpp
   src/sensor_fusion_node.cpp
   src/state_estimator_node.cpp
+  src/transform_publisher_node.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -123,10 +124,32 @@ target_link_libraries(state_estimator_node
   ${GINAC_LIB}
 )
 
+# Create transform broadcaster executable
+add_executable(transform_publisher_node
+  src/transform_publisher_node.cpp
+)
+
+target_include_directories(transform_publisher_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(transform_publisher_node
+  rclcpp
+  ament_index_cpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  march_shared_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+)
+
 # Install targets and executables
 install(TARGETS
   robot_description_node
   state_estimator_node
+  transform_publisher_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
