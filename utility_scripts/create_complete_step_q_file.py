@@ -21,27 +21,27 @@ df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
 
 df_gait_joint = df_gait_joint.reset_index(drop=True)
 
-print(f"Index of max RHFE: ", df_gait_joint[['RHFE']].idxmax())
-print(f"Index of 2nd max RHFE: ", df_gait_joint[['RHFE']].iloc[150:250].idxmax())
+# print(f"Index of max RHFE: ", df_gait_joint[['RHFE']].idxmax())
+# print(f"Index of 2nd max RHFE: ", df_gait_joint[['RHFE']].iloc[150:250].idxmax())
 
 first_step = df_gait_joint.iloc[0:72]
 first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
 full_step = df_gait_joint.iloc[73:189]
 full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
 
-plt.plot(first_step['LKFE'], label='LKFE')
-plt.plot(first_step['RKFE'], label='RKFE')
-plt.plot(first_step['LHFE'], label='LHFE')
-plt.plot(first_step['RHFE'], label='RHFE')
-plt.legend()
-plt.show()
+# plt.plot(first_step['LKFE'], label='LKFE')
+# plt.plot(first_step['RKFE'], label='RKFE')
+# plt.plot(first_step['LHFE'], label='LHFE')
+# plt.plot(first_step['RHFE'], label='RHFE')
+# plt.legend()
+# plt.show()
 
-plt.plot(full_step['LKFE'], label='LKFE')
-plt.plot(full_step['RKFE'], label='RKFE')
-plt.plot(full_step['LHFE'], label='LHFE')
-plt.plot(full_step['RHFE'], label='RHFE')
-plt.legend()
-plt.show()
+# plt.plot(full_step['LKFE'], label='LKFE')
+# plt.plot(full_step['RKFE'], label='RKFE')
+# plt.plot(full_step['LHFE'], label='LHFE')
+# plt.plot(full_step['RHFE'], label='RHFE')
+# plt.legend()
+# plt.show()
 
 df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
 
@@ -83,6 +83,50 @@ def sit_to_stand():
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
                sit_to_stand, delimiter=',')
 
+def sideways(): 
+    times = 100
+    ladpf1 = np.linspace(0.119176, 0.119176, times)
+    lhaa1 = np.linspace(-0.06, -0.1745, times)
+    lhfe1 = np.linspace(0.351166, 0.351166, times)
+    lkfe1 = np.linspace(0.372236, 0.5236, times)
+    radpf1 = np.linspace(0.077083, 0.077083, times)
+    rhaa1 = np.append(np.linspace(-0.06, -0.1, int(((2000000000-1500000000)/2000000000)*times)), np.linspace(-0.1, -0.1745, int(((1500000000)/2000000000)*times)))
+    rhfe1 = np.linspace(0.274982, 0.274982, times)
+    rkfe1 = np.linspace(0.286291, 0.5236, times)
+    left_open = np.column_stack([
+        lhaa1, lhfe1, lkfe1, ladpf1, rhaa1, rhfe1, rkfe1, radpf1
+    ]) 
+
+    ladpf = np.linspace(0.119176, 0.119176, times)
+    lhaa = np.append(np.linspace(-0.1745, -0.1, int((1500000000/2000000000)*times)), np.linspace(-0.1, -0.06, int(((2000000000-1500000000)/2000000000)*times)))
+    lhfe = np.linspace(0.351166, 0.351166, times)
+    lkfe = np.linspace(0.5236, 0.372236, times)
+    radpf = np.linspace(0.077083, 0.077083, times)
+    rhaa = np.linspace(-0.1745, -0.06, times)
+    rhfe = np.linspace(0.274982, 0.274982, times)
+    rkfe = np.linspace(0.5236, 0.286291, times)
+    right_close = np.column_stack([
+        lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
+    ])
+
+    full_sidestep = np.vstack((left_open, right_close)) 
+
+
+    plt.plot(full_sidestep[:,2], label='LKFE')
+    plt.plot(full_sidestep[:,6], label='RKFE')
+    plt.plot(full_sidestep[:,1], label='LHFE')
+    plt.plot(full_sidestep[:,5], label='RHFE')
+    plt.plot(full_sidestep[:,0], label='LHAA')
+    plt.plot(full_sidestep[:,4], label='RHAA')
+    plt.legend()
+    plt.show()
+       
+    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv', 
+               full_sidestep, delimiter=',')
+
+
     
-stand_to_sit()
-sit_to_stand()
+# stand_to_sit()
+# sit_to_stand()
+
+sideways()

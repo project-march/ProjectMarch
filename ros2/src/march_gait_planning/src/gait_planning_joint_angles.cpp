@@ -35,7 +35,7 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sideways_walking_gait_dataset.csv", m_sideways_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
 
