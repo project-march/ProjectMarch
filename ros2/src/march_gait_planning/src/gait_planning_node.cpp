@@ -19,8 +19,8 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
-    m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
+    // auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
+    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -37,6 +37,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
         m_gait_planning.setStanceFoot(msg->stance_leg); 
         RCLCPP_INFO(get_logger(), "Received current stance foot"); 
     }
+    footPositionsPublish(); 
 }
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
@@ -90,9 +91,9 @@ void GaitPlanningNode::footPositionsPublish(){
     }
 }
 
-void GaitPlanningNode::timerCallback() {
-    footPositionsPublish();
-}
+// void GaitPlanningNode::timerCallback() {
+//     footPositionsPublish();
+// }
 
 int main(int argc, char *argv[]){
     
