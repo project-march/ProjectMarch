@@ -44,9 +44,9 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
     
-    auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
-    m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
-    std::cout << "Timer function created" << std::endl; 
+    // auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
+    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
+    // std::cout << "Timer function created" << std::endl; 
 
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
@@ -80,6 +80,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
     }
     }
+    publishJointTrajectoryPoints(); 
     
 }
 
