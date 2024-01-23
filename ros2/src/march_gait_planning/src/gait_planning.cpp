@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 struct CSVRow {
     std::string x_swing;
     std::string z_swing;
@@ -45,10 +47,11 @@ void GaitPlanning::setGaitType(const exoMode &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_large_first_step_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv");
-    m_large_bezier_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv");
-    m_small_first_step_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv");
-    m_small_bezier_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv");
+    std::string cartesian_files_directory = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/cartesian/";
+    m_large_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_large.csv");
+    m_large_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_large.csv");
+    m_small_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_small.csv");
+    m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
