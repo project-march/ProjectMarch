@@ -19,12 +19,12 @@ int main(int argc, char** argv)
 }
 
 SafetyNode::SafetyNode()
-    : Node("safety_node", "march")
+    : Node("safety_node")
 {
     error_subscriber
         = create_subscription<march_shared_msgs::msg::Error>(
-            "/march/error", 20, std::bind(&SafetyNode::errorCallback, this, std::placeholders::_1));
-    RCLCPP_INFO(get_logger(), "Subscribed to /march/error");
+            "/error", 20, std::bind(&SafetyNode::errorCallback, this, std::placeholders::_1));
+    RCLCPP_INFO(get_logger(), "Subscribed to /error");
 
     
 }

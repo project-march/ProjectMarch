@@ -46,7 +46,7 @@ void SafetyHandler::publishStopMessage()
 }
 
 /**
- * @brief Publish a fatal error message to the /march/error topic
+ * @brief Publish a fatal error message to the /error topic
  * @param message Error message
  */
 void SafetyHandler::publishFatal(const std::string& message)
@@ -57,7 +57,7 @@ void SafetyHandler::publishFatal(const std::string& message)
 }
 
 /**
- * @brief Publish a non-fatal error message to the /march/error topic
+ * @brief Publish a non-fatal error message to the /error topic
  * @param message Error message
  */
 void SafetyHandler::publishNonFatal(const std::string& message)
