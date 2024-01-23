@@ -37,7 +37,7 @@ Eigen::VectorXd Task::calculateError()
     Eigen::VectorXd pose_error, error;
     pose_error.noalias() =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
     Eigen::VectorXd gain_p_matrix = Eigen::VectorXd::Zero(m_task_m);
-    gain_p_matrix << m_gain_p, m_gain_p * 2.0, m_gain_p, m_gain_p, m_gain_p * .0, m_gain_p; // TODO
+    gain_p_matrix << m_gain_p, m_gain_p * 2.0, m_gain_p, m_gain_p, m_gain_p * 2.0, m_gain_p; // TODO
     error.noalias() = gain_p_matrix.asDiagonal() * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
     m_error_norm = error.norm();
     return error;
