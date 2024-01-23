@@ -36,6 +36,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
     std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
+    m_desired_footpositions_msg->header = msg->header;
     if (m_current_trajectory.empty()){
         m_gait_planning.setStanceFoot(msg->stance_leg); 
         // RCLCPP_INFO(get_logger(), "Received current stance foot"); 
