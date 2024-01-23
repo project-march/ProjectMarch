@@ -19,38 +19,17 @@
 class RobotDescriptionNode : public rclcpp::Node
 {
 public:
-    RobotDescriptionNode();
+    RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
 
 private:
-    void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
-    void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
-    // void publishNodePositions();
     void handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response);
     void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response);
 
-    rclcpp::SubscriptionOptions m_joint_state_subscription_options;
-    rclcpp::SubscriptionOptions m_state_estimation_subscription_options;
-    rclcpp::CallbackGroup::SharedPtr m_joint_state_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_state_estimation_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_timer_callback_group;
+    std::shared_ptr<RobotDescription> m_robot_description;
     rclcpp::CallbackGroup::SharedPtr m_node_positions_callback_group;
     rclcpp::CallbackGroup::SharedPtr m_node_jacobian_callback_group;
-
-    std::shared_ptr<RobotDescription> m_robot_description;
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_subscription;
-    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_subscription;
-    rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr m_state_visualization_publisher;
-    rclcpp::TimerBase::SharedPtr m_timer;
-
-    // IMPLEMENTATION: persistent ROS2 services
-    // IMPLEMENTATION: function to set up ROS2 services once and persistently connect
-    // SOURCE: http://wiki.ros.org/roscpp/Overview/Services#Persistent_Connections
-    // IMPLEMENTATION: function of ronnection logic in case of connection failures
-
-    // sensor_msgs::msg::JointState::SharedPtr m_joint_state_msg;
-
     rclcpp::Service<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_service_node_position;
     rclcpp::Service<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_service_node_jacobian;
 

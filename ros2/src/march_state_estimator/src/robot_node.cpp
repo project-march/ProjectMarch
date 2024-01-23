@@ -269,71 +269,105 @@ std::vector<RobotNode*> RobotNode::getJointNodes(RobotNode * parent) const
     return joint_nodes;
 }
 
+void RobotNode::expressRotation()
+{
+    m_global_rotation_matrix = expressGlobalRotation();
+
+    // DEBUG: Print the global rotation expressions.
+    for (unsigned int i = 0; i < m_global_rotation_matrix.rows(); i++)
+    {
+        for (unsigned int j = 0; j < m_global_rotation_matrix.cols(); j++)
+        {
+            std::stringstream ss_rotation_expression;
+            ss_rotation_expression << "Global rotation " << m_name << " (" << i << "," << j << ") : " << m_global_rotation_matrix(i, j) << " ";
+            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_rotation_expression.str().c_str());
+        }
+    }
+}
+
 void RobotNode::expressKinematics()
 {
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotNode::expressKinematics: %s", m_name.c_str());
-    GiNaC::matrix global_position = expressGlobalPosition();
-    GiNaC::matrix global_rotation = expressGlobalRotation();
+    // m_global_rotation_matrix = expressGlobalRotation();
+    m_global_position_vector = expressGlobalPosition();
 
-    for (unsigned int i = 0; i < global_position.rows(); i++)
-    {
-        global_position(i, 0) = global_position(i, 0).simplify_indexed();
-    }
-    for (unsigned int i = 0; i < global_rotation.rows(); i++)
-    {
-        for (unsigned int j = 0; j < global_rotation.cols(); j++)
-        {
-            global_rotation(i, j) = global_rotation(i, j).simplify_indexed();
-        }
-    }
+    // for (unsigned int i = 0; i < global_position.rows(); i++)
+    // {
+    //     global_position(i, 0) = global_position(i, 0).simplify_indexed();
+    // }
+    // for (unsigned int i = 0; i < global_rotation.rows(); i++)
+    // {
+    //     for (unsigned int j = 0; j < global_rotation.cols(); j++)
+    //     {
+    //         global_rotation(i, j) = global_rotation(i, j).simplify_indexed();
+    //     }
+    // }
 
-    // joint_angles_ = getJointAngles();
     m_joint_nodes = getJointNodes(this);
-    m_global_position_vector = global_position;
-    m_global_rotation_matrix = global_rotation;
-
     m_global_position_jacobian_matrix = expressGlobalPositionJacobian();
     m_global_rotation_jacobian_matrix = expressGlobalRotationJacobian();
+
+    // DEBUG: Print the global position expressions.
+    for (unsigned int i = 0; i < m_global_position_vector.rows(); i++)
+    {
+        std::stringstream ss_position_expression;
+        ss_position_expression << "Global position " << m_name << " " << i << ": " << m_global_position_vector(i, 0) << " ";
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_position_expression.str().c_str());
+    }
+
+    // // DEBUG: Print the global position jacobian expressions.
+    // for (unsigned int i = 0; i < m_global_position_jacobian_matrix.rows(); i++)
+    // {
+    //     for (unsigned int j = 0; j < m_global_position_jacobian_matrix.cols(); j++)
+    //     {
+    //         std::stringstream ss_jacobian_expression;
+    //         ss_jacobian_expression << "Global position jacobian " << m_name << " (" << i << "," << j << "): " << m_global_position_jacobian_matrix(i, j) << " ";
+    //         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_jacobian_expression.str().c_str());
+    //     }
+    // }
+
+
 }
 
 GiNaC::matrix RobotNode::expressGlobalPosition() const
 {
-    GiNaC::matrix global_position(WORKSPACE_DIM, 1);
-    global_position = getOriginRotation().mul(m_origin_position_vector);
-    RobotNode * parent = m_parent;
-    while (parent != nullptr)
-    {
-        global_position = parent->getOriginRotation().mul(global_position);
-        global_position = global_position.add(parent->getOriginPosition());
+    GiNaC::matrix global_position = m_origin_position_vector;
+    // GiNaC::matrix global_position(WORKSPACE_DIM, 1);
+    // global_position = getOriginRotation().mul(m_origin_position_vector);
+    // RobotNode * parent = m_parent;
+    // while (parent != nullptr)
+    // {
+    //     global_position = parent->getOriginRotation().mul(global_position);
+    //     global_position = global_position.add(parent->getOriginPosition());
 
-        parent = parent->getParent();
+    //     parent = parent->getParent();
+    // }
+    if (m_parent != nullptr)
+    {
+        GiNaC::matrix rotated_origin_position = m_parent->getGlobalRotationExpression().mul(global_position);
+        global_position = rotated_origin_position.add(m_parent->expressGlobalPosition());
     }
     return global_position;
 }
 
 GiNaC::matrix RobotNode::expressGlobalRotation() const
 {
-    GiNaC::matrix global_rotation(WORKSPACE_DIM, WORKSPACE_DIM);
-    global_rotation = m_origin_rotation_matrix;
-    RobotNode * parent = m_parent;
-    while (parent != nullptr)
+    GiNaC::matrix global_rotation = getOriginRotation();
+    // global_rotation = m_origin_rotation_matrix;
+    // RobotNode * parent = m_parent;
+    // while (parent != nullptr)
+    // {
+    //     global_rotation = parent->getOriginRotation().mul(global_rotation);
+
+    //     parent = parent->getParent();
+    // }
+    // global_rotation = global_rotation.transpose();
+    // return global_rotation;
+    if (m_parent != nullptr)
     {
-        global_rotation = parent->getOriginRotation().mul(global_rotation);
-
-        parent = parent->getParent();
+        // global_rotation = m_parent->expressGlobalRotation().mul(global_rotation);
+        global_rotation = global_rotation.mul(m_parent->expressGlobalRotation());
     }
-
-    for (unsigned int i = 0; i < global_rotation.rows(); i++)
-    {
-        std::stringstream ss;
-        ss << "Global rotation: ";
-        for (unsigned int j = 0; j < global_rotation.cols(); j++)
-        {
-            ss << global_rotation(i, j) << " ";
-        }
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), ss.str().c_str());
-    }
-
     return global_rotation;
 }
 
@@ -349,8 +383,7 @@ GiNaC::matrix RobotNode::expressGlobalPositionJacobian() const
             GiNaC::ex global_position_component = m_global_position_vector(i, 0).diff(m_joint_nodes[j]->getJointAngle());
             global_position_jacobian(i, j) = global_position_component;
         }
-    }   
-
+    }
     return global_position_jacobian;
 }
 

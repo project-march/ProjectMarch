@@ -1,5 +1,5 @@
-#ifndef MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_
-#define MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
+#define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
 
 #include <string>
 #include <vector>
@@ -11,22 +11,19 @@
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include "march_state_estimator/robot_description.hpp"
 
-
-class StateEstimatorNode : public rclcpp::Node
+class SensorFusionNode : public rclcpp::Node
 {
 public:
-    StateEstimatorNode();
-    ~StateEstimatorNode() = default;
+    SensorFusionNode(std::shared_ptr<RobotDescription> robot_description);
+    ~SensorFusionNode() = default;
 
 private:
     void timerCallback();
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
-    void nodePositionCallback(
-        const rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture future);
     void publishStateEstimation();
-    void requestNodePositions();
 
     //eventually delete this function 
     void handleGetCurrentJointPositions(std::shared_ptr<march_shared_msgs::srv::GetCurrentJointPositions::Request>,
@@ -39,19 +36,15 @@ private:
     sensor_msgs::msg::Imu::SharedPtr m_imu;
     std::vector<std::string> m_node_feet_names;
     std::vector<geometry_msgs::msg::Point> m_foot_positions;
+    std::shared_ptr<RobotDescription> m_robot_description;
     
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
 
-    rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_get_node_position_client;
-    rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedFuture m_get_node_position_future;
-    march_shared_msgs::srv::GetNodePosition::Request::SharedPtr m_get_node_position_request;
-
     //eventually delete this service
     rclcpp::Service<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_service;
-
 
     rclcpp::CallbackGroup::SharedPtr m_joint_state_callback_group;
     rclcpp::CallbackGroup::SharedPtr m_imu_callback_group;
@@ -62,4 +55,4 @@ private:
     rclcpp::SubscriptionOptions m_imu_subscription_options;
 };
 
-#endif  // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_
+#endif  // MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
