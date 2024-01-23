@@ -17,6 +17,8 @@ GaitPlanningNode::GaitPlanningNode()
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
+    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOuptut>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
+
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
     m_home_stand = {0.2085, 0.16, -1.111, 0.2085, -0.16, -1.111}; 
@@ -44,15 +46,21 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     footPositionsPublish(); 
 }
 
+// void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOuptut::SharedPtr msg)[
+//     m_gait_planning.interpolateVariableTrajectory(msg->distance); 
+//     m_current_trajectory = m_gait_planning.getVariableTrajectory();
+//     footPositionsPublish(); 
+// ]
+
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
 {
     m_desired_footpositions_msg->left_foot_position.x = left_x;
-    m_desired_footpositions_msg->left_foot_position.y = 0.1; // left_y;
-    m_desired_footpositions_msg->left_foot_position.z = left_z + 0.035; 
+    m_desired_footpositions_msg->left_foot_position.y = left_y;
+    m_desired_footpositions_msg->left_foot_position.z = left_z; 
     m_desired_footpositions_msg->right_foot_position.x = right_x; 
-    m_desired_footpositions_msg->right_foot_position.y = -0.1; // right_y;
-    m_desired_footpositions_msg->right_foot_position.z = right_z + 0.035;
+    m_desired_footpositions_msg->right_foot_position.y = right_y;
+    m_desired_footpositions_msg->right_foot_position.z = right_z;
 }
 
 void GaitPlanningNode::footPositionsPublish(){
@@ -92,6 +100,21 @@ void GaitPlanningNode::footPositionsPublish(){
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
             }
             break;
+
+        // case exoMode::VariableWalk : 
+        //     if (m_current_trajectory.empty()){
+        //         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+        //         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+        //     }
+        //     else { 
+        //         std::array<double, 4> current_step = m_current_trajectory.front();
+        //         m_current_trajectory.erase(m_current_trajectory.begin());
+        //         setFootPositionsMessage(current_step[2], m_home_stand[1], current_step[3] + m_home_stand[2], 
+        //                         current_step[0], m_home_stand[4], current_step[1] + m_home_stand[5]);
+        //         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+        //         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!");
+        //     } 
+        //     break;
     }
 }
 

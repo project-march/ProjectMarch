@@ -63,8 +63,6 @@ std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
         result =  (m_current_stance_foot &0b11) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
     }
     return result; 
-    // return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
-    // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
 }
 
 int GaitPlanning::getCurrentStanceFoot() const {
@@ -82,6 +80,36 @@ std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
 exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
+
+//This getter can also be included in the general getTrajectory function, depending on how we identify
+// the camera's as being used for input. 
+// std::vector<std::array<double, 4>> GaitPlanning::getVariableTrajectory() const{
+//     return m_variable_step_trajectory; 
+// }
+
+std::vector<double> linspace(const double &min, const double &max, const int &size)
+{
+	std::vector<double> result;
+	int iterator = 0;
+	for (int i = 0; i <= size-2; i++)	
+	{
+		double temp = min + i*(max-min)/(floor((double)size) - 1);
+		result.insert(result.begin() + iterator, temp);
+		iterator += 1;
+	}
+	result.insert(result.begin() + iterator, max);
+	return result;
+}
+
+// void GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
+//     std::vector<std::array<double, 4>> result;
+//     std::vector<double> x_swing = linspace(0, step_distance, 40);  
+//     for (int i; i < 40; i++){
+//         float z_swing= m_small_bezier_trajectory[i][1] + (x_swing[i] - m_small_bezier_trajectory[i][0])*((m_large_bezier_trajectory[i][1]-m_small_bezier_trajectory[i][1])/(m_large_bezier_trajectory[i][0]-m_small_bezier_trajectory[i][0])); 
+//         result.push_back({x_swing[i], z_swing, 0.0, 0.0}); 
+//     }
+//     m_variable_step_trajectory = result; 
+// }
 
 std::vector<std::array<double, 4>> GaitPlanning::processCSV(const std::string& filename){
     std::vector<CSVRow> data;
