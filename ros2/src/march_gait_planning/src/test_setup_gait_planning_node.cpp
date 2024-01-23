@@ -13,7 +13,7 @@ TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
    m_current_trajectory(),
    m_current_joint_angles_msg(std::make_shared<trajectory_msgs::msg::JointTrajectory>())
 {
-    m_error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 10);
+    m_error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/error", 10);
     trajectory_msgs::msg::JointTrajectoryPoint previous_point;
     previous_point.positions.push_back(0.0);
     previous_point.time_from_start = rclcpp::Duration(0, 0);

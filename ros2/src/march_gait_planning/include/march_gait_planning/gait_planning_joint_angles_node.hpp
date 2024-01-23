@@ -19,14 +19,31 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include <cmath>
 
 #include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
 
-class GaitPlanningAnglesNode:public rclcpp::Node 
+class GaitPlanningAnglesNode : public rclcpp_lifecycle::LifecycleNode
 {
 public: 
     explicit GaitPlanningAnglesNode(); 
 
 private: 
     // std::vector<double> getCurrentJointAngles();
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn 
+    on_configure(const rclcpp_lifecycle::State &);
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_activate(const rclcpp_lifecycle::State &);
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_deactivate(const rclcpp_lifecycle::State &);
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_cleanup(const rclcpp_lifecycle::State &);
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_shutdown(const rclcpp_lifecycle::State &);
 
     // Callback for the current exoMode
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
@@ -46,7 +63,7 @@ private:
 
     // Member variables 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
+    rclcpp_lifecycle::LifecyclePublisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
