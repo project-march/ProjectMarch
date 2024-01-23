@@ -69,9 +69,11 @@ def package_bezier(step_length, array_size):
     curvexz_complete_step = bezier.Curve(xzpositions_complete_step, degree=3)
     number_of_time_points_complete_step = np.linspace(0, 1.0, array_size)
     points_complete_step= curvexz_complete_step.evaluate_multi(number_of_time_points_complete_step)
-    x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
+    # x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
+    x_swing_complete_step = points_complete_step[0,:]
     z_swing_complete_step = points_complete_step[1,:]
-    x_stance_complete_step = np.linspace(0+(step_length/2), 0 - (step_length/2), array_size)
+    # x_stance_complete_step = np.linspace(0+(step_length/2), 0 - (step_length/2), array_size)
+    x_stance_complete_step = np.linspace(0+step_length, 0, array_size)
     z_stance_complete_step = [0]*array_size
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
     plt.plot(x_swing_complete_step, z_swing_complete_step)
@@ -102,8 +104,29 @@ def package_bezier(step_length, array_size):
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', normal_gait_small, delimiter=',')
     
 large_gait_first_step, large_gait_complete_step = package_bezier(0.4, 40)
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', large_gait_first_step, delimiter=',')
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', large_gait_complete_step, delimiter=',')
+# np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', large_gait_first_step, delimiter=',')
+# np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', large_gait_complete_step, delimiter=',')
 small_gait_first_step, small_gait_complete_step = package_bezier(0.2, 40)
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', large_gait_first_step, delimiter=',')
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', large_gait_complete_step, delimiter=',')
+# np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', small_gait_first_step, delimiter=',')
+# np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', small_gait_complete_step, delimiter=',')
+
+def interpolate(step_size, small_gait_complete_step, large_gait_complete_step):
+    z_swing = []
+    x_swing = np.linspace(0, step_size, 40)
+    for i in range(40): 
+        z = small_gait_complete_step[i][1] + (x_swing[i]-small_gait_complete_step[i][0]) * ((large_gait_complete_step[i][1]-small_gait_complete_step[i][1])/(large_gait_complete_step[i][0]-small_gait_complete_step[i][0]))
+        z_swing.append(z)
+    x_stance = np.linspace(0.0, 0.0, 40)
+    z_stance = np.linspace(0.0, 0.0, 40)
+    result = np.column_stack((x_swing, z_swing, x_stance, z_stance))
+    plt.plot(result[:,0], result[:,1])
+    plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
+    plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
+    plt.show()
+    return result 
+
+res = interpolate(0.3, small_gait_complete_step, large_gait_complete_step)
+
+# plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
+# plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
+# plt.show()
