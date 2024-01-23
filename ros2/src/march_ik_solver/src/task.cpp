@@ -36,9 +36,11 @@ Eigen::VectorXd Task::calculateError()
 {
     Eigen::VectorXd pose_error, error;
     pose_error.noalias() =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
-    Eigen::VectorXd gain_p_matrix = Eigen::VectorXd::Zero(m_task_m);
-    gain_p_matrix << m_gain_p, m_gain_p * 2.0, m_gain_p, m_gain_p, m_gain_p * .0, m_gain_p; // TODO
-    error.noalias() = gain_p_matrix.asDiagonal() * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
+    // Eigen::VectorXd gain_p_matrix = Eigen::VectorXd::Zero(m_task_m);
+    // gain_p_vector << m_gain_p, m_gain_p * 5.0, m_gain_p, m_gain_p, m_gain_p * 5.0, m_gain_p; // TODO
+    Eigen::DiagonalMatrix<double, Eigen::Dynamic> gain_p_matrix(m_task_m);
+    gain_p_matrix.diagonal() << m_gain_p, m_gain_p * 5.0, m_gain_p, m_gain_p, m_gain_p * 5.0, m_gain_p;
+    error.noalias() = gain_p_matrix * pose_error; // + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
     m_error_norm = error.norm();
     return error;
 }
@@ -267,7 +269,7 @@ void Task::sendRequestNodePosition()
 
         for (auto node_position : result.get()->node_positions)
         {
-            RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
+            RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
             current_pose_vector.push_back(node_position.x);
             current_pose_vector.push_back(node_position.y);
             current_pose_vector.push_back(node_position.z);
