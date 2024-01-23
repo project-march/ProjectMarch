@@ -8,6 +8,8 @@ find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(ament_cmake_gtest)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 # find_package(filesystem REQUIRED)
 
 # Include directories
@@ -63,6 +65,8 @@ ament_target_dependencies(gait_planning_node
   )
 
 ament_target_dependencies(gait_planning_angles_node
+  rclcpp_lifecycle
+  lifecycle_msgs
   rclcpp
   trajectory_msgs
   march_shared_msgs
