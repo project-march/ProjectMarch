@@ -19,7 +19,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.0, 0.16, -0.802, 0.0, -0.16, -0.802}; 
+    m_home_stand = {0.2085, 0.16, -1.111, 0.2085, -0.16, -1.111}; 
 
     // auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
     // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
