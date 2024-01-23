@@ -45,10 +45,10 @@ void GaitPlanning::setGaitType(const exoMode &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_large_first_step_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv");
-    m_large_bezier_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv");
-    m_small_first_step_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv");
-    m_small_bezier_trajectory = processCSV("/home/control/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv");
+    m_large_first_step_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv");
+    m_large_bezier_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv");
+    m_small_first_step_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv");
+    m_small_bezier_trajectory = processCSV("/home/gungnir/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{

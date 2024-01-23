@@ -22,6 +22,7 @@ public:
     RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
 
 private:
+    void configureParameters();
     void handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response);
     void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,

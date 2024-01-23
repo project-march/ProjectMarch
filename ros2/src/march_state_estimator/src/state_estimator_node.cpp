@@ -15,6 +15,7 @@ int main(int argc, char ** argv)
 
     // declare_parameter<std::string>("urdf_path", ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf");
     // std::string urdf_path = get_parameter("urdf_path").as_string();
+
     std::string urdf_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf";
 
     std::shared_ptr<RobotDescription> robot_description = std::make_shared<RobotDescription>();

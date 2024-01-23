@@ -8,6 +8,7 @@ find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(ament_cmake_gtest)
+find_package(ament_index_cpp REQUIRED)
 # find_package(filesystem REQUIRED)
 
 # Include directories
@@ -31,6 +32,7 @@ ament_target_dependencies(gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
   )
 
@@ -38,6 +40,7 @@ ament_target_dependencies(gait_planning_angles_node
   rclcpp
   trajectory_msgs
   march_shared_msgs
+  ament_index_cpp
   )
 
 # Install the executable
@@ -60,6 +63,7 @@ ament_target_dependencies(test_setup_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
 )
 
@@ -79,6 +83,7 @@ ament_target_dependencies(test_joints_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
 )
 
@@ -99,7 +104,7 @@ install(FILES package.xml
 
 # Install launch file
 install(DIRECTORY 
-  launch test
+  launch test m9_gait_files
   DESTINATION share/${PROJECT_NAME}/ 
 )
 

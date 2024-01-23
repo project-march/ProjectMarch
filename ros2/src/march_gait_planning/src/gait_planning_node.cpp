@@ -48,11 +48,11 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
                                         double right_x, double right_y, double right_z) 
 {
     m_desired_footpositions_msg->left_foot_position.x = left_x;
-    m_desired_footpositions_msg->left_foot_position.y = left_y;
-    m_desired_footpositions_msg->left_foot_position.z = left_z; 
+    m_desired_footpositions_msg->left_foot_position.y = 0.1; // left_y;
+    m_desired_footpositions_msg->left_foot_position.z = left_z + 0.035; 
     m_desired_footpositions_msg->right_foot_position.x = right_x; 
-    m_desired_footpositions_msg->right_foot_position.y = right_y;
-    m_desired_footpositions_msg->right_foot_position.z = right_z;
+    m_desired_footpositions_msg->right_foot_position.y = -0.1; // right_y;
+    m_desired_footpositions_msg->right_foot_position.z = right_z + 0.035;
 }
 
 void GaitPlanningNode::footPositionsPublish(){

@@ -15,6 +15,7 @@ public:
 
   void parseURDF(const std::string & urdf_path);
   void configureRobotNodes();
+  void parameterizeRobotNode();
   std::vector<std::string> getNodeNames();
   std::vector<std::string> getParentNames();
   std::vector<RobotNode*> findNodes(std::vector<std::string> names);

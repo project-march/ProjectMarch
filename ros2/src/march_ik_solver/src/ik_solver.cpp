@@ -17,10 +17,10 @@ Eigen::VectorXd IKSolver::solve()
         // const Eigen::MatrixXd * J_ptr = task.getJacobianPtr();
         // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
-        // m_tasks[i].setDesiredPose(&desired_poses[i]);
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i].getTaskName().c_str());
-        desired_joint_velocities.noalias() += m_tasks[i].solve();
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i].getTaskName().c_str());
+        // m_tasks[i]->setDesiredPose(&desired_poses[i]);
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i]->getTaskName().c_str());
+        desired_joint_velocities.noalias() += m_tasks[i]->solve();
+        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i]->getTaskName().c_str());
     }
 
     return desired_joint_velocities;
@@ -28,7 +28,7 @@ Eigen::VectorXd IKSolver::solve()
 
 Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
-    double dt = 1e-2; // TODO: Get dt from the integral_dt_ptr.
+    double dt = 5e-3; // TODO: Get dt from the integral_dt_ptr.
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Integrating joint velocities with dt: %f", dt);
 
     // Eigen::VectorXd desired_joint_velocities = *m_desired_joint_velocities_ptr;
@@ -59,7 +59,7 @@ std::vector<double> IKSolver::getTasksError()
     std::vector<double> tasks_error;
     for (long unsigned int i = 0; i < m_tasks.size(); i++)
     {
-        tasks_error.push_back(m_tasks[i].getErrorNorm());
+        tasks_error.push_back(m_tasks[i]->getErrorNorm());
     }
     return tasks_error;
 }
@@ -79,7 +79,7 @@ void IKSolver::setJointLimits(std::vector<double> lower_joint_limits, std::vecto
     }
 }
 
-void IKSolver::setTasks(std::vector<Task> tasks)
+void IKSolver::setTasks(std::vector<std::shared_ptr<Task>> tasks)
 {
     m_tasks = tasks;
 }
@@ -88,8 +88,8 @@ void IKSolver::configureTasks(std::vector<Eigen::VectorXd> * desired_poses_ptr)
 {
     for (long unsigned int i = 0; i < m_tasks.size(); i++)
     {
-        m_tasks[i].setCurrentJointPositionsPtr(m_current_joint_positions_ptr);
-        m_tasks[i].setDesiredPosesPtr(desired_poses_ptr);
+        m_tasks[i]->setCurrentJointPositionsPtr(m_current_joint_positions_ptr);
+        m_tasks[i]->setDesiredPosesPtr(desired_poses_ptr);
     }
 }
 
@@ -112,14 +112,14 @@ void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positi
 {
     m_current_joint_positions_ptr = current_joint_positions_ptr;
 
-    for (int i = 0; i < m_n_joints; i++)
-    {
-        m_tasks[i].setCurrentJointNamesPtr(joint_names_ptr);
-    }
+    // for (int i = 0; i < m_n_joints; i++)
+    // {
+    //     m_tasks[i]->setCurrentJointNamesPtr(joint_names_ptr);
+    // }
 
     for (auto & task : m_tasks)
     {
-        task.setCurrentJointNamesPtr(joint_names_ptr);
+        task->setCurrentJointNamesPtr(joint_names_ptr);
     }
 }
 

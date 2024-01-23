@@ -73,15 +73,18 @@ IKSolverNode::IKSolverNode()
     m_ik_solver.setDesiredJointVelocitiesPtr(&m_desired_joint_velocities);
     RCLCPP_INFO(this->get_logger(), "IKSolver pointers set.");
 
-    std::vector<Task> tasks;
+    std::vector<std::shared_ptr<Task>> tasks;
     std::vector<std::string> task_nodes = {"left_ankle", "right_ankle"}; // TODO: Load this from a YAML file.
     for (long unsigned int i = 0; i < tasks_size; i++)
     {
-        Task task = Task(i, tasks_names[i], tasks_m[i], tasks_n[i], task_nodes);
-        task.setGainP(tasks_kp[i]);
-        // task.setKd(tasks_kd[i]);
-        // task.setKi(tasks_ki[i]);
-        task.setDampingCoefficient(tasks_damp_coeff[i]);
+        // Task task = Task(i, tasks_names[i], tasks_m[i], tasks_n[i], task_nodes);
+        // Create shared pointer to task.
+        std::shared_ptr<Task> task = std::make_shared<Task>(i, tasks_names[i], tasks_m[i], tasks_n[i], task_nodes);
+        task->setGainP(tasks_kp[i]);
+        task->setGainD(tasks_kd[i]);
+        task->setGainI(tasks_ki[i]);
+        task->setDt(dt);
+        task->setDampingCoefficient(tasks_damp_coeff[i]);
         tasks.push_back(task);
     }
     RCLCPP_INFO(this->get_logger(), "Tasks configured.");
@@ -144,7 +147,7 @@ void IKSolverNode::IksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     uint32_t iteration = 0;
     double error_norm = 0.0;
 
-    while (this->now() - msg->header.stamp < rclcpp::Duration::from_seconds(0.05))
+    while (this->now() - msg->header.stamp < rclcpp::Duration::from_seconds(0.05) && iteration < m_max_iterations)
     {
         RCLCPP_DEBUG(this->get_logger(), "Iteration: %d", iteration);
         RCLCPP_DEBUG(this->get_logger(), "Getting the current joint positions...");
@@ -220,7 +223,7 @@ void IKSolverNode::publishJointTrajectory()
     // joint_trajectory_msg.joint_names = {"left_ankle", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"};
 
     // Push back the previous trajectory point.
-    // joint_trajectory_msg.points.push_back(m_joint_trajectory_point_prev);
+    joint_trajectory_msg.points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
@@ -230,19 +233,19 @@ void IKSolverNode::publishJointTrajectory()
     // joint_trajectory_point_desired.positions = std::vector<double>(desired_joint_positions.data(), desired_joint_positions.data() + desired_joint_positions.size());
     joint_trajectory_point_desired.positions = std::vector<double>(m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     joint_trajectory_point_desired.velocities = std::vector<double>(m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
-    // joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
-    // joint_trajectory_point_desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
+    joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };
+    joint_trajectory_point_desired.effort = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0. };
     joint_trajectory_point_desired.time_from_start.sec = 0;
-    joint_trajectory_point_desired.time_from_start.nanosec = 10 * 1e6;
+    joint_trajectory_point_desired.time_from_start.nanosec = 1 * 1e6;
     joint_trajectory_msg.points.push_back(joint_trajectory_point_desired);
 
     // Publish the message.
     m_joint_trajectory_pub->publish(joint_trajectory_msg);
 
     // // Update the previous trajectory point.
-    // joint_trajectory_point_desired.time_from_start.sec = 0;
-    // joint_trajectory_point_desired.time_from_start.nanosec = 0;
-    // m_joint_trajectory_point_prev = joint_trajectory_point_desired;
+    joint_trajectory_point_desired.time_from_start.sec = 0;
+    joint_trajectory_point_desired.time_from_start.nanosec = 0;
+    m_joint_trajectory_point_prev = joint_trajectory_point_desired;
 }
 
 int main(int argc, char** argv)

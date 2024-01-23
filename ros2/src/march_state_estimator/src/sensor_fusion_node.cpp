@@ -19,9 +19,10 @@ using std::placeholders::_2;
 SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_description)
     : Node("state_estimator_node")
 {
-    this->declare_parameter<int64_t>("dt", 50);
+    // this->declare_parameter<int64_t>("dt", 50);
 
-    int64_t dt = this->get_parameter("dt").as_int();
+    // int64_t dt = this->get_parameter("dt").as_int();
+    int64_t dt = 50;
 
     m_joint_state_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_imu_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);

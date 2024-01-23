@@ -21,7 +21,7 @@ public:
 
     void setNJoints(int n_joints);
     void setJointLimits(std::vector<double> lower_joint_limits, std::vector<double> upper_joint_limits);
-    void setTasks(std::vector<Task> tasks);
+    void setTasks(std::vector<std::shared_ptr<Task>> tasks);
 
     void configureTasks(std::vector<Eigen::VectorXd> * desired_poses_ptr);
     void setIntegralDtPtr(uint32_t* integral_dt_ptr);
@@ -42,7 +42,7 @@ private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
 
     int m_n_joints;
-    std::vector<Task> m_tasks;
+    std::vector<std::shared_ptr<Task>> m_tasks;
     std::vector<std::array<double,2>> m_joint_limits;
     uint32_t* m_integral_dt_ptr;
     Eigen::VectorXd* m_current_joint_positions_ptr;
