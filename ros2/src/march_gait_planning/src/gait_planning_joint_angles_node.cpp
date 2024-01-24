@@ -211,6 +211,14 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 }
                 break;
 
+            case exoMode::Descending :
+                m_current_trajectory = m_gait_planning.getDescendingGait(); 
+                if (count < m_current_trajectory.size()-1){
+                    processMovingGaits(count); 
+                    m_gait_planning.setCounter(count+1); 
+                }
+                break;
+
             default :
                 // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Waiting for command"); 
                 break;

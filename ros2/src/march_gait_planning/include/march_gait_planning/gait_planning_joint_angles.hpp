@@ -37,6 +37,7 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getSidewaysGait() const; 
     std::vector<std::vector<double>> getSitToStandGait() const; 
     std::vector<std::vector<double>> getAscendingGait() const;
+    std::vector<std::vector<double>> getDescendingGait() const;
     std::vector<double> getHomeStand() const; 
     
     private: 
@@ -48,6 +49,7 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_sideways_trajectory; 
     std::vector<std::vector<double>> m_sit_to_stand_trajectory; 
     std::vector<std::vector<double>> m_ascending_trajectory;
+    std::vector<std::vector<double>> m_descending_trajectory;
     std::vector<double> m_home_stand; 
     std::vector<double> m_prev_point; 
     int m_counter; 
