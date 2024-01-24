@@ -103,10 +103,10 @@ def package_bezier(step_length, array_size):
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', first_step_small, delimiter=',')
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', normal_gait_small, delimiter=',')
     
-large_gait_first_step, large_gait_complete_step = package_bezier(0.6, 80)
+large_gait_first_step, large_gait_complete_step = package_bezier(0.6, 200)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', large_gait_first_step, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', large_gait_complete_step, delimiter=',')
-small_gait_first_step, small_gait_complete_step = package_bezier(0.2, 80)
+small_gait_first_step, small_gait_complete_step = package_bezier(0.2, 200)
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', small_gait_first_step, delimiter=',')
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', small_gait_complete_step, delimiter=',')
 
