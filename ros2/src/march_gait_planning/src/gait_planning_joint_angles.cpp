@@ -38,6 +38,7 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -133,6 +134,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
     return m_sit_to_stand_trajectory; 
 }
 
-
+std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
+    return m_ascending_trajectory; 
+}
 
 
