@@ -34,7 +34,7 @@ void RobotDescription::parseURDF(const std::string & urdf_path)
         }
         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Link origin: %f %f %f", link.second->inertial->origin.position.x, link.second->inertial->origin.position.y, link.second->inertial->origin.position.z);
         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "Link origin: %f %f %f %f", link.second->inertial->origin.rotation.x, link.second->inertial->origin.rotation.y, link.second->inertial->origin.rotation.z, link.second->inertial->origin.rotation.w);
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "")
+        // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "")
         RobotMass * robot_mass = new RobotMass(link.first, m_robot_nodes.size(), link.second->inertial->mass);
         
         Eigen::Vector3d position;

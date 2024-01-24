@@ -18,9 +18,9 @@ Eigen::VectorXd IKSolver::solve()
         // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
         // m_tasks[i]->setDesiredPose(&desired_poses[i]);
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i]->getTaskName().c_str());
+        // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i]->getTaskName().c_str());
         desired_joint_velocities.noalias() += m_tasks[i]->solve();
-        // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i]->getTaskName().c_str());
+        // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i]->getTaskName().c_str());
     }
 
     return desired_joint_velocities;

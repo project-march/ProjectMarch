@@ -43,35 +43,35 @@ IKSolverNode::IKSolverNode()
     std::vector<double> tasks_ki = get_parameter("tasks.ki").as_double_array();
     std::vector<double> tasks_damp_coeff = get_parameter("tasks.damp_coeff").as_double_array();
 
-    RCLCPP_INFO(this->get_logger(), "dt: %f", dt);
-    RCLCPP_INFO(this->get_logger(), "joints_size: %lu", joints_size);
+    RCLCPP_DEBUG(this->get_logger(), "dt: %f", dt);
+    RCLCPP_DEBUG(this->get_logger(), "joints_size: %lu", joints_size);
     for (long unsigned int i = 0; i < m_joints_names.size(); i++)
     {
-        RCLCPP_INFO(this->get_logger(), "joint %d name: %s", i, m_joints_names[i].c_str());
-        RCLCPP_INFO(this->get_logger(), "joints %d upper limit: %f", i, joints_limits_upper[i]);
-        RCLCPP_INFO(this->get_logger(), "joints %d lower limit: %f", i, joints_limits_lower[i]);
+        RCLCPP_DEBUG(this->get_logger(), "joint %d name: %s", i, m_joints_names[i].c_str());
+        RCLCPP_DEBUG(this->get_logger(), "joints %d upper limit: %f", i, joints_limits_upper[i]);
+        RCLCPP_DEBUG(this->get_logger(), "joints %d lower limit: %f", i, joints_limits_lower[i]);
     }
-    RCLCPP_INFO(this->get_logger(), "tasks_size: %lu", tasks_size);
+    RCLCPP_DEBUG(this->get_logger(), "tasks_size: %lu", tasks_size);
     for (long unsigned int i = 0; i < tasks_names.size(); i++)
     {
-        RCLCPP_INFO(this->get_logger(), "task %d name: %s", i, tasks_names[i].c_str());
-        RCLCPP_INFO(this->get_logger(), "task %d m: %d", i, tasks_m[i]);
-        RCLCPP_INFO(this->get_logger(), "task %d n: %d", i, tasks_n[i]);
-        RCLCPP_INFO(this->get_logger(), "task %d kp: %f", i, tasks_kp[i]);
-        RCLCPP_INFO(this->get_logger(), "task %d kd: %f", i, tasks_kd[i]);
-        RCLCPP_INFO(this->get_logger(), "task %d ki: %f", i, tasks_ki[i]);
-        RCLCPP_INFO(this->get_logger(), "task %d damp_coeff: %f", i, tasks_damp_coeff[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d name: %s", i, tasks_names[i].c_str());
+        RCLCPP_DEBUG(this->get_logger(), "task %d m: %d", i, tasks_m[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d n: %d", i, tasks_n[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d kp: %f", i, tasks_kp[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d kd: %f", i, tasks_kd[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d ki: %f", i, tasks_ki[i]);
+        RCLCPP_DEBUG(this->get_logger(), "task %d damp_coeff: %f", i, tasks_damp_coeff[i]);
     }
 
     // Initialize the state estimation message.
     m_state_estimation_msg = std::make_shared<march_shared_msgs::msg::StateEstimation>();
-    RCLCPP_INFO(this->get_logger(), "State estimation message initialized.");
+    RCLCPP_DEBUG(this->get_logger(), "State estimation message initialized.");
 
     // Configure the tasks.
     m_ik_solver.setCurrentJointPositionsPtr(&m_current_joint_positions, &m_joints_names);
     m_ik_solver.setDesiredJointPositionsPtr(&m_desired_joint_positions);
     m_ik_solver.setDesiredJointVelocitiesPtr(&m_desired_joint_velocities);
-    RCLCPP_INFO(this->get_logger(), "IKSolver pointers set.");
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver pointers set.");
 
     std::vector<std::shared_ptr<Task>> tasks;
     std::vector<std::string> task_nodes = {"left_ankle", "right_ankle"}; // TODO: Load this from a YAML file.
@@ -87,14 +87,14 @@ IKSolverNode::IKSolverNode()
         task->setDampingCoefficient(tasks_damp_coeff[i]);
         tasks.push_back(task);
     }
-    RCLCPP_INFO(this->get_logger(), "Tasks configured.");
+    RCLCPP_DEBUG(this->get_logger(), "Tasks configured.");
 
     m_ik_solver.setTasks(tasks);
     m_ik_solver.setNJoints(joints_size);
     m_ik_solver.setIntegralDtPtr(&m_desired_poses_dt);
     m_ik_solver.configureTasks(&m_desired_poses);
     m_ik_solver.setJointLimits(joints_limits_lower, joints_limits_upper);
-    RCLCPP_INFO(this->get_logger(), "IKSolver configured.");
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver configured.");
 
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", 10, std::bind(&IKSolverNode::IksFootPositionsCallback, this, std::placeholders::_1));
@@ -105,7 +105,7 @@ IKSolverNode::IKSolverNode()
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>(
         "ik_solver/buffer/error_norm", 10);
 
-    RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
+    RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
 
     // Configure previous joint trajectory point.
     // Eigen::VectorXd zeros = Eigen::VectorXd::Zero(joints_size);

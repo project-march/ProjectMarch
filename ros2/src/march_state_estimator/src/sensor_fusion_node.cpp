@@ -58,7 +58,7 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     m_imu = std::make_shared<sensor_msgs::msg::Imu>(init_imu_msg);
     m_node_feet_names = {"L_foot", "R_foot"};
 
-    RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
+    RCLCPP_DEBUG(this->get_logger(), "State Estimator Node initialized");
 }
 
 void SensorFusionNode::timerCallback()

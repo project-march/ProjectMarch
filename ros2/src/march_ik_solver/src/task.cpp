@@ -37,7 +37,7 @@ Eigen::VectorXd Task::calculateError()
 {
     Eigen::VectorXd pose_error, error;
     pose_error.noalias() =  (*m_desired_poses_ptr)[m_task_id] - m_current_pose;
-    RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Pose error: %f, %f, %f, %f, %f, %f", pose_error(0), pose_error(1), pose_error(2), pose_error(3), pose_error(4), pose_error(5));
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Pose error: %f, %f, %f, %f, %f, %f", pose_error(0), pose_error(1), pose_error(2), pose_error(3), pose_error(4), pose_error(5));
     // Eigen::VectorXd gain_p_matrix = Eigen::VectorXd::Zero(m_task_m);
     // gain_p_vector << m_gain_p, m_gain_p * 5.0, m_gain_p, m_gain_p, m_gain_p * 5.0, m_gain_p; // TODO
     Eigen::DiagonalMatrix<double, Eigen::Dynamic> gain_p_matrix(m_task_m);
@@ -45,7 +45,7 @@ Eigen::VectorXd Task::calculateError()
                                 1.0 * m_gain_p, 4.0 * m_gain_p, 4.0 * m_gain_p;
     error = gain_p_matrix * pose_error + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
     // error = m_gain_p * pose_error + calculateIntegralError(pose_error) + calculateDerivativeError(pose_error);
-    RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Error: %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5));
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Error: %f, %f, %f, %f, %f, %f", error(0), error(1), error(2), error(3), error(4), error(5));
     m_error_norm = error.norm();
     return error;
 }
@@ -56,7 +56,7 @@ Eigen::VectorXd Task::calculateIntegralError(const Eigen::VectorXd & error)
     integral_error.noalias() = m_integral_error + error * m_dt;
     m_integral_error = integral_error;
 
-    RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Integral error: %f, %f, %f, %f, %f, %f", integral_error(0), integral_error(1), integral_error(2), integral_error(3), integral_error(4), integral_error(5));
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Integral error: %f, %f, %f, %f, %f, %f", integral_error(0), integral_error(1), integral_error(2), integral_error(3), integral_error(4), integral_error(5));
 
     return m_gain_i * integral_error;
 }
@@ -66,7 +66,7 @@ Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd & error)
     Eigen::VectorXd derivative_error = (error - m_previous_error) / m_dt;
     m_previous_error = error;
 
-    RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Derivative error: %f, %f, %f, %f, %f, %f", derivative_error(0), derivative_error(1), derivative_error(2), derivative_error(3), derivative_error(4), derivative_error(5));
+    RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Derivative error: %f, %f, %f, %f, %f, %f", derivative_error(0), derivative_error(1), derivative_error(2), derivative_error(3), derivative_error(4), derivative_error(5));
 
     return m_gain_d * derivative_error;
 }
@@ -107,7 +107,7 @@ void Task::calculateJacobianInverse()
 
     for (unsigned int i = 0; i < m_task_n; i++)
     {
-        RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Jacobian inverse: %f, %f, %f, %f, %f, %f", m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
+        RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Jacobian inverse: %f, %f, %f, %f, %f, %f", m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
     }
 }
 
@@ -283,7 +283,7 @@ void Task::sendRequestNodePosition()
 
         for (auto node_position : result.get()->node_positions)
         {
-            RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
+            RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Node position: %f, %f, %f", node_position.x, node_position.y, node_position.z);
             current_pose_vector.push_back(node_position.x);
             current_pose_vector.push_back(node_position.y);
             current_pose_vector.push_back(node_position.z);
@@ -350,7 +350,7 @@ void Task::sendRequestNodeJacobian()
         m_jacobian = jacobian;
         for (unsigned int i = 0; i < m_task_m; i++)
         {
-            RCLCPP_INFO(rclcpp::get_logger("ik_solver_node"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
+            RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
         }
     }
     else
