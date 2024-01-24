@@ -110,22 +110,26 @@ small_gait_first_step, small_gait_complete_step = package_bezier(0.2, 40)
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', small_gait_first_step, delimiter=',')
 # np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', small_gait_complete_step, delimiter=',')
 
-def interpolate(step_size, small_gait_complete_step, large_gait_complete_step):
+def interpolate(step_size, small_gait_complete_step, large_gait_complete_step, array_size):
     z_swing = []
-    x_swing = np.linspace(0, step_size, 40)
-    for i in range(40): 
-        z = small_gait_complete_step[i][1] + (x_swing[i]-small_gait_complete_step[i][0]) * ((large_gait_complete_step[i][1]-small_gait_complete_step[i][1])/(large_gait_complete_step[i][0]-small_gait_complete_step[i][0]))
-        z_swing.append(z)
-    x_stance = np.linspace(0.0, 0.0, 40)
-    z_stance = np.linspace(0.0, 0.0, 40)
+    x_swing = np.linspace(0, step_size/2, array_size)
+    for i in range(array_size): 
+        try: 
+            z = small_gait_complete_step[i][1] + (x_swing[i]-small_gait_complete_step[i][0]) * ((large_gait_complete_step[i][1]-small_gait_complete_step[i][1])/(large_gait_complete_step[i][0]-small_gait_complete_step[i][0]))
+            z_swing.append(z)
+        except RuntimeWarning: 
+            z_swing.append(0.0)
+    x_stance = np.linspace(0.0, -step_size/2, array_size)
+    z_stance = np.linspace(0.0, 0.0, array_size)
     result = np.column_stack((x_swing, z_swing, x_stance, z_stance))
     plt.plot(result[:,0], result[:,1])
+    plt.plot(result[:,2], result[:,3])
     plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
     plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
     plt.show()
     return result 
 
-res = interpolate(0.3, small_gait_complete_step, large_gait_complete_step)
+res = interpolate(0.3, small_gait_first_step, large_gait_first_step, 20)
 
 # plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
 # plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])

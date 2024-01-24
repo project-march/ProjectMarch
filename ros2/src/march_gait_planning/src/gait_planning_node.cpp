@@ -49,6 +49,12 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 // void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOuptut::SharedPtr msg)[
 //     m_gait_planning.interpolateVariableTrajectory(msg->distance); 
 //     m_current_trajectory = m_gait_planning.getVariableTrajectory();
+//     std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
+//     std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
+//     for (int i = 0, i < m_current_trajectory.size(), ++i){
+//         m_current_trajectory[i][0] += left_foot[0]
+//         m_current_trajectory[i][2] += right_foot[0]
+//     }
 //     footPositionsPublish(); 
 // ]
 
@@ -63,6 +69,8 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
     m_desired_footpositions_msg->right_foot_position.z = right_z;
 }
 
+//TODO: add Step Close function. Upon calling this function, also get the feet positions once upon starting the step close
+// and add these coordinates to the step close vector, to make sure the trajectory is defined w/ respect to body frame. 
 void GaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
         case exoMode::Stand :
@@ -80,6 +88,14 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::SmallWalk :
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
+                // std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
+                // std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
+                // for (int i = 0; i < m_current_trajectory.size(); ++i){
+                //     m_current_trajectory[i][0] += left_foot[0];
+                //     m_current_trajectory[i][2] += right_foot[0];
+                //     m_current_trajectory[i][1] += left_foot[2];
+                //     m_current_trajectory[i][3] += right_foot[2];
+                // }
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
             }
             else {
@@ -89,8 +105,8 @@ void GaitPlanningNode::footPositionsPublish(){
                 // if (m_gait_planning.getCurrentStanceFoot() == -1 || m_gait_planning.getCurrentStanceFoot() == 0){
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
-                    setFootPositionsMessage(current_step[2], m_home_stand[1], current_step[3] + m_home_stand[2], 
-                                    current_step[0], m_home_stand[4], current_step[1] + m_home_stand[5]);
+                    setFootPositionsMessage(current_step[2], m_home_stand[1], current_step[3]+m_home_stand[2], 
+                                    current_step[0], m_home_stand[4], current_step[1]+m_home_stand[5]);
                 } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
                     // 10 is right stance leg
                     setFootPositionsMessage(current_step[0], m_home_stand[1], current_step[1]+ m_home_stand[2], 
@@ -101,8 +117,10 @@ void GaitPlanningNode::footPositionsPublish(){
             }
             break;
 
+//TODO: add VariableWalk to mode_machine
         // case exoMode::VariableWalk : 
         //     if (m_current_trajectory.empty()){
+        //        // eventually this will be the stepclose function
         //         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
         //         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
         //     }

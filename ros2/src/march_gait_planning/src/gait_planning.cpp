@@ -103,10 +103,12 @@ std::vector<double> linspace(const double &min, const double &max, const int &si
 
 // void GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
 //     std::vector<std::array<double, 4>> result;
-//     std::vector<double> x_swing = linspace(0, step_distance, 40);  
-//     for (int i; i < 40; i++){
-//         float z_swing= m_small_bezier_trajectory[i][1] + (x_swing[i] - m_small_bezier_trajectory[i][0])*((m_large_bezier_trajectory[i][1]-m_small_bezier_trajectory[i][1])/(m_large_bezier_trajectory[i][0]-m_small_bezier_trajectory[i][0])); 
-//         result.push_back({x_swing[i], z_swing, 0.0, 0.0}); 
+//     std::vector<double> x_swing = linspace(0, step_distance/2, 20);  
+//     std::vector<double> x_stance = linspace(0, -step_distance/2, 20); 
+//     std::vector<double> z_stance(20, 0.0); 
+//     for (int i; i < 20; i++){
+//         float z_swing = m_small_first_step_trajectory[i][1] + (x_swing[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
+//         result.push_back({x_swing[i], z_swing, x_stance[i], z_stance[i]}); 
 //     }
 //     m_variable_step_trajectory = result; 
 // }
