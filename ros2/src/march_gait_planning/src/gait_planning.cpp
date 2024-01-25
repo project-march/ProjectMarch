@@ -89,7 +89,7 @@ std::vector<std::array<double, 4>> GaitPlanning::getVariableTrajectory() const{
     return m_variable_step_trajectory; 
 }
 
-std::vector<double> linspace(const double &min, const double &max, const int &size)
+std::vector<double> GaitPlanning::linspace(const double &min, const double &max, const int &size)
 {
 	std::vector<double> result;
 	int iterator = 0;
@@ -103,17 +103,16 @@ std::vector<double> linspace(const double &min, const double &max, const int &si
 	return result;
 }
 
-// void GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
-//     std::vector<std::array<double, 4>> result;
-//     std::vector<double> x_swing = linspace(0, step_distance/2, 20);  
-//     std::vector<double> x_stance = linspace(0, -step_distance/2, 20); 
-//     std::vector<double> z_stance(20, 0.0); 
-//     for (int i; i < 20; i++){
-//         float z_swing = m_small_first_step_trajectory[i][1] + (x_swing[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
-//         result.push_back({x_swing[i], z_swing, x_stance[i], z_stance[i]}); 
-//     }
-//     m_variable_step_trajectory = result; 
-// }
+std::vector<std::array<double, 4>> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
+    std::vector<double> x_swing = linspace(0, step_distance/2, 100);  
+    std::vector<double> x_stance = linspace(0, -step_distance/2, 100); 
+    std::vector<double> z_stance(100, 0.0); 
+    for (int i; i < 100; i++){
+        float z_swing = m_small_first_step_trajectory[i][1] + (x_swing[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
+        m_variable_step_trajectory.push_back({x_swing[i], z_swing, x_stance[i], z_stance[i]}); 
+    }
+    return m_variable_step_trajectory;  
+}
 
 std::vector<std::array<double, 4>> GaitPlanning::processCSV(const std::string& filename){
     std::vector<CSVRow> data;

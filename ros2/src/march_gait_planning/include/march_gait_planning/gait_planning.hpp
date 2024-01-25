@@ -31,7 +31,7 @@ public:
     std::vector<double> linspace(const double &min, const double &max, const int &size); 
 
     //Interpolate between small and large bezier gait 
-    void interpolateVariableTrajectory(const float &step_distance); 
+    std::vector<std::array<double, 4>> interpolateVariableTrajectory(const float &step_distance); 
 
 private: 
     exoMode m_gait_type; 

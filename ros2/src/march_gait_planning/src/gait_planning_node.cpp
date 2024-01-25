@@ -47,14 +47,9 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg)[
-    m_gait_planning.interpolateVariableTrajectory(msg->distance); 
-    m_current_trajectory = m_gait_planning.getVariableTrajectory();
-    // std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
-    // std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
-    // for (int i = 0, i < m_current_trajectory.size(), ++i){
-    //     m_current_trajectory[i][0] += left_foot[0]
-    //     m_current_trajectory[i][2] += right_foot[0]
-    // }
+    float dist = msg->distance; 
+    m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
+    // m_current_trajectory = m_gait_planning.getVariableTrajectory();
     footPositionsPublish(); 
 ]
 
@@ -88,21 +83,6 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::SmallWalk :
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
-                // std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
-                // std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
-                // for (unsigned i = 0; i < m_current_trajectory.size(); ++i){
-                //     if (m_gait_planning.getCurrentStanceFoot() & 0b1){
-                //         m_current_trajectory[i][0] += right_foot[0];
-                //         m_current_trajectory[i][2] += left_foot[0];
-                //         m_current_trajectory[i][1] += right_foot[2];
-                //         m_current_trajectory[i][3] += left_foot[2];
-                //     } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
-                //         m_current_trajectory[i][0] += left_foot[0];
-                //         m_current_trajectory[i][2] += right_foot[0];
-                //         m_current_trajectory[i][1] += left_foot[2];
-                //         m_current_trajectory[i][3] += right_foot[2];
-                //     }
-                // }
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
             }
             else {
