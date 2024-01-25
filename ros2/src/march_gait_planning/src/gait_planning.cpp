@@ -83,11 +83,11 @@ exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
 
-//This getter can also be included in the general getTrajectory function, depending on how we identify
+// This getter can also be included in the general getTrajectory function, depending on how we identify
 // the camera's as being used for input. 
-// std::vector<std::array<double, 4>> GaitPlanning::getVariableTrajectory() const{
-//     return m_variable_step_trajectory; 
-// }
+std::vector<std::array<double, 4>> GaitPlanning::getVariableTrajectory() const{
+    return m_variable_step_trajectory; 
+}
 
 std::vector<double> linspace(const double &min, const double &max, const int &size)
 {

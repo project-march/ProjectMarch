@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-enum class exoMode { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4, Sideways = 5, LargeWalk = 6, SmallWalk = 7};
+enum class exoMode { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4, Sideways = 5, LargeWalk = 6, SmallWalk = 7, VariableWalk = 8};
 
 // toString function
 inline std::string toString(exoMode state) {

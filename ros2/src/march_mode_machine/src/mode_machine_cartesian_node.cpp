@@ -12,6 +12,8 @@ ModeMachineCartesianNode::ModeMachineCartesianNode()
 
     m_mode_publisher = create_publisher<march_shared_msgs::msg::ExoMode>("current_mode", 10);
     RCLCPP_WARN(rclcpp::get_logger("mode_machine_cartesian"), "Cartesian Mode Machine Node succesfully initialized");
+
+    m_footsteps_dummy_publisher = create_publisher<march_shared_msgs::msg::FootStepOutput>("footsteps", 100); 
 }
 
 ModeMachineCartesianNode::~ModeMachineCartesianNode()
@@ -47,6 +49,13 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         auto mode_msg = march_shared_msgs::msg::ExoMode();
         mode_msg.mode = m_mode_machine.getCurrentMode();
         m_mode_publisher->publish(mode_msg);
+
+        if (mode_msg.mode == 8){
+            march_shared_msgs::msg::FootStepOutput feet_msg; 
+            feet_msg.distance = 0.4;
+            m_footsteps_dummy_publisher->publish(feet_msg); 
+        }
+
     } else 
     {
         RCLCPP_WARN(rclcpp::get_logger("mode_machine_cartesian"), "Invalid mode transition! Ignoring new mode.");

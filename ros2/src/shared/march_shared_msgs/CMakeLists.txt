@@ -44,6 +44,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ExoModeArray.msg"
   "msg/FeetHeightStamped.msg"
   "msg/FootPosition.msg"
+  "msg/FootStepOutput.msg"
   "msg/GaitInstruction.msg"
   "msg/GaitRequest.msg"
   "msg/GaitResponse.msg"

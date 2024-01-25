@@ -13,6 +13,7 @@ ModeMachineCartesian::ModeMachineCartesian()
         { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
         { exoMode::BootUp, { exoMode::Stand } },
         { exoMode::Error, {}},
+        { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
     };
 }
 
