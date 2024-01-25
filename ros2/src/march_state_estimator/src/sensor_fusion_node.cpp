@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_state_estimator/sensor_fusion_node.hpp"
 
 #include "geometry_msgs/msg/pose.hpp"
@@ -8,6 +13,7 @@
 #include <memory>
 #include <functional>
 #include <future>
+#include <unordered_map>
 
 #include "math.h"
 #include "eigen3/Eigen/Core"
@@ -19,9 +25,9 @@ using std::placeholders::_2;
 SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_description)
     : Node("state_estimator_node")
 {
-    this->declare_parameter<int64_t>("dt", 50);
-
-    int64_t dt = this->get_parameter("dt").as_int();
+    // this->declare_parameter<int64_t>("dt", 50);
+    // int64_t dt = this->get_parameter("dt").as_int();
+    int64_t dt = 50;
 
     m_joint_state_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_imu_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -87,11 +93,19 @@ void SensorFusionNode::publishStateEstimation()
 
     uint8_t stance_leg = 0b11;
     std::vector<geometry_msgs::msg::Pose> foot_poses;
-    std::vector<RobotNode*> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
+    std::vector<std::shared_ptr<RobotNode>> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
+
+    // Find a way to optimize this
+    std::unordered_map<std::string, double> joint_positions;
+    for (long unsigned int i = 0; i < m_joint_state->name.size(); i++)
+    {
+        joint_positions[m_joint_state->name[i]] = m_joint_state->position[i];
+    }
+
     for (long unsigned int i = 0; i < feet_nodes.size(); i++)
     {
         geometry_msgs::msg::Pose foot_pose;
-        Eigen::Vector3d foot_position = feet_nodes[i]->getGlobalPosition(m_joint_state->name, m_joint_state->position);
+        Eigen::Vector3d foot_position = feet_nodes[i]->getGlobalPosition(joint_positions);
         foot_pose.position.x = foot_position.x();
         foot_pose.position.y = foot_position.y();
         foot_pose.position.z = foot_position.z();
