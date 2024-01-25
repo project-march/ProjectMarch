@@ -108,7 +108,7 @@ void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
 void GaitPlanningAnglesNode::processHomeStandGait(){
 if (m_gait_planning.getCounter() == 0){ // When switching to homestand
         m_incremental_steps_to_home_stand.clear();
-        for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
+        for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / 40); // 40 iterations to reach the target, i.e. in 2 seconds
         }
         m_initial_point = m_gait_planning.getPrevPoint();
@@ -121,7 +121,7 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
     if (m_gait_planning.getCounter() < 40){
         m_trajectory_des_point.positions.clear();
         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
-        for (int i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
+        for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             m_trajectory_des_point.positions.push_back(m_initial_point[i]);
         } 
@@ -146,7 +146,7 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
 void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
     if (!m_first_stand){
         RCLCPP_DEBUG(this->get_logger(), "Entering timer function"); 
-        int count = m_gait_planning.getCounter(); 
+        unsigned count = m_gait_planning.getCounter(); 
         switch (m_gait_planning.getGaitType()) {
             case exoMode::Walk : 
                 if (m_gait_planning.getPrevGaitType() == exoMode::Walk){
