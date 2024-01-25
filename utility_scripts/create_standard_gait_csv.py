@@ -51,6 +51,11 @@ def cubic_bezier(array_size, step_length, x_curr):
 
 def package_bezier(step_length, array_size):
 
+    def compensation_for_circle(array_size, step_length): 
+        x = np.linspace(-step_length, step_length, array_size, endpoint=True)
+        y = 0.5*x**2 
+        return y 
+
     xzpositions_first_step = np.asfortranarray([[0.0, (0.02/0.1)*(step_length/2), (0.0533/0.1)*(step_length/2), (step_length/2)], [0.0, 0.4, 0.2, 0.0]])
     curvexz_first_step = bezier.Curve(xzpositions_first_step, degree=3)
     number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size/2))
@@ -58,7 +63,9 @@ def package_bezier(step_length, array_size):
     x_swing_first_step = points_first_step[0,:]
     z_swing_first_step = points_first_step[1,:]
     x_stance_first_step = np.linspace(0, 0 - (step_length/2), int(array_size/2))
+    # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
     z_stance_first_step = [0]*int(array_size/2)
+    # z_swing_first_step = z_swing_first_step + z_stance_first_step
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
     plt.plot(x_swing_first_step, z_swing_first_step)
     plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
@@ -70,11 +77,11 @@ def package_bezier(step_length, array_size):
     number_of_time_points_complete_step = np.linspace(0, 1.0, array_size)
     points_complete_step= curvexz_complete_step.evaluate_multi(number_of_time_points_complete_step)
     x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
-    # x_swing_complete_step = points_complete_step[0,:]
     z_swing_complete_step = points_complete_step[1,:]
     x_stance_complete_step = np.linspace(0+(step_length/2), 0 - (step_length/2), array_size)
-    # x_stance_complete_step = np.linspace(0+step_length, 0, array_size)
+    # z_stance_complete_step = compensation_for_circle(array_size, step_length)
     z_stance_complete_step = [0]*array_size
+    # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
     plt.plot(x_swing_complete_step, z_swing_complete_step)
     plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
