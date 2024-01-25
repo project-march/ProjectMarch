@@ -116,7 +116,7 @@ void SensorFusionNode::publishStateEstimation()
         foot_poses.push_back(foot_pose);    
     }
 
-    double margin = 0.1;
+    double margin = 0.01;
     if (abs(foot_poses[0].position.x - foot_poses[1].position.x) <= margin)
     {
         stance_leg = 0b11;
