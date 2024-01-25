@@ -20,13 +20,13 @@ struct CSVRow {
 GaitPlanning::GaitPlanning()
 : m_gait_type(), 
   m_current_stance_foot(), 
+  m_step_size(), 
   m_current_left_foot_position(), 
   m_current_right_foot_position(), 
-  m_small_bezier_trajectory(),
-  m_large_bezier_trajectory(), 
-  m_small_first_step_trajectory(), 
-  m_large_first_step_trajectory(),  
-  m_step_size()
+  m_large_bezier_trajectory(),
+  m_large_first_step_trajectory(),
+  m_small_bezier_trajectory(), 
+  m_small_first_step_trajectory() 
   {
     std::cout << "Gait Planning Class created" << std::endl; 
     setBezierGait(); 
