@@ -116,18 +116,18 @@ void SensorFusionNode::publishStateEstimation()
         foot_poses.push_back(foot_pose);    
     }
 
-    double margin = 0.005;
+    double margin = 0.1;
     if (abs(foot_poses[0].position.x - foot_poses[1].position.x) <= margin)
     {
         stance_leg = 0b11;
     }
     else if (foot_poses[0].position.x + margin <= foot_poses[1].position.x)
     {
-        stance_leg = 0b01;
+        stance_leg = 0b10;
     }
     else if (foot_poses[0].position.x - margin > foot_poses[1].position.x)
     {
-        stance_leg = 0b10;
+        stance_leg = 0b01;
     }
 
     state_estimation_msg.header.stamp = this->now();
