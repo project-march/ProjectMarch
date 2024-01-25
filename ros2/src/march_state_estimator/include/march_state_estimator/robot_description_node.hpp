@@ -1,9 +1,15 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_NODE_HPP_
 #define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_NODE_HPP_
 
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -22,12 +28,17 @@ public:
     RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
 
 private:
+    void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
+    void publishVisualization(const std::unordered_map<std::string, double> & joint_positions);
     void handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response);
     void handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response);
+    
 
     std::shared_ptr<RobotDescription> m_robot_description;
+    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_subscription_state_estimation;
+    rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr m_publisher_state_estimator_visualization;
     rclcpp::CallbackGroup::SharedPtr m_node_positions_callback_group;
     rclcpp::CallbackGroup::SharedPtr m_node_jacobian_callback_group;
     rclcpp::Service<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_service_node_position;
