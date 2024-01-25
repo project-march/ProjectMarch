@@ -46,12 +46,12 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     footPositionsPublish(); 
 }
 
-void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg)[
+void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
     float dist = msg->distance; 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     // m_current_trajectory = m_gait_planning.getVariableTrajectory();
     footPositionsPublish(); 
-]
+}
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
