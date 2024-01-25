@@ -1,4 +1,0 @@
-robot_description_node:
-  ros__parameters:
-    tasks:
-      urdf: {file: $(find march_description)/urdf/march8/hennie_with_koen.urdf}
