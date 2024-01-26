@@ -102,7 +102,7 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     default_fuzzy_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
+        get_package_share_directory('march_fuzzy_generator'),
         'config',
         'joints.yaml'
     )
@@ -127,9 +127,9 @@ def generate_launch_description() -> LaunchDescription:
             ],
         ),
         Node(
-            package='fuzzy_generator',
-            executable='fuzzy_node',
-            name='fuzzy_node',
+            package='march_fuzzy_generator',
+            executable='fuzzy_generator_node',
+            name='fuzzy_generator',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
         input_device,

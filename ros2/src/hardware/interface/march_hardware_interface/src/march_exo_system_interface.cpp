@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "march_hardware_interface/march_exo_system_interface.hpp"
-//#include "march_hardware_interface/weight_node.h"
 
 #include <cassert>
 #include <chrono>
@@ -42,11 +41,9 @@ namespace march_hardware_interface {
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
-//    , m_weight_node_()
+
 {
     RCLCPP_INFO((*logger_), "creating Hardware Interface...");
-    //    m_weight_node_->m_hardware_interface = this;
-    //    RCLCPP_INFO((*logger_), "should've assigned the hwi to the weightnode now...");
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
 }
 
@@ -257,12 +254,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
             }
-            // if no weight has been assigned, we start in torque control
-            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight ||
-            // isnan(jointInfo.position_weight) ){
-            //     jointInfo.torque_weight = 1.0f;
-            //     jointInfo.position_weight = 0.0f;
-            // }
 
             RCLCPP_INFO_ONCE((*logger_),
                 "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
@@ -270,8 +261,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
                 jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
                 jointInfo.torque, jointInfo.torque_weight);
 
-            jointInfo.joint.actuate(
-                jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
+            jointInfo.joint.actuate(jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
 
             // Set the first target as the current position
             jointInfo.position = jointInfo.joint.getPosition();
@@ -470,10 +460,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-// either this or setting the target torque to the real-time measured torque in the weight node
-// jointInfo.target_torque = jointInfo.joint.getMotorController()->getTorqueSensor()->getAverageTorque();
-
-// TORQUEDEBUG LINE
 #ifdef TORQUEDEBUG
         RCLCPP_INFO_ONCE((*logger_),
             "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
@@ -482,26 +468,8 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             jointInfo.torque, jointInfo.torque_weight);
 #endif
 
-        // FIXME: BEUNFIX
-        // RCLCPP_INFO_STREAM((*logger_), "The fuzzy target values for " << jointInfo.name << " are as follows: \n
-        // target position: " << jointInfo.target_position << " \n measured position: " << jointInfo.position << "\n
-        // position weight: " << jointInfo.position_weight << " \n target torque: " << jointInfo.target_torque << " \n
-        // measured torque: " << jointInfo.torque << " \n torque weight: " << jointInfo.torque_weight);
-        // if(jointInfo.name.compare("left_ankle") == 0){
-        // RCLCPP_INFO((*logger_), "left ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque,
-        // jointInfo.position_weight, jointInfo.torque_weight);
-        // jointInfo.joint.actuate((float)jointInfo.target_position, -0.012, 0.6f, 0.4f);
-        // }
-        // else if(jointInfo.name.compare("right_ankle") == 0){
-        // RCLCPP_INFO((*logger_), "right ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque,
-        // jointInfo.position_weight, jointInfo.torque_weight);
-        // jointInfo.joint.actuate((float)jointInfo.target_position, -0.185f, 0.6f, 0.4f);
-        // }
-        // else{
-        // ACTUAL TORQUE LINE
         jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
             (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
-        // }
     }
 
     return hardware_interface::return_type::OK;

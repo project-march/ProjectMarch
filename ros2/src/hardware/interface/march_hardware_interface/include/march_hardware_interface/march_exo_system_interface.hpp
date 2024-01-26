@@ -68,6 +68,7 @@ struct JointInfo {
 
     JointLimit limit;
 };
+
 class WeightNode : public rclcpp::Node {
 public:
     explicit WeightNode()
@@ -85,62 +86,40 @@ public:
         RCLCPP_INFO(rclcpp::get_logger("weight_node"), "creating the weight node!");
     }
 
-    /**
-     * Processes the weights sent from the fuzzy generator
-     *
-     * @param msg Message that contains the weights for both torque and position
-     * @return
-     */
+    // Method to receive and set the weights of the joints
     void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
     {
         RCLCPP_INFO_STREAM_ONCE(this->get_logger(),
-            "Weights are in from fuzzy node: joint : " << msg->joint_name << " position " << msg->position_weight
+            "Weights are in from fuzzy generator node: joint : " << msg->joint_name << " position " << msg->position_weight
                                                        << ", torque " << msg->torque_weight);
 
         setJointWeight(msg->joint_name, msg->position_weight, msg->torque_weight);
     }
 
-    /**
-     * This is a temporary method: it is used for logging measured torque
-     *
-     * @return
-     */
+    // Method to publish the measured torque
     void publish_measured_torque()
     {
         control_msgs::msg::JointTrajectoryControllerState torque_points;
 
         trajectory_msgs::msg::JointTrajectoryPoint point;
         for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-            // RCLCPP_INFO(this->get_logger(), "Publishing the measured torque: %f", jointInfo.torque);
             torque_points.joint_names.push_back(jointInfo.name);
             point.effort.push_back(jointInfo.torque);
         }
 
         point.time_from_start.sec = 0;
         point.time_from_start.nanosec = 8 * 1e6;
-        // torque_points.points.push_back(point);
         torque_points.actual = point;
         torque_points.header.stamp = this->get_clock()->now();
 
         m_measured_torque_publisher->publish(torque_points);
     }
 
-    /**
-     * Applies torque and position weights to all JointInfo objects in the hardware interface
-     *
-     * @param leg Either "l" or "r" to indicate left or right leg
-     * @param position_weight A float between 0 and 1 to apply to joints
-     * @param torque_weight A float between 0 and 1 to apply to joints
-     * @return
-     */
+    // Method to set the weights of a joint
     void setJointWeight(std::string joint_name, float position_weight, float torque_weight)
     {
-
-        // RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
-
         bool found_joint = false;
         for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
-            // RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
             // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
                 if (jointInfo.torque_weight > std::numeric_limits<float>::epsilon()
@@ -160,6 +139,7 @@ public:
         }
     }
 
+    // Method to set the joints info
     void average_torque_callback(std_msgs::msg::Int32::SharedPtr msg)
     {
 
@@ -172,8 +152,7 @@ public:
         auto now = std::chrono::steady_clock::now;
         auto work_duration = std::chrono::seconds { msg->data };
         auto start = now();
-        // RCLCPP_INFO_STREAM(this->get_logger(), "start: " <<  std::chrono::system_clock::to_time_t(start) << "
-        // duration: " << work_duration);
+
         while ((now() - start) < work_duration) {
             for (auto j : *joints_info_) {
                 measured_torques[j.name].push_back(j.torque);
@@ -186,16 +165,7 @@ public:
             RCLCPP_INFO_STREAM(this->get_logger(),
                 "joint " << jointInfo.name << " has average torque " << avg_torque << " measured over " << total.size()
                          << " values");
-            // FIXME: BEUNFIX
-            // if (jointInfo.name.compare("left_ankle") == 0 || jointInfo.name.compare("right_ankle") == 0) {
-            //     RCLCPP_INFO_STREAM(this->get_logger(), "putting the values into fuzzy!");
-            //     jointInfo.target_torque = avg_torque;
-            //     jointInfo.torque_weight = 0.4;
-            //     jointInfo.position_weight = 0.6;
-            // }
             jointInfo.target_torque = avg_torque;
-            // Either this or target_torque = jointInfo.joint.torque_sensor.getAverageTorque(); in the cpp if we want to
-            // hardcode it
         }
     }
 
