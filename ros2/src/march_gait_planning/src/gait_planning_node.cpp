@@ -17,14 +17,9 @@ GaitPlanningNode::GaitPlanningNode()
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
-    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOuptut>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
-
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
     m_home_stand = {0.3, 0.12, -0.65, 0.3, -0.12, -0.65}; 
-
-    // auto timer_callback = std::bind(&GaitPlanningNode::timerCallback, this);
-    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -46,17 +41,6 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     footPositionsPublish(); 
 }
 
-// void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOuptut::SharedPtr msg)[
-//     m_gait_planning.interpolateVariableTrajectory(msg->distance); 
-//     m_current_trajectory = m_gait_planning.getVariableTrajectory();
-//     std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
-//     std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
-//     for (int i = 0, i < m_current_trajectory.size(), ++i){
-//         m_current_trajectory[i][0] += left_foot[0]
-//         m_current_trajectory[i][2] += right_foot[0]
-//     }
-//     footPositionsPublish(); 
-// ]
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
@@ -88,21 +72,6 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::SmallWalk :
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
-                // std::array<double,3> left_foot = m_gait_planning.getCurrentLeftFootPos(); 
-                // std::array<double,3> right_foot = m_gait_planning.getCurrentRightFootPos(); 
-                // for (unsigned i = 0; i < m_current_trajectory.size(); ++i){
-                //     if (m_gait_planning.getCurrentStanceFoot() & 0b1){
-                //         m_current_trajectory[i][0] += right_foot[0];
-                //         m_current_trajectory[i][2] += left_foot[0];
-                //         m_current_trajectory[i][1] += right_foot[2];
-                //         m_current_trajectory[i][3] += left_foot[2];
-                //     } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
-                //         m_current_trajectory[i][0] += left_foot[0];
-                //         m_current_trajectory[i][2] += right_foot[0];
-                //         m_current_trajectory[i][1] += left_foot[2];
-                //         m_current_trajectory[i][3] += right_foot[2];
-                //     }
-                // }
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
             }
             else {
@@ -123,29 +92,8 @@ void GaitPlanningNode::footPositionsPublish(){
                 // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
             }
             break;
-
-//TODO: add VariableWalk to mode_machine
-        // case exoMode::VariableWalk : 
-        //     if (m_current_trajectory.empty()){
-        //        // eventually this will be the stepclose function
-        //         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
-        //         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-        //     }
-        //     else { 
-        //         std::array<double, 4> current_step = m_current_trajectory.front();
-        //         m_current_trajectory.erase(m_current_trajectory.begin());
-        //         setFootPositionsMessage(current_step[2], m_home_stand[1], current_step[3] + m_home_stand[2], 
-        //                         current_step[0], m_home_stand[4], current_step[1] + m_home_stand[5]);
-        //         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-        //         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!");
-        //     } 
-        //     break;
     }
 }
-
-// void GaitPlanningNode::timerCallback() {
-//     footPositionsPublish();
-// }
 
 int main(int argc, char *argv[]){
     

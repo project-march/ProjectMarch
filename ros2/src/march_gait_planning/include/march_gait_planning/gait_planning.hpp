@@ -25,13 +25,7 @@ public:
     std::array<double, 3> getCurrentRightFootPos() const; 
     exoMode getGaitType() const; 
 
-    //Getter for variable step size 
-    // std::vector<std::array<double, 4>> getVariableTrajectory() const; 
-
     std::vector<double> linspace(const double &min, const double &max, const int &size); 
-
-    //Interpolate between small and large bezier gait 
-    // void interpolateVariableTrajectory(const float &step_distance); 
 
 private: 
     exoMode m_gait_type; 
@@ -43,9 +37,6 @@ private:
     std::vector<std::array<double, 4>> m_large_first_step_trajectory; 
     std::vector<std::array<double, 4>> m_small_bezier_trajectory; 
     std::vector<std::array<double, 4>> m_small_first_step_trajectory; 
-    
-    //Create trajectory for variable step size. This should already include a stepclose. 
-    // std::vector<std::array<double, 4>> m_variable_step_trajectory; 
 
     std::vector<std::array<double, 4>> processCSV(const std::string& filename);
     
