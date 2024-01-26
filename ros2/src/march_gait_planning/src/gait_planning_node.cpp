@@ -114,9 +114,6 @@ void GaitPlanningNode::footPositionsPublish(){
                 setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
                                 current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                RCLCPP_INFO(this->get_logger(), "coordinates sent: %f, %f, %f, %f, %f, %f", current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
-                                current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
-                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "trajectory size: %d", std::end(m_current_trajectory)-std::begin(m_current_trajectory));
             } 
             break;
     }

@@ -106,27 +106,27 @@ std::vector<double> GaitPlanning::linspace(const double &min, const double &max,
 std::vector<std::array<double, 4>> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
     m_variable_step_trajectory.clear(); 
     int length = std::end(m_small_first_step_trajectory)-std::begin(m_small_first_step_trajectory); 
-    std::vector<double> x_right_first= linspace(0, step_distance/2, length);  
-    std::vector<double> x_left_first = linspace(0, -step_distance/2, length); 
-    std::vector<double> z_left_first(length, 0.0); 
-    std::vector<std::array<double, 4>> second_part;
+    std::vector<double> x_right= linspace(0, step_distance/2, length);  
+    std::vector<double> x_left = linspace(0, -step_distance/2, length); 
+    std::vector<double> z_left(length, 0.0); 
+    std::vector<std::array<double, 4>> finish_step;
     for (int i=0; i < length; i++){
-        float z_right_first= m_small_first_step_trajectory[i][1] + (x_right_first[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
-        if (z_right_first != z_right_first){
-            m_variable_step_trajectory.push_back({x_right_first[i], 0.0, x_left_first[i], z_left_first[i]}); 
+        float z= m_small_first_step_trajectory[i][1] + (x_right[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
+        if (z != z){
+            m_variable_step_trajectory.push_back({x_right[i], 0.0, x_left[i], z_left[i]}); 
         } else {
-        m_variable_step_trajectory.push_back({x_right_first[i], z_right_first, x_left_first[i], z_left_first[i]});       
+        m_variable_step_trajectory.push_back({x_right[i], z, x_left[i], z_left[i]});       
         }
     }
     for (int k = 0; k < length; k++){
-        float z_right_first= m_small_first_step_trajectory[k][1] + (x_right_first[k] - m_small_first_step_trajectory[k][0])*((m_large_first_step_trajectory[k][1]-m_small_first_step_trajectory[k][1])/(m_large_first_step_trajectory[k][0]-m_small_first_step_trajectory[k][0]));
-        if (z_right_first != z_right_first){
-            second_part.push_back({x_left_first[k]+(step_distance/2), z_left_first[k], x_right_first[k]-(step_distance/2), 0.0});        
+        float z= m_small_first_step_trajectory[k][1] + (x_right[k] - m_small_first_step_trajectory[k][0])*((m_large_first_step_trajectory[k][1]-m_small_first_step_trajectory[k][1])/(m_large_first_step_trajectory[k][0]-m_small_first_step_trajectory[k][0]));
+        if (z != z){
+            finish_step.push_back({x_left[k]+(step_distance/2), z_left[k], x_right[k]-(step_distance/2), 0.0});        
         } else {
-        second_part.push_back({x_left_first[k]+(step_distance/2), z_left_first[k], x_right_first[k]-(step_distance/2), z_right_first}); 
+        finish_step.push_back({x_left[k]+(step_distance/2), z_left[k], x_right[k]-(step_distance/2), z}); 
         }    
     }
-    m_variable_step_trajectory.insert(m_variable_step_trajectory.end(), second_part.begin(), second_part.end()); 
+    m_variable_step_trajectory.insert(m_variable_step_trajectory.end(), finish_step.begin(), finish_step.end()); 
     return m_variable_step_trajectory;  
 }
 
