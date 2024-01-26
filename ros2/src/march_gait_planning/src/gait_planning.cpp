@@ -104,13 +104,29 @@ std::vector<double> GaitPlanning::linspace(const double &min, const double &max,
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
-    std::vector<double> x_swing = linspace(0, step_distance/2, 100);  
-    std::vector<double> x_stance = linspace(0, -step_distance/2, 100); 
-    std::vector<double> z_stance(100, 0.0); 
-    for (int i; i < 100; i++){
-        float z_swing = m_small_first_step_trajectory[i][1] + (x_swing[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
-        m_variable_step_trajectory.push_back({x_swing[i], z_swing, x_stance[i], z_stance[i]}); 
+    m_variable_step_trajectory.clear(); 
+    int length = std::end(m_small_first_step_trajectory)-std::begin(m_small_first_step_trajectory); 
+    std::vector<double> x_right_first= linspace(0, step_distance/2, length);  
+    std::vector<double> x_left_first = linspace(0, -step_distance/2, length); 
+    std::vector<double> z_left_first(length, 0.0); 
+    std::vector<std::array<double, 4>> second_part;
+    for (int i=0; i < length; i++){
+        float z_right_first= m_small_first_step_trajectory[i][1] + (x_right_first[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
+        if (z_right_first != z_right_first){
+            m_variable_step_trajectory.push_back({x_right_first[i], 0.0, x_left_first[i], z_left_first[i]}); 
+        } else {
+        m_variable_step_trajectory.push_back({x_right_first[i], z_right_first, x_left_first[i], z_left_first[i]});       
+        }
     }
+    for (int k = 0; k < length; k++){
+        float z_right_first= m_small_first_step_trajectory[k][1] + (x_right_first[k] - m_small_first_step_trajectory[k][0])*((m_large_first_step_trajectory[k][1]-m_small_first_step_trajectory[k][1])/(m_large_first_step_trajectory[k][0]-m_small_first_step_trajectory[k][0]));
+        if (z_right_first != z_right_first){
+            second_part.push_back({x_left_first[k]+(step_distance/2), z_left_first[k], x_right_first[k]-(step_distance/2), 0.0});        
+        } else {
+        second_part.push_back({x_left_first[k]+(step_distance/2), z_left_first[k], x_right_first[k]-(step_distance/2), z_right_first}); 
+        }    
+    }
+    m_variable_step_trajectory.insert(m_variable_step_trajectory.end(), second_part.begin(), second_part.end()); 
     return m_variable_step_trajectory;  
 }
 

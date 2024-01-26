@@ -14,6 +14,7 @@ inline std::string toString(exoMode state) {
         case exoMode::Sideways: return "Sideways";
         case exoMode::LargeWalk: return "LargeWalk"; 
         case exoMode::SmallWalk: return "SmallWalk"; 
+        case exoMode::VariableWalk: return "VariableWalk"; 
         default: return "Unknown";
     }
 }

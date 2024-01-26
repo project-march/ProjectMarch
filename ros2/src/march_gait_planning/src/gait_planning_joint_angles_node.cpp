@@ -25,7 +25,6 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
  : Node("gait_planning_angles_node"), 
    m_gait_planning(GaitPlanningAngles()),
    m_joints_msg(),
-//    m_trajectory_prev_point(),
    m_trajectory_des_point(),
    m_current_trajectory(),
    m_incremental_steps_to_home_stand(),
