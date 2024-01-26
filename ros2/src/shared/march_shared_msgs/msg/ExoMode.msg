@@ -11,3 +11,5 @@ int8 ERROR = 4
 int8 SIDEWAYS = 5
 int8 LARGEWALK = 6
 int8 SMALLWALK = 7
+int8 ASCEND = 8
+int8 DESCEND = 9
