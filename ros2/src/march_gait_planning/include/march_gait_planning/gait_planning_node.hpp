@@ -2,6 +2,9 @@
 
 #pragma once 
 
+#include <string>
+#include <vector>
+#include <array>  
 #include "rclcpp/rclcpp.hpp" 
 #include "march_gait_planning/gait_planning.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
@@ -16,6 +19,8 @@
 class GaitPlanningNode:public rclcpp::Node {
     public: 
     explicit GaitPlanningNode();
+    typedef std::array<double, 4> XZFeetPositionsArray; 
+    typedef std::array<double, 3> XYZFootPositionArray; 
 
     private: 
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
@@ -36,7 +41,7 @@ class GaitPlanningNode:public rclcpp::Node {
 
     GaitPlanning m_gait_planning; 
 
-    std::vector<std::array<double, 4>> m_current_trajectory; 
+    std::vector<XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 

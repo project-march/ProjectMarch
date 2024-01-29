@@ -32,8 +32,8 @@ void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode
 
 void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current foot positions");
-    std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
-    std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
+    GaitPlanningNode::XYZFootPositionArray new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
+    GaitPlanningNode::XYZFootPositionArray new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
     m_desired_footpositions_msg->header = msg->header;
     if (m_current_trajectory.empty()){
@@ -85,7 +85,7 @@ void GaitPlanningNode::footPositionsPublish(){
                 RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
             }
             else {
-                std::array<double, 4> current_step = m_current_trajectory.front();
+                GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
@@ -109,7 +109,7 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             }
             else { 
-                std::array<double, 4> current_step = m_current_trajectory.front();
+                GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
                                 current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);

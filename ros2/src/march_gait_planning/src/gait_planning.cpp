@@ -37,7 +37,7 @@ void GaitPlanning::setStanceFoot(const uint8_t &new_stance_foot){
     m_current_stance_foot = new_stance_foot; 
 }
 
-void GaitPlanning::setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) { 
+void GaitPlanning::setFootPositions(const XYZFootPositionArray &new_left_foot_position, const XYZFootPositionArray &new_right_foot_position) { 
     m_current_left_foot_position = new_left_foot_position; 
     m_current_right_foot_position = new_right_foot_position; 
 }
@@ -54,8 +54,8 @@ void GaitPlanning::setBezierGait(){
     m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
 }
 
-std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
-    std::vector<std::array<double, 4>> result;  
+std::vector<XZFeetPositionsArray> GaitPlanning::getTrajectory() const{
+    std::vector<XZFeetPositionsArray> result;  
     switch (m_gait_type){
         case exoMode::LargeWalk : 
         return (m_current_stance_foot & 0b11) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
@@ -71,11 +71,11 @@ int GaitPlanning::getCurrentStanceFoot() const {
     return m_current_stance_foot; 
 }
 
-std::array<double, 3> GaitPlanning::getCurrentLeftFootPos() const{
+XYZFootPositionArray GaitPlanning::getCurrentLeftFootPos() const{
     return m_current_left_foot_position; 
 }
 
-std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
+XYZFootPositionArray GaitPlanning::getCurrentRightFootPos() const{
     return m_current_right_foot_position; 
 }
 
@@ -85,7 +85,7 @@ exoMode GaitPlanning::getGaitType() const{
 
 // This getter can also be included in the general getTrajectory function, depending on how we identify
 // the camera's as being used for input. 
-std::vector<std::array<double, 4>> GaitPlanning::getVariableTrajectory() const{
+std::vector<XZFeetPositionsArray> GaitPlanning::getVariableTrajectory() const{
     return m_variable_step_trajectory; 
 }
 
@@ -103,13 +103,13 @@ std::vector<double> GaitPlanning::linspace(const double &min, const double &max,
 	return result;
 }
 
-std::vector<std::array<double, 4>> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
+std::vector<XZFeetPositionsArray> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
     m_variable_step_trajectory.clear(); 
     int length = std::end(m_small_first_step_trajectory)-std::begin(m_small_first_step_trajectory); 
     std::vector<double> x_right= linspace(0, step_distance/2, length);  
     std::vector<double> x_left = linspace(0, -step_distance/2, length); 
     std::vector<double> z_left(length, 0.0); 
-    std::vector<std::array<double, 4>> finish_step;
+    std::vector<XZFeetPositionsArray> finish_step;
     for (int i=0; i < length; i++){
         float z= m_small_first_step_trajectory[i][1] + (x_right[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
         if (z != z){
@@ -130,7 +130,7 @@ std::vector<std::array<double, 4>> GaitPlanning::interpolateVariableTrajectory(c
     return m_variable_step_trajectory;  
 }
 
-std::vector<std::array<double, 4>> GaitPlanning::processCSV(const std::string& filename){
+std::vector<XZFeetPositionsArray> GaitPlanning::processCSV(const std::string& filename){
     std::vector<CSVRow> data;
     std::ifstream file(filename);
 
@@ -154,7 +154,7 @@ std::vector<std::array<double, 4>> GaitPlanning::processCSV(const std::string& f
 
     file.close();
 
-    std::vector<std::array<double, 4>> trajectory;
+    std::vector<XZFeetPositionsArray> trajectory;
     for (const auto& row : data) {
         trajectory.push_back({std::stod(row.x_swing), std::stod(row.z_swing), std::stod(row.x_stance), std::stod(row.z_stance)}); 
     }
