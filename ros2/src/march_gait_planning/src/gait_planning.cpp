@@ -113,13 +113,13 @@ std::vector<XZFeetPositionsArray> GaitPlanning::interpolateVariableTrajectory(co
     The function also compensates for a scalar zero divide error by checking if the calculated value is a nan. 
     */
     m_variable_step_trajectory.clear(); 
-    int length = std::end(m_small_first_step_trajectory)-std::begin(m_small_first_step_trajectory); 
-    std::vector<double> x_right= linspace(0, step_distance/2, length);  
-    std::vector<double> x_left = linspace(0, -step_distance/2, length); 
-    std::vector<double> z_left(length, 0.0); 
+    int array_length = std::end(m_small_first_step_trajectory)-std::begin(m_small_first_step_trajectory); 
+    std::vector<double> x_right= linspace(0, step_distance/2, array_length);  
+    std::vector<double> x_left = linspace(0, -step_distance/2, array_length); 
+    std::vector<double> z_left(array_length, 0.0); 
     std::vector<XZFeetPositionsArray> finish_step;
     //  Interpolate first right step and left move backwards
-    for (int i=0; i < length; i++){
+    for (int i=0; i < array_length; i++){
         float z = m_small_first_step_trajectory[i][1] + (x_right[i] - m_small_first_step_trajectory[i][0])*((m_large_first_step_trajectory[i][1]-m_small_first_step_trajectory[i][1])/(m_large_first_step_trajectory[i][0]-m_small_first_step_trajectory[i][0])); 
         // Check if interpolated value for the swing leg is a nan
         if (z != z){
@@ -129,7 +129,7 @@ std::vector<XZFeetPositionsArray> GaitPlanning::interpolateVariableTrajectory(co
         }
     }
     // Interpolate the second portion where left performs a swing step close. x_left is now sent to the right foot, and x_right is sent to the left foot as the movement is inversed. 
-    for (int k = 0; k < length; k++){
+    for (int k = 0; k < array_length; k++){
         float z = m_small_first_step_trajectory[k][1] + (x_right[k] - m_small_first_step_trajectory[k][0])*((m_large_first_step_trajectory[k][1]-m_small_first_step_trajectory[k][1])/(m_large_first_step_trajectory[k][0]-m_small_first_step_trajectory[k][0]));
         if (z != z){
             finish_step.push_back({x_left[k]+(step_distance/2), z_left[k], x_right[k]-(step_distance/2), 0.0});        
