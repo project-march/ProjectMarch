@@ -24,12 +24,13 @@ GaitPlanningAngles::GaitPlanningAngles()
  : m_gait_type(), 
    m_prev_gait_type(), 
    m_first_step_angle_trajectory(), 
-   m_prev_point(), 
-   m_counter(), 
-   m_complete_step_angle_trajectory(), 
+   m_complete_step_angle_trajectory(),
+   m_stand_to_sit_trajectory(), 
    m_sideways_trajectory(),
-   m_sit_to_stand_trajectory(), 
-   m_home_stand()
+   m_sit_to_stand_trajectory(),
+   m_home_stand(),
+   m_prev_point(), 
+   m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 

@@ -8,11 +8,12 @@ ModeMachineCartesian::ModeMachineCartesian()
     m_exo_transitions = {
         /*{CurrentMode, PossibleModes}*/
         { exoMode::Stand,
-            { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error} },
+            { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error, exoMode::VariableWalk} },
         { exoMode::LargeWalk, { exoMode::Stand, exoMode::Error} },
         { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
         { exoMode::BootUp, { exoMode::Stand } },
         { exoMode::Error, {}},
+        { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
     };
 }
 

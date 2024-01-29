@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-enum class exoMode { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4, Sideways = 5, LargeWalk = 6, SmallWalk = 7, Ascending = 8, Descending = 9};
+enum class exoMode { Sit = 0, Stand = 1, Walk = 2, BootUp = 3, Error = 4, Sideways = 5, LargeWalk = 6, SmallWalk = 7, Ascending = 8, Descending = 9, VariableWalk = 10};
 
 // toString function
 inline std::string toString(exoMode state) {
@@ -15,7 +15,8 @@ inline std::string toString(exoMode state) {
         case exoMode::LargeWalk: return "LargeWalk"; 
         case exoMode::SmallWalk: return "SmallWalk"; 
         case exoMode::Ascending: return "Ascending";
-        case exoMode::Descending: return "Descending";
+        case exoMode::Descending: return "Descending"; 
+        case exoMode::VariableWalk: return "VariableWalk"; 
         default: return "Unknown";
     }
 }
