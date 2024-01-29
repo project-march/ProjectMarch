@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 struct CSVRow {
     std::string x_swing;
     std::string z_swing;
@@ -18,10 +20,13 @@ struct CSVRow {
 GaitPlanning::GaitPlanning()
 : m_gait_type(), 
   m_current_stance_foot(), 
+  m_step_size(), 
   m_current_left_foot_position(), 
   m_current_right_foot_position(), 
-  m_bezier_trajectory(), 
-  m_step_size()
+  m_large_bezier_trajectory(),
+  m_large_first_step_trajectory(),
+  m_small_bezier_trajectory(), 
+  m_small_first_step_trajectory() 
   {
     std::cout << "Gait Planning Class created" << std::endl; 
     setBezierGait(); 
@@ -42,13 +47,24 @@ void GaitPlanning::setGaitType(const exoMode &new_gait_type){
 }
 
 void GaitPlanning::setBezierGait(){
-    m_first_step_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step.csv");
-    m_bezier_trajectory = processCSV("/home/andrew/march/ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait.csv");
+    std::string cartesian_files_directory = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/cartesian/";
+    m_large_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_large.csv");
+    m_large_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_large.csv");
+    m_small_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_small.csv");
+    m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::getTrajectory() const{
-    return m_current_stance_foot & 0b11 ? m_first_step_trajectory : m_bezier_trajectory; 
-    // return m_current_stance_foot == 0 ? m_first_step_trajectory : m_bezier_trajectory;
+    std::vector<std::array<double, 4>> result;  
+    switch (m_gait_type){
+        case exoMode::LargeWalk : 
+        return (m_current_stance_foot & 0b11) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
+        case exoMode::SmallWalk : 
+        return  (m_current_stance_foot & 0b11) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
+        default : 
+        return {}; 
+    }
+    // return result; 
 }
 
 int GaitPlanning::getCurrentStanceFoot() const {
@@ -65,6 +81,20 @@ std::array<double, 3> GaitPlanning::getCurrentRightFootPos() const{
 
 exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
+}
+
+std::vector<double> linspace(const double &min, const double &max, const int &size)
+{
+	std::vector<double> result;
+	int iterator = 0;
+	for (int i = 0; i <= size-2; i++)	
+	{
+		double temp = min + i*(max-min)/(floor((double)size) - 1);
+		result.insert(result.begin() + iterator, temp);
+		iterator += 1;
+	}
+	result.insert(result.begin() + iterator, max);
+	return result;
 }
 
 std::vector<std::array<double, 4>> GaitPlanning::processCSV(const std::string& filename){

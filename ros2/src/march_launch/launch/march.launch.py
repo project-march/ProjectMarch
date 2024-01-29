@@ -114,7 +114,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
-                "mode_machine.launch.py",
+                "mode_machine_cartesian.launch.py",
             )
         ),
     )

@@ -47,20 +47,19 @@ private:
     // Member variables 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
-    rclcpp::TimerBase::SharedPtr m_timer;
+    // rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
     
-    
+    GaitPlanningAngles m_gait_planning; 
     trajectory_msgs::msg::JointTrajectory m_joints_msg;
-    trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
+    // trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
     trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_des_point;
 
     std::vector<std::vector<double>> m_current_trajectory; 
 
-    GaitPlanningAngles m_gait_planning; 
     std::vector<double> m_incremental_steps_to_home_stand;
-    std::vector<double> m_initial_point;
     bool m_first_stand;
+    std::vector<double> m_initial_point;
 
 };

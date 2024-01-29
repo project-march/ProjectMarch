@@ -63,7 +63,7 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     m_imu = std::make_shared<sensor_msgs::msg::Imu>(init_imu_msg);
     m_node_feet_names = {"L_foot", "R_foot"};
 
-    RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
+    RCLCPP_DEBUG(this->get_logger(), "State Estimator Node initialized");
 }
 
 void SensorFusionNode::timerCallback()
@@ -116,18 +116,18 @@ void SensorFusionNode::publishStateEstimation()
         foot_poses.push_back(foot_pose);    
     }
 
-    double margin = 0.005;
+    double margin = 0.01;
     if (abs(foot_poses[0].position.x - foot_poses[1].position.x) <= margin)
     {
         stance_leg = 0b11;
     }
     else if (foot_poses[0].position.x + margin <= foot_poses[1].position.x)
     {
-        stance_leg = 0b01;
+        stance_leg = 0b10;
     }
     else if (foot_poses[0].position.x - margin > foot_poses[1].position.x)
     {
-        stance_leg = 0b10;
+        stance_leg = 0b01;
     }
 
     state_estimation_msg.header.stamp = this->now();
