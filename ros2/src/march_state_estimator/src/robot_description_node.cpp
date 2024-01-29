@@ -36,6 +36,36 @@ RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> rob
     //     std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
     //     rmw_qos_profile_services_default, m_node_jacobian_callback_group);
 
+    // // Declare parameters
+    // declare_parameter("names", std::vector<std::string>());
+
+    // // Get parameters
+    // std::vector<std::string> names = get_parameter("names").as_string_array();
+
+    // // Print parameters
+    // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %d", names.size());
+    // for (long unsigned int i = 0; i < names.size(); i++)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", names[i].c_str());
+    // }
+
+    // // Get config file path
+    // std::string config_file_path = ament_index_cpp::get_package_share_directory("march_state_estimator") + "/config/robot_definition-config.yaml";
+    // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", config_file_path.c_str());
+
+    // // Parse config file
+    // YAML::Node config_file = YAML::LoadFile(config_file_path);
+    // // const std::string test = config_file["L_UL"]["linear"]["position"]["x"].as<std::string>();
+    // // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", test.c_str());
+
+    // const std::vector<std::string> names = config_file["names"].as<std::vector<std::string>>();
+    // for (long unsigned int i = 0; i < names.size(); i++)
+    // {
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", names[i].c_str());
+    //     const std::string abs_linear_position = config_file[names[i]]["linear"]["position"]["x"].as<std::string>();
+    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", abs_linear_position.c_str());
+    // }
+
     m_subscription_state_estimation = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 10, std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
     m_publisher_state_estimator_visualization = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
@@ -178,6 +208,11 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
 
         std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
         node_jacobian_msg.jacobian = jacobian_vector;
+
+        for (long unsigned int i = 0; i < jacobian_vector.size(); i++)
+        {
+            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian_vector[i]);
+        }
 
         node_jacobians.push_back(node_jacobian_msg);
     }
