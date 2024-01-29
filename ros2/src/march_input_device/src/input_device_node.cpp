@@ -5,7 +5,7 @@
 #include <cstdlib>
 using std::placeholders::_1;
 
-std::array<exoMode, 9> all_possible_modes = {exoMode::Sit, exoMode::Stand, exoMode::Walk, exoMode::BootUp, exoMode::Sideways, exoMode::LargeWalk, exoMode::SmallWalk, exoMode::Ascending, exoMode::Descending};
+std::array<exoMode, 10> all_possible_modes = {exoMode::Sit, exoMode::Stand, exoMode::Walk, exoMode::BootUp, exoMode::Sideways, exoMode::LargeWalk, exoMode::SmallWalk, exoMode::Ascending, exoMode::Descending, exoMode::VariableWalk};
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),

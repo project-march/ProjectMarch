@@ -53,7 +53,7 @@ private:
     
     GaitPlanningAngles m_gait_planning; 
     trajectory_msgs::msg::JointTrajectory m_joints_msg;
-    // trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
+    trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
     trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_des_point;
 
     std::vector<std::vector<double>> m_current_trajectory; 
