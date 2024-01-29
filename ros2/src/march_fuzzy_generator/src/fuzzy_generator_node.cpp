@@ -3,8 +3,7 @@
 //
 
 #include "fuzzy_generator/fuzzy_generator_node.hpp"
-#include "fuzzy_generator/fuzzy_generator.hpp"
-#include <chrono>
+
 using std::placeholders::_1;
 using std::placeholders::_2;
 using namespace std::chrono_literals;
@@ -27,12 +26,11 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     this->declare_parameter("allowed_control_type", "position");
 }
 
-void FuzzyGeneratorNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg)
-{
+void FuzzyGeneratorNode::height_callback(march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg){
+    
     auto weights = m_fuzzy_generator.calculateWeights(msg->heights);
+    
     for (auto w : weights) {
-
-        // send the weights for the legs
         march_shared_msgs::msg::WeightStamped fuzzy_weights;
         fuzzy_weights.joint_name = std::get<0>(w);
         fuzzy_weights.position_weight = std::get<1>(w);
@@ -42,8 +40,8 @@ void FuzzyGeneratorNode::height_callback(march_shared_msgs::msg::FeetHeightStamp
     }
 }
 
-void FuzzyGeneratorNode::control_type_callback(std_msgs::msg::String::SharedPtr msg)
-{
+void FuzzyGeneratorNode::control_type_callback(std_msgs::msg::String::SharedPtr msg){
+    
     std::string allowed_control_type = msg->data;
 
     if (allowed_control_type != "fuzzy" && allowed_control_type != "position") {
@@ -55,8 +53,7 @@ void FuzzyGeneratorNode::control_type_callback(std_msgs::msg::String::SharedPtr 
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
 }
 
-void FuzzyGeneratorNode::publish_weights(march_shared_msgs::msg::WeightStamped msg)
-{
+void FuzzyGeneratorNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){
 
     std::string allowed_control_type = this->get_parameter("allowed_control_type").as_string();
 
@@ -72,11 +69,10 @@ void FuzzyGeneratorNode::publish_weights(march_shared_msgs::msg::WeightStamped m
 }
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv){
+
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<FuzzyGeneratorNode>());
-
     rclcpp::shutdown();
     return 0;
 }

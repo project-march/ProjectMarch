@@ -3,7 +3,6 @@
 //
 
 #include "fuzzy_generator/fuzzy_generator.hpp"
-#include "rclcpp/rclcpp.hpp"
 
 FuzzyGenerator::FuzzyGenerator(){
 }
@@ -16,7 +15,7 @@ FuzzyGenerator::FuzzyGenerator(std::string config_path){
 
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeights(std::vector<double> both_foot_heights){
     // get the joints, with their torque ranges from the yaml
-    std::vector<std::tuple<std::string, float, float>> torque_ranges = getTorqueRanges();
+    const auto torque_ranges = getTorqueRanges();
     std::vector<std::tuple<std::string, float, float>> joints;
 
     // get stance leg
@@ -28,11 +27,10 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
 
     // for each joint in the leg, calculate the torque weight and position weight
     for (auto t : torque_ranges) {
-        std::string joint_name = std::get<0>(t);
-        float minimum_torque_percentage = std::get<1>(t);
-        float maximum_torque_percentage = std::get<2>(t);
-
-        float torque_range = maximum_torque_percentage - minimum_torque_percentage;
+        const std::string joint_name = std::get<0>(t);
+        const float minimum_torque_percentage = std::get<1>(t);
+        const float maximum_torque_percentage = std::get<2>(t);
+        const float torque_range = maximum_torque_percentage - minimum_torque_percentage;
 
         // getting the correct foot height and leg
         float foot_height;
@@ -45,17 +43,15 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
             foot_height = both_foot_heights[1];
             current_leg = "right";
         } else {
-            foot_height = both_foot_heights[0];
-            current_leg = "left";
-            RCLCPP_INFO_STREAM(rclcpp::get_logger("fuzzy_generator"),"We could not determine if joint "
-                    << joint_name << " was left or right. Assuming test joint and using left foot height");
+            // if the joint name does not contain 'left' or 'right', it is not a leg joint > check with girls
+            throw std::runtime_error("Could not determine if joint " + joint_name + " was left or right.");
         }
 
-        // calculate far the foot is in the 'fuzzy shifting range'
-        float height_percentage = (upper_bound - foot_height) / (upper_bound - lower_bound);
+        // calculate how far the foot is in the 'fuzzy shifting range'
+        const float height_percentage = (upper_bound - foot_height) / (upper_bound - lower_bound);
         float torque_weight = torque_range * height_percentage;
         torque_weight = std::max(minimum_torque_percentage, std::min(torque_weight, maximum_torque_percentage));
-        float position_weight = 1 - torque_weight;
+        const float position_weight = 1 - torque_weight;
 
         joints.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
     }
@@ -65,7 +61,6 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateWeig
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getTorqueRanges()
 {
     std::vector<std::tuple<std::string, /*position_weight=*/float, /*torque_weight=*/float>> joints;
-
     YAML::Node joints_config = config_["joints"];
 
     for (YAML::const_iterator it = joints_config.begin(); it != joints_config.end(); ++it) {
