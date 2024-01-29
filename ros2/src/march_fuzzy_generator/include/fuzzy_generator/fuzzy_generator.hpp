@@ -9,6 +9,7 @@
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/torque_stamped.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int32.hpp"
@@ -21,11 +22,13 @@ class FuzzyGenerator {
         FuzzyGenerator(std::string config_path);
         std::vector<std::tuple<std::string, float, float>> calculateWeights(std::vector<double> both_foot_heights);
         std::vector<std::tuple<std::string, float, float>> getTorqueRanges();
+        void setConfigPath(const exoMode &new_gait_type);
 
     private:
         double lower_bound;
         double upper_bound;
         YAML::Node config_;
+        exoMode m_gait_type;
 };
 
 #endif // MARCH_FUZZY_GENERATOR_HPP

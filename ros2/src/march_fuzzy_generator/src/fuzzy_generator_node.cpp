@@ -9,7 +9,7 @@ using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 FuzzyGeneratorNode::FuzzyGeneratorNode()
-    : Node("fuzzy_node")
+    : Node("fuzzy_generator_node")
 {
     declare_parameter("config_path", std::string("src/march_fuzzy_generator/config/joints.yaml"));
     std::string config_path = this->get_parameter("config_path").as_string();
@@ -20,6 +20,9 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
 
     m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
         "/march/weight_control_type", 10, std::bind(&FuzzyGeneratorNode::control_type_callback, this, _1));
+
+    m_mode_subscription = create_subscription<march_shared_msgs::msg::ExoMode>(
+        "current_mode", 10, std::bind(&FuzzyGeneratorNode::current_mode_callback, this, _1));
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::WeightStamped>("fuzzy_weight", 10);
 
@@ -51,6 +54,11 @@ void FuzzyGeneratorNode::control_type_callback(std_msgs::msg::String::SharedPtr 
         RCLCPP_INFO_STREAM(this->get_logger(), "setting control type to " << allowed_control_type << " control ");
     }
     this->set_parameter(rclcpp::Parameter("allowed_control_type", allowed_control_type));
+}
+
+void FuzzyGeneratorNode::current_mode_callback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
+    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode);
+    m_fuzzy_generator.setConfigPath((exoMode)msg->mode);
 }
 
 void FuzzyGeneratorNode::publish_weights(march_shared_msgs::msg::WeightStamped msg){

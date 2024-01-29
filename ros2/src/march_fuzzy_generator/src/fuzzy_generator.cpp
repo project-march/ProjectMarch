@@ -69,7 +69,25 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getTorqueRang
         float min_torque = joints_config[joint_name]["minimum_torque"].as<float>();
         float max_torque = joints_config[joint_name]["maximum_torque"].as<float>();
 
+        std::cout << "Joint: " << joint_name << " min_torque: " << min_torque << " max_torque: " << max_torque << '\n';
+
         joints.push_back(std::make_tuple(joint_name, min_torque, max_torque));
     }
     return joints;
+}
+
+// Method to set the config path
+void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
+    m_gait_type = new_gait_type;
+    std::cout << "Gait type set to: " << m_gait_type << '\n';
+
+    if (new_gait_type == static_cast<exoMode>(0)) {
+        config_ = YAML::LoadFile("src/march_fuzzy_generator/config/sit_weights_tsu.yaml");
+    } else if (new_gait_type == static_cast<exoMode>(1)) {
+        config_ = YAML::LoadFile("src/march_fuzzy_generator/config/stand_weights_tsu.yaml");
+    } else if (new_gait_type == static_cast<exoMode>(2)) {
+        config_ = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights_tsu.yaml");
+    } else {
+        throw std::runtime_error("Gait type not found");
+    }
 }
