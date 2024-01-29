@@ -3,14 +3,18 @@
 <package format="3">
   <name>march_state_estimator</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="gungnir@todo.todo">gungnir</maintainer>
+  <description>MARCH State Estimator</description>
+  <maintainer email="alexanderjames.becoy@projectmarch.nl">Alexander James Becoy</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
   <depend>ament_index_cpp</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_kdl</depend>
+  <depend>tf2_geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
@@ -18,6 +22,7 @@
   <depend>march_description</depend>
   <depend>march_shared_msgs</depend>
   <depend>eigen</depend>
+  <depend>yaml-cpp</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

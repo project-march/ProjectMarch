@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
 #define MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
 
@@ -24,8 +29,8 @@ private:
     GiNaC::matrix utilRotateX(const GiNaC::ex & angle) const;
     GiNaC::matrix utilRotateY(const GiNaC::ex & angle) const;
     GiNaC::matrix utilRotateZ(const GiNaC::ex & angle) const;
+    GiNaC::matrix utilIdentity() const;
 
-    std::vector<double> m_axis;
     double m_lower_limit;
     double m_upper_limit;
 

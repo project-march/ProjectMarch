@@ -88,13 +88,25 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch state machine
+    # region Launch mode machine
     mode_machine = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
                 "mode_machine.launch.py",
+            )
+        ),
+    )
+    # endregion
+
+    # region Launch gait planning
+    gait_planning = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_gait_planning"),
+                "launch",
+                "march_gait_planning_angles.launch.py",
             )
         ),
     )
@@ -127,7 +139,7 @@ def generate_launch_description() -> LaunchDescription:
 
 
     # region Launch State Estimator
-    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
+    state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
@@ -175,23 +187,19 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_generator',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
-        Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_angles_node', 
-            name='march_gait_planning', 
-        ), 
         mujoco_node,
         march_control,
         mode_machine,
+        gait_planning,
         record_rosbags_action,
         imu_nodes,
         state_estimator,
         ipd_node,
-        Node(
-            package='plotjuggler',
-            executable='plotjuggler',
-            name='plotjuggler',
-        #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
-        ),
+        safety_node,
+        # Node(
+        #     package='plotjuggler',
+        #     executable='plotjuggler',
+        #     name='plotjuggler',
+        # #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
+        # ),
     ])

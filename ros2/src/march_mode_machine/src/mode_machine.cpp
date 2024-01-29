@@ -21,10 +21,13 @@ ModeMachine::ModeMachine()
         /*{CurrentMode, PossibleModes}*/
         { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
         { exoMode::Stand,
-            { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error} },
+            { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending} },
         { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
-        { exoMode::BootUp, { exoMode::Stand, exoMode::Sit, exoMode::BootUp, exoMode::Error } },
-        { exoMode::Error, {}}
+        { exoMode::BootUp, { exoMode::Stand } },
+        { exoMode::Error, {}},
+        { exoMode::Sideways, { exoMode::Stand}},
+        { exoMode::Ascending, { exoMode::Stand}},
+        { exoMode::Descending, { exoMode::Stand}}
 
     };
     

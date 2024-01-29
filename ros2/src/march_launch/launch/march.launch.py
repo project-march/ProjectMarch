@@ -114,7 +114,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
-                "mode_machine.launch.py",
+                "mode_machine_cartesian.launch.py",
             )
         ),
     )
@@ -148,12 +148,12 @@ def generate_launch_description() -> LaunchDescription:
 
 
     # region Launch State Estimator
-    state_estimator_launch_dir = os.path.join(get_package_share_directory("state_estimator"), "launch")
+    state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
         condition=UnlessCondition(airgait),
-        )
+    )
     # endregion
 
     # region Launch IK Solver
