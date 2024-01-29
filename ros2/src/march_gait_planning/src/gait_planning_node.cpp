@@ -46,9 +46,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
     float dist = msg->distance; 
     m_current_trajectory.clear(); 
-    RCLCPP_INFO(this->get_logger(), "Current trajectory size: %d", std::end(m_current_trajectory)-std::begin(m_current_trajectory)); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
-    RCLCPP_INFO(this->get_logger(), "After interpolation trajectory size: %d", std::end(m_current_trajectory)-std::begin(m_current_trajectory)); 
     footPositionsPublish(); 
 }
 
@@ -101,7 +99,6 @@ void GaitPlanningNode::footPositionsPublish(){
             }
             break;
 
-//TODO: add VariableWalk to mode_machine
         case exoMode::VariableWalk : 
             if (m_current_trajectory.empty()){
                // eventually this will be the stepclose function
@@ -118,10 +115,6 @@ void GaitPlanningNode::footPositionsPublish(){
             break;
     }
 }
-
-// void GaitPlanningNode::timerCallback() {
-//     footPositionsPublish();
-// }
 
 int main(int argc, char *argv[]){
     
