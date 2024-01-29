@@ -16,8 +16,8 @@ IKSolverBufferNode::IKSolverBufferNode()
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
     m_early_stopping = get_parameter("early_stopping").as_bool();
     m_early_stopping_threshold = get_parameter("m_early_stoppingthreshold").as_int();
-    RCLCPP_INFO(this->get_logger(), "dt: %f", m_dt);
-    RCLCPP_INFO(this->get_logger(), "convergence_threshold: %f", m_convergence_threshold);
+    RCLCPP_DEBUG(this->get_logger(), "dt: %f", m_dt);
+    RCLCPP_DEBUG(this->get_logger(), "convergence_threshold: %f", m_convergence_threshold);
 
     // Create a timer that will publish the joint trajectory buffer.
     auto timer_callback = std::bind(&IKSolverBufferNode::publishIKSolverFootPositions, this);
@@ -156,8 +156,8 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //         publishIKSolverError(error);
 
     //         // Check if the desired joint positions are reached.
-    //         // RCLCPP_INFO(this->get_logger(), "Error: %f", error);
-    //         // RCLCPP_INFO(this->get_logger(), "Convergence threshold: %f", m_convergence_threshold);
+    //         // RCLCPP_DEBUG(this->get_logger(), "Error: %f", error);
+    //         // RCLCPP_DEBUG(this->get_logger(), "Convergence threshold: %f", m_convergence_threshold);
     //         if (m_early_stopping || (m_ik_solver_foot_positions_buffer.size() > m_early_stopping_threshold))
     //         {
     //             march_shared_msgs::msg::IksFootPositions msg;
@@ -184,7 +184,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
     //             m_ik_solver_foot_positions_pub->publish(msg);
     //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_INFO(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
+    //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
     //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
     //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
     //         }
@@ -210,7 +210,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
     //             m_ik_solver_foot_positions_pub->publish(msg);
     //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_INFO(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
+    //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
     //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
     //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
     //         }
@@ -231,7 +231,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //     msg.time_from_start.sec = 0;
     //             m_ik_solver_foot_positions_pub->publish(msg);
     //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_INFO(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
+    //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
     //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
     //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
     //         }
@@ -254,7 +254,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //     msg.time_from_start.sec = 0;
     //             m_ik_solver_foot_positions_pub->publish(msg);
     //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_INFO(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
+    //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
     //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
     //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
     //         }
@@ -274,7 +274,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
     //     msg.time_from_start.sec = 0;
     //     msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
     //     m_ik_solver_foot_positions_pub->publish(msg);sitions_latest_ = msg;
-    //             // RCLCPP_INFO(this->get_logger(), "Early stopping");
+    //             // RCLCPP_DEBUG(this->get_logger(), "Early stopping");
     //             return;
     //         }
     //         if (error < m_convergence_threshold)
@@ -294,7 +294,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
         //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
         //             m_ik_solver_foot_positions_pub->publish(msg);
         //             m_ik_solver_foot_positions_latest = msg;
-        //             // RCLCPP_INFO(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
+        //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
         //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
         //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
         //         }
@@ -312,7 +312,7 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
         //             msg.time_from_start.sec = 0;
         //             m_ik_solver_foot_positions_pub->publish(msg);
         //             m_ik_solver_foot_positions_latest = msg;
-        //             // RCLCPP_INFO(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
+        //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
         //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
         //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
         //         }

@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 #include <sstream>
+#include <unordered_map>
 
 // #include "rclcpp/rclcpp.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -88,33 +89,29 @@ protected:
     Eigen::Vector3d getElbowGlobalPositionGivenJointAngle(double joint_angle)
     {
         std::vector<std::string> node_names = {"link_elbow"};
-        std::vector<std::string> joint_names = {"joint_shoulder"};
-        std::vector<double> joint_angles = {joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalPosition(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalPosition(joint_positions);
     }
 
     Eigen::Matrix3d getElbowGlobalRotationGivenJointAngle(double joint_angle)
     {
         std::vector<std::string> node_names = {"link_elbow"};
-        std::vector<std::string> joint_names = {"joint_shoulder"};
-        std::vector<double> joint_angles = {joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalRotation(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalRotation(joint_positions);
     }
 
     Eigen::MatrixXd getElbowGlobalPositionJacobianGivenJointAngle(double joint_angle)
     {
         std::vector<std::string> node_names = {"link_elbow"};
-        std::vector<std::string> joint_names = {"joint_shoulder"};
-        std::vector<double> joint_angles = {joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalPositionJacobian(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalPositionJacobian(joint_positions);
     }
 
     Eigen::MatrixXd getElbowGlobalRotationJacobianGivenJointAngle(double joint_angle)
     {
         std::vector<std::string> node_names = {"link_elbow"};
-        std::vector<std::string> joint_names = {"joint_shoulder"};
-        std::vector<double> joint_angles = {joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalRotationJacobian(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalRotationJacobian(joint_positions);
     }
 
     void assertEndpointGlobalPositionGivenJointAngles(double shoulder_joint_angle, double elbow_joint_angle, Eigen::Vector3d expected_global_position)
@@ -134,33 +131,32 @@ protected:
     Eigen::Vector3d getEndpointGlobalPositionGivenJointAngles(double shoulder_joint_angle, double elbow_joint_angle)
     {
         std::vector<std::string> node_names = {"link_endpoint"};
-        std::vector<std::string> joint_names = {"joint_shoulder", "joint_elbow"};
-        std::vector<double> joint_angles = {shoulder_joint_angle, elbow_joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalPosition(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", shoulder_joint_angle}, {"joint_elbow", elbow_joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalPosition(joint_positions);
     }
 
     Eigen::Matrix3d getEndpointGlobalRotationGivenJointAngles(double shoulder_joint_angle, double elbow_joint_angle)
     {
         std::vector<std::string> node_names = {"link_endpoint"};
-        std::vector<std::string> joint_names = {"joint_shoulder", "joint_elbow"};
-        std::vector<double> joint_angles = {shoulder_joint_angle, elbow_joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalRotation(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", shoulder_joint_angle}, {"joint_elbow", elbow_joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalRotation(joint_positions);
     }
 
     Eigen::Matrix3d getEndpointGlobalPositionJacobianGivenJointAngles(double shoulder_joint_angle, double elbow_joint_angle)
     {
         std::vector<std::string> node_names = {"link_endpoint"};
-        std::vector<std::string> joint_names = {"joint_shoulder", "joint_elbow"};
-        std::vector<double> joint_angles = {shoulder_joint_angle, elbow_joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalPositionJacobian(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {{"joint_shoulder", shoulder_joint_angle}, {"joint_elbow", elbow_joint_angle}};
+        return m_robot_description->findNodes(node_names)[0]->getGlobalPositionJacobian(joint_positions);
     }
 
     Eigen::Matrix3d getEndpointGlobalRotationJacobianGivenJointAngles(double shoulder_joint_angle, double elbow_joint_angle)
     {
         std::vector<std::string> node_names = {"link_endpoint"};
-        std::vector<std::string> joint_names = {"joint_shoulder", "joint_elbow"};
-        std::vector<double> joint_angles = {shoulder_joint_angle, elbow_joint_angle};
-        return m_robot_description->findNodes(node_names)[0]->getGlobalRotationJacobian(joint_names, joint_angles);
+        std::unordered_map <std::string, double> joint_positions = {
+            {"joint_shoulder", shoulder_joint_angle}, 
+            {"joint_elbow", elbow_joint_angle}
+        };
+        return m_robot_description->findNodes(node_names)[0]->getGlobalRotationJacobian(joint_positions);
     }
 
     std::unique_ptr<RobotDescription> m_robot_description = std::make_unique<RobotDescription>();
@@ -178,8 +174,8 @@ TEST_F(RobotDescriptionTest, should_set_robot_information_from_rotational_setup_
     std::vector<double> expected_joint_1_axis = {0.0, -1.0, 0.0};
     std::vector<double> expected_joint_2_axis = {0.0, -1.0, 0.0};
 
-    int actual_num_nodes = m_robot_description->getNodeNames().size();
-    std::vector<std::string> actual_node_names = m_robot_description->getNodeNames();
+    int actual_num_nodes = m_robot_description->getAllNodeNames().size();
+    std::vector<std::string> actual_node_names = m_robot_description->getAllNodeNames();
     std::string actual_link_1_name = actual_node_names[2];
     std::string actual_link_2_name = actual_node_names[0];
     std::string actual_link_3_name = actual_node_names[1];

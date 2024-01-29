@@ -11,6 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D, axes3d
 class StateEstimatorVisualizerNode(Node):
     def __init__(self):
         super().__init__('state_estimator_visualizer_node')
+        # self.timer = self.create_timer(1e-2, self.timer_callback)
         self.subscription = self.create_subscription(
             StateEstimatorVisualization,
             'state_estimation/visualization',
@@ -19,10 +20,12 @@ class StateEstimatorVisualizerNode(Node):
         self.subscription  # prevent unused variable warning
         self.figure = plt.figure()
         self.ax = Axes3D(self.figure)
+        self.nodes = None
 
     def listener_callback(self, msg):
-        # self.get_logger().info('I heard: "%s"' % msg)
-        nodes = {
+        # for name, pose, parent in zip(msg.node_names, msg.node_poses, msg.parent_node_names):
+        #     self.get_logger().info('I heard: "%s" "%s" "%s"' % (name, pose, parent))
+        self.nodes = {
             name: {
                 'pose': pose, 
                 'parent': parent,
@@ -31,12 +34,18 @@ class StateEstimatorVisualizerNode(Node):
         }
         # names = [name for name in msg.node_names]
         # points = np.array([[pose.position.x, pose.position.y, pose.position.z] for pose in msg.node_poses])
-        self.plot(nodes)
+        self.plot(self.nodes)
+
+    def timer_callback(self):
+        if self.nodes is not None:
+            self.plot(self.nodes)
 
     def plot(self, nodes):
         # ax.scatter(points[:,0], points[:,1], points[:,2])
         # for i, name in enumerate(names):
         #     ax.text(points[i,0], points[i,1], points[i,2], name)
+
+        backpack_position = nodes['backpack']['pose'].position
 
         for name, item in nodes.items():
             # ax.scatter(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z)
@@ -75,9 +84,9 @@ class StateEstimatorVisualizerNode(Node):
             self.ax.scatter(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, c='black', alpha=0.7)
             self.ax.text(item['pose'].position.x, item['pose'].position.y, item['pose'].position.z, name, alpha=0.5)
 
-        self.ax.set_xlim(-0.5, 0.5)
-        self.ax.set_ylim(-0.5, 0.5)
-        self.ax.set_zlim(-1.0, 0.0)
+        self.ax.set_xlim(-0.5 + backpack_position.x, 0.5 + backpack_position.x)
+        self.ax.set_ylim(-0.5 + backpack_position.y, 0.5 + backpack_position.y)
+        self.ax.set_zlim(-1.0 + backpack_position.z, 0.0 + backpack_position.z)
         self.figure.canvas.draw()
         plt.pause(1e-9)
         self.figure.canvas.flush_events()

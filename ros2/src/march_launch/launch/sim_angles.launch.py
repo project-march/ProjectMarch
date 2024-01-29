@@ -196,6 +196,7 @@ def generate_launch_description() -> LaunchDescription:
         # imu_nodes,
         state_estimator,
         ipd_node,
+        safety_node,
         # Node(
         #     package='plotjuggler',
         #     executable='plotjuggler',

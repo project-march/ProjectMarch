@@ -45,13 +45,26 @@ add_executable(test_joints_mode_machine_node
   src/test_joints_mode_machine.cpp
 )
 
+add_executable(mode_machine_cartesian_node
+  src/mode_machine_cartesian_node.cpp 
+  src/mode_machine_cartesian.cpp)
+
 # Link the mode_machine library to the test_joints_mode_machine_node executable
 target_link_libraries(test_joints_mode_machine_node
   ${PROJECT_NAME}
 )
 
+target_link_libraries(mode_machine_cartesian_node
+  ${PROJECT_NAME}
+)
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(test_joints_mode_machine_node
+  rclcpp
+  march_shared_msgs
+  )
+
+ament_target_dependencies(mode_machine_cartesian_node
   rclcpp
   march_shared_msgs
   )
@@ -70,6 +83,7 @@ ament_target_dependencies(
 install(TARGETS 
   mode_machine_node
   test_joints_mode_machine_node
+  mode_machine_cartesian_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 

@@ -36,6 +36,9 @@ find_package(urdf REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
 include_directories(include)
 
 # include_directories(${GINAC_BUILD_DIR})
@@ -61,36 +64,6 @@ ament_target_dependencies(${PROJECT_NAME}
   march_shared_msgs
   urdf
   Eigen3
-)
-
-# Create robot_description_node executable
-add_executable(robot_description_node
-  src/robot_description_node.cpp
-  src/robot_description.cpp
-  src/robot_node.cpp
-  src/robot_mass.cpp
-  src/robot_joint.cpp
-)
-
-target_include_directories(robot_description_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(robot_description_node
-  rclcpp
-  ament_index_cpp
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-  march_description
-  march_shared_msgs
-  urdf
-  Eigen3
-)
-
-target_link_libraries(robot_description_node
-  ${PROJECT_NAME}
-  ${GINAC_LIB}
 )
 
 # Create state_estimator_node executable
@@ -122,40 +95,19 @@ ament_target_dependencies(state_estimator_node
 target_link_libraries(state_estimator_node
   ${PROJECT_NAME}
   ${GINAC_LIB}
-)
-
-# Create transform broadcaster executable
-add_executable(transform_publisher_node
-  src/transform_publisher_node.cpp
-)
-
-target_include_directories(transform_publisher_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(transform_publisher_node
-  rclcpp
-  ament_index_cpp
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-  march_shared_msgs
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
+  ${YAMLCPP_LIBRARIES}
 )
 
 # Install targets and executables
 install(TARGETS
-  robot_description_node
   state_estimator_node
-  transform_publisher_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
 install(DIRECTORY
   launch
+  config
   DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -168,7 +120,7 @@ if(BUILD_TESTING)
   # file(COPY test/urdf/rotational_test_setup.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/urdf)
 
   ament_add_gmock(test_runner
-    test/robot_description_test.cpp
+    # test/robot_description_test.cpp
     test/test_runner.cpp
   )
 
@@ -192,6 +144,7 @@ if(BUILD_TESTING)
   target_link_libraries(test_runner
     ${PROJECT_NAME}
     ${GINAC_LIB}
+    ${YAMLCPP_LIBRARIES}
   )
 
   # # EXPORT

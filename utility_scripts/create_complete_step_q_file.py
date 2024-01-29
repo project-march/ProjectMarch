@@ -2,48 +2,47 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
 
-df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
+def normal_large_step(): 
+    df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
 
+    df_gait_joint = df_gait_joint.assign(LHAA=-0.06)
+    df_gait_joint = df_gait_joint.assign(RHAA=-0.06)
+    df_gait_joint = df_gait_joint.assign(LADPF=0.119176)
+    df_gait_joint = df_gait_joint.assign(RADPF=0.077083)
 
-df_gait_joint = df_gait_joint.assign(LHAA=-0.06)
-df_gait_joint = df_gait_joint.assign(RHAA=-0.06)
-df_gait_joint = df_gait_joint.assign(LADPF=0.119176)
-df_gait_joint = df_gait_joint.assign(RADPF=0.077083)
+    df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
+    df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
 
+    df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
+    df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
 
-df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
-df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
-df_gait_joint['LHFE'] = df_gait_joint['LHFE']
-df_gait_joint['RHFE'] = df_gait_joint['RHFE']
+    df_gait_joint = df_gait_joint.reset_index(drop=True)
 
-df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
-df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
+    max_rhfe = df_gait_joint[['RHFE']].idxmax()
+    max_rhfe_second = df_gait_joint[['RHFE']].iloc[150:250].idxmax()
 
-df_gait_joint = df_gait_joint.reset_index(drop=True)
+    first_step = df_gait_joint.iloc[0:72]
+    first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
+    full_step = df_gait_joint.iloc[73:182]
+    full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
 
-# print(f"Index of max RHFE: ", df_gait_joint[['RHFE']].idxmax())
-# print(f"Index of 2nd max RHFE: ", df_gait_joint[['RHFE']].iloc[150:250].idxmax())
+    # plot_joints(first_step)
+    plot_joints(full_step)
 
-first_step = df_gait_joint.iloc[0:72]
-first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
-full_step = df_gait_joint.iloc[73:189]
-full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+    df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
 
-# plt.plot(first_step['LKFE'], label='LKFE')
-# plt.plot(first_step['RKFE'], label='RKFE')
-# plt.plot(first_step['LHFE'], label='LHFE')
-# plt.plot(first_step['RHFE'], label='RHFE')
-# plt.legend()
-# plt.show()
+def plot_joints(dataset):
 
-# plt.plot(full_step['LKFE'], label='LKFE')
-# plt.plot(full_step['RKFE'], label='RKFE')
-# plt.plot(full_step['LHFE'], label='LHFE')
-# plt.plot(full_step['RHFE'], label='RHFE')
-# plt.legend()
-# plt.show()
-
-df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
+    plt.plot(dataset['LKFE'], label='LKFE')
+    plt.plot(dataset['RKFE'], label='RKFE')
+    plt.plot(dataset['LHFE'], label='LHFE')
+    plt.plot(dataset['RHFE'], label='RHFE')
+    plt.plot(dataset['LADPF'], label='LADPF')
+    plt.plot(dataset['RADPF'], label='RADPF')
+    plt.plot(dataset['LHAA'], label='LHAA')
+    plt.plot(dataset['RHAA'], label='RHAA')
+    plt.legend()
+    plt.show()
 
 def stand_to_sit():
     time_points = 100
@@ -129,4 +128,6 @@ def sideways():
 # stand_to_sit()
 # sit_to_stand()
 
-sideways()
+# sideways()
+
+# normal_large_step()

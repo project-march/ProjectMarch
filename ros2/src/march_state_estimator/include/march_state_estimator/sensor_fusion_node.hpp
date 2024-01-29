@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
 #define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
 

@@ -44,10 +44,10 @@ void IKSolverPointEvaluatorNode::publishIKSFootPositions()
     iks_foot_positions_msg.left_foot_position = m_desired_left_foot_position;
     iks_foot_positions_msg.right_foot_position = m_desired_right_foot_position;
 
-    RCLCPP_INFO(this->get_logger(), "Publishing desired foot positions");
-    RCLCPP_INFO(this->get_logger(), "Left foot position: x: %f, y: %f, z: %f", m_desired_left_foot_position.x,
+    RCLCPP_DEBUG(this->get_logger(), "Publishing desired foot positions");
+    RCLCPP_DEBUG(this->get_logger(), "Left foot position: x: %f, y: %f, z: %f", m_desired_left_foot_position.x,
                 m_desired_left_foot_position.y, m_desired_left_foot_position.z);
-    RCLCPP_INFO(this->get_logger(), "Right foot position: x: %f, y: %f, z: %f", m_desired_right_foot_position.x,
+    RCLCPP_DEBUG(this->get_logger(), "Right foot position: x: %f, y: %f, z: %f", m_desired_right_foot_position.x,
                 m_desired_right_foot_position.y, m_desired_right_foot_position.z);
 
     m_iks_foot_positions_pub->publish(iks_foot_positions_msg);

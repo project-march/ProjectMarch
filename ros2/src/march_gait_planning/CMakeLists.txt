@@ -1,8 +1,23 @@
 cmake_minimum_required(VERSION 3.5)
 project(march_gait_planning)
 
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 # Find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -61,6 +76,7 @@ ament_target_dependencies(gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
   )
 
@@ -70,6 +86,7 @@ ament_target_dependencies(gait_planning_angles_node
   rclcpp
   trajectory_msgs
   march_shared_msgs
+  ament_index_cpp
   )
 
 # Install the executable
@@ -96,6 +113,7 @@ ament_target_dependencies(test_setup_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
 )
 
@@ -120,6 +138,7 @@ ament_target_dependencies(test_joints_gait_planning_node
   rclcpp
   march_shared_msgs
   geometry_msgs
+  ament_index_cpp
   # filesystem
 )
 
@@ -140,7 +159,7 @@ install(FILES package.xml
 
 # Install launch file
 install(DIRECTORY 
-  launch test
+  launch test m9_gait_files
   DESTINATION share/${PROJECT_NAME}/ 
 )
 
@@ -165,6 +184,7 @@ if(BUILD_TESTING)
   )
   ament_target_dependencies(${PROJECT_NAME}_test
     std_msgs
+    ament_index_cpp
   )
   if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
