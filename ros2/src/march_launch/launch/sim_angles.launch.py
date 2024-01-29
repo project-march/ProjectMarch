@@ -193,7 +193,7 @@ def generate_launch_description() -> LaunchDescription:
         mode_machine,
         gait_planning,
         record_rosbags_action,
-        imu_nodes,
+        # imu_nodes,
         state_estimator,
         ipd_node,
         # Node(
