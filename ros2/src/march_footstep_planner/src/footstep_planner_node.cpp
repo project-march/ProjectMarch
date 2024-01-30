@@ -46,6 +46,7 @@ bool FootstepPlannerNode::compareDistance(const plane1, const plane2){
 void FootstepPlannerNode::rankPlanesByDistance(){
     // this function should sort the list of planes by centroid distance to the current foot poistions, 
     // starting with the closest first 
+    // Maybe do this recursively??????
     sort(m_planes_list.begin(), m_planes_list.end(), compareDistance); 
 }
 
