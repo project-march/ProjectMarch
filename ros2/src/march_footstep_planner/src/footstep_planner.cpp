@@ -7,7 +7,7 @@ FootstepPlanner::FootstepPlanner()
   {
     std::cout << "Footstep Planner class created" << std::endl;
     setDistanceThreshold(0.4); 
-    setFootSize(15, 25, 0); //z is not yet relevant
+    setFootSize(30, 25, 0); //z is not yet relevant, this box should include BOTH feet
     std::cout << "Member variables initialized" << std::endl; 
   }
 

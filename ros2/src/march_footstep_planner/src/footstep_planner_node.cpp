@@ -36,7 +36,7 @@ void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::Planes::S
     m_planes_list = msg->planes; 
 }
 
-bool FootstepPlannerNode::compareDistance(const plane1, const plane2){
+bool FootstepPlannerNode::compareDistance(const plane plane1, const plane plane2) const{
     // this function should compare two planes and return a bool describing if the first plane centroid 
     // is closer to the current foot positions than the second plane centroid 
     double current_x_position = m_footstep_planner.getRightFootPosition()[0]; 
@@ -47,21 +47,42 @@ void FootstepPlannerNode::rankPlanesByDistance(){
     // this function should sort the list of planes by centroid distance to the current foot poistions, 
     // starting with the closest first 
     // Maybe do this recursively??????
-    sort(m_planes_list.begin(), m_planes_list.end(), compareDistance); 
+
+    // std::sort(m_planes_list.begin(), m_planes_list.end(), compareDistance); 
+
+    // ChatGPT implementation: 
+    std::sort(m_planes_list.begin(), m_planes_list.end(), [this](const plane& plane1, const plane& plane2){
+        return compareDistance(&plane1, &plane2); 
+    });
 }
 
-bool FootstepPlannerNode::checkCentroidPlaneSafe(const plane){
+plane FootstepPlannerNode::findSafePlane(size_t index = 0){
+    // This function recursively iterates through the list of planes ranked by distance. It 
+    // returns the first plane that is found to be safe to step on. 
+    if (index >= m_planes_list.size()){
+        return nullptr; 
+    }
+    if (checkCentroidPlaneSafe(&m_planes_list[index])) {
+        return &m_planes_list[index];
+    }
+    return findSafePlane(index + 1); 
+}
+
+bool FootstepPlannerNode::checkCentroidPlaneSafe(const plane plane) const{
     // this function should return a bool describing if the centroid of a plane is close enough to 
     // safely reach, given ranges of motion etc. 
     return (plane.centroid.x < (m_footstep_planner.getDistanceThreshold()+m_footstep_planner.getRightFootPosition()[0])); 
 }
 
-void FootstepPlannerNode::filterUnsafePlanes(){
-    //This function should remove planes that have a centroid too far away to be safe to step on
+bool FootstepPlannerNode::checkOverlapPlaneFootbox() {
+    // This function should in some way check if an area the size of the two feet around the centroid is safe
+    // to step on, aka falls within plane. We might want to check with just one foot, depending
+    // on strategy. How to navigate through neighbouring voxels/points?
 }
 
-int FootstepPlannerNode::checkNumberOfOverlappingPointsPlaneFootbox() {
-    // This function should in some way check if an area the size of the foot around the centroid is safe
-    // to step on, aka falls within plane. We might want to check two feet next to each other, depending
-    // on strategy. 
+void selectDesiredPoint(){
+    //This function should return the desired stepping point, which should be used in the desired steppoint
+    // message. 
+    // the FootstepOutput message is now just a distance. Calculate distance here or send point to gaitplanning
+    // and process further there. 
 }

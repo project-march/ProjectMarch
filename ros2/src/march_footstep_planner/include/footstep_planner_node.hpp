@@ -45,15 +45,15 @@ class FootstepPlannerNode:public rclcpp::Node {
     void footstepOutputPublish(); 
 
     // Used planes as dummy object data type for now
-    bool compareDistance(const plane1, const plane2); 
+    bool compareDistance(const plane plane1, const plane plane2) const; 
     void rankPlanesByDistance(); 
-    void filterUnsafePlanes(); 
-    bool checkCentroidPlaneSafe(); 
-    int checkNumberOfOverlappingPointsPlaneFootbox();
+    bool checkCentroidPlaneSafe(const plane plane) const; 
+    plane findSafePlane(size_t index = 0); 
+    bool checkOverlapPlaneFootbox();
     void selectDesiredPoint(); 
     
 
-    std::vector<planes> m_planes_list; 
+    std::vector<plane> m_planes_list; 
     std::array<double, 3> m_desired_point; 
     march_shared_msgs::msg::FootStepOutput::SharedPtr m_desired_footstep_msg; 
     exoMode m_gait_type; 
