@@ -119,259 +119,44 @@ void IKSolverBufferNode::publishIKSolverFootPositions()
         return;
     }
 
-    // // Check if the buffer is empty.
-    // if (m_ik_solver_foot_positions_buffer.size() > 0)
-    // {
-    //     // Check if the gait reset flag is set.
-    //     if (m_gait_reset)
-    //     {
-    //         // Reset the gait reset flag.
-    //         m_gait_reset = false;
+    // Publish the IK solver foot positions.
+    march_shared_msgs::msg::IksFootPositions msg;
+    msg.header.stamp = this->now();
+    msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
+    msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
+    msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
+    msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
+    msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
+    msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
+    msg.time_from_start.sec = 0;
+    msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
+    msg.new_point = false;
+    m_ik_solver_foot_positions_pub->publish(msg);
 
-    //         // // Set the current joint positions to the first IK solver foot positions.
-    //         // m_current_joint_positions = Eigen::Map<Eigen::VectorXd>(m_ik_solver_foot_positions_buffer.front().positions.data(), m_n_joints);
+    // Publish the IK solver status.
+    publishIKSolverStatus();
+}
 
-    //         // Publish the IK solver foot positions.
-    //         march_shared_msgs::msg::IksFootPositions msg;
-    //         msg.header.stamp = this->now();
-    //         msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-    //         msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.front().left_foot_position.y;
-    //         msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.front().left_foot_position.z;
-    //         msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.front().right_foot_position.x;
-    //         msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.front().right_foot_position.y;
-    //         msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.front().right_foot_position.z; 
-    //         msg.time_from_start.sec = 0;
-    //         msg.time_from_start.nanosec = 50;
-    //         m_ik_solver_foot_positions_pub->publish(msg);
+void IKSolverBufferNode::publishIKSolverStatus()
+{
+    // Publish the IK solver status.
+    std_msgs::msg::UInt32 msg;
+    msg.data = m_ik_solver_foot_positions_buffer.size();
+    m_ik_solver_status_pub->publish(msg);
+}
 
-    //         // Clear the buffer.
-    //         m_ik_solver_foot_positions_buffer.clear();
-    //     }
-    //     else
-    //     {
-    //         // Calculate the joint position error.
-    //         double error = (m_desired_joint_positions - m_current_joint_positions).norm();
+void IKSolverBufferNode::publishIKSolverError(double error)
+{
+    // Publish the IK solver error.
+    std_msgs::msg::Float64 msg;
+    msg.data = error;
+    m_ik_solver_error_pub->publish(msg);
+}
 
-    //         // Publish the IK solver error.
-    //         publishIKSolverError(error);
-
-    //         // Check if the desired joint positions are reached.
-    //         // RCLCPP_DEBUG(this->get_logger(), "Error: %f", error);
-    //         // RCLCPP_DEBUG(this->get_logger(), "Convergence threshold: %f", m_convergence_threshold);
-    //         if (m_early_stopping || (m_ik_solver_foot_positions_buffer.size() > m_early_stopping_threshold))
-    //         {
-    //             march_shared_msgs::msg::IksFootPositions msg;
-    //             msg.header.stamp = this->now();
-    //             msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.back().left_foot_position.x;
-    //             msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.back().left_foot_position.y;
-    //             msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.back().left_foot_position.z;
-    //             msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.back().right_foot_position.x;
-    //             msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.back().right_foot_position.y;
-    //             msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.back().right_foot_position.z; 
-    //             msg.time_from_start.sec = 0;
-    //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-    //             m_ik_solver_foot_positions_pub->publish(msg);
-
-    //             // Clear the buffer.
-    //             m_ik_solver_foot_positions_buffer.clear();
-    //             ik_solver_foot_potion.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-    //             msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.front().left_foot_position.y;
-    //             msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.front().left_foot_position.z;
-    //             msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.front().right_foot_position.x;
-    //             msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.front().right_foot_position.y;
-    //             msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.front().right_foot_position.z; 
-    //             msg.time_from_start.sec = 0;
-    //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-    //             m_ik_solver_foot_positions_pub->publish(msg);
-    //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
-    //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-    //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-    //         }
-    //         else
-    //         {
-    //             // Publish the IK solver foot positions.
-    //             march_shared_msgs::msg::IksFootPositions msg;
-    //             msg.header.stamp = this->now();
-    //             msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-    //             msg.left_foot_position.y =itions msg;
-    //     msg.header.stamp = this->now();
-    //     msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-    //     msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-    //     msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-    //     msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-    //     msg.right_foot_positiontion.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-    //             msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.front().left_foot_position.y;
-    //             msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.front().left_foot_position.z;
-    //             msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.front().right_foot_position.x;
-    //             msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.front().right_foot_position.y;
-    //             msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.front().right_foot_position.z; 
-    //             msg.time_from_start.sec = 0;
-    //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-    //             m_ik_solver_foot_positions_pub->publish(msg);
-    //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
-    //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-    //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-    //         }
-    //         else
-    //         {
-    //             // Publish the IK solver foot positions.
-    //             march_shared_msgs::msg::IksFootPositions msg;
-    //             msg.header.stamp = this->now();
-    //             msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-    //             msg.left_foot_position.y =itions msg;
-    //     msg.header.stamp = this->now();
-    //     msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-    //     msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-    //     msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-    //     msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-    //     msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
-    //     msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-    //     msg.time_from_start.sec = 0;
-    //             m_ik_solver_foot_positions_pub->publish(msg);
-    //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
-    //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-    //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     // Publish the IK solver foot positions.
-    //     march_shared_msgs::msg::IksFootPositions msg;
-    //     msg.header.stamp = this->now();
-    //     msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-    //     msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-    //     msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-    //     msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-    //     msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
-    //     msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-    //     msg.time_from_start.sec = 0;
-    //     msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-    //     msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-    //     msg.time_from_start.sec = 0;
-    //             m_ik_solver_foot_positions_pub->publish(msg);
-    //             m_ik_solver_foot_positions_latest = msg;
-    //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
-    //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-    //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     // Publish the IK solver foot positions.
-    //     march_shared_msgs::msg::IksFootPositions msg;
-    //     msg.header.stamp = this->now();
-    //     msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-    //     msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-    //     msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-    //     msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-    //     msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
-    //     msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-    //     msg.time_from_start.sec = 0;
-    //     msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-    //     m_ik_solver_foot_positions_pub->publish(msg);sitions_latest_ = msg;
-    //             // RCLCPP_DEBUG(this->get_logger(), "Early stopping");
-    //             return;
-    //         }
-    //         if (error < m_convergence_threshold)
-    //         {
-        //             // Remove the first IK solver foot positions from the buffer.
-        //             m_ik_solver_foot_positions_buffer.erase(m_ik_solver_foot_positions_buffer.begin());
-
-        //             march_shared_msgs::msg::IksFootPositions msg;
-        //             msg.header.stamp = this->now();
-        //             msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-        //             msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.front().left_foot_position.y;
-        //             msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.front().left_foot_position.z;
-        //             msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.front().right_foot_position.x;
-        //             msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.front().right_foot_position.y;
-        //             msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.front().right_foot_position.z; 
-        //             msg.time_from_start.sec = 0;
-        //             msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-        //             m_ik_solver_foot_positions_pub->publish(msg);
-        //             m_ik_solver_foot_positions_latest = msg;
-        //             // RCLCPP_DEBUG(this->get_logger(), "New front: %f, %f, %f, %f, %f, %f", 
-        //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-        //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-        //         }
-        //         else
-        //         {
-        //             // Publish the IK solver foot positions.
-        //             march_shared_msgs::msg::IksFootPositions msg;
-        //             msg.header.stamp = this->now();
-        //             msg.left_foot_position.x = m_ik_solver_foot_positions_buffer.front().left_foot_position.x;
-        //             msg.left_foot_position.y = m_ik_solver_foot_positions_buffer.front().left_foot_position.y;
-        //             msg.left_foot_position.z = m_ik_solver_foot_positions_buffer.front().left_foot_position.z;
-        //             msg.right_foot_position.x = m_ik_solver_foot_positions_buffer.front().right_foot_position.x;
-        //             msg.right_foot_position.y = m_ik_solver_foot_positions_buffer.front().right_foot_position.y;
-        //             msg.right_foot_position.z = m_ik_solver_foot_positions_buffer.front().right_foot_position.z;
-        //             msg.time_from_start.sec = 0;
-        //             m_ik_solver_foot_positions_pub->publish(msg);
-        //             m_ik_solver_foot_positions_latest = msg;
-        //             // RCLCPP_DEBUG(this->get_logger(), "Old front: %f, %f, %f, %f, %f, %f", 
-        //             //     msg.left_foot_position.x, msg.left_foot_position.y, msg.left_foot_position.z, 
-        //             //     msg.right_foot_position.x, msg.right_foot_position.y, msg.right_foot_position.z);
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     // Publish the IK solver foot positions.
-        //     march_shared_msgs::msg::IksFootPositions msg;
-        //     msg.header.stamp = this->now();
-        //     msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-        //     msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-        //     msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-        //     msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-        //     msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
-        //     msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-        //     msg.time_from_start.sec = 0;
-        //     msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-        //     m_ik_solver_foot_positions_pub->publish(msg);
-        // }
-
-        // Publish the IK solver foot positions.
-        march_shared_msgs::msg::IksFootPositions msg;
-        msg.header.stamp = this->now();
-        msg.left_foot_position.x = m_ik_solver_foot_positions_latest.left_foot_position.x;
-        msg.left_foot_position.y = m_ik_solver_foot_positions_latest.left_foot_position.y;
-        msg.left_foot_position.z = m_ik_solver_foot_positions_latest.left_foot_position.z;
-        msg.right_foot_position.x = m_ik_solver_foot_positions_latest.right_foot_position.x;
-        msg.right_foot_position.y = m_ik_solver_foot_positions_latest.right_foot_position.y;
-        msg.right_foot_position.z = m_ik_solver_foot_positions_latest.right_foot_position.z;
-        msg.time_from_start.sec = 0;
-        msg.time_from_start.nanosec = (uint32_t) (m_dt * 1e9);
-        msg.new_point = false;
-        m_ik_solver_foot_positions_pub->publish(msg);
-
-        // Publish the IK solver status.
-        publishIKSolverStatus();
-    }
-
-    void IKSolverBufferNode::publishIKSolverStatus()
-    {
-        // Publish the IK solver status.
-        std_msgs::msg::UInt32 msg;
-        msg.data = m_ik_solver_foot_positions_buffer.size();
-        m_ik_solver_status_pub->publish(msg);
-    }
-
-    void IKSolverBufferNode::publishIKSolverError(double error)
-    {
-        // Publish the IK solver error.
-        std_msgs::msg::Float64 msg;
-        msg.data = error;
-        m_ik_solver_error_pub->publish(msg);
-    }
-
-    int main(int argc, char * argv[])
-    {
-        rclcpp::init(argc, argv);
-        rclcpp::spin(std::make_shared<IKSolverBufferNode>());
-        rclcpp::shutdown();
-        return 0;    }
-
+int main(int argc, char * argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<IKSolverBufferNode>());
+    rclcpp::shutdown();
+    return 0;
+}

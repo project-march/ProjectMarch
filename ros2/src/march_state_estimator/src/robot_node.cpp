@@ -5,87 +5,90 @@
 
 #include "march_state_estimator/robot_node.hpp"
 
-#include "rclcpp/rclcpp.hpp"
-#include <sstream>
-#include <algorithm>
 #include "math.h"
+#include "rclcpp/rclcpp.hpp"
+#include <algorithm>
+#include <sstream>
 
-void RobotNode::setName(const std::string & name)
+void RobotNode::setName(const std::string& name)
 {
     m_name = name;
 }
 
-void RobotNode::setId(const uint64_t & id)
+void RobotNode::setId(const uint64_t& id)
 {
     m_id = id;
 }
 
-void RobotNode::setParent(std::shared_ptr<RobotNode> parent)
+void RobotNode::setParent(RobotNode::SharedPtr parent)
 {
     m_parent = parent;
 }
 
-void RobotNode::addChild(std::shared_ptr<RobotNode> child)
+void RobotNode::addChild(RobotNode::SharedPtr child)
 {
     m_children.push_back(child);
     child->setParent(shared_from_this());
 }
 
-void RobotNode::setJointNodes(std::vector<std::shared_ptr<RobotNode>> joint_nodes)
+void RobotNode::setJointNodes(std::vector<SharedPtr> absolute_joint_nodes, std::vector<SharedPtr> relative_joint_nodes)
 {
-    m_joint_nodes = joint_nodes;
-    for (auto & joint_node : m_joint_nodes)
-    {
-        m_joint_symbols_list.append(joint_node->getJointAngle());
+    // Set joint nodes in absolute reference frame.
+    for (const auto& absolute_joint_node : absolute_joint_nodes) {
+        m_joint_symbols_list.append(absolute_joint_node->getJointPosition());
+        m_joint_symbols_list.append(absolute_joint_node->getJointVelocity());
+        m_joint_symbols_list.append(absolute_joint_node->getJointAcceleration());
+    }
+    m_joint_nodes = absolute_joint_nodes;
+
+    // Set joint nodes in relative reference frame.
+    for (const auto& relative_joint_node : relative_joint_nodes) {
+        m_relative_joint_nodes.push_back(relative_joint_node);
+        m_relative_joint_symbols_list.append(relative_joint_node->getJointPosition());
+        m_relative_joint_symbols_list.append(relative_joint_node->getJointVelocity());
+        m_relative_joint_symbols_list.append(relative_joint_node->getJointAcceleration());
     }
 }
 
-void RobotNode::setOriginPosition(const Eigen::Vector3d & position)
+void RobotNode::setExpressionRelativeInertia(const std::string& expression)
 {
-    Eigen::MatrixXd position_matrix(WORKSPACE_DIM, 1);
-    position_matrix = position;
-    m_origin_position_vector = utilConvertEigenToGiNaC(position_matrix);
+    m_relative_inertia_expression = GiNaC::ex(expression, m_relative_joint_symbols_list);
 }
 
-void RobotNode::setOriginRotation(const Eigen::Matrix3d & rotation)
-{
-    m_origin_rotation_matrix = utilConvertEigenToGiNaC(rotation);
-}
-
-// TODO: Convert these functions into typedefs?
-void RobotNode::setExpressionGlobalPosition(const std::vector<std::string> & expressions)
+void RobotNode::setExpressionGlobalPosition(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_position_expressions);
 }
 
-void RobotNode::setExpressionGlobalRotation(const std::vector<std::string> & expressions)
+void RobotNode::setExpressionGlobalRotation(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_rotation_expressions);
 }
 
-void RobotNode::setExpressionGlobalPositionJacobian(const std::vector<std::string> & expressions)
+void RobotNode::setExpressionGlobalPositionJacobian(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_position_jacobian_expressions);
 }
 
-void RobotNode::setExpressionGlobalRotationJacobian(const std::vector<std::string> & expressions)
+void RobotNode::setExpressionGlobalRotationJacobian(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_rotation_jacobian_expressions);
+}
+
+void RobotNode::setExpressionDynamicalTorque(const std::vector<std::string>& expressions)
+{
+    if (m_dynamical_torque_expressions.size() > 0) {
+        m_dynamical_torque_expressions.clear();
+    }
+    for (unsigned long int i = 0; i < expressions.size(); i++) {
+        GiNaC::ex expression(expressions[i], m_relative_joint_symbols_list);
+        m_dynamical_torque_expressions.push_back(expression);
+    }
 }
 
 std::string RobotNode::getName() const
 {
     return m_name;
-}
-
-uint64_t RobotNode::getId() const
-{
-    return m_id;
-}
-
-uint64_t RobotNode::getId(const std::string & name) const
-{
-    return std::hash<std::string>{}(name);
 }
 
 char RobotNode::getType() const
@@ -98,22 +101,22 @@ std::vector<double> RobotNode::getJointAxis() const
     return m_joint_axis;
 }
 
-GiNaC::matrix RobotNode::getOriginPosition() const
+RobotNode::JointSymbol RobotNode::getJointPosition() const
 {
-    return m_origin_position_vector;
+    return m_joint_symbol_position;
 }
 
-GiNaC::matrix RobotNode::getOriginRotation() const
+RobotNode::JointSymbol RobotNode::getJointVelocity() const
 {
-    return m_origin_rotation_matrix;
+    return m_joint_symbol_velocity;
 }
 
-GiNaC::symbol RobotNode::getJointAngle() const
+RobotNode::JointSymbol RobotNode::getJointAcceleration() const
 {
-    return m_joint_angle;
+    return m_joint_symbol_acceleration;
 }
 
-std::shared_ptr<RobotNode> RobotNode::getParent() const
+RobotNode::SharedPtr RobotNode::getParent() const
 {
     return m_parent;
 }
@@ -126,71 +129,84 @@ std::vector<std::weak_ptr<RobotNode>> RobotNode::getChildren() const
 std::vector<std::string> RobotNode::getJointNames() const
 {
     std::vector<std::string> joint_names;
-    for (auto & joint_node : m_joint_nodes)
-    {
+    for (const auto& joint_node : m_joint_nodes) {
         joint_names.push_back(joint_node->getName());
     }
     return joint_names;
 }
 
-GiNaC::matrix RobotNode::getGlobalPositionExpression() const
+std::vector<std::string> RobotNode::getRelativeJointNames() const
 {
-    return m_global_position_vector;
-}
-
-GiNaC::matrix RobotNode::getGlobalRotationExpression() const
-{
-    return m_global_rotation_matrix;
-}
-
-Eigen::Vector3d RobotNode::getGlobalPosition(std::unordered_map<std::string, double> joint_positions) const
-{
-    return Eigen::Map<Eigen::Vector3d>(evaluateExpression(m_global_position_expressions, joint_positions, WORKSPACE_DIM, 1).data());
-}
-
-Eigen::Matrix3d RobotNode::getGlobalRotation(std::unordered_map<std::string, double> joint_positions) const
-{
-    return Eigen::Map<Eigen::Matrix3d>(evaluateExpression(m_global_rotation_expressions, joint_positions, WORKSPACE_DIM, WORKSPACE_DIM).data());
-}
-
-Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(std::unordered_map<std::string, double> joint_positions) const
-{
-    return evaluateExpression(m_global_position_jacobian_expressions, joint_positions, WORKSPACE_DIM, m_joint_nodes.size());
-}
-
-Eigen::MatrixXd RobotNode::getGlobalRotationJacobian(std::unordered_map<std::string, double> joint_positions) const
-{
-    //  TODO: To optimize -> Override in RobotMass.
-    if (m_type == 'M')
-    {
-        return Eigen::MatrixXd::Zero(WORKSPACE_DIM, m_joint_nodes.size());
-    }
-
-    return evaluateExpression(m_global_rotation_jacobian_expressions, joint_positions, WORKSPACE_DIM, m_joint_nodes.size());
-}
-
-std::vector<GiNaC::symbol> RobotNode::getJointAngles() const
-{
-    std::vector<GiNaC::symbol> joint_angles;
-    std::shared_ptr<RobotNode> parent = m_parent;
-    while (parent != nullptr)
-    {
-        if (parent->getType() == 'J')
-        {
-            joint_angles.push_back(parent->getJointAngle());
+    std::vector<std::string> joint_names;
+    for (const auto& joint_node : m_relative_joint_nodes) {
+        if (joint_node.expired()) {
+            continue;
         }
-        parent = parent->getParent();
+        joint_names.push_back(joint_node.lock()->getName());
     }
-    return joint_angles;
+    return joint_names;
 }
 
-std::vector<std::shared_ptr<RobotNode>> RobotNode::getJointNodes(std::shared_ptr<RobotNode> parent) const
+Eigen::Vector3d RobotNode::getGlobalPosition(JointNameToValueMap joint_positions) const
 {
-    std::vector<std::shared_ptr<RobotNode>> joint_nodes;
-    while (parent != nullptr)
-    {
-        if (parent->getType() == 'J')
-        {
+    return Eigen::Map<Eigen::Vector3d>(
+        evaluateExpression(m_global_position_expressions, joint_positions, WORKSPACE_DIM, 1).data());
+}
+
+Eigen::Matrix3d RobotNode::getGlobalRotation(JointNameToValueMap joint_positions) const
+{
+    return Eigen::Map<Eigen::Matrix3d>(
+        evaluateExpression(m_global_rotation_expressions, joint_positions, WORKSPACE_DIM, WORKSPACE_DIM).data());
+}
+
+Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(JointNameToValueMap joint_positions) const
+{
+    return evaluateExpression(
+        m_global_position_jacobian_expressions, joint_positions, WORKSPACE_DIM, m_joint_nodes.size());
+}
+
+Eigen::MatrixXd RobotNode::getGlobalRotationJacobian(JointNameToValueMap joint_positions) const
+{
+    (void)joint_positions;
+    return Eigen::MatrixXd::Zero(WORKSPACE_DIM, m_joint_nodes.size());
+}
+
+Eigen::VectorXd RobotNode::getDynamicalTorque(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
+    JointNameToValueMap joint_accelerations) const
+{
+    GiNaC::lst substitutions = GiNaC::lst();
+    for (const auto& relative_joint_node : m_relative_joint_nodes) {
+        RobotNode::SharedPtr joint_node = relative_joint_node.lock();
+        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
+        substitutions.append(joint_node->getJointVelocity() == joint_velocities.at(joint_node->getName()));
+        substitutions.append(joint_node->getJointAcceleration() == joint_accelerations.at(joint_node->getName()));
+    }
+    Eigen::VectorXd evaluation_matrix = Eigen::VectorXd::Zero(m_relative_joint_nodes.size());
+    for (unsigned int i = 0; i < m_relative_joint_nodes.size(); i++) {
+        GiNaC::ex expression = GiNaC::evalf(m_dynamical_torque_expressions[i].subs(substitutions));
+        evaluation_matrix(i) = GiNaC::ex_to<GiNaC::numeric>(expression).to_double();
+    }
+    return evaluation_matrix;
+}
+
+double RobotNode::getDynamicalJointAcceleration(double joint_torque, JointNameToValueMap joint_positions) const
+{
+    // TODO: Create a relative substitution function.
+    GiNaC::lst substitutions = GiNaC::lst();
+    for (const auto& relative_joint_node : m_relative_joint_nodes) {
+        RobotNode::SharedPtr joint_node = relative_joint_node.lock();
+        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
+    }
+    GiNaC::ex expression = GiNaC::evalf(m_relative_inertia_expression.subs(substitutions));
+    double relative_inertia = GiNaC::ex_to<GiNaC::numeric>(expression).to_double();
+    return joint_torque / relative_inertia;
+}
+
+std::vector<RobotNode::SharedPtr> RobotNode::getJointNodes(RobotNode::SharedPtr parent) const
+{
+    std::vector<RobotNode::SharedPtr> joint_nodes;
+    while (parent != nullptr) {
+        if (parent->getType() == 'J') {
             joint_nodes.push_back(parent);
         }
         parent = parent->getParent();
@@ -199,134 +215,25 @@ std::vector<std::shared_ptr<RobotNode>> RobotNode::getJointNodes(std::shared_ptr
     return joint_nodes;
 }
 
-void RobotNode::expressRotation()
+void RobotNode::setExpression(const std::vector<std::string>& expressions, std::vector<GiNaC::ex>& target)
 {
-    m_global_rotation_matrix = expressGlobalRotation();
-
-    // DEBUG: Print the global rotation expressions.
-    for (unsigned int i = 0; i < m_global_rotation_matrix.rows(); i++)
-    {
-        for (unsigned int j = 0; j < m_global_rotation_matrix.cols(); j++)
-        {
-            std::stringstream ss_rotation_expression;
-            ss_rotation_expression << "Global rotation " << m_name << " (" << i << "," << j << ") : " << m_global_rotation_matrix(i, j) << " ";
-            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_rotation_expression.str().c_str());
-        }
-    }
-}
-
-void RobotNode::expressKinematics()
-{
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotNode::expressKinematics: %s", m_name.c_str());
-    m_global_rotation_matrix = expressGlobalRotation();
-    m_global_position_vector = expressGlobalPosition();
-
-    m_joint_nodes = getJointNodes(shared_from_this());
-    m_global_position_jacobian_matrix = expressGlobalPositionJacobian();
-    m_global_rotation_jacobian_matrix = expressGlobalRotationJacobian();
-
-    // DEBUG: Print the global position expressions.
-    for (unsigned int i = 0; i < m_global_position_vector.rows(); i++)
-    {
-        std::stringstream ss_position_expression;
-        ss_position_expression << "Global position " << m_name << " " << i << ": " << m_global_position_vector(i, 0) << " ";
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), ss_position_expression.str().c_str());
-    }
-}
-
-GiNaC::matrix RobotNode::expressGlobalPosition() const
-{
-    GiNaC::matrix global_position = m_origin_position_vector;
-    if (m_parent != nullptr)
-    {
-        GiNaC::matrix rotated_origin_position = m_parent->getGlobalRotationExpression().mul(global_position);
-        global_position = rotated_origin_position.add(m_parent->expressGlobalPosition());
-    }
-    return global_position;
-}
-
-GiNaC::matrix RobotNode::expressGlobalRotation() const
-{
-    GiNaC::matrix global_rotation = getOriginRotation();
-    if (m_parent != nullptr)
-    {
-        global_rotation = global_rotation.mul(m_parent->expressGlobalRotation());
-    }
-    return global_rotation;
-}
-
-GiNaC::matrix RobotNode::expressGlobalPositionJacobian() const
-{
-    GiNaC::matrix global_position_jacobian(WORKSPACE_DIM, m_joint_nodes.size());
-
-    // TODO: Replace this into a util function.
-    for (int i = 0; i < WORKSPACE_DIM; i++)
-    {
-        for (long unsigned int j = 0; j < m_joint_nodes.size(); j++)
-        {
-            GiNaC::ex global_position_component = m_global_position_vector(i, 0).diff(m_joint_nodes[j]->getJointAngle());
-            global_position_jacobian(i, j) = global_position_component;
-        }
-    }
-    return global_position_jacobian;
-}
-
-GiNaC::matrix RobotNode::expressGlobalRotationJacobian() const
-{
-    GiNaC::matrix global_rotation_jacobian(WORKSPACE_DIM, m_joint_nodes.size());
-
-    if (m_type == 'J')
-    {
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotNode::expressGlobalRotationJacobian: m_type == 'J'");
-        // TODO: Replace this into a util function.
-        for (long unsigned int i = 0; i < WORKSPACE_DIM; i++)
-        {
-            for (long unsigned int j = 0; j < m_joint_nodes.size(); j++)
-            {
-                GiNaC::ex global_rotation_component = m_global_rotation_matrix(i, utilGetJointAxisIndex()).diff(m_joint_nodes[j]->getJointAngle());
-                global_rotation_jacobian(i, j) = global_rotation_component;
-            }
-        }
-    }
-    else // m_type == 'M'
-    {
-        RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "RobotNode::expressGlobalRotationJacobian: m_type == 'M'");
-        for (long unsigned int i = 0; i < WORKSPACE_DIM; i++)
-        {
-            for (long unsigned int j = 0; j < m_joint_nodes.size(); j++)
-            {
-                global_rotation_jacobian(i, j) = 0;
-            }
-        }
-    }
-
-    return global_rotation_jacobian;
-}
-
-void RobotNode::setExpression(const std::vector<std::string> & expressions, std::vector<GiNaC::ex> & target)
-{
-    if (target.size() > 0)
-    {
+    if (target.size() > 0) {
         target.clear();
     }
 
-    for (unsigned long int i = 0; i < expressions.size(); i++)
-    {
+    for (unsigned long int i = 0; i < expressions.size(); i++) {
         GiNaC::ex expression(expressions[i], m_joint_symbols_list);
         target.push_back(expression);
     }
 }
 
-Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex> & expressions, 
-        const std::unordered_map<std::string, double> & joint_positions,
-        const unsigned int & rows, const unsigned int & cols) const
+Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+    const JointNameToValueMap& joint_positions, const unsigned int& rows, const unsigned int& cols) const
 {
     GiNaC::lst substitutions = substituteSymbolsWithJointValues(joint_positions);
     Eigen::MatrixXd evaluation_matrix = Eigen::MatrixXd::Zero(rows, cols);
-    for (unsigned int i = 0; i < rows; i++)
-    {
-        for (unsigned int j = 0; j < cols; j++)
-        {
+    for (unsigned int i = 0; i < rows; i++) {
+        for (unsigned int j = 0; j < cols; j++) {
             GiNaC::ex expression = GiNaC::evalf(expressions[i * cols + j].subs(substitutions));
             evaluation_matrix(i, j) = GiNaC::ex_to<GiNaC::numeric>(expression).to_double();
         }
@@ -334,54 +241,24 @@ Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex> & exp
     return evaluation_matrix;
 }
 
-GiNaC::lst RobotNode::substituteSymbolsWithJointValues(const std::unordered_map<std::string, double> & joint_positions) const
+GiNaC::lst RobotNode::substituteSymbolsWithJointValues(const JointNameToValueMap& joint_positions) const
 {
     GiNaC::lst substitutions = GiNaC::lst();
-    for (const auto & joint_node : m_joint_nodes)
-    {
-        substitutions.append(joint_node->getJointAngle() == joint_positions.at(joint_node->getName()));
+    for (const auto& joint_node : m_joint_nodes) {
+        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
     }
     return substitutions;
-}
-
-GiNaC::matrix RobotNode::utilConvertEigenToGiNaC(const Eigen::MatrixXd & matrix) const
-{
-    GiNaC::matrix ginac_matrix(matrix.rows(), matrix.cols());
-    for (unsigned int i = 0; i < matrix.rows(); i++)
-    {
-        for (unsigned int j = 0; j < matrix.cols(); j++)
-        {
-            ginac_matrix(i, j) = matrix(i, j);
-        }
-    }
-    return ginac_matrix;
-}
-
-Eigen::Matrix3d RobotNode::utilConvertGiNaCToEigen(const GiNaC::matrix & matrix) const
-{
-    Eigen::Matrix3d eigen_matrix = Eigen::Matrix3d::Zero();
-    for (unsigned int i = 0; i < matrix.rows(); i++)
-    {
-        for (unsigned int j = 0; j < matrix.cols(); j++)
-        {
-            eigen_matrix(i, j) = GiNaC::ex_to<GiNaC::numeric>(matrix(i, j)).to_double();
-        }
-    }
-    return eigen_matrix;
 }
 
 int RobotNode::utilGetJointAxisIndex() const
 {
     // Assuming that the joint axis is orthogonal to the other two axes.
     int joint_axis_index = -1;
-    for (long unsigned int i = 0; i < m_joint_axis.size(); i++)
-    {
-        if (m_joint_axis[i] != 0)
-        {
+    for (long unsigned int i = 0; i < m_joint_axis.size(); i++) {
+        if (m_joint_axis[i] != 0) {
             joint_axis_index = i;
             break;
         }
     }
-    RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Joint axis index: %d", joint_axis_index);
     return joint_axis_index;
 }
