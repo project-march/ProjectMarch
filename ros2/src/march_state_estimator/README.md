@@ -25,24 +25,11 @@ The MARCH State Estimator package has been tested under ROS2 Foxy on Ubuntu 20.0
 
 ### Installation from Packages
 
-Firstly, we need to install the necessary deb packages:
+**IMPORTANT.** We need to install the necessary deb packages:
 
 ```Linux
 sudo apt-get update
-sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev libginac-dev
-```
-
-To install all packages from this repository as Debian packages, use:
-
-```Linux
-sudo apt-get update
-sudo apt-get install ros-foxy-...
-```
-
-Or better, use `rosdep`:
-
-```Linux
-sudo rosdep install --from-paths src
+sudo apt-get install libmpfr-dev libgmp-dev libboost-all-dev
 ```
 
 ### Building GiNaC
@@ -53,18 +40,10 @@ First, update the git submodules.
 
 ```Linux
 cd ~/march
-git submodule init
-git submodule update
+git submodule update --recursive --init
 ```
 
-Go to the GiNaC folder and clone CLN.
-
-```Linux
-cd ~/march/ros2/src/libraries/ginac
-git clone git://www.ginac.de/cln.git
-```
-
-Then create a build folder build the GiNaC library.
+Go to the GiNaC folder and create a build folder build the GiNaC library.
 
 ```Linux
 mkdir build && cd build

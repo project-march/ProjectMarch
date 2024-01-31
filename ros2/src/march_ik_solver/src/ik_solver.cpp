@@ -18,9 +18,7 @@ Eigen::VectorXd IKSolver::solve()
         // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
         // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
         // m_tasks[i]->setDesiredPose(&desired_poses[i]);
-        // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solving task %s", m_tasks[i]->getTaskName().c_str());
         desired_joint_velocities.noalias() += m_tasks[i]->solve();
-        // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::solve(): Solved task %s", m_tasks[i]->getTaskName().c_str());
     }
 
     return desired_joint_velocities;
@@ -30,16 +28,6 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
 {
     double dt = 5e-3; // TODO: Get dt from the integral_dt_ptr.
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Integrating joint velocities with dt: %f", dt);
-
-    // Eigen::VectorXd desired_joint_velocities = *m_desired_joint_velocities_ptr;
-    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Desired joint velocities: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-    //     desired_joint_velocities(0), desired_joint_velocities(1), desired_joint_velocities(2), desired_joint_velocities(3), 
-    //     desired_joint_velocities(4), desired_joint_velocities(5), desired_joint_velocities(6), desired_joint_velocities(7));
-
-    // Eigen::VectorXd current_joint_positions = *m_current_joint_positions_ptr;
-    // RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "IKSolver::integrateJointVelocities(): Current joint positions: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-    //     current_joint_positions(0), current_joint_positions(1), current_joint_positions(2), current_joint_positions(3), 
-    //     current_joint_positions(4), current_joint_positions(5), current_joint_positions(6), current_joint_positions(7));
 
     Eigen::VectorXd desired_joint_positions;
     desired_joint_positions.noalias() = (*m_current_joint_positions_ptr) + (*m_desired_joint_velocities_ptr) * dt;
@@ -111,11 +99,6 @@ Eigen::VectorXd IKSolver::clampJointLimits(Eigen::VectorXd desired_joint_positio
 void IKSolver::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr, std::vector<std::string> * joint_names_ptr)
 {
     m_current_joint_positions_ptr = current_joint_positions_ptr;
-
-    // for (int i = 0; i < m_n_joints; i++)
-    // {
-    //     m_tasks[i]->setCurrentJointNamesPtr(joint_names_ptr);
-    // }
 
     for (auto & task : m_tasks)
     {

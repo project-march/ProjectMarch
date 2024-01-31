@@ -104,11 +104,6 @@ void Task::calculateJacobianInverse()
     //         }
     //     }
     // }
-
-    for (unsigned int i = 0; i < m_task_n; i++)
-    {
-        RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Jacobian inverse: %f, %f, %f, %f, %f, %f", m_jacobian_inverse(i,0), m_jacobian_inverse(i,1), m_jacobian_inverse(i,2), m_jacobian_inverse(i,3), m_jacobian_inverse(i,4), m_jacobian_inverse(i,5));
-    }
 }
 
 std::string Task::getTaskName() const
@@ -253,6 +248,7 @@ void Task::sendRequestNodePosition()
     request->node_names = m_node_names;
     RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Node names: %s, %s", request->node_names[0].c_str(), request->node_names[1].c_str());
     
+    // TODO: Fix this hack.
     // request->m_joint_names = *m_current_joint_names_ptr;
     request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
     request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(), m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
@@ -290,7 +286,6 @@ void Task::sendRequestNodePosition()
         }
 
         m_current_pose = Eigen::Map<Eigen::VectorXd>(current_pose_vector.data(), m_task_m);
-        // RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Current pose: %f, %f, %f, %f, %f, %f", m_current_pose(0), m_current_pose(1), m_current_pose(2), m_current_pose(3), m_current_pose(4), m_current_pose(5));
     }
     else
     {
@@ -302,7 +297,7 @@ void Task::sendRequestNodeJacobian()
 {
     auto request = std::make_shared<march_shared_msgs::srv::GetNodeJacobian::Request>();
     request->node_names = m_node_names;
-    // TODO
+    // TODO: Fix the request joint names
     // request->m_joint_names = *m_current_joint_names_ptr;
     request->joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
     request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(), m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
@@ -348,10 +343,6 @@ void Task::sendRequestNodeJacobian()
         }
 
         m_jacobian = jacobian;
-        for (unsigned int i = 0; i < m_task_m; i++)
-        {
-            RCLCPP_DEBUG(rclcpp::get_logger("ik_solver_node"), "Jacobian row %d: %f, %f, %f, %f, %f, %f, %f, %f", i, m_jacobian(i,0), m_jacobian(i,1), m_jacobian(i,2), m_jacobian(i,3), m_jacobian(i,4), m_jacobian(i,5), m_jacobian(i,6), m_jacobian(i,7));
-        }
     }
     else
     {

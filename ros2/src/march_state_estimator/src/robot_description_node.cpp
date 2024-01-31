@@ -5,11 +5,11 @@
 
 #include "march_state_estimator/robot_description_node.hpp"
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "march_shared_msgs/msg/node_jacobian.hpp"
-#include "ament_index_cpp/get_package_share_directory.hpp"
-#include <functional>
 #include <chrono>
+#include <functional>
 #include <unordered_map>
 
 #include "eigen3/Eigen/Core"
@@ -18,61 +18,21 @@
 #include "yaml-cpp/yaml.h"
 
 RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description)
-: Node("robot_description_node")
+    : Node("robot_description_node")
 {
     RCLCPP_INFO(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode constructor");
 
     m_robot_description = robot_description;
 
-    // TODO: Create a callback group for the services to multi-thread services. This goes into backlog for now.
-    // m_node_positions_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    // m_node_jacobian_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    // m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
-    //     "state_estimation/get_node_position", 
-    //     std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2),
-    //     rmw_qos_profile_services_default, m_node_positions_callback_group);
-    // m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
-    //     "state_estimation/get_node_jacobian", 
-    //     std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
-    //     rmw_qos_profile_services_default, m_node_jacobian_callback_group);
-
-    // // Declare parameters
-    // declare_parameter("names", std::vector<std::string>());
-
-    // // Get parameters
-    // std::vector<std::string> names = get_parameter("names").as_string_array();
-
-    // // Print parameters
-    // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %d", names.size());
-    // for (long unsigned int i = 0; i < names.size(); i++)
-    // {
-    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", names[i].c_str());
-    // }
-
-    // // Get config file path
-    // std::string config_file_path = ament_index_cpp::get_package_share_directory("march_state_estimator") + "/config/robot_definition-config.yaml";
-    // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", config_file_path.c_str());
-
-    // // Parse config file
-    // YAML::Node config_file = YAML::LoadFile(config_file_path);
-    // // const std::string test = config_file["L_UL"]["linear"]["position"]["x"].as<std::string>();
-    // // RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", test.c_str());
-
-    // const std::vector<std::string> names = config_file["names"].as<std::vector<std::string>>();
-    // for (long unsigned int i = 0; i < names.size(); i++)
-    // {
-    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", names[i].c_str());
-    //     const std::string abs_linear_position = config_file[names[i]]["linear"]["position"]["x"].as<std::string>();
-    //     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::configureParameters: %s", abs_linear_position.c_str());
-    // }
-
-    m_subscription_state_estimation = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "state_estimation/state", 10, std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
-    m_publisher_state_estimator_visualization = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
-        "state_estimation/visualization", 10);
+    m_subscription_state_estimation
+        = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10,
+            std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
+    m_publisher_state_estimator_visualization
+        = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
+            "state_estimation/visualization", 10);
 
     m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
-        "state_estimation/get_node_position", 
+        "state_estimation/get_node_position",
         std::bind(&RobotDescriptionNode::handleNodePositionRequest, this, std::placeholders::_1, std::placeholders::_2),
         rmw_qos_profile_services_default);
     m_service_node_jacobian = this->create_service<march_shared_msgs::srv::GetNodeJacobian>(
@@ -87,20 +47,22 @@ void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg:
 {
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::stateEstimationCallback");
 
-    if (msg->joint_state.name.empty() || msg->joint_state.position.empty())
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::stateEstimationCallback: Joint state is empty");
+    if (msg->joint_state.name.empty() || msg->joint_state.position.empty()) {
+        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescriptionNode::stateEstimationCallback: Joint state is empty");
         return;
     }
 
     std::unordered_map<std::string, double> joint_positions;
-    std::transform(msg->joint_state.name.begin(), msg->joint_state.name.end(), msg->joint_state.position.begin(), std::inserter(joint_positions, joint_positions.end()),
-        [](const std::string & name, const double & position) { return std::make_pair(name, position); });
+    std::transform(msg->joint_state.name.begin(), msg->joint_state.name.end(), msg->joint_state.position.begin(),
+        std::inserter(joint_positions, joint_positions.end()), [](const std::string& name, const double& position) {
+            return std::make_pair(name, position);
+        });
 
     publishVisualization(joint_positions);
 }
 
-void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::string, double> & joint_positions)
+void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::string, double>& joint_positions)
 {
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::publishVisualization");
 
@@ -110,9 +72,8 @@ void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::st
     march_shared_msgs::msg::StateEstimatorVisualization state_estimator_visualization_msg;
     state_estimator_visualization_msg.node_names = m_robot_description->getAllNodeNames();
     state_estimator_visualization_msg.parent_node_names = m_robot_description->getAllParentNames();
-    
-    for (long unsigned int i = 0; i < node_positions.size(); i++)
-    {
+
+    for (long unsigned int i = 0; i < node_positions.size(); i++) {
         geometry_msgs::msg::Pose node_pose;
         node_pose.position.x = node_positions[i].x();
         node_pose.position.y = node_positions[i].y();
@@ -130,33 +91,34 @@ void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::st
     m_publisher_state_estimator_visualization->publish(state_estimator_visualization_msg);
 }
 
-void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
+void RobotDescriptionNode::handleNodePositionRequest(
+    const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
 {
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest");
 
     // Assert that the request is not empty
-    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty())
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
+    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
+        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
         return;
     }
 
     // Find a way to optimize this
     std::unordered_map<std::string, double> joint_positions;
-    for (long unsigned int i = 0; i < request->joint_names.size(); i++)
-    {
+    for (long unsigned int i = 0; i < request->joint_names.size(); i++) {
         joint_positions[request->joint_names[i]] = request->joint_positions[i];
     }
 
     std::vector<std::shared_ptr<RobotNode>> robot_nodes = m_robot_description->findNodes(request->node_names);
-    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest: %d", robot_nodes.size());
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest: %d",
+        robot_nodes.size());
 
-    for (auto & robot_node : robot_nodes)
-    {
+    for (auto& robot_node : robot_nodes) {
         Eigen::Vector3d pose = robot_node->getGlobalPosition(joint_positions);
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest: %f %f %f", pose(0), pose(1), pose(2));
-        
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescriptionNode::handleNodePositionRequest: %f %f %f", pose(0), pose(1), pose(2));
+
         geometry_msgs::msg::Point node_position;
         node_position.x = pose(0);
         node_position.y = pose(1);
@@ -168,40 +130,42 @@ void RobotDescriptionNode::handleNodePositionRequest(const std::shared_ptr<march
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest done");
 }
 
-void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
+void RobotDescriptionNode::handleNodeJacobianRequest(
+    const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response)
 {
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest");
 
     // Assert that the request is not empty
-    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty())
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
+    if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
+        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescriptionNode::handleNodePositionRequest: Request is empty");
         return;
     }
 
     // Find a way to optimize this
     std::unordered_map<std::string, double> joint_positions;
-    for (long unsigned int i = 0; i < request->joint_names.size(); i++)
-    {
+    for (long unsigned int i = 0; i < request->joint_names.size(); i++) {
         joint_positions[request->joint_names[i]] = request->joint_positions[i];
     }
 
     std::vector<std::shared_ptr<RobotNode>> robot_nodes = m_robot_description->findNodes(request->node_names);
-    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d", robot_nodes.size());
+    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d",
+        robot_nodes.size());
     std::vector<march_shared_msgs::msg::NodeJacobian> node_jacobians;
 
-    for (auto & robot_node : robot_nodes)
-    {
+    for (auto& robot_node : robot_nodes) {
         march_shared_msgs::msg::NodeJacobian node_jacobian_msg;
 
         // TODO: Create a function that returns the joint names of a node in robot_node.hpp
         node_jacobian_msg.joint_names = robot_node->getJointNames();
         std::vector<std::string> joint_names = robot_node->getJointNames();
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d", joint_names.size());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d",
+            joint_names.size());
 
         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(joint_positions);
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
+        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
 
         node_jacobian_msg.rows = jacobian.rows();
         node_jacobian_msg.cols = jacobian.cols();
@@ -209,9 +173,9 @@ void RobotDescriptionNode::handleNodeJacobianRequest(const std::shared_ptr<march
         std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
         node_jacobian_msg.jacobian = jacobian_vector;
 
-        for (long unsigned int i = 0; i < jacobian_vector.size(); i++)
-        {
-            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian_vector[i]);
+        for (long unsigned int i = 0; i < jacobian_vector.size(); i++) {
+            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
+                "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian_vector[i]);
         }
 
         node_jacobians.push_back(node_jacobian_msg);

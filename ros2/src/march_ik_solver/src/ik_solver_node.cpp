@@ -108,8 +108,6 @@ IKSolverNode::IKSolverNode()
     RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
 
     // Configure previous joint trajectory point.
-    // Eigen::VectorXd zeros = Eigen::VectorXd::Zero(joints_size);
-    // std::vector<double> zeros_vector(zeros.data(), zeros.data() + zeros.size());
     m_joint_trajectory_point_prev = trajectory_msgs::msg::JointTrajectoryPoint();
     m_joint_trajectory_point_prev.positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     m_joint_trajectory_point_prev.velocities = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -220,17 +218,12 @@ void IKSolverNode::publishJointTrajectory()
     trajectory_msgs::msg::JointTrajectory joint_trajectory_msg;
     joint_trajectory_msg.header.stamp = this->now();
     joint_trajectory_msg.joint_names = m_joints_names;
-    // joint_trajectory_msg.joint_names = {"left_ankle", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"};
 
     // Push back the previous trajectory point.
     joint_trajectory_msg.points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
     trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
-    // Eigen::VectorXd desired_joint_positions = Eigen::VectorXd::Zero(m_desired_joint_positions.size());
-    // desired_joint_positions << m_desired_joint_positions(3), m_desired_joint_positions(0), m_desired_joint_positions(1), m_desired_joint_positions(2),
-    //     m_desired_joint_positions(7), m_desired_joint_positions(4), m_desired_joint_positions(5), m_desired_joint_positions(6);
-    // joint_trajectory_point_desired.positions = std::vector<double>(desired_joint_positions.data(), desired_joint_positions.data() + desired_joint_positions.size());
     joint_trajectory_point_desired.positions = std::vector<double>(m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     joint_trajectory_point_desired.velocities = std::vector<double>(m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
     joint_trajectory_point_desired.accelerations = { 0.0, 0.0, 0.0, 0.0, 0.0, 0., 0., 0. };

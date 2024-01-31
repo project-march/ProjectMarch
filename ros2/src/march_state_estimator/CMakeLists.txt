@@ -50,6 +50,7 @@ add_library(${PROJECT_NAME} STATIC
   src/robot_mass.cpp
   src/robot_joint.cpp
   src/sensor_fusion_node.cpp
+  src/torque_converter.cpp
   src/state_estimator_node.cpp
   src/transform_publisher_node.cpp
 )
@@ -74,6 +75,7 @@ add_executable(state_estimator_node
   src/robot_mass.cpp
   src/robot_joint.cpp
   src/sensor_fusion_node.cpp
+  src/torque_converter.cpp
   src/state_estimator_node.cpp
 )
 target_include_directories(state_estimator_node PUBLIC
@@ -120,8 +122,11 @@ if(BUILD_TESTING)
   # file(COPY test/urdf/rotational_test_setup.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/urdf)
 
   ament_add_gmock(test_runner
-    # test/robot_description_test.cpp
+    test/torque_converter_test.cpp
     test/test_runner.cpp
+    src/torque_converter.cpp
+    src/robot_description.cpp
+    src/robot_node.cpp
   )
 
   target_include_directories(test_runner PUBLIC
