@@ -43,7 +43,7 @@ ament_target_dependencies(footstep_planner_node
   ament_index_cpp
   )
 
-install(TARGETS footstep_planner_noder
+install(TARGETS footstep_planner_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

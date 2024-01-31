@@ -1,4 +1,4 @@
-#include "march_footstep_planner/include/footstep_planner_node.hpp"
+#include "march_footstep_planner/footstep_planner_node.hpp"
 
 using std::placeholders::_1; 
 
