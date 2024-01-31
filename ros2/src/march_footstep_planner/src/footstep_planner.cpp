@@ -1,4 +1,8 @@
-#include "march_footstep_planner/include/footstep_planner.hpp"
+/*
+Author: Femke Buiks, MIX
+*/
+
+#include "march_footstep_planner/footstep_planner.hpp"
 #include <iostream> 
 
 FootstepPlanner::FootstepPlanner()
@@ -14,6 +18,14 @@ FootstepPlanner::FootstepPlanner()
 void FootstepPlanner::setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position) { 
     m_left_foot_position = new_left_foot_position; 
     m_right_foot_position = new_right_foot_position; 
+}
+
+void FootstepPlanner::setDistanceThreshold(const double &distance){
+    m_step_distance_threshold = distance; 
+}
+
+void FootstepPlanner::setFootSize(const double &width, const double &length, const double &height){
+    m_foot_size = {width, length, height}; 
 }
 
 std::array<double, 3> FootstepPlanner::getFootSize() const {

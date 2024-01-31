@@ -1,3 +1,6 @@
+/*
+Author: Femke Buiks, MIX
+*/
 
 /*
 From paper with slight adaptations: 
@@ -22,11 +25,14 @@ safe to step in.
 class FootstepPlanner {
     public: 
     explicit FootstepPlanner(); 
+    // struct plane {
+    //     std::array<double, 3> centroid; 
+    // }; 
 
     //Setters
-    void setFootPositions(double l_x, double l_y, double l_z, double r_x, double r_y, double r_z); 
-    void setFootSize(double width, double length, double height); 
-    void setDistanceThreshold(double distance); 
+    // void setFootPositions(const double &l_x, const double &l_y, const double &l_z, const double &r_x, const double &r_y, const double &r_z); 
+    void setFootSize(const double &width, const double &length, const double &height); 
+    void setDistanceThreshold(const double &distance); 
     void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position); 
     //Getters
     std::array<double, 3> getFootSize() const;
@@ -36,8 +42,8 @@ class FootstepPlanner {
 
     private:
 
-    std::array<double, 3> m_foot_size; 
     double m_step_distance_threshold; 
+    std::array<double, 3> m_foot_size; 
     std::array<double, 3> m_left_foot_position; 
     std::array<double, 3> m_right_foot_position; 
 }; 
