@@ -14,7 +14,7 @@ ModeMachineCartesianNode::ModeMachineCartesianNode()
     RCLCPP_WARN(rclcpp::get_logger("mode_machine_cartesian"), "Cartesian Mode Machine Node succesfully initialized");
 
     //TODO: This publisher should not be here, this information should come from the footstepplanner. We do not have this module as of yet so this is a replacement mock. 
-    m_footsteps_dummy_publisher = create_publisher<march_shared_msgs::msg::FootStepOutput>("footsteps", 100); 
+    m_planes_dummy_publisher = create_publisher<march_shared_msgs::msg::AllPlanes>("planes", 100); 
 }
 
 ModeMachineCartesianNode::~ModeMachineCartesianNode()
@@ -54,9 +54,14 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         //TODO: Remove following logic from here. When you now activate the VariableWalk, the mode machine will send a distance of 0.4 to the gait planning module. This distance should come from footstepplanner. Somewhere
         // the logic to identify when we use the cameras should be included (maybe a boolean?)
         if (mode_msg.mode == 10){
-            march_shared_msgs::msg::FootStepOutput feet_msg; 
-            feet_msg.distance = 0.4;
-            m_footsteps_dummy_publisher->publish(feet_msg); 
+            march_shared_msgs::msg::AllPlanes plane_msg; 
+            march_shared_msgs::msg::Plane plane; 
+            plane.centroid.x = 0.3; 
+            plane.centroid.y = 0.16; 
+            plane.centroid.z = 0.0;
+            plane_msg.planes = {plane}; 
+            m_planes_dummy_publisher->publish(plane_msg); 
+            RCLCPP_INFO(this->get_logger(), "Planes sent!"); 
         }
 
     } else 
