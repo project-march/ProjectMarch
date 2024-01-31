@@ -9,7 +9,9 @@ using std::placeholders::_1;
 FootstepPlannerNode::FootstepPlannerNode()
 : Node("march_footstep_planner_node"), 
   m_footstep_planner(FootstepPlanner()), 
-  m_desired_footstep_msg(std::make_shared<march_shared_msgs::msg::FootStepOutput>())
+  m_desired_footstep_msg(std::make_shared<march_shared_msgs::msg::FootStepOutput>()), 
+  m_planes_list(), 
+  m_gait_type()
 {
     m_variable_footstep_publisher = create_publisher<march_shared_msgs::msg::FootStepOutput>("footsteps", 1); 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
@@ -90,13 +92,6 @@ bool FootstepPlannerNode::checkOverlapPlaneFootbox() {
     // to step on, aka falls within plane. We might want to check with just one foot, depending
     // on strategy. How to navigate through neighbouring voxels/points?
     return true; 
-}
-
-void FootstepPlannerNode::selectDesiredPoint(){
-    //This function should return the desired stepping point, which should be used in the desired steppoint
-    // message. 
-    // the FootstepOutput message is now just a distance. Calculate distance here or send point to gaitplanning
-    // and process further there. 
 }
 
 void FootstepPlannerNode::footstepOutputPublish(){

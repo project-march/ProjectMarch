@@ -58,13 +58,11 @@ class FootstepPlannerNode : public rclcpp::Node {
     bool checkCentroidPlaneSafe(const march_shared_msgs::msg::Plane& plane) const; 
     march_shared_msgs::msg::Plane* findSafePlane(size_t index = 0); 
     bool checkOverlapPlaneFootbox();
-    void selectDesiredPoint(); 
     
     FootstepPlanner m_footstep_planner; 
 
     march_shared_msgs::msg::FootStepOutput::SharedPtr m_desired_footstep_msg; 
     std::vector<march_shared_msgs::msg::Plane> m_planes_list; 
-    std::array<double, 3> m_desired_point; 
     exoMode m_gait_type; 
 
 }; 
