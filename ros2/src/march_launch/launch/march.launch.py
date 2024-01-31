@@ -120,6 +120,16 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    footstep_planner = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_footstep_planner"),
+                "launch",
+                "footstep_planner.launch.py",
+            )
+        ),
+    )
+
     # region Launch IMU
     imu_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -228,4 +238,5 @@ def generate_launch_description() -> LaunchDescription:
         ik_solver,
         state_estimator,
         ipd_node,
+        footstep_planner, 
     ])
