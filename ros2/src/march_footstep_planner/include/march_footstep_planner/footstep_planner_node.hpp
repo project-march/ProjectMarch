@@ -55,9 +55,10 @@ class FootstepPlannerNode : public rclcpp::Node {
     // Used planes as dummy object data type for now
     bool compareDistance(const march_shared_msgs::msg::Plane& plane1, const march_shared_msgs::msg::Plane& plane2) const; 
     void rankPlanesByDistance(); 
-    bool checkCentroidPlaneSafe(const march_shared_msgs::msg::Plane& plane) const; 
+    bool checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const; 
     march_shared_msgs::msg::Plane* findSafePlane(size_t index = 0); 
-    bool checkOverlapPlaneFootbox();
+    bool checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const;
+    bool checkIfCircle(const march_shared_msgs::msg::Plane &plane) const; 
     
     FootstepPlanner m_footstep_planner; 
 

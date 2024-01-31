@@ -75,24 +75,41 @@ march_shared_msgs::msg::Plane* FootstepPlannerNode::findSafePlane(size_t index){
     if (index >= m_planes_list.size()){
         return nullptr; 
     }
-    if (checkCentroidPlaneSafe(m_planes_list[index])) {
+    if (checkCentroidPlaneSafeDistance(m_planes_list[index])) {
         return &m_planes_list[index];
     }
     return findSafePlane(index + 1); 
 }
 
-bool FootstepPlannerNode::checkCentroidPlaneSafe(const march_shared_msgs::msg::Plane& plane) const{
+bool FootstepPlannerNode::checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const{
     // this function should return a bool describing if the centroid of a plane is close enough to 
     // safely reach, given ranges of motion etc. 
     return (plane.centroid.x < (m_footstep_planner.getDistanceThreshold()+m_footstep_planner.getRightFootPosition()[0])); 
 }
 
-bool FootstepPlannerNode::checkOverlapPlaneFootbox() {
+bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
+    //This function checks whether a given plane is a circle or not
+    float x = plane.upper_boundary_point.x - plane.lower_boundary_point.x; 
+    float y = plane.left_boundary_point.y + abs(plane.right_boundary_point.y);
+    return (x - y < 0.05);  
+}
+
+bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane &plane) const {
     // This function should in some way check if an area the size of the two feet around the centroid is safe
     // to step on, aka falls within plane. We might want to check with just one foot, depending
-    // on strategy. How to navigate through neighbouring voxels/points?
-    return true; 
+    // on strategy.
+    if (checkIfCircle(plane)){
+        return true; 
+    } else {
+        // right now, assuming the plane coordinates are with respect to the backpack frame 
+        bool fits_x = ((plane.centroid.x + m_foot_size[0]/2) < plane.upper_boundary_point.x && (plane.centroid.x - m_foot_size[0]/2) > plane.lower_boundary_point.x); 
+        bool fits_y = ((plane.centroid.y + m_foot_size[1]/2) < plane.left_boundary_point.y && (plane.centroid.y - m_foot_size[1]/2) > plane.right_boundary_point.y); 
+        return (fits_x && fits_y); 
+    }
 }
+
+// somewhere include logic to say whether feet should be placed together or in a normal box (use 
+// an offset, as gait planning is determined in how the feet are placed, or send y position to gaitplanning)
 
 void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
