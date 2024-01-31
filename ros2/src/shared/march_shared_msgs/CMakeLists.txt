@@ -33,6 +33,7 @@ find_package(sensor_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Alive.msg"
+  "msg/AllPlanes.msg"
   "msg/BatteryState.msg"
   "msg/CenterOfMass.msg"
   "msg/CurrentGait.msg"
@@ -54,6 +55,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageState.msg"
   "msg/MotorControllerStates.msg"
   "msg/NodeJacobian.msg"
+  "msg/Plane.msg"
   "msg/PowerDistributionBoardData.msg"
   "msg/RobotState.msg"
   "msg/TorqueStamped.msg"
