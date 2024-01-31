@@ -283,6 +283,9 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         weight_node = std::make_shared<WeightNode>();
         weight_node->joints_info_ = getJointsInfo();
         executor_.add_node(weight_node);
+        gains_node = std::make_shared<GainsNode>();
+        gains_node->joints_info_ = getJointsInfo();
+        executor_.add_node(gains_node);
         std::thread([this]() {
             executor_.spin();
         }).detach();
