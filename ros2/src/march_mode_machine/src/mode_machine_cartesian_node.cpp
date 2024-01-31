@@ -56,7 +56,7 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         if (mode_msg.mode == 10){
             march_shared_msgs::msg::AllPlanes plane_msg; 
             march_shared_msgs::msg::Plane plane; 
-            plane.centroid.x = 0.3; 
+            plane.centroid.x = 0.5; 
             plane.centroid.y = 0.16; 
             plane.centroid.z = 0.0;
             plane_msg.planes = {plane}; 
