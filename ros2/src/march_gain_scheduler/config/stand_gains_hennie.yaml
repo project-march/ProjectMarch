@@ -1,0 +1,57 @@
+joints:
+  left_ankle:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 16.5
+          ki: 0.11
+          kd: 0.22
+  left_hip_aa:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 38.5
+          ki: 0.33
+          kd: 0.66
+  left_hip_fe:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 38.5
+          ki: 0.55
+          kd: 0.44
+  left_knee:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 22.0
+          ki: 0.22
+          kd: 1.65
+  right_ankle:  
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 16.5
+          ki: 0.11
+          kd: 0.22
+  right_hip_aa:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 38.5
+          ki: 0.33
+          kd: 0.66
+  right_hip_fe:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 38.5
+          ki: 0.33
+          kd: 0.44
+  right_knee:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 22.0
+          ki: 0.11
+          kd: 1.65
