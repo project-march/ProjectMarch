@@ -27,6 +27,7 @@ namespace error {
         "Homing without endstop. ",
         "Over temperature. ",
         "Unknown position. ",
+        "Unknown moment. ",
     };
 
     const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE> ODRIVE_MOTOR_ERRORS = {
@@ -75,13 +76,17 @@ namespace error {
     const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS = {
         "Invalid axis. ",
         "Request state failed. ",
-        "Motor not ready. ",
+        "No encoder data. ",
+        "Encoder error. ",
+        "Encoder warning. ",
+        "Joint in endstop. ",
+        "No EtherCAT communication. ",
         "Motor not calibrated. ",
         "Encoder not ready. ",
-        "Encoder index not yet found. ",
-        "Encoder not precalibrated. ",
-        "Encoder: absolute position not valid. ",
-        "Encoder: absolute gpio pin not valid. ",
+        "No ODrive communication. ",
+        "No absolute position sent. ",
+        "No PID sent. ",
+        "No torque sent. ",
     };
 
     const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS = {
@@ -93,6 +98,7 @@ namespace error {
         "Invalid estimate. ",
         "Invalid circular range. ",
         "Spinout detected (recalibrate, or replacing motor cable + recalibrate). ",
+        "Invalid weigths. ",
     };
 
     void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description)

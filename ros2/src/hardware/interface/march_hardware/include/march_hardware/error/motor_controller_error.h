@@ -21,7 +21,7 @@ namespace error {
     const size_t ODRIVE_ERRORS_SIZE = 8;
     extern const std::array<std::string, ODRIVE_ERRORS_SIZE> ODRIVE_ERRORS;
 
-    const size_t ODRIVE_AXIS_ERRORS_SIZE = 8;
+    const size_t ODRIVE_AXIS_ERRORS_SIZE = 9;
     extern const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE> ODRIVE_AXIS_ERRORS;
 
     const size_t ODRIVE_MOTOR_ERRORS_SIZE = 27;
@@ -30,10 +30,10 @@ namespace error {
     const size_t ODRIVE_ENCODER_ERRORS_SIZE = 10;
     extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS;
 
-    const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 9;
+    const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 13;
     extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS;
 
-    const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 8;
+    const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 9;
     extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS;
 
     // Add an error type to the description
