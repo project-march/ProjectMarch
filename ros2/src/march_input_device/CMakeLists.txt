@@ -23,6 +23,11 @@ add_executable(test_joints_input_device_node
   src/test_joints_input_device.cpp
 )
 
+add_executable(bluetooth_input_device_node
+  src/bluetooth_input_device_node.cpp
+  src/input_device.cpp
+)
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(input_device_node
   rclcpp
@@ -35,12 +40,26 @@ ament_target_dependencies(test_joints_input_device_node
   march_shared_msgs
   )
 
+# Link against ROS 2 dependencies
+ament_target_dependencies(bluetooth_input_device_node
+  rclcpp
+  march_shared_msgs
+  )
+
+# Link against the Bluetooth library
+target_link_libraries(bluetooth_input_device_node bluetooth)
+
+
 # Install the executable
 install(TARGETS input_device_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(TARGETS test_joints_input_device_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS bluetooth_input_device_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
