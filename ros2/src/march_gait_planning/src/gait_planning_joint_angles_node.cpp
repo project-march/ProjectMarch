@@ -184,47 +184,29 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         processMovingGaits(count); 
                         m_gait_planning.setCounter(count+1); 
                     } else {
-                        RCLCPP_INFO(this->get_logger(), "Fill trajectory with step close"); 
                         m_gait_planning.setPrevGaitType(exoMode::Stand);
                         m_gait_planning.setCounter(0);  
+                        m_current_trajectory = m_gait_planning.getStepCloseGait();
+                        RCLCPP_INFO(this->get_logger(), "Fill trajectory with step close"); 
                     }
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Stand){
-                    m_current_trajectory = m_gait_planning.getStepCloseGait(); 
-                    processMovingGaits(count); 
-                    m_gait_planning.setCounter(count+1); 
-                    // if (count < m_current_trajectory.size()-1){
-                    //     RCLCPP_INFO(this->get_logger(), "Execute step close"); 
-                    //     processMovingGaits(count); 
-                    //     m_gait_planning.setCounter(count+1); 
-                    // } else {
-                        // m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-                        // m_joints_msg.points.push_back(m_trajectory_prev_point);
-                        // m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
-                        // m_joints_msg.points.push_back(m_trajectory_des_point);
-                        // m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-                        // m_joints_msg.points.clear();   
-                        // m_gait_planning.setPrevPoint(m_trajectory_des_point.positions);
-                        // RCLCPP_INFO(this->get_logger(), "Publishing homestand"); 
-                    // }
+                } if (m_gait_planning.getPrevGaitType() == exoMode::Stand){ 
+                    if (count >= (m_current_trajectory.size()-1)){
+                        RCLCPP_INFO(this->get_logger(), "Publishing home stand"); 
+                        m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
+                        m_joints_msg.points.push_back(m_trajectory_prev_point);
+                        m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
+                        m_joints_msg.points.push_back(m_trajectory_des_point);
+                        m_joint_angle_trajectory_publisher->publish(m_joints_msg);
+                        m_joints_msg.points.clear();   
+                        m_gait_planning.setPrevPoint(m_trajectory_des_point.positions);
+                    } else {
+                        processMovingGaits(count);
+                        m_gait_planning.setCounter(count+1);
+                        RCLCPP_INFO(this->get_logger(), "Publishing step close"); 
+                    }
                 } if (m_gait_planning.getPrevGaitType() == exoMode::BootUp){
                     processHomeStandGait(); 
                 }
-                    // switch (m_current_trajectory) {
-                    //     case m_gait_planning.getStepCloseGait() :
-                    //         if (count < m_current_trajectory.size()-1){
-                    //         processMovingGaits(count); 
-                    //         m_gait_planning.setCounter(count+1); 
-                    //         } 
-                    //     default :
-                    //         if (count < m_current_trajectory.size()-1){
-                    //         processMovingGaits(count); 
-                    //         m_gait_planning.setCounter(count+1); 
-                    //         }   
-                    //         if (count >= m_current_trajectory.size()-1){
-                    //         m_gait_planning.setCounter(0); 
-                    //         m_current_trajectory = m_gait_planning.getStepClose(); 
-                    //         }
-                    // }
                 break; 
                 // } else {
                 // processHomeStandGait(); 

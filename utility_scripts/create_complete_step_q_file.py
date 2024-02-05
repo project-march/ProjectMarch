@@ -22,9 +22,11 @@ def normal_large_step():
     max_rhfe_second = df_gait_joint[['RHFE']].iloc[150:250].idxmax()
 
     first_step = df_gait_joint.iloc[0:72]
-    first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
+    # first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
     full_step = df_gait_joint.iloc[73:182]
-    full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+    # full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+    step_close = df_gait_joint.iloc[183::]
+    # step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
 
     # plot_joints(first_step)
     plot_joints(full_step)
@@ -32,23 +34,34 @@ def normal_large_step():
     df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
 
 def step_close():
-    df_full_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
     df_first_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+    df_full_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+    df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
+    df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
+    df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
+    df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
+    df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
+    df_gait_joint = df_gait_joint.reset_index(drop=True)
+    step_close = df_gait_joint.iloc[183:350]
+    step_close = step_close.reset_index(drop=True)
     # print("Full step final position: ",df_full_step.iloc[[-1]])
-    print("First step final position: \n",df_first_step.iloc[[-1]], '\n')
-    print("First step initial position: \n",df_first_step.iloc[[0]], '\n')
-    # step_close = df_first_step.loc[::-1].reset_index(drop=True)
+    # print("First step final position: \n",df_first_step.iloc[[-1]], '\n')
+    # print("First step initial position: \n",df_first_step.iloc[[0]], '\n')
+    # step_close = df_first_step
     # step_close = step_close.rename(columns={"LHFE": "RHFE", "LKFE": "RKFE", "RHFE": "LHFE", "RKFE": "LKFE"})
-    step_close = df_first_step
-    step_close = step_close.rename(columns={"LHFE": "RHFE", "LKFE": "RKFE", "RHFE": "LHFE", "RKFE": "LKFE"})
-    step_close['LHFE'] = step_close["LHFE"] + (0.194641 - 0.274982)
-    step_close['RHFE'] = step_close['RHFE'] + (0.722718 - 0.351166)
-    step_close['LKFE'] = step_close['LKFE'] + (0.450064 - 0.286291)
-    step_close['RKFE'] = step_close["RKFE"] + (0.302273 - 0.372236)
-    print("Step close final position: \n", step_close.iloc[[-1]])
+    # step_close['LHFE'] = step_close["LHFE"] + (0.194641 - 0.274982)
+    # step_close['RHFE'] = step_close['RHFE'] + (0.722718 - 0.351166)
+    # step_close['LKFE'] = step_close['LKFE'] + (0.450064 - 0.286291)
+    # step_close['RKFE'] = step_close["RKFE"] + (0.302273 - 0.372236)
+    # print("Step close final position: \n", step_close.iloc[[-1]])
     plot_joints(df_first_step)
+    plot_joints(df_gait_joint)
+    plot_joints(df_full_step)
     plot_joints(step_close)
-    step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv')
+    print("full step final position: \n", step_close.iloc[[-1]], "\n")
+    print("step close first position: \n", step_close.iloc[[0]], "\n")
+    print("Step Close final position: \n",step_close.iloc[[-1]], '\n')
+    # step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
 
 def plot_joints(dataset):
 
@@ -144,11 +157,4 @@ def sideways():
 
 
     
-# stand_to_sit()
-# sit_to_stand()
-
-# sideways()
-
-# normal_large_step()
-    
-step_close()
+normal_large_step()
