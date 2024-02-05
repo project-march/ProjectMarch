@@ -20,8 +20,6 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
-find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
@@ -29,7 +27,6 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(urdf REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -40,8 +37,6 @@ add_library(${PROJECT_NAME} STATIC
 
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp
-  rclcpp_action
-  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
@@ -56,24 +51,9 @@ target_include_directories(ik_solver_node PUBLIC
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(ik_solver_node
   rclcpp
-  rclcpp_action
-  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
-  sensor_msgs
-  trajectory_msgs
-  march_shared_msgs
-)
-
-add_executable(ik_solver_buffer_node src/ik_solver_buffer_node.cpp)
-target_include_directories(ik_solver_buffer_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(ik_solver_buffer_node
-  rclcpp
-  Eigen3
-  std_msgs
   sensor_msgs
   trajectory_msgs
   march_shared_msgs
@@ -94,7 +74,6 @@ ament_target_dependencies(ik_solver_point_evaluator_node
 
 install(TARGETS
   ik_solver_node
-  ik_solver_buffer_node
   ik_solver_point_evaluator_node
   DESTINATION lib/${PROJECT_NAME})
 
@@ -123,8 +102,6 @@ if(BUILD_TESTING)
 
   ament_target_dependencies(${PROJECT_NAME}_test
     rclcpp
-    rclcpp_action
-    rclcpp_components
     std_msgs
     Eigen3
     geometry_msgs
@@ -133,12 +110,8 @@ if(BUILD_TESTING)
     march_shared_msgs
   )
 
-  # target_link_libraries(test_runner ${PROJECT_NAME})
-
   ament_export_dependencies(
     rclcpp
-    rclcpp_action
-    rclcpp_components
     std_msgs
     Eigen3
     geometry_msgs
