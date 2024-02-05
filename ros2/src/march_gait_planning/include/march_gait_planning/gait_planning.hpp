@@ -45,6 +45,8 @@ private:
     
     XYZFootPositionArray m_current_left_foot_position; 
     XYZFootPositionArray m_current_right_foot_position; 
+
+    // Order: x_swing, z_swing, x_stance, z_stance
     std::vector<XZFeetPositionsArray> m_large_bezier_trajectory; 
     std::vector<XZFeetPositionsArray> m_large_first_step_trajectory; 
     std::vector<XZFeetPositionsArray> m_small_bezier_trajectory; 
