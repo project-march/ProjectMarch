@@ -94,7 +94,7 @@ bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &pla
     return (x - y < 0.05);  
 }
 
-bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane &plane) const {
+bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const {
     // This function should in some way check if an area the size of the two feet around the centroid is safe
     // to step on, aka falls within plane. We might want to check with just one foot, depending
     // on strategy.
@@ -102,8 +102,8 @@ bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg:
         return true; 
     } else {
         // right now, assuming the plane coordinates are with respect to the backpack frame 
-        bool fits_x = ((plane.centroid.x + m_foot_size[0]/2) < plane.upper_boundary_point.x && (plane.centroid.x - m_foot_size[0]/2) > plane.lower_boundary_point.x); 
-        bool fits_y = ((plane.centroid.y + m_foot_size[1]/2) < plane.left_boundary_point.y && (plane.centroid.y - m_foot_size[1]/2) > plane.right_boundary_point.y); 
+        bool fits_x = ((plane.centroid.x + m_footstep_planner.getFootSize()[0]/2) < plane.upper_boundary_point.x && (plane.centroid.x - m_footstep_planner.getFootSize()[0]/2) > plane.lower_boundary_point.x); 
+        bool fits_y = ((plane.centroid.y + m_footstep_planner.getFootSize()[1]/2) < plane.left_boundary_point.y && (plane.centroid.y - m_footstep_planner.getFootSize()[1]/2) > plane.right_boundary_point.y); 
         return (fits_x && fits_y); 
     }
 }
@@ -116,7 +116,7 @@ void FootstepPlannerNode::footstepOutputPublish(){
     rankPlanesByDistance(); 
     RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
     march_shared_msgs::msg::Plane* safe_plane = findSafePlane(); 
-    if (checkOverlapPlaneFootbox()){
+    if (checkOverlapPlaneFootbox(*safe_plane)){
         m_desired_footstep_msg->distance = (safe_plane->centroid.x - m_footstep_planner.getRightFootPosition()[0]); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
         RCLCPP_INFO(this->get_logger(), "Sent footstep message! %f", m_desired_footstep_msg->distance); 
