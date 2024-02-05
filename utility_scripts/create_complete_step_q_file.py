@@ -31,16 +31,35 @@ def normal_large_step():
 
     df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
 
+def step_close():
+    df_full_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+    df_first_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+    # print("Full step final position: ",df_full_step.iloc[[-1]])
+    print("First step final position: \n",df_first_step.iloc[[-1]], '\n')
+    print("First step initial position: \n",df_first_step.iloc[[0]], '\n')
+    # step_close = df_first_step.loc[::-1].reset_index(drop=True)
+    # step_close = step_close.rename(columns={"LHFE": "RHFE", "LKFE": "RKFE", "RHFE": "LHFE", "RKFE": "LKFE"})
+    step_close = df_first_step
+    step_close = step_close.rename(columns={"LHFE": "RHFE", "LKFE": "RKFE", "RHFE": "LHFE", "RKFE": "LKFE"})
+    step_close['LHFE'] = step_close["LHFE"] + (0.194641 - 0.274982)
+    step_close['RHFE'] = step_close['RHFE'] + (0.722718 - 0.351166)
+    step_close['LKFE'] = step_close['LKFE'] + (0.450064 - 0.286291)
+    step_close['RKFE'] = step_close["RKFE"] + (0.302273 - 0.372236)
+    print("Step close final position: \n", step_close.iloc[[-1]])
+    plot_joints(df_first_step)
+    plot_joints(step_close)
+    step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv')
+
 def plot_joints(dataset):
 
-    plt.plot(dataset['LKFE'], label='LKFE')
-    plt.plot(dataset['RKFE'], label='RKFE')
-    plt.plot(dataset['LHFE'], label='LHFE')
-    plt.plot(dataset['RHFE'], label='RHFE')
-    plt.plot(dataset['LADPF'], label='LADPF')
-    plt.plot(dataset['RADPF'], label='RADPF')
-    plt.plot(dataset['LHAA'], label='LHAA')
-    plt.plot(dataset['RHAA'], label='RHAA')
+    plt.plot(dataset['LKFE'], label='LKFE', color = 'blue')
+    plt.plot(dataset['RKFE'], label='RKFE', color = 'green')
+    plt.plot(dataset['LHFE'], label='LHFE', color = 'red')
+    plt.plot(dataset['RHFE'], label='RHFE', color = 'orange')
+    # plt.plot(dataset['LADPF'], label='LADPF')
+    # plt.plot(dataset['RADPF'], label='RADPF')
+    # plt.plot(dataset['LHAA'], label='LHAA')
+    # plt.plot(dataset['RHAA'], label='RHAA')
     plt.legend()
     plt.show()
 
@@ -131,3 +150,5 @@ def sideways():
 # sideways()
 
 # normal_large_step()
+    
+step_close()
