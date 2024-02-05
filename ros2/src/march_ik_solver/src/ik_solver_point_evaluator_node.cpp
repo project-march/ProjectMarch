@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-IKSolverPointEvaluatorNode::IKSolverPointEvaluatorNode() : Node("ik_solver_point_evaluator_node")
+IKSolverPointEvaluatorNode::IKSolverPointEvaluatorNode()
+    : Node("ik_solver_point_evaluator_node")
 {
     declare_parameter("desired_left_foot_position.x", 0.0);
     declare_parameter("desired_left_foot_position.y", 0.0);
@@ -20,15 +21,16 @@ IKSolverPointEvaluatorNode::IKSolverPointEvaluatorNode() : Node("ik_solver_point
     m_desired_right_foot_position.y = get_parameter("desired_right_foot_position.y").as_double();
     m_desired_right_foot_position.z = get_parameter("desired_right_foot_position.z").as_double();
 
-    m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "state_estimation/state", 1, std::bind(&IKSolverPointEvaluatorNode::stateEstimationCallback, this, std::placeholders::_1));
-    m_iks_foot_positions_pub = this->create_publisher<march_shared_msgs::msg::IksFootPositions>(
-        "ik_solver/buffer/input", 10);
+    m_state_estimation_sub
+        = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 1,
+            std::bind(&IKSolverPointEvaluatorNode::stateEstimationCallback, this, std::placeholders::_1));
+    m_iks_foot_positions_pub
+        = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 }
 
 void IKSolverPointEvaluatorNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
 {
-    (void) msg;
+    (void)msg;
     publishIKSFootPositions();
 }
 
@@ -42,14 +44,14 @@ void IKSolverPointEvaluatorNode::publishIKSFootPositions()
 
     RCLCPP_DEBUG(this->get_logger(), "Publishing desired foot positions");
     RCLCPP_DEBUG(this->get_logger(), "Left foot position: x: %f, y: %f, z: %f", m_desired_left_foot_position.x,
-                m_desired_left_foot_position.y, m_desired_left_foot_position.z);
+        m_desired_left_foot_position.y, m_desired_left_foot_position.z);
     RCLCPP_DEBUG(this->get_logger(), "Right foot position: x: %f, y: %f, z: %f", m_desired_right_foot_position.x,
-                m_desired_right_foot_position.y, m_desired_right_foot_position.z);
+        m_desired_right_foot_position.y, m_desired_right_foot_position.z);
 
     m_iks_foot_positions_pub->publish(iks_foot_positions_msg);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<IKSolverPointEvaluatorNode>());
