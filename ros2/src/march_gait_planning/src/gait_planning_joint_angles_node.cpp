@@ -149,6 +149,24 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
 
 }
 
+void GaitPlanningAnglesNode::finishGaitBeforeStand(){
+    unsigned count = m_gait_planning.getCounter(); 
+    if (count < m_current_trajectory.size()-1){ 
+        processMovingGaits(count); 
+        m_gait_planning.setCounter(count+1); 
+        RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
+    } if (count == m_current_trajectory.size()-1) { 
+        m_trajectory_prev_point.positions = m_gait_planning.getHomeStand(); 
+        m_joints_msg.points.push_back(m_trajectory_prev_point);
+        m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
+        m_joints_msg.points.push_back(m_trajectory_des_point);
+        m_joint_angle_trajectory_publisher->publish(m_joints_msg);
+        m_joints_msg.points.clear();   
+        m_gait_planning.setPrevPoint(m_trajectory_des_point.positions);
+        RCLCPP_INFO(this->get_logger(), "Publishing home stand");
+    } 
+}
+
 
 void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
     if (!m_first_stand){
@@ -252,24 +270,6 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 break;
         }
     }
-}
-
-void GaitPlanningAnglesNode::finishGaitBeforeStand(){
-    unsigned count = m_gait_planning.getCounter(); 
-    if (count < m_current_trajectory.size()-1){ 
-        processMovingGaits(count); 
-        m_gait_planning.setCounter(count+1); 
-        RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
-    } if (count == m_current_trajectory.size()-1) { 
-        m_trajectory_prev_point.positions = m_gait_planning.getHomeStand(); 
-        m_joints_msg.points.push_back(m_trajectory_prev_point);
-        m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
-        m_joints_msg.points.push_back(m_trajectory_des_point);
-        m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-        m_joints_msg.points.clear();   
-        m_gait_planning.setPrevPoint(m_trajectory_des_point.positions);
-        RCLCPP_INFO(this->get_logger(), "Publishing home stand");
-    } 
 }
 
 int main(int argc, char *argv[]){
