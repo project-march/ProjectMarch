@@ -1,6 +1,8 @@
 import pandas as pd 
 import matplotlib.pyplot as plt 
 import numpy as np
+from scipy.interpolate import CubicSpline, UnivariateSpline, interp1d
+from scipy.signal import argrelmax, argrelmin
 
 def normal_large_step(): 
     df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
@@ -18,50 +20,53 @@ def normal_large_step():
 
     df_gait_joint = df_gait_joint.reset_index(drop=True)
 
-    max_rhfe = df_gait_joint[['RHFE']].idxmax()
-    max_rhfe_second = df_gait_joint[['RHFE']].iloc[150:250].idxmax()
-
     first_step = df_gait_joint.iloc[0:72]
-    # first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
     full_step = df_gait_joint.iloc[73:182]
-    # full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
-    step_close = df_gait_joint.iloc[183::]
-    # step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
-
-    # plot_joints(first_step)
-    plot_joints(full_step)
-
-    df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
-
-def step_close():
-    df_first_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-    df_full_step = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA','LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-    df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
-    df_gait_joint['LKFE'] = df_gait_joint['LKFE']*-1
-    df_gait_joint['RKFE'] = df_gait_joint['RKFE']*-1
-    df_gait_joint.drop(df_gait_joint.index[0:50], inplace=True)
-    df_gait_joint.drop(df_gait_joint.index[350:567], inplace=True)
-    df_gait_joint = df_gait_joint.reset_index(drop=True)
-    step_close = df_gait_joint.iloc[183:350]
+    full_step = full_step.reset_index(drop=True)
+    step_close = df_gait_joint.iloc[246::]
     step_close = step_close.reset_index(drop=True)
-    # print("Full step final position: ",df_full_step.iloc[[-1]])
-    # print("First step final position: \n",df_first_step.iloc[[-1]], '\n')
-    # print("First step initial position: \n",df_first_step.iloc[[0]], '\n')
-    # step_close = df_first_step
-    # step_close = step_close.rename(columns={"LHFE": "RHFE", "LKFE": "RKFE", "RHFE": "LHFE", "RKFE": "LKFE"})
-    # step_close['LHFE'] = step_close["LHFE"] + (0.194641 - 0.274982)
-    # step_close['RHFE'] = step_close['RHFE'] + (0.722718 - 0.351166)
-    # step_close['LKFE'] = step_close['LKFE'] + (0.450064 - 0.286291)
-    # step_close['RKFE'] = step_close["RKFE"] + (0.302273 - 0.372236)
-    # print("Step close final position: \n", step_close.iloc[[-1]])
-    plot_joints(df_first_step)
-    plot_joints(df_gait_joint)
-    plot_joints(df_full_step)
+    step_close = step_close.rename(columns={'LHFE': 'RHFE', 'LKFE': 'RKFE', 'RHFE':'LHFE', 'RKFE':'LKFE'})
+    step_close = step_close[['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF']]
+    
     plot_joints(step_close)
-    print("full step final position: \n", step_close.iloc[[-1]], "\n")
-    print("step close first position: \n", step_close.iloc[[0]], "\n")
-    print("Step Close final position: \n",step_close.iloc[[-1]], '\n')
-    # step_close.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
+
+    return first_step, full_step, step_close, df_gait_joint
+
+def step_close_update(step_close, full_step, first_step):
+
+    plot_joints(step_close)
+
+    res_lhfe = extract_max_min('LHFE', step_close, first_step, full_step)
+    res_rhfe = extract_max_min('RHFE', step_close, first_step, full_step)
+    res_lkfe = extract_max_min('LKFE', step_close, first_step, full_step)
+    res_rkfe = extract_max_min('RKFE', step_close, first_step, full_step)
+
+
+    interpolate_linear('LKFE', res_lkfe, step_close)
+    interpolate_linear('RKFE', res_rkfe, step_close)
+    interpolate_linear('LHFE', res_lhfe, step_close)
+    interpolate_linear('RHFE', res_rhfe, step_close)
+
+    plot_joints(step_close)
+
+    return step_close
+
+def extract_max_min(joint, step_close, first_step, full_step):
+    local_max_joint = step_close[joint][(step_close[joint].shift(1) < step_close[joint]) & (step_close[joint].shift(-1) < step_close[joint])]
+    local_min_joint= step_close[joint][(step_close[joint].shift(1) > step_close[joint]) & (step_close[joint].shift(-1) > step_close[joint])]
+    res_joint = list(zip(local_max_joint,local_max_joint.index))
+    res_joint += list(zip(local_min_joint, local_min_joint.index))
+    res_joint.sort(key = lambda x: x[1])
+    res_joint.append((first_step[joint].iloc[0], step_close[joint].index[-1]))
+    res_joint.insert(0, (full_step[joint].iloc[-1], step_close[joint].index[0]))
+    return res_joint
+
+def interpolate_linear(joint, res_joint, step_close):
+    x_joint = [x[1] for x in res_joint]
+    y_joint = [x[0] for x in res_joint]
+    joint_interp = interp1d(x_joint, y_joint)
+    x_new_joint = np.linspace(res_joint[0][1], res_joint[-1][1], len(step_close))
+    step_close[joint] = joint_interp(x_new_joint)
 
 def plot_joints(dataset):
 
@@ -157,4 +162,12 @@ def sideways():
 
 
     
-normal_large_step()
+
+first_step, one_step, step_close, full_gait = normal_large_step()
+first_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+one_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+step_close_updated = step_close_update(step_close, one_step_updated, first_step_updated)
+# first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
+# one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+# step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
+# full_gait.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
