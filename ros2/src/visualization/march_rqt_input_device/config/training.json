@@ -5,34 +5,42 @@
       "callback": "publish_home_stand"
     },
     {
-      "name": "Walk"
+      "name": "Walk",
+      "callback": "publish_normal_walk"
     },
     {
-      "name": "Sit"
+      "name": "Sit",
+      "callback": "publish_sit"
     }
   ],
 
 
   [
     {
-      "name": "Sideways"
+      "name": "Sideways",
+      "callback": "publish_sideways_walk"
     },
     {
-      "name": "Ascending"
+      "name": "Ascending",
+      "callback": "publish_ascending_walk"
     },
     {
-      "name": "Descending"
+      "name": "Descending",
+      "callback": "publish_descending_walk"
     }
   ],
   [
     {
-      "name": "Large Walk"
+      "name": "Large Walk",
+      "callback": "publish_large_walk"
     },
     {
-      "name": "Small Walk"
+      "name": "Small Walk",
+      "callback": "publish_small_walk"
     },
     {
-      "name": "Variable Walk"
+      "name": "Variable Walk",
+      "callback": "publish_variable_walk"
     }
   ]
 ]

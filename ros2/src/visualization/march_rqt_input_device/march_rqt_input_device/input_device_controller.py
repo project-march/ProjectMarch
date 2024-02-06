@@ -51,3 +51,99 @@ class InputDeviceController:
         else:
             self._node.get_logger().error('Exception while calling service: %r' % future.exception())
     
+    def publish_normal_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 2
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception())
+
+    def publish_sit(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 0
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception())
+
+    def publish_sideways_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 5
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception())
+
+    def publish_ascending_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 8
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception())
+
+    def publish_descending_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 9
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception())
+    
+    def publish_large_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 6
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception()) 
+
+    def publish_small_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 7
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception()) 
+
+    
+    def publish_variable_walk(self) -> None:
+        request = GetExoModeArray.Request()
+        request.desired_mode.mode = 10
+
+        future = self._get_exo_mode_array_client.call_async(request)
+        rclpy.spin_until_future_complete(self._node, future)
+
+        if future.result() is not None:
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
+        else:
+            self._node.get_logger().error('Exception while calling service: %r' % future.exception()) 
