@@ -17,6 +17,8 @@ class MarchOctree : public OccupancyOcTreeBase<MarchOctreeNode> {
   
 public:
 
+    //TODO: Add min/max insert range?
+
     // Occupancy parameters as constants
     static constexpr double DEFAULT_OCCUPANCY_THRESHOLD = 0.5;   // = 0.0 in logodds
     static constexpr double DEFAULT_HIT_UPDATE          = 0.7;   // = 0.85 in logodds
@@ -24,7 +26,8 @@ public:
     static constexpr double DEFAULT_MIN_PROBABILITY     = 0.1192;// = -2 in log odds
     static constexpr double DEFAULT_MAX_PROBABILITY     = 0.971; // = 3.5 in log odds
 
-    // Normal Estimation parameters
+    // Normal Estimation parameters (primarily RANSAC + least squares)
+    //TODO: Add parameter to choose which method?
     static constexpr double DEFAULT_SEARCH_RADIUS               = 0.08;
     static constexpr double DEFAULT_MAX_DISTANCE_FROM_PLANE     = 0.02;
     static constexpr double DEFAULT_MIN_CONSENSUS_RATIO         = 0.5;
@@ -33,10 +36,6 @@ public:
     static constexpr bool   DEFAULT_LEAST_SQUARES_ESTIMATION    = true;
     static constexpr bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS    = true;
 
-    //TODO: Fix how these are stored in the instance
-    //static bool computeNormalsInParallel = false;
-    //static bool insertMissesInParallel = false;
-    
     //TODO: Change this constructor to the one that inherits 
     MarchOctree(double in_resolution);
     ~MarchOctree() = default;
@@ -44,17 +43,16 @@ public:
     /// virtual constructor: creates a new object of same type
     MarchOctree* create() const {return new MarchOctree(resolution); }
 
+    //TODO: Should these be "const"?
     unsigned int getLastUpdateTime();
     void degradeOutdatedNodes(unsigned int time_thres);
-    void updateNodeLogOdds(MarchOctreeNode* node, const float& update) const;
-    void integrateMissNoTime(MarchOctreeNode* node) const;
+    void updateNodeLogOdds(MarchOctreeNode* node, const float& update);
+    void integrateMissNoTime(MarchOctreeNode* node);
 
     void update(octomap::Pointcloud& point_cloud);
-    // void insertPointCloud(pcl::PointCloud<pcl::PointXYZ>& point_cloud);
-    // void insertPointCloud(pcl::PointCloud<pcl::PointXYZ>& point_cloud, bool insert_miss);
-    // void insertPointCloud(pcl::PointCloud<pcl::PointXYZ>& point_cloud, bool insert_miss, std::set<MarchOctreeNode*>& updated_leaves_to_pack,
-    //                       std::set<OcTreeKey>& deleted_leaves_to_pack);
-
+    void insertNewScan(octomap::Pointcloud& point_cloud, bool insert_miss, std::set<MarchOctreeNode*>& updated_leaves_to_pack, 
+                       std::set<OcTreeKey>& deleted_leaves_to_pack);
+    
     void updateNormals();
     void updateNodesNormals(const std::vector<MarchOctreeNode*>& nodes_to_update);
     void clearNormals();
@@ -67,17 +65,16 @@ public:
 
     std::array<double, 5> getOccupancyParameters();
     std::array<double, 7> getNormalEstimationParameters();
-
-    void setMinimumInsertRange(double min_range);
-    void setMaximumInsertRange(double max_range);
-    void setBoundsInsertRange(double min_range, double max_range);
-    void removeMinimumInsertRange();
-    void removeMaximumInsertRange();
-    void removeBoundsInsertRange();
+   
     //TODO: fix this 
     //void updateHitTimestamp(long timestamp);
 
 private:
+
+    //TODO: Implement the parallel computations and test them
+    bool compute_normals_in_parallel;
+    bool insert_misses_in_parallel;
+    bool report_time;
     
     class StaticMemberInitializer{
     public:

@@ -1,9 +1,12 @@
-    #include <march_octree/march_octree.h>
+#include <march_octree/march_octree.h>
 
 namespace octomap {
 
 MarchOctree::MarchOctree(double in_resolution)
-: OccupancyOcTreeBase<MarchOctreeNode>(in_resolution) {
+: OccupancyOcTreeBase<MarchOctreeNode>(in_resolution),
+    compute_normals_in_parallel(false),
+    insert_misses_in_parallel(false),
+    report_time(false) {
     marchOctreeMemberInit.ensureLinking();
 }
 
@@ -25,13 +28,13 @@ for(leaf_iterator it = this->begin_leafs(), end=this->end_leafs();
     }
 }
 
-void MarchOctree::updateNodeLogOdds(MarchOctreeNode* node, const float& update) const {
+void MarchOctree::updateNodeLogOdds(MarchOctreeNode* node, const float& update) {
     OccupancyOcTreeBase<MarchOctreeNode>::updateNodeLogOdds(node, update);
     //TODO: Fix this 
     //node->updateLastHitTimestamp();
 }
 
-void MarchOctree::integrateMissNoTime(MarchOctreeNode* node) const{
+void MarchOctree::integrateMissNoTime(MarchOctreeNode* node){
     OccupancyOcTreeBase<MarchOctreeNode>::updateNodeLogOdds(node, prob_miss_log);
 }
 
@@ -39,23 +42,23 @@ void MarchOctree::integrateMissNoTime(MarchOctreeNode* node) const{
 // Updates map with next instance of the point cloud
 void MarchOctree::update(octomap::Pointcloud& point_cloud) {
     //TODO: Change the inputs to this method and remove the smaller versions
-    insertPointCloud(point_cloud, true);
+    std::set<MarchOctreeNode*> updated_leaves_to_pack;
+    std::set<OcTreeKey> deleted_leaves_to_pack;
+    insertNewScan(point_cloud, true, updated_leaves_to_pack , deleted_leaves_to_pack);
     updateNormals();
 }
 
-void MarchOctree::insertPointCloud(pcl::PointCloud<pcl::PointXYZ>& point_cloud, bool insert_miss, std::set<MarchOctreeNode*>& updated_leaves_to_pack,
+void MarchOctree::insertNewScan(octomap::Pointcloud& point_cloud, bool insert_miss, std::set<MarchOctreeNode*>& updated_leaves_to_pack,
                                    std::set<OcTreeKey>& deleted_leaves_to_pack) {
-    if (point_cloud.empty())
+    if (point_cloud.size() == 0)
         return;
 
     unsigned int query_time = (unsigned int)time(NULL);
 
-    for (const auto& point : point_cloud.points) {
-
-        pcl::PointXYZ point3D = point;
+    for (auto& point : point_cloud) {
 
         OcTreeKey key;
-        if (!coordToKeyChecked(point3D.x, point3D.y, point3D.z, key))
+        if (!coordToKeyChecked(point.x(), point.y(), point.z(), key))
             continue;
 
         MarchOctreeNode* node = search(key);
@@ -63,18 +66,19 @@ void MarchOctree::insertPointCloud(pcl::PointCloud<pcl::PointXYZ>& point_cloud, 
 
         if (node) {
             updateNodeLogOdds(node, prob_hit_log); // Update the node with hit probability
-            if (updated_leaves_to_pack) updated_leaves_to_pack.insert(node);
+            if (!updated_leaves_to_pack.empty()) updated_leaves_to_pack.insert(node);
             // Remove the key from the deleted set if present
-            if (deleted_leaves_to_pack) deletedLeavesToPack.erase(key);
+            if (!deleted_leaves_to_pack.empty()) deleted_leaves_to_pack.erase(key);
         }
     }
 
     if (insert_miss) {
         for (leaf_iterator it = this->begin_leafs(), end = this->end_leafs(); it != end; ++it) {
-            if (this->isNodeOccupied(*it) && ((query_time - it->getLastHitTimestamp()) > time_thres)) {
+            //TODO: Check if this miss update is good 
+            if (this->isNodeOccupied(*it) && ((query_time - it->getLastHitTimestamp()) > DEFAULT_MISS_UPDATE)) {
                 integrateMissNoTime(&*it);
                 // Insert the key to the deleted set
-                if (deleted_leaves_to_pack) deleted_leaves_to_pack.insert(it.getKey());
+                if (!deleted_leaves_to_pack.empty()) deleted_leaves_to_pack.insert(it.getKey());
             }
         }
     }
@@ -90,8 +94,9 @@ void MarchOctree::updateNormals() {
 }
 
 void MarchOctree::updateNodesNormals(const std::vector<MarchOctreeNode*>& nodesToUpdate) {
+
     for (auto node : nodesToUpdate) {
-        // TODO: Choose which function and implement it.
+        //TODO: Choose which function and implement it.
         //computeNodeNormals(node);
     }
 
@@ -112,9 +117,11 @@ void MarchOctree::updateInnerNormalsRecursive(MarchOctreeNode* node, int depth) 
 
     if (depth < this->getTreeDepth() - 1) {
         for (size_t i = 0; i < 8; ++i) {
-            MarchOctreeNode* childNode = node->getChildNode(i);
-            if (childNode)
-                updateInnerNormalsRecursive(childNode, depth + 1);
+            // This might be an issue have to test it a bit more
+            MarchOctreeNode& childNode = node->getChildNode(i);
+            MarchOctreeNode* pChildNode = &childNode; // Get the pointer to the child node
+            if (pChildNode)
+                updateInnerNormalsRecursive(pChildNode, depth + 1);
         }
     }
 
@@ -122,11 +129,11 @@ void MarchOctree::updateInnerNormalsRecursive(MarchOctreeNode* node, int depth) 
 }
 
 void MarchOctree::enableReportTime(bool enable) {
-    // Implement enabling or disabling time reporting
+    report_time = enable;
 }
 
 void MarchOctree::enableParallelComputationForNormals(bool enable) {
-    // Implement enabling or disabling parallel computation for normals
+    compute_normals_in_parallel = enable;
 }
 
 
@@ -136,31 +143,7 @@ void MarchOctree::setNodeMaximumNumberOfHits(unsigned long maximumNumberOfHits) 
 
 
 void MarchOctree::enableParallelInsertionOfMisses(bool enable) {
-    
-}
-
-void MarchOctree::setMinimumInsertRange(double minRange) {
-    // Implement setting the minimum insert range
-}
-
-void MarchOctree::setMaximumInsertRange(double maxRange) {
-    // Implement setting the maximum insert range
-}
-
-void MarchOctree::setBoundsInsertRange(double minRange, double maxRange) {
-    // Implement setting the bounds insert range
-}
-
-void MarchOctree::removeMinimumInsertRange() {
-    // Implement removing the minimum insert range
-}
-
-void MarchOctree::removeMaximumInsertRange() {
-    // Implement removing the maximum insert range
-}
-
-void MarchOctree::removeBoundsInsertRange() {
-    // Implement removing the bounds insert range
+    insert_misses_in_parallel = enable;   
 }
 
 std::array<double, 5> MarchOctree::getOccupancyParameters(){
