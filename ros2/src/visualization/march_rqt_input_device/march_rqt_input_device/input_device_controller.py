@@ -47,7 +47,7 @@ class InputDeviceController:
         rclpy.spin_until_future_complete(self._node, future)
 
         if future.result() is not None:
-            self._node.get_logger().info('Mode sent: %d' % request.desired_mode)
+            self._node.get_logger().info('Mode sent: %d' % request.desired_mode.mode)
         else:
             self._node.get_logger().error('Exception while calling service: %r' % future.exception())
     
