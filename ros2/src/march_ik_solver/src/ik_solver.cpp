@@ -4,11 +4,12 @@
 #include <boost/algorithm/clamp.hpp>
 #include <math.h>
 
-void IKSolver::createTask(const std::string& name, const std::vector<std::string>& node_names,
-    const unsigned int& task_dim, const unsigned int& workspace_dim, const std::vector<double>& gain_p,
-    const std::vector<double>& gain_d, const std::vector<double>& gain_i, const double& damping_coefficient)
+void IKSolver::createTask(const std::string& name, const std::string reference_frame,
+    const std::vector<std::string>& node_names, const unsigned int& workspace_dim,
+    const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
+    const std::vector<double>& gain_i, const double& damping_coefficient)
 {
-    m_task_map[name] = std::make_unique<Task>(name, task_dim, workspace_dim, m_dt);
+    m_task_map[name] = std::make_unique<Task>(name, reference_frame, workspace_dim, configuration_dim, m_dt);
     m_task_map[name]->setNodeNames(node_names);
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);
@@ -20,8 +21,8 @@ void IKSolver::createTask(const std::string& name, const std::vector<std::string
 
 void IKSolver::updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks)
 {
-    for (const auto& desired_task : desired_tasks) {
-        m_task_map[desired_task.first]->setDesiredTask(desired_task.second);
+    for (const auto& task_name : m_task_names) {
+        m_task_map.at(task_name)->setDesiredTask(desired_tasks.at(task_name));
     }
 }
 
@@ -37,15 +38,11 @@ void IKSolver::updateCurrentJointState(
 Eigen::VectorXd IKSolver::solveInverseKinematics()
 {
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
-    // Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(m_n_joints, m_n_joints); // TODO: Set to workspace_dim
-
-    for (const auto& task : m_task_map) {
-        // const Eigen::MatrixXd * J_ptr = task.getJacobianPtr();
-        // const Eigen::MatrixXd * J_inv_ptr = task.getJacobianInversePtr();
-        // Eigen::VectorXd null_space_projection = (identity - *J_ptr * *J_inv_ptr) * joint_velocities;
-        m_desired_joint_velocities.noalias() += task.second->solveTask();
+    for (const auto& task_name : m_task_names) {
+        m_task_map.at(task_name)->requestCurrentTask();
+        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
+            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
-
     return m_desired_joint_velocities;
 }
 
@@ -85,15 +82,15 @@ std::vector<double> IKSolver::getDesiredJointVelocities() const
         m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
 }
 
-std::vector<double> IKSolver::getTasksError() const
+double IKSolver::getTasksError() const
 {
-    std::vector<double> tasks_error;
+    Eigen::VectorXd tasks_error = Eigen::VectorXd::Zero(m_task_names.size());
 
-    for (const auto& task : m_task_map) {
-        tasks_error.push_back(task.second->getErrorNorm());
+    for (long unsigned int i = 0; i < m_task_names.size(); i++) {
+        tasks_error(i) = m_task_map.at(m_task_names[i])->getErrorNorm();
     }
 
-    return tasks_error;
+    return tasks_error.norm();
 }
 
 void IKSolver::setDt(const double& dt)

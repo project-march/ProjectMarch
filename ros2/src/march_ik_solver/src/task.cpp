@@ -4,25 +4,31 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "march_shared_msgs/msg/node_jacobian.hpp"
 
-Task::Task(
-    const std::string& task_name, const unsigned int& task_dim, const unsigned int& workspace_dim, const float& dt)
+Task::Task(const std::string& task_name, const std::string& reference_frame, const unsigned int& workspace_dim,
+    const unsigned int& configuration_dim, const float& dt)
 {
     m_task_name = task_name;
-    m_task_m = task_dim;
-    m_task_n = workspace_dim;
+    m_reference_frame = reference_frame;
+    m_task_m = workspace_dim;
+    m_task_n = configuration_dim;
     m_dt = dt;
-    m_previous_error = Eigen::VectorXd::Zero(task_dim);
-    m_integral_error = Eigen::VectorXd::Zero(task_dim);
+    m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
+    m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
 
-    m_gain_p = Eigen::MatrixXd::Zero(task_dim, task_dim);
-    m_gain_d = Eigen::MatrixXd::Zero(task_dim, task_dim);
-    m_gain_i = Eigen::MatrixXd::Zero(task_dim, task_dim);
-    for (unsigned int i = 0; i < task_dim; i++) {
+    // Initialize gains as diagonal matrices
+    m_gain_p = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
+    m_gain_d = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
+    m_gain_i = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
+    for (unsigned int i = 0; i < workspace_dim; i++) {
         m_gain_p.diagonal()[i] = 1.0;
         m_gain_d.diagonal()[i] = 0.0;
         m_gain_i.diagonal()[i] = 0.0;
     }
 
+    // Initialize damping identity matrix for singularity-robustness
+    m_damping_identity = Eigen::MatrixXd::Identity(workspace_dim, configuration_dim);
+
+    // Initialize ROS node and service clients.
     m_node = std::make_shared<rclcpp::Node>("task_" + m_task_name + "_client");
     m_client_node_position
         = m_node->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position");
@@ -79,6 +85,7 @@ void Task::setGainI(const std::vector<double>& gain_i)
 void Task::setDampingCoefficient(const float& damping_coefficient)
 {
     m_damping_coefficient = damping_coefficient;
+    m_damping_identity.noalias() = damping_coefficient * m_damping_identity;
 }
 
 void Task::setDesiredTask(const Eigen::VectorXd& desired_task)
@@ -88,15 +95,9 @@ void Task::setDesiredTask(const Eigen::VectorXd& desired_task)
 
 Eigen::VectorXd Task::solveTask()
 {
-    if (!m_unit_test) {
-        sendRequestNodeJacobian();
-        sendRequestNodePosition();
-    }
-    calculateJacobianInverse();
     Eigen::VectorXd error = calculateError();
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_task_n);
     joint_velocities.noalias() = m_jacobian_inverse * error;
-
     return joint_velocities;
 }
 
@@ -105,31 +106,40 @@ Eigen::VectorXd Task::calculateError()
     Eigen::VectorXd task_error, error;
 
     task_error.noalias() = m_desired_task - m_current_task;
+    m_previous_error = task_error;
     m_error_norm = task_error.norm();
 
-    error.noalias() = m_gain_p * task_error + calculateIntegralError(task_error) + calculateDerivativeError(task_error);
+    error.noalias()
+        = m_gain_p * task_error; // + calculateIntegralError(task_error) + calculateDerivativeError(task_error);
     return error;
 }
 
 Eigen::VectorXd Task::calculateIntegralError(const Eigen::VectorXd& error)
 {
     Eigen::VectorXd integral_error;
-    integral_error.noalias() = m_integral_error + error * m_dt;
-    m_integral_error = integral_error;
-    return m_gain_i * integral_error;
+    m_integral_error.noalias() = m_integral_error + error * m_dt;
+    integral_error.noalias() = m_gain_i * m_integral_error;
+    return integral_error;
 }
 
 Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd& error)
 {
-    Eigen::VectorXd derivative_error = (error - m_previous_error) / m_dt;
-    m_previous_error = error;
-    return m_gain_d * derivative_error;
+    Eigen::VectorXd derivative_error;
+    derivative_error.noalias() = m_gain_d * ((error - m_previous_error) / m_dt);
+    return derivative_error;
+}
+
+void Task::requestCurrentTask()
+{
+    sendRequestNodePosition();
+    sendRequestNodeJacobian();
+    calculateJacobianInverse();
 }
 
 void Task::calculateJacobianInverse()
 {
     Eigen::MatrixXd damped_jacobian = Eigen::MatrixXd::Zero(m_task_m, m_task_n);
-    damped_jacobian.noalias() = m_jacobian + m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_n);
+    damped_jacobian.noalias() = m_jacobian + m_damping_identity;
     m_jacobian_inverse.noalias() = damped_jacobian.completeOrthogonalDecomposition().pseudoInverse();
 }
 
@@ -161,6 +171,13 @@ double Task::getErrorNorm() const
 Eigen::VectorXd Task::getDesiredTask() const
 {
     return m_desired_task;
+}
+
+Eigen::MatrixXd Task::getNullspaceProjection() const
+{
+    Eigen::MatrixXd nullspace_projection;
+    nullspace_projection.noalias() = Eigen::MatrixXd::Identity(m_task_n, m_task_n) - m_jacobian_inverse * m_jacobian;
+    return nullspace_projection;
 }
 
 const std::vector<std::string>* Task::getJointNamesPtr() const
@@ -198,28 +215,27 @@ void Task::setUnitTest(const bool& unit_test)
     m_unit_test = unit_test;
 }
 
-const Eigen::MatrixXd* Task::getJacobianPtr()
+Eigen::MatrixXd Task::getJacobian() const
 {
-    return &m_jacobian;
+    return m_jacobian;
 }
 
-const Eigen::MatrixXd* Task::getJacobianInversePtr()
+Eigen::MatrixXd Task::getJacobianInverse() const
 {
-    return &m_jacobian_inverse;
+    return m_jacobian_inverse;
 }
 
 void Task::sendRequestNodePosition()
 {
     auto position_request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
+    position_request->reference_frame = m_reference_frame;
     position_request->node_names = m_node_names;
     position_request->joint_names = *m_joint_names_ptr;
     position_request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(),
         m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
 
-    while (!m_client_node_position->wait_for_service(std::chrono::milliseconds(m_service_timeout)))
-    {
-        if (!rclcpp::ok())
-        {
+    while (!m_client_node_position->wait_for_service(std::chrono::milliseconds(m_service_timeout))) {
+        if (!rclcpp::ok()) {
             RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
@@ -233,12 +249,12 @@ void Task::sendRequestNodePosition()
         for (auto node_position : result.get()->node_positions) {
             current_task_vector.push_back(node_position.x);
             current_task_vector.push_back(node_position.y);
-            current_task_vector.push_back(node_position.z);
+            if (m_task_m / m_node_names.size() == 3) {
+                current_task_vector.push_back(node_position.z);
+            }
         }
         m_current_task = Eigen::Map<Eigen::VectorXd>(current_task_vector.data(), m_task_m);
-    }
-    else
-    {
+    } else {
         RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Failed to call service get_node_position");
     }
 }
@@ -246,15 +262,14 @@ void Task::sendRequestNodePosition()
 void Task::sendRequestNodeJacobian()
 {
     auto position_jacobian_request = std::make_shared<march_shared_msgs::srv::GetNodeJacobian::Request>();
+    position_jacobian_request->reference_frame = m_reference_frame;
     position_jacobian_request->node_names = m_node_names;
     position_jacobian_request->joint_names = *m_joint_names_ptr;
     position_jacobian_request->joint_positions = std::vector<double>(m_current_joint_positions_ptr->data(),
         m_current_joint_positions_ptr->data() + m_current_joint_positions_ptr->size());
 
-    while (!m_client_node_jacobian->wait_for_service(std::chrono::milliseconds(m_service_timeout)))
-    {
-        if (!rclcpp::ok())
-        {
+    while (!m_client_node_jacobian->wait_for_service(std::chrono::milliseconds(m_service_timeout))) {
+        if (!rclcpp::ok()) {
             RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Interrupted while waiting for the service. Exiting.");
             return;
         }
@@ -268,17 +283,16 @@ void Task::sendRequestNodeJacobian()
         m_jacobian.noalias() = Eigen::MatrixXd::Zero(m_task_m, m_task_n);
         const unsigned int JACOBIAN_SIZE = result.get()->node_jacobians.size();
         const unsigned int WORKSPACE_DIM = m_task_m / JACOBIAN_SIZE;
-        const unsigned int JOINT_DIM = m_task_n / JACOBIAN_SIZE;
+        const unsigned int CONFIGURATION_DIM = m_task_n / JACOBIAN_SIZE;
 
-        for (long unsigned int i = 0; i < JACOBIAN_SIZE; i++)
-        {
+        for (long unsigned int i = 0; i < JACOBIAN_SIZE; i++) {
             const unsigned int jacobian_rows = result.get()->node_jacobians[i].rows;
             const unsigned int jacobian_cols = result.get()->node_jacobians[i].cols;
-            m_jacobian.block(i * WORKSPACE_DIM, i * JOINT_DIM, jacobian_rows, jacobian_cols).noalias()
-                = Eigen::Map<Eigen::MatrixXd>(result.get()->node_jacobians[i].jacobian.data(), jacobian_rows, jacobian_cols);
+            m_jacobian.block(i * WORKSPACE_DIM, i * CONFIGURATION_DIM, jacobian_rows, jacobian_cols).noalias()
+                = Eigen::Map<Eigen::MatrixXd>(
+                    result.get()->node_jacobians[i].jacobian.data(), jacobian_rows, jacobian_cols);
         }
-    }else
-    {
+    } else {
         RCLCPP_ERROR(rclcpp::get_logger("ik_solver_node"), "Failed to call service get_node_jacobian");
     }
 }

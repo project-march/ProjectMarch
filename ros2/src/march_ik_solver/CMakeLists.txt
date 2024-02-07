@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -ffast-math -fno-math-errno)
 endif()
 
 # find dependencies
@@ -59,22 +59,8 @@ ament_target_dependencies(ik_solver_node
   march_shared_msgs
 )
 
-add_executable(ik_solver_point_evaluator_node src/ik_solver_point_evaluator_node.cpp)
-target_include_directories(ik_solver_point_evaluator_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(ik_solver_point_evaluator_node
-  rclcpp
-  Eigen3
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  march_shared_msgs
-)
-
 install(TARGETS
   ik_solver_node
-  ik_solver_point_evaluator_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(eigen3_cmake_module)
@@ -82,8 +68,8 @@ ament_export_dependencies(Eigen3)
 
 # Install launch files.
 install(DIRECTORY
-launch
-config
+  launch
+  config
 DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -91,9 +77,11 @@ if(BUILD_TESTING)
   # find_package(ament_lint_auto REQUIRED)
 
   ament_add_gmock(${PROJECT_NAME}_test
-    src/task.cpp
-    test/task_test.cpp 
     test/test_runner.cpp
+    test/ik_solver_test.cpp
+    src/ik_solver.cpp
+    test/task_test.cpp 
+    src/task.cpp
   )
 
   target_include_directories(${PROJECT_NAME}_test PUBLIC
