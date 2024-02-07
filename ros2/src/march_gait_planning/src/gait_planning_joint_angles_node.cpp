@@ -174,28 +174,62 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
         unsigned count = m_gait_planning.getCounter(); 
         switch (m_gait_planning.getGaitType()) {
             case exoMode::Walk : 
-                if (m_gait_planning.getPrevGaitType() == exoMode::Walk){
-                    m_current_trajectory = m_gait_planning.getFullGaitAngleCSV(); 
-                    processMovingGaits(count);
-                    if (count >= (m_current_trajectory.size()-1)){
-                        m_gait_planning.setCounter(0);
-                    } else {
-                        m_gait_planning.setCounter(count+1);
-                    } 
-                } else if (m_gait_planning.getPrevGaitType() == exoMode::Stand) {
-                    m_current_trajectory = m_gait_planning.getFirstStepAngleTrajectory(); 
-                    processMovingGaits(count);
-                    if (count >= (m_current_trajectory.size()-1)){
-                        m_gait_planning.setCounter(0); 
-                        m_gait_planning.setPrevGaitType(exoMode::Walk); 
-                    } else {
-                        m_gait_planning.setCounter(count+1);
-                    }
+            
+            switch(m_gait_planning.getPrevGaitType()){
+                case exoMode::Walk : 
+
+                m_current_trajectory = m_gait_planning.getFullGaitAngleCSV(); 
+                processMovingGaits(count);
+                if (count >= (m_current_trajectory.size()-1)){
+                    m_gait_planning.setCounter(0);
+                } else {
+                    m_gait_planning.setCounter(count+1);
                 }
-                break;
+                break; 
+
+                case exoMode::Stand :
+
+                m_current_trajectory = m_gait_planning.getFirstStepAngleTrajectory(); 
+                processMovingGaits(count);
+                if (count >= (m_current_trajectory.size()-1)){
+                    m_gait_planning.setCounter(0); 
+                    m_gait_planning.setPrevGaitType(exoMode::Walk); 
+                } else {
+                    m_gait_planning.setCounter(count+1);
+                }
+                break; 
+
+                default :
+
+                break; 
+                }
+
+                break; 
+                // if (m_gait_planning.getPrevGaitType() == exoMode::Walk){
+                //     m_current_trajectory = m_gait_planning.getFullGaitAngleCSV(); 
+                //     processMovingGaits(count);
+                //     if (count >= (m_current_trajectory.size()-1)){
+                //         m_gait_planning.setCounter(0);
+                //     } else {
+                //         m_gait_planning.setCounter(count+1);
+                //     } 
+                // } else if (m_gait_planning.getPrevGaitType() == exoMode::Stand) {
+                //     m_current_trajectory = m_gait_planning.getFirstStepAngleTrajectory(); 
+                //     processMovingGaits(count);
+                //     if (count >= (m_current_trajectory.size()-1)){
+                //         m_gait_planning.setCounter(0); 
+                //         m_gait_planning.setPrevGaitType(exoMode::Walk); 
+                //     } else {
+                //         m_gait_planning.setCounter(count+1);
+                //     }
+                // }
             
             case exoMode::Stand :
-                if (m_gait_planning.getPrevGaitType() == exoMode::Sit){
+
+                switch(m_gait_planning.getPrevGaitType()){
+
+                    case exoMode::Sit :
+
                     m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                     processMovingGaits(count);
                     if (count >= (m_current_trajectory.size()-1)){
@@ -203,8 +237,11 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         m_gait_planning.setPrevGaitType(exoMode::Stand); 
                     } else {
                         m_gait_planning.setCounter(count+1);
-                    } 
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Walk) {
+                    }
+                    break; 
+
+                    case exoMode::Walk :
+
                     if (count < m_current_trajectory.size()-1){
                         RCLCPP_DEBUG(this->get_logger(), "finishing gait! with count %d", count); 
                         processMovingGaits(count); 
@@ -215,19 +252,72 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         RCLCPP_DEBUG(this->get_logger(), "Filled step close trajectory"); 
                         m_gait_planning.setPrevGaitType(exoMode::Stand); 
                     }
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Stand){ 
-                    finishGaitBeforeStand();
-                } if (m_gait_planning.getPrevGaitType() == exoMode::BootUp) {
+                    break; 
+
+                    case exoMode::Stand :
+
+                    finishGaitBeforeStand(); 
+                    break; 
+
+                    case exoMode::BootUp :
+
                     processHomeStandGait(); 
-                // FINISH GAITS, then just publish home stand! No interpolation
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Ascending) {
+                    break; 
+
+                    case exoMode::Ascending :
+
                     finishGaitBeforeStand(); 
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Descending) {
+                    break; 
+
+                    case exoMode::Descending :
+
                     finishGaitBeforeStand(); 
-                } if (m_gait_planning.getPrevGaitType() == exoMode::Sideways) {
+                    break; 
+
+                    case exoMode::Sideways :
+
                     finishGaitBeforeStand(); 
+                    break; 
+
+                    default :
+
+                    break; 
                 }
                 break; 
+
+
+                // if (m_gait_planning.getPrevGaitType() == exoMode::Sit){
+                //     m_current_trajectory = m_gait_planning.getSitToStandGait(); 
+                //     processMovingGaits(count);
+                //     if (count >= (m_current_trajectory.size()-1)){
+                //         m_gait_planning.setCounter(m_current_trajectory.size()-1);
+                //         m_gait_planning.setPrevGaitType(exoMode::Stand); 
+                //     } else {
+                //         m_gait_planning.setCounter(count+1);
+                //     } 
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::Walk) {
+                //     if (count < m_current_trajectory.size()-1){
+                //         RCLCPP_DEBUG(this->get_logger(), "finishing gait! with count %d", count); 
+                //         processMovingGaits(count); 
+                //         m_gait_planning.setCounter(count+1); 
+                //     } if (count >= m_current_trajectory.size()-1){
+                //         m_gait_planning.setCounter(0); 
+                //         m_current_trajectory = m_gait_planning.getStepCloseGait();
+                //         RCLCPP_DEBUG(this->get_logger(), "Filled step close trajectory"); 
+                //         m_gait_planning.setPrevGaitType(exoMode::Stand); 
+                //     }
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::Stand){ 
+                //     finishGaitBeforeStand();
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::BootUp) {
+                //     processHomeStandGait(); 
+                // // FINISH GAITS, then just publish home stand! No interpolation
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::Ascending) {
+                //     finishGaitBeforeStand(); 
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::Descending) {
+                //     finishGaitBeforeStand(); 
+                // } if (m_gait_planning.getPrevGaitType() == exoMode::Sideways) {
+                //     finishGaitBeforeStand(); 
+                // }
             
             case exoMode::Sit :
                 m_current_trajectory = m_gait_planning.getStandToSitGait(); 
