@@ -15,14 +15,12 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 
-
-#include "march_shared_msgs/msg/state_estimation.hpp"
-#include "sensor_msgs/msg/joint_state.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 
-class TransformPublisherNode : public rclcpp::Node
-{
+class TransformPublisherNode : public rclcpp::Node {
 public:
     TransformPublisherNode();
     ~TransformPublisherNode() = default;

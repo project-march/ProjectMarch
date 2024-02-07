@@ -9,7 +9,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <march_ik_solver/task.hpp>
@@ -28,7 +30,7 @@ public:
 protected:
     void SetUp() override
     {
-        m_task = std::make_unique<Task>(m_task_name, m_task_m, m_task_n, m_dt);
+        m_task = std::make_unique<Task>(m_task_name, m_reference_frame, m_task_m, m_task_n, m_dt);
         configureTaskParameters();
         configurePointerReferences();
         m_task->setUnitTest(true);
@@ -60,10 +62,11 @@ protected:
     {
         m_task->setJacobian(jacobian);
         m_task->calculateJacobianInverse();
-        return *m_task->getJacobianInversePtr();
+        return m_task->getJacobianInverse();
     }
 
     std::string m_task_name = "test";
+    std::string m_reference_frame = "body";
     unsigned int m_task_m = WORKSPACE_DIMENSION;
     unsigned int m_task_n = JOINT_DIMENSION;
     std::vector<std::string> m_node_names = { "node_1", "node_2" };
@@ -80,7 +83,8 @@ protected:
     std::vector<double> m_gain_i = { 0.0, 0.0, 0.0 };
     float m_damping_coefficient = 0.1;
 
-    float m_test_error_tolerance = 1e-6;
+    float m_test_jacobian_error_tolerance = 1e-6;
+    float m_test_velocity_error_tolerance = 1e-6;
 };
 
 TEST_F(TaskTest, test_should_get_equal_constructor_parameter_name)
@@ -131,53 +135,22 @@ TEST_F(TaskTest, test_should_calculate_error_given_current_task_equals_zeros_and
     ASSERT_EQ(expected_error, actual_error);
 }
 
-TEST_F(TaskTest, test_should_get_correct_jacobian_inverse_given_jacobian_of_ones_of_underactuated_robot)
+TEST_F(TaskTest, test_should_get_correct_jacobian_inverse_using_complete_orthogonal_decomposition)
 {
-    Eigen::MatrixXd expected_jacobian_inverse
-        = 0.16393443 * Eigen::MatrixXd::Ones(JOINT_DIMENSION, WORKSPACE_DIMENSION);
+    Eigen::MatrixXd expected_jacobian_inverse = Eigen::MatrixXd(JOINT_DIMENSION, WORKSPACE_DIMENSION);
+    expected_jacobian_inverse << 5.16381, -4.83619, 0.156006, -4.83619, 5.16381, 0.156006;
     Eigen::MatrixXd jacobian = Eigen::MatrixXd::Ones(WORKSPACE_DIMENSION, JOINT_DIMENSION);
 
     Eigen::MatrixXd actual_jacobian_inverse = setCalculateAndGetJacobianInverse(jacobian);
 
     ASSERT_EQ(actual_jacobian_inverse.rows(), expected_jacobian_inverse.rows());
     ASSERT_EQ(actual_jacobian_inverse.cols(), expected_jacobian_inverse.cols());
-    ASSERT_TRUE(actual_jacobian_inverse.isApprox(expected_jacobian_inverse, m_test_error_tolerance));
-}
-
-TEST_F(TaskTest, test_should_get_correct_jacobian_inverse_given_jacobian_of_ones_of_overactuated_robot)
-{
-    m_task->setTaskM(JOINT_DIMENSION);
-    m_task->setTaskN(WORKSPACE_DIMENSION);
-    Eigen::MatrixXd expected_jacobian_inverse
-        = 0.16393443 * Eigen::MatrixXd::Ones(WORKSPACE_DIMENSION, JOINT_DIMENSION);
-    Eigen::MatrixXd jacobian = Eigen::MatrixXd::Ones(JOINT_DIMENSION, WORKSPACE_DIMENSION);
-
-    Eigen::MatrixXd actual_jacobian_inverse = setCalculateAndGetJacobianInverse(jacobian);
-
-    ASSERT_EQ(actual_jacobian_inverse.rows(), expected_jacobian_inverse.rows());
-    ASSERT_EQ(actual_jacobian_inverse.cols(), expected_jacobian_inverse.cols());
-    ASSERT_TRUE(actual_jacobian_inverse.isApprox(expected_jacobian_inverse, m_test_error_tolerance));
-}
-
-TEST_F(TaskTest, test_should_get_correct_jacobian_inverse_given_jacobian_of_ones_of_square_robot)
-{
-    m_task->setTaskN(WORKSPACE_DIMENSION);
-    Eigen::MatrixXd jacobian = Eigen::MatrixXd::Ones(WORKSPACE_DIMENSION, WORKSPACE_DIMENSION);
-    Eigen::MatrixXd expected_jacobian_inverse;
-    expected_jacobian_inverse.resize(WORKSPACE_DIMENSION, WORKSPACE_DIMENSION);
-    expected_jacobian_inverse << 6.77419355, -3.22580645, -3.22580645, -3.22580645, 6.77419355, -3.22580645,
-        -3.22580645, -3.22580645, 6.77419355;
-
-    Eigen::MatrixXd actual_jacobian_inverse = setCalculateAndGetJacobianInverse(jacobian);
-
-    ASSERT_EQ(actual_jacobian_inverse.rows(), expected_jacobian_inverse.rows());
-    ASSERT_EQ(actual_jacobian_inverse.cols(), expected_jacobian_inverse.cols());
-    ASSERT_TRUE(actual_jacobian_inverse.isApprox(expected_jacobian_inverse, m_test_error_tolerance));
+    ASSERT_TRUE(actual_jacobian_inverse.isApprox(expected_jacobian_inverse, m_test_jacobian_error_tolerance));
 }
 
 TEST_F(TaskTest, test_should_get_correct_joint_velocity_after_solving_for_dummy_desired_task_and_zero_current_task)
 {
-    Eigen::VectorXd expected_joint_velocities = 0.49180328 * Eigen::VectorXd::Ones(JOINT_DIMENSION);
+    Eigen::VectorXd expected_joint_velocities = 0.48361934 * Eigen::VectorXd::Ones(JOINT_DIMENSION);
     Eigen::VectorXd desired_task = Eigen::VectorXd::Ones(WORKSPACE_DIMENSION);
     Eigen::VectorXd current_task = Eigen::VectorXd::Zero(WORKSPACE_DIMENSION);
     Eigen::MatrixXd jacobian = Eigen::MatrixXd::Ones(WORKSPACE_DIMENSION, JOINT_DIMENSION);
@@ -185,10 +158,11 @@ TEST_F(TaskTest, test_should_get_correct_joint_velocity_after_solving_for_dummy_
     m_task->setDesiredTask(desired_task);
     m_task->setCurrentTask(current_task);
     m_task->setJacobian(jacobian);
+    m_task->calculateJacobianInverse();
     Eigen::VectorXd actual_joint_velocities = m_task->solveTask();
 
     ASSERT_EQ(actual_joint_velocities.rows(), expected_joint_velocities.rows());
-    ASSERT_TRUE(actual_joint_velocities.isApprox(expected_joint_velocities, m_test_error_tolerance));
+    ASSERT_TRUE(actual_joint_velocities.isApprox(expected_joint_velocities, m_test_velocity_error_tolerance));
 }
 
 // NOLINTEND

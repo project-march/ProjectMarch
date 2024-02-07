@@ -21,9 +21,11 @@ class RobotNode : public std::enable_shared_from_this<RobotNode> {
 public:
     typedef std::shared_ptr<RobotNode> SharedPtr;
     typedef std::weak_ptr<RobotNode> WeakPtr;
+    typedef std::unordered_map<std::string, double> QuaternionNameToValueMap;
     typedef std::unordered_map<std::string, double> JointNameToValueMap;
     typedef GiNaC::symbol JointSymbol;
     typedef std::vector<JointSymbol> JointSymbols;
+    typedef std::shared_ptr<GiNaC::symbol> JointSymbolPtr; // TODO
 
     using EvaluateJacobianPtr = Eigen::MatrixXd (RobotNode::*)(JointNameToValueMap) const;
     using EvaluateDynamicalTorquePtr
@@ -48,30 +50,34 @@ public:
     std::string getName() const;
     char getType() const;
     SharedPtr getParent() const;
-    std::vector<double> getJointAxis() const;
-    std::vector<double> getInertia() const;
     JointSymbol getJointPosition() const;
     JointSymbol getJointVelocity() const;
     JointSymbol getJointAcceleration() const;
-    Eigen::Vector3d getGlobalPosition(JointNameToValueMap joint_positions) const;
+    virtual Eigen::Vector3d getGlobalPosition(JointNameToValueMap joint_positions) const;
     Eigen::Matrix3d getGlobalRotation(JointNameToValueMap joint_positions) const;
-    Eigen::MatrixXd getGlobalPositionJacobian(JointNameToValueMap joint_positions) const;
+    virtual Eigen::MatrixXd getGlobalPositionJacobian(JointNameToValueMap joint_positions) const;
     Eigen::MatrixXd getGlobalRotationJacobian(JointNameToValueMap joint_positions) const;
     Eigen::VectorXd getDynamicalTorque(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
         JointNameToValueMap joint_accelerations) const;
     double getDynamicalJointAcceleration(double joint_torque, JointNameToValueMap joint_positions) const;
-    std::vector<std::weak_ptr<RobotNode>> getChildren() const;
+    std::vector<RobotNode::WeakPtr> getChildren() const;
     std::vector<std::string> getJointNames() const;
     std::vector<std::string> getRelativeJointNames() const;
 
 protected:
-    std::vector<SharedPtr> getJointNodes(SharedPtr parent) const;
     void setExpression(const std::vector<std::string>& expressions, std::vector<GiNaC::ex>& target);
+    Eigen::MatrixXd substituteExpression(const std::vector<GiNaC::ex>& expressions, const unsigned int& rows,
+        const unsigned int& cols, const GiNaC::lst& substitutions) const;
     Eigen::MatrixXd evaluateExpression(const std::vector<GiNaC::ex>& expressions,
-        const JointNameToValueMap& joint_positions, const unsigned int& rows, const unsigned int& cols) const;
-    GiNaC::lst substituteSymbolsWithJointValues(const JointNameToValueMap& joint_positions) const;
-
-    int utilGetJointAxisIndex() const;
+        const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+        const JointNameToValueMap& joint_positions) const;
+    Eigen::MatrixXd evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+        const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+        const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities) const;
+    Eigen::MatrixXd evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+        const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+        const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities,
+        const JointNameToValueMap& joint_accelerations) const;
 
     std::string m_name;
     uint64_t m_id;
