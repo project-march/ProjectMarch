@@ -18,15 +18,13 @@
     - export PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH # Adapt your desired python version here
     - export CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
     - cd ros2
-    - colcon build --symlink-install
-    - source /opt/ros/foxy/local_setup.bash && source ./install/local_setup.bash
+    - source /opt/ros/foxy/local_setup.bash
     - apt install lcov -y
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
     # - git submodule update --remote src/libraries/acados
     # - colcon build --packages-select acados
-    - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
-    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" -DCMAKE_BUILD_TYPE=Debug --event-handlers console_direct+ --ament-cmake-args -DCMAKE_CXX_FLAGS="$COVERAGE_FLAGS" -DCMAKE_C_FLAGS="$COVERAGE_FLAGS"
+    - source install/local_setup.bash
     - lcov -q -c --directory build -o lcov.base --initial
     - 'colcon test --abort-on-error --packages-skip control_msgs control_toolbox \
       controller_interface controller_manager controller_manager_msgs diagnostic_updater diff_drive_controller effort_controllers \
