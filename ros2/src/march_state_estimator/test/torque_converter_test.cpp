@@ -28,11 +28,6 @@ public:
     ~TorqueConverterTest() override = default;
 
 protected:
-    void SetUp() override
-    {
-        m_robot_description = std::make_shared<RobotDescription>();
-    }
-
     void TearDown() override
     {
         m_torque_converter.reset();
@@ -42,14 +37,14 @@ protected:
     void setupRotationalTestSetup()
     {
         std::string yaml_filename = "robot_definition-rotational_test_setup.yaml";
-        m_robot_description->parseYAML(yaml_filename);
+        m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
         m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description);
     }
 
     void setupHennieWithKoen()
     {
         std::string yaml_filename = "robot_definition-hennie_with_koen.yaml";
-        m_robot_description->parseYAML(yaml_filename);
+        m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
         m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description);
     }
 

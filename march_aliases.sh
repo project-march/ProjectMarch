@@ -48,9 +48,15 @@ alias gits='git status'
 alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
 alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py'
 
-# Alias to build one package, appended with specified pakage
+# Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
 
+# Alias to run tests on a package
+alias mbt='mbt'
+mbt() {
+  colcon build --packages-select "$1"
+  colcon test --packages-select "$1" && colcon test-result --verbose
+}
 
 # Training aliases
 export URDF6='robot:=march6_three_cameras'
