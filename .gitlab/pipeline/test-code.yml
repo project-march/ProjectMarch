@@ -17,8 +17,8 @@
     - export LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
     - export PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH # Adapt your desired python version here
     - export CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
-    - cd ros2
-    - source /opt/ros/foxy/local_setup.bash
+    - cd $ROS_VERSION/
+    - source /opt/ros/$ROS_CODENAME/local_setup.bash
     - apt install lcov -y
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
     - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
@@ -34,7 +34,7 @@
       position_controllers realsense_gazebo_plugin realtime_tools ros2_control ros2_control_test_assets ros2_controllers \
       ros2bag rosbag2 rosbag2_compression rosbag2_compression_zstd rosbag2_cpp rosbag2_performance_benchmarking rosbag2_py \
       rosbag2_storage rosbag2_storage_default_plugins rosbag2_test_common rosbag2_tests rosbag2_transport shared_queues_vendor \
-      ros2controlcli soem transmission_interface velocity_controllers'
+      ros2controlcli soem transmission_interface velocity_controllers GiNaC'
     - colcon test-result --verbose
     - lcov -q -c --directory build -o lcov.test
     - lcov -q -a lcov.base -a lcov.test -o lcov.total
@@ -45,6 +45,10 @@
     paths:
       - ros2/coverage/
     expire_in: 2 weeks
+    paths:
+      - $ROS_VERSION/build/
+      - $ROS_VERSION/install/
+      - $ROS_VERSION/log/
   variables:
     COVERAGE_FLAGS: "-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1"
   coverage: /\s*lines.*:\s(\d+\.\d+\%\s\(\d+\sof\s\d+.*\))/
