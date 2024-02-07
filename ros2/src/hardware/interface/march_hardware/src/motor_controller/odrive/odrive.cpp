@@ -191,12 +191,13 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
-    state->odrive_error_ = getOdriveError();
+    state->odrive_error_ = getODriveError();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();
-    state->dieboslave_error_ = getDieBOSlaveError();
     state->encoder_error_ = getEncoderError();
+    state->torquesensor_error_ = getTorqueSensorError();
     state->controller_error_ = getControllerError();
+    state->dieboslave_error_ = getDieBOSlaveError();
 
     return state;
 }
@@ -288,34 +289,87 @@ float ODrive::getActualEffort()
     return getMotorCurrent();
 }
 
-uint32_t ODrive::getOdriveError()
+// Allow easy debugging of all incoming errors
+// #include <rclcpp/rclcpp.hpp>
+// #define DEBUG_MODE
+
+
+
+uint32_t ODrive::getODriveError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveError, ODriveAxis::None)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ODriveError, ODriveAxis::None)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "ODrive error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getAxisError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Axis error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getMotorError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
-}
-
-uint32_t ODrive::getDieBOSlaveError()
-{
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::DieBOSlaveError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Motor error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getEncoderError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Encoder error: %u", error);
+    }
+#endif
+    return error;
+}
+
+uint32_t ODrive::getTorqueSensorError()
+{
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::TorqueSensorError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Torque sensor error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getControllerError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Controller error: %u", error);
+    }
+#endif
+    return error;
+}
+
+uint32_t ODrive::getDieBOSlaveError()
+{
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::DieBOSlaveError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "DieBOSlave error: %u", error);
+    }
+#endif
+    return error;
 }
 
 void ODrive::setAxisState(ODriveAxisState state)

@@ -73,6 +73,24 @@ namespace error {
         "Hall not calibrated yet. ",
     };
 
+    const std::array<std::string, ODRIVE_TORQUESENSOR_ERRORS_SIZE> ODRIVE_TORQUESENSOR_ERRORS = {
+        "Dummy error. ",
+        "Torque limit exceeded. ",
+        "Time limit exceeded. ",
+    };
+
+    const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS = {
+        "Overspeed. ",
+        "Invalid input mode. ",
+        "Unstable gain. ",
+        "Invalid mirror axis. ",
+        "Invalid load encoder. ",
+        "Invalid estimate. ",
+        "Invalid circular range. ",
+        "Spinout detected (recalibrate, or replacing motor cable + recalibrate). ",
+        "Invalid weigths. ",
+    };
+
     const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS = {
         "Invalid axis. ",
         "Request state failed. ",
@@ -87,18 +105,6 @@ namespace error {
         "No absolute position sent. ",
         "No PID sent. ",
         "No torque sent. ",
-    };
-
-    const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS = {
-        "Overspeed. ",
-        "Invalid input mode. ",
-        "Unstable gain. ",
-        "Invalid mirror axis. ",
-        "Invalid load encoder. ",
-        "Invalid estimate. ",
-        "Invalid circular range. ",
-        "Spinout detected (recalibrate, or replacing motor cable + recalibrate). ",
-        "Invalid weigths. ",
     };
 
     void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description)
@@ -124,14 +130,19 @@ namespace error {
                     description += ODRIVE_ENCODER_ERRORS[index];
                 }
                 break;
-            case ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR:
-                if (index < ODRIVE_DIEBOSLAVE_ERRORS.size()) {
-                    description += ODRIVE_DIEBOSLAVE_ERRORS[index];
+            case ErrorRegister::ODRIVE_TORQUESENSOR_ERROR:
+                if (index < ODRIVE_TORQUESENSOR_ERRORS.size()) {
+                    description += ODRIVE_TORQUESENSOR_ERRORS[index];
                 }
                 break;
             case ErrorRegister::ODRIVE_CONTROLLER_ERROR:
                 if (index < ODRIVE_CONTROLLER_ERRORS.size()) {
                     description += ODRIVE_CONTROLLER_ERRORS[index];
+                }
+                break;
+            case ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR:
+                if (index < ODRIVE_DIEBOSLAVE_ERRORS.size()) {
+                    description += ODRIVE_DIEBOSLAVE_ERRORS[index];
                 }
                 break;
             default:

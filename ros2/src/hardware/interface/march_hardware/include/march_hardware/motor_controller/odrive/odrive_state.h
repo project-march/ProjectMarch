@@ -142,11 +142,11 @@ public:
                          << std::endl
                          << "Encoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR)
                          << std::endl
-                         << "DieBOSlave: "
-                         << error::parseError(dieboslave_error_, error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
+                         << "Torque sensor: " << error::parseError(torquesensor_error_, error::ErrorRegister::ODRIVE_TORQUESENSOR_ERROR)
                          << std::endl
-                         << "Controller: "
-                         << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
+                         << "Controller: " << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR)
+                         << std::endl
+                         << "DieBOSlave: " << error::parseError(dieboslave_error_, error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR);
             return error_stream.str();
         } else {
             return std::nullopt;
@@ -163,8 +163,9 @@ public:
     uint32_t axis_error_ {};
     uint32_t motor_error_ {};
     uint32_t encoder_error_ {};
-    uint32_t dieboslave_error_ {};
+    uint32_t torquesensor_error_ {};
     uint32_t controller_error_ {};
+    uint32_t dieboslave_error_ {};
 };
 
 } // namespace march

@@ -14,8 +14,9 @@ namespace error {
         ODRIVE_AXIS_ERROR,
         ODRIVE_MOTOR_ERROR,
         ODRIVE_ENCODER_ERROR,
-        ODRIVE_DIEBOSLAVE_ERROR,
+        ODRIVE_TORQUESENSOR_ERROR,
         ODRIVE_CONTROLLER_ERROR,
+        ODRIVE_DIEBOSLAVE_ERROR,
     };
 
     const size_t ODRIVE_ERRORS_SIZE = 8;
@@ -30,11 +31,14 @@ namespace error {
     const size_t ODRIVE_ENCODER_ERRORS_SIZE = 10;
     extern const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS;
 
-    const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 13;
-    extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS;
+    const size_t ODRIVE_TORQUESENSOR_ERRORS_SIZE = 3;
+    extern const std::array<std::string, ODRIVE_TORQUESENSOR_ERRORS_SIZE> ODRIVE_TORQUESENSOR_ERRORS;
 
     const size_t ODRIVE_CONTROLLER_ERRORS_SIZE = 9;
     extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS;
+
+    const size_t ODRIVE_DIEBOSLAVE_ERRORS_SIZE = 13;
+    extern const std::array<std::string, ODRIVE_DIEBOSLAVE_ERRORS_SIZE> ODRIVE_DIEBOSLAVE_ERRORS;
 
     // Add an error type to the description
     void addErrorToDescription(size_t index, ErrorRegister error_register, std::string& description);

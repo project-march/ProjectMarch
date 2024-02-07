@@ -98,12 +98,13 @@ private:
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
 
-    uint32_t getOdriveError();
+    uint32_t getODriveError();
     uint32_t getAxisError();
     uint32_t getMotorError();
-    uint32_t getDieBOSlaveError();
     uint32_t getEncoderError();
+    uint32_t getTorqueSensorError();
     uint32_t getControllerError();
+    uint32_t getDieBOSlaveError();
 
     ODriveAxis axis_;
     bool index_found_;
