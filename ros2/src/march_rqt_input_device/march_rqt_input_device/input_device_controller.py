@@ -101,6 +101,7 @@ class InputDeviceController:
         self.publish_mode(10)
 
     def publish_mode(self, mode: int) -> None:
+        self._ipd.set_current_mode(mode)
         request = GetExoModeArray.Request()
         request.desired_mode.mode = mode
 
@@ -118,8 +119,7 @@ class InputDeviceController:
             available_modes = future.result().mode_array.modes
             mode_list = [exo_mode.mode for exo_mode in available_modes]
             self._ipd.set_available_modes(set(mode_list))
-            self._node.get_logger().info("Available modes: %s" % self._ipd.get_available_modes())
-            # Do something with the result
+            self.update_view_buttons()
         else:
             self._node.get_logger().error("Failed to call service GetExoModeArray")
 
