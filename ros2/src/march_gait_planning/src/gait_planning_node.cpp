@@ -82,7 +82,6 @@ void GaitPlanningNode::footPositionsPublish(){
                                     current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
             }
 
             // Step close if previous gait was walk. Note how variable walk already has a step close implemented by default.
@@ -102,7 +101,7 @@ void GaitPlanningNode::footPositionsPublish(){
             break;
 
         case exoMode::BootUp :
-            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
+            RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
             break;
         
         case exoMode::LargeWalk :
@@ -124,7 +123,6 @@ void GaitPlanningNode::footPositionsPublish(){
                                     current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
             }
             break;
 
