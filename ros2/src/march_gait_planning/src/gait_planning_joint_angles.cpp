@@ -35,7 +35,7 @@ GaitPlanningAngles::GaitPlanningAngles()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 

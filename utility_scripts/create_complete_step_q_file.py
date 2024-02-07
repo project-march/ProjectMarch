@@ -167,6 +167,11 @@ first_step, one_step, step_close, full_gait = normal_large_step()
 first_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
 one_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
 step_close_updated = step_close_update(step_close, one_step_updated, first_step_updated)
+
+
+one_step_updated = step_close_update(one_step_updated, one_step_updated, one_step_updated)
+one_step_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv', sep=',', header=False, index=False)
+
 # first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
 # one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
 # step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
