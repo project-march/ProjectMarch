@@ -24,6 +24,8 @@
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
     # - git submodule update --remote src/libraries/acados
     # - colcon build --packages-select acados
+    - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
+    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" -DCMAKE_BUILD_TYPE=Debug --event-handlers console_direct+ --ament-cmake-args -DCMAKE_CXX_FLAGS="$COVERAGE_FLAGS" -DCMAKE_C_FLAGS="$COVERAGE_FLAGS"
     - lcov -q -c --directory build -o lcov.base --initial
     - 'colcon test --abort-on-error --packages-skip control_msgs control_toolbox \
