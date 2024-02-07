@@ -110,7 +110,7 @@ Eigen::VectorXd Task::calculateError()
     m_error_norm = task_error.norm();
 
     error.noalias()
-        = m_gain_p * task_error; // + calculateIntegralError(task_error) + calculateDerivativeError(task_error);
+        = m_gain_p * task_error + calculateIntegralError(task_error) + calculateDerivativeError(task_error);
     return error;
 }
 
