@@ -1,7 +1,9 @@
-"""Author: MIV; MV; MVI."""
+"""Author: MIV; MV; MVI, MIX"""
 import json
 import os
 from typing import List, Callable, Tuple, Optional, Union
+
+from enum import Enum
 
 from pathlib import Path
 
@@ -21,11 +23,29 @@ DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 
+class ExoMode(Enum):
+    Sit = 0
+    Stand = 1
+    Walk = 2
+    BootUp = 3
+    Error = 4
+    Sideways = 5
+    LargeWalk = 6
+    SmallWalk = 7
+    Ascending = 8
+    Descending = 9
+    VariableWalk = 10
+
+    def __str__(self):
+        return self.name
+
 class InputDeviceView(QWidget):
     def __init__(self, ui_file: str, controller: InputDeviceController, layout_file: str = None):
         super(InputDeviceView, self).__init__()
 
         loadUi(ui_file, self)
+
+        self._button_layout = None
 
         self._layout_file = layout_file
         self._controller = controller
@@ -37,10 +57,10 @@ class InputDeviceView(QWidget):
         with open(self._layout_file) as file:
             json_content = json.loads(file.read())
 
-        button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
+        self._button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
 
         # Create the qt_layout from the button layout.
-        qt_layout = self.create_layout(button_layout)
+        qt_layout = self.create_layout(self._button_layout)
 
         # Apply the qt_layout to the top level widget.
         self.content.setLayout(qt_layout)
@@ -79,6 +99,11 @@ class InputDeviceView(QWidget):
         qt_button.setText(check_string(name) + "\n" + check_string(control_type))
         qt_button.setObjectName(name)
 
+        if qt_button.objectName() == "Stand":
+            qt_button.setEnabled(True)
+        else:
+            qt_button.setEnabled(False)
+
         qt_button.setMinimumSize(QSize(*size))
         qt_button.setMaximumSize(QSize(*size))
 
@@ -113,7 +138,15 @@ class InputDeviceView(QWidget):
                 qt_button_layout.addWidget(user_input_object, row, column, 1, 1)
 
         return qt_button_layout
-
+    
+    def update_buttons(self, available_modes) -> None:
+        available_mode_names = [ExoMode(mode).name for mode in available_modes]
+        for button_row in self._button_layout:
+            for button in button_row:
+                if button.objectName() in available_mode_names:
+                    button.setEnabled(True)
+                else:
+                    button.setEnabled(False)
 
 def check_string(text: str) -> str:
     """Split text into new lines on every third word.

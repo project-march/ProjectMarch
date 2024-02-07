@@ -1,4 +1,4 @@
-"""Author: Olav de Haas MIV."""
+"""Author: Olav de Haas MIV & Andrew Hutani, MIX"""
 import os
 import json
 from typing import List, Callable, Tuple, Optional, Union
@@ -44,6 +44,8 @@ class InputDevicePlugin(Plugin):
 
         self._controller = InputDeviceController(self._node)
         self._widget = InputDeviceView(ui_file, self._controller, layout_file)
+
+        self._controller.set_view(self._widget)
         
         context.add_widget(self._widget)
 

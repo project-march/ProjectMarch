@@ -31,15 +31,15 @@
   ],
   [
     {
-      "name": "Large Walk",
+      "name": "LargeWalk",
       "callback": "publish_large_walk"
     },
     {
-      "name": "Small Walk",
+      "name": "SmallWalk",
       "callback": "publish_small_walk"
     },
     {
-      "name": "Variable Walk",
+      "name": "VariableWalk",
       "callback": "publish_variable_walk"
     }
   ]
