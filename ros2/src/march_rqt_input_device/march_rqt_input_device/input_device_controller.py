@@ -30,7 +30,7 @@ class InputDeviceController:
 
         self._alive_pub = self._node.create_publisher(Alive, "/march/input_device/alive", 10)
         self._alive_timer = self._node.create_timer(timer_period_sec=0.1,
-                                                    callback=self.alive_callback,
+                                                    callback=self.alive_callback(),
                                                     clock=self._node.get_clock())
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
@@ -112,3 +112,4 @@ class InputDeviceController:
         """Callback to send out an alive message."""
         msg = Alive(stamp=self._node.get_clock().now().to_msg(), id=self._id)
         self._alive_pub.publish(msg)
+        self._node.get_logger().debug("Published alive message")
