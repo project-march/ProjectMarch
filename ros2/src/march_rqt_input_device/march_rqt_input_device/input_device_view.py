@@ -3,8 +3,6 @@ import json
 import os
 from typing import List, Callable, Tuple, Optional, Union
 
-from enum import Enum
-
 from pathlib import Path
 
 from PyQt5.QtCore import Qt
@@ -18,26 +16,11 @@ from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
+from march_rqt_input_device.exo_mode import ExoMode
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
-
-class ExoMode(Enum):
-    Sit = 0
-    Stand = 1
-    Walk = 2
-    BootUp = 3
-    Error = 4
-    Sideways = 5
-    LargeWalk = 6
-    SmallWalk = 7
-    Ascending = 8
-    Descending = 9
-    VariableWalk = 10
-
-    def __str__(self):
-        return self.name
 
 class InputDeviceView(QWidget):
     def __init__(self, ui_file: str, controller: InputDeviceController, layout_file: str = None):
