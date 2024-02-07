@@ -14,8 +14,7 @@
 
 #include <march_ik_solver/ik_solver.hpp>
 
-class IkSolverTest : public ::testing::Test
-{
+class IkSolverTest : public ::testing::Test {
 protected:
     void SetUp() override
     {
@@ -27,8 +26,8 @@ protected:
 
 TEST_F(IkSolverTest, test)
 {
-  ASSERT_EQ(2, 1+1);
+    ASSERT_EQ(2, 1 + 1);
 }
 
 // NOLINTEND
-#endif  // __clang_analyzer__
+#endif // __clang_analyzer__
