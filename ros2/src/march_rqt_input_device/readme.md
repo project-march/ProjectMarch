@@ -1,4 +1,5 @@
 # March RQT Input Device
+**Author: Andrew Hutani, MIX**
 ## Overview
 This packages is the implementation of the RQT input device, which allows the user to control the exoskeleton using a virtual button interface. In essence, the user can relay instructions to the whole ROS architecture using this packages.
 
