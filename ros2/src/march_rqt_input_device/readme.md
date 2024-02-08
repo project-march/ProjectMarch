@@ -25,6 +25,8 @@ The InputDeviceController class acts as the model in the MVC structure. It manag
 
 This MVC structure allows for a clear separation of concerns. Each component has a specific responsibility, making the code easier to understand and maintain. Changes in one component (for example, a change in the user interface design) can be made independently of the others, reducing the risk of introducing bugs.
 
+## Possible dependencies
+PyQt5 version <= 5.11.2
 ## Node structure
 ### Client
 - `'get_exo_mode_array'` ([GetExoModeArray.srv](https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/srv/GetExoModeArray.srv))
@@ -54,3 +56,4 @@ After this block is lifted (i.e. the response has been received), the alive publ
 To circumvent this, it is possible to do the waiting in the View class, but this does create some stupid behaviour between the controller and viewer, since the button presses are handled in the controller. A sequence diagram is shown below to visualize the interactions.
 
 ![Sequence diagram of button presses](resource/img/ipd_button_press.png)
+\
