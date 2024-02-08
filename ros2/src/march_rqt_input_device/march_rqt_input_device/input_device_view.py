@@ -17,6 +17,7 @@ from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import Bool
 from march_rqt_input_device.exo_mode import ExoMode
+import time
 
 DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
@@ -29,6 +30,8 @@ class InputDeviceView(QWidget):
         loadUi(ui_file, self)
 
         self._button_layout = None
+        self._current_possible_modes = set()
+
 
         self._layout_file = layout_file
         self._controller = controller
@@ -122,6 +125,10 @@ class InputDeviceView(QWidget):
 
         return qt_button_layout
     
+    def update_possible_modes(self) -> None:
+        self._controller.publish_mode()
+        self._controller._available_modes_future.add_done_callback(self._controller.store_available_modes)
+
     def update_buttons(self, available_modes) -> None:
         available_mode_names = [ExoMode(mode).name for mode in available_modes]
         for button_row in self._button_layout:

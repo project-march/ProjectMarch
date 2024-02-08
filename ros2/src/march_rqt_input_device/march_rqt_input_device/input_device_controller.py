@@ -6,6 +6,7 @@ from march_shared_msgs.msg import Alive
 from march_shared_msgs.srv import GetExoModeArray
 from rclpy.node import Node
 import rclpy
+import threading
 
 from march_rqt_input_device.input_device import IPD
 
@@ -20,6 +21,10 @@ class InputDeviceController:
         self._ipd = IPD()
         self._node = node
         self._view = None
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
+
+        self._requested_mode = GetExoModeArray.Request()
+        self._available_modes_future = None
 
         self._get_exo_mode_array_client = self._node.create_client(GetExoModeArray, 'get_exo_mode_array')
 
@@ -30,9 +35,9 @@ class InputDeviceController:
 
         self._alive_pub = self._node.create_publisher(Alive, "/march/input_device/alive", 10)
         self._alive_timer = self._node.create_timer(timer_period_sec=0.1,
-                                                    callback=self.alive_callback(),
+                                                    callback=self.alive_callback,
                                                     clock=self._node.get_clock())
-        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
+        
 
         
 
@@ -52,57 +57,54 @@ class InputDeviceController:
     def node(self):
         """Define the node."""
         return self._node
+    def publish_sit(self) -> None:
+        self._requested_mode.desired_mode.mode = 0
+        self._view.update_possible_modes()
 
     def publish_home_stand(self) -> None:
-        self.publish_mode(1)
+        self._requested_mode.desired_mode.mode = 1
+        self._view.update_possible_modes()
     
     def publish_normal_walk(self) -> None:
-        self.publish_mode(2)
-
-    def publish_sit(self) -> None:
-        self.publish_mode(0)
+        self._requested_mode.desired_mode.mode = 2
+        self._view.update_possible_modes()
 
     def publish_sideways_walk(self) -> None:
-        self.publish_mode(5)
+        self._requested_mode.desired_mode.mode = 5
+        self._view.update_possible_modes()
 
-    def publish_ascending_walk(self) -> None:
-        self.publish_mode(8)
-
-    def publish_descending_walk(self) -> None:
-        self.publish_mode(9)
-    
     def publish_large_walk(self) -> None:
-        self.publish_mode(10)
+        self._requested_mode.desired_mode.mode = 6
+        self._view.update_possible_modes()
 
     def publish_small_walk(self) -> None:
-        self.publish_mode(7)
+        self._requested_mode.desired_mode.mode = 7
+        self._view.update_possible_modes()
 
-    
+    def publish_ascending_walk(self) -> None:
+        self._requested_mode.desired_mode.mode = 8
+        self._view.update_possible_modes()
+
+    def publish_descending_walk(self) -> None:
+        self._requested_mode.desired_mode.mode = 9
+        self._view.update_possible_modes()
+        
     def publish_variable_walk(self) -> None:
-        self.publish_mode(10)
+        self._requested_mode.desired_mode.mode = 10
+        self._view.update_possible_modes()
 
-    def publish_mode(self, mode: int) -> None:
-        self._ipd.set_current_mode(mode)
-        request = GetExoModeArray.Request()
-        request.desired_mode.mode = mode
-
-        future = self._get_exo_mode_array_client.call_async(request)
-        rclpy.spin_until_future_complete(self._node, future)
-
-        if future.result() is not None:
-            self.store_available_modes(future)
-        else:
-            self._node.get_logger().error('Exception while calling service: %r' % future.exception()) 
+    def publish_mode(self) -> None:
+        self._available_modes_future = self._get_exo_mode_array_client.call_async(self._requested_mode)
 
     def store_available_modes(self, future) -> None:
-        rclpy.spin_until_future_complete(self._node, future)
-        if future.done():
-            available_modes = future.result().mode_array.modes
-            mode_list = [exo_mode.mode for exo_mode in available_modes]
-            self._ipd.set_available_modes(set(mode_list))
-            self.update_view_buttons()
-        else:
-            self._node.get_logger().error("Failed to call service GetExoModeArray")
+        if future.result() is None:
+            self._node.get_logger().warn("No available modes received")
+            return
+        
+        available_modes = future.result().mode_array.modes
+        mode_list = [exo_mode.mode for exo_mode in available_modes]
+        self._ipd.set_available_modes(set(mode_list))
+        self.update_view_buttons()
 
     def update_view_buttons(self):
         available_modes = self._ipd.get_available_modes()
@@ -112,4 +114,3 @@ class InputDeviceController:
         """Callback to send out an alive message."""
         msg = Alive(stamp=self._node.get_clock().now().to_msg(), id=self._id)
         self._alive_pub.publish(msg)
-        self._node.get_logger().debug("Published alive message")
