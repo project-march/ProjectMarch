@@ -5,18 +5,17 @@
 #include <array>
 #include <string>
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "march_gait_planning/gait_planning_base_class.hpp"
 
-class TestSetupGaitPlanning
+class TestSetupGaitPlanning : public GaitPlanning
 {
 public:
     TestSetupGaitPlanning();
     void loadTrajectoryFromCSV();
     std::vector<double> getTrajectory() const;
-    void setGaitType(const exoMode &new_gait_type);
-    exoMode getGaitType() const;
+
 
 private:
-    exoMode m_gait_type;
     std::vector<double> m_trajectory;
 };
 

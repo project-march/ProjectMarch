@@ -21,9 +21,7 @@ struct CSVRow {
 
 // Constructor for the GaitPlanningAngles class (functionality of joint angle trajectory)
 GaitPlanningAngles::GaitPlanningAngles()
- : m_gait_type(), 
-   m_prev_gait_type(), 
-   m_first_step_angle_trajectory(), 
+ : m_first_step_angle_trajectory(), 
    m_complete_step_angle_trajectory(),
    m_stand_to_sit_trajectory(), 
    m_sideways_trajectory(),
@@ -79,14 +77,6 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
-    m_gait_type = new_gait_type; 
-}
-
-void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
-    m_prev_gait_type = prev_gait_type; 
-}
-
 void GaitPlanningAngles::setCounter(const int &count){
     m_counter = count; 
 }
@@ -97,14 +87,6 @@ void GaitPlanningAngles::setPrevPoint(const std::vector<double> &point){
 
 void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
     m_home_stand = stand; 
-}
-
-exoMode GaitPlanningAngles::getGaitType() const {
-    return m_gait_type; 
-}
-
-exoMode GaitPlanningAngles::getPrevGaitType() const {
-    return m_prev_gait_type; 
 }
 
 std::vector<double> GaitPlanningAngles::getPrevPoint() const{

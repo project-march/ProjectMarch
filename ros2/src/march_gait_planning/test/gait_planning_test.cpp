@@ -3,7 +3,7 @@
 
 class GaitPlanningTest : public testing::Test {
     protected: 
-    GaitPlanning test_gait_planning = GaitPlanning();
+    GaitPlanningCartesian test_gait_planning = GaitPlanningCartesian();
 };
 
 TEST_F(GaitPlanningTest, AssertObjectCreated){

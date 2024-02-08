@@ -48,7 +48,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     // std::cout << "Timer function created" << std::endl; 
 
     m_gait_planning.setGaitType(exoMode::BootUp);
-    m_gait_planning.setPrevGaitType(exoMode::BootUp); 
+    m_gait_planning.setPreviousGaitType(exoMode::BootUp); 
     m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
 
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
@@ -58,11 +58,11 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current mode: %d", msg->mode); 
-    m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
+    m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType());
     m_gait_planning.setGaitType((exoMode)msg->mode);
     // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
     if ((exoMode)msg->mode == exoMode::Stand){
-        if (m_gait_planning.getPrevGaitType() == exoMode::Walk || m_gait_planning.getPrevGaitType() == exoMode::Ascending || m_gait_planning.getPrevGaitType() == exoMode::Descending || m_gait_planning.getPrevGaitType() == exoMode::Sideways){
+        if (m_gait_planning.getPreviousGaitType() == exoMode::Walk || m_gait_planning.getPreviousGaitType() == exoMode::Ascending || m_gait_planning.getPreviousGaitType() == exoMode::Descending || m_gait_planning.getPreviousGaitType() == exoMode::Sideways){
         }   
     } else {
         m_gait_planning.setCounter(0); 
@@ -174,7 +174,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
         switch (m_gait_planning.getGaitType()) {
             case exoMode::Walk : 
             
-            switch(m_gait_planning.getPrevGaitType()){
+            switch(m_gait_planning.getPreviousGaitType()){
                 case exoMode::Walk : 
 
                     m_current_trajectory = m_gait_planning.getFullGaitAngleCSV(); 
@@ -192,7 +192,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     processMovingGaits(count);
                     if (count >= (m_current_trajectory.size()-1)){
                         m_gait_planning.setCounter(0); 
-                        m_gait_planning.setPrevGaitType(exoMode::Walk); 
+                        m_gait_planning.setPreviousGaitType(exoMode::Walk); 
                     } else {
                         m_gait_planning.setCounter(count+1);
                     }
@@ -207,7 +207,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             
             case exoMode::Stand :
 
-                switch(m_gait_planning.getPrevGaitType()){
+                switch(m_gait_planning.getPreviousGaitType()){
 
                     case exoMode::Sit :
 
@@ -215,7 +215,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         processMovingGaits(count);
                         if (count >= (m_current_trajectory.size()-1)){
                             m_gait_planning.setCounter(m_current_trajectory.size()-1);
-                            m_gait_planning.setPrevGaitType(exoMode::Stand); 
+                            m_gait_planning.setPreviousGaitType(exoMode::Stand); 
                         } else {
                             m_gait_planning.setCounter(count+1);
                         }
@@ -231,7 +231,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                             m_gait_planning.setCounter(0); 
                             m_current_trajectory = m_gait_planning.getStepCloseGait();
                             RCLCPP_DEBUG(this->get_logger(), "Filled step close trajectory"); 
-                            m_gait_planning.setPrevGaitType(exoMode::Stand); 
+                            m_gait_planning.setPreviousGaitType(exoMode::Stand); 
                         }
                         break; 
 
