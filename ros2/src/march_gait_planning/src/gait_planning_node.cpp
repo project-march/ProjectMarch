@@ -26,6 +26,7 @@ GaitPlanningNode::GaitPlanningNode()
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
     footPositionsPublish(); 
 }
@@ -66,14 +67,41 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
 void GaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
         case exoMode::Stand :
-            m_current_trajectory.clear();
-            setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
-            m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Home stand position published!");
+            // If the current trajectory is not empty, finish it before going to step close or stand.
+            if (!m_current_trajectory.empty()){
+                RCLCPP_DEBUG_THROTTLE(rclcpp::get_logger("march_gait_planning"), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
+                GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
+                m_current_trajectory.erase(m_current_trajectory.begin());
+                if (m_gait_planning.getCurrentStanceFoot() & 0b1){
+                    // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
+                    setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3]+m_home_stand[2], 
+                                    current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1]+m_home_stand[5]);
+                } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
+                    // 10 is right stance leg
+                    setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
+                                    current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
+                }
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            }
+
+            // Step close if previous gait was walk. Note how variable walk already has a step close implemented by default.
+            else if (m_gait_planning.getPreviousGaitType() == exoMode::LargeWalk || m_gait_planning.getPreviousGaitType() == exoMode::SmallWalk){
+                RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Calling step close trajectory with mode: %d", m_gait_planning.getPreviousGaitType());
+                m_current_trajectory = m_gait_planning.getTrajectory();
+                RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Size of step close trajectory: %d", m_current_trajectory.size());
+                m_gait_planning.setPreviousGaitType(exoMode::Stand);
+            }
+
+            else {
+                m_current_trajectory.clear();
+                setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                RCLCPP_INFO_THROTTLE(rclcpp::get_logger("march_gait_planning"), *this->get_clock(), 2000, "Publishing homestand position.");
+            }
             break;
 
         case exoMode::BootUp :
-            // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
+            RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
             break;
         
         case exoMode::LargeWalk :
@@ -95,7 +123,6 @@ void GaitPlanningNode::footPositionsPublish(){
                                     current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Foot positions published!"); 
             }
             break;
 

@@ -1,6 +1,8 @@
 import pandas as pd 
 import matplotlib.pyplot as plt 
 import numpy as np
+from scipy.interpolate import CubicSpline, UnivariateSpline, interp1d
+from scipy.signal import argrelmax, argrelmin
 
 def normal_large_step(): 
     df_gait_joint = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/q_test.csv')
@@ -18,29 +20,64 @@ def normal_large_step():
 
     df_gait_joint = df_gait_joint.reset_index(drop=True)
 
-    max_rhfe = df_gait_joint[['RHFE']].idxmax()
-    max_rhfe_second = df_gait_joint[['RHFE']].iloc[150:250].idxmax()
-
     first_step = df_gait_joint.iloc[0:72]
-    first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
     full_step = df_gait_joint.iloc[73:182]
-    full_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+    full_step = full_step.reset_index(drop=True)
+    step_close = df_gait_joint.iloc[246::]
+    step_close = step_close.reset_index(drop=True)
+    step_close = step_close.rename(columns={'LHFE': 'RHFE', 'LKFE': 'RKFE', 'RHFE':'LHFE', 'RKFE':'LKFE'})
+    step_close = step_close[['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF']]
+    
+    plot_joints(step_close)
 
-    # plot_joints(first_step)
-    plot_joints(full_step)
+    return first_step, full_step, step_close, df_gait_joint
 
-    df_gait_joint.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
+def step_close_update(step_close, full_step, first_step):
+
+    plot_joints(step_close)
+
+    res_lhfe = extract_max_min('LHFE', step_close, first_step, full_step)
+    res_rhfe = extract_max_min('RHFE', step_close, first_step, full_step)
+    res_lkfe = extract_max_min('LKFE', step_close, first_step, full_step)
+    res_rkfe = extract_max_min('RKFE', step_close, first_step, full_step)
+
+
+    interpolate_linear('LKFE', res_lkfe, step_close)
+    interpolate_linear('RKFE', res_rkfe, step_close)
+    interpolate_linear('LHFE', res_lhfe, step_close)
+    interpolate_linear('RHFE', res_rhfe, step_close)
+
+    plot_joints(step_close)
+
+    return step_close
+
+def extract_max_min(joint, step_close, first_step, full_step):
+    local_max_joint = step_close[joint][(step_close[joint].shift(1) < step_close[joint]) & (step_close[joint].shift(-1) < step_close[joint])]
+    local_min_joint= step_close[joint][(step_close[joint].shift(1) > step_close[joint]) & (step_close[joint].shift(-1) > step_close[joint])]
+    res_joint = list(zip(local_max_joint,local_max_joint.index))
+    res_joint += list(zip(local_min_joint, local_min_joint.index))
+    res_joint.sort(key = lambda x: x[1])
+    res_joint.append((first_step[joint].iloc[0], step_close[joint].index[-1]))
+    res_joint.insert(0, (full_step[joint].iloc[-1], step_close[joint].index[0]))
+    return res_joint
+
+def interpolate_linear(joint, res_joint, step_close):
+    x_joint = [x[1] for x in res_joint]
+    y_joint = [x[0] for x in res_joint]
+    joint_interp = interp1d(x_joint, y_joint)
+    x_new_joint = np.linspace(res_joint[0][1], res_joint[-1][1], len(step_close))
+    step_close[joint] = joint_interp(x_new_joint)
 
 def plot_joints(dataset):
 
-    plt.plot(dataset['LKFE'], label='LKFE')
-    plt.plot(dataset['RKFE'], label='RKFE')
-    plt.plot(dataset['LHFE'], label='LHFE')
-    plt.plot(dataset['RHFE'], label='RHFE')
-    plt.plot(dataset['LADPF'], label='LADPF')
-    plt.plot(dataset['RADPF'], label='RADPF')
-    plt.plot(dataset['LHAA'], label='LHAA')
-    plt.plot(dataset['RHAA'], label='RHAA')
+    plt.plot(dataset['LKFE'], label='LKFE', color = 'blue')
+    plt.plot(dataset['RKFE'], label='RKFE', color = 'green')
+    plt.plot(dataset['LHFE'], label='LHFE', color = 'red')
+    plt.plot(dataset['RHFE'], label='RHFE', color = 'orange')
+    # plt.plot(dataset['LADPF'], label='LADPF')
+    # plt.plot(dataset['RADPF'], label='RADPF')
+    # plt.plot(dataset['LHAA'], label='LHAA')
+    # plt.plot(dataset['RHAA'], label='RHAA')
     plt.legend()
     plt.show()
 
@@ -125,9 +162,17 @@ def sideways():
 
 
     
-# stand_to_sit()
-# sit_to_stand()
 
-# sideways()
+first_step, one_step, step_close, full_gait = normal_large_step()
+first_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+one_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+step_close_updated = step_close_update(step_close, one_step_updated, first_step_updated)
 
-# normal_large_step()
+
+one_step_updated = step_close_update(one_step_updated, one_step_updated, one_step_updated)
+one_step_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv', sep=',', header=False, index=False)
+
+# first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
+# one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
+# step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
+# full_gait.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
