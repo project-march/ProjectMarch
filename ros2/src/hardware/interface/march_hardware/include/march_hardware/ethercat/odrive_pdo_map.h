@@ -56,7 +56,6 @@ enum class ODriveObjectName {
     PositionI,
     PositionD,
     TorqueP,
-    TorqueI,
     TorqueD,
     RequestedState
 

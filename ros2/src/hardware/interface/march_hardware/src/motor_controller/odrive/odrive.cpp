@@ -10,6 +10,7 @@
 
 #include "march_hardware/motor_controller/actuation_mode.h"
 
+#include <rclcpp/rclcpp.hpp>
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -17,7 +18,9 @@
 #include <unistd.h>
 #include <utility>
 
-//#define DEBUG_EFFORT
+// Allows easy debugging of all incoming errors
+// #define DEBUG_MODE
+
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -288,12 +291,6 @@ float ODrive::getActualEffort()
 {
     return getMotorCurrent();
 }
-
-// Allow easy debugging of all incoming errors
-// #include <rclcpp/rclcpp.hpp>
-// #define DEBUG_MODE
-
-
 
 uint32_t ODrive::getODriveError()
 {
