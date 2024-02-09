@@ -128,7 +128,7 @@ def generate_launch_description() -> LaunchDescription:
     ipd_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("march_input_device"),
+                get_package_share_directory("march_rqt_input_device"),
                 "launch",
                 "input_device.launch.py",
             )
