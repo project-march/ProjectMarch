@@ -7,6 +7,7 @@ class GaitPlanning {
     public: 
 
     //node class still needs to be able to use these 
+    explicit GaitPlanning(); 
     void setGaitType(const exoMode &new_gait_type); 
     void setPreviousGaitType(const exoMode &previous_gait_type);  
     exoMode getGaitType() const; 
