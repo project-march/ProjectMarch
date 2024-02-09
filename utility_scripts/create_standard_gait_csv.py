@@ -85,3 +85,11 @@ res = interpolate(0.3, small_gait_first_step, large_gait_first_step, 100)
 # plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
 # plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
 # plt.show()
+
+large_step_close, _ = package_bezier(-0.6, 200)
+large_step_close = np.flip(large_step_close, axis=0)
+np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/large_step_close.csv', large_step_close, delimiter=',')
+
+small_step_close, _ = package_bezier(-0.2, 200)
+small_step_close = np.flip(small_step_close, axis=0)
+np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', small_step_close, delimiter=',')
