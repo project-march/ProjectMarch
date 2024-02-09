@@ -57,44 +57,11 @@ class InputDeviceController:
     def node(self):
         """Define the node."""
         return self._node
-    def publish_sit(self) -> None:
-        self._requested_mode.desired_mode.mode = 0
-        self._view.update_possible_modes()
 
-    def publish_home_stand(self) -> None:
-        self._requested_mode.desired_mode.mode = 1
-        self._view.update_possible_modes()
-    
-    def publish_normal_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 2
-        self._view.update_possible_modes()
-
-    def publish_sideways_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 5
-        self._view.update_possible_modes()
-
-    def publish_large_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 6
-        self._view.update_possible_modes()
-
-    def publish_small_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 7
-        self._view.update_possible_modes()
-
-    def publish_ascending_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 8
-        self._view.update_possible_modes()
-
-    def publish_descending_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 9
-        self._view.update_possible_modes()
-        
-    def publish_variable_walk(self) -> None:
-        self._requested_mode.desired_mode.mode = 10
-        self._view.update_possible_modes()
-
-    def publish_mode(self) -> None:
+    def publish_mode(self, mode: int) -> None:
+        self._requested_mode.desired_mode.mode = mode
         self._available_modes_future = self._get_exo_mode_array_client.call_async(self._requested_mode)
+        self._view.update_possible_modes()
 
     def store_available_modes(self, future) -> None:
         if future.result() is None:

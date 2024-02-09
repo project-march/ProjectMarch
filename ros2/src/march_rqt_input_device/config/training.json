@@ -2,15 +2,18 @@
   [
     {
       "name": "Stand",
-      "callback": "publish_home_stand"
+      "callback": "publish_home_stand",
+      "exoMode": 1
     },
     {
       "name": "Walk",
-      "callback": "publish_normal_walk"
+      "callback": "publish_normal_walk",
+      "exoMode": 2
     },
     {
       "name": "Sit",
-      "callback": "publish_sit"
+      "callback": "publish_sit",
+      "exoMode": 0
     }
   ],
 
@@ -18,29 +21,35 @@
   [
     {
       "name": "Sideways",
-      "callback": "publish_sideways_walk"
+      "callback": "publish_sideways_walk",
+      "exoMode": 5
     },
     {
       "name": "Ascending",
-      "callback": "publish_ascending_walk"
+      "callback": "publish_ascending_walk",
+      "exoMode": 8
     },
     {
       "name": "Descending",
-      "callback": "publish_descending_walk"
+      "callback": "publish_descending_walk",
+      "exoMode": 9
     }
   ],
   [
     {
       "name": "LargeWalk",
-      "callback": "publish_large_walk"
+      "callback": "publish_large_walk",
+      "exoMode": 6
     },
     {
       "name": "SmallWalk",
-      "callback": "publish_small_walk"
+      "callback": "publish_small_walk",
+      "exoMode": 7
     },
     {
       "name": "VariableWalk",
-      "callback": "publish_variable_walk"
+      "callback": "publish_variable_walk",
+      "exoMode": 10
     }
   ]
 ]

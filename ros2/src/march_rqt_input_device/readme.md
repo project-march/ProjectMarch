@@ -45,6 +45,16 @@ Since the relation between Plugin, View and Controller can be a bit confusing, a
 - Subsequently, the view class is created, and all buttons defined in the layout file are created, linked to a callback function and displayed.
 - Lastly, the view class is linked to the controller to allow communication between the two.
 
+To avoid repeating a lot of code for all the different modes, a lambda notation is used to (more or less) tie the button to a specific mode and sending that mode.
+
+> **Using copilot to explain the lambda expression**:
+> - _In Python, lambda is used to create small anonymous functions at runtime. These functions are called "anonymous" because they are not declared with the standard def keyword._
+> - _The general syntax of a lambda function is: `lambda arguments: expression`._
+> - _In your case, `lambda: self._controller.publish_mode(mode)` is a lambda function that takes no arguments (hence the empty : before the colon) and calls `self._controller.publish_mode(mode)` when it's invoked._
+> - _The reason we use a lambda function here is because the button.clicked.connect() method expects a function object that it can call when the button is clicked. However, we want to call `self._controller.publish_mode(mode)`, which requires an argument (mode)._
+> - _If we simply passed `self._controller.publish_mode` to `button.clicked.connect()`, it wouldn't know what value to use for mode. By using a lambda function, we create a new function that takes no arguments and calls `self._controller.publish_mode(mode)` with the correct value for mode._
+> - _So when the button is clicked, it calls the lambda function (which takes no arguments), and the lambda function in turn calls `self._controller.publish_mode(mode)` with the correct value for mode. This is a common pattern when working with GUIs in Python, because often you need to respond to an event (like a button click) with a function that takes some specific arguments._
+
 ## Button presses
 **This functionality might seem needlessly convoluted, but so far I have not been able to circumvent this.**
 The main problem with correctly relaying the button presses to the ModeMachine, is the alive message that needs to continuouosly be published.
