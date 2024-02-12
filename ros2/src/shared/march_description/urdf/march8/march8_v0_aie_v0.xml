@@ -118,7 +118,7 @@ See <https://www.gnu.org/licenses/>.
       <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
       <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
       <site name='imu_backpack' size='0.01' pos="0 0 0"/>
-      <site name='tendon_top' size='0.01' pos="0.05 -0.006 0.642"/>
+      <site name='tendon_top' size='0.01' pos="0.1 -0.006 0.642"/>
       <site name='tendon_left' size='0.01' pos="0.171 0.2 0"/>
       <site name='tendon_right' size='0.01' pos="0.171 -0.2 0"/>
 
@@ -237,21 +237,21 @@ See <https://www.gnu.org/licenses/>.
 
 
   <tendon>
-    <spatial range="0 0.4" limited="true" width=".002" rgba=".95 .3 .3 1" stiffness="100">
+    <spatial range="0 0.45" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
   </tendon>
 
   <tendon>
-    <spatial range="0 0.45" limited="true" width=".002" rgba=".3 .95 .3 1" stiffness="100">
+    <spatial range="0 0.45" limited="true" width=".004" rgba=".3 .95 .3 1" stiffness="100">
       <site site="tendon_left" />
       <site site="tendon_fixture_left" />
     </spatial>
   </tendon>
 
   <tendon>
-    <spatial range="0 0.45" limited="true" width=".002" rgba=".95 .95 .3 1" stiffness="100">
+    <spatial range="0 0.45" limited="true" width=".004" rgba=".95 .95 .3 1" stiffness="100">
       <site site="tendon_right" />
       <site site="tendon_fixture_right" />
     </spatial>
