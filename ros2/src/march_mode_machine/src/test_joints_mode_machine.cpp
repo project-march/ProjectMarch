@@ -12,11 +12,7 @@ This class is only used in the test_joints launch file.
 
 TestJointsModeMachine::TestJointsModeMachine()
 {
-        m_exo_transitions ={
-                /*{CurrentMode, PossibleModes}*/
-                {{exoMode::BootUp, {exoMode::Stand}},
-                {exoMode::Stand, {exoMode::Walk, exoMode::BootUp}},
-                {exoMode::Walk, {exoMode::Stand}}}};
+        m_exo_transitions = ExoModeTransitions("Test Joints");
 
         setCurrentMode(exoMode::BootUp);
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Test joints Mode Machine created");
