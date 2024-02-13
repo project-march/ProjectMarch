@@ -15,7 +15,7 @@ def generate_launch_description():
     arg = SetEnvironmentVariable("RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED", "1")
     ld.add_action(arg)
 
-    default_config = os.path.join(get_package_share_directory("march_fuzzy_generator"), "config", "joints.yaml")
+    default_config = os.path.join(get_package_share_directory("march_fuzzy_generator"), "config", "default_weights.yaml")
 
     # parameters
     config_path = LaunchConfiguration("config_path", default=default_config)

@@ -21,7 +21,7 @@
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
-#include "march_shared_msgs/msg/weight_stamped.hpp"
+#include "march_shared_msgs/msg/fuzzy_weights.hpp"
 #include "march_shared_msgs/msg/pid_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -131,7 +131,7 @@ public:
     explicit WeightNode()
         : Node("weight_node")
     {
-        m_weight_subscription = this->create_subscription<march_shared_msgs::msg::WeightStamped>(
+        m_weight_subscription = this->create_subscription<march_shared_msgs::msg::FuzzyWeights>(
             "fuzzy_weight", 10, std::bind(&WeightNode::weight_callback, this, _1));
 
         m_measured_torque_publisher
@@ -144,7 +144,7 @@ public:
     }
 
     // Method to receive and set the weights of the joints
-    void weight_callback(march_shared_msgs::msg::WeightStamped::SharedPtr msg)
+    void weight_callback(march_shared_msgs::msg::FuzzyWeights::SharedPtr msg)
     {
         RCLCPP_INFO_STREAM_ONCE(this->get_logger(),
             "Weights are in from fuzzy generator node: joint : " << msg->joint_name << " position " << msg->position_weight
@@ -230,7 +230,7 @@ public:
     std::optional<float> delta;
 
 private:
-    rclcpp::Subscription<march_shared_msgs::msg::WeightStamped>::SharedPtr m_weight_subscription;
+    rclcpp::Subscription<march_shared_msgs::msg::FuzzyWeights>::SharedPtr m_weight_subscription;
     rclcpp::Publisher<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_measured_torque_publisher;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_measure_torque_subscription;
 };

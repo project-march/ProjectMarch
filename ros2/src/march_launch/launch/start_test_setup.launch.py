@@ -104,7 +104,7 @@ def generate_launch_description() -> LaunchDescription:
     default_fuzzy_config = os.path.join(
         get_package_share_directory('march_fuzzy_generator'),
         'config',
-        'joints.yaml'
+        'default_weights.yaml'
     )
     
     default_gainscheduler_config = os.path.join(

@@ -6,29 +6,32 @@
 #define MARCH_FUZZY_GENERATOR_HPP
 #pragma once
 
-#include "geometry_msgs/msg/point_stamped.hpp"
-#include "march_shared_msgs/msg/feet_height_stamped.hpp"
-#include "march_shared_msgs/msg/torque_stamped.hpp"
+#include "march_shared_msgs/msg/foot_heights.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/float32.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
+
 
 class FuzzyGenerator {
     public:
         FuzzyGenerator();
         FuzzyGenerator(std::string config_path);
-        std::vector<std::tuple<std::string, float, float>> calculateWeights(std::vector<double> both_foot_heights);
-        std::vector<std::tuple<std::string, float, float>> getTorqueRanges();
         void setConfigPath(const exoMode &new_gait_type);
+        std::vector<std::tuple<std::string, float, float>> getConstantWeights();
+        std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FootHeights::SharedPtr& both_foot_heights);
+        std::vector<std::tuple<std::string, float, float>> calculateStanceSwingLegWeights(std::vector<double> stance_swing);
+        std::vector<std::string> m_joint_names;
 
     private:
-        double lower_bound;
-        double upper_bound;
-        YAML::Node config_;
+        double m_lower_bound;
+        double m_upper_bound;
+        YAML::Node m_config;
         exoMode m_gait_type;
+        std::vector<std::tuple<std::string, float, float, float>> m_torque_ranges;
+        void setJointParameters();
+        std::vector<std::tuple<std::string, float, float, float>> getTorqueRanges();
+        void getJointNames();
+
 };
 
 #endif // MARCH_FUZZY_GENERATOR_HPP
