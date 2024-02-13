@@ -60,18 +60,18 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current mode: %d", msg->mode); 
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType());
     m_gait_planning.setGaitType((exoMode)msg->mode);
-    // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
     if ((exoMode)msg->mode == exoMode::Stand){
         if (m_gait_planning.getPreviousGaitType() == exoMode::Walk || m_gait_planning.getPreviousGaitType() == exoMode::Ascending || m_gait_planning.getPreviousGaitType() == exoMode::Descending || m_gait_planning.getPreviousGaitType() == exoMode::Sideways){
-        }   
+        RCLCPP_DEBUG(this->get_logger(), "Finish gait transition!"); 
+        } else {
+        m_gait_planning.setCounter(0); 
+        }
     } else {
         m_gait_planning.setCounter(0); 
-        RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!"); 
     }
     if (!m_first_stand){
         publishJointTrajectoryPoints(); 
     }
-    // publishJointTrajectoryPoints(); 
 }
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
@@ -79,7 +79,6 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         std::vector<double> point = msg->joint_state.position; 
         if (point.size() >= 8) {
             m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
-            // m_gait_planning.setPrevPoint(point); 
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
             m_first_stand = false;
         } else {
@@ -210,7 +209,6 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 switch(m_gait_planning.getPreviousGaitType()){
 
                     case exoMode::Sit :
-
                         m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                         processMovingGaits(count);
                         if (count >= (m_current_trajectory.size()-1)){
