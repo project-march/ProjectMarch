@@ -4,7 +4,7 @@
 #include <cstdio>
 #include "march_shared_msgs/msg/error.hpp"
 #include <string>
-#include "march_mode_machine/exo_mode.hpp"
+#include "march_mode_machine/exo_mode_transitions.hpp"
 
 
 class ModeMachineCartesian {
