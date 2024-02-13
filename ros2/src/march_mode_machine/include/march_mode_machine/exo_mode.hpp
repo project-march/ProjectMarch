@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 enum class exoMode {
     Sit = 0,
@@ -14,6 +15,22 @@ enum class exoMode {
     Descending = 9,
     VariableWalk = 10,
 };
+
+std::vector<exoMode> getAllPossibleModes() {
+    return {
+    exoMode::Sit,
+    exoMode::Stand,
+    exoMode::Walk,
+    exoMode::BootUp,
+    exoMode::Error,
+    exoMode::Sideways,
+    exoMode::LargeWalk,
+    exoMode::SmallWalk,
+    exoMode::Ascending,
+    exoMode::Descending,
+    exoMode::VariableWalk,
+    };
+}
 
 inline std::string toString(exoMode state) {
     switch (state) {

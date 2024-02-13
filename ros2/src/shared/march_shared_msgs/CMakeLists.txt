@@ -30,6 +30,16 @@ find_package(control_msgs REQUIRED)
 find_package(actionlib_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+# Run the Python script to generate ExoMode.msg
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+execute_process(
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate/generate_exo_mode_message.py
+  RESULT_VARIABLE result
+  OUTPUT_VARIABLE output
+)
+if(result)
+  message(FATAL_ERROR "Failed to generate ExoMode.msg: ${output}")
+endif()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Alive.msg"

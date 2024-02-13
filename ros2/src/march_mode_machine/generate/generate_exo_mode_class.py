@@ -24,7 +24,7 @@ all_modes.sort(key=lambda mode: mode['exoMode'])
 
 # Open the output file
 with open(os.path.join(output_dir, 'exo_mode.hpp'), 'w') as f:
-    f.write("#pragma once\n#include <string>\n\n")
+    f.write("#pragma once\n#include <string>\n#include <vector>\n\n")
 
 
     # Write the enum definition
@@ -38,6 +38,20 @@ with open(os.path.join(output_dir, 'exo_mode.hpp'), 'w') as f:
 
     # Write the closing brace for the enum
     f.write('};\n\n')
+
+    # Write the getAllPossibleModes function definition
+    f.write('std::vector<exoMode> getAllPossibleModes() {\n')
+    f.write('    return {\n')
+
+    # Write each enum member
+    for mode in all_modes:
+        name = mode['name']
+        value = mode['exoMode']
+        f.write(f'    exoMode::{name},\n')
+
+    # Write the closing brace for the enum
+    f.write('    };\n')
+    f.write('}\n\n')
 
     # Write the toString function
     f.write("inline std::string toString(exoMode state) {\n")

@@ -5,9 +5,8 @@
 #include <cstdlib>
 using std::placeholders::_1;
 
-#define X(name, value) exoMode::name,
-std::vector<exoMode> all_possible_modes = { EXO_MODES };
-#undef X
+
+std::vector<exoMode> all_possible_modes;
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
