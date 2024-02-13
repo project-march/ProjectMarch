@@ -13,6 +13,7 @@ from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
 from rclpy.node import Node
+import aie_passive_force
 
 
 def get_actuator_names(model):
@@ -85,6 +86,7 @@ class MujocoSimNode(Node):
         self.data = mujoco.MjData(self.model)
 
         self.actuator_names = get_actuator_names(self.model)
+        self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.005
@@ -217,6 +219,7 @@ class MujocoSimNode(Node):
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
         while self.data.time <= time_difference_withseconds:
+            mujoco.set_mjcb_passive(self.aie_passive_force.callback)
             mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
