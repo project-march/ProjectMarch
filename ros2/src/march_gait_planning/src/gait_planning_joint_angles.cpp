@@ -28,19 +28,22 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_stand_to_sit_trajectory(), 
    m_sideways_trajectory(),
    m_sit_to_stand_trajectory(),
+   m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
+
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv", m_step_close_trajectory); 
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -142,4 +145,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
 
 std::vector<std::vector<double>> GaitPlanningAngles::getDescendingGait() const{
     return m_descending_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
+    return m_step_close_trajectory; 
 }

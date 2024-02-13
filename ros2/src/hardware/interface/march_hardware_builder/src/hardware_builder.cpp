@@ -90,34 +90,28 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
 
     auto motor_controller = HardwareBuilder::createMotorController(*logger, joint_config["motor_controller"]);
 
-    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating Motor controllers.");
-    std::array<double, 3> position_pid;
-    auto pos_pids = joint_config["pids"]["position"];
-    position_pid[0] = pos_pids["p"].as<double>();
-    position_pid[1] = pos_pids["i"].as<double>();
-    position_pid[2] = pos_pids["d"].as<double>();
+        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done creating Motor controllers.");
+        std::array<double, 3> position_pid;
+        auto pos_pids = joint_config["pids"]["position"];
+        position_pid[0] = pos_pids["p"].as<double>();
+        position_pid[1] = pos_pids["i"].as<double>();
+        position_pid[2] = pos_pids["d"].as<double>();
 
-    std::array<double, 3> torque_pid;
-    auto tor_pids = joint_config["pids"]["torque"];
-    torque_pid[0] = tor_pids["p"].as<double>();
-    torque_pid[1] = tor_pids["i"].as<double>();
-    torque_pid[2] = tor_pids["d"].as<double>();
+        std::array<double, 3> torque_pid;
+        auto tor_pids = joint_config["pids"]["torque"];
+        torque_pid[0] = tor_pids["p"].as<double>();
+        torque_pid[1] = tor_pids["i"].as<double>();
+        torque_pid[2] = tor_pids["d"].as<double>();
 
-    RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done setting pids.");
-    if (joint_config["temperatureges"]) {
-        auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
-        return { joint_name, net_number, std::move(motor_controller),
-            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
-            std::move(ges), logger };
-    } else {
-        return { joint_name, net_number, std::move(motor_controller),
-            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
-            logger };
-        return { joint_name, net_number, std::move(motor_controller),
-            std::make_unique<std::array<double, 3>>(position_pid), std::make_unique<std::array<double, 3>>(torque_pid),
-            logger };
+        RCLCPP_INFO(rclcpp::get_logger("hardware_builder"), "done setting pids.");
+        if (joint_config["temperatureges"]) {
+            auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
+            return { joint_name, net_number, std::move(motor_controller), position_pid, torque_pid, std::move(ges), logger };
+        } else {
+            return { joint_name, net_number, std::move(motor_controller), position_pid, torque_pid, logger };
+        }
     }
-}
+
 
 std::map<std::string, YAML::Node> HardwareBuilder::getMapOfActiveJointConfigs(
     const YAML::Node& joints_config, std::vector<std::string> active_joint_names) const

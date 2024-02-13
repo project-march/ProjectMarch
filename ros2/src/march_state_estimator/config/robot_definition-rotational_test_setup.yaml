@@ -1,0 +1,203 @@
+backpack:
+  angular:
+    acceleration:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    velocity:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  axis:
+  - 0
+  - 0
+  - 0
+  children:
+  - bar
+  dynamics:
+    inertia: '0'
+    mass: 0.3743
+    torque:
+      m00: -0.080330734594*ddq_bar*sin(q_bar+Pi/4)^2-0.080330734594*ddq_bar*cos(q_bar+Pi/4)^2-0.256*ddq_bar-1.6534714779*sqrt(2)*cos(q_bar+Pi/4)
+  jacobian:
+    position:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    rotation:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  joint_names:
+    absolute: []
+    relative:
+    - bar
+  linear:
+    acceleration:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    position:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    velocity:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  name: backpack
+  parent: ''
+  rotation:
+    m00: '1.00000000000000'
+    m01: '0'
+    m02: '0'
+    m10: '0'
+    m11: '1.00000000000000'
+    m12: '0'
+    m20: '0'
+    m21: '0'
+    m22: '1.00000000000000'
+  type: mass
+bar:
+  angular:
+    acceleration:
+      m00: '0'
+      m10: ddq_bar
+      m20: '0'
+    velocity:
+      m00: '0'
+      m10: dq_bar
+      m20: '0'
+  axis:
+  - 0.0
+  - 1.0
+  - 0.0
+  children:
+  - weight
+  dynamics:
+    inertia: '0.336330734594000'
+    mass: 0.0
+    torque:
+      m00: '0'
+  jacobian:
+    position:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    rotation:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  joint_names:
+    absolute:
+    - bar
+    relative: []
+  linear:
+    acceleration:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    position:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+    velocity:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  name: bar
+  parent: backpack
+  rotation:
+    m00: cos(q_bar)
+    m01: '0'
+    m02: sin(q_bar)
+    m10: '0'
+    m11: '1.00000000000000'
+    m12: '0'
+    m20: -sin(q_bar)
+    m21: '0'
+    m22: cos(q_bar)
+  type: joint
+names:
+- backpack
+- weight
+- bar
+weight:
+  angular:
+    acceleration:
+      m00: '0'
+      m10: ddq_bar
+      m20: '0'
+    velocity:
+      m00: '0'
+      m10: dq_bar
+      m20: '0'
+  axis:
+  - 0
+  - 0
+  - 0
+  children: []
+  dynamics:
+    inertia: '0'
+    mass: 0.7073
+    torque: {}
+  jacobian:
+    position:
+      m00: 0.2383*sqrt(2)*sin(q_bar+Pi/4)
+      m10: '0'
+      m20: 0.2383*sqrt(2)*cos(q_bar+Pi/4)
+    rotation:
+      m00: '0'
+      m10: '0'
+      m20: '0'
+  joint_names:
+    absolute:
+    - bar
+    relative: []
+  linear:
+    acceleration:
+      m00: 0.2383*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))
+      m10: '0'
+      m20: 0.2383*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))
+    position:
+      m00: -0.2383*sqrt(2)*cos(q_bar+Pi/4)
+      m10: '0'
+      m20: 0.2383*sqrt(2)*sin(q_bar+Pi/4)
+    velocity:
+      m00: 0.2383*sqrt(2)*dq_bar*sin(q_bar+Pi/4)
+      m10: '0'
+      m20: 0.2383*sqrt(2)*dq_bar*cos(q_bar+Pi/4)
+  name: weight
+  parent: bar
+  rotation:
+    m00: cos(q_bar)
+    m01: '0'
+    m02: sin(q_bar)
+    m10: '0'
+    m11: '1.00000000000000'
+    m12: '0'
+    m20: -sin(q_bar)
+    m21: '0'
+    m22: cos(q_bar)
+  type: mass
+zmp:
+  mass: 1.0816000000000001
+  jacobian:
+    m00: '0'
+    m10: '0'
+    m20: '0'
+  joint_names:
+  - bar
+  position:
+    x: (-0.7073*(0.2383*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(-2*q_inertial_2^2-2*q_inertial_3^2+1)+0.2383*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3))*(-0.2383*sqrt(2)*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)*cos(q_bar+Pi/4)+0.2383*sqrt(2)*(-2*q_inertial_1^2-2*q_inertial_2^2+1)*sin(q_bar+Pi/4))+0.7073*(0.2383*sqrt(2)*(2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)*sin(q_bar+Pi/4)-0.2383*sqrt(2)*(-2*q_inertial_2^2-2*q_inertial_3^2+1)*cos(q_bar+Pi/4))*(0.2383*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)+0.2383*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(-2*q_inertial_1^2-2*q_inertial_2^2+1)-9.81))/(0.16854959*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)+0.16854959*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(-2*q_inertial_1^2-2*q_inertial_2^2+1)-10.610496)
+    y: (-0.7073*(0.2383*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(2*q_inertial_0*q_inertial_3+2*q_inertial_1*q_inertial_2)+0.2383*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(-2*q_inertial_0*q_inertial_1+2*q_inertial_2*q_inertial_3))*(-0.2383*sqrt(2)*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)*cos(q_bar+Pi/4)+0.2383*sqrt(2)*(-2*q_inertial_1^2-2*q_inertial_2^2+1)*sin(q_bar+Pi/4))+0.7073*(0.2383*sqrt(2)*(-2*q_inertial_0*q_inertial_1+2*q_inertial_2*q_inertial_3)*sin(q_bar+Pi/4)-0.2383*sqrt(2)*(2*q_inertial_0*q_inertial_3+2*q_inertial_1*q_inertial_2)*cos(q_bar+Pi/4))*(0.2383*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)+0.2383*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(-2*q_inertial_1^2-2*q_inertial_2^2+1)-9.81))/(0.16854959*sqrt(2)*(ddq_bar*sin(q_bar+Pi/4)+dq_bar^2*cos(q_bar+Pi/4))*(-2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3)+0.16854959*sqrt(2)*(ddq_bar*cos(q_bar+Pi/4)-dq_bar^2*sin(q_bar+Pi/4))*(-2*q_inertial_1^2-2*q_inertial_2^2+1)-10.610496)
+  rotation:
+    m00: -2*q_inertial_2^2-2*q_inertial_3^2+1
+    m01: -2*q_inertial_0*q_inertial_3+2*q_inertial_1*q_inertial_2
+    m02: 2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3
+    m10: 2*q_inertial_0*q_inertial_3+2*q_inertial_1*q_inertial_2
+    m11: -2*q_inertial_1^2-2*q_inertial_3^2+1
+    m12: -2*q_inertial_0*q_inertial_1+2*q_inertial_2*q_inertial_3
+    m20: -2*q_inertial_0*q_inertial_2+2*q_inertial_1*q_inertial_3
+    m21: 2*q_inertial_0*q_inertial_1+2*q_inertial_2*q_inertial_3
+    m22: -2*q_inertial_1^2-2*q_inertial_2^2+1

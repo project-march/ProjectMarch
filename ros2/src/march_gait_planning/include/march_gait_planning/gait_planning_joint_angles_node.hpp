@@ -39,6 +39,7 @@ private:
 
     // Process various types of gaits 
     void processHomeStandGait();
+    void finishGaitBeforeStand(); 
     void processMovingGaits(const int &counter);     
     
     // Final joint angle trajectory publisher
