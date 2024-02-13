@@ -29,7 +29,6 @@ class FuzzyGenerator {
         exoMode m_gait_type;
         std::vector<std::tuple<std::string, float, float, float>> m_torque_ranges;
         void getJointNames();
-        void setJointParameters();
         std::vector<std::tuple<std::string, float, float, float>> getTorqueRanges();
         std::vector<std::tuple<std::string, float, float>> calculateVariableWeights(double left_leg_parameter, double right_leg_parameter);
         

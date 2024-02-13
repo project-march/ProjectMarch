@@ -9,7 +9,7 @@ FuzzyGenerator::FuzzyGenerator(){
 
 FuzzyGenerator::FuzzyGenerator(std::string config_path){
     m_config = YAML::LoadFile(config_path);
-    setJointParameters();
+    m_torque_ranges = getTorqueRanges();
     getJointNames();
 }
 
@@ -35,6 +35,9 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getConstantWe
 // Method to calculate the foot height weights
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFootHeightWeights(const march_shared_msgs::msg::FootHeights::SharedPtr& both_foot_heights){
     
+    m_lower_bound = m_config["height_bounds"]["lower_bound"].as<double>();
+    m_upper_bound = m_config["height_bounds"]["upper_bound"].as<double>();
+
     if (both_foot_heights == nullptr) {
         throw std::runtime_error("No foot height received.");
     }  
@@ -60,6 +63,9 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFoot
 // Method to calculate the stance swing leg weights
 // TODO: get torques from hwi and create configs for the different gaits
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque){
+
+    m_lower_bound = m_config["torque_bounds"]["lower_bound"].as<double>();
+    m_upper_bound = m_config["torque_bounds"]["upper_bound"].as<double>();
 
     if (left_ankle_torque == 0 || right_ankle_torque == 0) {
         throw std::runtime_error("No ankle torque received.");
@@ -93,7 +99,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateVari
             throw std::runtime_error("Joint not found");
         }
 
-        // calculate how far the foot is in the 'fuzzy shifting range'
+        // calculate how far the parameter is in the 'fuzzy shifting range'
         const float fuzzy_percentage = (m_upper_bound - fuzzy_parameter) / (m_upper_bound - m_lower_bound);
         float torque_weight = torque_range * fuzzy_percentage;
         torque_weight = std::max(minimum_torque_percentage, std::min(torque_weight, maximum_torque_percentage));
@@ -141,14 +147,6 @@ void FuzzyGenerator::getJointNames() {
 }
 
 
-// Method to set the joint parameters
-void FuzzyGenerator::setJointParameters() {
-    m_torque_ranges = getTorqueRanges();
-    m_lower_bound = m_config["bounds"]["lower_bound"].as<double>();
-    m_upper_bound = m_config["bounds"]["upper_bound"].as<double>();
-}
-
-
 // Method to set the config path
 // TODO: update the config (paths) for the rest of the gaits
 void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
@@ -164,5 +162,6 @@ void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
     } else {
         throw std::runtime_error("Gait type not found");
     }
-    setJointParameters();
+
+    m_torque_ranges = getTorqueRanges();
 }

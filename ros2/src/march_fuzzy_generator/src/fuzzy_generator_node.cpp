@@ -27,7 +27,6 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
 
     m_timer = create_wall_timer(std::chrono::milliseconds(1000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
-
 }
 
 
@@ -36,7 +35,7 @@ void FuzzyGeneratorNode::footHeightsCallback(const march_shared_msgs::msg::FootH
     if (msg != nullptr) {
         m_latest_foot_heights = msg;
     } else {
-        throw std::runtime_error("No foot heights received.");
+        RCLCPP_ERROR(get_logger(), "Received nullptr foot heights");
     }
 }
 
@@ -47,6 +46,7 @@ void FuzzyGeneratorNode::controlTypeCallback(std_msgs::msg::String::SharedPtr ms
         m_control_type = msg->data;
     } else {
         m_control_type = "position";
+        RCLCPP_WARN(get_logger(), "Received nullptr control type, defaulting to position control");
     }
 }
 
