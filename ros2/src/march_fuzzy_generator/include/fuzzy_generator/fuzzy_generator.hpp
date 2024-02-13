@@ -19,19 +19,28 @@ class FuzzyGenerator {
         void setConfigPath(const exoMode &new_gait_type);
         std::vector<std::tuple<std::string, float, float>> getConstantWeights();
         std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FootHeights::SharedPtr& both_foot_heights);
-        std::vector<std::tuple<std::string, float, float>> calculateStanceSwingLegWeights(std::vector<double> stance_swing);
+        std::vector<std::tuple<std::string, float, float>> calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque);         // TODO: get torques from hwi
         std::vector<std::string> m_joint_names;
 
     private:
+        YAML::Node m_config;
         double m_lower_bound;
         double m_upper_bound;
-        YAML::Node m_config;
         exoMode m_gait_type;
         std::vector<std::tuple<std::string, float, float, float>> m_torque_ranges;
+        void getJointNames();
         void setJointParameters();
         std::vector<std::tuple<std::string, float, float, float>> getTorqueRanges();
-        void getJointNames();
-
+        std::vector<std::tuple<std::string, float, float>> calculateVariableWeights(double left_leg_parameter, double right_leg_parameter);
+        
+        static constexpr std::size_t m_left_foot_index = 0;
+        static constexpr std::size_t m_right_foot_index = 1;
+        static constexpr std::size_t m_joint_name_index = 0;
+        static constexpr std::size_t m_min_torque_index = 1;
+        static constexpr std::size_t m_max_torque_index = 2;
+        static constexpr std::size_t m_torque_weight_index = 3;
+        
+   
 };
 
 #endif // MARCH_FUZZY_GENERATOR_HPP

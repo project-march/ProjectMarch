@@ -13,23 +13,34 @@ FuzzyGenerator::FuzzyGenerator(std::string config_path){
     getJointNames();
 }
 
+
+// Method to get the constant weights
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getConstantWeights() {
+
+    std::vector<std::tuple<std::string, float, float>> constant_joint_weights;
+  
+    for (const auto& joint_torque_ranges : m_torque_ranges) {
+        
+        const std::string joint_name = std::get<m_joint_name_index>(joint_torque_ranges);
+        const float torque_weight = std::get<m_torque_weight_index>(joint_torque_ranges);
+        const float position_weight = 1 - torque_weight;
+
+        constant_joint_weights.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
+    }
+
+    return constant_joint_weights;
+}
+
+
+// Method to calculate the foot height weights
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFootHeightWeights(const march_shared_msgs::msg::FootHeights::SharedPtr& both_foot_heights){
-    const unsigned int left_foot_index = 0;
-    const unsigned int right_foot_index = 1;
-    const unsigned int joint_name_index = 0;
-    const unsigned int min_torque_index = 1;
-    const unsigned int max_torque_index = 2;
-
-    std::vector<std::tuple<std::string, float, float>> joint_weights_vector;
-    double left_foot_height;
-    double right_foot_height;
-
+    
     if (both_foot_heights == nullptr) {
         throw std::runtime_error("No foot height received.");
-    } else {
-        left_foot_height = both_foot_heights->heights[left_foot_index];
-        right_foot_height = both_foot_heights->heights[right_foot_index];
-    }   
+    }  
+
+    double left_foot_height = both_foot_heights->heights[m_left_foot_index];
+    double right_foot_height = both_foot_heights->heights[m_right_foot_index];
 
     if (left_foot_height < 0 || right_foot_height < 0) {
         throw std::runtime_error("Negative foot height received.");
@@ -42,36 +53,58 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFoot
         right_foot_height = 0;
     }
 
+    return calculateVariableWeights(left_foot_height, right_foot_height);
+}
+
+
+// Method to calculate the stance swing leg weights
+// TODO: get torques from hwi and create configs for the different gaits
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque){
+
+    if (left_ankle_torque == 0 || right_ankle_torque == 0) {
+        throw std::runtime_error("No ankle torque received.");
+    }
+
+    return calculateVariableWeights(left_ankle_torque, right_ankle_torque);
+}
+
+
+// Method to calculate the variable weights
+std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateVariableWeights(double left_leg_parameter, double right_leg_parameter){
+
+    std::vector<std::tuple<std::string, float, float>> joint_weights_vector;
+    joint_weights_vector.reserve(m_torque_ranges.size()); 
+
+    double fuzzy_parameter;
+
     // for each joint in the leg, calculate the torque weight and position weight
     for (const auto& joint_torque_ranges : m_torque_ranges) {
         
-        const std::string joint_name = std::get<joint_name_index>(joint_torque_ranges);
-        const float minimum_torque_percentage = std::get<min_torque_index>(joint_torque_ranges);
-        const float maximum_torque_percentage = std::get<max_torque_index>(joint_torque_ranges);
+        const std::string joint_name = std::get<m_joint_name_index>(joint_torque_ranges);
+        const float minimum_torque_percentage = std::get<m_min_torque_index>(joint_torque_ranges);
+        const float maximum_torque_percentage = std::get<m_max_torque_index>(joint_torque_ranges);
         const float torque_range = maximum_torque_percentage - minimum_torque_percentage;
 
-        // getting the correct foot height and leg
-        float foot_height;
-    
         if (joint_name.find("left") != std::string::npos) {
-            foot_height = left_foot_height;
+            fuzzy_parameter = left_leg_parameter;
         } else if (joint_name.find("right") != std::string::npos) {
-            foot_height = right_foot_height;
+            fuzzy_parameter = right_leg_parameter;
         } else {
             throw std::runtime_error("Joint not found");
         }
 
         // calculate how far the foot is in the 'fuzzy shifting range'
-        const float height_percentage = (m_upper_bound - foot_height) / (m_upper_bound - m_lower_bound);
-        float torque_weight = torque_range * height_percentage;
+        const float fuzzy_percentage = (m_upper_bound - fuzzy_parameter) / (m_upper_bound - m_lower_bound);
+        float torque_weight = torque_range * fuzzy_percentage;
         torque_weight = std::max(minimum_torque_percentage, std::min(torque_weight, maximum_torque_percentage));
         const float position_weight = 1 - torque_weight;
 
-        joint_weights_vector.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
+        joint_weights_vector.emplace_back(joint_name, position_weight, torque_weight);  
     }
 
     return joint_weights_vector;
 }
+
 
 //  Method to get the torque ranges
 std::vector<std::tuple<std::string, float, float, float>> FuzzyGenerator::getTorqueRanges()
@@ -92,6 +125,30 @@ std::vector<std::tuple<std::string, float, float, float>> FuzzyGenerator::getTor
     return joint_torque_ranges;
 }
 
+
+// Method to get the joint names
+void FuzzyGenerator::getJointNames() {
+
+    std::vector<std::string> joint_names; 
+
+    for (const auto& joint_torque_ranges : m_torque_ranges) {
+        
+        const std::string joint_name = std::get<FuzzyGenerator::m_joint_name_index>(joint_torque_ranges);
+        joint_names.push_back(joint_name);
+    }
+
+    m_joint_names = joint_names; 
+}
+
+
+// Method to set the joint parameters
+void FuzzyGenerator::setJointParameters() {
+    m_torque_ranges = getTorqueRanges();
+    m_lower_bound = m_config["bounds"]["lower_bound"].as<double>();
+    m_upper_bound = m_config["bounds"]["upper_bound"].as<double>();
+}
+
+
 // Method to set the config path
 // TODO: update the config (paths) for the rest of the gaits
 void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
@@ -107,50 +164,5 @@ void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
     } else {
         throw std::runtime_error("Gait type not found");
     }
-
     setJointParameters();
-}
-
-std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getConstantWeights() {
-
-    std::vector<std::tuple<std::string, float, float>> constant_joint_weights;
-
-    for (const auto& joint_torque_ranges : m_torque_ranges) {
-        
-        const std::string joint_name = std::get<0>(joint_torque_ranges);
-        const float torque_weight = std::get<3>(joint_torque_ranges);
-        const float position_weight = 1 - torque_weight;
-
-        constant_joint_weights.push_back(std::make_tuple(joint_name, position_weight, torque_weight));
-    }
-
-    return constant_joint_weights;
-}
-
-// Method to set the joint parameters
-void FuzzyGenerator::setJointParameters() {
-    m_torque_ranges = getTorqueRanges();
-    m_lower_bound = m_config["bounds"]["lower_bound"].as<double>();
-    m_upper_bound = m_config["bounds"]["upper_bound"].as<double>();
-}
-
-void FuzzyGenerator::getJointNames() {
-
-    std::vector<std::string> joint_names; 
-
-    for (const auto& joint_torque_ranges : m_torque_ranges) {
-        
-        const std::string joint_name = std::get<0>(joint_torque_ranges);
-        joint_names.push_back(joint_name);
-    }
-
-    m_joint_names = joint_names; 
-}
-
-
-std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateStanceSwingLegWeights(std::vector<double> stance_swing){
-
-    // stance-swing leg scheduling logic 
-
-    return std::vector<std::tuple<std::string, float, float>>();
 }

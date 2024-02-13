@@ -26,9 +26,10 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
 
-    m_timer = create_wall_timer(std::chrono::milliseconds(1000), std::bind(&FuzzyGeneratorNode::timerCallback, this));
+    m_timer = create_wall_timer(std::chrono::milliseconds(1000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
 
 }
+
 
 // Method to receive the foot heights
 void FuzzyGeneratorNode::footHeightsCallback(const march_shared_msgs::msg::FootHeights::SharedPtr msg){
@@ -37,8 +38,8 @@ void FuzzyGeneratorNode::footHeightsCallback(const march_shared_msgs::msg::FootH
     } else {
         throw std::runtime_error("No foot heights received.");
     }
-    
 }
+
 
 // Method to receive the control type, etiher "position" or "fuzzy"
 void FuzzyGeneratorNode::controlTypeCallback(std_msgs::msg::String::SharedPtr msg){
@@ -49,11 +50,13 @@ void FuzzyGeneratorNode::controlTypeCallback(std_msgs::msg::String::SharedPtr ms
     }
 }
 
+
 // Method to receive the current mode 
 void FuzzyGeneratorNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
     RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode);
     m_fuzzy_generator.setConfigPath((exoMode)msg->mode);
 }
+
 
 // Method to publish the fuzzy weights
 void FuzzyGeneratorNode::publishFuzzyWeights(){
@@ -71,23 +74,18 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
         // Uncomment desired method
         const auto fuzzy_weights = m_fuzzy_generator.getConstantWeights();
         // const auto fuzzy_weights = m_fuzzy_generator.calculateFootHeightWeights(m_latest_foot_heights);
-        // const auto fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(msg->stance_swing);
+        // const auto fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(0, 0);
 
         march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
         for (const auto& weight : fuzzy_weights) {
-            fuzzy_weights_msg.joint_name = std::get<0>(weight);
-            fuzzy_weights_msg.position_weight = std::get<1>(weight);
-            fuzzy_weights_msg.torque_weight = std::get<2>(weight);
+            fuzzy_weights_msg.joint_name = std::get<m_joint_name_index>(weight);
+            fuzzy_weights_msg.position_weight = std::get<m_position_weight_index>(weight);
+            fuzzy_weights_msg.torque_weight = std::get<m_torque_weight_index>(weight);
             m_weight_publisher->publish(fuzzy_weights_msg);
         }
     }
 }
 
-// Timer callback to publish the fuzzy weights
-void FuzzyGeneratorNode::timerCallback(){
-
-    publishFuzzyWeights();
-}
 
 int main(int argc, char** argv){
 
