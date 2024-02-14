@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_lib.h>
 #include <unistd.h>
 using std::placeholders::_1;
 
@@ -36,30 +38,25 @@ BluetoothInputDeviceNode::~BluetoothInputDeviceNode()
 
 void BluetoothInputDeviceNode::createSocket()
 {
-    m_bluetooth_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-    if (m_bluetooth_socket == -1) {
-        RCLCPP_ERROR(this->get_logger(), "Error creating socket: %s", strerror(errno));
-        return;
-    }
-
     struct sockaddr_rc addr = { 0 };
-    addr.rc_family = AF_BLUETOOTH;                  // AF_BLUETOOTH is defined in bluetooth.h
-    str2ba("64:5D:F4:14:B4:7E", &addr.rc_bdaddr);   // 64:5D:F4:14:B4:7E is the MAC address of the bluetooth module
-    addr.rc_channel = (uint8_t) 1;                  // channel 1 is used for bluetooth communication
+    addr.rc_family = AF_BLUETOOTH;
+    str2ba("64:5D:F4:14:B4:7E", &addr.rc_bdaddr);
+    addr.rc_channel = (uint8_t) 6;
 
-    int result = bind(m_bluetooth_socket, (struct sockaddr *)&addr, sizeof(addr));
-    if (result == -1) {
-        RCLCPP_ERROR(this->get_logger(), "Error binding socket: %s", strerror(errno));
+    // Open a socket to the local Bluetooth adapter
+    m_bluetooth_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+    if (m_bluetooth_socket < 0) {
+        RCLCPP_ERROR(this->get_logger(), "Error opening socket: %s", strerror(errno));
         return;
     }
-    RCLCPP_INFO(this->get_logger(), "Socket created and bound successfully");
-        
+
     // Connect to the remote device
-    result = connect(m_bluetooth_socket, (struct sockaddr *)&addr, sizeof(addr));
+    int result = connect(m_bluetooth_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (result == -1) {
         RCLCPP_ERROR(this->get_logger(), "Error connecting to remote device: %s", strerror(errno));
         return;
     }
+
     RCLCPP_INFO(this->get_logger(), "Connected to remote device successfully");
 }
 
