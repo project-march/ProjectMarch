@@ -270,9 +270,9 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
-        weight_node = std::make_shared<WeightNode>();
-        weight_node->joints_info_ = getJointsInfo();
-        executor_.add_node(weight_node);
+        fuzzy_weights_node = std::make_shared<FuzzyWeightsNode>();
+        fuzzy_weights_node->joints_info_ = getJointsInfo();
+        executor_.add_node(fuzzy_weights_node);
         gains_node = std::make_shared<GainsNode>();
         gains_node->joints_info_ = getJointsInfo();
         executor_.add_node(gains_node);
@@ -455,7 +455,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     }
 
     // publish the measured torque each iteration
-    weight_node->publish_measured_torque();
+    fuzzy_weights_node->publish_measured_torque();
 
     for (JointInfo& jointInfo : joints_info_) {
         if (!is_joint_in_valid_state(jointInfo)) {
