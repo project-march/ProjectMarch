@@ -63,6 +63,10 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
     // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
     if ((exoMode)msg->mode == exoMode::Stand){
         if (m_gait_planning.getPrevGaitType() == exoMode::Walk || m_gait_planning.getPrevGaitType() == exoMode::Ascending || m_gait_planning.getPrevGaitType() == exoMode::Descending || m_gait_planning.getPrevGaitType() == exoMode::Sideways){
+        }
+        else {
+            m_gait_planning.setCounter(0); 
+            RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!"); 
         }   
     } else {
         m_gait_planning.setCounter(0); 
@@ -212,10 +216,10 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     case exoMode::Sit :
 
                         m_current_trajectory = m_gait_planning.getSitToStandGait(); 
+                        RCLCPP_INFO(this->get_logger(), "filled sit to stand gait"); 
                         processMovingGaits(count);
                         if (count >= (m_current_trajectory.size()-1)){
                             m_gait_planning.setCounter(m_current_trajectory.size()-1);
-                            m_gait_planning.setPrevGaitType(exoMode::Stand); 
                         } else {
                             m_gait_planning.setCounter(count+1);
                         }
