@@ -142,6 +142,24 @@ std::vector<std::string> RobotNode::getRelativeJointNames() const
     return joint_names;
 }
 
+RobotNode::JointNameToValueMap RobotNode::getAbsoluteJointValues(const JointNameToValueMap& joint_values) const
+{
+    JointNameToValueMap absolute_joint_values;
+    for (const auto& joint_node : m_joint_nodes) {
+        absolute_joint_values[joint_node->getName()] = joint_values.at(joint_node->getName());
+    }
+    return absolute_joint_values;
+}
+
+Eigen::VectorXd RobotNode::convertAbsoluteJointValuesToVectorXd(const JointNameToValueMap& joint_values) const
+{
+    Eigen::VectorXd joint_values_vector = Eigen::VectorXd::Zero(m_joint_nodes.size());
+    for (unsigned long int i = 0; i < m_joint_nodes.size(); i++) {
+        joint_values_vector(i) = joint_values.at(m_joint_nodes[i]->getName());
+    }
+    return joint_values_vector;
+}
+
 Eigen::Vector3d RobotNode::getGlobalPosition(JointNameToValueMap joint_positions) const
 {
     return Eigen::Map<Eigen::Vector3d>(

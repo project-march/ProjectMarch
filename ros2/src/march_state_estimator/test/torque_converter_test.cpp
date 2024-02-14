@@ -151,5 +151,37 @@ TEST_F(TorqueConverterTest, test_should_be_able_to_calculate_external_forces_fro
     EXPECT_EQ(expected_external_torques, actual_external_torques);
 }
 
+TEST_F(TorqueConverterTest, test_should_be_able_to_calculate_external_force_in_upright_position_with_dummy_external_torque_from_rotational_test_setup)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", M_PI_4 } };
+    RobotNode::JointNameToValueMap external_torques = { { "bar", 1.0 } };
+    Eigen::Vector3d expected_external_force = { 2.9673067882, 0.0, 9.09709e-17};
+
+    Eigen::Vector3d actual_external_force
+        = m_torque_converter->getExternalForceByNode("weight", joint_positions, external_torques);
+
+    std::cout << "Expected external force: "<< std::endl << expected_external_force << std::endl;
+    std::cout << "Actual external force: "<< std::endl << actual_external_force << std::endl;
+    std::cout << "Difference: "<< std::endl << expected_external_force - actual_external_force << std::endl;
+    ASSERT_TRUE(expected_external_force.isApprox(actual_external_force, 1e-3));
+}
+
+TEST_F(TorqueConverterTest, test_should_be_able_to_calculate_external_force_in_upright_position_with_zero_external_torque_from_rotational_test_setup)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", M_PI_4 } };
+    RobotNode::JointNameToValueMap external_torques = { { "bar", 0.0 } };
+    Eigen::Vector3d expected_external_force = { 0.0, 0.0, 0.0};
+
+    Eigen::Vector3d actual_external_force
+        = m_torque_converter->getExternalForceByNode("weight", joint_positions, external_torques);
+
+    std::cout << "Expected external force: "<< std::endl << expected_external_force << std::endl;
+    std::cout << "Actual external force: "<< std::endl << actual_external_force << std::endl;
+    std::cout << "Difference: "<< std::endl << expected_external_force - actual_external_force << std::endl;
+    ASSERT_TRUE(expected_external_force.isApprox(actual_external_force));
+}
+
 // NOLINTBEGIN
 #endif // __clang_analyzer__

@@ -21,7 +21,7 @@ public:
     typedef std::shared_ptr<TorqueConverter> SharedPtr;
 
     TorqueConverter(std::shared_ptr<RobotDescription> robot_description);
-    ~TorqueConverter();
+    ~TorqueConverter() = default;
 
     RobotNode::JointNameToValueMap getDynamicalJointAccelerations(
         const RobotNode::JointNameToValueMap& joint_positions, 
@@ -33,10 +33,15 @@ public:
     RobotNode::JointNameToValueMap getExternalTorques(
         const RobotNode::JointNameToValueMap& joint_total_torques, 
         const RobotNode::JointNameToValueMap& joint_dynamical_torques) const;
+    Eigen::Vector3d getExternalForceByNode(const std::string& node_name, 
+        const RobotNode::JointNameToValueMap& joint_positions, 
+        const RobotNode::JointNameToValueMap& external_torques) const;
     std::vector<std::string> getJointNames() const;
 
 private:
-    RobotNode::SharedPtr m_backpack_node;
+    Eigen::VectorXd convertToEigenVector(const RobotNode::JointNameToValueMap& joint_values) const;
+
+    std::shared_ptr<RobotDescription> m_robot_description;
     std::vector<RobotNode::SharedPtr>
         m_joint_nodes; // TODO: This is a duplicate of m_robot_description->m_robot_node_ptrs
     std::unordered_map<std::string, RobotNode::SharedPtr> m_joint_nodes_map;
