@@ -138,5 +138,18 @@ TEST_F(TorqueConverterTest, test_should_get_zero_dynamical_joint_acceleration_fr
     EXPECT_EQ(expected_dynamical_joint_acceleration, actual_dynamical_joint_acceleration);
 }
 
+TEST_F(TorqueConverterTest, test_should_be_able_to_calculate_external_forces_from_dummy_total_joint_torques_and_dummy_dynamical_joint_torques_from_rotational_test_setup)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_total_torques = { { "bar", 3.0 } };
+    RobotNode::JointNameToValueMap joint_dynamical_torques = { { "bar", 2.0 } };
+    RobotNode::JointNameToValueMap expected_external_torques = { { "bar", 1.0 } };
+
+    RobotNode::JointNameToValueMap actual_external_torques
+        = m_torque_converter->getExternalTorques(joint_total_torques, joint_dynamical_torques);
+
+    EXPECT_EQ(expected_external_torques, actual_external_torques);
+}
+
 // NOLINTBEGIN
 #endif // __clang_analyzer__

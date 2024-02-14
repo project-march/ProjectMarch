@@ -21,12 +21,18 @@ public:
     typedef std::shared_ptr<TorqueConverter> SharedPtr;
 
     TorqueConverter(std::shared_ptr<RobotDescription> robot_description);
-    ~TorqueConverter() = default;
+    ~TorqueConverter();
 
     RobotNode::JointNameToValueMap getDynamicalJointAccelerations(
-        RobotNode::JointNameToValueMap joint_positions, RobotNode::JointNameToValueMap joint_torques) const;
-    RobotNode::JointNameToValueMap getDynamicalTorques(RobotNode::JointNameToValueMap joint_positions,
-        RobotNode::JointNameToValueMap joint_velocities, RobotNode::JointNameToValueMap joint_accelerations) const;
+        const RobotNode::JointNameToValueMap& joint_positions, 
+        const RobotNode::JointNameToValueMap& joint_torques) const;
+    RobotNode::JointNameToValueMap getDynamicalTorques(
+        const RobotNode::JointNameToValueMap& joint_positions,
+        const RobotNode::JointNameToValueMap& joint_velocities, 
+        const RobotNode::JointNameToValueMap& joint_accelerations) const;
+    RobotNode::JointNameToValueMap getExternalTorques(
+        const RobotNode::JointNameToValueMap& joint_total_torques, 
+        const RobotNode::JointNameToValueMap& joint_dynamical_torques) const;
     std::vector<std::string> getJointNames() const;
 
 private:

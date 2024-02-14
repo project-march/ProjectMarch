@@ -28,13 +28,19 @@ TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_descrip
     }
 }
 
+TorqueConverter::~TorqueConverter()
+{
+    RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "TorqueConverter has been stopped.");
+}
+
 std::vector<std::string> TorqueConverter::getJointNames() const
 {
     return m_backpack_node->getRelativeJointNames();
 }
 
 RobotNode::JointNameToValueMap TorqueConverter::getDynamicalJointAccelerations(
-    RobotNode::JointNameToValueMap joint_positions, RobotNode::JointNameToValueMap joint_torques) const
+    const RobotNode::JointNameToValueMap& joint_positions, 
+    const RobotNode::JointNameToValueMap& joint_torques) const
 {
     try {
         RobotNode::JointNameToValueMap joint_accelerations;
@@ -50,8 +56,10 @@ RobotNode::JointNameToValueMap TorqueConverter::getDynamicalJointAccelerations(
     }
 }
 
-RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(RobotNode::JointNameToValueMap joint_positions,
-    RobotNode::JointNameToValueMap joint_velocities, RobotNode::JointNameToValueMap joint_accelerations) const
+RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(
+    const RobotNode::JointNameToValueMap& joint_positions,
+    const RobotNode::JointNameToValueMap& joint_velocities, 
+    const RobotNode::JointNameToValueMap& joint_accelerations) const
 {
     try {
         RobotNode::JointNameToValueMap joint_torques;
@@ -65,4 +73,15 @@ RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(RobotNode::J
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Could not calculate dynamical torque %s.", e.what());
         return RobotNode::JointNameToValueMap();
     }
+}
+
+RobotNode::JointNameToValueMap TorqueConverter::getExternalTorques(
+    const RobotNode::JointNameToValueMap& joint_total_torques, 
+    const RobotNode::JointNameToValueMap& joint_dynamical_torques) const
+{
+    RobotNode::JointNameToValueMap external_torques;
+    for (const auto& joint_total_pair : joint_total_torques) {
+        external_torques[joint_total_pair.first] = joint_total_pair.second - joint_dynamical_torques.at(joint_total_pair.first);
+    }
+    return external_torques;
 }
