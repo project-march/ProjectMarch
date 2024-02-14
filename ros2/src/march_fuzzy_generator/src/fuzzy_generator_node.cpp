@@ -17,16 +17,12 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FootHeights>(
         "robot_foot_heights", 10, std::bind(&FuzzyGeneratorNode::footHeightsCallback, this, _1));
 
-    // TODO: let something (?) publish the control type
-    m_control_type_subscription = this->create_subscription<std_msgs::msg::String>(
-        "low_level_control_type", 10, std::bind(&FuzzyGeneratorNode::controlTypeCallback, this, _1));
-
     m_mode_subscription = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&FuzzyGeneratorNode::currentModeCallback, this, _1));
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
 
-    m_timer = create_wall_timer(std::chrono::milliseconds(1000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
+    m_timer = create_wall_timer(std::chrono::milliseconds(2000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
 }
 
 
@@ -36,17 +32,6 @@ void FuzzyGeneratorNode::footHeightsCallback(const march_shared_msgs::msg::FootH
         m_latest_foot_heights = msg;
     } else {
         RCLCPP_ERROR(get_logger(), "Received nullptr foot heights");
-    }
-}
-
-
-// Method to receive the control type, etiher "position" or "fuzzy"
-void FuzzyGeneratorNode::controlTypeCallback(std_msgs::msg::String::SharedPtr msg){
-    if (msg != nullptr) {
-        m_control_type = msg->data;
-    } else {
-        m_control_type = "position";
-        RCLCPP_WARN(get_logger(), "Received nullptr control type, defaulting to position control");
     }
 }
 
@@ -63,14 +48,14 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
 
     march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
 
-    if (m_control_type == "yomama") {
+    if (m_fuzzy_generator.m_control_type == "position") {
         for (const auto& joint_names : m_fuzzy_generator.m_joint_names){
             fuzzy_weights_msg.joint_name = joint_names; 
             fuzzy_weights_msg.position_weight = 1.0f;
             fuzzy_weights_msg.torque_weight = 0.0f;
             m_weight_publisher->publish(fuzzy_weights_msg);
         }
-    } else {
+    } else if (m_fuzzy_generator.m_control_type == "fuzzy"){
         // Uncomment desired method
         const auto fuzzy_weights = m_fuzzy_generator.getConstantWeights();
         // const auto fuzzy_weights = m_fuzzy_generator.calculateFootHeightWeights(m_latest_foot_heights);
@@ -81,6 +66,8 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
             fuzzy_weights_msg.joint_name = std::get<m_joint_name_index>(weight);
             fuzzy_weights_msg.position_weight = std::get<m_position_weight_index>(weight);
             fuzzy_weights_msg.torque_weight = std::get<m_torque_weight_index>(weight);
+            RCLCPP_INFO(get_logger(), "Publishing fuzzy weights for joint %s: position weight %f, torque weight %f", 
+                fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
             m_weight_publisher->publish(fuzzy_weights_msg);
         }
     }

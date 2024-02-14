@@ -22,7 +22,6 @@ class FuzzyGeneratorNode : public rclcpp::Node {
         rclcpp::Publisher<march_shared_msgs::msg::FuzzyWeights>::SharedPtr m_weight_publisher;
         rclcpp::TimerBase::SharedPtr m_timer; 
 
-        std::string m_control_type = "position"; // default value
         march_shared_msgs::msg::FootHeights::SharedPtr m_latest_foot_heights;
         
         static constexpr std::size_t m_joint_name_index = 0;
@@ -30,7 +29,6 @@ class FuzzyGeneratorNode : public rclcpp::Node {
         static constexpr std::size_t m_torque_weight_index = 2;
 
         void footHeightsCallback(const march_shared_msgs::msg::FootHeights::SharedPtr msg);
-        void controlTypeCallback(std_msgs::msg::String::SharedPtr msg);
         void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
         void publishFuzzyWeights();
 

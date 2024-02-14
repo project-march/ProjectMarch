@@ -21,6 +21,8 @@ class FuzzyGenerator {
         std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FootHeights::SharedPtr& both_foot_heights);
         std::vector<std::tuple<std::string, float, float>> calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque);         // TODO: get torques from hwi
         std::vector<std::string> m_joint_names;
+        std::string m_control_type = "position"; // default value
+        std::string m_scheduling_variable;
 
     private:
         YAML::Node m_config;

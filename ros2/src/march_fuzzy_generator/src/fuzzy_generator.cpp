@@ -153,14 +153,16 @@ void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
     m_gait_type = new_gait_type;
     std::cout << "Gait type set to: " << m_gait_type << '\n';
 
-    if (new_gait_type == static_cast<exoMode>(0)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sit_weights_tsu.yaml");  
-    } else if (new_gait_type == static_cast<exoMode>(1)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/stand_weights_tsu.yaml");
-    } else if (new_gait_type == static_cast<exoMode>(2)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights_tsu.yaml");
+    if (new_gait_type == static_cast<exoMode>(2)) {
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights.yaml");  
+        m_control_type = "fuzzy";
+        // m_scheduling_variable = "height";
+    } else if (new_gait_type == static_cast<exoMode>(5)) {
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sideways_walk_weights.yaml");
+        m_control_type = "fuzzy";
+        // m_scheduling_variable = "constant";
     } else {
-        throw std::runtime_error("Gait type not found");
+        m_control_type = "position";
     }
 
     m_torque_ranges = getTorqueRanges();
