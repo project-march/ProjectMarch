@@ -17,8 +17,8 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FootHeights>(
         "robot_foot_heights", 10, std::bind(&FuzzyGeneratorNode::footHeightsCallback, this, _1));
 
-    m_mode_subscription = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "current_mode", 10, std::bind(&FuzzyGeneratorNode::currentModeCallback, this, _1));
+    m_torque_subscription = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>(
+        "measured_torque", 10, std::bind(&FuzzyGeneratorNode::measuredTorquesCallback, this, _1));
 
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
 
@@ -43,6 +43,27 @@ void FuzzyGeneratorNode::currentModeCallback(const march_shared_msgs::msg::ExoMo
 }
 
 
+// Method to receive the measured torques from the hardware interface
+void FuzzyGeneratorNode::measuredTorquesCallback(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr msg){
+
+    m_left_ankle_torque = getActualJointTorque(msg, "left_ankle");
+    m_right_ankle_torque = getActualJointTorque(msg, "right_ankle");
+}
+
+
+// Method to get the actual joint torque from the hardware interface
+double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr& msg, const std::string& joint_name) {
+    for (size_t i = 0; i < msg->joint_names.size(); ++i) {
+        if (msg->joint_names[i] == joint_name) {
+            RCLCPP_INFO(get_logger(), "The actual torque of the %s joint is: %f", joint_name.c_str(), msg->actual.effort[i]);
+            return msg->actual.effort[i];
+        }
+    }
+    RCLCPP_ERROR(get_logger(), "The joint %s is not found in the message", joint_name.c_str());
+    return 0.0;
+}
+
+
 // Method to publish the fuzzy weights
 void FuzzyGeneratorNode::publishFuzzyWeights(){
 
@@ -59,7 +80,7 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
         // Uncomment desired method
         const auto fuzzy_weights = m_fuzzy_generator.getConstantWeights();
         // const auto fuzzy_weights = m_fuzzy_generator.calculateFootHeightWeights(m_latest_foot_heights);
-        // const auto fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(0, 0);
+        // const auto fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(m_left_ankle_torque, m_right_ankle_torque);
 
         march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
         for (const auto& weight : fuzzy_weights) {
