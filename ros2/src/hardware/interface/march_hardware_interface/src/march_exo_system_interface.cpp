@@ -188,7 +188,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
 
-    RCLCPP_INFO((*logger_), "Creating export state interface finished.");
     return state_interfaces;
 }
 
