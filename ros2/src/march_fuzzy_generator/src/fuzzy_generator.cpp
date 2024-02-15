@@ -61,14 +61,13 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFoot
 
 
 // Method to calculate the stance swing leg weights
-// TODO: get torques from hwi and create configs for the different gaits
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque){
 
     m_lower_bound = m_config["torque_bounds"]["lower_bound"].as<double>();
     m_upper_bound = m_config["torque_bounds"]["upper_bound"].as<double>();
 
-    if (left_ankle_torque == 0 || right_ankle_torque == 0) {
-        throw std::runtime_error("No ankle torque received.");
+    if (left_ankle_torque == 0 && right_ankle_torque == 0) {
+        throw std::runtime_error("No ankle torques received.");
     }
 
     return calculateVariableWeights(left_ankle_torque, right_ankle_torque);
@@ -139,7 +138,7 @@ void FuzzyGenerator::getJointNames() {
 
     for (const auto& joint_torque_ranges : m_torque_ranges) {
         
-        const std::string joint_name = std::get<FuzzyGenerator::m_joint_name_index>(joint_torque_ranges);
+        const std::string joint_name = std::get<m_joint_name_index>(joint_torque_ranges);
         joint_names.push_back(joint_name);
     }
 
@@ -151,18 +150,15 @@ void FuzzyGenerator::getJointNames() {
 // TODO: update the config (paths) for the rest of the gaits
 void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
     m_gait_type = new_gait_type;
-    std::cout << "Gait type set to: " << m_gait_type << '\n';
 
-    if (new_gait_type == static_cast<exoMode>(2)) {
+    if (new_gait_type == static_cast<exoMode>(m_walk_index)) {
         m_config = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights.yaml");  
-        m_control_type = "fuzzy";
-        // m_scheduling_variable = "height";
-    } else if (new_gait_type == static_cast<exoMode>(5)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sideways_walk_weights.yaml");
-        m_control_type = "fuzzy";
-        // m_scheduling_variable = "constant";
-    } else {
         m_control_type = "position";
+    } else if (new_gait_type == static_cast<exoMode>(m_sideways_walk_index)) {
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sideways_walk_weights.yaml");
+        m_control_type = "stance_swing_leg";    // should throw an error unless it receives torques from the HWI
+    } else {
+        m_control_type = "constant";
     }
 
     m_torque_ranges = getTorqueRanges();

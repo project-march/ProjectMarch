@@ -20,6 +20,9 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     m_torque_subscription = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>(
         "measured_torque", 10, std::bind(&FuzzyGeneratorNode::measuredTorquesCallback, this, _1));
 
+    m_mode_subscription = this->create_subscription<march_shared_msgs::msg::ExoMode>(
+        "current_mode", 10, std::bind(&FuzzyGeneratorNode::currentModeCallback, this, _1));
+
     m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
 
     m_timer = create_wall_timer(std::chrono::milliseconds(2000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
@@ -38,7 +41,7 @@ void FuzzyGeneratorNode::footHeightsCallback(const march_shared_msgs::msg::FootH
 
 // Method to receive the current mode 
 void FuzzyGeneratorNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
-    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode);
+    // RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode);
     m_fuzzy_generator.setConfigPath((exoMode)msg->mode);
 }
 
@@ -51,7 +54,7 @@ void FuzzyGeneratorNode::measuredTorquesCallback(const control_msgs::msg::JointT
 }
 
 
-// Method to get the actual joint torque from the hardware interface
+// Method to get the actual joint torques from the hardware interface
 double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr& msg, const std::string& joint_name) {
     for (size_t i = 0; i < msg->joint_names.size(); ++i) {
         if (msg->joint_names[i] == joint_name) {
@@ -60,7 +63,7 @@ double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTr
         }
     }
     RCLCPP_ERROR(get_logger(), "The joint %s is not found in the message", joint_name.c_str());
-    return 0.0;
+    return 0.0f;
 }
 
 
@@ -68,6 +71,7 @@ double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTr
 void FuzzyGeneratorNode::publishFuzzyWeights(){
 
     march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
+    std::vector<std::tuple<std::string, float, float>> fuzzy_weights;
 
     if (m_fuzzy_generator.m_control_type == "position") {
         for (const auto& joint_names : m_fuzzy_generator.m_joint_names){
@@ -75,25 +79,30 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
             fuzzy_weights_msg.position_weight = 1.0f;
             fuzzy_weights_msg.torque_weight = 0.0f;
             m_weight_publisher->publish(fuzzy_weights_msg);
-        }
-    } else if (m_fuzzy_generator.m_control_type == "fuzzy"){
-        // Uncomment desired method
-        const auto fuzzy_weights = m_fuzzy_generator.getConstantWeights();
-        // const auto fuzzy_weights = m_fuzzy_generator.calculateFootHeightWeights(m_latest_foot_heights);
-        // const auto fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(m_left_ankle_torque, m_right_ankle_torque);
-
-        march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
-        for (const auto& weight : fuzzy_weights) {
-            fuzzy_weights_msg.joint_name = std::get<m_joint_name_index>(weight);
-            fuzzy_weights_msg.position_weight = std::get<m_position_weight_index>(weight);
-            fuzzy_weights_msg.torque_weight = std::get<m_torque_weight_index>(weight);
-            m_weight_publisher->publish(fuzzy_weights_msg);
 
             // RCLCPP_INFO(get_logger(), "Publishing fuzzy weights for joint %s: position weight %f, torque weight %f", 
-            //     fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
+            // fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
         }
+
+    } else if (m_fuzzy_generator.m_control_type == "constant"){
+        fuzzy_weights = m_fuzzy_generator.getConstantWeights();
+    } else if (m_fuzzy_generator.m_control_type == "foot_height") {
+        fuzzy_weights = m_fuzzy_generator.calculateFootHeightWeights(m_latest_foot_heights);
+    } else if (m_fuzzy_generator.m_control_type == "stance_swing_leg") {
+        fuzzy_weights = m_fuzzy_generator.calculateStanceSwingLegWeights(m_left_ankle_torque, m_right_ankle_torque);
+    }
+    
+    for (const auto& weight : fuzzy_weights) {
+        fuzzy_weights_msg.joint_name = std::get<m_joint_name_index>(weight);
+        fuzzy_weights_msg.position_weight = std::get<m_position_weight_index>(weight);
+        fuzzy_weights_msg.torque_weight = std::get<m_torque_weight_index>(weight);
+        m_weight_publisher->publish(fuzzy_weights_msg);
+
+        // RCLCPP_INFO(get_logger(), "Publishing fuzzy weights for joint %s: position weight %f, torque weight %f", 
+        //     fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
     }
 }
+
 
 
 int main(int argc, char** argv){

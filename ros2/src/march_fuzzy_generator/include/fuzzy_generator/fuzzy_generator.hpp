@@ -40,6 +40,9 @@ class FuzzyGenerator {
         static constexpr std::size_t m_min_torque_index = 1;
         static constexpr std::size_t m_max_torque_index = 2;
         static constexpr std::size_t m_torque_weight_index = 3;
+        static constexpr std::size_t m_walk_index = 2;
+        static constexpr std::size_t m_sideways_walk_index = 5; 
+
         
    
 };
