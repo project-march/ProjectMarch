@@ -6,19 +6,18 @@
 #include <vector>
 #include <array>  
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "march_gait_planning/gait_planning_base_class.hpp"
 
-class GaitPlanning {
+class GaitPlanningCartesian : public GaitPlanning {
     
 public:
-    explicit GaitPlanning();
+    explicit GaitPlanningCartesian();
     typedef std::array<double, 4> XZFeetPositionsArray;
     typedef std::array<double, 3> XYZFootPositionArray; 
 
     // Setters
     void setStanceFoot(const uint8_t &new_stance_foot);
     void setFootPositions(const XYZFootPositionArray &new_left_foot_position, const XYZFootPositionArray &new_right_foot_position);
-    void setGaitType(const exoMode &new_gait_type);
-    void setPreviousGaitType(const exoMode &previous_gait_type);  
     void setBezierGait();
 
     // Getters
@@ -26,8 +25,6 @@ public:
     int getCurrentStanceFoot() const; 
     XYZFootPositionArray getCurrentLeftFootPos() const; 
     XYZFootPositionArray getCurrentRightFootPos() const; 
-    exoMode getGaitType() const; 
-    exoMode getPreviousGaitType() const;
 
     //Getter for variable step size 
     std::vector<XZFeetPositionsArray> getVariableTrajectory() const; 
@@ -38,8 +35,6 @@ public:
     std::vector<XZFeetPositionsArray> interpolateVariableTrajectory(const float &step_distance); 
 
 private: 
-    exoMode m_gait_type; 
-    exoMode m_previous_gait_type;
     int m_current_stance_foot; 
     double m_step_size; 
     

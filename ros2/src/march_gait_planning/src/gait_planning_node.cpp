@@ -7,7 +7,7 @@ using std::placeholders::_1;
 
 GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
-   m_gait_planning(GaitPlanning()),
+   m_gait_planning(GaitPlanningCartesian()),
    m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>())
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
