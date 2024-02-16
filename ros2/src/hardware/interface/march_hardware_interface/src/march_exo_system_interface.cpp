@@ -181,12 +181,20 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             state_interfaces.emplace_back(hardware_interface::StateInterface(
                 jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
         }
+
     }
 
     // // For the PDB broadcaster.
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
+
+    for (const hardware_interface::StateInterface& interface : state_interfaces) {
+    RCLCPP_WARN((*logger_),
+                "Interface Name: %s ",
+                interface.get_full_name().c_str(),
+    );
+}
 
     return state_interfaces;
 }
