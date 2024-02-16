@@ -21,26 +21,27 @@ struct CSVRow {
 
 // Constructor for the GaitPlanningAngles class (functionality of joint angle trajectory)
 GaitPlanningAngles::GaitPlanningAngles()
- : m_gait_type(), 
-   m_prev_gait_type(), 
-   m_first_step_angle_trajectory(), 
+ : m_first_step_angle_trajectory(), 
    m_complete_step_angle_trajectory(),
    m_stand_to_sit_trajectory(), 
    m_sideways_trajectory(),
    m_sit_to_stand_trajectory(),
+   m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv", m_first_step_angle_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv", m_complete_step_angle_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
+
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv", m_step_close_trajectory); 
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -76,14 +77,6 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
-    m_gait_type = new_gait_type; 
-}
-
-void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
-    m_prev_gait_type = prev_gait_type; 
-}
-
 void GaitPlanningAngles::setCounter(const int &count){
     m_counter = count; 
 }
@@ -94,14 +87,6 @@ void GaitPlanningAngles::setPrevPoint(const std::vector<double> &point){
 
 void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
     m_home_stand = stand; 
-}
-
-exoMode GaitPlanningAngles::getGaitType() const {
-    return m_gait_type; 
-}
-
-exoMode GaitPlanningAngles::getPrevGaitType() const {
-    return m_prev_gait_type; 
 }
 
 std::vector<double> GaitPlanningAngles::getPrevPoint() const{
@@ -142,4 +127,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
 
 std::vector<std::vector<double>> GaitPlanningAngles::getDescendingGait() const{
     return m_descending_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
+    return m_step_close_trajectory; 
 }

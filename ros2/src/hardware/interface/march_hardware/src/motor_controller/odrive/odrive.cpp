@@ -122,26 +122,27 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
 }
 
-void ODrive::sendPID(std::unique_ptr<std::array<double, 3>> pos_pid, std::unique_ptr<std::array<double, 3>> tor_pid)
+void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 3> tor_pid)
 {
     auto offset
         = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
-    for (double& i : *pos_pid.get()) {
+    for (double& i : pos_pid) {
         bit32 write_value {};
-        logger_->info(logger_->fstring("Sending PID value %f, with offset %d, to the exo.", i, offset));
+        // logger_->info(logger_->fstring("Sending PID value %f, with offset %d, to the exo.", i, offset));
         write_value.f = static_cast<float>(i);
         this->write32(offset, write_value);
         offset += 4;
     }
 
     offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_); // TODO:fix this with ODrivePDOMap.
-    for (double& i : *tor_pid.get()) {
+    for (double& i : tor_pid) {
         bit32 write_value {};
         write_value.f = static_cast<float>(i);
         this->write32(offset, write_value);
         offset += 4;
     }
 }
+
 
 int ODrive::getActuationModeNumber() const
 {

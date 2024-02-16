@@ -17,6 +17,9 @@
 
 class TorqueConverter {
 public:
+    typedef std::unique_ptr<TorqueConverter> UniquePtr;
+    typedef std::shared_ptr<TorqueConverter> SharedPtr;
+
     TorqueConverter(std::shared_ptr<RobotDescription> robot_description);
     ~TorqueConverter() = default;
 

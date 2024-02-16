@@ -20,8 +20,6 @@
 RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description)
     : Node("robot_description_node")
 {
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode constructor");
-
     m_robot_description = robot_description;
 
     m_subscription_state_estimation
@@ -39,8 +37,11 @@ RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> rob
         "state_estimation/get_node_jacobian",
         std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
         rmw_qos_profile_services_default);
+}
 
-    RCLCPP_INFO(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode constructor done");
+RobotDescriptionNode::~RobotDescriptionNode()
+{
+    RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode has been stopped.");
 }
 
 void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -95,7 +96,8 @@ void RobotDescriptionNode::handleNodePositionRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
 {
-    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest");
+    RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
+        "RobotDescriptionNode::handleNodePositionRequest");
 
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
@@ -134,7 +136,8 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response)
 {
-    RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest");
+    RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
+        "RobotDescriptionNode::handleNodeJacobianRequest");
 
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
@@ -164,23 +167,20 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
             joint_names.size());
 
         Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(joint_positions);
+        std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
             "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
 
         node_jacobian_msg.rows = jacobian.rows();
         node_jacobian_msg.cols = jacobian.cols();
-
-        std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
         node_jacobian_msg.jacobian = jacobian_vector;
 
         for (long unsigned int i = 0; i < jacobian_vector.size(); i++) {
             RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
                 "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian_vector[i]);
         }
-
         node_jacobians.push_back(node_jacobian_msg);
     }
-
     response->node_jacobians = node_jacobians;
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest done");
 }

@@ -16,8 +16,8 @@ namespace march {
 Joint::Joint(
     std::string name,
     int net_number, std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<std::array<double, 3>> position_pid,
-    std::unique_ptr<std::array<double, 3>> torque_pid,
+    std::array<double, 3> position_pid,
+    std::array<double, 3> torque_pid,
     std::shared_ptr<march_logger::BaseLogger> logger)
     :name_(std::move(name)),
     net_number_(net_number),
@@ -37,8 +37,8 @@ Joint::Joint(
 Joint::Joint(
     std::string name, int net_number,
     std::unique_ptr<MotorController> motor_controller,
-    std::unique_ptr<std::array<double, 3>> position_pid,
-    std::unique_ptr<std::array<double, 3>> torque_pid,
+    std::array<double, 3> position_pid,
+    std::array<double, 3> torque_pid,
     std::unique_ptr<TemperatureGES> temperature_ges,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : name_(std::move(name)),
@@ -204,6 +204,11 @@ void Joint::sendPID()
 {
     this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
 }
+
+void Joint::setPositionPIDValues(const std::array<double, 3>& new_position_pid)
+{
+    position_pid = std::array<double, 3>(new_position_pid);
+} 
 
 double Joint::getPosition() const
 {

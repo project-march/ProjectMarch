@@ -37,7 +37,7 @@ class GaitPlanningNode:public rclcpp::Node {
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
 
-    GaitPlanning m_gait_planning; 
+    GaitPlanningCartesian m_gait_planning; 
 
     std::vector<XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 

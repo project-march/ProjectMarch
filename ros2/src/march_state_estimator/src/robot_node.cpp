@@ -96,11 +96,6 @@ char RobotNode::getType() const
     return m_type;
 }
 
-std::vector<double> RobotNode::getJointAxis() const
-{
-    return m_joint_axis;
-}
-
 RobotNode::JointSymbol RobotNode::getJointPosition() const
 {
     return m_joint_symbol_position;
@@ -150,69 +145,49 @@ std::vector<std::string> RobotNode::getRelativeJointNames() const
 Eigen::Vector3d RobotNode::getGlobalPosition(JointNameToValueMap joint_positions) const
 {
     return Eigen::Map<Eigen::Vector3d>(
-        evaluateExpression(m_global_position_expressions, joint_positions, WORKSPACE_DIM, 1).data());
+        evaluateExpression(m_global_position_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions).data());
 }
 
 Eigen::Matrix3d RobotNode::getGlobalRotation(JointNameToValueMap joint_positions) const
 {
     return Eigen::Map<Eigen::Matrix3d>(
-        evaluateExpression(m_global_rotation_expressions, joint_positions, WORKSPACE_DIM, WORKSPACE_DIM).data());
+        evaluateExpression(m_global_rotation_expressions, m_joint_nodes, WORKSPACE_DIM, WORKSPACE_DIM, joint_positions)
+            .data());
 }
 
 Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(JointNameToValueMap joint_positions) const
 {
     return evaluateExpression(
-        m_global_position_jacobian_expressions, joint_positions, WORKSPACE_DIM, m_joint_nodes.size());
+        m_global_position_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);
 }
 
 Eigen::MatrixXd RobotNode::getGlobalRotationJacobian(JointNameToValueMap joint_positions) const
 {
-    (void)joint_positions;
-    return Eigen::MatrixXd::Zero(WORKSPACE_DIM, m_joint_nodes.size());
+    return evaluateExpression(
+        m_global_rotation_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);
 }
 
 Eigen::VectorXd RobotNode::getDynamicalTorque(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
     JointNameToValueMap joint_accelerations) const
 {
-    GiNaC::lst substitutions = GiNaC::lst();
+    std::vector<RobotNode::SharedPtr> joint_nodes;
     for (const auto& relative_joint_node : m_relative_joint_nodes) {
-        RobotNode::SharedPtr joint_node = relative_joint_node.lock();
-        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
-        substitutions.append(joint_node->getJointVelocity() == joint_velocities.at(joint_node->getName()));
-        substitutions.append(joint_node->getJointAcceleration() == joint_accelerations.at(joint_node->getName()));
+        joint_nodes.push_back(relative_joint_node.lock());
     }
-    Eigen::VectorXd evaluation_matrix = Eigen::VectorXd::Zero(m_relative_joint_nodes.size());
-    for (unsigned int i = 0; i < m_relative_joint_nodes.size(); i++) {
-        GiNaC::ex expression = GiNaC::evalf(m_dynamical_torque_expressions[i].subs(substitutions));
-        evaluation_matrix(i) = GiNaC::ex_to<GiNaC::numeric>(expression).to_double();
-    }
-    return evaluation_matrix;
+    Eigen::MatrixXd dynamical_torque_matrix = evaluateExpression(m_dynamical_torque_expressions, joint_nodes,
+        m_relative_joint_nodes.size(), 1, joint_positions, joint_velocities, joint_accelerations);
+    return Eigen::Map<Eigen::VectorXd>(dynamical_torque_matrix.data(), dynamical_torque_matrix.size());
 }
 
 double RobotNode::getDynamicalJointAcceleration(double joint_torque, JointNameToValueMap joint_positions) const
 {
-    // TODO: Create a relative substitution function.
-    GiNaC::lst substitutions = GiNaC::lst();
-    for (const auto& relative_joint_node : m_relative_joint_nodes) {
-        RobotNode::SharedPtr joint_node = relative_joint_node.lock();
-        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
-    }
-    GiNaC::ex expression = GiNaC::evalf(m_relative_inertia_expression.subs(substitutions));
-    double relative_inertia = GiNaC::ex_to<GiNaC::numeric>(expression).to_double();
-    return joint_torque / relative_inertia;
-}
-
-std::vector<RobotNode::SharedPtr> RobotNode::getJointNodes(RobotNode::SharedPtr parent) const
-{
     std::vector<RobotNode::SharedPtr> joint_nodes;
-    while (parent != nullptr) {
-        if (parent->getType() == 'J') {
-            joint_nodes.push_back(parent);
-        }
-        parent = parent->getParent();
+    for (const auto& relative_joint_node : m_relative_joint_nodes) {
+        joint_nodes.push_back(relative_joint_node.lock());
     }
-    std::reverse(joint_nodes.begin(), joint_nodes.end());
-    return joint_nodes;
+    double relative_inertia
+        = evaluateExpression({ m_relative_inertia_expression }, joint_nodes, 1, 1, joint_positions)(0, 0);
+    return joint_torque / relative_inertia;
 }
 
 void RobotNode::setExpression(const std::vector<std::string>& expressions, std::vector<GiNaC::ex>& target)
@@ -227,10 +202,9 @@ void RobotNode::setExpression(const std::vector<std::string>& expressions, std::
     }
 }
 
-Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expressions,
-    const JointNameToValueMap& joint_positions, const unsigned int& rows, const unsigned int& cols) const
+Eigen::MatrixXd RobotNode::substituteExpression(const std::vector<GiNaC::ex>& expressions, const unsigned int& rows,
+    const unsigned int& cols, const GiNaC::lst& substitutions) const
 {
-    GiNaC::lst substitutions = substituteSymbolsWithJointValues(joint_positions);
     Eigen::MatrixXd evaluation_matrix = Eigen::MatrixXd::Zero(rows, cols);
     for (unsigned int i = 0; i < rows; i++) {
         for (unsigned int j = 0; j < cols; j++) {
@@ -241,24 +215,39 @@ Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expr
     return evaluation_matrix;
 }
 
-GiNaC::lst RobotNode::substituteSymbolsWithJointValues(const JointNameToValueMap& joint_positions) const
+Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+    const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+    const JointNameToValueMap& joint_positions) const
 {
     GiNaC::lst substitutions = GiNaC::lst();
-    for (const auto& joint_node : m_joint_nodes) {
+    for (const auto& joint_node : joint_nodes) {
         substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
     }
-    return substitutions;
+    return substituteExpression(expressions, rows, cols, substitutions);
 }
 
-int RobotNode::utilGetJointAxisIndex() const
+Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+    const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+    const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities) const
 {
-    // Assuming that the joint axis is orthogonal to the other two axes.
-    int joint_axis_index = -1;
-    for (long unsigned int i = 0; i < m_joint_axis.size(); i++) {
-        if (m_joint_axis[i] != 0) {
-            joint_axis_index = i;
-            break;
-        }
+    GiNaC::lst substitutions = GiNaC::lst();
+    for (const auto& joint_node : joint_nodes) {
+        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
+        substitutions.append(joint_node->getJointVelocity() == joint_velocities.at(joint_node->getName()));
     }
-    return joint_axis_index;
+    return substituteExpression(expressions, rows, cols, substitutions);
+}
+
+Eigen::MatrixXd RobotNode::evaluateExpression(const std::vector<GiNaC::ex>& expressions,
+    const std::vector<RobotNode::SharedPtr> joint_nodes, const unsigned int& rows, const unsigned int& cols,
+    const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities,
+    const JointNameToValueMap& joint_accelerations) const
+{
+    GiNaC::lst substitutions = GiNaC::lst();
+    for (const auto& joint_node : joint_nodes) {
+        substitutions.append(joint_node->getJointPosition() == joint_positions.at(joint_node->getName()));
+        substitutions.append(joint_node->getJointVelocity() == joint_velocities.at(joint_node->getName()));
+        substitutions.append(joint_node->getJointAcceleration() == joint_accelerations.at(joint_node->getName()));
+    }
+    return substituteExpression(expressions, rows, cols, substitutions);
 }
