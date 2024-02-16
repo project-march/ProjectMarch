@@ -25,6 +25,7 @@
 class RobotDescriptionNode : public rclcpp::Node {
 public:
     RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
+    ~RobotDescriptionNode();
 
 private:
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);

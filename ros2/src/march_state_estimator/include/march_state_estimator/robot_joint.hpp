@@ -17,7 +17,7 @@
 
 class RobotJoint : public RobotNode {
 public:
-    RobotJoint(const std::string& name, const uint64_t& id, const std::vector<double>& axis);
+    RobotJoint(const std::string& name, const uint64_t& id);
     ~RobotJoint() = default;
 
     void setLimits(const double& lower_limit, const double& upper_limit);

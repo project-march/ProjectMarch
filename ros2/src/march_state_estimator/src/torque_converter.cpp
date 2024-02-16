@@ -7,16 +7,14 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+#include <stdio.h>
+
 TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_description)
 {
+    m_robot_description = robot_description;
     try {
-        m_backpack_node = robot_description->findNode("backpack");
-    } catch (const std::exception& e) {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Could not find backpack node in robot description.");
-    }
-
-    try {
-        std::vector<std::string> joint_names = m_backpack_node->getRelativeJointNames();
+        RobotNode::SharedPtr root_node = robot_description->findNode("backpack");
+        std::vector<std::string> joint_names = root_node->getRelativeJointNames();
         std::vector<RobotNode::SharedPtr> joint_nodes = robot_description->findNodes(joint_names);
         for (auto& joint_node : joint_nodes) {
             m_joint_nodes.push_back(joint_node);
@@ -30,11 +28,12 @@ TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_descrip
 
 std::vector<std::string> TorqueConverter::getJointNames() const
 {
-    return m_backpack_node->getRelativeJointNames();
+    return m_robot_description->findNode("backpack")->getRelativeJointNames();
 }
 
 RobotNode::JointNameToValueMap TorqueConverter::getDynamicalJointAccelerations(
-    RobotNode::JointNameToValueMap joint_positions, RobotNode::JointNameToValueMap joint_torques) const
+    const RobotNode::JointNameToValueMap& joint_positions, 
+    const RobotNode::JointNameToValueMap& joint_torques) const
 {
     try {
         RobotNode::JointNameToValueMap joint_accelerations;
@@ -50,13 +49,15 @@ RobotNode::JointNameToValueMap TorqueConverter::getDynamicalJointAccelerations(
     }
 }
 
-RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(RobotNode::JointNameToValueMap joint_positions,
-    RobotNode::JointNameToValueMap joint_velocities, RobotNode::JointNameToValueMap joint_accelerations) const
+RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(
+    const RobotNode::JointNameToValueMap& joint_positions,
+    const RobotNode::JointNameToValueMap& joint_velocities, 
+    const RobotNode::JointNameToValueMap& joint_accelerations) const
 {
     try {
         RobotNode::JointNameToValueMap joint_torques;
         Eigen::VectorXd joint_torque_values
-            = m_backpack_node->getDynamicalTorque(joint_positions, joint_velocities, joint_accelerations);
+            = m_robot_description->findNode("backpack")->getDynamicalTorque(joint_positions, joint_velocities, joint_accelerations);
         for (unsigned long int i = 0; i < m_joint_nodes.size(); i++) {
             joint_torques[m_joint_nodes[i]->getName()] = joint_torque_values(i);
         }
@@ -65,4 +66,38 @@ RobotNode::JointNameToValueMap TorqueConverter::getDynamicalTorques(RobotNode::J
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Could not calculate dynamical torque %s.", e.what());
         return RobotNode::JointNameToValueMap();
     }
+}
+
+RobotNode::JointNameToValueMap TorqueConverter::getExternalTorques(
+    const RobotNode::JointNameToValueMap& joint_total_torques, 
+    const RobotNode::JointNameToValueMap& joint_dynamical_torques) const
+{
+    RobotNode::JointNameToValueMap external_torques;
+    for (const auto& joint_total_pair : joint_total_torques) {
+        external_torques[joint_total_pair.first] = joint_total_pair.second - joint_dynamical_torques.at(joint_total_pair.first);
+    }
+    return external_torques;
+}
+
+Eigen::Vector3d TorqueConverter::getExternalForceByNode(const std::string& node_name, 
+    const RobotNode::JointNameToValueMap& joint_positions, 
+    const RobotNode::JointNameToValueMap& external_torques) const
+{
+    Eigen::VectorXd external_force_vector;
+    Eigen::MatrixXd jacobian_inverse;
+
+    RobotNode::SharedPtr node = m_robot_description->findNode(node_name);
+    jacobian_inverse.noalias() = (node->getGlobalPositionJacobian(joint_positions).transpose()).completeOrthogonalDecomposition().pseudoInverse();
+
+    external_force_vector.noalias() = jacobian_inverse * node->convertAbsoluteJointValuesToVectorXd(external_torques);
+    return external_force_vector;
+}
+
+Eigen::VectorXd TorqueConverter::convertToEigenVector(const RobotNode::JointNameToValueMap& joint_values) const
+{
+    Eigen::VectorXd eigen_vector(joint_values.size());
+    for (unsigned long int i = 0; i < joint_values.size(); i++) {
+        eigen_vector(i) = joint_values.at(m_joint_nodes[i]->getName());
+    }
+    return eigen_vector;
 }

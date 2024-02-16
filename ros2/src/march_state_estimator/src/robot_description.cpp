@@ -7,6 +7,7 @@
 
 #include "march_state_estimator/robot_joint.hpp"
 #include "march_state_estimator/robot_mass.hpp"
+#include "march_state_estimator/robot_zmp.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include "boost/range/combine.hpp"
@@ -17,28 +18,32 @@
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
+RobotDescription::RobotDescription(std::string yaml_filename)
+{
+    m_robot_node_ptrs.clear();
+    std::string yaml_filepath = ament_index_cpp::get_package_share_directory("march_state_estimator") + "/config/";
+    parseYAML(yaml_filepath + yaml_filename);
+}
+
 void RobotDescription::parseYAML(const std::string& yaml_path)
 {
-    std::string package_share_directory = ament_index_cpp::get_package_share_directory("march_state_estimator");
-    YAML::Node yaml_node = YAML::LoadFile(package_share_directory + "/config/" + yaml_path);
+    YAML::Node yaml_node = YAML::LoadFile(yaml_path);
 
     const std::vector<std::string> part_names = yaml_node["names"].as<std::vector<std::string>>();
     std::vector<RobotPartData> robot_part_datas;
 
+    // Create data structures for robot parts and initialize the robot parts.
     for (auto& name : part_names) {
         RobotPartData robot_part_data;
         robot_part_data.name = name;
         robot_part_data.type = yaml_node[name]["type"].as<std::string>();
         robot_part_data.mass = yaml_node[name]["dynamics"]["mass"].as<double>();
-        if (robot_part_data.type == "joint") {
-            robot_part_data.joint_axis = yaml_node[name]["axis"].as<std::vector<double>>();
-        }
         const unsigned int ABSOLUTE_DOF
             = yaml_node[name]["joint_names"]["absolute"].as<std::vector<std::string>>().size();
         const unsigned int RELATIVE_DOF
             = yaml_node[name]["joint_names"]["relative"].as<std::vector<std::string>>().size();
 
-        robot_part_data.inertia = vectorizeExpression(yaml_node[name]["dynamics"]["inertia"]);
+        robot_part_data.inertia = yaml_node[name]["dynamics"]["inertia"].as<std::string>();
         robot_part_data.global_rotation
             = vectorizeExpressions(yaml_node[name]["rotation"], WORKSPACE_DIM, WORKSPACE_DIM);
         robot_part_data.global_linear_position
@@ -53,6 +58,7 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
         robot_part_datas.push_back(robot_part_data);
     }
 
+    // Set the parent and children of each robot node, including the absolute and relative joints.
     for (const auto& robot_node : m_robot_node_ptrs) {
         std::vector<std::string> children_name
             = yaml_node[robot_node->getName()]["children"].as<std::vector<std::string>>();
@@ -67,40 +73,13 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
         robot_node->setJointNodes(absolute_joint_nodes, relative_joint_nodes);
     }
 
+    // Set the expressions for each robot node.
     for (auto tuple : boost::combine(m_robot_node_ptrs, robot_part_datas)) {
         RobotNode::SharedPtr robot_node;
         RobotPartData robot_data;
         boost::tie(robot_node, robot_data) = tuple;
         setRobotPart(robot_node, robot_data);
     }
-}
-
-void RobotDescription::createRobotPart(const RobotPartData& robot_part_data)
-{
-    if (robot_part_data.type == "mass") {
-        std::shared_ptr<RobotMass> robot_mass
-            = std::make_shared<RobotMass>(robot_part_data.name, m_robot_node_ptrs.size(), robot_part_data.mass);
-        m_robot_node_ptrs.push_back(robot_mass);
-        m_robot_nodes_map[robot_part_data.name] = robot_mass;
-    } else if (robot_part_data.type == "joint") {
-        std::shared_ptr<RobotJoint> robot_joint
-            = std::make_shared<RobotJoint>(robot_part_data.name, m_robot_node_ptrs.size(), robot_part_data.joint_axis);
-        m_robot_node_ptrs.push_back(robot_joint);
-        m_robot_nodes_map[robot_part_data.name] = robot_joint;
-    } else {
-        RCLCPP_ERROR(
-            rclcpp::get_logger("state_estimator_node"), "RobotDescription::createRobotPart: Unknown robot part type");
-    }
-}
-
-void RobotDescription::setRobotPart(const RobotNode::SharedPtr robot_node, const RobotPartData& robot_part_data)
-{
-    robot_node->setExpressionRelativeInertia(robot_part_data.inertia);
-    robot_node->setExpressionGlobalPosition(robot_part_data.global_linear_position);
-    robot_node->setExpressionGlobalRotation(robot_part_data.global_rotation);
-    robot_node->setExpressionGlobalPositionJacobian(robot_part_data.global_linear_position_jacobian);
-    robot_node->setExpressionGlobalRotationJacobian(robot_part_data.global_rotation_jacobian);
-    robot_node->setExpressionDynamicalTorque(robot_part_data.dynamical_torque);
 }
 
 std::vector<std::string> RobotDescription::getAllNodeNames() const
@@ -165,9 +144,57 @@ std::vector<Eigen::Matrix3d> RobotDescription::getAllNodesRotation(
     return nodes_rotation;
 }
 
-std::string RobotDescription::vectorizeExpression(const YAML::Node& yaml_node)
+void RobotDescription::createRobotPart(const RobotPartData& robot_part_data)
 {
-    return yaml_node.as<std::string>();
+    if (robot_part_data.type == "zmp") {
+        std::shared_ptr<RobotZMP> robot_zmp = std::make_shared<RobotZMP>();
+        m_robot_node_ptrs.push_back(robot_zmp);
+        m_robot_nodes_map[robot_part_data.name] = robot_zmp;
+    } else if (robot_part_data.type == "mass" || robot_part_data.type == "com") {
+        std::shared_ptr<RobotMass> robot_mass
+            = std::make_shared<RobotMass>(robot_part_data.name, m_robot_node_ptrs.size(), robot_part_data.mass);
+        m_robot_node_ptrs.push_back(robot_mass);
+        m_robot_nodes_map[robot_part_data.name] = robot_mass;
+    } else if (robot_part_data.type == "joint") {
+        std::shared_ptr<RobotJoint> robot_joint
+            = std::make_shared<RobotJoint>(robot_part_data.name, m_robot_node_ptrs.size());
+        m_robot_node_ptrs.push_back(robot_joint);
+        m_robot_nodes_map[robot_part_data.name] = robot_joint;
+    } else {
+        RCLCPP_ERROR(
+            rclcpp::get_logger("state_estimator_node"), "RobotDescription::createRobotPart: Unknown robot part type");
+    }
+}
+
+Eigen::Quaterniond RobotDescription::getInertialOrientation() const
+{
+    return m_inertial_orientation;
+}
+
+void RobotDescription::setInertialOrientation(const Eigen::Quaterniond& inertial_orientation)
+{
+    m_inertial_orientation = inertial_orientation;
+
+    // Set the orientation of abstract robot parts.
+    std::dynamic_pointer_cast<RobotZMP>(m_robot_nodes_map.at("zmp"))->setInertialOrientation(inertial_orientation);
+}
+
+void RobotDescription::setStanceLeg(
+    const uint8_t& stance_leg, const Eigen::Vector3d& left_foot_position, const Eigen::Vector3d& right_foot_position)
+{
+    std::dynamic_pointer_cast<RobotZMP>(m_robot_nodes_map.at("zmp"))
+        ->setFootPositions(left_foot_position, right_foot_position);
+    std::dynamic_pointer_cast<RobotZMP>(m_robot_nodes_map.at("zmp"))->setStanceLeg(stance_leg);
+}
+
+void RobotDescription::setRobotPart(const RobotNode::SharedPtr robot_node, const RobotPartData& robot_part_data)
+{
+    robot_node->setExpressionRelativeInertia(robot_part_data.inertia);
+    robot_node->setExpressionGlobalPosition(robot_part_data.global_linear_position);
+    robot_node->setExpressionGlobalRotation(robot_part_data.global_rotation);
+    robot_node->setExpressionGlobalPositionJacobian(robot_part_data.global_linear_position_jacobian);
+    robot_node->setExpressionGlobalRotationJacobian(robot_part_data.global_rotation_jacobian);
+    robot_node->setExpressionDynamicalTorque(robot_part_data.dynamical_torque);
 }
 
 std::vector<std::string> RobotDescription::vectorizeExpressions(
