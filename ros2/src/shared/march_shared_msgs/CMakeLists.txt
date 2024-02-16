@@ -32,14 +32,15 @@ find_package(sensor_msgs REQUIRED)
 
 # Run the Python script to generate ExoMode.msg
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-execute_process(
-  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate/generate_exo_mode_message.py
-  RESULT_VARIABLE result
-  OUTPUT_VARIABLE output
+
+set(PYTHON_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/generate/generate_exo_mode_message.py")
+
+add_custom_target(
+    run_python_script ALL
+    COMMAND ${Python3_EXECUTABLE} ${PYTHON_SCRIPT_PATH}
+    COMMENT "Generating ExoMode.msg from JSON file"
+    VERBATIM
 )
-if(result)
-  message(FATAL_ERROR "Failed to generate ExoMode.msg: ${output}")
-endif()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Alive.msg"
