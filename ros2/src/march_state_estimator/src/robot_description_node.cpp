@@ -96,8 +96,8 @@ void RobotDescriptionNode::handleNodePositionRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
 {
-    RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
-        "RobotDescriptionNode::handleNodePositionRequest");
+    // RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
+    //     "RobotDescriptionNode::handleNodePositionRequest");
 
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
@@ -136,8 +136,8 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response)
 {
-    RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
-        "RobotDescriptionNode::handleNodeJacobianRequest");
+    // RCLCPP_INFO_THROTTLE(rclcpp::get_logger("state_estimator_node"), *get_clock(), 2000,
+    //     "RobotDescriptionNode::handleNodeJacobianRequest");
 
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
