@@ -78,7 +78,7 @@ public:
         m_pid_values_subscription = this->create_subscription<march_shared_msgs::msg::PidValues>(
             "pid_values", 10, std::bind(&GainsNode::pid_values_callback, this, _1));
 
-        RCLCPP_INFO(rclcpp::get_logger("gains_node"), "Creating the gains node!");
+        RCLCPP_INFO(get_logger(), "Creating the gains node!");
     }
 
     /**
@@ -320,6 +320,7 @@ private:
     void make_joints_operational(std::vector<march::Joint*> joints);
 
     const std::shared_ptr<rclcpp::Logger> logger_;
+    rclcpp::Node::SharedPtr m_node;
     std::unique_ptr<march::MarchRobot> march_robot_;
     march::PowerDistributionBoardData pdb_data_;
     std::vector<JointInfo> joints_info_;

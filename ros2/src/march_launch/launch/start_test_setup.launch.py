@@ -119,6 +119,12 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         Node(
+            package='march_loggers',
+            namespace='',
+            executable='hardware_interface_logger_node',
+            name='HardwareInterface',
+        ),
+        Node(
             package='march_mode_machine',
             namespace='',
             executable='mode_machine_node',
