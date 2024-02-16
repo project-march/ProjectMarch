@@ -119,7 +119,7 @@ void FootstepPlannerNode::footstepOutputPublish(){
     if (checkOverlapPlaneFootbox(*safe_plane)){
         m_desired_footstep_msg->stepping_point = (safe_plane->centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
-        RCLCPP_INFO(this->get_logger(), "Sent footstep message! %f", m_desired_footstep_msg->distance); 
+        RCLCPP_INFO(this->get_logger(), "Sent footstep message! %f", m_desired_footstep_msg->stepping_point); 
     }
 }
 

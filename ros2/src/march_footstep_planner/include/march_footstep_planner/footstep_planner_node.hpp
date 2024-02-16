@@ -20,6 +20,7 @@ safe to step in.
 - send coordinates of desired centroid stepping point to gait planning 
 (check if we use ankle or toe as x in IKS, that might make a difference)
 */
+#pragma once
 
 #include <vector>
 #include "rclcpp/rclcpp.hpp" 

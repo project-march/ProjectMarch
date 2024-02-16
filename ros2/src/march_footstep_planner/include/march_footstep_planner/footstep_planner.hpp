@@ -20,6 +20,8 @@ safe to step in.
 (check if we use ankle or toe as x in IKS, that might make a difference)
 */
 
+#pragma once
+
 #include <array>
 
 class FootstepPlanner {
