@@ -25,7 +25,7 @@ FootstepPlannerNode::FootstepPlannerNode()
 void FootstepPlannerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     // A footstep should only be calculated when the gait type is dynamic/cameras. Maybe
     // use a different member variable or method to identify when this is the case. 
-    RCLCPP_INFO(this->get_logger(), "Received current mode: %d", msg->mode); 
+    RCLCPP_INFO(this->get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_type = (exoMode)msg->mode; 
     // if (m_gait_type == exoMode::VariableWalk){
     //     footstepOutputPublish(); 
