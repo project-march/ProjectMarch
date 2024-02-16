@@ -63,6 +63,7 @@ void BluetoothInputDeviceNode::createSocket()
 void BluetoothInputDeviceNode::receiveData()
 {
     char buffer[1024] = { 0 }; // This 
+    RCLCPP_INFO(this->get_logger(), "Waiting for data from the external device.");
     ssize_t bytesRead = read(m_bluetooth_socket, buffer, sizeof(buffer) - 1); // This is blocking so will not pass unless there is something to read
     if (bytesRead == -1) {
         RCLCPP_ERROR(this->get_logger(), "Error reading from socket:  %s", strerror(errno));
