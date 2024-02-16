@@ -61,7 +61,7 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType());
     m_gait_planning.setGaitType((exoMode)msg->mode);
     if ((exoMode)msg->mode == exoMode::Stand){
-        if (m_gait_planning.getPrevGaitType() == exoMode::Walk || m_gait_planning.getPrevGaitType() == exoMode::Ascending || m_gait_planning.getPrevGaitType() == exoMode::Descending || m_gait_planning.getPrevGaitType() == exoMode::Sideways){
+        if (m_gait_planning.getPreviousGaitType() == exoMode::Walk || m_gait_planning.getPreviousGaitType() == exoMode::Ascending || m_gait_planning.getPreviousGaitType() == exoMode::Descending || m_gait_planning.getPreviousGaitType() == exoMode::Sideways){
         }
         else {
             m_gait_planning.setCounter(0); 
