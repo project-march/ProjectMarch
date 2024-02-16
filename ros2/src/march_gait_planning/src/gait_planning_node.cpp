@@ -45,7 +45,9 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
+    RCLCPP_INFO(this->get_logger(), "Received variable step coordinate!"); 
     float dist = msg->stepping_point.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    RCLCPP_INFO(this->get_logger(), "Calculated distance and interpolating! %f", dist); 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 
