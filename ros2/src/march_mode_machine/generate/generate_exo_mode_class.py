@@ -5,7 +5,7 @@ import os
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Open the JSON file
-with open(os.path.join(script_dir, 'training.json'), 'r') as f:
+with open(os.path.join(script_dir, 'modes.json'), 'r') as f:
     data = json.load(f)
 
 # Get the output directory

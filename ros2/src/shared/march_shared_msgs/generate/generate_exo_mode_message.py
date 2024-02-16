@@ -4,7 +4,7 @@ import rospkg
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
-json_dir = os.path.join(script_dir, '../../../march_mode_machine/generate/training.json')
+json_dir = os.path.join(script_dir, '../../../march_mode_machine/generate/modes.json')
 json_dir = os.path.normpath(json_dir)
 
 

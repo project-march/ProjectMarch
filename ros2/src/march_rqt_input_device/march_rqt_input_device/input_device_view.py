@@ -19,7 +19,7 @@ from std_msgs.msg import Bool
 from march_rqt_input_device.exo_mode import ExoMode
 import time
 
-DEFAULT_LAYOUT_FILE = os.path.join(get_package_share_directory("march_rqt_input_device"), "config", "training.json")
+DEFAULT_LAYOUT_FILE = os.path.join("src/march_mode_machine/", "generate", "modes.json")
 MAX_CHARACTERS_PER_LINE_BUTTON = 17
 
 
@@ -43,7 +43,7 @@ class InputDeviceView(QWidget):
         with open(self._layout_file) as file:
             json_content = json.loads(file.read())
 
-        self._button_layout = [[self.create_button(**button_dict) for button_dict in row] for row in json_content]
+        self._button_layout = [[self.create_button(**button_dict) for button_dict in row if button_dict['name'] not in ['BootUp', 'Error']] for row in json_content]
 
         # Create the qt_layout from the button layout.
         qt_layout = self.create_layout(self._button_layout)

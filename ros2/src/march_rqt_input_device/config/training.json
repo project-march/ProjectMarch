@@ -51,5 +51,15 @@
       "callback": "publish_variable_walk",
       "exoMode": 10
     }
+  ],
+  [
+    {
+      "name": "Error",
+      "exoMode": 4
+    },
+    {
+      "name": "BootUp",
+      "exoMode": 3
+    }
   ]
 ]
