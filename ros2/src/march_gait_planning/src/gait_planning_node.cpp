@@ -25,7 +25,7 @@ GaitPlanningNode::GaitPlanningNode()
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    RCLCPP_INFO(get_logger(), "Received current mode: %d", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
     footPositionsPublish(); 
@@ -45,7 +45,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
-    float dist = msg->centroid.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    float dist = msg->stepping_point.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 
