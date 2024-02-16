@@ -36,8 +36,10 @@ void FootstepPlannerNode::currentModeCallback(const march_shared_msgs::msg::ExoM
 }
 
 void FootstepPlannerNode::currentExoStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
-    std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
-    std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
+    std::array<double, 3> new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, 
+    msg->foot_pose[0].position.z};
+    std::array<double, 3> new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, 
+    msg->foot_pose[1].position.z};
     m_footstep_planner.setFootPositions(new_left_foot_position, new_right_foot_position); 
 }
 
@@ -59,11 +61,6 @@ bool FootstepPlannerNode::compareDistance(const march_shared_msgs::msg::Plane& p
 void FootstepPlannerNode::rankPlanesByDistance(){
     // this function should sort the list of planes by centroid distance to the current foot poistions, 
     // starting with the closest first 
-    // Maybe do this recursively??????
-
-    // std::sort(m_planes_list.begin(), m_planes_list.end(), compareDistance); 
-
-    // ChatGPT implementation: 
     std::sort(m_planes_list.begin(), m_planes_list.end(), [this](const march_shared_msgs::msg::Plane& plane1, const march_shared_msgs::msg::Plane& plane2){
         return compareDistance(plane1, plane2); 
     });
@@ -71,7 +68,7 @@ void FootstepPlannerNode::rankPlanesByDistance(){
 
 march_shared_msgs::msg::Plane* FootstepPlannerNode::findSafePlane(size_t index){
     // This function recursively iterates through the list of planes ranked by distance. It 
-    // returns the first plane that is found to be safe to step on. checkCentroidPlaneSafe
+    // returns the first plane that is found to be safe to step on. 
     if (index >= m_planes_list.size()){
         return nullptr; 
     }
@@ -84,11 +81,11 @@ march_shared_msgs::msg::Plane* FootstepPlannerNode::findSafePlane(size_t index){
 bool FootstepPlannerNode::checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const{
     // this function should return a bool describing if the centroid of a plane is close enough to 
     // safely reach, given ranges of motion etc. 
-    return (plane.centroid.x < (m_footstep_planner.getDistanceThreshold()+m_footstep_planner.getRightFootPosition()[0])); 
+    return (plane.centroid.x < (m_footstep_planner.getDistanceThreshold() + m_footstep_planner.getRightFootPosition()[0])); 
 }
 
 bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
-    //This function checks whether a given plane is a circle or not
+    //This function checks whether a given plane is a circle or not by checking radius
     float x = plane.upper_boundary_point.x - plane.lower_boundary_point.x; 
     float y = plane.left_boundary_point.y + abs(plane.right_boundary_point.y);
     return (x - y < 0.05);  
@@ -97,19 +94,22 @@ bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &pla
 bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const {
     // This function should in some way check if an area the size of the two feet around the centroid is safe
     // to step on, aka falls within plane. We might want to check with just one foot, depending
-    // on strategy.
+    // on strategy. If it is a circle (stepping stone) the feet will never fully fit, so we need to set a default value of true. 
     if (checkIfCircle(plane)){
         return true; 
     } else {
-        // right now, assuming the plane coordinates are with respect to the backpack frame 
-        bool fits_x = ((plane.centroid.x + m_footstep_planner.getFootSize()[0]/2) < plane.upper_boundary_point.x && (plane.centroid.x - m_footstep_planner.getFootSize()[0]/2) > plane.lower_boundary_point.x); 
-        bool fits_y = ((plane.centroid.y + m_footstep_planner.getFootSize()[1]/2) < plane.left_boundary_point.y && (plane.centroid.y - m_footstep_planner.getFootSize()[1]/2) > plane.right_boundary_point.y); 
+        bool fits_x = ((plane.centroid.x + m_footstep_planner.getFootSize()[0]/2) < plane.upper_boundary_point.x && 
+            (plane.centroid.x - m_footstep_planner.getFootSize()[0]/2) > plane.lower_boundary_point.x); 
+        bool fits_y = ((plane.centroid.y + m_footstep_planner.getFootSize()[1]/2) < plane.left_boundary_point.y && 
+            (plane.centroid.y - m_footstep_planner.getFootSize()[1]/2) > plane.right_boundary_point.y); 
         return (fits_x && fits_y); 
     }
 }
 
-// somewhere include logic to say whether feet should be placed together or in a normal box (use 
+// TODO: somewhere include logic to say whether feet should be placed together (e.g. on stepping stone) or in a normal box (use 
 // an offset, as gait planning is determined in how the feet are placed, or send y position to gaitplanning)
+
+// TODO: IKS currently locates ankles of feet at coordinate you send it, so add offset (ankle to midfoot distance to centroid for example)
 
 void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
@@ -117,7 +117,7 @@ void FootstepPlannerNode::footstepOutputPublish(){
     RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
     march_shared_msgs::msg::Plane* safe_plane = findSafePlane(); 
     if (checkOverlapPlaneFootbox(*safe_plane)){
-        m_desired_footstep_msg->distance = (safe_plane->centroid.x - m_footstep_planner.getRightFootPosition()[0]); 
+        m_desired_footstep_msg->stepping_point = (safe_plane->centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
         RCLCPP_INFO(this->get_logger(), "Sent footstep message! %f", m_desired_footstep_msg->distance); 
     }

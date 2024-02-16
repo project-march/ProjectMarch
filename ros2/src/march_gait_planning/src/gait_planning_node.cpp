@@ -45,7 +45,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
-    float dist = msg->distance; 
+    float dist = msg->centroid.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 
