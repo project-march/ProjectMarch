@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+// This is a generated file. Do not edit.
+
 enum class exoMode {
     Sit = 0,
     Stand = 1,

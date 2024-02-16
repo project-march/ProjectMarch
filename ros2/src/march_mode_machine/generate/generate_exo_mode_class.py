@@ -1,3 +1,5 @@
+"""Author: Andrew Hutani, MIX"""
+
 import json
 import os
 
@@ -26,6 +28,7 @@ all_modes.sort(key=lambda mode: mode['exoMode'])
 with open(os.path.join(output_dir, 'exo_mode.hpp'), 'w') as f:
     f.write("#pragma once\n#include <string>\n#include <vector>\n\n")
 
+    f.write("// This is a generated file. Do not edit.\n\n")
 
     # Write the enum definition
     f.write('enum class exoMode {\n')

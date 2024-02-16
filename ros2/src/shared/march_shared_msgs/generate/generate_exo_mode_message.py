@@ -1,3 +1,5 @@
+"""Author: Andrew Hutani, MIX"""
+
 import json
 import os
 import rospkg

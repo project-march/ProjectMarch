@@ -1,7 +1,7 @@
 # March RQT Input Device
 **Author: Andrew Hutani, MIX**
 ## Overview
-This packages is the implementation of the RQT input device, which allows the user to control the exoskeleton using a virtual button interface. In essence, the user can relay instructions to the whole ROS architecture using this packages.
+This package is the implementation of the RQT input device, which allows the user to control the exoskeleton using a virtual button interface. In essence, the user can relay instructions to the whole ROS architecture using this packages. Note how the whole layout is dependant on the modes defined in the `modes.json` file in the `march_mode_machine` package.
 
 ## User Interface Structure
 The user interface of this plugin follows the classic Model-View-Controller (MVC) architectural pattern, which separates the application into three interconnected components. This allows for efficient code organization, modular design, and easier maintenance. Blame old Marchies for the naming convention, but in this case the following holds:
