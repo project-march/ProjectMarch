@@ -63,6 +63,8 @@ public:
     std::vector<RobotNode::WeakPtr> getChildren() const;
     std::vector<std::string> getJointNames() const;
     std::vector<std::string> getRelativeJointNames() const;
+    JointNameToValueMap getAbsoluteJointValues(const JointNameToValueMap& joint_values) const;
+    Eigen::VectorXd convertAbsoluteJointValuesToVectorXd(const JointNameToValueMap& joint_values) const;
 
 protected:
     void setExpression(const std::vector<std::string>& expressions, std::vector<GiNaC::ex>& target);

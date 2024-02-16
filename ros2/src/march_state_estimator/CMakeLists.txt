@@ -54,7 +54,6 @@ add_library(${PROJECT_NAME} STATIC
   src/sensor_fusion.cpp
   src/torque_converter.cpp
   src/state_estimator_node.cpp
-  src/transform_publisher_node.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
