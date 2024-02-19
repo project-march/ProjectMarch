@@ -24,6 +24,8 @@ find_package(orocos_kdl REQUIRED)
 find_package(urdf REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
+find_package(Eigen3 REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -38,6 +40,7 @@ ament_target_dependencies(${PROJECT_NAME}
   urdf
   tf2_kdl
   tf2_ros
+  Eigen3
 )
 
 add_executable(kdl_integration_node
@@ -57,12 +60,16 @@ ament_target_dependencies(kdl_integration_node
   urdf
   tf2_kdl
   tf2_ros
+  Eigen3
 )
 
 install(TARGETS
   kdl_integration_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
