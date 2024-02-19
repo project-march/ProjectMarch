@@ -46,7 +46,7 @@ void GainSchedulerNode::jointStatesCallback(const sensor_msgs::msg::JointState::
         // Convert the message to a string and print it
         std::string position = vectorToString(msg->position);
         std::string velocity = vectorToString(msg->velocity);
-        RCLCPP_INFO(get_logger(), "Position: %s, Velocity: %s", position.c_str(), velocity.c_str());
+        // RCLCPP_INFO(get_logger(), "Position: %s, Velocity: %s", position.c_str(), velocity.c_str());
         
         m_latest_joint_state = msg;   
     } 
@@ -61,14 +61,14 @@ void GainSchedulerNode::publishPidValues() {
 
     if (m_scheduler.isInterpolating()) {
         joints = m_scheduler.getInterpolatedPidValues();
-        RCLCPP_INFO(get_logger(), "Interpolating PID values");
+        // RCLCPP_INFO(get_logger(), "Interpolating PID values");
     } else {
         if (m_latest_joint_state != nullptr) {
             joints = m_scheduler.getAllJointStatePidValues(m_latest_joint_state);
-            RCLCPP_INFO(get_logger(), "Using joint states from message");
+            // RCLCPP_INFO(get_logger(), "Using joint states from message");
         } else {
             joints = m_scheduler.getAllPidValues();
-            RCLCPP_INFO(get_logger(), "Using default joint states");
+            // RCLCPP_INFO(get_logger(), "Using default joint states");
         }
     }
 
@@ -91,10 +91,10 @@ void GainSchedulerNode::publishPidValues() {
         //             pid_values_msg.joint_name.c_str(), pid_values_msg.proportional_gain,
         //             pid_values_msg.integral_gain, pid_values_msg.derivative_gain);
 
-        RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f",
-                    pid_values_hwi_msg.joint_name.c_str(), pid_values_hwi_msg.proportional_gain);
+        // RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f",
+        //             pid_values_hwi_msg.joint_name.c_str(), pid_values_hwi_msg.proportional_gain);
     }
-        RCLCPP_INFO(get_logger(), "                                    ");
+        // RCLCPP_INFO(get_logger(), "                                    ");
 }   
 
 

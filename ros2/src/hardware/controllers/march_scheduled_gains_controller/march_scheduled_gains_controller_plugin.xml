@@ -1,0 +1,9 @@
+<library path="march_scheduled_gains_controller">
+  <class name="march_scheduled_gains_controller/ScheduledGainsController" 
+         type="march_scheduled_gains_controller::ScheduledGainsController" 
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      The scheduled gains controller commands a group of joints through the scheduled gains interface
+    </description>
+  </class>
+</library>
