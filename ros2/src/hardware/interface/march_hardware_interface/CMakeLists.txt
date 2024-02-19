@@ -20,6 +20,7 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_utility REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(march_scheduled_gains_controller REQUIRED)
 
 add_library(
         ${PROJECT_NAME}
@@ -45,6 +46,7 @@ ament_target_dependencies(
         yaml-cpp
         march_utility
         sensor_msgs
+        march_scheduled_gains_controller
 )
 
 pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
@@ -62,6 +64,7 @@ ament_export_dependencies(
         yaml-cpp
         march_utility
         sensor_msg
+        march_scheduled_gains_controller
 )
 
 install(

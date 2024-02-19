@@ -34,6 +34,8 @@
 #include <rclcpp/clock.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/int32.hpp>
+#include "scheduled_gains_controller/scheduled_gains_controller.hpp"
+
 
 #define TORQUEDEBUG
 
@@ -66,6 +68,9 @@ struct JointInfo {
     // Values for the fuzzy control on the ODrive
     double position_weight;
     double torque_weight;
+
+    // Values for the PID control on the ODrive
+    double pid_values;
 
     JointLimit limit;
 };

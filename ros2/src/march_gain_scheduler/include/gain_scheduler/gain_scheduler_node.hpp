@@ -2,6 +2,9 @@
 #include "march_shared_msgs/msg/pid_values.hpp"     
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "march_shared_msgs/msg/pid_values_hwi.hpp"
+#include "rclcpp/rclcpp.hpp"
+
 
 class GainSchedulerNode:public rclcpp::Node {
     
@@ -10,6 +13,7 @@ class GainSchedulerNode:public rclcpp::Node {
 
     private: 
         rclcpp::Publisher<march_shared_msgs::msg::PidValues>::SharedPtr m_pid_values_publisher; 
+        rclcpp::Publisher<march_shared_msgs::msg::PidValuesHwi>::SharedPtr m_test_hwi_publisher;
         rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscriber;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_states_subscriber;
         rclcpp::TimerBase::SharedPtr m_timer; 

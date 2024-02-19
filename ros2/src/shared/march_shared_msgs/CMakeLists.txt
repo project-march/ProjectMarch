@@ -55,6 +55,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MotorControllerStates.msg"
   "msg/NodeJacobian.msg"
   "msg/PidValues.msg"
+  "msg/PidValuesHwi.msg"
   "msg/PowerDistributionBoardData.msg"
   "msg/RobotState.msg"
   "msg/TorqueStamped.msg"

@@ -12,6 +12,8 @@ GainSchedulerNode::GainSchedulerNode()
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
+    m_test_hwi_publisher = create_publisher<march_shared_msgs::msg::PidValuesHwi>("~/commands", rclcpp::SystemDefaultsQoS());
+
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
 
@@ -79,9 +81,18 @@ void GainSchedulerNode::publishPidValues() {
 
         m_pid_values_publisher->publish(pid_values_msg);
 
-        RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f, I: %f, D: %f",
-                    pid_values_msg.joint_name.c_str(), pid_values_msg.proportional_gain,
-                    pid_values_msg.integral_gain, pid_values_msg.derivative_gain);
+        march_shared_msgs::msg::PidValuesHwi pid_values_hwi_msg;
+        pid_values_hwi_msg.joint_name = std::get<joint_name>(joint);
+        pid_values_hwi_msg.proportional_gain = std::get<joint_p_gain>(joint);
+
+        m_test_hwi_publisher->publish(pid_values_hwi_msg);
+
+        // RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f, I: %f, D: %f",
+        //             pid_values_msg.joint_name.c_str(), pid_values_msg.proportional_gain,
+        //             pid_values_msg.integral_gain, pid_values_msg.derivative_gain);
+
+        RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f",
+                    pid_values_hwi_msg.joint_name.c_str(), pid_values_hwi_msg.proportional_gain);
     }
         RCLCPP_INFO(get_logger(), "                                    ");
 }   

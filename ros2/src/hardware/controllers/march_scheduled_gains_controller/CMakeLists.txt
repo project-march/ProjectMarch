@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(controller_interface REQUIRED)
+find_package(forward_command_controller REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(rcutils REQUIRED)
@@ -33,6 +34,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 ament_target_dependencies(${PROJECT_NAME}
   builtin_interfaces
   controller_interface
+  forward_command_controller
   pluginlib
   rclcpp_lifecycle
   rcutils
@@ -40,13 +42,12 @@ ament_target_dependencies(${PROJECT_NAME}
   realtime_tools
 )
 
-# unsure if this is needed/what it does
-# # Causes the visibility macros to use dllexport rather than dllimport,
-# # which is appropriate when building the dll but not consuming it.
-# target_compile_definitions(${PROJECT_NAME} PRIVATE "PDB_STATE_BROADCASTER_BUILDING_DLL")
+# Causes the visibility macros to use dllexport rather than dllimport,
+# which is appropriate when building the dll but not consuming it.
+# target_compile_definitions(${PROJECT_NAME} PRIVATE "MARCH_SCHEDULED_GAINS_CONTROLLER_BUILDING_DLL")
 # # prevent pluginlib from using boost
 # target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-# pluginlib_export_plugin_description_file(controller_interface march_pdb_state_plugin.xml)
+# pluginlib_export_plugin_description_file(controller_interface march_scheduled_gains_controller_plugins.xml)
 
 
 install(
@@ -77,6 +78,7 @@ ament_export_dependencies(
   controller_interface
   rclcpp_lifecycle
   march_shared_msgs
+  forward_command_controller
 )
 ament_export_include_directories(
   include

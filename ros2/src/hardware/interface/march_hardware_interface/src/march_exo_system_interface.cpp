@@ -139,6 +139,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
+        /*pid_values=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
             /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
@@ -211,6 +212,10 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
+        
+        // For scheduled gains controller.
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(
+            jointInfo.name, hardware_interface::HW_IF_SCHEDULED_GAINS, &jointInfo.pid_values));
     }
 
     return command_interfaces;
