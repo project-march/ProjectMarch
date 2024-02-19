@@ -10,7 +10,6 @@
 #include <ctime>
 #include <set>
 #include <eigen3/Eigen/Core>
-#include <pcl/point_cloud.h>
 
 namespace octomap {
 class MarchOctree : public OccupancyOcTreeBase<MarchOctreeNode> {
