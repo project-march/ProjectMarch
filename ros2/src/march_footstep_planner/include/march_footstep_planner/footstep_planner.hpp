@@ -23,24 +23,30 @@ safe to step in.
 #pragma once
 
 #include <array>
+#include "geometry_msgs/msg/point.hpp"
+#include "march_shared_msgs/msg/plane.hpp"
+
 
 class FootstepPlanner {
     public: 
     explicit FootstepPlanner(); 
-    // struct plane {
-    //     std::array<double, 3> centroid; 
-    // }; 
 
     //Setters
     // void setFootPositions(const double &l_x, const double &l_y, const double &l_z, const double &r_x, const double &r_y, const double &r_z); 
     void setFootSize(const double &width, const double &length, const double &height); 
     void setDistanceThreshold(const double &distance); 
-    void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position); 
+    void setFootPositions(const std::array<double, 3> &new_left_foot_position, const std::array<double, 3> &new_right_foot_position);
+    void setPlanesList(const std::vector<march_shared_msgs::msg::Plane> &planes);  
     //Getters
     std::array<double, 3> getFootSize() const;
     double getDistanceThreshold() const; 
     std::array<double, 3> getLeftFootPosition() const; 
     std::array<double, 3> getRightFootPosition() const; 
+    std::vector<march_shared_msgs::msg::Plane> getPlanesList() const; 
+
+    bool compareDistance(const geometry_msgs::msg::Point& plane1_centroid, const geometry_msgs::msg::Point& plane2_centroid) const; 
+    bool checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const; 
+    void rankPlanesByDistance(); 
 
     private:
 
@@ -48,4 +54,6 @@ class FootstepPlanner {
     std::array<double, 3> m_foot_size; 
     std::array<double, 3> m_left_foot_position; 
     std::array<double, 3> m_right_foot_position; 
+    std::vector<march_shared_msgs::msg::Plane> m_planes_list; 
+
 }; 

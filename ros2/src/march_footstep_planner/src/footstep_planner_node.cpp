@@ -10,7 +10,6 @@ FootstepPlannerNode::FootstepPlannerNode()
 : Node("march_footstep_planner_node"), 
   m_footstep_planner(FootstepPlanner()), 
   m_desired_footstep_msg(std::make_shared<march_shared_msgs::msg::FootStepOutput>()), 
-  m_planes_list(), 
   m_gait_type()
 {
     m_variable_footstep_publisher = create_publisher<march_shared_msgs::msg::FootStepOutput>("footsteps", 1); 
@@ -44,44 +43,26 @@ void FootstepPlannerNode::currentExoStateCallback(const march_shared_msgs::msg::
 }
 
 void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::AllPlanes::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received list of planes!"); 
-    m_planes_list = msg->planes; 
+    if (msg->planes.empty()) {
+        throw std::logic_error("No planes in message!"); 
+    } 
+    RCLCPP_INFO(this->get_logger(), "Received list of planes!");
+    m_footstep_planner.setPlanesList(msg->planes);
     if (m_gait_type == exoMode::VariableWalk){
         footstepOutputPublish(); 
     }
 }
 
-bool FootstepPlannerNode::compareDistance(const march_shared_msgs::msg::Plane& plane1, const march_shared_msgs::msg::Plane& plane2) const{
-    // this function should compare two planes and return a bool describing if the first plane centroid 
-    // is closer to the current foot positions than the second plane centroid 
-    double current_x_position = m_footstep_planner.getRightFootPosition()[0]; 
-    return ((plane1.centroid.x - current_x_position) < (plane2.centroid.x- current_x_position)); 
-}
-
-void FootstepPlannerNode::rankPlanesByDistance(){
-    // this function should sort the list of planes by centroid distance to the current foot poistions, 
-    // starting with the closest first 
-    std::sort(m_planes_list.begin(), m_planes_list.end(), [this](const march_shared_msgs::msg::Plane& plane1, const march_shared_msgs::msg::Plane& plane2){
-        return compareDistance(plane1, plane2); 
-    });
-}
-
 march_shared_msgs::msg::Plane* FootstepPlannerNode::findSafePlane(size_t index){
     // This function recursively iterates through the list of planes ranked by distance. It 
     // returns the first plane that is found to be safe to step on. 
-    if (index >= m_planes_list.size()){
-        return nullptr; 
+    if (index >= m_footstep_planner.getPlanesList().size()){
+        throw std::logic_error( "No safe plane found!");
     }
-    if (checkCentroidPlaneSafeDistance(m_planes_list[index])) {
-        return &m_planes_list[index];
+    if (m_footstep_planner.checkCentroidPlaneSafeDistance(m_footstep_planner.getPlanesList()[index])) {
+        return &m_footstep_planner.getPlanesList()[index];
     }
     return findSafePlane(index + 1); 
-}
-
-bool FootstepPlannerNode::checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const{
-    // this function should return a bool describing if the centroid of a plane is close enough to 
-    // safely reach, given ranges of motion etc. 
-    return (plane.centroid.x < (m_footstep_planner.getDistanceThreshold() + m_footstep_planner.getRightFootPosition()[0])); 
 }
 
 bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
@@ -104,6 +85,7 @@ bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg:
             (plane.centroid.y - m_footstep_planner.getFootSize()[1]/2) > plane.right_boundary_point.y); 
         return (fits_x && fits_y); 
     }
+    // What to do if it doesn't fit???? 
 }
 
 // TODO: somewhere include logic to say whether feet should be placed together (e.g. on stepping stone) or in a normal box (use 
@@ -113,14 +95,14 @@ bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg:
 
 void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
-    rankPlanesByDistance(); 
+    m_footstep_planner.rankPlanesByDistance(); 
     RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
     march_shared_msgs::msg::Plane* safe_plane = findSafePlane(); 
     if (checkOverlapPlaneFootbox(*safe_plane)){
         m_desired_footstep_msg->stepping_point = (safe_plane->centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
         RCLCPP_INFO(this->get_logger(), "Sent footstep message!"); 
-    }
+    } 
 }
 
 int main(int argc, char *argv[]){

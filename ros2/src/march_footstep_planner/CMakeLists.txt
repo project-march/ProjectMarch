@@ -17,7 +17,8 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(ament_cmake_gtest)
+find_package(ament_cmake_gtest REQUIRED)
+
 
 include_directories(include)
 
@@ -60,17 +61,12 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/ 
 )
 
-# if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
-#     find_package(code_coverage REQUIRED)
-#     # Add compiler flags for coverage instrumentation before defining any targets
-#     append_coverage_compiler_flags()
-# endif()
-
 # if(BUILD_TESTING)
 #   find_package(ament_cmake_gtest REQUIRED)
 #   find_package(march_shared_msgs REQUIRED)
 #   ament_add_gtest(${PROJECT_NAME}_test 
 #     test/footstep_planner_test.cpp 
+#     test/test_runner.cpp 
 #     src/footstep_planner.cpp
 #     src/footstep_planner_node.cpp
 #     )
@@ -79,17 +75,12 @@ install(DIRECTORY
 #     $<INSTALL_INTERFACE:include>
 #   )
 #   ament_target_dependencies(${PROJECT_NAME}_test
+#     rclcpp
 #     std_msgs
 #     ament_index_cpp
 #     march_shared_msgs
+#     trajectory_msgs
 #   )
-#   if(ENABLE_COVERAGE_TESTING)
-#         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
-#         add_code_coverage(
-#             NAME coverage_report
-#             DEPENDENCIES ${PROJECT_NAME}_test
-#         )
-#   endif()
 # endif()
 
 # Add the necessary Python modules
