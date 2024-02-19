@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -ffast-math -fno-math-errno)
 endif()
 
 # find dependencies
@@ -20,8 +20,6 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
-find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
@@ -29,7 +27,6 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
-find_package(urdf REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -40,8 +37,6 @@ add_library(${PROJECT_NAME} STATIC
 
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp
-  rclcpp_action
-  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
@@ -56,8 +51,6 @@ target_include_directories(ik_solver_node PUBLIC
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(ik_solver_node
   rclcpp
-  rclcpp_action
-  rclcpp_components
   std_msgs
   Eigen3
   geometry_msgs
@@ -66,36 +59,8 @@ ament_target_dependencies(ik_solver_node
   march_shared_msgs
 )
 
-add_executable(ik_solver_buffer_node src/ik_solver_buffer_node.cpp)
-target_include_directories(ik_solver_buffer_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(ik_solver_buffer_node
-  rclcpp
-  Eigen3
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  march_shared_msgs
-)
-
-add_executable(ik_solver_point_evaluator_node src/ik_solver_point_evaluator_node.cpp)
-target_include_directories(ik_solver_point_evaluator_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(ik_solver_point_evaluator_node
-  rclcpp
-  Eigen3
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  march_shared_msgs
-)
-
 install(TARGETS
   ik_solver_node
-  ik_solver_buffer_node
-  ik_solver_point_evaluator_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(eigen3_cmake_module)
@@ -103,8 +68,8 @@ ament_export_dependencies(Eigen3)
 
 # Install launch files.
 install(DIRECTORY
-launch
-config
+  launch
+  config
 DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -112,9 +77,11 @@ if(BUILD_TESTING)
   # find_package(ament_lint_auto REQUIRED)
 
   ament_add_gmock(${PROJECT_NAME}_test
-    src/task.cpp
-    test/task_test.cpp 
     test/test_runner.cpp
+    test/ik_solver_test.cpp
+    src/ik_solver.cpp
+    test/task_test.cpp 
+    src/task.cpp
   )
 
   target_include_directories(${PROJECT_NAME}_test PUBLIC
@@ -123,8 +90,6 @@ if(BUILD_TESTING)
 
   ament_target_dependencies(${PROJECT_NAME}_test
     rclcpp
-    rclcpp_action
-    rclcpp_components
     std_msgs
     Eigen3
     geometry_msgs
@@ -133,12 +98,8 @@ if(BUILD_TESTING)
     march_shared_msgs
   )
 
-  # target_link_libraries(test_runner ${PROJECT_NAME})
-
   ament_export_dependencies(
     rclcpp
-    rclcpp_action
-    rclcpp_components
     std_msgs
     Eigen3
     geometry_msgs

@@ -19,6 +19,7 @@ struct CSVRow {
 
 GaitPlanning::GaitPlanning()
 : m_gait_type(), 
+  m_previous_gait_type(),
   m_current_stance_foot(), 
   m_step_size(), 
   m_current_left_foot_position(), 
@@ -26,7 +27,9 @@ GaitPlanning::GaitPlanning()
   m_large_bezier_trajectory(),
   m_large_first_step_trajectory(),
   m_small_bezier_trajectory(), 
-  m_small_first_step_trajectory() 
+  m_small_first_step_trajectory(),
+  m_large_step_close_trajectory(),
+  m_small_step_close_trajectory()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
     setBezierGait(); 
@@ -46,23 +49,31 @@ void GaitPlanning::setGaitType(const exoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
+void GaitPlanning::setPreviousGaitType(const exoMode &previous_gait_type){
+    m_previous_gait_type = previous_gait_type; 
+}
+
 void GaitPlanning::setBezierGait(){
     std::string cartesian_files_directory = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/cartesian/";
     m_large_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_large.csv");
     m_large_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_large.csv");
     m_small_first_step_trajectory = processCSV(cartesian_files_directory + "first_step_small.csv");
     m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
+    m_large_step_close_trajectory = processCSV(cartesian_files_directory + "large_step_close.csv");
+    m_small_step_close_trajectory = processCSV(cartesian_files_directory + "small_step_close.csv");
 }
 
 std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getTrajectory() const{
     std::vector<GaitPlanning::XZFeetPositionsArray> result;  
     switch (m_gait_type){
         case exoMode::LargeWalk : 
-        return (m_current_stance_foot & 0b11) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
+            return (m_current_stance_foot == 3) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
         case exoMode::SmallWalk : 
-        return  (m_current_stance_foot & 0b11) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
+            return  (m_current_stance_foot == 3) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
+        case exoMode::Stand :
+            return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
         default : 
-        return {}; 
+            return {}; 
     }
     // return result; 
 }
@@ -81,6 +92,10 @@ GaitPlanning::XYZFootPositionArray GaitPlanning::getCurrentRightFootPos() const{
 
 exoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
+}
+
+exoMode GaitPlanning::getPreviousGaitType() const{
+    return m_previous_gait_type; 
 }
 
 // This getter can also be included in the general getTrajectory function, depending on how we identify
