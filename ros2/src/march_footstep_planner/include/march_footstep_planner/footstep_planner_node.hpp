@@ -54,12 +54,10 @@ class FootstepPlannerNode : public rclcpp::Node {
     void footstepOutputPublish(); 
 
     // Used planes as dummy object data type for now
-    march_shared_msgs::msg::Plane* findSafePlane(size_t index = 0); 
     bool checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const;
     bool checkIfCircle(const march_shared_msgs::msg::Plane &plane) const; 
     
     FootstepPlanner m_footstep_planner; 
-
     march_shared_msgs::msg::FootStepOutput::SharedPtr m_desired_footstep_msg; 
     exoMode m_gait_type; 
 

@@ -23,6 +23,8 @@ safe to step in.
 #pragma once
 
 #include <array>
+#include <vector>
+#include <iostream>
 #include "geometry_msgs/msg/point.hpp"
 #include "march_shared_msgs/msg/plane.hpp"
 
@@ -47,6 +49,9 @@ class FootstepPlanner {
     bool compareDistance(const geometry_msgs::msg::Point& plane1_centroid, const geometry_msgs::msg::Point& plane2_centroid) const; 
     bool checkCentroidPlaneSafeDistance(const march_shared_msgs::msg::Plane& plane) const; 
     void rankPlanesByDistance(); 
+    march_shared_msgs::msg::Plane* findSafePlane(size_t index = 0); 
+    // bool checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const;
+    // bool checkIfCircle(const march_shared_msgs::msg::Plane &plane) const; 
 
     private:
 

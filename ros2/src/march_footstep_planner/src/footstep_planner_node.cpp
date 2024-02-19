@@ -53,18 +53,6 @@ void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::AllPlanes
     }
 }
 
-march_shared_msgs::msg::Plane* FootstepPlannerNode::findSafePlane(size_t index){
-    // This function recursively iterates through the list of planes ranked by distance. It 
-    // returns the first plane that is found to be safe to step on. 
-    if (index >= m_footstep_planner.getPlanesList().size()){
-        throw std::logic_error( "No safe plane found!");
-    }
-    if (m_footstep_planner.checkCentroidPlaneSafeDistance(m_footstep_planner.getPlanesList()[index])) {
-        return &m_footstep_planner.getPlanesList()[index];
-    }
-    return findSafePlane(index + 1); 
-}
-
 bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
     //This function checks whether a given plane is a circle or not by checking radius
     float x = plane.upper_boundary_point.x - plane.lower_boundary_point.x; 
@@ -76,6 +64,7 @@ bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg:
     // This function should in some way check if an area the size of the two feet around the centroid is safe
     // to step on, aka falls within plane. We might want to check with just one foot, depending
     // on strategy. If it is a circle (stepping stone) the feet will never fully fit, so we need to set a default value of true. 
+    RCLCPP_INFO(this->get_logger(), "check circle true or false: %d", checkIfCircle(plane));
     if (checkIfCircle(plane)){
         return true; 
     } else {
@@ -97,7 +86,9 @@ void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
     m_footstep_planner.rankPlanesByDistance(); 
     RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
-    march_shared_msgs::msg::Plane* safe_plane = findSafePlane(); 
+    march_shared_msgs::msg::Plane* safe_plane = m_footstep_planner.findSafePlane(); 
+    RCLCPP_INFO(this->get_logger(), "Safe plane found!"); 
+    // RCLCPP_INFO(this->get_logger(), "check overlap true or false: %d", checkOverlapPlaneFootbox(*safe_plane));
     if (checkOverlapPlaneFootbox(*safe_plane)){
         m_desired_footstep_msg->stepping_point = (safe_plane->centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
