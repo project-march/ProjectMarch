@@ -71,12 +71,10 @@ bool FootstepPlanner::checkCentroidPlaneSafeDistance(const march_shared_msgs::ms
 void FootstepPlanner::rankPlanesByDistance(){
     // this function should sort the list of planes by centroid distance to the current foot poistions, 
     // starting with the closest first 
-    std::sort(m_planes_list.begin(), m_planes_list.end(), [this](const march_shared_msgs::msg::Plane& plane1, const march_shared_msgs::msg::Plane& plane2){
+    std::sort(m_planes_list.begin(), m_planes_list.end(), [this](const march_shared_msgs::msg::Plane& plane1, const         march_shared_msgs::msg::Plane& plane2){
         return compareDistance(plane1.centroid, plane2.centroid); 
     });
 }
-
-
 
 march_shared_msgs::msg::Plane& FootstepPlanner::findSafePlane(size_t index){
     // This function recursively iterates through the list of planes ranked by distance. It 

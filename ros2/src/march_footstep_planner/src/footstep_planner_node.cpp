@@ -40,7 +40,7 @@ void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::AllPlanes
     if (msg->planes.empty()) {
         throw std::logic_error("No planes in message!"); 
     } 
-    RCLCPP_INFO(this->get_logger(), "Received list of planes!");
+    RCLCPP_DEBUG(this->get_logger(), "Received list of planes!");
     m_footstep_planner.setPlanesList(msg->planes);
     if (m_gait_type == exoMode::VariableWalk){
         footstepOutputPublish(); 
@@ -55,15 +55,15 @@ void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::AllPlanes
 void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
     m_footstep_planner.rankPlanesByDistance(); 
-    RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
+    RCLCPP_DEBUG(this->get_logger(), "Planes ranked"); 
     march_shared_msgs::msg::Plane& safe_plane = m_footstep_planner.findSafePlane(); 
-    RCLCPP_INFO(this->get_logger(), "Safe plane found!"); 
+    RCLCPP_DEBUG(this->get_logger(), "Safe plane found!"); 
     if (m_footstep_planner.checkOverlapPlaneFootbox(safe_plane)){
         m_desired_footstep_msg->stepping_point = (safe_plane.centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
         RCLCPP_INFO(this->get_logger(), "Sent footstep message!"); 
     } else {
-        RCLCPP_INFO(this->get_logger(), "No overlap"); 
+        RCLCPP_DEBUG(this->get_logger(), "No overlap"); 
     }
 }
 

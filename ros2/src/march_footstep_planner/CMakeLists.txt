@@ -61,27 +61,26 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/ 
 )
 
-# if(BUILD_TESTING)
-#   find_package(ament_cmake_gtest REQUIRED)
-#   find_package(march_shared_msgs REQUIRED)
-#   ament_add_gtest(${PROJECT_NAME}_test 
-#     test/footstep_planner_test.cpp 
-#     test/test_runner.cpp 
-#     src/footstep_planner.cpp
-#     src/footstep_planner_node.cpp
-#     )
-#   target_include_directories(${PROJECT_NAME}_test PUBLIC
-#     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#     $<INSTALL_INTERFACE:include>
-#   )
-#   ament_target_dependencies(${PROJECT_NAME}_test
-#     rclcpp
-#     std_msgs
-#     ament_index_cpp
-#     march_shared_msgs
-#     trajectory_msgs
-#   )
-# endif()
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(march_shared_msgs REQUIRED)
+  ament_add_gtest(${PROJECT_NAME}_test 
+    test/footstep_planner_test.cpp 
+    test/test_runner.cpp 
+    src/footstep_planner.cpp
+    )
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+  ament_target_dependencies(${PROJECT_NAME}_test
+    rclcpp
+    std_msgs
+    ament_index_cpp
+    march_shared_msgs
+    trajectory_msgs
+  )
+endif()
 
 # Add the necessary Python modules
 ament_package()
