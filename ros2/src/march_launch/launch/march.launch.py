@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default="march8_v0_aie_v0.xml")
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march8_v0_aie_v0.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
         launch_arguments=[
-            ("model_to_load", mujoco_toload),
+            ("model_to_load", mujoco_to_load),
             ("tunings_to_load_path",
                 PathJoinSubstitution(
                     [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]

@@ -20,7 +20,7 @@ def generate_launch_description():
                 namespace="",
                 executable="mujoco_sim_node",
                 name="mujoco_sim",
-                parameters=[tunings_to_load, {"model_toload": model_to_load}],
+                parameters=[tunings_to_load, {"model_to_load": model_to_load}],
             ),
             Node(
                 package="mujoco_reader",
