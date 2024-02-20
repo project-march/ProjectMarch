@@ -187,8 +187,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
 
-}
-
     return state_interfaces;
 }
 
