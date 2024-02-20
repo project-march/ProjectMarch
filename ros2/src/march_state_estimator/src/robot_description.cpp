@@ -48,6 +48,10 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
             = vectorizeExpressions(yaml_node[name]["rotation"], WORKSPACE_DIM, WORKSPACE_DIM);
         robot_part_data.global_linear_position
             = vectorizeExpressions(yaml_node[name]["linear"]["position"], WORKSPACE_DIM, 1);
+        robot_part_data.global_linear_velocity
+            = vectorizeExpressions(yaml_node[name]["linear"]["velocity"], WORKSPACE_DIM, 1);
+        robot_part_data.global_linear_acceleration
+            = vectorizeExpressions(yaml_node[name]["linear"]["acceleration"], WORKSPACE_DIM, 1);
         robot_part_data.global_linear_position_jacobian
             = vectorizeExpressions(yaml_node[name]["jacobian"]["position"], WORKSPACE_DIM, ABSOLUTE_DOF);
         robot_part_data.global_rotation_jacobian
@@ -191,6 +195,8 @@ void RobotDescription::setRobotPart(const RobotNode::SharedPtr robot_node, const
 {
     robot_node->setExpressionRelativeInertia(robot_part_data.inertia);
     robot_node->setExpressionGlobalPosition(robot_part_data.global_linear_position);
+    robot_node->setExpressionGlobalVelocity(robot_part_data.global_linear_velocity);
+    robot_node->setExpressionGlobalAcceleration(robot_part_data.global_linear_acceleration);
     robot_node->setExpressionGlobalRotation(robot_part_data.global_rotation);
     robot_node->setExpressionGlobalPositionJacobian(robot_part_data.global_linear_position_jacobian);
     robot_node->setExpressionGlobalRotationJacobian(robot_part_data.global_rotation_jacobian);

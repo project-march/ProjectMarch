@@ -16,6 +16,7 @@
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 
 #include "march_state_estimator/robot_description.hpp"
 #include "march_state_estimator/sensor_fusion.hpp"
@@ -44,14 +45,10 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
+    rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr m_filtered_imu_pub;
 
-    rclcpp::CallbackGroup::SharedPtr m_joint_state_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_imu_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_timer_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_node_position_callback_group;
-
-    rclcpp::SubscriptionOptions m_joint_state_subscription_options;
-    rclcpp::SubscriptionOptions m_imu_subscription_options;
+    rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
+    rclcpp::SubscriptionOptions m_sensors_subscription_options;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_

@@ -1,6 +1,7 @@
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
+#include "omp.h"
 #include <chrono>
 #include <cstdlib>
 #include <functional>
@@ -240,6 +241,7 @@ std::vector<double> IKSolverNode::createZeroVector()
 
 int main(int argc, char** argv)
 {
+    Eigen::initParallel();
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<IKSolverNode>());
     rclcpp::shutdown();

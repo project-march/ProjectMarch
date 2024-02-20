@@ -21,6 +21,8 @@ struct RobotPartData {
     std::vector<double> joint_axis;
     std::vector<std::string> global_rotation;
     std::vector<std::string> global_linear_position;
+    std::vector<std::string> global_linear_velocity;
+    std::vector<std::string> global_linear_acceleration;
     std::vector<std::string> global_linear_position_jacobian;
     std::vector<std::string> global_rotation_jacobian;
     std::vector<std::string> dynamical_torque;
