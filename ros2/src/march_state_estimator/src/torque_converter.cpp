@@ -4,10 +4,7 @@
  */
 
 #include "march_state_estimator/torque_converter.hpp"
-
 #include "rclcpp/rclcpp.hpp"
-
-#include <stdio.h>
 
 TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_description)
 {

@@ -5,3 +5,4 @@ sensor_msgs/Imu imu
 geometry_msgs/Pose[] foot_pose
 uint8 stance_leg
 geometry_msgs/Point zmp
+geometry_msgs/Vector3 imu_orientation
