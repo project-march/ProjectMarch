@@ -162,7 +162,6 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
  */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
-    RCLCPP_WARN((*logger_), "Creating state interface for joint %s.", jointInfo.name.c_str());
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
@@ -181,7 +180,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             state_interfaces.emplace_back(hardware_interface::StateInterface(
                 jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
         }
-
     }
 
     // // For the PDB broadcaster.
@@ -189,11 +187,6 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
 
-    for (const hardware_interface::StateInterface& interface : state_interfaces) {
-    RCLCPP_WARN((*logger_),
-                "Interface Name: %s ",
-                interface.get_full_name().c_str(),
-    );
 }
 
     return state_interfaces;
@@ -212,7 +205,6 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_WARN((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         // command_interfaces.emplace_back(hardware_interface::CommandInterface(
         //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
