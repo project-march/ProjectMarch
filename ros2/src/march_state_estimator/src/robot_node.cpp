@@ -60,6 +60,16 @@ void RobotNode::setExpressionGlobalPosition(const std::vector<std::string>& expr
     setExpression(expressions, m_global_position_expressions);
 }
 
+void RobotNode::setExpressionGlobalVelocity(const std::vector<std::string>& expressions)
+{
+    setExpression(expressions, m_global_velocity_expressions);
+}
+
+void RobotNode::setExpressionGlobalAcceleration(const std::vector<std::string>& expressions)
+{
+    setExpression(expressions, m_global_acceleration_expressions);
+}
+
 void RobotNode::setExpressionGlobalRotation(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_rotation_expressions);
@@ -164,6 +174,19 @@ Eigen::Vector3d RobotNode::getGlobalPosition(JointNameToValueMap joint_positions
 {
     return Eigen::Map<Eigen::Vector3d>(
         evaluateExpression(m_global_position_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions).data());
+}
+
+Eigen::Vector3d RobotNode::getGlobalVelocity(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities) const
+{
+    return Eigen::Map<Eigen::Vector3d>(
+        evaluateExpression(m_global_velocity_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions, joint_velocities).data());
+}
+
+Eigen::Vector3d RobotNode::getGlobalAcceleration(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
+    JointNameToValueMap joint_accelerations) const
+{
+    return Eigen::Map<Eigen::Vector3d>(
+        evaluateExpression(m_global_acceleration_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions, joint_velocities, joint_accelerations).data());
 }
 
 Eigen::Matrix3d RobotNode::getGlobalRotation(JointNameToValueMap joint_positions) const

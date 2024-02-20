@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -ffast-math -fno-math-errno)
+  add_compile_options(-Wall -Wextra -Wpedantic -fno-math-errno -ffast-math -O3 -lblas -fopenmp -DNDEBUG)
 endif()
 
 # find dependencies
@@ -27,6 +27,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(OpenMP REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -46,9 +47,11 @@ ament_target_dependencies(${PROJECT_NAME}
 )
 
 add_executable(ik_solver_node src/ik_solver_node.cpp src/ik_solver.cpp src/task.cpp)
+
 target_include_directories(ik_solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
 ament_target_dependencies(ik_solver_node
   rclcpp
   std_msgs
@@ -57,6 +60,11 @@ ament_target_dependencies(ik_solver_node
   sensor_msgs
   trajectory_msgs
   march_shared_msgs
+)
+
+target_link_libraries(ik_solver_node
+  ${PROJECT_NAME}
+  ${OpenMP_CXX_LIBRARIES}
 )
 
 install(TARGETS
@@ -106,6 +114,11 @@ if(BUILD_TESTING)
     sensor_msgs
     trajectory_msgs
     march_shared_msgs
+  )
+
+  target_link_libraries(${PROJECT_NAME}_test
+    ${PROJECT_NAME}
+    ${OpenMP_CXX_LIBRARIES}
   )
 
   # the following line skips the linter which checks for copyrights
