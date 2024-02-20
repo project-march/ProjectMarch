@@ -162,8 +162,15 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
  */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
-    RCLCPP_INFO((*logger_), "Creating export state interface.");
     std::vector<hardware_interface::StateInterface> state_interfaces;
+    
+    RCLCPP_INFO((*logger_), "Export state interface.");
+    
+    // // For the Log broadcaster.
+    for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
+        state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
+    }
+    
     for (JointInfo& jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(

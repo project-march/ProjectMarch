@@ -1,0 +1,9 @@
+<library path="march_log_broadcaster">
+    <class name="march_log_broadcaster/LogBroadcaster"
+           type="march_log_broadcaster::LogBroadcaster"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            The log broadcaster logs the hardware interface logs to rosout, so they are saved to the rosbag.
+        </description>
+    </class>
+</library>
