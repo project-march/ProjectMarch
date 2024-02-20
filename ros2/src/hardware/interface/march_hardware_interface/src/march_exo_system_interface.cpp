@@ -139,7 +139,7 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
-        /*pid_values=*/std::numeric_limits<double>::quiet_NaN(),
+        /*proportional_gain=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
             /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
@@ -205,7 +205,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
+        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         // command_interfaces.emplace_back(hardware_interface::CommandInterface(
         //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
@@ -215,8 +215,8 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
         
         // For scheduled gains controller.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
-            jointInfo.name, hardware_interface::HW_IF_SCHEDULED_GAINS, &jointInfo.pid_values));
-    }
+            jointInfo.name, hardware_interface::HW_IF_SCHEDULED_GAINS, &jointInfo.proportional_gain));
+}
 
     return command_interfaces;
 }
@@ -509,6 +509,8 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         // ACTUAL TORQUE LINE
         jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
             (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+
+        RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
         // }
     }
 

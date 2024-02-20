@@ -12,11 +12,10 @@ GainSchedulerNode::GainSchedulerNode()
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
-    m_test_hwi_publisher = create_publisher<march_shared_msgs::msg::PidValuesHwi>("~/commands", rclcpp::SystemDefaultsQoS());
+    m_test_hwi_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("~/commands", rclcpp::SystemDefaultsQoS());
 
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
-
 
     m_joint_states_subscriber = create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 10, std::bind(&GainSchedulerNode::jointStatesCallback, this, _1));
@@ -54,6 +53,7 @@ void GainSchedulerNode::jointStatesCallback(const sensor_msgs::msg::JointState::
 
 void GainSchedulerNode::publishPidValues() {   
     std::vector<std::tuple<std::string, double, double, double>> joints;
+    std::vector<double> proportional_gains;
     const unsigned int joint_name = 0;
     const unsigned int joint_p_gain = 1;
     const unsigned int joint_i_gain = 2;
@@ -78,23 +78,22 @@ void GainSchedulerNode::publishPidValues() {
         pid_values_msg.proportional_gain = std::get<joint_p_gain>(joint);
         pid_values_msg.integral_gain = std::get<joint_i_gain>(joint);
         pid_values_msg.derivative_gain = std::get<joint_d_gain>(joint);
+        
+        proportional_gains.push_back({std::get<joint_p_gain>(joint)});
 
         m_pid_values_publisher->publish(pid_values_msg);
 
-        march_shared_msgs::msg::PidValuesHwi pid_values_hwi_msg;
-        pid_values_hwi_msg.joint_name = std::get<joint_name>(joint);
-        pid_values_hwi_msg.proportional_gain = std::get<joint_p_gain>(joint);
+    }
+              
+        // HWI gains test
+        std_msgs::msg::Float64MultiArray pid_values_hwi_msg;
+
+        // Flatten the PID values and add them to the message
+        for (const auto& p : proportional_gains) {
+            pid_values_hwi_msg.data.push_back(p);
+        }
 
         m_test_hwi_publisher->publish(pid_values_hwi_msg);
-
-        // RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f, I: %f, D: %f",
-        //             pid_values_msg.joint_name.c_str(), pid_values_msg.proportional_gain,
-        //             pid_values_msg.integral_gain, pid_values_msg.derivative_gain);
-
-        // RCLCPP_INFO(get_logger(), "Published PID values for joint: %s, P: %f",
-        //             pid_values_hwi_msg.joint_name.c_str(), pid_values_hwi_msg.proportional_gain);
-    }
-        // RCLCPP_INFO(get_logger(), "                                    ");
 }   
 
 

@@ -82,6 +82,7 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner.py",
         arguments=["scheduled_gains_controller", "-t", "march_scheduled_gains_controller/ScheduledGainsController","--controller-manager", "/controller_manager"],
+        condition=UnlessCondition(simulation),
     )
 
     # endregion

@@ -70,7 +70,7 @@ struct JointInfo {
     double torque_weight;
 
     // Values for the PID control on the ODrive
-    double pid_values;
+    double proportional_gain;
 
     JointLimit limit;
 };
