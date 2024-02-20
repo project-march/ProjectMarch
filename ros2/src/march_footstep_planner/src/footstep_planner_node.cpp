@@ -26,12 +26,6 @@ void FootstepPlannerNode::currentModeCallback(const march_shared_msgs::msg::ExoM
     // use a different member variable or method to identify when this is the case. 
     RCLCPP_INFO(this->get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_type = (exoMode)msg->mode; 
-    // if (m_gait_type == exoMode::VariableWalk){
-    //     footstepOutputPublish(); 
-    // }
-    // Maybe this function is not necessary, as this logic of only sending distances when receiving mode 
-    // command will be done in the vision module. Then we only need to include this type of logic in the 
-    // planes callback. 
 }
 
 void FootstepPlannerNode::currentExoStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
@@ -53,30 +47,6 @@ void FootstepPlannerNode::planesCallback(const march_shared_msgs::msg::AllPlanes
     }
 }
 
-bool FootstepPlannerNode::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
-    //This function checks whether a given plane is a circle or not by checking radius
-    float x = plane.upper_boundary_point.x - plane.lower_boundary_point.x; 
-    float y = plane.left_boundary_point.y + abs(plane.right_boundary_point.y);
-    return (x - y < 0.05);  
-}
-
-bool FootstepPlannerNode::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const {
-    // This function should in some way check if an area the size of the two feet around the centroid is safe
-    // to step on, aka falls within plane. We might want to check with just one foot, depending
-    // on strategy. If it is a circle (stepping stone) the feet will never fully fit, so we need to set a default value of true. 
-    RCLCPP_INFO(this->get_logger(), "check circle true or false: %d", checkIfCircle(plane));
-    if (checkIfCircle(plane)){
-        return true; 
-    } else {
-        bool fits_x = ((plane.centroid.x + m_footstep_planner.getFootSize()[0]/2) < plane.upper_boundary_point.x && 
-            (plane.centroid.x - m_footstep_planner.getFootSize()[0]/2) > plane.lower_boundary_point.x); 
-        bool fits_y = ((plane.centroid.y + m_footstep_planner.getFootSize()[1]/2) < plane.left_boundary_point.y && 
-            (plane.centroid.y - m_footstep_planner.getFootSize()[1]/2) > plane.right_boundary_point.y); 
-        return (fits_x && fits_y); 
-    }
-    // What to do if it doesn't fit???? 
-}
-
 // TODO: somewhere include logic to say whether feet should be placed together (e.g. on stepping stone) or in a normal box (use 
 // an offset, as gait planning is determined in how the feet are placed, or send y position to gaitplanning)
 
@@ -86,14 +56,15 @@ void FootstepPlannerNode::footstepOutputPublish(){
     //This function should ultimately publish distance/desired stepping point on the footstepoutput topic
     m_footstep_planner.rankPlanesByDistance(); 
     RCLCPP_INFO(this->get_logger(), "Planes ranked"); 
-    march_shared_msgs::msg::Plane* safe_plane = m_footstep_planner.findSafePlane(); 
+    march_shared_msgs::msg::Plane& safe_plane = m_footstep_planner.findSafePlane(); 
     RCLCPP_INFO(this->get_logger(), "Safe plane found!"); 
-    // RCLCPP_INFO(this->get_logger(), "check overlap true or false: %d", checkOverlapPlaneFootbox(*safe_plane));
-    if (checkOverlapPlaneFootbox(*safe_plane)){
-        m_desired_footstep_msg->stepping_point = (safe_plane->centroid); 
+    if (m_footstep_planner.checkOverlapPlaneFootbox(safe_plane)){
+        m_desired_footstep_msg->stepping_point = (safe_plane.centroid); 
         m_variable_footstep_publisher->publish(*m_desired_footstep_msg);
         RCLCPP_INFO(this->get_logger(), "Sent footstep message!"); 
-    } 
+    } else {
+        RCLCPP_INFO(this->get_logger(), "No overlap"); 
+    }
 }
 
 int main(int argc, char *argv[]){

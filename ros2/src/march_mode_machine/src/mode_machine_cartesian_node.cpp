@@ -61,8 +61,8 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
             plane.centroid.z = 0.0;
             plane.left_boundary_point.y = 0.6; 
             plane.right_boundary_point.y = -0.6; 
-            plane.upper_boundary_point.x = 1; 
-            plane.lower_boundary_point.x = 0; 
+            plane.upper_boundary_point.x = 1.2; 
+            plane.lower_boundary_point.x = 0.0; 
             plane_msg.planes = {plane}; 
             m_planes_dummy_publisher->publish(plane_msg); 
             RCLCPP_INFO(this->get_logger(), "Planes sent!"); 

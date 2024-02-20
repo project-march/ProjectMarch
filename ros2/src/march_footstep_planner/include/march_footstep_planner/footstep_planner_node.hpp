@@ -52,10 +52,6 @@ class FootstepPlannerNode : public rclcpp::Node {
     void currentExoStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
 
     void footstepOutputPublish(); 
-
-    // Used planes as dummy object data type for now
-    bool checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const;
-    bool checkIfCircle(const march_shared_msgs::msg::Plane &plane) const; 
     
     FootstepPlanner m_footstep_planner; 
     march_shared_msgs::msg::FootStepOutput::SharedPtr m_desired_footstep_msg; 

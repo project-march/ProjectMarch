@@ -76,39 +76,38 @@ void FootstepPlanner::rankPlanesByDistance(){
     });
 }
 
-march_shared_msgs::msg::Plane* FootstepPlanner::findSafePlane(size_t index){
+
+
+march_shared_msgs::msg::Plane& FootstepPlanner::findSafePlane(size_t index){
     // This function recursively iterates through the list of planes ranked by distance. It 
     // returns the first plane that is found to be safe to step on. 
     if (index >= m_planes_list.size()){
         throw std::logic_error( "No safe plane found!");
     }
     if (checkCentroidPlaneSafeDistance(m_planes_list[index])) {
-        return &m_planes_list[index];
+        return m_planes_list[index];
     }
     return findSafePlane(index + 1); 
 }
 
-// bool FootstepPlanner::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const {
-//     // This function should in some way check if an area the size of the two feet around the centroid is safe
-//     // to step on, aka falls within plane. We might want to check with just one foot, depending
-//     // on strategy. If it is a circle (stepping stone) the feet will never fully fit, so we need to set a default value of true. 
-//     if (checkIfCircle(plane)){
-//         return true; 
-//     } else {
-//         bool fits_x = ((plane.centroid.x + m_foot_size[0]/2) < plane.upper_boundary_point.x && 
-//             (plane.centroid.x - m_foot_size[0]/2) > plane.lower_boundary_point.x); 
-//         bool fits_y = ((plane.centroid.y + m_foot_size[1]/2) < plane.left_boundary_point.y && 
-//             (plane.centroid.y - m_foot_size[1]/2) > plane.right_boundary_point.y); 
-//         return (fits_x && fits_y); 
-//     }
-//     // What to do if it doesn't fit???? 
-// }
+bool FootstepPlanner::checkOverlapPlaneFootbox(const march_shared_msgs::msg::Plane& plane) const {
+    // This function should in some way check if an area the size of the two feet around the centroid is safe
+    // to step on, aka falls within plane. We might want to check with just one foot, depending
+    // on strategy. If it is a circle (stepping stone) the feet will never fully fit, so we need to set a default value of true. 
+    if (checkIfCircle(plane)){
+        return true; 
+    } else {
+        bool fits_x = ((plane.centroid.x + m_foot_size[0]/2) < plane.upper_boundary_point.x && 
+            (plane.centroid.x - m_foot_size[0]/2) > plane.lower_boundary_point.x); 
+        bool fits_y = ((plane.centroid.y + m_foot_size[1]/2) < plane.left_boundary_point.y && 
+            (plane.centroid.y - m_foot_size[1]/2) > plane.right_boundary_point.y); 
+        return (fits_x && fits_y); 
+    }
+    // What to do if it doesn't fit???? 
+}
 
-// bool FootstepPlanner::checkIfCircle(const march_shared_msgs::msg::Plane &plane) const {
-//     //This function checks whether a given plane is a circle or not by checking radius
-//     std::cout << "entered circle function" << std::endl; 
-//     float x = plane.upper_boundary_point.x - plane.lower_boundary_point.x; 
-//     float y = plane.left_boundary_point.y + abs(plane.right_boundary_point.y);
-//     return (x - y < 0.05);  
-// }
+bool FootstepPlanner::checkIfCircle(const march_shared_msgs::msg::Plane& plane) const {
+    //This function checks whether a given plane is a circle or not by checking radius 
+    return (std::abs(plane.upper_boundary_point.x - plane.lower_boundary_point.x - (plane.left_boundary_point.y +           std::abs(plane.right_boundary_point.y))) < 0.05);
+}
 
