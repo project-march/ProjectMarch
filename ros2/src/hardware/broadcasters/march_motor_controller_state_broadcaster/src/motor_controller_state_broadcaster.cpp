@@ -40,7 +40,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn MotorC
     try {
         // register motor controller data publisher
         motor_controller_state_publisher_
-            = node_->create_publisher<MCsMsg>("/march/motor_controller_states", rclcpp::SystemDefaultsQoS());
+            = node_->create_publisher<MCsMsg>("motor_controller_states", rclcpp::SystemDefaultsQoS());
         realtime_motor_controller_publisher_ = std::make_unique<MCsRTPublisher>(motor_controller_state_publisher_);
     } catch (const std::exception& e) {
         RCLCPP_FATAL(
