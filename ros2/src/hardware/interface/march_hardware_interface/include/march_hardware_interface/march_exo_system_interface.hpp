@@ -92,9 +92,9 @@ public:
      */
     void pid_values_callback(const march_shared_msgs::msg::PidValues::SharedPtr msg)
     {
-        RCLCPP_INFO(get_logger(), "Received PID values for joint: %s, P: %f, I: %f, D: %f",
-                    msg->joint_name.c_str(), msg->proportional_gain,
-                    msg->integral_gain, msg->derivative_gain);
+        // RCLCPP_INFO(get_logger(), "Received PID values for joint: %s, P: %f, I: %f, D: %f",
+        //             msg->joint_name.c_str(), msg->proportional_gain,
+        //             msg->integral_gain, msg->derivative_gain);
         
         setPidValues(msg->joint_name, std::array<double, 3>{msg->proportional_gain, msg->integral_gain, msg->derivative_gain});
     }
@@ -109,21 +109,21 @@ public:
         bool jointFound = false;
         for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
             if (jointInfo.name == joint_name) {
-                jointInfo.joint.setPositionPIDValues(new_position_pid);
+                // jointInfo.joint.setPositionPIDValues(new_position_pid);
                 jointFound = true;
 
-                RCLCPP_INFO(get_logger(), "Set PID values for joint: %s, P: %f, I: %f, D: %f",
-                        joint_name.c_str(), new_position_pid[0],
-                        new_position_pid[1], new_position_pid[2]);
+                // RCLCPP_INFO(get_logger(), "Set PID values for joint: %s, P: %f, I: %f, D: %f",
+                //         joint_name.c_str(), new_position_pid[0],
+                //         new_position_pid[1], new_position_pid[2]);
 
                 // Call sendPID() after new PID values are set
-                jointInfo.joint.sendPID();
+                // jointInfo.joint.sendPID();
             }
         }
 
-        if (!jointFound) {
-            RCLCPP_WARN(get_logger(), "Joint '%s' not found!", joint_name.c_str());
-        }
+        // if (!jointFound) {
+        //     RCLCPP_WARN(get_logger(), "Joint '%s' not found!", joint_name.c_str());
+        // }
     }
 
     std::vector<JointInfo>* joints_info_;

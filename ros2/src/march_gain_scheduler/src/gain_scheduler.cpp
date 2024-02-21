@@ -14,6 +14,7 @@ std::tuple<std::string, double, double, double> GainScheduler::getPidValues(cons
     
     YAML::Node jointConfig = m_config["joints"][joint];
     if (!jointConfig) {
+        std::cout << joint << "\n";
         throw std::runtime_error("Joint not found in config file");
     }
 
@@ -74,11 +75,11 @@ void GainScheduler::setConfigPath(const exoMode &new_gait_type) {
     std::cout << "Gait type set to: " << m_gait_type << '\n';
 
     if (new_gait_type == static_cast<exoMode>(0)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains.yaml");
+        m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains_hennie.yaml");
     } else if (new_gait_type == static_cast<exoMode>(1)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/stand_gains.yaml");
+        m_config = YAML::LoadFile("src/march_gain_scheduler/config/stand_gains_hennie.yaml");
     } else if (new_gait_type == static_cast<exoMode>(2)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/walk_gains.yaml");
+        m_config = YAML::LoadFile("src/march_gain_scheduler/config/walk_gains_hennie.yaml");
     } else {
         throw std::runtime_error("Gait type not found");
     }

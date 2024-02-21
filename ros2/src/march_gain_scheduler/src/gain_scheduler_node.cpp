@@ -6,7 +6,7 @@ using std::placeholders::_1;
 GainSchedulerNode::GainSchedulerNode()
  : Node("gain_scheduler_node")
  {
-    this->declare_parameter<std::string>("config_path", "src/march_gain_scheduler/config/walk_gains.yaml");   
+    this->declare_parameter<std::string>("config_path", "src/march_gain_scheduler/config/walk_gains_hennie.yaml");   
     auto config_path = this->get_parameter("config_path").as_string();                                                       
     m_scheduler = GainScheduler(config_path);
 
