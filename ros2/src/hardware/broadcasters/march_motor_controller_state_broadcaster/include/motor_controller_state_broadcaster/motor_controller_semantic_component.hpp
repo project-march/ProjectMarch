@@ -25,7 +25,7 @@ using JointMCMsg = march_shared_msgs::msg::JointMotorControllerState;
 class MotorControllerSemanticComponent : public semantic_components::SemanticComponentInterface<JointMCMsg> {
 public:
     explicit MotorControllerSemanticComponent(const std::string& joint_name)
-        : SemanticComponentInterface(joint_name, /*size=*/13)
+        : SemanticComponentInterface(joint_name, /*size=*/12)
         , joint_name_(joint_name)
     {
         interface_names_.emplace_back(joint_name + "/" + "motor_current");
@@ -40,7 +40,6 @@ public:
         interface_names_.emplace_back(joint_name + "/" + "incremental_position");
         interface_names_.emplace_back(joint_name + "/" + "absolute_velocity");
         interface_names_.emplace_back(joint_name + "/" + "incremental_velocity");
-        interface_names_.emplace_back(joint_name + "/" + "torque_sensor_value");
     }
 
     virtual ~MotorControllerSemanticComponent() = default;
@@ -70,13 +69,12 @@ public:
         incremental_position_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         absolute_velocity_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         incremental_velocity_ = static_cast<float>(state_interface::get(index, state_interfaces_));
-        torque_sensor_value_ = static_cast<float>(state_interface::get(index, state_interfaces_));
     }
 
     /**
-     * @brief Fills the joint motor controller message with updated values.
+     * @brief Fills the pdb message with updated values.
      *
-     * @param msg The reference to the joint motor controller message that we fill up.
+     * @param msg The reference to the pdb message that we fill up.
      * @return True to overwrite the unimplemented default.
      */
     bool get_values_as_message(JointMCMsg& msg)
@@ -96,7 +94,6 @@ public:
         msg.incremental_position = incremental_position_;
         msg.absolute_velocity = absolute_velocity_;
         msg.incremental_velocity = incremental_velocity_;
-        msg.torque_sensor_value = torque_sensor_value_;
         return true;
     }
 
@@ -117,8 +114,6 @@ private:
     float incremental_position_ = 0.F;
     float absolute_velocity_ = 0.F;
     float incremental_velocity_ = 0.F;
-
-    float torque_sensor_value_ = 0.F;
 };
 
 } // namespace march_motor_controller_state_broadcaster
