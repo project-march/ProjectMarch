@@ -24,6 +24,7 @@ public:
     double incremental_position_ = 0;
     double absolute_velocity_ = 0;
     double incremental_velocity_ = 0;
+    double torque_sensor_value_ = 0;
 
     friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
@@ -38,8 +39,11 @@ public:
             && lhs.absolute_position_ == rhs.absolute_position_
             && lhs.incremental_position_ == rhs.incremental_position_
             && lhs.absolute_velocity_ == rhs.absolute_velocity_
-            && lhs.incremental_velocity_ == rhs.incremental_velocity_ && lhs.isOperational() == rhs.isOperational()
+            && lhs.incremental_velocity_ == rhs.incremental_velocity_ 
+            && lhs.torque_sensor_value_ == rhs.torque_sensor_value_
+            && lhs.isOperational() == rhs.isOperational()
             && lhs.hasError() == rhs.hasError();
+
     }
 
     /**
@@ -84,7 +88,7 @@ public:
      * `march_motor_controller_state_broadcaster/.../motor_controller_semantic_component.hpp`
      * @return A pair of interface_names and pointers to the member variables.
      */
-    inline std::array<std::pair<std::string, double*>, 12> get_pointers()
+    inline std::array<std::pair<std::string, double*>, 13> get_pointers()
     {
         return {
             std::make_pair(/*__x=*/"motor_current", &motor_current_),
@@ -99,11 +103,12 @@ public:
             std::make_pair(/*__x=*/"incremental_position", &incremental_position_),
             std::make_pair(/*__x=*/"absolute_velocity", &absolute_velocity_),
             std::make_pair(/*__x=*/"incremental_velocity", &incremental_velocity_),
+            std::make_pair(/*__x=*/"torque_sensor_value", &torque_sensor_value_),
         };
     }
 
     /**
-     * @brief Updates the member variables based on the input array.E
+     * @brief Updates the member variables based on the input array.
      * @param other The other motor controller state of which all values need to be copied over from.
      */
     inline void update_values(MotorControllerState* other)
@@ -120,6 +125,7 @@ public:
         incremental_position_ = other->incremental_position_;
         absolute_velocity_ = other->absolute_velocity_;
         incremental_velocity_ = other->incremental_velocity_;
+        torque_sensor_value_ = other->torque_sensor_value_;
     }
 };
 
