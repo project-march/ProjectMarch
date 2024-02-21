@@ -156,9 +156,11 @@ def generate_launch_description() -> LaunchDescription:
 
 
     fuzzy_default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
-
+    default_gainscheduler_config = os.path.join(get_package_share_directory('march_gain_scheduler'),'config','stand_gains.yaml'
+    )  
     # parameters
     fuzzy_config_path = LaunchConfiguration("config_path", default=fuzzy_default_config)
+    gainscheduler_config_path = LaunchConfiguration("config_path", default=default_gainscheduler_config)
 
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
@@ -193,6 +195,13 @@ def generate_launch_description() -> LaunchDescription:
             executable='fuzzy_node',
             name='fuzzy_generator',
             parameters=[{'config_path': fuzzy_config_path}]
+        ),
+        Node(
+            package='march_gain_scheduler',
+            executable='gain_scheduler_node',
+            name='gain_scheduler',
+            parameters=[{'config_path': gainscheduler_config_path}],
+            condition=UnlessCondition(simulation),
         ),
         Node(
             package='robot_state_publisher',
