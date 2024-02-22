@@ -101,7 +101,7 @@ void GaitPlanningAnglesNode::initializeConstantsPoints(trajectory_msgs::msg::Joi
 void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
     if (!m_current_trajectory.empty()){
         m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-        m_joints_msg.points.push_back(m_trajectory_prev_point); 
+        // m_joints_msg.points.push_back(m_trajectory_prev_point); 
         m_trajectory_des_point.positions = m_current_trajectory[counter]; 
         m_joints_msg.points.push_back(m_trajectory_des_point);
         m_gait_planning.setPrevPoint(m_current_trajectory[counter]); 
@@ -122,7 +122,7 @@ if (m_gait_planning.getCounter() == 0){ // When switching to homestand
     }
 
     m_trajectory_prev_point.positions = m_gait_planning.getPrevPoint(); 
-    m_joints_msg.points.push_back(m_trajectory_prev_point); 
+    // m_joints_msg.points.push_back(m_trajectory_prev_point); 
 
     if (m_gait_planning.getCounter() < 40){
         m_trajectory_des_point.positions.clear();
@@ -156,7 +156,7 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
         RCLCPP_DEBUG(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_trajectory_prev_point.positions = m_gait_planning.getHomeStand(); 
-        m_joints_msg.points.push_back(m_trajectory_prev_point);
+        // m_joints_msg.points.push_back(m_trajectory_prev_point);
         m_trajectory_des_point.positions = m_gait_planning.getHomeStand();
         m_joints_msg.points.push_back(m_trajectory_des_point);
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
