@@ -70,14 +70,15 @@ class MujocoSimNode(Node):
         the sim_step function.
         """
         super().__init__("mujoco_sim")
-        self.declare_parameter("model_toload")
+        self.declare_parameter("model_to_load")
+        self.declare_parameter("aie_force")
 
         self.SIM_TIMESTEP_ROS = 0.008
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
         # The model can be found in the robot_description package.
-        self.model_name = self.get_parameter("model_toload")
+        self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
@@ -86,7 +87,10 @@ class MujocoSimNode(Node):
         self.data = mujoco.MjData(self.model)
 
         self.actuator_names = get_actuator_names(self.model)
-        self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
+        self.use_aie_force = self.get_parameter("aie_force")
+
+        if self.use_aie_force.value:
+            self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.005
@@ -218,9 +222,13 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        while self.data.time <= time_difference_withseconds:
-            mujoco.set_mjcb_passive(self.aie_passive_force.callback)
-            mujoco.mj_step(self.model, self.data)
+        if self.use_aie_force.value == 'true':
+            while self.data.time <= time_difference_withseconds:
+                mujoco.set_mjcb_passive(self.aie_passive_force.callback)
+                mujoco.mj_step(self.model, self.data)
+        else:
+            while self.data.time <= time_difference_withseconds:
+                mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
 

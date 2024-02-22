@@ -1,7 +1,8 @@
 <!-- 
-Copyright (C) 2023. Stichting Moving Bird 
-Joy Brand, joy.brand@projectmarch.nl 
-Thijn Hoekstra, thijn.hoekstra@projectmarch.nl 
+Copyright (C) 2024. Stichting Moving Bird 
+M8 - Joy Brand, joy.brand@projectmarch.nl 
+M8 - Thijn Hoekstra, thijn.hoekstra@projectmarch.nl 
+M9 - Martijn Habers, martijn@habers.eu
 
 This program is free software: you can redistribute it and/or modify 
 it under the terms of the GNU General Public License as published by 
@@ -19,7 +20,7 @@ See <https://www.gnu.org/licenses/>.
 <mujoco model="exoskeleton">
   <compiler meshdir="obj-files" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
-  <option timestep='0.01' iterations='50' solver='PGS' gravity='0 0 -9.81' integrator='RK4'>
+  <option timestep='0.01' iterations='50' solver='PGS' gravity='0 0 -9.81'>
     <!-- <flag energy="enable"/> -->
   </option>
 
