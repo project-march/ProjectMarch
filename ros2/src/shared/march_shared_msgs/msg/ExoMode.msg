@@ -1,4 +1,4 @@
-# ExoMode.msg
+#ExoMode.msg
 std_msgs/Header header
 int8 mode
 

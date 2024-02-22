@@ -24,6 +24,18 @@ find_package(mujoco_interfaces REQUIRED)
 # find_package(<dependency> REQUIRED)
 include_directories(include)
 
+# Run the Python script to generate exo_mode.hpp
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+set(PYTHON_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/generate/generate_exo_mode_class.py")
+
+add_custom_target(
+    run_python_script ALL
+    COMMAND ${Python3_EXECUTABLE} ${PYTHON_SCRIPT_PATH}
+    COMMENT "Generating ezo_mode.hpp from JSON file"
+    VERBATIM
+)
+
 add_library(${PROJECT_NAME}
   STATIC
   src/mode_machine.cpp
