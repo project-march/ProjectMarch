@@ -13,6 +13,7 @@
 #include "ginac/ginac.h"
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
+#include <eigen3/Eigen/Dense>
 
 #define WORKSPACE_DIM 3
 #define NO_INERTIA_PARAMS 6
@@ -42,6 +43,8 @@ public:
 
     void setExpressionRelativeInertia(const std::string& expression);
     void setExpressionGlobalPosition(const std::vector<std::string>& expressions);
+    void setExpressionGlobalVelocity(const std::vector<std::string>& expressions);
+    void setExpressionGlobalAcceleration(const std::vector<std::string>& expressions);
     void setExpressionGlobalRotation(const std::vector<std::string>& expressions);
     void setExpressionGlobalPositionJacobian(const std::vector<std::string>& expressions);
     void setExpressionGlobalRotationJacobian(const std::vector<std::string>& expressions);
@@ -54,6 +57,9 @@ public:
     JointSymbol getJointVelocity() const;
     JointSymbol getJointAcceleration() const;
     virtual Eigen::Vector3d getGlobalPosition(JointNameToValueMap joint_positions) const;
+    Eigen::Vector3d getGlobalVelocity(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities) const;
+    Eigen::Vector3d getGlobalAcceleration(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
+        JointNameToValueMap joint_accelerations) const;
     Eigen::Matrix3d getGlobalRotation(JointNameToValueMap joint_positions) const;
     virtual Eigen::MatrixXd getGlobalPositionJacobian(JointNameToValueMap joint_positions) const;
     Eigen::MatrixXd getGlobalRotationJacobian(JointNameToValueMap joint_positions) const;
@@ -99,6 +105,8 @@ protected:
 
     GiNaC::ex m_relative_inertia_expression;
     std::vector<GiNaC::ex> m_global_position_expressions;
+    std::vector<GiNaC::ex> m_global_velocity_expressions;
+    std::vector<GiNaC::ex> m_global_acceleration_expressions;
     std::vector<GiNaC::ex> m_global_rotation_expressions;
     std::vector<GiNaC::ex> m_global_position_jacobian_expressions;
     std::vector<GiNaC::ex> m_global_rotation_jacobian_expressions;
