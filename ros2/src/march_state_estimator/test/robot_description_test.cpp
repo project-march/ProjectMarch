@@ -51,9 +51,36 @@ protected:
     const unsigned int NUM_COLS = 3;
 };
 
-TEST_F(RobotDescriptionTest, test_should_create_robot_description_instance_and_configure_for_rotational_test_setup)
+TEST_F(RobotDescriptionTest, test_should_create_robot_description_instance_and_configure)
 {
     ASSERT_NO_FATAL_FAILURE();
+}
+
+TEST_F(RobotDescriptionTest, test_should_able_to_evaluate_linear_position_in_a_robot_node)
+{
+    RobotNode::JointNameToValueMap empty_joint_values
+        = { { "left_hip_aa", 0.0 }, { "left_hip_fe", 0.0 }, { "left_knee", 0.0 }, { "left_ankle", 0.0 },
+              { "right_hip_aa", 0.0 }, { "right_hip_fe", 0.0 }, { "right_knee", 0.0 }, { "right_ankle", 0.0 } };
+    
+    ASSERT_NO_FATAL_FAILURE(m_robot_description->findNode("L_foot")->getGlobalPosition(empty_joint_values));
+}
+
+TEST_F(RobotDescriptionTest, test_should_able_to_evaluate_linear_velocity_in_a_robot_node)
+{
+    RobotNode::JointNameToValueMap empty_joint_values
+        = { { "left_hip_aa", 0.0 }, { "left_hip_fe", 0.0 }, { "left_knee", 0.0 }, { "left_ankle", 0.0 },
+              { "right_hip_aa", 0.0 }, { "right_hip_fe", 0.0 }, { "right_knee", 0.0 }, { "right_ankle", 0.0 } };
+    
+    ASSERT_NO_FATAL_FAILURE(m_robot_description->findNode("L_foot")->getGlobalVelocity(empty_joint_values, empty_joint_values));
+}
+
+TEST_F(RobotDescriptionTest, test_should_able_to_evaluate_linear_acceleration_in_a_robot_node)
+{
+    RobotNode::JointNameToValueMap empty_joint_values
+        = { { "left_hip_aa", 0.0 }, { "left_hip_fe", 0.0 }, { "left_knee", 0.0 }, { "left_ankle", 0.0 },
+              { "right_hip_aa", 0.0 }, { "right_hip_fe", 0.0 }, { "right_knee", 0.0 }, { "right_ankle", 0.0 } };
+    
+    ASSERT_NO_FATAL_FAILURE(m_robot_description->findNode("L_foot")->getGlobalAcceleration(empty_joint_values, empty_joint_values, empty_joint_values));
 }
 
 TEST_F(RobotDescriptionTest, test_should_able_to_find_and_store_pointer_to_robot_zmp)

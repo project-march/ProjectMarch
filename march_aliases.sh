@@ -54,8 +54,12 @@ alias mbp='mba --packages-select'
 # Alias to run tests on a package
 alias mbt='mbt'
 mbt() {
-  colcon build --packages-select "$1"
-  colcon test --packages-select "$1" && colcon test-result --verbose
+  if [ $# -eq 0 ]; then
+    echo "Please specify a package to test"
+    return 1
+  fi
+  colcon build --packages-select "$@"
+  colcon test --packages-select "$@" && colcon test-result --verbose
 }
 
 # Training aliases
