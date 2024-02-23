@@ -7,7 +7,6 @@
 #include <random>
 #include <iostream>
 #include <eigen3/Eigen/Core>
-#include <march_octree/march_octree.h>
 
 namespace octomap {
 
@@ -84,18 +83,18 @@ private:
                                     std::vector<std::seed_seq::result_type> &neighborsIndices);
     static void findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, 
                                     std::function<void(MarchOctreeNode*)> recursiveAction);
-    static std::vector<MarchOctreeNode*> searchNeighbors(MarchOctree* root, MarchOctreeNode* current_node);
-    static void computeNodeNormalRANSAC(MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth);
-    static void computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_node);
-    static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
+    static std::vector<MarchOctreeNode*> searchNeighbors(const MarchOctree* root, MarchOctreeNode* current_node);
+    static void computeNodeNormalRANSAC(const MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth);
+    static void computeNodeNormalRANSAC(const MarchOctree* root, MarchOctreeNode* current_node);
+    static void peekBestNormal(const MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
                            Eigen::Vector3f& candidate_normal, double candidate_variance, int candidate_consensus);
     static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
                            Eigen::Vector3f& candidate_normal, double candidate_variance, int candidate_consensus);
     static bool isCandidateNormalBetter(double current_variance, int current_consensus, double candidate_variance, int candidate_consensus);
     static Eigen::Vector3f computeNormalFromTwoRandomNeighbors(std::vector<MarchOctreeNode*>& neighbors, const octomap::point3d& current_node_location);
-    static Eigen::Vector3f refineNormalWithLeastSquares(MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
+    static Eigen::Vector3f refineNormalWithLeastSquares(const MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
                                                         const std::vector<MarchOctreeNode*>& neighbors);
-    static void computeNormalConsensusAndVariance(MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
+    static void computeNormalConsensusAndVariance(const MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
                                               int hits_at_current_point, const std::vector<MarchOctreeNode*>& neighbors,
                                               double& variance_to_pack, int& consensus_to_pack);
 

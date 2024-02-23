@@ -105,20 +105,20 @@ void MarchOctreeUtils::findRadiusNeighbors(const MarchOctreeNode* node, const po
 }
 
 
-std::vector<MarchOctreeNode*> MarchOctreeUtils::searchNeighbors(MarchOctree* root, MarchOctreeNode* current_node) {
+std::vector<MarchOctreeNode*> MarchOctreeUtils::searchNeighbors(const MarchOctree* root, MarchOctreeNode* current_node) {
 
     std::vector<MarchOctreeNode*> neighbors;
     // Implement the search for neighbors logic here
     return neighbors;
 }
 
-void MarchOctreeUtils::computeNodeNormalRANSAC(MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth) {
+void MarchOctreeUtils::computeNodeNormalRANSAC(const MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth) {
 
     MarchOctreeNode* current_node = root->search(key, tree_depth);
     computeNodeNormalRANSAC(root, current_node);
 }
 
-void MarchOctreeUtils::computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_node) {
+void MarchOctreeUtils::computeNodeNormalRANSAC(const MarchOctree* root, MarchOctreeNode* current_node) {
 
     if (!current_node->isNodeLocationSet() || !current_node->isNormalSet()) {
 
@@ -204,7 +204,7 @@ Eigen::Vector3f MarchOctreeUtils::computeNormalFromTwoRandomNeighbors(std::vecto
 }
 
 // TODO: Where is max distance from plane used and for what?
-Eigen::Vector3f MarchOctreeUtils::refineNormalWithLeastSquares(MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
+Eigen::Vector3f MarchOctreeUtils::refineNormalWithLeastSquares(const MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
                                                                const std::vector<MarchOctreeNode*>& neighbors) {
 
     // Compute the centroid of neighbors
@@ -233,7 +233,7 @@ Eigen::Vector3f MarchOctreeUtils::refineNormalWithLeastSquares(MarchOctreeNode* 
     return refined_normal;
 }
 
-void MarchOctreeUtils::computeNormalConsensusAndVariance(MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
+void MarchOctreeUtils::computeNormalConsensusAndVariance(const MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
                                               int hits_at_current_point, const std::vector<MarchOctreeNode*>& neighbors,
                                               double& variance_to_pack, int& consensus_to_pack) {
 

@@ -10,6 +10,7 @@
 #include <ctime>
 #include <set>
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 
 namespace octomap {
 class MarchOctree : public OccupancyOcTreeBase<MarchOctreeNode> {
