@@ -140,6 +140,23 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
             break;
+        
+        case exoMode::HighStep1 :
+            if (m_current_trajectory.empty()){
+                m_current_trajectory = m_gait_planning.getTrajectory(); 
+                RCLCPP_INFO(this->get_logger(), "Trajectory refilled, size of current trajectory: %d", m_current_trajectory.size());
+            }
+            else {
+                GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
+                m_current_trajectory.erase(m_current_trajectory.begin());
+                setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
+                                current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            }
+            break;
+
+        default :
+            break;
     }
 }
 

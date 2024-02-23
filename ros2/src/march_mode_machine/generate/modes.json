@@ -45,6 +45,20 @@
   ],
   [
     {
+      "name": "HighStep1",
+      "exoMode": 11
+    },
+    {
+      "name": "HighStep2",
+      "exoMode": 12
+    },
+    {
+      "name": "HighStep3",
+      "exoMode": 13
+    }
+  ],
+  [
+    {
       "name": "Error",
       "exoMode": 4
     },
