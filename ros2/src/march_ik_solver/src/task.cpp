@@ -9,24 +9,11 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
 {
     m_task_name = task_name;
     m_reference_frame = reference_frame;
-    m_task_m = workspace_dim;
-    m_task_n = configuration_dim;
+    setTaskM(workspace_dim);
+    setTaskN(configuration_dim);
     m_dt = dt;
     m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
     m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
-
-    // Initialize gains as diagonal matrices
-    m_gain_p = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
-    m_gain_d = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
-    m_gain_i = Eigen::MatrixXd::Zero(workspace_dim, workspace_dim);
-    for (unsigned int i = 0; i < workspace_dim; i++) {
-        m_gain_p.diagonal()[i] = 1.0;
-        m_gain_d.diagonal()[i] = 0.0;
-        m_gain_i.diagonal()[i] = 0.0;
-    }
-
-    // Initialize damping identity matrix for singularity-robustness
-    m_damping_identity = Eigen::MatrixXd::Identity(workspace_dim, configuration_dim);
 
     // Initialize ROS node and service clients.
     m_node = std::make_shared<rclcpp::Node>("task_" + m_task_name + "_client");
@@ -49,11 +36,24 @@ void Task::setNodeNames(const std::vector<std::string>& node_names)
 void Task::setTaskM(const unsigned int& task_m)
 {
     m_task_m = task_m;
+    
+    // Initialize gains as diagonal matrices
+    m_gain_p = Eigen::MatrixXd::Zero(task_m, task_m);
+    m_gain_d = Eigen::MatrixXd::Zero(task_m, task_m);
+    m_gain_i = Eigen::MatrixXd::Zero(task_m, task_m);
+    for (unsigned int i = 0; i < task_m; i++) {
+        m_gain_p.diagonal()[i] = 1.0;
+        m_gain_d.diagonal()[i] = 0.0;
+        m_gain_i.diagonal()[i] = 0.0;
+    }
 }
 
 void Task::setTaskN(const unsigned int& task_n)
 {
     m_task_n = task_n;
+
+    // Initialize damping identity matrix for singularity-robustness
+    m_damping_identity = Eigen::MatrixXd::Identity(m_task_m, task_n);
 }
 
 void Task::setDt(const float& dt)
@@ -63,8 +63,12 @@ void Task::setDt(const float& dt)
 
 void Task::setGainP(const std::vector<double>& gain_p)
 {
+    m_nonzero_gain_p_indices.clear();
     for (unsigned long int i = 0; i < gain_p.size(); i++) {
         m_gain_p.diagonal()[i] = gain_p[i];
+        if (gain_p[i] > 0.0) {
+            m_nonzero_gain_p_indices.push_back(i);
+        }
     }
 }
 
@@ -103,15 +107,20 @@ Eigen::VectorXd Task::solveTask()
 
 Eigen::VectorXd Task::calculateError()
 {
-    Eigen::VectorXd task_error, error;
+    Eigen::VectorXd error, pid_error;
 
-    task_error.noalias() = m_desired_task - m_current_task;
-    m_previous_error = task_error;
-    m_error_norm = task_error.norm();
+    error.noalias() = m_desired_task - m_current_task;
+    m_previous_error = error;
+    
+    m_error_norm = 0.0;
+    for (const auto& nonzero_gain_p_idx : m_nonzero_gain_p_indices) {
+        m_error_norm += pow(error(nonzero_gain_p_idx), 2);
+    }
+    m_error_norm = sqrt(m_error_norm);
 
-    error.noalias()
-        = m_gain_p * task_error; // + calculateIntegralError(task_error) + calculateDerivativeError(task_error);
-    return error;
+    pid_error.noalias()
+        = m_gain_p * error; // + calculateIntegralError(error) + calculateDerivativeError(error);
+    return pid_error;
 }
 
 Eigen::VectorXd Task::calculateIntegralError(const Eigen::VectorXd& error)
@@ -225,6 +234,20 @@ Eigen::MatrixXd Task::getJacobianInverse() const
     return m_jacobian_inverse;
 }
 
+Eigen::Vector3d Task::calculateEulerAnglesFromQuaternion(const geometry_msgs::msg::Quaternion& quaternion)
+{
+    Eigen::Vector3d euler_angles;
+    double norm, norm_sine_2;
+
+    norm = 2 * acos(quaternion.w);
+    norm_sine_2 = sin(0.5 * norm);
+    euler_angles.x() = quaternion.x / norm_sine_2;
+    euler_angles.y() = quaternion.y / norm_sine_2;
+    euler_angles.z() = quaternion.z / norm_sine_2;
+
+    return euler_angles;
+}
+
 void Task::sendRequestNodePosition()
 {
     auto position_request = std::make_shared<march_shared_msgs::srv::GetNodePosition::Request>();
@@ -246,12 +269,17 @@ void Task::sendRequestNodePosition()
     if (rclcpp::spin_until_future_complete(m_node->get_node_base_interface(), result)
         == rclcpp::FutureReturnCode::SUCCESS) {
         std::vector<double> current_task_vector;
-        for (auto node_position : result.get()->node_positions) {
-            current_task_vector.push_back(node_position.x);
-            current_task_vector.push_back(node_position.y);
-            if (m_task_m / m_node_names.size() == 3) {
-                current_task_vector.push_back(node_position.z);
-            }
+        for (auto node_pose : result.get()->node_poses) {
+            // Push back position
+            current_task_vector.push_back(node_pose.position.x);
+            current_task_vector.push_back(node_pose.position.y);
+            current_task_vector.push_back(node_pose.position.z);
+
+            // Push back orientation
+            Eigen::Vector3d euler_angles = calculateEulerAnglesFromQuaternion(node_pose.orientation);
+            current_task_vector.push_back(euler_angles.x());
+            current_task_vector.push_back(euler_angles.y());
+            current_task_vector.push_back(euler_angles.z());
         }
         m_current_task = Eigen::Map<Eigen::VectorXd>(current_task_vector.data(), m_task_m);
     } else {

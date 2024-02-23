@@ -1,6 +1,8 @@
 #ifndef IK_SOLVER__TASK_HPP
 #define IK_SOLVER__TASK_HPP
 
+#define EIGEN_RUNTIME_NO_MALLOC
+
 #include <algorithm>
 #include <functional>
 #include <memory>
@@ -9,6 +11,7 @@
 
 #include "march_shared_msgs/srv/get_node_jacobian.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
+#include "geometry_msgs/msg/quaternion.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <eigen3/Eigen/Core>
@@ -61,6 +64,7 @@ public:
     void setUnitTest(const bool& unit_test);
 
 private:
+    Eigen::Vector3d calculateEulerAnglesFromQuaternion(const geometry_msgs::msg::Quaternion& quaternion);
     void sendRequestNodePosition();
     void sendRequestNodeJacobian();
 
@@ -88,6 +92,7 @@ private:
     Eigen::VectorXd m_integral_error;
     Eigen::VectorXd m_previous_error;
     double m_error_norm;
+    std::vector<unsigned int> m_nonzero_gain_p_indices;
 
     Eigen::VectorXd m_current_task;
     Eigen::MatrixXd m_jacobian;
