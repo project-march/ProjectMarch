@@ -51,8 +51,8 @@ void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPt
         m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
         m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
     }
-    // m_joint_accelerations
-    //     = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
+    m_joint_accelerations
+        = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
 }
 
 void SensorFusion::updateImu(const sensor_msgs::msg::Imu::SharedPtr imu)
@@ -62,7 +62,7 @@ void SensorFusion::updateImu(const sensor_msgs::msg::Imu::SharedPtr imu)
     m_robot_description->setInertialOrientation(m_quaternion);
 }
 
-uint8_t SensorFusion::updateStanceLeg(
+uint8_t SensorFusion::updateStaticStanceLeg(
     const geometry_msgs::msg::Point* left_foot_position, const geometry_msgs::msg::Point* right_foot_position)
 {
     uint8_t stance_leg = 0b11;
@@ -80,6 +80,32 @@ uint8_t SensorFusion::updateStanceLeg(
     m_robot_description->setStanceLeg(stance_leg,
         Eigen::Vector3d(left_foot_position->x, left_foot_position->y, left_foot_position->z),
         Eigen::Vector3d(right_foot_position->x, right_foot_position->y, right_foot_position->z));
+    return stance_leg;
+}
+
+uint8_t SensorFusion::updateDynamicStanceLeg()
+{
+    uint8_t stance_leg = 0b11;
+
+    m_joint_accelerations
+        = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
+    m_joint_dynamical_torques
+        = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
+    m_joint_external_torques
+        = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
+    
+    // TODO: Update stance leg iff foot is flat on the ground
+    Eigen::Vector3d left_foot_external_force, right_foot_external_force;
+    left_foot_external_force 
+        = m_torque_converter->getExternalForceByNode("L_foot", m_joint_positions, m_joint_external_torques);
+    right_foot_external_force
+        = m_torque_converter->getExternalForceByNode("R_foot", m_joint_positions, m_joint_external_torques);
+
+    double force_norm = 1e3;
+    stance_leg = 
+        ((right_foot_external_force.z() > force_norm) * 0b10) | 
+        ((left_foot_external_force.z() > force_norm) * 0b01);
+        
     return stance_leg;
 }
 

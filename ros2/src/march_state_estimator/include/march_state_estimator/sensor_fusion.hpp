@@ -57,9 +57,10 @@ public:
     void configureJointNames(const std::vector<std::string>& joint_names);
     void updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state);
     void updateImu(const sensor_msgs::msg::Imu::SharedPtr imu);
-    uint8_t updateStanceLeg(
+    uint8_t updateStaticStanceLeg(
         const geometry_msgs::msg::Point* left_foot_position, 
         const geometry_msgs::msg::Point* right_foot_position);
+    uint8_t updateDynamicStanceLeg();
     void updateKalmanFilter();
 
     // TODO: Move these to RobotDescription
@@ -124,6 +125,8 @@ private:
     RobotNode::JointNameToValueMap m_joint_velocities;
     RobotNode::JointNameToValueMap m_joint_accelerations;
     RobotNode::JointNameToValueMap m_joint_total_torques;
+    RobotNode::JointNameToValueMap m_joint_dynamical_torques;
+    RobotNode::JointNameToValueMap m_joint_external_torques;
 
     Eigen::Quaterniond m_quaternion;
 

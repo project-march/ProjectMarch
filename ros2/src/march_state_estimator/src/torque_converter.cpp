@@ -81,10 +81,11 @@ Eigen::Vector3d TorqueConverter::getExternalForceByNode(const std::string& node_
     const RobotNode::JointNameToValueMap& external_torques) const
 {
     Eigen::VectorXd external_force_vector;
-    Eigen::MatrixXd jacobian_inverse;
+    Eigen::MatrixXd jacobian_inverse, jacobian;
 
     RobotNode::SharedPtr node = m_robot_description->findNode(node_name);
-    jacobian_inverse.noalias() = (node->getGlobalPositionJacobian(joint_positions).transpose()).completeOrthogonalDecomposition().pseudoInverse();
+    jacobian.noalias() = m_robot_description->getInertialOrientation() * node->getGlobalPositionJacobian(joint_positions);
+    jacobian_inverse.noalias() = jacobian.completeOrthogonalDecomposition().pseudoInverse();
 
     external_force_vector.noalias() = jacobian_inverse * node->convertAbsoluteJointValuesToVectorXd(external_torques);
     return external_force_vector;

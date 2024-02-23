@@ -300,7 +300,7 @@ TEST_F(SensorFusionTest, test_should_update_stance_leg_for_hennie_with_koen)
     setupHennieWithKoen();
     geometry_msgs::msg::Point left_foot_position = createZeroPoint();
     geometry_msgs::msg::Point right_foot_position = createZeroPoint();
-    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->updateStanceLeg(&left_foot_position, &right_foot_position));
+    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->updateStaticStanceLeg(&left_foot_position, &right_foot_position));
 }
 
 TEST_F(SensorFusionTest, test_should_calculate_exponential_map_and_get_correct_results_for_hennie_with_koen)
@@ -796,7 +796,7 @@ TEST_F(SensorFusionTest, test_should_get_zmp_for_hennie_with_koen)
 
     m_sensor_fusion->updateImu(imu);
     m_sensor_fusion->updateJointState(joint_state);
-    m_sensor_fusion->updateStanceLeg(&left_foot_position, &right_foot_position);
+    m_sensor_fusion->updateStaticStanceLeg(&left_foot_position, &right_foot_position);
 
     ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getZMP());
 }

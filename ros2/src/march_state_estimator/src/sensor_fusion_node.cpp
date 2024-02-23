@@ -92,7 +92,6 @@ void SensorFusionNode::publishStateEstimation()
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
 
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
-    uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
@@ -101,6 +100,8 @@ void SensorFusionNode::publishStateEstimation()
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
-    state_estimation_msg.stance_leg = stance_leg;
+    // state_estimation_msg.stance_leg = m_sensor_fusion->updateStaticStanceLeg(
+    //     &foot_poses[0].position, &foot_poses[1].position);
+    state_estimation_msg.stance_leg = m_sensor_fusion->updateDynamicStanceLeg();
     m_state_estimation_pub->publish(state_estimation_msg);
 }
