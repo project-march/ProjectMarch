@@ -90,6 +90,7 @@ ament_target_dependencies(computer_vision_node
 target_link_libraries(computer_vision_node
   ${PROJECT_NAME}
   ${OCTOMAP_LIBRARIES}
+  #${EIGEN3_INCLUDE_DIRS}
   #${CGAL_LIBRARIES}
 )
 

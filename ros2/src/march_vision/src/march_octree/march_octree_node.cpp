@@ -5,32 +5,32 @@
 namespace octomap {
 
 MarchOctreeNode::MarchOctreeNode()
-    : normal_x{NAN},
-      normal_y{NAN},
-      normal_z{NAN},
-      normal_average_deviation{NAN},
-      normal_consensus_size{0},
-      node_location_x{NAN},
-      node_location_y{NAN},
-      node_location_z{NAN},
+    : m_normal_x{NAN},
+      m_normal_y{NAN},
+      m_normal_z{NAN},
+      m_normal_average_deviation{NAN},
+      m_normal_consensus_size{0},
+      m_node_location_x{NAN},
+      m_node_location_y{NAN},
+      m_node_location_z{NAN},
       //TODO: Check if PCL has a functionality for this
-      last_hit_timestamp{NAN},
-      number_of_hits{0}
+      m_last_hit_timestamp{NAN},
+      m_number_of_hits{0}
 {
 }
 
 void MarchOctreeNode::copyData(MarchOctreeNode& other){
     OcTreeNode::copyData(other);
-    normal_x = other.getNormalX();
-    normal_y = other.getNormalY();
-    normal_z = other.getNormalZ();
-    normal_average_deviation = other.getNormalAverageDeviation();
-    normal_consensus_size = other.getNormalConsensusSize();
-    node_location_x = other.getNodeLocationX();
-    node_location_y = other.getNodeLocationY();
-    node_location_z = other.getNodeLocationZ();
-    last_hit_timestamp = other.getLastHitTimestamp();
-    number_of_hits = other.getNumberOfHits();
+    m_normal_x = other.getNormalX();
+    m_normal_y = other.getNormalY();
+    m_normal_z = other.getNormalZ();
+    m_normal_average_deviation = other.getNormalAverageDeviation();
+    m_normal_consensus_size = other.getNormalConsensusSize();
+    m_node_location_x = other.getNodeLocationX();
+    m_node_location_y = other.getNodeLocationY();
+    m_node_location_z = other.getNodeLocationZ();
+    m_last_hit_timestamp = other.getLastHitTimestamp();
+    m_number_of_hits = other.getNumberOfHits();
 }
 
 void MarchOctreeNode::clear()
@@ -42,20 +42,20 @@ void MarchOctreeNode::clear()
 
 void MarchOctreeNode::resetNormal()
 {
-    normal_x = NAN;
-    normal_y = NAN;
-    normal_y = NAN;
-    normal_average_deviation = NAN;
-    normal_consensus_size = 0;
+    m_normal_x = NAN;
+    m_normal_y = NAN;
+    m_normal_y = NAN;
+    m_normal_average_deviation = NAN;
+    m_normal_consensus_size = 0;
 }   
 
 void MarchOctreeNode::resetNodeLocation()
 {
-    node_location_x = NAN;
-    node_location_y = NAN;
-    node_location_z = NAN;
-    number_of_hits = 0;
-    last_hit_timestamp = 0;
+    m_node_location_x = NAN;
+    m_node_location_y = NAN;
+    m_node_location_z = NAN;
+    m_number_of_hits = 0;
+    m_last_hit_timestamp = 0;
 }
 
 void MarchOctreeNode::updateNormalChildren()
@@ -64,7 +64,7 @@ void MarchOctreeNode::updateNormalChildren()
 Eigen::Vector3f MarchOctreeNode::getNormal()
 {
     Eigen::Vector3f res_vector;
-    res_vector << normal_x, normal_y, normal_x;
+    res_vector << m_normal_x, m_normal_y, m_normal_x;
     return res_vector;
 }
 
@@ -76,49 +76,47 @@ Eigen::Vector3f MarchOctreeNode::getNormal()
 
 void MarchOctreeNode::setNormal(Eigen::Vector3f& normal)
 {
-    normal_x = static_cast<float>(normal[0]);
-    normal_y = static_cast<float>(normal[1]);
-    normal_z = static_cast<float>(normal[2]);
+    m_normal_x = static_cast<float>(normal[0]);
+    m_normal_y = static_cast<float>(normal[1]);
+    m_normal_z = static_cast<float>(normal[2]);
 }
 
 void MarchOctreeNode::negateNormal()
 {
-    normal_x = -normal_x;
-    normal_y = -normal_y;
-    normal_z = -normal_z;
+    m_normal_x = -m_normal_x;
+    m_normal_y = -m_normal_y;
+    m_normal_z = -m_normal_z;
 }
 
 void MarchOctreeNode::setNormalQuality(float average_deviation, int consensus_size)
 {
-    normal_average_deviation = average_deviation;
-    normal_consensus_size = consensus_size;
+    m_normal_average_deviation = average_deviation;
+    m_normal_consensus_size = consensus_size;
 }
 
-float MarchOctreeNode::getNormalAverageDeviation()
+float MarchOctreeNode::getNormalAverageDeviation() const
 {
-    return normal_average_deviation;
+    return m_normal_average_deviation;
 }
 
-int MarchOctreeNode::getNormalConsensusSize()
+int MarchOctreeNode::getNormalConsensusSize() const
 {
-    return normal_consensus_size;
+    return m_normal_consensus_size;
 }
 
-bool MarchOctreeNode::isNormalSet()
+bool MarchOctreeNode::isNormalSet() const
 {
-    return !std::isnan(normal_x) && !std::isnan(normal_y) && !std::isnan(normal_z);
+    return !std::isnan(m_normal_x) && !std::isnan(m_normal_y) && !std::isnan(m_normal_z);
 }
 
-bool MarchOctreeNode::isNodeLocationSet()
+bool MarchOctreeNode::isNodeLocationSet() const
 {
-    return !std::isnan(node_location_x) && !std::isnan(node_location_y) && !std::isnan(node_location_z);
+    return !std::isnan(m_node_location_x) && !std::isnan(m_node_location_y) && !std::isnan(m_node_location_z);
 }
 //TODO: Change this method
-void MarchOctreeNode::getNodeLocation(pcl::PointXYZ& hit_location_to_pack)
+point3d MarchOctreeNode::getNodeLocation()
 {
-    hit_location_to_pack.x = this->getNodeLocationX();
-    hit_location_to_pack.y = this->getNodeLocationY();
-    hit_location_to_pack.z = this->getNodeLocationZ();
+    return point3d(m_node_location_x, m_node_location_y, m_node_location_z);
 }
 
 // //TODO: Decide if this is needed.
@@ -128,48 +126,39 @@ void MarchOctreeNode::getNodeLocation(pcl::PointXYZ& hit_location_to_pack)
 // }
 
 //TODO: Remove unneeded methods from these three.
-void MarchOctreeNode::updateNodeLocation(pcl::PointXYZ& center_update)
+void MarchOctreeNode::updateNodeLocation(octomap::point3d& center_update)
 {
-    updateNodeLocation(center_update, 1L);
+    //TODO: Change these to the actual values to be used
+    updateNodeLocation(center_update, 1L, LONG_MAX, NAN);
 }
 
-void MarchOctreeNode::updateNodeLocation(pcl::PointXYZ& center_update, long update_weight)
+void MarchOctreeNode::updateNodeLocation(octomap::point3d& center_update, long update_weight, long maximum_number_of_hits, long current_timestamp)
 {
-    updateNodeLocation(center_update, update_weight, LONG_MAX);
-}
-
-void MarchOctreeNode::updateNodeLocation(pcl::PointXYZ& centerUpdate, long updateWeight, long maximum_number_of_hits)
-{
-    updateNodeLocation(centerUpdate, updateWeight, maximum_number_of_hits, NAN);
-}
-
-void MarchOctreeNode::updateNodeLocation(pcl::PointXYZ& center_update, long update_weight, long maximum_number_of_hits, long current_timestamp)
-{
-    updateNodeLocation(x_update, y_update, z_update, update_weight, maximum_number_of_hits, current_timestamp);
+    updateNodeLocation(center_update.x(), center_update.y(), center_update.z(), update_weight, maximum_number_of_hits, current_timestamp);
 }
 
 void MarchOctreeNode::updateNodeLocation(float x_update, float y_update, float z_update)
 {
-    updateNodeLocation(x_update, y_update, z_update, 1L, NAN);
+    updateNodeLocation(x_update, y_update, z_update, LONG_MAX, NAN, m_last_hit_timestamp);
 }
 
 void MarchOctreeNode::updateNodeLocation(float x_update, float y_update, float z_update, long update_weight, long maximum_number_of_hits, long current_timestamp)
 {
-    if (number_of_hits == 0)
+    if (m_number_of_hits == 0)
     {
-        node_location_x = 0.0f;
-        node_location_y = 0.0f;
-        node_location_z = 0.0f;
+        m_node_location_x = 0.0f;
+        m_node_location_y = 0.0f;
+        m_node_location_z = 0.0f;
     }
 
-    number_of_hits += update_weight;
-    number_of_hits = std::min(number_of_hits, maximum_number_of_hits);
-    double n_inv = static_cast<double>(update_weight) / static_cast<double>(number_of_hits);
-    node_location_x += (x_update - node_location_x) * n_inv;
-    node_location_y += (y_update - node_location_y) * n_inv;
-    node_location_z += (z_update - node_location_z) * n_inv;
-    if (current_timestamp != NAN && current_timestamp > last_hit_timestamp)
-        last_hit_timestamp = current_timestamp;
+    m_number_of_hits += update_weight;
+    m_number_of_hits = std::min(m_number_of_hits, maximum_number_of_hits);
+    double n_inv = static_cast<double>(update_weight) / static_cast<double>(m_number_of_hits);
+    m_node_location_x += (x_update - m_node_location_x) * n_inv;
+    m_node_location_y += (y_update - m_node_location_y) * n_inv;
+    m_node_location_z += (z_update - m_node_location_z) * n_inv;
+    if (current_timestamp != NAN && current_timestamp > m_last_hit_timestamp)
+        m_last_hit_timestamp = current_timestamp;
 }
 
 
@@ -181,9 +170,9 @@ void MarchOctreeNode::updateNodeLocationChildren()
         return;
     }
 
-    node_location_x = 0.0f;
-    node_location_y = 0.0f;
-    node_location_z = 0.0f;
+    m_node_location_x = 0.0f;
+    m_node_location_y = 0.0f;
+    m_node_location_z = 0.0f;
     int count = 0;
 
     for (int i = 0; i < 8; i++)
@@ -192,9 +181,9 @@ void MarchOctreeNode::updateNodeLocationChildren()
 
         if (child.isNodeLocationSet())
         {
-            node_location_x += child.getNodeLocationX();
-            node_location_y += child.getNodeLocationY();
-            node_location_z += child.getNodeLocationZ();
+            m_node_location_x += child.getNodeLocationX();
+            m_node_location_y += child.getNodeLocationY();
+            m_node_location_z += child.getNodeLocationZ();
             count++;
         }
     }
@@ -206,55 +195,55 @@ void MarchOctreeNode::updateNodeLocationChildren()
     }
 
     double inv_count = 1.0 / count;
-    node_location_x *= inv_count;
-    node_location_y *= inv_count;
-    node_location_z *= inv_count;
+    m_node_location_x *= inv_count;
+    m_node_location_y *= inv_count;
+    m_node_location_z *= inv_count;
 }
 
-float MarchOctreeNode::getNodeLocationX()
+float MarchOctreeNode::getNodeLocationX() const
 {
-    return node_location_x;
+    return m_node_location_x;
 }
 
-float MarchOctreeNode::getNodeLocationY()
+float MarchOctreeNode::getNodeLocationY() const
 {
-    return node_location_y;
+    return m_node_location_y;
 }
 
-float MarchOctreeNode::getNodeLocationZ()
+float MarchOctreeNode::getNodeLocationZ() const
 {
-    return node_location_z;
+    return m_node_location_z;
 }
 
-long MarchOctreeNode::getNumberOfHits()
+long MarchOctreeNode::getNumberOfHits() const
 {
-    return number_of_hits;
+    return m_number_of_hits;
 }
 
-float MarchOctreeNode::getNormalX()
+float MarchOctreeNode::getNormalX() const
 {
-    return normal_x;
+    return m_normal_x;
 }
 
-float MarchOctreeNode::getNormalY()
+float MarchOctreeNode::getNormalY() const
 {
-    return normal_y;
+    return m_normal_y;
 }
 
-float MarchOctreeNode::getNormalZ()
+float MarchOctreeNode::getNormalZ() const
 {
-    return normal_z;
+    return m_normal_z;
 }
 
 //TODO: Change this method
-bool MarchOctreeNode::isLastHitTimestampDefined()
+bool MarchOctreeNode::isLastHitTimestampDefined() const
 {
-    return last_hit_timestamp != NAN;
+    return m_last_hit_timestamp != NAN;
 }
 
-long MarchOctreeNode::getLastHitTimestamp()
+long MarchOctreeNode::getLastHitTimestamp() const
 {
-    return last_hit_timestamp;
+    return m_last_hit_timestamp;
 }
 
 // void updateHitTimestamp(long timestamp){
@@ -264,25 +253,22 @@ long MarchOctreeNode::getLastHitTimestamp()
 
 bool MarchOctreeNode::epsilonEqualsInternal(MarchOctreeNode& other, double epsilon)
 {
-    if (!std::isnan(normal_x) && !std::isnan(other.getNormalX()) && !std::isnan(normal_y) && !std::isnan(other.getNormalY()) &&
-        !std::isnan(normal_z) && !std::isnan(other.getNormalZ()))
+    if (!std::isnan(m_normal_x) && !std::isnan(other.getNormalX()) && !std::isnan(m_normal_y) && !std::isnan(other.getNormalY()) &&
+        !std::isnan(m_normal_z) && !std::isnan(other.getNormalZ()))
     {
-        if (fabs(normal_x - other.getNormalX()) > epsilon)
+        if (fabs(m_normal_x - other.getNormalX()) > epsilon ||
+            fabs(m_normal_y - other.getNormalY()) > epsilon ||
+            fabs(m_normal_z - other.getNormalZ()) > epsilon)  {
             return false;
-        if (fabs(normal_y - other.getNormalY()) > epsilon)
-            return false;
-        if (fabs(normal_z - other.getNormalZ()) > epsilon)
-            return false;
+        }
     }
 
-    if (!std::isnan(node_location_x) && !std::isnan(other.getNodeLocationX()) && !std::isnan(node_location_y) && !std::isnan(other.getNodeLocationY()) &&
-        !std::isnan(node_location_z) && !std::isnan(other.getNodeLocationZ()))
+    if (!std::isnan(m_node_location_x) && !std::isnan(other.getNodeLocationX()) && !std::isnan(m_node_location_y) && !std::isnan(other.getNodeLocationY()) &&
+        !std::isnan(m_node_location_z) && !std::isnan(other.getNodeLocationZ()))
     {
-        if (fabs(node_location_x - other.getNodeLocationX()) > epsilon)
-            return false;
-        if (fabs(node_location_y - other.getNodeLocationY()) > epsilon)
-            return false;
-        if (fabs(node_location_z - other.getNodeLocationZ()) > epsilon)
+        if (fabs(m_node_location_x - other.getNodeLocationX()) > epsilon || 
+            fabs(m_node_location_y - other.getNodeLocationY()) > epsilon ||
+            fabs(m_node_location_z - other.getNodeLocationZ()) > epsilon)  {
             return false;
     }
 

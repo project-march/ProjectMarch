@@ -5,121 +5,122 @@
 
 namespace octomap {
 
-// // Returns if search ball S(query,r) contains node
-// template <typename Distance>
-// bool MarchOctreeUtils::contains(const MarchOctreeNode* node, const point3d& query, float squared_radius){
+const double DEFAULT_SEARCH_RADIUS               = 0.08;
+const double DEFAULT_MAX_DISTANCE_FROM_PLANE     = 0.02;
+const double DEFAULT_MIN_CONSENSUS_RATIO         = 0.5;
+const double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO = 0.75;
+const int    DEFAULT_NUMBER_OF_ITERATIONS        = 1;
+const bool   DEFAULT_LEAST_SQUARES_ESTIMATION    = true;
+const bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS    = true;
 
-//     float x = query.x() - node->getNodeLocationX();
-//     float y = query.y() - node->getNodeLocationY();
-//     float z = query.z() - node->getNodeLocationZ();
-//     x = std::abs(x);
-//     y = std::abs(y);
-//     z = std::abs(z);
-//     x += node->extent;
-//     y += node->extent;
-//     z += node->extent;
+// Returns if search ball S(query,r) contains node
+template <typename Distance>
+bool MarchOctreeUtils::contains(const MarchOctreeNode* node, const point3d& query, float squared_radius) {
 
-//     return (Distance::norm(x, y, z) < squared_radius);
+    float x = query.x() - node->getNodeLocationX();
+    float y = query.y() - node->getNodeLocationY();
+    float z = query.z() - node->getNodeLocationZ();
+    x = std::abs(x);
+    y = std::abs(y);
+    z = std::abs(z);
+    x += node->extent;
+    y += node->extent;
+    z += node->extent;
 
-// }
+    return (Distance::norm(x, y, z) < squared_radius);
+}
 
-// void findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, std::vector<uint32_t>& neighborsIndices){
+void MarchOctreeUtils::findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, std::vector<uint32_t>& neighbors_indices) {
 
-//     double radius_squared = search_radius * search_radius;
-//     double node_x = node->getNodeLocationX();
-//     double node_y = node->getNodeLocationY();
-//     double node_z = node->getNodeLocationZ();
+    double radius_squared = search_radius * search_radius;
+    float node_x = node->getNodeLocationX();
+    float node_y = node->getNodeLocationY();
+    float node_z = node->getNodeLocationZ();
 
-//     if (contains<L1Distance>(node, query_point, radius_squared)){
+    if (contains<L1Distance>(node, query_point, radius_squared)){
 
-//         recursiveAction(node, recursiveAction)
-//         return;
-//     }
-//     if (!node->hasChildren()){
+        // recursiveAction(node, recursiveAction)
+        return;
+    }
 
-//         double dx = query_point.x() - node_x;
-//         double dy = query_point.y() - node_y;
-//         double dz = query_point.z() - node_z;
+    if (!node->hasChildren()){
 
-//         double distanceSquared = dx * dx + dy * dy + dz * dz;
-//         //TODO: Fix this actionRule 
-//         if (distanceSquared < radius_squared) actionRule.doActionOnNeighbor(node);
-//         return;
-//     }
-//     // check whether child nodes are in range.
-//     for (int childIndex = 0; childIndex < 8; childIndex++){
-//         //TODO: Check if this makes sense
-//         MarchOctreeNode child = node->getChildNode(childIndex);
-//         if (child == null)
-//         continue;
-//         //TODO: Fix the way this is called by only getting one radius
-//         if (!overlaps(child, x, y, z, radius, radiusSquared)) continue;
-//         //TODO: Fix how this is called and if it accepts pointer to the child
-//         findRadiusNeighbors(child, x, y, z, radius, radiusSquared, recursiveAction);
-//         if (actionRule.earlyAbort()) return;
-//     }
-// }
+        float dx = query_point.x() - node_x;
+        float dy = query_point.y() - node_y;
+        float dz = query_point.z() - node_z;
 
-// void findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, std::function<void(MarchOctreeNode*)> recursiveAction) {
+        float distanceSquared = dx * dx + dy * dy + dz * dz;
+        //TODO: Fix this actionRule 
+        // if (distanceSquared < radius_squared) actionRule.doActionOnNeighbor(node);
+        // return;
+    }
+    // check whether child nodes are in range.
+    for (int childIndex = 0; childIndex < 8; childIndex++){
+        //TODO: Check if this makes sense
+        MarchOctreeNode child = node->getChildNode(childIndex);
+        if (child == NULL) continue;
+        //TODO: Fix the way this is called by only getting one radius
+        // if (!overlaps(child, x, y, z, radius_squared)) continue;
+        // //TODO: Fix how this is called and if it accepts pointer to the child
+        // findRadiusNeighbors(child, x, y, z, radius, radius_squared, recursiveAction);
+        // if (actionRule.earlyAbort()) return;
+    }
+}
 
-//     double radius_squared = search_radius * search_radius;
-//     double node_x = node->getNodeLocationX();
-//     double node_y = node->getNodeLocationY();
-//     double node_z = node->getNodeLocationZ();
+void MarchOctreeUtils::findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, std::function<void(MarchOctreeNode*)> recursiveAction) {
 
-//     if (contains<L1Distance>(node, query_point, radius_squared)){
+    double radius_squared = search_radius * search_radius;
+    float node_x = node->getNodeLocationX();
+    float node_y = node->getNodeLocationY();
+    float node_z = node->getNodeLocationZ();
 
-//         recursiveAction(node, recursiveAction)
-//         return;
-//     }
-//     if (!node->hasChildren()){
+    if (contains<L1Distance>(node, query_point, radius_squared)){
 
-//         double dx = query_point.x() - node_x;
-//         double dy = query_point.y() - node_y;
-//         double dz = query_point.z() - node_z;
+        //recursiveAction(node, recursiveAction)
+        return;
+    }
+    if (!node->hasChildren()){
 
-//         double distanceSquared = dx * dx + dy * dy + dz * dz;
-//         //TODO: Fix this actionRule 
-//         if (distanceSquared < radius_squared) actionRule.doActionOnNeighbor(node);
-//         return;
-//     }
-//     // check whether child nodes are in range.
-//     for (int childIndex = 0; childIndex < 8; childIndex++){
-//         //TODO: Check if this makes sense
-//         MarchOctreeNode child = node->getChildNode(childIndex);
-//         if (child == null)
-//         continue;
-//         //TODO: Fix the way this is called by only getting one radius
-//         if (!overlaps(child, x, y, z, radius, radiusSquared)) continue;
-//         //TODO: Fix how this is called and if it accepts pointer to the child
-//         findRadiusNeighbors(child, x, y, z, radius, radiusSquared, recursiveAction);
-//         if (actionRule.earlyAbort()) return;
-//     }
-// }
+        float dx = query_point.x() - node_x;
+        float dy = query_point.y() - node_y;
+        float dz = query_point.z() - node_z;
 
-#include <cmath>
-#include <random>
-#include <algorithm>
-#include <vector>
-#include <Eigen/Core>
+        float distanceSquared = dx * dx + dy * dy + dz * dz;
+        //TODO: Fix this actionRule 
+        //if (distanceSquared < radius_squared) actionRule.doActionOnNeighbor(node);
+        return;
+    }
+    // check whether child nodes are in range.
+    for (int childIndex = 0; childIndex < 8; childIndex++){
+        //TODO: Check if this makes sense
+        MarchOctreeNode child = node->getChildNode(childIndex);
+        if (child == NULL)
+        continue;
+        //TODO: Fix the way this is called by only getting one radius
+        //if (!overlaps(child, x, y, z, radius_squared)) continue;
+        //TODO: Fix how this is called and if it accepts pointer to the child
+        findRadiusNeighbors(&child, query_point, search_radius, recursiveAction);
+        //if (actionRule.earlyAbort()) return;
+    }
+}
 
 
-static std::vector<MarchOctreeNode*> searchNeighbors(MarchOctree* root, MarchOctreeNode* current_node) {
+std::vector<MarchOctreeNode*> MarchOctreeUtils::searchNeighbors(MarchOctree* root, MarchOctreeNode* current_node) {
 
     std::vector<MarchOctreeNode*> neighbors;
     // Implement the search for neighbors logic here
     return neighbors;
 }
 
-static void computeNodeNormalRANSAC(MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth) {
+void MarchOctreeUtils::computeNodeNormalRANSAC(MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth) {
 
     MarchOctreeNode* current_node = root->search(key, tree_depth);
     computeNodeNormalRANSAC(root, current_node);
 }
 
-static void computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_node) {
+void MarchOctreeUtils::computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_node) {
 
-    if (!current_node->isHitLocationSet() || !current_node->isNormalSet()) {
+    if (!current_node->isNodeLocationSet() || !current_node->isNormalSet()) {
 
         current_node->resetNormal();
         return;
@@ -136,10 +137,11 @@ static void computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_
     double current_variance = 0.0;
     computeNormalConsensusAndVariance(current_node, current_normal, number_of_hits_at_current_point, neighbors, current_variance, current_consensus);
 
-    for (int iteration = 0; iteration < DEFAULT_NUMBER_OF_ITERATOINS; iteration++) {
+    for (int iteration = 0; iteration < DEFAULT_NUMBER_OF_ITERATIONS; iteration++) {
 
         Eigen::Vector3f candidate_normal = computeNormalFromTwoRandomNeighbors(neighbors, current_node->getNodeLocation());
 
+        // TODO: Why and where is the max distance from plane used in the method
         if (DEFAULT_LEAST_SQUARES_ESTIMATION) candidate_normal = refineNormalWithLeastSquares(current_node, candidate_normal, neighbors);
 
         if (candidate_normal.isZero())
@@ -149,17 +151,15 @@ static void computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_
         double candidate_variance = 0.0;
 
         computeNormalConsensusAndVariance(current_node, candidate_normal, number_of_hits_at_current_point, neighbors, candidate_variance, candidate_consensus);
-
         peekBestNormal(current_node, current_normal, current_variance, current_consensus, candidate_normal, candidate_variance, candidate_consensus);
     }
 }
 
-
-static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
+void MarchOctreeUtils::peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
                            Eigen::Vector3f& candidate_normal, double candidate_variance, int candidate_consensus) {
 
-    if (isCandidateNormalBetter(current_variance, current_consensus, candidate_variance, candidate_consensus))
-    {
+    if (isCandidateNormalBetter(current_variance, current_consensus, candidate_variance, candidate_consensus)) {
+
         //TODO: Might have to change the "const"s because of reassignment
         if (current_normal.dot(candidate_normal) < 0.0) candidate_normal = -candidate_normal;
         node->setNormal(candidate_normal);
@@ -169,7 +169,7 @@ static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current
     }
 }
 
-static bool isCandidateNormalBetter(double current_variance, int current_consensus, double candidate_variance, int candidate_consensus) {
+bool MarchOctreeUtils::isCandidateNormalBetter(double current_variance, int current_consensus, double candidate_variance, int candidate_consensus) {
 
     if (candidate_consensus >= current_consensus && candidate_variance <= current_variance) return true;
     //TODO: change the name of this?
@@ -178,7 +178,7 @@ static bool isCandidateNormalBetter(double current_variance, int current_consens
     return has_smaller_consensus_but_is_much_better;
 }
 
-static Eigen::Vector3f computeNormalFromTwoRandomNeighbors(std::vector<MarchOctreeNode*>& neighbors, const octomap::point3d& currentNodeHitLocation) {
+Eigen::Vector3f MarchOctreeUtils::computeNormalFromTwoRandomNeighbors(std::vector<MarchOctreeNode*>& neighbors, const point3d& current_node_hit_location) {
 
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0, neighbors.size() - 1);
@@ -192,87 +192,88 @@ static Eigen::Vector3f computeNormalFromTwoRandomNeighbors(std::vector<MarchOctr
     }
 
     Eigen::Vector3f normal_candidate;
-    octomap::point3d& loc1 = neighbors->getChild(indices[0])->getNodeLocation();
-    octomap::point3d& loc2 = neighbors[indices[1]]->getNodeLocation();
-    Eigen::Vector3f vec1(loc1.x() - currentNodeHitLocation.x(), loc1.y() - currentNodeHitLocation.y(), loc1.z() - currentNodeHitLocation.z());
-    Eigen::Vector3f vec2(loc2.x() - currentNodeHitLocation.x(), loc2.y() - currentNodeHitLocation.y(), loc2.z() - currentNodeHitLocation.z());
+    // TODO: Check if the logic here is correct
+    point3d loc1 = neighbors[indices[0]]->getNodeLocation();
+    point3d loc2 = neighbors[indices[1]]->getNodeLocation();
+    Eigen::Vector3f vec1(loc1.x() - current_node_hit_location.x(), loc1.y() - current_node_hit_location.y(), loc1.z() - current_node_hit_location.z());
+    Eigen::Vector3f vec2(loc2.x() - current_node_hit_location.x(), loc2.y() - current_node_hit_location.y(), loc2.z() - current_node_hit_location.z());
     normal_candidate = vec1.cross(vec2);
     normal_candidate.normalize();
 
     return normal_candidate;
 }
 
-
-static Eigen::Vector3f refineNormalWithLeastSquares(MarchOctreeNode* currentNode, const Eigen::Vector3f& ransacNormal,
-                                                    double maxDistanceFromPlane, const std::vector<MarchOctreeNode*>& neighbors) {
+// TODO: Where is max distance from plane used and for what?
+Eigen::Vector3f MarchOctreeUtils::refineNormalWithLeastSquares(MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
+                                                               const std::vector<MarchOctreeNode*>& neighbors) {
 
     // Compute the centroid of neighbors
     Eigen::Vector3f centroid(0.0f, 0.0f, 0.0f);
 
     for (const auto& neighbor : neighbors) {
 
-        const octomap::point3d& neighborLoc = neighbor->getNodeLocation();
-        centroid[0] += neighborLoc.x();
-        centroid[1] += neighborLoc.y();
-        centroid[2] += neighborLoc.z();
+        const point3d& neighbor_loc = neighbor->getNodeLocation();
+        centroid[0] += neighbor_loc.x();
+        centroid[1] += neighbor_loc.y();
+        centroid[2] += neighbor_loc.z();
     }
     centroid /= static_cast<float>(neighbors.size());
-    Eigen::Matrix3f covarianceMatrix = Eigen::Matrix3f::Zero();
+    Eigen::Matrix3f covariance_matrix = Eigen::Matrix3f::Zero();
 
     for (const auto& neighbor : neighbors) {
 
-        const octomap::point3d& neighborLoc = neighbor->getNodeLocation();
-        Eigen::Vector3f vec(neighborLoc.x() - centroid[0], neighborLoc.y() - centroid[1], neighborLoc.z() - centroid[2]);
-        covarianceMatrix += vec * vec.transpose();
+        const point3d& neighbor_loc = neighbor->getNodeLocation();
+        Eigen::Vector3f vec(neighbor_loc.x() - centroid[0], neighbor_loc.y() - centroid[1], neighbor_loc.z() - centroid[2]);
+        covariance_matrix += vec * vec.transpose();
     }
-    // Compute SVD of the covariance matrix
-    Eigen::JacobiSVD<Eigen::Matrix3f> svd(covarianceMatrix, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    Eigen::Vector3f refinedNormal = svd.matrixV().col(2);
-    // Normalize the refined normal vector
-    refinedNormal.normalize();
-    return refinedNormal;
+
+    Eigen::JacobiSVD<Eigen::Matrix3f> svd(covariance_matrix, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::Vector3f refined_normal = svd.matrixV().col(2);
+    refined_normal.normalize();
+    return refined_normal;
 }
 
-static void computeNormalConsensusAndVariance(MarchOctreeNode* currentNode, const Eigen::Vector3f& planeNormal,
-                                              int hitsAtCurrentPoint, const std::vector<MarchOctreeNode*>& neighbors,
-                                              double& varianceToPack, int& consensusToPack)
-{
-    varianceToPack = 0.0;
-    consensusToPack = 0;
-    Eigen::Vector3f toNeighborHitLocation;
+void MarchOctreeUtils::computeNormalConsensusAndVariance(MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
+                                              int hits_at_current_point, const std::vector<MarchOctreeNode*>& neighbors,
+                                              double& variance_to_pack, int& consensus_to_pack) {
+
+    variance_to_pack = 0.0;
+    consensus_to_pack = 0;
+
+    Eigen::Vector3f to_neighbor_hit_location;
 
     if (DEFAULT_WEIGHT_BY_NUMBER_OF_HITS) {
 
         // Weighted computation of consensus and variance
         for (const auto& neighbor : neighbors) {
 
-            const octomap::point3d& neighborLoc = neighbor->getNodeLocation();
-            toNeighborHitLocation << neighborLoc.x() - currentNode->getNodeLocationX(),
-                                     neighborLoc.y() - currentNode->getNodeLocationY(),
-                                     neighborLoc.z() - currentNode->getNodeLocationZ();
-            double distanceFromPlane = std::abs(planeNormal.dot(toNeighborHitLocation));
+            const octomap::point3d& neighbor_loc = neighbor->getNodeLocation();
+            to_neighbor_hit_location << neighbor_loc.x() - current_node->getNodeLocationX(),
+                                        neighbor_loc.y() - current_node->getNodeLocationY(),
+                                        neighbor_loc.z() - current_node->getNodeLocationZ();
+            double distance_from_plane = std::abs(plane_normal.dot(to_neighbor_hit_location));
 
-            if (distanceFromPlane <= DEFAULT_MAX_DISTANCE_FROM_PLANE) {
+            if (distance_from_plane <= DEFAULT_MAX_DISTANCE_FROM_PLANE) {
 
                 double weight = neighbor->getNumberOfHits();
-                varianceToPack += weight * distanceFromPlane * distanceFromPlane;
-                consensusToPack += weight;
+                variance_to_pack += weight * distance_from_plane * distance_from_plane;
+                consensus_to_pack += weight;
             }
         }
     } else {
         // Non-weighted computation of consensus and variance
         for (const auto& neighbor : neighbors) {
 
-            const octomap::point3d& neighborLoc = neighbor->getNodeLocation();
-            toNeighborHitLocation << neighborLoc.x() - currentNode->getNodeLocationX(),
-                                     neighborLoc.y() - currentNode->getNodeLocationY(),
-                                     neighborLoc.z() - currentNode->getNodeLocationZ();
-            double distanceFromPlane = std::abs(planeNormal.dot(toNeighborHitLocation));
+            const octomap::point3d& neighbor_loc = neighbor->getNodeLocation();
+            to_neighbor_hit_location << neighbor_loc.x() - current_node->getNodeLocationX(),
+                                        neighbor_loc.y() - current_node->getNodeLocationY(),
+                                        neighbor_loc.z() - current_node->getNodeLocationZ();
+            double distance_from_plane = std::abs(plane_normal.dot(to_neighbor_hit_location));
 
-            if (distanceFromPlane <= DEFAULT_MAX_DISTANCE_FROM_PLANE) {
+            if (distance_from_plane <= DEFAULT_MAX_DISTANCE_FROM_PLANE) {
 
-                varianceToPack += distanceFromPlane * distanceFromPlane;
-                consensusToPack++;
+                variance_to_pack += distance_from_plane * distance_from_plane;
+                consensus_to_pack++;
             }
         }
     }

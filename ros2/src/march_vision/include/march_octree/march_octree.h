@@ -19,21 +19,21 @@ public:
     //TODO: Add min/max insert range?
 
     // Occupancy parameters as constants
-    static constexpr double DEFAULT_OCCUPANCY_THRESHOLD = 0.5;   // = 0.0 in logodds
-    static constexpr double DEFAULT_HIT_UPDATE          = 0.7;   // = 0.85 in logodds
-    static constexpr double DEFAULT_MISS_UPDATE         = 0.4;   // = -0.4 in logodds
-    static constexpr double DEFAULT_MIN_PROBABILITY     = 0.1192;// = -2 in log odds
-    static constexpr double DEFAULT_MAX_PROBABILITY     = 0.971; // = 3.5 in log odds
+    static const double DEFAULT_OCCUPANCY_THRESHOLD;
+    static const double DEFAULT_HIT_UPDATE;
+    static const double DEFAULT_MISS_UPDATE;
+    static const double DEFAULT_MIN_PROBABILITY;
+    static const double DEFAULT_MAX_PROBABILITY;
 
     // Normal Estimation parameters (primarily RANSAC + least squares)
     //TODO: Add parameter to choose which method?
-    static constexpr double DEFAULT_SEARCH_RADIUS               = 0.08;
-    static constexpr double DEFAULT_MAX_DISTANCE_FROM_PLANE     = 0.02;
-    static constexpr double DEFAULT_MIN_CONSENSUS_RATIO         = 0.5;
-    static constexpr double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO = 0.75;
-    static constexpr int    DEFAULT_NUMBER_OF_ITERATIONS        = 1;
-    static constexpr bool   DEFAULT_LEAST_SQUARES_ESTIMATION    = true;
-    static constexpr bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS    = true;
+    static const double DEFAULT_SEARCH_RADIUS;
+    static const double DEFAULT_MAX_DISTANCE_FROM_PLANE;
+    static const double DEFAULT_MIN_CONSENSUS_RATIO;
+    static const double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO;
+    static const int    DEFAULT_NUMBER_OF_ITERATIONS;
+    static const bool   DEFAULT_LEAST_SQUARES_ESTIMATION;
+    static const bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS;
 
     //TODO: Change this constructor to the one that inherits 
     MarchOctree(double in_resolution);
@@ -43,7 +43,7 @@ public:
     MarchOctree* create() const {return new MarchOctree(resolution); }
 
     //TODO: Should these be "const"?
-    unsigned int getLastUpdateTime();
+    unsigned int getLastUpdateTime() const;
     void degradeOutdatedNodes(unsigned int time_thres);
     void updateNodeLogOdds(MarchOctreeNode* node, const float& update);
     void integrateMissNoTime(MarchOctreeNode* node);
@@ -62,18 +62,15 @@ public:
     void enableParallelComputationForNormals(bool enable);
     void enableParallelInsertionOfMisses(bool enable);
 
-    std::array<double, 5> getOccupancyParameters();
-    std::array<double, 7> getNormalEstimationParameters();
-   
     //TODO: fix this 
     //void updateHitTimestamp(long timestamp);
 
 private:
 
     //TODO: Implement the parallel computations and test them
-    bool compute_normals_in_parallel;
-    bool insert_misses_in_parallel;
-    bool report_time;
+    bool m_compute_normals_in_parallel;
+    bool m_insert_misses_in_parallel;
+    bool m_report_time;
     
     class StaticMemberInitializer{
     public:

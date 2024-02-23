@@ -2,15 +2,33 @@
 
 namespace octomap {
 
+// Occupancy parameters as constants
+static const double DEFAULT_OCCUPANCY_THRESHOLD = 0.5;   // = 0.0 in logodds
+static const double DEFAULT_HIT_UPDATE          = 0.7;   // = 0.85 in logodds
+static const double DEFAULT_MISS_UPDATE         = 0.4;   // = -0.4 in logodds
+static const double DEFAULT_MIN_PROBABILITY     = 0.1192;// = -2 in log odds
+static const double DEFAULT_MAX_PROBABILITY     = 0.971; // = 3.5 in log odds
+
+// Normal Estimation parameters (primarily RANSAC + least squares)
+//TODO: Add parameter to choose which method?
+static const double DEFAULT_SEARCH_RADIUS               = 0.08;
+static const double DEFAULT_MAX_DISTANCE_FROM_PLANE     = 0.02;
+static const double DEFAULT_MIN_CONSENSUS_RATIO         = 0.5;
+static const double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO = 0.75;
+static const int    DEFAULT_NUMBER_OF_ITERATIONS        = 1;
+static const bool   DEFAULT_LEAST_SQUARES_ESTIMATION    = true;
+static const bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS    = true;
+
+
 MarchOctree::MarchOctree(double in_resolution)
 : OccupancyOcTreeBase<MarchOctreeNode>(in_resolution),
-    compute_normals_in_parallel(false),
-    insert_misses_in_parallel(false),
-    report_time(false) {
+    m_compute_normals_in_parallel(false),
+    m_insert_misses_in_parallel(false),
+    m_report_time(false) {
     marchOctreeMemberInit.ensureLinking();
 }
 
-unsigned int MarchOctree::getLastUpdateTime() {
+unsigned int MarchOctree::getLastUpdateTime() const {
 // this value is updated whenever inner nodes are
 // updated using updateOccupancyChildren()
 return root->getLastHitTimestamp();
@@ -129,11 +147,11 @@ void MarchOctree::updateInnerNormalsRecursive(MarchOctreeNode* node, int depth) 
 }
 
 void MarchOctree::enableReportTime(bool enable) {
-    report_time = enable;
+    m_report_time = enable;
 }
 
 void MarchOctree::enableParallelComputationForNormals(bool enable) {
-    compute_normals_in_parallel = enable;
+    m_compute_normals_in_parallel = enable;
 }
 
 
@@ -143,20 +161,7 @@ void MarchOctree::setNodeMaximumNumberOfHits(unsigned long maximumNumberOfHits) 
 
 
 void MarchOctree::enableParallelInsertionOfMisses(bool enable) {
-    insert_misses_in_parallel = enable;   
-}
-
-std::array<double, 5> MarchOctree::getOccupancyParameters(){
-
-    return { DEFAULT_OCCUPANCY_THRESHOLD, DEFAULT_HIT_UPDATE, 
-             DEFAULT_MISS_UPDATE, DEFAULT_MIN_PROBABILITY, DEFAULT_MAX_PROBABILITY };
-}
-
-std::array<double, 7> MarchOctree::getNormalEstimationParameters(){
-
-    return { DEFAULT_SEARCH_RADIUS, DEFAULT_MAX_DISTANCE_FROM_PLANE, DEFAULT_MIN_CONSENSUS_RATIO,
-             DEFAULT_MAX_AVERAGE_DEVIATION_RATIO, DEFAULT_NUMBER_OF_ITERATIONS,
-             DEFAULT_LEAST_SQUARES_ESTIMATION, DEFAULT_WEIGHT_BY_NUMBER_OF_HITS };
+    m_insert_misses_in_parallel = enable;   
 }
 
 MarchOctree::StaticMemberInitializer MarchOctree::marchOctreeMemberInit;

@@ -6,9 +6,8 @@
 #include <algorithm>
 #include <random>
 #include <iostream>
+#include <eigen3/Eigen/Core>
 #include <march_octree/march_octree.h>
-#include <Eigen/Core>
-
 
 namespace octomap {
 
@@ -67,39 +66,41 @@ class MarchOctreeUtils {
         static inline float sqr(float r){ return r;}
         static inline float sqrt(float r){ return r;}
     };
-public: 
+
+
+private:
 
     // Normal Estimation parameters (primarily RANSAC + least squares)
     //TODO: Add parameter to choose which method?
-    static constexpr double DEFAULT_SEARCH_RADIUS               = 0.08;
-    static constexpr double DEFAULT_MAX_DISTANCE_FROM_PLANE     = 0.02;
-    static constexpr double DEFAULT_MIN_CONSENSUS_RATIO         = 0.5;
-    static constexpr double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO = 0.75;
-    static constexpr int    DEFAULT_NUMBER_OF_ITERATIONS        = 1;
-    static constexpr bool   DEFAULT_LEAST_SQUARES_ESTIMATION    = true;
-    static constexpr bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS    = true;
+    static const double DEFAULT_SEARCH_RADIUS;            
+    static const double DEFAULT_MAX_DISTANCE_FROM_PLANE;
+    static const double DEFAULT_MIN_CONSENSUS_RATIO;
+    static const double DEFAULT_MAX_AVERAGE_DEVIATION_RATIO;
+    static const int    DEFAULT_NUMBER_OF_ITERATIONS;
+    static const bool   DEFAULT_LEAST_SQUARES_ESTIMATION;
+    static const bool   DEFAULT_WEIGHT_BY_NUMBER_OF_HITS;
 
-private:
-    // static void computeNormalRANSAC();
-    // static void computeNormalFromTwoRandomNeighbors();
-    // static std::vector<float> refineNormalWithLeastSquares();
-    // static bool peekBestNormal();
-    // static bool isCandidateNormalBetter();
-    // static void computeNormalConsensusAndVariance();
-    // static void computeNormalPCA();
-    // static std::vector<MarchOctree> searchNeighbors(MarchOctreeNode* root, MarchOctreeNode* current_node, double search_radius);
-    // static bool overlaps(MarchOctreeNode& node, double x, double y, double z, double radius, double squareRadius);
-    // static bool contains(MarchOctreeNode& node, double x, double y, double z, double squareRadius);
-    // static bool inside(MarchOctreeNode& node, double x, double y, double z, double radius);
-    // static void findRadiusNeighbors(const MarchOctreeNode& rootNode, double x, double y, double z, double radius,
-    //                                 std::shared_ptr<NeighborActionRule> actionRule);
-    // static void findNearestNeighbor(const MarchOctreeNode& rootNode, double x, double y, double z, double minDistance,
-    //                                 double maxDistance, OcTreeKey& nearestNeighborKeyToPack);
-    // static void findNearestNeighborHelper(const MarchOctreeNode& node, double x, double y, double z, double& nearestDistanceSquared,
-    //                                       double squareMinDistance, double squareMaxDistance, OcTreeKey& nearestNeighborKeyToPack);
+    static void findRadiusNeighbors(const octomap::MarchOctreeNode *node, octomap::point3d query_point, double search_radius,
+                                    std::vector<std::seed_seq::result_type> &neighborsIndices);
+    static void findRadiusNeighbors(const MarchOctreeNode* node, const point3d query_point, double search_radius, 
+                                    std::function<void(MarchOctreeNode*)> recursiveAction);
+    static std::vector<MarchOctreeNode*> searchNeighbors(MarchOctree* root, MarchOctreeNode* current_node);
+    static void computeNodeNormalRANSAC(MarchOctree* root, const octomap::OcTreeKey& key, int tree_depth);
+    static void computeNodeNormalRANSAC(MarchOctree* root, MarchOctreeNode* current_node);
+    static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
+                           Eigen::Vector3f& candidate_normal, double candidate_variance, int candidate_consensus);
+    static void peekBestNormal(MarchOctreeNode* node, const Eigen::Vector3f& current_normal, double& current_variance, int& current_consensus,
+                           Eigen::Vector3f& candidate_normal, double candidate_variance, int candidate_consensus);
+    static bool isCandidateNormalBetter(double current_variance, int current_consensus, double candidate_variance, int candidate_consensus);
+    static Eigen::Vector3f computeNormalFromTwoRandomNeighbors(std::vector<MarchOctreeNode*>& neighbors, const octomap::point3d& current_node_location);
+    static Eigen::Vector3f refineNormalWithLeastSquares(MarchOctreeNode* current_node, const Eigen::Vector3f& ransac_normal,
+                                                        const std::vector<MarchOctreeNode*>& neighbors);
+    static void computeNormalConsensusAndVariance(MarchOctreeNode* current_node, const Eigen::Vector3f& plane_normal,
+                                              int hits_at_current_point, const std::vector<MarchOctreeNode*>& neighbors,
+                                              double& variance_to_pack, int& consensus_to_pack);
 
     template <typename Distance>
-    static bool contains(const point3d& query, float sqRadius, const MarchOctreeNode* node);
+    static bool contains(const MarchOctreeNode* node, const point3d& query, float squared_radius);
 
 };  
 
