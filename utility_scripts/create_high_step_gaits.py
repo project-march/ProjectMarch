@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import bezier 
+from scipy.interpolate import interp1d
 
 def high_step(step_height, array_size):
     step_length = 0.3
@@ -23,5 +24,15 @@ def high_step(step_height, array_size):
 
     return final_points_first_step
 
+def interpolate_linear(dataset):
+    begin_coordinate = dataset[-1, 0:2]
+    end_coordinate = [begin_coordinate[0], 0.0]
+    x_vals = [begin_coordinate[0], end_coordinate[0]]
+    z_vals = [begin_coordinate[1], end_coordinate[1]]
+    time_steps = np.arange(0, 100, 1)
+    interpolated_vals = interp1d(time_steps, x_vals, z_vals)
+    plt.plot(time_steps, interpolated_vals)
+
 high_step1 = high_step(0.26, 200)
-np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', high_step1, delimiter=',')
+interpolate_linear(high_step1)
+# np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', high_step1, delimiter=',')
