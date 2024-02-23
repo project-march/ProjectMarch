@@ -62,7 +62,7 @@ void GaitPlanning::setBezierGait(){
     m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
     m_large_step_close_trajectory = processCSV(cartesian_files_directory + "large_step_close.csv");
     m_small_step_close_trajectory = processCSV(cartesian_files_directory + "small_step_close.csv");
-    m_high_step_20cm_trajectory = processCSV(cartesian_files_directory + "high_step1.csv");
+    m_high_step_26cm_trajectory = processCSV(cartesian_files_directory + "high_step1.csv");
 }
 
 std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getTrajectory() const{

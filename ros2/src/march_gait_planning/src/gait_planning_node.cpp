@@ -142,9 +142,15 @@ void GaitPlanningNode::footPositionsPublish(){
             break;
         
         case exoMode::HighStep1 :
-            if (m_current_trajectory.empty()){
+            static bool is_trajectory_filled = false; // Add this line
+            if (m_current_trajectory.empty() && !is_trajectory_filled){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
+                is_trajectory_filled = true;
                 RCLCPP_INFO(this->get_logger(), "Trajectory refilled, size of current trajectory: %d", m_current_trajectory.size());
+            }
+            else if (m_current_trajectory.empty() && is_trajectory_filled){
+                setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             }
             else {
                 GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
