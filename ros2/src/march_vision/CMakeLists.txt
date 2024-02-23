@@ -46,6 +46,8 @@ add_library(${PROJECT_NAME} STATIC
     src/march_octree/march_octree_utils.cpp 
     src/plane_segmentation/march_polygon.cpp 
     src/plane_segmentation/polygon_calculator.cpp 
+    src/processing/cameras_interface.cpp
+    src/processing/point_cloud_registration.cpp
 
 )
 
@@ -70,6 +72,8 @@ add_executable(computer_vision_node
     src/march_octree/march_octree_utils.cpp 
     src/plane_segmentation/march_polygon.cpp 
     src/plane_segmentation/polygon_calculator.cpp
+    src/processing/cameras_interface.cpp
+    src/processing/point_cloud_registration.cpp
 
 )
 
