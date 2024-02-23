@@ -42,7 +42,7 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
-        = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+        = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 1);
 
     std::vector<std::string> joint_names = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa",
         "right_hip_fe", "right_knee", "right_ankle" };

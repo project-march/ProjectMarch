@@ -38,6 +38,10 @@ class MujocoVisualizer:
         self.cam.elevation = 1
         self.cam.lookat[2] += 0.5
 
+        # Visualize contact
+        self.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = True
+        self.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTFORCE] = True
+
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
         # Collect the time when the simulation has been started

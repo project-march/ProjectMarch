@@ -85,7 +85,7 @@ uint8_t SensorFusion::updateStaticStanceLeg(
 
 uint8_t SensorFusion::updateDynamicStanceLeg()
 {
-    uint8_t stance_leg = 0b11;
+    uint8_t stance_leg = 0b00;
 
     m_joint_accelerations
         = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
@@ -101,8 +101,10 @@ uint8_t SensorFusion::updateDynamicStanceLeg()
     right_foot_external_force
         = m_torque_converter->getExternalForceByNode("R_foot", m_joint_positions, m_joint_external_torques);
 
-    double force_norm = 1e3;
+    double force_norm = 400;
     stance_leg = 
+        // ((right_foot_external_force.z() > force_norm) * 0b10 * isFootFlat("R_foot")) | 
+        // ((left_foot_external_force.z() > force_norm) * 0b01 * isFootFlat("L_foot"));
         ((right_foot_external_force.z() > force_norm) * 0b10) | 
         ((left_foot_external_force.z() > force_norm) * 0b01);
         
@@ -436,6 +438,15 @@ geometry_msgs::msg::Vector3::SharedPtr SensorFusion::getFilteredOrientationMsg()
     return filtered_orientation;
 }
 
+bool SensorFusion::isFootFlat(const std::string foot_name) const
+{
+    Eigen::Matrix3d foot_orientation
+        = m_robot_description->getInertialOrientation() * 
+        m_robot_description->findNode(foot_name)->getGlobalRotation(m_joint_positions);
+    double pitch = rotationMatrixToEulerAngles(foot_orientation).y();
+    return abs(pitch) < 0.1;
+}
+
 Eigen::Vector3d SensorFusion::msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const
 {
     return Eigen::Vector3d(vector.x, vector.y, vector.z);
@@ -448,5 +459,17 @@ Eigen::Vector3d SensorFusion::quaternionToEulerAngles(const Eigen::Quaterniond& 
 
 Eigen::Vector3d SensorFusion::rotationMatrixToEulerAngles(const Eigen::Matrix3d& rotation_matrix) const
 {
-    return rotation_matrix.eulerAngles(EULER_ROLL_AXIS, EULER_PITCH_AXIS, EULER_YAW_AXIS);
+    // return rotation_matrix.eulerAngles(EULER_ROLL_AXIS, EULER_PITCH_AXIS, EULER_YAW_AXIS);
+    
+    Eigen::Vector3d euler_angles;
+    double norm, norm_sine_2;
+
+    Eigen::Quaterniond quaternion(rotation_matrix);
+    norm = 2 * acos(quaternion.w());
+    norm_sine_2 = sin(0.5 * norm);
+    euler_angles.x() = quaternion.x() / norm_sine_2;
+    euler_angles.y() = quaternion.y() / norm_sine_2;
+    euler_angles.z() = quaternion.z() / norm_sine_2;
+
+    return euler_angles;
 }

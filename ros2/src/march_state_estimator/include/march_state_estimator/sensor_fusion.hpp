@@ -111,6 +111,7 @@ public:
 
 private:
     
+    inline bool isFootFlat(const std::string foot_name) const;
     inline Eigen::Vector3d msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const;
     inline Eigen::Vector3d quaternionToEulerAngles(const Eigen::Quaterniond& quaternion) const;
     inline Eigen::Vector3d rotationMatrixToEulerAngles(const Eigen::Matrix3d& rotation_matrix) const;
