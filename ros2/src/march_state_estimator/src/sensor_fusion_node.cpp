@@ -43,7 +43,6 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
-    m_filtered_imu_pub = this->create_publisher<geometry_msgs::msg::TransformStamped>("filtered_imu", 10);
 
     std::vector<std::string> joint_names = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa",
         "right_hip_fe", "right_knee", "right_ankle" };
@@ -65,7 +64,6 @@ SensorFusionNode::~SensorFusionNode()
 
 void SensorFusionNode::timerCallback()
 {
-    // if (m_joint_state == nullptr || m_imu == nullptr) {
     if (m_joint_state == nullptr || m_imu == nullptr) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state or imu data received yet");
         return;
@@ -83,21 +81,15 @@ void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
     m_sensor_fusion->updateImu(m_imu);
-    if (m_joint_state != nullptr) {
-        m_sensor_fusion->updateKalmanFilter();
-    }
+    // if (m_joint_state != nullptr) {
+    //     m_sensor_fusion->updateKalmanFilter();
+    // }
 }
 
 void SensorFusionNode::publishStateEstimation()
 {
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
-
-    // Find a way to optimize this
-    std::unordered_map<std::string, double> joint_positions;
-    for (long unsigned int i = 0; i < m_joint_state->name.size(); i++) {
-        joint_positions[m_joint_state->name[i]] = m_joint_state->position[i];
-    }
 
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
@@ -106,20 +98,9 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
-    state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
+    // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
+    state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
-    // state_estimation_msg.zmp = m_sensor_fusion->getZMP();
-    state_estimation_msg.imu_orientation = *m_sensor_fusion->getFilteredOrientationMsg();
     m_state_estimation_pub->publish(state_estimation_msg);
-
-    geometry_msgs::msg::TransformStamped filtered_imu_msg;
-    filtered_imu_msg.header.stamp = this->now();
-    filtered_imu_msg.header.frame_id = "map";
-    filtered_imu_msg.child_frame_id = "backpack";
-    filtered_imu_msg.transform.translation.x = m_sensor_fusion->getFilteredImuMsg()->linear_acceleration.x;
-    filtered_imu_msg.transform.translation.y = m_sensor_fusion->getFilteredImuMsg()->linear_acceleration.y;
-    filtered_imu_msg.transform.translation.z = m_sensor_fusion->getFilteredImuMsg()->linear_acceleration.z;
-    filtered_imu_msg.transform.rotation = m_sensor_fusion->getFilteredImuMsg()->orientation;
-    m_filtered_imu_pub->publish(filtered_imu_msg);
 }

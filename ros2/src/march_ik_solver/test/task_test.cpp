@@ -165,5 +165,32 @@ TEST_F(TaskTest, test_should_get_correct_joint_velocity_after_solving_for_dummy_
     ASSERT_TRUE(actual_joint_velocities.isApprox(expected_joint_velocities, m_test_velocity_error_tolerance));
 }
 
+TEST_F(TaskTest, test_should_be_able_to_get_relevant_errors_in_extended_task)
+{
+    Eigen::VectorXd expected_error = Eigen::VectorXd(6);
+    expected_error << 1.0, 1.0, 1.0, 0.0, 0.0, 0.0;
+    double expected_error_norm = 1.7320508075688772935274463415058723669428052538103806280558069794;
+
+    m_task->setTaskM(6);
+    m_task->setTaskN(2);
+    std::vector<double> gain_p = { 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+    std::vector<double> gain_d = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    std::vector<double> gain_i = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    m_task->setGainP(gain_p);
+    m_task->setGainD(gain_d);
+    m_task->setGainI(gain_i);
+
+    m_task->setDesiredTask(Eigen::VectorXd::Ones(6));
+    m_task->setCurrentTask(Eigen::VectorXd::Zero(6));
+    Eigen::VectorXd actual_error = m_task->calculateError();
+    double actual_error_norm = m_task->getErrorNorm();
+
+    std::cout << "actual_error:\n" << actual_error << std::endl;
+    std::cout << "actual_error_norm:\n" << actual_error_norm << std::endl;
+    ASSERT_EQ(actual_error.rows(), expected_error.rows());
+    ASSERT_EQ(actual_error_norm, expected_error_norm);
+    ASSERT_TRUE(actual_error.isApprox(expected_error));
+}
+
 // NOLINTEND
 #endif // __clang_analyzer__

@@ -21,7 +21,9 @@ protected:
     {
         m_ik_solver = std::make_unique<IKSolver>();
         m_ik_solver->setDt(m_dt);
-        m_ik_solver->setJointConfigurations(m_joint_names, m_joint_lower_limits, m_joint_upper_limits);
+        m_ik_solver->setJointConfigurations(m_joint_names, 
+            m_joint_position_lower_limits, m_joint_position_upper_limits,
+            m_joint_velocity_lower_limits, m_joint_velocity_upper_limits);
     }
 
     void TearDown() override
@@ -86,8 +88,10 @@ protected:
     double m_dt = 1e-3;
     std::vector<std::string> m_joint_names = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa",
         "right_hip_fe", "right_knee", "right_ankle" };
-    std::vector<double> m_joint_lower_limits = { 10.0, 112.5, 125.0, 10.0, 10.0, 112.5, 125.0, 10.0 };
-    std::vector<double> m_joint_upper_limits = { -15.0, -10.0, 0.0, -25.0, -15.0, -10.0, 0.0, -25.0 };
+    std::vector<double> m_joint_position_lower_limits = { 10.0, 112.5, 125.0, 10.0, 10.0, 112.5, 125.0, 10.0 };
+    std::vector<double> m_joint_position_upper_limits = { -15.0, -10.0, 0.0, -25.0, -15.0, -10.0, 0.0, -25.0 };
+    std::vector<double> m_joint_velocity_lower_limits = { -100.0, -115.6, -243.6, -130.1, -100.0, -115.6, -243.6, -130.1 };
+    std::vector<double> m_joint_velocity_upper_limits = { 100.0,  67.16,  208.9,  100.3,  100.0,  67.16,  208.9,  100.3 };
 
     // IKSolverNode::configureTasksParameters()
     std::vector<std::string> m_task_names = { "stability", "motion" };
@@ -95,11 +99,11 @@ protected:
     // IKSolverNode::configureTasksParameters() : Motion Task
     std::string m_motion_task_reference_frame = "body";
     std::vector<std::string> m_motion_task_node_names = { "left_ankle", "right_ankle" };
-    unsigned int m_motion_task_workspace_dim = 6;
+    unsigned int m_motion_task_workspace_dim = 12;
     unsigned int m_motion_task_configurations_dim = 8;
-    std::vector<double> m_motion_task_gain_p = { 50.0, 100.0, 100.0, 50.0, 100.0, 100.0 };
-    std::vector<double> m_motion_task_gain_d = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    std::vector<double> m_motion_task_gain_i = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    std::vector<double> m_motion_task_gain_p = { 50.0, 100.0, 100.0, 0.0, 0.0, 0.0, 50.0, 100.0, 100.0, 0.0, 0.0, 0.0 };
+    std::vector<double> m_motion_task_gain_d = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    std::vector<double> m_motion_task_gain_i = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     double m_motion_task_damping_coefficient = 1e-6;
 
     // IKSolverNode::configureTasksParameters() : Stability Task
