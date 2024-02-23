@@ -14,7 +14,7 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
 
     // TODO: get from parameter server
     m_timestep = 1e-3;
-    m_process_noise_acceleration = Eigen::Vector3d(0.0000216, 0.0000216, 0.0000194236968674863745671109643707885307479093055166101907281227);
+    m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 1.94e-5);
     m_process_noise_angular_velocity = Eigen::Vector3d(0.118174, 0.118174, 0.118174);
     setProcessNoiseCovarianceMatrix(
         m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
@@ -116,13 +116,14 @@ std::vector<geometry_msgs::msg::Pose> SensorFusion::getFootPoses() const
     for (long unsigned int i = 0; i < feet_nodes.size(); i++) {
         geometry_msgs::msg::Pose foot_pose;
         Eigen::Vector3d foot_position = feet_nodes[i]->getGlobalPosition(m_joint_positions);
+        Eigen::Quaterniond foot_orientation = Eigen::Quaterniond(feet_nodes[i]->getGlobalRotation(m_joint_positions));
         foot_pose.position.x = foot_position.x();
         foot_pose.position.y = foot_position.y();
         foot_pose.position.z = foot_position.z();
-        foot_pose.orientation.x = 0.0;
-        foot_pose.orientation.y = 0.0;
-        foot_pose.orientation.z = 0.0;
-        foot_pose.orientation.w = 1.0;
+        foot_pose.orientation.x = foot_orientation.x();
+        foot_pose.orientation.y = foot_orientation.y();
+        foot_pose.orientation.z = foot_orientation.z();
+        foot_pose.orientation.w = foot_orientation.w();
         foot_poses.push_back(foot_pose);
     }
 
