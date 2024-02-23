@@ -12,7 +12,7 @@ GainSchedulerNode::GainSchedulerNode()
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
-    m_test_hwi_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("~/commands", rclcpp::SystemDefaultsQoS());
+    m_test_hwi_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("march_scheduled_gains_controller/commands", rclcpp::SystemDefaultsQoS());
 
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));

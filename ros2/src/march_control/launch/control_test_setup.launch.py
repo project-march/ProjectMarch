@@ -106,8 +106,8 @@ def generate_launch_description():
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
-        motor_controller_state_broadcaster_spawner,
         scheduled_gains_controller_spawner,
+        motor_controller_state_broadcaster_spawner,
     ]
 
     robot_desc_xacro = Command(

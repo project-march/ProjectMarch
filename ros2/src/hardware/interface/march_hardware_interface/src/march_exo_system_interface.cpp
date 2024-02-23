@@ -512,7 +512,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
         // if (jointInfo.proportional_gain != std::nan) {
 
-        // RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
+        RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
         // }
         
         
