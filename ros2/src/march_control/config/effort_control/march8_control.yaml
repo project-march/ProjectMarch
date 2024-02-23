@@ -18,7 +18,7 @@ controller_manager:
       type: pressure_sole_broadcaster/PressureSoleBroadcaster
 
     march_scheduled_gains_controller:
-      type: scheduled_gains_controller/ScheduledGainsController
+      type: march_scheduled_gains_controller/ScheduledGainsController
 
 march_motor_controller_state_broadcaster:
   ros__parameters:

@@ -510,8 +510,12 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
             (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
 
-        RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
+        // if (jointInfo.proportional_gain != std::nan) {
+
+        // RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
         // }
+        
+        
     }
 
     return hardware_interface::return_type::OK;

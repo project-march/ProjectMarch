@@ -13,9 +13,9 @@ testsetup:
           useIncrementalEncoder: true
           absoluteEncoder:
             resolution: 14
-            minPositionIU: 14180
-            maxPositionIU: 15250
-            zeroPositionIU: 14715
+            minPositionIU: 14166
+            maxPositionIU: 15666
+            zeroPositionIU: 14916
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.

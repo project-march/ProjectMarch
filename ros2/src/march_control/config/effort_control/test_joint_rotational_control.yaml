@@ -9,7 +9,7 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     march_scheduled_gains_controller:
-      type: scheduled_gains_controller/ScheduledGainsController
+      type: march_scheduled_gains_controller/ScheduledGainsController
 
     
 
