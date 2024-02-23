@@ -1,6 +1,8 @@
 # ExoMode.msg
 std_msgs/Header header
 int8 mode
+bool cameras
+string gaiting_type
 
 # Constant types of modes
 int8 SIT = 0
