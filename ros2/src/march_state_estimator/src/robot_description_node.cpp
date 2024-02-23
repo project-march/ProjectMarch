@@ -6,7 +6,7 @@
 #include "march_state_estimator/robot_description_node.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include "march_shared_msgs/msg/node_jacobian.hpp"
 #include <chrono>
 #include <functional>
@@ -26,12 +26,12 @@ RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> rob
 
     m_service_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
-    // m_subscription_state_estimation
-    //     = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10,
-    //         std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
-    // m_publisher_state_estimator_visualization
-    //     = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
-    //         "state_estimation/visualization", 10);
+    m_subscription_state_estimation
+        = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10,
+            std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
+    m_publisher_state_estimator_visualization
+        = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
+            "state_estimation/visualization", 10);
 
     m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
         "state_estimation/get_node_position",
@@ -47,7 +47,7 @@ RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> rob
 
 RobotDescriptionNode::~RobotDescriptionNode()
 {
-    // RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode has been stopped.");
+    RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode has been stopped.");
 }
 
 void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -65,45 +65,42 @@ void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg:
     //     std::inserter(joint_positions, joint_positions.end()), [](const std::string& name, const double& position) {
     //         return std::make_pair(name, position);
     //     });
-
     // publishVisualization(joint_positions);
 }
 
-// void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::string, double>& joint_positions)
-// {
-//     RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::publishVisualization");
+void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::string, double>& joint_positions)
+{
+    RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::publishVisualization");
 
-//     std::vector<Eigen::Vector3d> node_positions = m_robot_description->getAllNodesPosition(joint_positions);
-//     std::vector<Eigen::Matrix3d> node_rotations = m_robot_description->getAllNodesRotation(joint_positions);
+    std::vector<Eigen::Vector3d> node_positions = m_robot_description->getAllNodesPosition(joint_positions);
+    std::vector<Eigen::Matrix3d> node_rotations = m_robot_description->getAllNodesRotation(joint_positions);
 
-//     march_shared_msgs::msg::StateEstimatorVisualization state_estimator_visualization_msg;
-//     state_estimator_visualization_msg.node_names = m_robot_description->getAllNodeNames();
-//     state_estimator_visualization_msg.parent_node_names = m_robot_description->getAllParentNames();
+    march_shared_msgs::msg::StateEstimatorVisualization state_estimator_visualization_msg;
+    state_estimator_visualization_msg.node_names = m_robot_description->getAllNodeNames();
+    state_estimator_visualization_msg.parent_node_names = m_robot_description->getAllParentNames();
 
-//     for (long unsigned int i = 0; i < node_positions.size(); i++) {
-//         geometry_msgs::msg::Pose node_pose;
-//         node_pose.position.x = node_positions[i].x();
-//         node_pose.position.y = node_positions[i].y();
-//         node_pose.position.z = node_positions[i].z();
+    for (long unsigned int i = 0; i < node_positions.size(); i++) {
+        geometry_msgs::msg::Pose node_pose;
+        node_pose.position.x = node_positions[i].x();
+        node_pose.position.y = node_positions[i].y();
+        node_pose.position.z = node_positions[i].z();
 
-//         Eigen::Quaterniond quaternion(node_rotations[i]);
-//         node_pose.orientation.x = quaternion.x();
-//         node_pose.orientation.y = quaternion.y();
-//         node_pose.orientation.z = quaternion.z();
-//         node_pose.orientation.w = quaternion.w();
+        Eigen::Quaterniond quaternion(node_rotations[i]);
+        node_pose.orientation.x = quaternion.x();
+        node_pose.orientation.y = quaternion.y();
+        node_pose.orientation.z = quaternion.z();
+        node_pose.orientation.w = quaternion.w();
 
-//         state_estimator_visualization_msg.node_poses.push_back(node_pose);
-//     }
+        state_estimator_visualization_msg.node_poses.push_back(node_pose);
+    }
 
-//     m_publisher_state_estimator_visualization->publish(state_estimator_visualization_msg);
-// }
+    m_publisher_state_estimator_visualization->publish(state_estimator_visualization_msg);
+}
 
 void RobotDescriptionNode::handleNodePositionRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodePosition::Response> response)
 {
-    // RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest");
-
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
         RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
@@ -122,18 +119,20 @@ void RobotDescriptionNode::handleNodePositionRequest(
         robot_nodes.size());
 
     for (auto& robot_node : robot_nodes) {
-        Eigen::Vector3d pose = robot_node->getGlobalPosition(joint_positions);
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
-            "RobotDescriptionNode::handleNodePositionRequest: %f %f %f", pose(0), pose(1), pose(2));
+        Eigen::Vector3d position = robot_node->getGlobalPosition(joint_positions);
+        Eigen::Quaterniond quaternion = Eigen::Quaterniond(robot_node->getGlobalRotation(joint_positions));
 
-        geometry_msgs::msg::Point node_position;
-        node_position.x = pose(0);
-        node_position.y = pose(1);
-        node_position.z = pose(2);
+        geometry_msgs::msg::Pose node_pose;
+        node_pose.position.x = position.x();
+        node_pose.position.y = position.y();
+        node_pose.position.z = position.z();
+        node_pose.orientation.x = quaternion.x();
+        node_pose.orientation.y = quaternion.y();
+        node_pose.orientation.z = quaternion.z();
+        node_pose.orientation.w = quaternion.w();
 
-        response->node_positions.push_back(node_position);
+        response->node_poses.push_back(node_pose);
     }
-
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodePositionRequest done");
 }
 
@@ -141,8 +140,6 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
     const std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Request> request,
     std::shared_ptr<march_shared_msgs::srv::GetNodeJacobian::Response> response)
 {
-    // RCLCPP_WARN(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest");
-
     // Assert that the request is not empty
     if (request->node_names.empty() || request->joint_names.empty() || request->joint_positions.empty()) {
         RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
@@ -170,19 +167,16 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
         RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest: %d",
             joint_names.size());
 
-        Eigen::MatrixXd jacobian = robot_node->getGlobalPositionJacobian(joint_positions);
-        std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
-        RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
-            "RobotDescriptionNode::handleNodeJacobianRequest: %d %d", jacobian.rows(), jacobian.cols());
+        Eigen::MatrixXd position_jacobian = robot_node->getGlobalPositionJacobian(joint_positions);
+        Eigen::MatrixXd rotation_jacobian = robot_node->getGlobalRotationJacobian(joint_positions);
+        Eigen::MatrixXd jacobian(position_jacobian.rows() + rotation_jacobian.rows(), position_jacobian.cols());
+        jacobian << position_jacobian, rotation_jacobian;
 
+        std::vector<double> jacobian_vector(jacobian.data(), jacobian.data() + jacobian.size());
         node_jacobian_msg.rows = jacobian.rows();
         node_jacobian_msg.cols = jacobian.cols();
         node_jacobian_msg.jacobian = jacobian_vector;
 
-        for (long unsigned int i = 0; i < jacobian_vector.size(); i++) {
-            RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"),
-                "RobotDescriptionNode::handleNodeJacobianRequest: %f", jacobian_vector[i]);
-        }
         node_jacobians.push_back(node_jacobian_msg);
     }
     response->node_jacobians = node_jacobians;

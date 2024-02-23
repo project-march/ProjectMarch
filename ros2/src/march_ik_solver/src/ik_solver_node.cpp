@@ -45,14 +45,21 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
-    Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(6);
-    desired_pose << msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z,
-        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
+    Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(12);
+    desired_pose << 
+        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0,
+        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
     desired_tasks["motion"] = desired_pose;
 
-    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
-    desired_stability << 0.3, 0.0;
+    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(6);
+    desired_stability << 0.3, 0.0, 0.0, 0.0, 0.0, 0.0;
     desired_tasks["stability"] = desired_stability;
+
+    Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
+    desired_posture << 
+        0, 0, 0, 0, M_PI_4, 0,
+        0, 0, 0, 0, M_PI_4, 0;
+    desired_tasks["posture"] = desired_posture;
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
@@ -162,6 +169,8 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.names", std::vector<std::string>());
     declare_parameter("joint.limits.positions.upper", std::vector<double>());
     declare_parameter("joint.limits.positions.lower", std::vector<double>());
+    declare_parameter("joint.limits.velocities.upper", std::vector<double>());
+    declare_parameter("joint.limits.velocities.lower", std::vector<double>());
 
     m_state_estimator_time_offset = get_parameter("state_estimator_time_offset").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -173,10 +182,14 @@ void IKSolverNode::configureIKSolverParameters()
     double joint_trajectory_controller_period = get_parameter("joint_trajectory_controller_period").as_double();
     m_joint_trajectory_controller_period = (uint64_t)(joint_trajectory_controller_period * 1e9);
 
-    std::vector<double> joint_limits_upper = get_parameter("joint.limits.positions.upper").as_double_array();
-    std::vector<double> joint_limits_lower = get_parameter("joint.limits.positions.lower").as_double_array();
+    std::vector<double> joint_position_limits_upper = get_parameter("joint.limits.positions.upper").as_double_array();
+    std::vector<double> joint_position_limits_lower = get_parameter("joint.limits.positions.lower").as_double_array();
+    std::vector<double> joint_velocity_limits_upper = get_parameter("joint.limits.velocities.upper").as_double_array();
+    std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
-    m_ik_solver->setJointConfigurations(m_joint_names, joint_limits_lower, joint_limits_upper);
+    m_ik_solver->setJointConfigurations(m_joint_names, 
+        joint_position_limits_lower, joint_position_limits_upper,
+        joint_velocity_limits_lower, joint_velocity_limits_upper);
 }
 
 void IKSolverNode::configureTasksParameters()

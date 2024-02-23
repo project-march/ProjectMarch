@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
-#include "march_mode_machine/exo_mode.hpp"
+#include "march_mode_machine/exo_mode_transitions.hpp"
 
 
 class ModeMachine {
@@ -21,10 +21,9 @@ public:
     int getCurrentMode() const;
     std::set<exoMode> getAvailableModes(exoMode current_mode) const;
     void setCurrentMode(const exoMode& mode);
-    void setExoTransitions(const std::map<exoMode, std::set<exoMode>>& transitions);
 
 protected:
-    std::map<exoMode, std::set<exoMode>> m_exo_transitions;
+    ExoModeTransitions m_exo_transitions;
 
 private:
     exoMode m_current_mode;

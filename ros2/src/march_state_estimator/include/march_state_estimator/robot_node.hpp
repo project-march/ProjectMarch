@@ -28,9 +28,9 @@ public:
     typedef std::vector<JointSymbol> JointSymbols;
     typedef std::shared_ptr<GiNaC::symbol> JointSymbolPtr; // TODO
 
-    using EvaluateJacobianPtr = Eigen::MatrixXd (RobotNode::*)(JointNameToValueMap) const;
+    using EvaluateJacobianPtr = Eigen::MatrixXd (RobotNode::*)(const JointNameToValueMap&) const;
     using EvaluateDynamicalTorquePtr
-        = Eigen::VectorXd (RobotNode::*)(JointNameToValueMap, JointNameToValueMap, JointNameToValueMap) const;
+        = Eigen::VectorXd (RobotNode::*)(const JointNameToValueMap&, const JointNameToValueMap&, const JointNameToValueMap&) const;
 
     RobotNode() = default;
     ~RobotNode() = default;
@@ -56,16 +56,19 @@ public:
     JointSymbol getJointPosition() const;
     JointSymbol getJointVelocity() const;
     JointSymbol getJointAcceleration() const;
-    virtual Eigen::Vector3d getGlobalPosition(JointNameToValueMap joint_positions) const;
-    Eigen::Vector3d getGlobalVelocity(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities) const;
-    Eigen::Vector3d getGlobalAcceleration(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
-        JointNameToValueMap joint_accelerations) const;
-    Eigen::Matrix3d getGlobalRotation(JointNameToValueMap joint_positions) const;
-    virtual Eigen::MatrixXd getGlobalPositionJacobian(JointNameToValueMap joint_positions) const;
-    Eigen::MatrixXd getGlobalRotationJacobian(JointNameToValueMap joint_positions) const;
-    Eigen::VectorXd getDynamicalTorque(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
-        JointNameToValueMap joint_accelerations) const;
-    double getDynamicalJointAcceleration(double joint_torque, JointNameToValueMap joint_positions) const;
+
+    virtual Eigen::Vector3d getGlobalPosition(const JointNameToValueMap& joint_positions) const;
+    Eigen::Vector3d getGlobalVelocity(const JointNameToValueMap& joint_positions, 
+        const JointNameToValueMap& joint_velocities) const;
+    Eigen::Vector3d getGlobalAcceleration(const JointNameToValueMap& joint_positions, 
+        const JointNameToValueMap& joint_velocities, const JointNameToValueMap& joint_accelerations) const;
+    Eigen::Matrix3d getGlobalRotation(const JointNameToValueMap& joint_positions) const;
+    virtual Eigen::MatrixXd getGlobalPositionJacobian(const JointNameToValueMap& joint_positions) const;
+    Eigen::MatrixXd getGlobalRotationJacobian(const JointNameToValueMap& joint_positions) const;
+    Eigen::VectorXd getDynamicalTorque(const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities,
+        const JointNameToValueMap& joint_accelerations) const;
+    double getDynamicalJointAcceleration(double joint_torque, const JointNameToValueMap& joint_positions) const;
+
     std::vector<RobotNode::WeakPtr> getChildren() const;
     std::vector<std::string> getJointNames() const;
     std::vector<std::string> getRelativeJointNames() const;

@@ -14,7 +14,7 @@ RobotZMP::RobotZMP()
     setNormOrder(2); // TODO: Make this a parameter
 }
 
-Eigen::Vector3d RobotZMP::getGlobalPosition(JointNameToValueMap joint_positions) const
+Eigen::Vector3d RobotZMP::getGlobalPosition(const JointNameToValueMap& joint_positions) const
 {
     Eigen::Vector3d global_position = Eigen::Map<Eigen::Vector3d>(
         evaluateExpression(m_global_position_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions).data());
@@ -22,7 +22,7 @@ Eigen::Vector3d RobotZMP::getGlobalPosition(JointNameToValueMap joint_positions)
     return normalizeZmp(global_position);
 }
 
-Eigen::MatrixXd RobotZMP::getGlobalPositionJacobian(JointNameToValueMap joint_positions) const
+Eigen::MatrixXd RobotZMP::getGlobalPositionJacobian(const JointNameToValueMap& joint_positions) const
 {
     Eigen::MatrixXd global_position_jacobian = evaluateExpression(
         m_global_position_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);

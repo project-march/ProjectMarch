@@ -45,7 +45,6 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
-    rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr m_filtered_imu_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
     rclcpp::SubscriptionOptions m_sensors_subscription_options;
