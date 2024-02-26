@@ -25,7 +25,7 @@ namespace march_scheduled_gains_controller
 ScheduledGainsController::ScheduledGainsController(): forward_command_controller::ForwardCommandController()
 {
   logger_name_ = "Scheduled Gains Controller";
-  interface_name_ = hardware_interface::HW_IF_SCHEDULED_GAINS;
+  interface_name_ = hardware_interface::HW_IF_PROPORTIONAL_GAIN;
 }
 
 controller_interface::return_type ScheduledGainsController::init(const std::string & controller_name)
@@ -40,7 +40,7 @@ controller_interface::return_type ScheduledGainsController::init(const std::stri
   {
     // Explicitly set the interface parameter declared by the forward_command_controller
     get_node()->set_parameter(
-      rclcpp::Parameter("interface_name", hardware_interface::HW_IF_SCHEDULED_GAINS));
+      rclcpp::Parameter("interface_name", hardware_interface::HW_IF_PROPORTIONAL_GAIN));
   }
   catch (const std::exception & e)
   {

@@ -35,5 +35,5 @@ march_scheduled_gains_controller:
     joints:
       - linear_joint
     command_interfaces:
-      - scheduled_gains
+      - proportional_gain
   

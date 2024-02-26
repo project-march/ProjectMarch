@@ -45,7 +45,7 @@ march_scheduled_gains_controller:
       - right_hip_fe
       - right_knee
     command_interfaces:
-      - scheduled_gains
+      - proportional_gain
 
 joint_trajectory_controller:
   ros__parameters:

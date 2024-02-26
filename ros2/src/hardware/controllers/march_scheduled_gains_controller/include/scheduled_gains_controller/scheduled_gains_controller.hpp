@@ -27,7 +27,7 @@
 
 namespace hardware_interface
 {
-    constexpr char HW_IF_SCHEDULED_GAINS[] = "scheduled_gains";
+    constexpr char HW_IF_PROPORTIONAL_GAIN[] = "proportional_gain";
 }
 
 namespace march_scheduled_gains_controller

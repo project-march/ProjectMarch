@@ -13,8 +13,7 @@ class GainSchedulerNode:public rclcpp::Node {
         explicit GainSchedulerNode();
 
     private: 
-        rclcpp::Publisher<march_shared_msgs::msg::PidValues>::SharedPtr m_pid_values_publisher; 
-        rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_test_hwi_publisher;
+        rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_pid_values_publisher;
         rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscriber;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_states_subscriber;
         rclcpp::TimerBase::SharedPtr m_timer; 

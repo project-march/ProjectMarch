@@ -76,7 +76,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_SCHEDULED_GAINS },
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_PROPORTIONAL_GAIN },
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
             /*logger=*/(*logger_))) {
@@ -215,7 +215,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
         
         // For scheduled gains controller.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
-            jointInfo.name, hardware_interface::HW_IF_SCHEDULED_GAINS, &jointInfo.proportional_gain));
+            jointInfo.name, hardware_interface::HW_IF_PROPORTIONAL_GAIN, &jointInfo.proportional_gain));
 }
 
     return command_interfaces;
@@ -288,9 +288,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         weight_node = std::make_shared<WeightNode>();
         weight_node->joints_info_ = getJointsInfo();
         executor_.add_node(weight_node);
-        gains_node = std::make_shared<GainsNode>();
-        gains_node->joints_info_ = getJointsInfo();
-        executor_.add_node(gains_node);
         std::thread([this]() {
             executor_.spin();
         }).detach();
@@ -510,12 +507,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
             (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
 
-        // if (jointInfo.proportional_gain != std::nan) {
-
-        RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);
-        // }
-        
-        
+        // gain scheduling
+        // RCLCPP_INFO_STREAM((*logger_), "The proportional gain for " << jointInfo.name << " is " << jointInfo.proportional_gain);       
+        // jointInfo.joint.setPositionPIDValues(jointInfo.proportional_gain, 0.0f, 0.0f);
+        // jointInfo.joint.sendPID();
     }
 
     return hardware_interface::return_type::OK;
