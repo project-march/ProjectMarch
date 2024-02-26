@@ -30,7 +30,7 @@ def generate_launch_description():
     )
 
     node_in_new_terminal = ExecuteProcess(
-        cmd=['xterm', '-e', 'ros2', 'run', 'march_input_device', 'input_device_node'],
+        cmd=['xterm', '-e', 'ros2', 'run', 'march_input_device', 'test_joints_input_device_node'],
         output='screen',
         condition=conditions.IfCondition(IPD_new_terminal)
     )

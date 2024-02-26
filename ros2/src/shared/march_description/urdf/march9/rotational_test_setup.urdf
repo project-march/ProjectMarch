@@ -2,11 +2,11 @@
 <robot name="rotational_test_setup">
 
   <!-- Define base link -->
-  <link name="world">
+  <link name="base_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.0"/>
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+      <mass value="0.3743"/>
+      <inertia ixx="0.006" ixy="0.004" ixz="0.0" iyy="0.006" iyz="0.0" izz="0.011"/>
     </inertial>
     <visual>
       <geometry>
@@ -19,11 +19,11 @@
   </link>
 
   <!-- Define endpoint link -->
-  <link name="endpoint">
+  <link name="weight">
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 1"/>
-      <mass value="10.0"/>
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="10.0" iyz="0.0" izz="0.083"/>
+      <origin rpy="0 0 0" xyz="-0.2383 0 0.2383"/>
+      <mass value="0.7073"/>
+      <inertia ixx="0.259" ixy="0.001" ixz="0.0" iyy="0.256" iyz="0.036" izz="0.023"/>
     </inertial>
     <visual>
       <geometry>
@@ -38,10 +38,10 @@
   <!-- Define rotational joint -->
   <joint name="bar" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <axis xyz="0 -1 0"/>
-    <parent link="world"/>
-    <child link="endpoint"/>
-    <limit effort="250" lower="-0.1745329252" upper="1.9634954085" velocity="3.94"/>
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="weight"/>
+    <limit effort="250" lower="-0.78539816339" upper="0.78539816339" velocity="3.94"/>
   </joint>
 
 </robot>

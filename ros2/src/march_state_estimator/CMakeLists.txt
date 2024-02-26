@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -fno-math-errno -ffast-math -O3 -fopenmp -DNDEBUG)
 endif()
 
 # Set external library directories
@@ -37,6 +37,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
+find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
 include_directories(include)
@@ -49,9 +50,11 @@ add_library(${PROJECT_NAME} STATIC
   src/robot_node.cpp
   src/robot_mass.cpp
   src/robot_joint.cpp
+  src/robot_zmp.cpp
   src/sensor_fusion_node.cpp
+  src/sensor_fusion.cpp
+  src/torque_converter.cpp
   src/state_estimator_node.cpp
-  src/transform_publisher_node.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -73,7 +76,10 @@ add_executable(state_estimator_node
   src/robot_node.cpp
   src/robot_mass.cpp
   src/robot_joint.cpp
+  src/robot_zmp.cpp
   src/sensor_fusion_node.cpp
+  src/sensor_fusion.cpp
+  src/torque_converter.cpp
   src/state_estimator_node.cpp
 )
 target_include_directories(state_estimator_node PUBLIC
@@ -96,6 +102,7 @@ target_link_libraries(state_estimator_node
   ${PROJECT_NAME}
   ${GINAC_LIB}
   ${YAMLCPP_LIBRARIES}
+  ${OpenMP_CXX_LIBRARIES}
 )
 
 # Install targets and executables
@@ -120,8 +127,14 @@ if(BUILD_TESTING)
   # file(COPY test/urdf/rotational_test_setup.urdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/urdf)
 
   ament_add_gmock(test_runner
-    # test/robot_description_test.cpp
     test/test_runner.cpp
+    test/robot_description_test.cpp
+    src/robot_description.cpp
+    test/torque_converter_test.cpp  
+    src/torque_converter.cpp
+    test/sensor_fusion_test.cpp
+    src/sensor_fusion.cpp
+    src/robot_node.cpp
   )
 
   target_include_directories(test_runner PUBLIC
@@ -145,6 +158,7 @@ if(BUILD_TESTING)
     ${PROJECT_NAME}
     ${GINAC_LIB}
     ${YAMLCPP_LIBRARIES}
+    ${OpenMP_CXX_LIBRARIES}
   )
 
   # # EXPORT

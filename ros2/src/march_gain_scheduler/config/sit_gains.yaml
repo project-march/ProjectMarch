@@ -1,0 +1,15 @@
+joints:
+  linear_joint:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 11.0
+          ki: 0.001
+          kd: 0.2
+  rotational_joint:
+    design_points:
+      - design_point: 0
+        pid_values:
+          kp: 14.0
+          ki: 0.001
+          kd: 0.3
