@@ -14,19 +14,23 @@
 #include <cmath>
 #include <functional>
 #include <librealsense2/rs.hpp>
-// #include <pcl/common/distances.h>
-// #include <pcl/common/transforms.h>
-// #include <pcl/point_cloud.h>
-// #include <pcl/point_types.h>
+#include <pcl/common/common.h>
+#include <pcl/common/distances.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
 #include <string>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 #include <thread>
 #include <vector>
+#include <librealsense2/rs.hpp>
 
 // TODO: Change this if we use some other point structure like octomap
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
+using MarkerPublisher = rclcpp::Publisher<visualization_msgs::msg::Marker>;
 
 class CamerasInterface {
 
@@ -39,10 +43,10 @@ public:
 protected:
 
     void processRealSenseDepthFrames();
-    void processSimulatedDepthFrames(const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
+    //void processSimulatedDepthFrames(const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud);
     void processPointCloud(const PointCloud::Ptr& pointcloud);
-    Point computeTemporalAveragePoint(const Point& new_point);
-    Point transformPoint(Point point, const std::string& frame_from, const std::string& frame_to);
+    //Point computeTemporalAveragePoint(const Point& new_point);
+    //Point transformPoint(Point point, const std::string& frame_from, const std::string& frame_to);
 
     rclcpp::Node* n_;
     // std::unique_ptr<Preprocessor> preprocessor_ { nullptr };
@@ -90,27 +94,31 @@ protected:
     bool locked_;
     bool realsense_simulation_;
 
-    // double foot_gap_;
-    // double step_distance_;
-    // double outlier_distance_;
-    // double height_zero_threshold_;
-    // double height_distance_coefficient_;
-    // float last_height_;
+    double foot_gap_;
+    double step_distance_;
+    double outlier_distance_;
+    double height_zero_threshold_;
+    double height_distance_coefficient_;
+    float last_height_;
     int switch_factor_;
-    // int sample_size_;
-    // int refresh_last_height_;
+    int sample_size_;
+    int refresh_last_height_;
 
-    // std::vector<Point> found_points_;
-    // std::vector<double> displacements_;
+    std::vector<Point> found_points_;
+    std::vector<double> displacements_;
 
     Point ORIGIN;
-    // Point last_chosen_point_;
-    // Point start_point_;
-    // Point desired_point_;
-    // Point previous_start_point_;
-    // Point last_displacement_;
-    // Point new_displacement_;
-    // Point found_covid_point_;
+    Point last_chosen_point_;
+    Point start_point_;
+    Point desired_point_;
+    Point previous_start_point_;
+    Point last_displacement_;
+    Point new_displacement_;
+    Point found_covid_point_;
+
+    PointCloud::Ptr points_to_pcl(const rs2::points& points);
+    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right);
+
 };
 
 #endif // MARCH_CAMERAS_INTERFACE_H

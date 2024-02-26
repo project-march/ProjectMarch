@@ -31,9 +31,16 @@ find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(realsense2 REQUIRED)
+
+find_package(pcl_conversions REQUIRED)
+find_package(PCL 1.7 REQUIRED COMPONENTS)
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 #find_package(CGAL REQUIRED)
-
 
 include_directories(include)
 
@@ -41,11 +48,11 @@ add_library(${PROJECT_NAME} STATIC
 
     src/computer_vision_node.cpp
     src/computer_vision.cpp
-    src/march_octree/march_octree_node.cpp
-    src/march_octree/march_octree.cpp 
-    src/march_octree/march_octree_utils.cpp 
-    src/plane_segmentation/march_polygon.cpp 
-    src/plane_segmentation/polygon_calculator.cpp 
+    # src/march_octree/march_octree_node.cpp
+    # src/march_octree/march_octree.cpp 
+    # src/march_octree/march_octree_utils.cpp 
+    # src/plane_segmentation/march_polygon.cpp 
+    # src/plane_segmentation/polygon_calculator.cpp 
     src/processing/cameras_interface.cpp
     src/processing/point_cloud_registration.cpp
 
@@ -60,21 +67,24 @@ ament_target_dependencies(${PROJECT_NAME}
     geometry_msgs
     march_shared_msgs
     Eigen3
+    tf2_ros
+    tf2
+    tf2_geometry_msgs
 
+    pcl_conversions
 )
 
 add_executable(computer_vision_node
 
     src/computer_vision_node.cpp
     src/computer_vision.cpp
-    src/march_octree/march_octree_node.cpp
-    src/march_octree/march_octree.cpp 
-    src/march_octree/march_octree_utils.cpp 
-    src/plane_segmentation/march_polygon.cpp 
-    src/plane_segmentation/polygon_calculator.cpp
+    # src/march_octree/march_octree_node.cpp
+    # src/march_octree/march_octree.cpp 
+    # src/march_octree/march_octree_utils.cpp 
+    # src/plane_segmentation/march_polygon.cpp 
+    # src/plane_segmentation/polygon_calculator.cpp
     src/processing/cameras_interface.cpp
     src/processing/point_cloud_registration.cpp
-
 )
 
 target_include_directories(computer_vision_node PUBLIC
@@ -89,11 +99,21 @@ ament_target_dependencies(computer_vision_node
     geometry_msgs
     march_shared_msgs
     Eigen3
+    realsense2
+    tf2
+    tf2_ros
+    tf2_geometry_msgs
+
+    pcl_conversions
+    
 )
 
 target_link_libraries(computer_vision_node
   ${PROJECT_NAME}
   ${OCTOMAP_LIBRARIES}
+  ${realsense2_LIBRARY}
+
+  ${PCL_LIBRARIES}
   #${EIGEN3_INCLUDE_DIRS}
   #${CGAL_LIBRARIES}
 )
@@ -108,7 +128,6 @@ install(TARGETS
 # Install launch files.
 install(DIRECTORY
   launch
-  config
   DESTINATION share/${PROJECT_NAME}/
 )
 

@@ -6,10 +6,10 @@
 //#include "utilities/realsense_to_pcl.hpp"
 #include <iostream>
 #include <string>
-//#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_eigen/tf2_eigen.h>
 
 // TODO: Fix this visualization msg
-//#include <visualization_msgs/msg/marker_array.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 // TODO: Don't think I need this 
 //using namespace marchPublishUtilities;
@@ -57,19 +57,19 @@ CamerasInterface::CamerasInterface(rclcpp::Node* n,
 
     // TODO: Change the topic name (+ maybe the color to just depth points)
     topic_camera_front_ = "/camera_front_" + left_or_right + "/depth/color/points";
-    topic_other_chosen_point_ = "/march/chosen_foot_position/" + other_side_; // in current_frame_id
-    topic_current_chosen_point_ = "/march/chosen_foot_position/" + left_or_right_;
+    //topic_other_chosen_point_ = "/march/chosen_foot_position/" + other_side_; // in current_frame_id
+    //topic_current_chosen_point_ = "/march/chosen_foot_position/" + left_or_right_;
 
-    point_publisher_ = n_->create_publisher<march_shared_msgs::msg::FootPosition>(
-        "/march/foot_position/" + left_or_right_, /*qos=*/1);
+    // point_publisher_ = n_->create_publisher<march_shared_msgs::msg::FootPosition>(
+    //     "/march/foot_position/" + left_or_right_, /*qos=*/1);
 
     // TODO: This is supposed to be 
 
     // preprocessed_pointcloud_publisher_
     //     = n_->create_publisher<sensor_msgs::msg::PointCloud2>("/camera_" + left_or_right_ + "/preprocessed_cloud",
     //         /*qos=*/1);
-    point_marker_publisher_ = n_->create_publisher<visualization_msgs::msg::Marker>(
-        "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
+    // point_marker_publisher_ = n_->create_publisher<visualization_msgs::msg::Marker>(
+    //     "/camera_" + left_or_right_ + "/found_points", /*qos=*/1);
 
 
     // TODO: See if we are going to use these for footstep planning
@@ -82,7 +82,7 @@ CamerasInterface::CamerasInterface(rclcpp::Node* n,
     height_distance_coefficient_ = n_->get_parameter("height_distance_coefficient").as_double();
     realsense_simulation_ = n_->get_parameter("realsense_simulation").as_bool();
     found_points_.resize(sample_size_);
-    displacements_ = point_finder_->getDisplacements();
+    //displacements_ = point_finder_->getDisplacements();
 
     // Process the actual cameras' data
     if (!realsense_simulation_) {
@@ -113,16 +113,17 @@ CamerasInterface::CamerasInterface(rclcpp::Node* n,
             break;
         }
     } else {
-        // Initialize the callback for the RealSense simulation plugin
-        std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)> callback
-            = std::bind(&FootPositionFinder::processSimulatedDepthFrames, this, std::placeholders::_1);
+        return;
+        // // Initialize the callback for the RealSense simulation plugin
+        // std::function<void(const sensor_msgs::msg::PointCloud2::SharedPtr msg)> callback
+        //     = std::bind(&CamerasInterface::processSimulatedDepthFrames, this, std::placeholders::_1);
 
-        // TODO: Change the topic here
-        pointcloud_subscriber_ = n_->create_subscription<sensor_msgs::msg::PointCloud2>(topic_camera_front_,
-            /*qos=*/1, callback, realsense_callback_options_);
+        // // TODO: Change the topic here
+        // pointcloud_subscriber_ = n_->create_subscription<sensor_msgs::msg::PointCloud2>(topic_camera_front_,
+        //     /*qos=*/1, callback, realsense_callback_options_);
 
-        RCLCPP_INFO(
-            n_->get_logger(), "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m", left_or_right_.c_str());
+        // RCLCPP_INFO(
+        //     n_->get_logger(), "\033[1;36mSimulated RealSense callback initialized (%s)\033[0m", left_or_right_.c_str());
     }
 }
 
@@ -137,31 +138,22 @@ void CamerasInterface::readParameters(const std::vector<rclcpp::Parameter>& para
     for (const auto& param : parameters) {
         const std::string& name = param.get_name();
         
-        switch(hash(name.c_str())) {
-            case hash("foot_gap"):
-                foot_gap_ = param.as_double();
-                break;
-            case hash("step_distance"):
-                step_distance_ = param.as_double();
-                break;
-            case hash("sample_size"):
-                sample_size_ = param.as_int();
-                break;
-            case hash("outlier_distance"):
-                outlier_distance_ = param.as_double();
-                break;
-            case hash("height_zero_threshold"):
-                height_zero_threshold_ = param.as_double();
-                break;
-            case hash("realsense_simulation"):
-                realsense_simulation_ = param.as_bool();
-                break;
-            case hash("height_distance_coefficient"):
-                height_distance_coefficient_ = param.as_double();
-                break;
-            default:
-                // TODO: Handle unknown parameters
-                break;
+        if (name == "foot_gap") {
+            foot_gap_ = param.as_double();
+        } else if (name == "step_distance") {
+            step_distance_ = param.as_double();
+        } else if (name == "sample_size") {
+            sample_size_ = param.as_int();
+        } else if (name == "outlier_distance") {
+            outlier_distance_ = param.as_double();
+        } else if (name == "height_zero_threshold") {
+            height_zero_threshold_ = param.as_double();
+        } else if (name == "realsense_simulation") {
+            realsense_simulation_ = param.as_bool();
+        } else if (name == "height_distance_coefficient") {
+            height_distance_coefficient_ = param.as_double();
+        } else {
+            break;
         }
 
         RCLCPP_INFO(n_->get_logger(), "\033[92mParameter %s updated in %s Foot Position Finder\033[0m",
@@ -170,7 +162,7 @@ void CamerasInterface::readParameters(const std::vector<rclcpp::Parameter>& para
 
 
     found_points_.resize(sample_size_);
-    point_finder_->readParameters(parameters);
+    //point_finder_->readParameters(parameters);
     // displacements_ = point_finder_->getDisplacements();
 }
 
@@ -212,21 +204,21 @@ void CamerasInterface::processRealSenseDepthFrames() {
 
 // TODO: Change this to MuJoCo sim
 
-/**
- * Callback function for when a simulated RealSense depth frame arrives.
- *
- * @param input_cloud PointCloud2 message from the realsense MuJoCo plugin
- * callback.
- */
-// Suppress lint error "make reference of argument" (breaks callback)
-void CamerasInterface::processSimulatedDepthFrames(
-    const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud) // NOLINT
-{
-    PointCloud converted_cloud;
-    pcl::fromROSMsg(*input_cloud, converted_cloud);
-    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
-    processPointCloud(pointcloud);
-}
+// /**
+//  * Callback function for when a simulated RealSense depth frame arrives.
+//  *
+//  * @param input_cloud PointCloud2 message from the realsense MuJoCo plugin
+//  * callback.
+//  */
+// // Suppress lint error "make reference of argument" (breaks callback)
+// void CamerasInterface::processSimulatedDepthFrames(
+//     const sensor_msgs::msg::PointCloud2::SharedPtr input_cloud) // NOLINT
+// {
+//     PointCloud converted_cloud;
+//     pcl::fromROSMsg(*input_cloud, converted_cloud);
+//     PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
+//     processPointCloud(pointcloud);
+// }
 
 
 // TODO: This might be for the registration class
@@ -244,7 +236,7 @@ void CamerasInterface::processPointCloud(const PointCloud::Ptr& pointcloud)
     // TODO: Change this to the point cloud registration step
 
     // Preprocess point cloud and place pointcloud in aligned toes frame:
-    preprocessor_->preprocess(pointcloud);
+    //preprocessor_->preprocess(pointcloud);
    
     // TODO: Add a transform method to common reference frame 
 
@@ -253,45 +245,100 @@ void CamerasInterface::processPointCloud(const PointCloud::Ptr& pointcloud)
     publishCloud(preprocessed_pointcloud_publisher_, n_, *pointcloud, left_or_right_);
 
     // Visualization
-    if (validatePoint(desired_point_) && validatePoint(start_point_)) {
+    //if (validatePoint(desired_point_) && validatePoint(start_point_)) {
         // publishSearchRectangle(point_marker_publisher_, n_, desired_point_,
         //     displacements_, left_or_right_); // Cyan
         // publishDesiredPosition(point_marker_publisher_, n_, desired_point_,
         //     left_or_right_); // Green
         // publishRelativeSearchPoint(point_marker_publisher_, n_, start_point_,
         //     left_or_right_); // Purple
-    }
+    //}
 
     locked_ = false;
 }
 
 
-/**
- * Computes a temporal average of the last X points and removes any outliers,
- * then publishes the average of the points without the outliers.
- *
- * @param new_point New point to compute the temporal average with.
- * @return Point Average point of last n number of final points.
- */
-Point CamerasInterface::computeTemporalAveragePoint(const Point& new_point) {
+// /**
+//  * Computes a temporal average of the last X points and removes any outliers,
+//  * then publishes the average of the points without the outliers.
+//  *
+//  * @param new_point New point to compute the temporal average with.
+//  * @return Point Average point of last n number of final points.
+//  */
+// Point CamerasInterface::computeTemporalAveragePoint(const Point& new_point) {
 
-    if (found_points_.size() < sample_size_) {
-        found_points_.push_back(new_point);
-    } else {
-        std::rotate(found_points_.begin(), found_points_.begin() + 1, found_points_.end());
-        found_points_[sample_size_ - 1] = new_point;
-        Point avg = computeAveragePoint(found_points_);
+//     if (found_points_.size() < sample_size_) {
+//         found_points_.push_back(new_point);
+//     } else {
+//         std::rotate(found_points_.begin(), found_points_.begin() + 1, found_points_.end());
+//         found_points_[sample_size_ - 1] = new_point;
+//         Point avg = computeAveragePoint(found_points_);
 
-        std::vector<Point> non_outliers;
-        for (Point& p : found_points_) {
-            if (pcl::squaredEuclideanDistance(p, avg) < outlier_distance_) {
-                non_outliers.push_back(p);
-            }
-        }
+//         std::vector<Point> non_outliers;
+//         // for (Point& p : found_points_) {
+//         //     if (pcl::squaredEuclideanDistance(p, avg) < outlier_distance_) {
+//         //         non_outliers.push_back(p);
+//         //     }
+//         // }
 
-        if (non_outliers.size() == sample_size_) {
-            Point final_point = computeAveragePoint(non_outliers);
-            return final_point;
-        }
+//         if (non_outliers.size() == sample_size_) {
+//             Point final_point = computeAveragePoint(non_outliers);
+//             return final_point;
+//         }
+//     }
+// }
+
+
+PointCloud::Ptr CamerasInterface::points_to_pcl(const rs2::points& points)
+{
+    PointCloud::Ptr cloud = boost::make_shared<PointCloud>();
+
+    auto sp = points.get_profile().as<rs2::video_stream_profile>();
+    cloud->width = sp.width();
+    cloud->height = sp.height();
+    cloud->is_dense = false;
+    cloud->points.resize(points.size());
+
+    auto x_min = -0.5;
+    auto x_max = 0.5;
+    auto y_min = -1;
+    auto y_max = 1;
+    auto z_min = -0.10;
+    auto z_max = 2;
+
+    int point_count = 0;
+    auto ptr = points.get_vertices();
+    for (std::size_t i = 0; i < points.size(); i++) {
+        (*cloud)[point_count].x = ptr->x;
+        (*cloud)[point_count].y = ptr->y;
+        (*cloud)[point_count].z = ptr->z;
+        point_count++;
+        ptr++;
     }
+    cloud->points.resize(point_count);
+
+    return cloud;
 }
+
+/**
+ * Transforms a pointcloud to world frame and publishes it for visualization.
+ *
+ * @param publisher publisher to use
+ * @param cloud cloud to publish
+ */
+void CamerasInterface::publishCloud(
+    const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
+{
+    cloud.width = 1;
+    cloud.height = cloud.points.size();
+    sensor_msgs::msg::PointCloud2 msg;
+    pcl::toROSMsg(cloud, msg);
+    if (left_or_right == "right") {
+        msg.header.frame_id = "toes_right_aligned";
+    } else {
+        msg.header.frame_id = "toes_left_aligned";
+    }
+    msg.header.stamp = n->now();
+    publisher->publish(msg);
+}
+
