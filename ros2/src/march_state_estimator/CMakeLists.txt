@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -fno-math-errno -ffast-math -O3 -fopenmp -DNDEBUG)
 endif()
 
 # Set external library directories
@@ -37,6 +37,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
+find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
 include_directories(include)
@@ -101,6 +102,7 @@ target_link_libraries(state_estimator_node
   ${PROJECT_NAME}
   ${GINAC_LIB}
   ${YAMLCPP_LIBRARIES}
+  ${OpenMP_CXX_LIBRARIES}
 )
 
 # Install targets and executables
@@ -156,6 +158,7 @@ if(BUILD_TESTING)
     ${PROJECT_NAME}
     ${GINAC_LIB}
     ${YAMLCPP_LIBRARIES}
+    ${OpenMP_CXX_LIBRARIES}
   )
 
   # # EXPORT
