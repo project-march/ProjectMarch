@@ -9,6 +9,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(xacro REQUIRED)
+find_package(urdf REQUIRED)
 
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME})
@@ -16,8 +17,10 @@ install(DIRECTORY launch
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
 install(DIRECTORY urdf
-        DESTINATION share/${PROJECT_NAME}
-        )
+  DESTINATION share/${PROJECT_NAME})
+
+install(DIRECTORY meshes
+  DESTINATION share/${PROJECT_NAME})
 
 set(XACRO_FILES
         urdf/test_xacros/test_joint_linear.xacro
