@@ -9,6 +9,7 @@
 
     <depend>xacro</depend>
     <depend>march_control</depend>
+    <depend>urdf</depend>
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 

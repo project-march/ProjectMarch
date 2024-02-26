@@ -13,15 +13,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/Backpack.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/Backpack.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/Backpack.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/Backpack.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -33,15 +33,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/HipLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/HipLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -53,15 +53,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/UpperLegLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/UpperLegLeft.obj"  scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl"  scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -73,15 +73,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/LowerLegLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/LowerLegLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -93,15 +93,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/FootLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/FootLeft.obj" scale="1 1 1"/>
+				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -113,15 +113,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/HipLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/HipLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -133,15 +133,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/UpperLegLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/UpperLegLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -153,15 +153,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/LowerLegLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/LowerLegLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -173,15 +173,15 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/FootLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="1.0 0.45 0.15 1"/>
+				<color rgba="0.8 0.8 0.8 1"/>
 			</material>
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_gym/march_gym/envs/assets/meshes/FootLeft.obj" scale="1 -1 1"/>
+				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
