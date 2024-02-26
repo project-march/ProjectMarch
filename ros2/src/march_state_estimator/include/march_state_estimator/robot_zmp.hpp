@@ -15,8 +15,8 @@ public:
     RobotZMP();
     ~RobotZMP() = default;
 
-    Eigen::Vector3d getGlobalPosition(JointNameToValueMap joint_positions) const override;
-    Eigen::MatrixXd getGlobalPositionJacobian(JointNameToValueMap joint_positions) const override;
+    Eigen::Vector3d getGlobalPosition(const JointNameToValueMap& joint_positions) const override;
+    Eigen::MatrixXd getGlobalPositionJacobian(const JointNameToValueMap& joint_positions) const override;
     Eigen::MatrixXd getFootBoundingPolygonUnionCoefficients() const;
 
     void setNormOrder(const unsigned int& norm_order);

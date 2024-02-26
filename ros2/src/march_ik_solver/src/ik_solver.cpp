@@ -43,6 +43,7 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
         m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
             + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
+    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
     return m_desired_joint_velocities;
 }
 
@@ -57,11 +58,25 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
 Eigen::VectorXd IKSolver::clampJointLimits(Eigen::VectorXd desired_joint_positions)
 {
     Eigen::VectorXd limited_joint_positions = Eigen::VectorXd::Zero(m_joint_names.size());
-    for (long unsigned int i = 0; i < m_joint_limits.size(); i++) {
+    for (long unsigned int i = 0; i < m_joint_position_limits.size(); i++) {
         limited_joint_positions(i) = boost::algorithm::clamp(
-            desired_joint_positions(i), m_joint_limits[i][LOWER_JOINT_LIMIT], m_joint_limits[i][UPPER_JOINT_LIMIT]);
+            desired_joint_positions(i), 
+            m_joint_position_limits[i][LOWER_JOINT_LIMIT], 
+            m_joint_position_limits[i][UPPER_JOINT_LIMIT]);
     }
     return limited_joint_positions;
+}
+
+Eigen::VectorXd IKSolver::clampJointVelocities(Eigen::VectorXd desired_joint_velocities)
+{
+    Eigen::VectorXd limited_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    for (long unsigned int i = 0; i < m_joint_position_limits.size(); i++) {
+        limited_joint_velocities(i) = boost::algorithm::clamp(
+            desired_joint_velocities(i), 
+            m_joint_velocity_limits[i][LOWER_JOINT_LIMIT], 
+            m_joint_velocity_limits[i][UPPER_JOINT_LIMIT]);
+    }
+    return limited_joint_velocities;
 }
 
 std::vector<double> IKSolver::getCurrentJointPositions() const
@@ -99,20 +114,22 @@ void IKSolver::setDt(const double& dt)
 }
 
 void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_names,
-    const std::vector<double>& joint_lower_limits, const std::vector<double>& joint_upper_limits)
+    const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
+    const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits)
 {
     m_joint_names = joint_names;
 
-    if (joint_lower_limits.size() != joint_upper_limits.size()) {
+    if (joint_position_lower_limits.size() != joint_position_upper_limits.size()) {
         RCLCPP_ERROR(rclcpp::get_logger("ik_solver"),
             "IKSolver::setJointLimits(): lower_joint_limits.size() != upper_joint_limits.size()");
         return;
     }
 
     for (long unsigned int i = 0; i < joint_names.size(); i++) {
-        double joint_lower_limit_rad = joint_lower_limits[i] * M_PI / 180.0;
-        double joint_upper_limit_rad = joint_upper_limits[i] * M_PI / 180.0;
-        m_joint_limits.push_back({ joint_lower_limit_rad, joint_upper_limit_rad });
+        double joint_lower_limit_rad = joint_position_lower_limits[i] * M_PI / 180.0;
+        double joint_upper_limit_rad = joint_position_upper_limits[i] * M_PI / 180.0;
+        m_joint_position_limits.push_back({ joint_lower_limit_rad, joint_upper_limit_rad });
+        m_joint_velocity_limits.push_back({ joint_velocity_lower_limits[i], joint_velocity_upper_limits[i] });
     }
 }
 
