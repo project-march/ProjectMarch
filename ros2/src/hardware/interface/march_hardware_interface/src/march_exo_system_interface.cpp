@@ -270,9 +270,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
         }
-        fuzzy_weights_node = std::make_shared<FuzzyWeightsNode>();
-        fuzzy_weights_node->joints_info_ = getJointsInfo();
-        executor_.add_node(fuzzy_weights_node);
+        
         gains_node = std::make_shared<GainsNode>();
         gains_node->joints_info_ = getJointsInfo();
         executor_.add_node(gains_node);
@@ -454,9 +452,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
         return hardware_interface::return_type::OK;
     }
 
-    // publish the measured torque each iteration
-    fuzzy_weights_node->publish_measured_torque();
-
+    
     for (JointInfo& jointInfo : joints_info_) {
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
