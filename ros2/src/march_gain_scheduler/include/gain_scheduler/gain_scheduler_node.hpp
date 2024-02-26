@@ -2,7 +2,6 @@
 #include "march_shared_msgs/msg/pid_values.hpp"     
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "march_shared_msgs/msg/pid_values_hwi.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 #include "rclcpp/rclcpp.hpp"
 
