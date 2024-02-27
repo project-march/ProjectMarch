@@ -60,6 +60,16 @@ void RobotNode::setExpressionGlobalPosition(const std::vector<std::string>& expr
     setExpression(expressions, m_global_position_expressions);
 }
 
+void RobotNode::setExpressionGlobalVelocity(const std::vector<std::string>& expressions)
+{
+    setExpression(expressions, m_global_velocity_expressions);
+}
+
+void RobotNode::setExpressionGlobalAcceleration(const std::vector<std::string>& expressions)
+{
+    setExpression(expressions, m_global_acceleration_expressions);
+}
+
 void RobotNode::setExpressionGlobalRotation(const std::vector<std::string>& expressions)
 {
     setExpression(expressions, m_global_rotation_expressions);
@@ -142,33 +152,65 @@ std::vector<std::string> RobotNode::getRelativeJointNames() const
     return joint_names;
 }
 
-Eigen::Vector3d RobotNode::getGlobalPosition(JointNameToValueMap joint_positions) const
+RobotNode::JointNameToValueMap RobotNode::getAbsoluteJointValues(const JointNameToValueMap& joint_values) const
+{
+    JointNameToValueMap absolute_joint_values;
+    for (const auto& joint_node : m_joint_nodes) {
+        absolute_joint_values[joint_node->getName()] = joint_values.at(joint_node->getName());
+    }
+    return absolute_joint_values;
+}
+
+Eigen::VectorXd RobotNode::convertAbsoluteJointValuesToVectorXd(const JointNameToValueMap& joint_values) const
+{
+    Eigen::VectorXd joint_values_vector = Eigen::VectorXd::Zero(m_joint_nodes.size());
+    for (unsigned long int i = 0; i < m_joint_nodes.size(); i++) {
+        joint_values_vector(i) = joint_values.at(m_joint_nodes[i]->getName());
+    }
+    return joint_values_vector;
+}
+
+Eigen::Vector3d RobotNode::getGlobalPosition(const JointNameToValueMap& joint_positions) const
 {
     return Eigen::Map<Eigen::Vector3d>(
         evaluateExpression(m_global_position_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions).data());
 }
 
-Eigen::Matrix3d RobotNode::getGlobalRotation(JointNameToValueMap joint_positions) const
+Eigen::Vector3d RobotNode::getGlobalVelocity(const JointNameToValueMap& joint_positions, 
+    const JointNameToValueMap& joint_velocities) const
+{
+    return Eigen::Map<Eigen::Vector3d>(
+        evaluateExpression(m_global_velocity_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions, joint_velocities).data());
+}
+
+Eigen::Vector3d RobotNode::getGlobalAcceleration(const JointNameToValueMap& joint_positions, 
+    const JointNameToValueMap& joint_velocities, const JointNameToValueMap& joint_accelerations) const
+{
+    return Eigen::Map<Eigen::Vector3d>(
+        evaluateExpression(m_global_acceleration_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions, joint_velocities, joint_accelerations).data());
+}
+
+Eigen::Matrix3d RobotNode::getGlobalRotation(const JointNameToValueMap& joint_positions) const
 {
     return Eigen::Map<Eigen::Matrix3d>(
         evaluateExpression(m_global_rotation_expressions, m_joint_nodes, WORKSPACE_DIM, WORKSPACE_DIM, joint_positions)
             .data());
 }
 
-Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(JointNameToValueMap joint_positions) const
+Eigen::MatrixXd RobotNode::getGlobalPositionJacobian(const JointNameToValueMap& joint_positions) const
 {
     return evaluateExpression(
         m_global_position_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);
 }
 
-Eigen::MatrixXd RobotNode::getGlobalRotationJacobian(JointNameToValueMap joint_positions) const
+Eigen::MatrixXd RobotNode::getGlobalRotationJacobian(const JointNameToValueMap& joint_positions) const
 {
     return evaluateExpression(
         m_global_rotation_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);
 }
 
-Eigen::VectorXd RobotNode::getDynamicalTorque(JointNameToValueMap joint_positions, JointNameToValueMap joint_velocities,
-    JointNameToValueMap joint_accelerations) const
+Eigen::VectorXd RobotNode::getDynamicalTorque(const JointNameToValueMap& joint_positions, const JointNameToValueMap& joint_velocities,
+    const JointNameToValueMap& joint_accelerations) const
 {
     std::vector<RobotNode::SharedPtr> joint_nodes;
     for (const auto& relative_joint_node : m_relative_joint_nodes) {
@@ -179,7 +221,7 @@ Eigen::VectorXd RobotNode::getDynamicalTorque(JointNameToValueMap joint_position
     return Eigen::Map<Eigen::VectorXd>(dynamical_torque_matrix.data(), dynamical_torque_matrix.size());
 }
 
-double RobotNode::getDynamicalJointAcceleration(double joint_torque, JointNameToValueMap joint_positions) const
+double RobotNode::getDynamicalJointAcceleration(double joint_torque, const JointNameToValueMap& joint_positions) const
 {
     std::vector<RobotNode::SharedPtr> joint_nodes;
     for (const auto& relative_joint_node : m_relative_joint_nodes) {
