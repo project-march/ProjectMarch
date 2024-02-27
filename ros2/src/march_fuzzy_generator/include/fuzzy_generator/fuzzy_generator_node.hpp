@@ -8,6 +8,7 @@
 #include "march_shared_msgs/msg/fuzzy_weights.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include <control_msgs/msg/joint_trajectory_controller_state.hpp>
+#include "std_msgs/msg/float64_multi_array.hpp"
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
 
@@ -20,7 +21,7 @@ class FuzzyGeneratorNode : public rclcpp::Node {
         rclcpp::Subscription<march_shared_msgs::msg::FootHeights>::SharedPtr m_foot_height_subscription;
         rclcpp::Subscription<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_torque_subscription;        
         rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscription;
-        rclcpp::Publisher<march_shared_msgs::msg::FuzzyWeights>::SharedPtr m_weight_publisher;
+        rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_weight_publisher;
         rclcpp::TimerBase::SharedPtr m_timer; 
 
         march_shared_msgs::msg::FootHeights::SharedPtr m_latest_foot_heights;

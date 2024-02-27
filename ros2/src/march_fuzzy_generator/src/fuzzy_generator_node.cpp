@@ -23,7 +23,7 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     m_mode_subscription = this->create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&FuzzyGeneratorNode::currentModeCallback, this, _1));
 
-    m_weight_publisher = this->create_publisher<march_shared_msgs::msg::FuzzyWeights>("fuzzy_weights", 10);
+    m_weight_publisher = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_fuzzy_weights_controller/commands", rclcpp::SystemDefaultsQoS());
 
     m_timer = create_wall_timer(std::chrono::milliseconds(2000), std::bind(&FuzzyGeneratorNode::publishFuzzyWeights, this));
 }
@@ -70,18 +70,13 @@ double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTr
 // Method to publish the fuzzy weights
 void FuzzyGeneratorNode::publishFuzzyWeights(){
 
-    march_shared_msgs::msg::FuzzyWeights fuzzy_weights_msg;
+    std_msgs::msg::Float64MultiArray fuzzy_weights_msg;
     std::vector<std::tuple<std::string, float, float>> fuzzy_weights;
 
     if (m_fuzzy_generator.m_control_type == "position") {
-        for (const auto& joint_names : m_fuzzy_generator.m_joint_names){
-            fuzzy_weights_msg.joint_name = joint_names; 
-            fuzzy_weights_msg.position_weight = 1.0f;
-            fuzzy_weights_msg.torque_weight = 0.0f;
-            m_weight_publisher->publish(fuzzy_weights_msg);
-
-            // RCLCPP_INFO(get_logger(), "Publishing fuzzy weights for joint %s: position weight %f, torque weight %f", 
-            // fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
+        size_t num_joints = m_fuzzy_generator.m_joint_names.size();
+        for (size_t i = 0; i < num_joints; ++i) {
+            fuzzy_weights_msg.data.push_back(0.0);
         }
 
     } else if (m_fuzzy_generator.m_control_type == "constant"){
@@ -93,14 +88,10 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
     }
     
     for (const auto& weight : fuzzy_weights) {
-        fuzzy_weights_msg.joint_name = std::get<m_joint_name_index>(weight);
-        fuzzy_weights_msg.position_weight = std::get<m_position_weight_index>(weight);
-        fuzzy_weights_msg.torque_weight = std::get<m_torque_weight_index>(weight);
-        m_weight_publisher->publish(fuzzy_weights_msg);
-
-        // RCLCPP_INFO(get_logger(), "Publishing fuzzy weights for joint %s: position weight %f, torque weight %f", 
-        //     fuzzy_weights_msg.joint_name.c_str(), fuzzy_weights_msg.position_weight, fuzzy_weights_msg.torque_weight);
+        double torque_weight = std::get<m_torque_weight_index>(weight);
+        fuzzy_weights_msg.data.push_back(torque_weight);
     }
+    m_weight_publisher->publish(fuzzy_weights_msg);
 }
 
 
