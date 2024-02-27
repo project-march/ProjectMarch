@@ -21,7 +21,7 @@ def generate_launch_description():
     config_path = LaunchConfiguration("config_path", default=default_config)
 
     fuzzy_generator_node = Node(
-        package="march_fuzzy_generator", executable="march_fuzzy_node", name="fuzzy_generator", parameters=[{"config_path": config_path}]
+        package="march_fuzzy_generator", executable="fuzzy_generator_node", name="fuzzy_generator", parameters=[{"config_path": config_path}]
     )
     ld.add_action(fuzzy_generator_node)
 
