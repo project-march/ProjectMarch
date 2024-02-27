@@ -44,6 +44,12 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
 
+    // M8's MPC
+    m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
+    m_mpc_com_pub = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 10);
+    m_mpc_zmp_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 10);
+    m_mpc_stance_foot_pub = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 10);
+
     std::vector<std::string> joint_names = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa",
         "right_hip_fe", "right_knee", "right_ankle" };
     m_sensor_fusion = std::make_unique<SensorFusion>(robot_description);
@@ -69,6 +75,7 @@ void SensorFusionNode::timerCallback()
         return;
     }
     publishStateEstimation();
+    publishMPCEstimation();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
@@ -103,4 +110,52 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);
+}
+
+void SensorFusionNode::publishMPCEstimation()
+{
+    std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
+    std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
+    uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
+
+    Eigen::Vector3d com_position = m_sensor_fusion->getCOM();
+    Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity();
+
+    const double gravity = 9.81;
+    double zmp_x = com_position.x() + (com_velocity.x() / sqrt(gravity / com_position.z())) * com_position.y();
+    double zmp_y = com_position.y() + (com_velocity.y() / sqrt(gravity / com_position.z())) * com_position.z();
+
+    geometry_msgs::msg::PoseArray foot_positions_msg;
+    foot_positions_msg.header.stamp = this->now();
+    foot_positions_msg.header.frame_id = "world";
+    foot_positions_msg.poses = foot_poses;
+    m_mpc_foot_positions_pub->publish(foot_positions_msg);
+
+    march_shared_msgs::msg::CenterOfMass com_msg;
+    com_msg.header.stamp = this->now();
+    com_msg.header.frame_id = "world";
+    com_msg.position.x = com_position.x();
+    com_msg.position.y = com_position.y();
+    com_msg.position.z = com_position.z();
+    com_msg.velocity.x = com_velocity.x();
+    com_msg.velocity.y = com_velocity.y();
+    com_msg.velocity.z = com_velocity.z();
+    m_mpc_com_pub->publish(com_msg);
+
+    geometry_msgs::msg::PointStamped zmp_msg;
+    zmp_msg.header.stamp = this->now();
+    zmp_msg.header.frame_id = "world";
+    zmp_msg.point.x = zmp_x;
+    zmp_msg.point.y = zmp_y;
+    zmp_msg.point.z = 0.0;
+    m_mpc_zmp_pub->publish(zmp_msg);
+
+    std_msgs::msg::Int32 stance_foot_msg;
+    if (stance_leg == 0b11)
+        stance_foot_msg.data = 0;
+    else if (stance_leg == 0b10)
+        stance_foot_msg.data = -1;
+    else if (stance_leg == 0b01)
+        stance_foot_msg.data = 1;
+    m_mpc_stance_foot_pub->publish(stance_foot_msg);
 }

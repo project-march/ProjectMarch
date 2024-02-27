@@ -64,6 +64,7 @@ public:
 
     // TODO: Move these to RobotDescription
     Eigen::Vector3d getCOM() const;
+    Eigen::Vector3d getCOMVelocity() const;
     geometry_msgs::msg::Point getZMP() const;
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
 
