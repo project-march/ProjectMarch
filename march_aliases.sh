@@ -48,6 +48,10 @@ alias gits='git status'
 alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
 alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py'
 
+alias angles_air='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="false"'
+alias angles_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+alias cartesian_air='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="true"'
+alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
 # Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
 
