@@ -19,9 +19,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 
 add_executable(hardware_interface_logger_node src/hardware_interface_logger_node.cpp)
-ament_target_dependencies(hardware_interface_logger_node rclcpp std_msgs)
+ament_target_dependencies(hardware_interface_logger_node rclcpp std_msgs rcl_interfaces)
 
 install(TARGETS
   hardware_interface_logger_node
