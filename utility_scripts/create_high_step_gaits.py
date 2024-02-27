@@ -29,9 +29,12 @@ def interpolate_linear(dataset):
     end_coordinate = [begin_coordinate[0], 0.0]
     x_vals = [begin_coordinate[0], end_coordinate[0]]
     z_vals = [begin_coordinate[1], end_coordinate[1]]
-    time_steps = np.arange(0, 100, 1)
-    interpolated_vals = interp1d(time_steps, x_vals, z_vals)
-    plt.plot(time_steps, interpolated_vals)
+    time_steps = np.linspace(begin_coordinate[0], end_coordinate[0], 100)
+    interpolated_vals = interp1d(x_vals, z_vals)
+    print(begin_coordinate, end_coordinate)
+    print(interpolated_vals(time_steps))
+    # plt.plot(time_steps, interpolated_vals(time_steps))
+    # plt.show()
 
 high_step1 = high_step(0.26, 200)
 interpolate_linear(high_step1)
