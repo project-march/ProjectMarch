@@ -6,6 +6,7 @@
              params="name stop_when_outside_hard_limits:=^ msec_until_error_when_in_error_soft_limits:=^">
   <joint name="${name}">
     <command_interface name="position"/>
+    <command_interface name="torque_weight"/>
     <state_interface name="position"/>
     <state_interface name="velocity"/>
     <param name="stop_when_outside_hard_limits">${stop_when_outside_hard_limits}</param>
