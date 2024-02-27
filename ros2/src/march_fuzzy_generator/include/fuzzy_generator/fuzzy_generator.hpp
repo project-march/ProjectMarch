@@ -43,8 +43,6 @@ class FuzzyGenerator {
         static constexpr std::size_t m_walk_index = 2;
         static constexpr std::size_t m_sideways_walk_index = 5; 
 
-        
-   
 };
 
 #endif // MARCH_FUZZY_GENERATOR_HPP

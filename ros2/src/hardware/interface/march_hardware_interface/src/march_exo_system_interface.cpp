@@ -73,7 +73,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
+            /*required_command_interfaces=*/ {hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_TORQUE_WEIGHT},
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
             /*logger=*/(*logger_))) {
@@ -201,13 +201,17 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
+        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         // command_interfaces.emplace_back(hardware_interface::CommandInterface(
         //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
+
+        // Torque Weight: Couples the command controller to the value jointInfo.torque_weight through a pointer.
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(
+            jointInfo.name, hardware_interface::HW_IF_TORQUE_WEIGHT, &jointInfo.torque_weight));
     }
 
     return command_interfaces;
@@ -467,8 +471,17 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             jointInfo.torque, jointInfo.torque_weight);
 #endif
 
-        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
-            (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+        // Update position weight using the torque weight obtained through the command interface.
+        jointInfo.position_weight = 1 - jointInfo.torque_weight;
+
+        // for testing purposes
+        RCLCPP_INFO((*logger_), "The fuzzy target values are as follows: \n torque weight: %f \n position weight: %f",
+            jointInfo.torque_weight, jointInfo.position_weight);
+
+        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque, 1.0, 0.0); 
+
+        // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
+        //     (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
 
     return hardware_interface::return_type::OK;

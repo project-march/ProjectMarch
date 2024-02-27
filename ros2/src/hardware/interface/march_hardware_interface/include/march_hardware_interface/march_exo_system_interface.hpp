@@ -34,6 +34,7 @@
 #include <rclcpp/clock.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/int32.hpp>
+#include "fuzzy_weights_controller/fuzzy_weights_controller.hpp"
 
 #define TORQUEDEBUG
 
