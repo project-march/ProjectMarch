@@ -12,6 +12,8 @@
     <buildtool_depend>ament_cmake</buildtool_depend>
 
     <depend>robot_state_publisher</depend>
+    <depend>tf2_ros</depend>
+    <depend>urdf</depend>
 
     <!-- <exec_depend>march_gait_selection</exec_depend> -->
     <!-- <exec_depend>march_gait_preprocessor</exec_depend> -->
