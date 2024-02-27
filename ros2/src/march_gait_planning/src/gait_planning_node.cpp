@@ -21,7 +21,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.3, 0.12, -0.65, 0.3, -0.12, -0.65}; 
+    m_home_stand = {0.3, 0.12, -0.70, 0.3, -0.12, -0.70}; 
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -39,7 +39,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     m_desired_footpositions_msg->header = msg->header;
     if (m_current_trajectory.empty()){
         m_gait_planning.setStanceFoot(msg->stance_leg); 
-        // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
+        // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
     }
     footPositionsPublish(); 
 }
@@ -69,7 +69,7 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::Stand :
             // If the current trajectory is not empty, finish it before going to step close or stand.
             if (!m_current_trajectory.empty()){
-                RCLCPP_DEBUG_THROTTLE(rclcpp::get_logger("march_gait_planning"), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
+                RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
                 GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1){
@@ -86,29 +86,37 @@ void GaitPlanningNode::footPositionsPublish(){
 
             // Step close if previous gait was walk. Note how variable walk already has a step close implemented by default.
             else if (m_gait_planning.getPreviousGaitType() == exoMode::LargeWalk || m_gait_planning.getPreviousGaitType() == exoMode::SmallWalk){
-                RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Calling step close trajectory with mode: %d", m_gait_planning.getPreviousGaitType());
+                RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %d", m_gait_planning.getPreviousGaitType());
                 m_current_trajectory = m_gait_planning.getTrajectory();
-                RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Size of step close trajectory: %d", m_current_trajectory.size());
+                RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
                 m_gait_planning.setPreviousGaitType(exoMode::Stand);
+            }
+
+            else if (m_gait_planning.getPreviousGaitType() == exoMode::HighStep1){
+                RCLCPP_INFO(this->get_logger(), "Stepping down from box"); 
+                m_current_trajectory = m_gait_planning.getTrajectory(); 
+                RCLCPP_INFO(this->get_logger(), "Size of step down trajectory: %d", m_current_trajectory.size()); 
+                m_gait_planning.setPreviousGaitType(exoMode::Stand); 
+                RCLCPP_INFO(this->get_logger(), "set previous gait type to stand"); 
             }
 
             else {
                 m_current_trajectory.clear();
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                RCLCPP_INFO_THROTTLE(rclcpp::get_logger("march_gait_planning"), *this->get_clock(), 2000, "Publishing homestand position.");
+                RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
             }
             break;
 
         case exoMode::BootUp :
-            RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "BootUp mode entered, waiting for new mode."); 
+            RCLCPP_DEBUG(this->get_logger(), "BootUp mode entered, waiting for new mode."); 
             break;
         
         case exoMode::LargeWalk :
         case exoMode::SmallWalk :
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
-                RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Trajectory refilled!");
+                RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
             }
             else {
                 GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -146,7 +154,7 @@ void GaitPlanningNode::footPositionsPublish(){
             if (m_current_trajectory.empty() && !is_trajectory_filled){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 is_trajectory_filled = true;
-                RCLCPP_INFO(this->get_logger(), "Trajectory refilled, size of current trajectory: %d", m_current_trajectory.size());
+                RCLCPP_INFO(this->get_logger(), "High step trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
             }
             else if (m_current_trajectory.empty() && is_trajectory_filled){
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
