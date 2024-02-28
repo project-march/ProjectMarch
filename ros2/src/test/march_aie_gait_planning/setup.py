@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'march_aie_gait_planning_node = march_aie_gait_planning.march_aie_gait_planning_node:main'
+            'march_aie_gait_planning_node = march_aie_gait_planning.march_aie_gait_planning_node:main',
+            'one_leg_balance_node = march_aie_gait_planning.one_leg_balance_node:main',
         ],
     },
 )
