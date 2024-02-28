@@ -13,6 +13,10 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
     m_state_posterior = EKFState();
 
     // TODO: get from parameter server
+    m_state_posterior.imu_position = Eigen::Vector3d(0.0, 0.0, 0.77);
+    m_state_posterior.left_foot_position = Eigen::Vector3d(0.38, 0.037, 0.0);
+    m_state_posterior.right_foot_position = Eigen::Vector3d(0.38, -0.049, 0.0);
+
     m_timestep = 1e-3;
     m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 1.94e-5);
     m_process_noise_angular_velocity = Eigen::Vector3d(0.118174, 0.118174, 0.118174);
@@ -116,6 +120,19 @@ geometry_msgs::msg::Point SensorFusion::getZMP() const
     return zmp;
 }
 
+geometry_msgs::msg::Pose SensorFusion::getImuPose() const
+{
+    geometry_msgs::msg::Pose imu_pose;
+    imu_pose.position.x = m_state_posterior.imu_position.x();
+    imu_pose.position.y = m_state_posterior.imu_position.y();
+    imu_pose.position.z = m_state_posterior.imu_position.z();
+    imu_pose.orientation.x = m_state_posterior.imu_orientation.x();
+    imu_pose.orientation.y = m_state_posterior.imu_orientation.y();
+    imu_pose.orientation.z = m_state_posterior.imu_orientation.z();
+    imu_pose.orientation.w = m_state_posterior.imu_orientation.w();
+    return imu_pose;
+}
+
 std::vector<geometry_msgs::msg::Pose> SensorFusion::getFootPoses() const
 {
     std::vector<geometry_msgs::msg::Pose> foot_poses;
@@ -136,6 +153,21 @@ std::vector<geometry_msgs::msg::Pose> SensorFusion::getFootPoses() const
     }
 
     return foot_poses;
+}
+
+std::vector<double> SensorFusion::getFootContactHeight() const
+{
+    std::vector<double> foot_contact_height;
+    std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes({ "L_foot", "R_foot" });
+
+    for (const auto& foot_node : feet_nodes) {
+        Eigen::Vector3d foot_position = foot_node->getGlobalPosition(m_joint_positions);
+        foot_position.noalias() 
+            = m_state_posterior.imu_orientation * foot_position + m_state_posterior.imu_position;
+        foot_contact_height.push_back(foot_position.z());
+    }
+
+    return foot_contact_height;
 }
 
 Eigen::Quaterniond SensorFusion::getFilteredOrientation() const
@@ -364,6 +396,8 @@ EKFState SensorFusion::calculatePosteriorState(const EKFState& state_priori) con
     Eigen::VectorXd state_correction_vector = calculateStateCorrectionVector(kalman_gain, innovation);
     Eigen::MatrixXd estimated_covariance_matrix = calculateEstimatedCovarianceMatrix(state_priori, kalman_gain, observation_model_matrix);
 
+    state_posterior.imu_position.noalias() = state_priori.imu_position + state_correction_vector.block<3, 1>(0, 0);
+    state_posterior.imu_velocity.noalias() = state_priori.imu_velocity + state_correction_vector.block<3, 1>(3, 0);
     state_posterior.imu_orientation = getExponentialMap(state_correction_vector.block<3, 1>(6, 0)) * state_priori.imu_orientation;
     state_posterior.left_foot_position.noalias() = state_priori.left_foot_position + state_correction_vector.block<3, 1>(9, 0);
     state_posterior.right_foot_position.noalias() = state_priori.right_foot_position + state_correction_vector.block<3, 1>(12, 0);

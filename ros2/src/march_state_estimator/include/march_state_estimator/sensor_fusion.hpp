@@ -66,7 +66,9 @@ public:
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;
     geometry_msgs::msg::Point getZMP() const;
+    geometry_msgs::msg::Pose getImuPose() const;
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
+    std::vector<double> getFootContactHeight() const;
 
     Eigen::Quaterniond getFilteredOrientation() const;
     Eigen::Quaterniond getExponentialMap(const Eigen::Vector3d& vector) const;

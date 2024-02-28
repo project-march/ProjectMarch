@@ -43,6 +43,9 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+    m_feet_height_pub 
+        = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
+    m_imu_pose_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("state_estimation/imu_pose", 10);
 
     // M8's MPC
     m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
@@ -75,6 +78,7 @@ void SensorFusionNode::timerCallback()
         return;
     }
     publishStateEstimation();
+    publishFeetHeight();
     publishMPCEstimation();
 }
 
@@ -101,6 +105,12 @@ void SensorFusionNode::publishStateEstimation()
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
+    geometry_msgs::msg::PoseStamped imu_pose_msg;
+    imu_pose_msg.header.stamp = this->now();
+    imu_pose_msg.header.frame_id = "world";
+    imu_pose_msg.pose = m_sensor_fusion->getImuPose();
+    m_imu_pose_pub->publish(imu_pose_msg);
+
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
@@ -110,6 +120,15 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);
+}
+
+void SensorFusionNode::publishFeetHeight()
+{
+    march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
+    feet_height_msg.header.stamp = this->now();
+    feet_height_msg.header.frame_id = "world";
+    feet_height_msg.heights = m_sensor_fusion->getFootContactHeight();
+    m_feet_height_pub->publish(feet_height_msg);
 }
 
 void SensorFusionNode::publishMPCEstimation()

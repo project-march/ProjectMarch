@@ -16,7 +16,7 @@
 				<mesh filename="package://march_description/meshes/march8/Backpack.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -36,7 +36,7 @@
 				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -56,7 +56,7 @@
 				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -76,7 +76,7 @@
 				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -96,7 +96,7 @@
 				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -116,7 +116,7 @@
 				<mesh filename="package://march_description/meshes/march8/HipLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -136,7 +136,7 @@
 				<mesh filename="package://march_description/meshes/march8/UpperLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -156,7 +156,7 @@
 				<mesh filename="package://march_description/meshes/march8/LowerLegLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>
@@ -176,7 +176,7 @@
 				<mesh filename="package://march_description/meshes/march8/FootLeft.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
-				<color rgba="0.8 0.8 0.8 1"/>
+				<color rgba="0.8 0.8 0.8 0.5"/>
 			</material>
 		</visual>
 		<collision>

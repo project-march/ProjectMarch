@@ -12,10 +12,14 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include "march_shared_msgs/msg/state_estimation.hpp"
+#include "march_shared_msgs/msg/feet_height_stamped.hpp"
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include "march_shared_msgs/srv/get_node_position.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "std_msgs/msg/int32.hpp"
@@ -34,6 +38,7 @@ private:
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
     void publishStateEstimation();
+    void publishFeetHeight();
     void publishMPCEstimation();
 
     double m_dt;
@@ -48,6 +53,8 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr m_imu_pose_pub;
 
     // M8's MPC
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_pub;
