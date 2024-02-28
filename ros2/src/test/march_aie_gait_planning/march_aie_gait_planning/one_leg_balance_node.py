@@ -25,18 +25,27 @@ class OneLegBalanceNode(Node):
 
         self.current_stance_leg = 0b11
         self.desired_stance_leg = 0b11
-        self.step_height = 0.25
-        self.step_width = 0.06
-        self.no_of_points = 200
+        self.step_height = 0.35
+        self.step_width = 0.08
+        self.no_of_points = 400
         self.counter = 0
         self.state = 'standing'
         
         self.home_stance = self.generate_home_stance()
         self.raising_trajectory, self.raise_stance = self.generate_raising_trajectory()
-        self.state_transitions = {
-            'standing': 'raising',
-            'raising': 'balancing',
-            'balancing': 'balancing',
+        self.states = {
+            'standing': {
+                'counter': 50,
+                'transition': 'raising',
+            },
+            'raising': {
+                'counter': self.no_of_points,
+                'transition': 'balancing',
+            },
+            'balancing': {
+                'counter': self.no_of_points,
+                'transition': 'balancing',
+            },
         }
 
         self.get_logger().info('March AIE Gait Planning - One Leg Balance Node Started')
@@ -55,16 +64,18 @@ class OneLegBalanceNode(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
         self.iks_foot_position_publisher.publish(msg)
         
-        if self.counter == self.no_of_points - 1:
-            self.state = self.state_transitions[self.state]
-        self.counter = (self.counter + 1) % self.no_of_points
+        if self.counter == self.states[self.state]['counter']:
+            self.state = self.states[self.state]['transition']
+            self.counter = 0
+        else:
+            self.counter += 1
 
     def generate_home_stance(self):
         home_stance = IksFootPositions()
-        home_stance.left_foot_position.x = 0.3
+        home_stance.left_foot_position.x = 0.36
         home_stance.left_foot_position.y = 0.12
         home_stance.left_foot_position.z = -0.7
-        home_stance.right_foot_position.x = 0.3
+        home_stance.right_foot_position.x = 0.36
         home_stance.right_foot_position.y = -0.12
         home_stance.right_foot_position.z = -0.7
         return home_stance
