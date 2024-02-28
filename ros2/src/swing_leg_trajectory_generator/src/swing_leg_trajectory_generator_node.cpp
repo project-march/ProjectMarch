@@ -80,13 +80,13 @@ void SwingLegTrajectoryGeneratorNode::final_feet_callback(geometry_msgs::msg::Po
 void SwingLegTrajectoryGeneratorNode::publish_path_visualization()
 {
     nav_msgs::msg::Path msg;
-    msg.header.frame_id = "map";
+    msg.header.frame_id = "backpack";
     msg.header.stamp = this->get_clock()->now();
 
     geometry_msgs::msg::PoseStamped pose_container;
     for (int i = 0; i < m_swing_leg_generator.get_curve().trajectory.poses.size(); i++) {
         pose_container.pose = m_swing_leg_generator.get_curve().trajectory.poses[i];
-        pose_container.header.frame_id = "map";
+        pose_container.header.frame_id = "backpack";
         pose_container.header.stamp = msg.header.stamp;
         pose_container.header.stamp.nanosec += 1e9 * i;
         msg.poses.push_back(pose_container);

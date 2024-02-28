@@ -38,7 +38,7 @@ SolverNode::SolverNode()
 
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
-    m_prev_foot_msg.header.frame_id = "map";
+    m_prev_foot_msg.header.frame_id = "backpack";
     prev_foot_pose_container.position.x = 0.0;
     prev_foot_pose_container.position.y = 0.0;
     prev_foot_pose_container.position.z = 0.0;
@@ -143,38 +143,38 @@ void SolverNode::timer_callback()
         } else {
             auto com_msg = geometry_msgs::msg::PoseArray();
             com_msg.header.stamp = this->get_clock()->now();
-            com_msg.header.frame_id = "map";
+            com_msg.header.frame_id = "backpack";
 
             auto foot_msg = geometry_msgs::msg::PoseArray();
             foot_msg.header.stamp = this->get_clock()->now();
-            foot_msg.header.frame_id = "map";
+            foot_msg.header.frame_id = "backpack";
 
             geometry_msgs::msg::Pose pose_container;
 
             // This is all for visualization
             visualization_msgs::msg::Marker current_footsteps_marker;
             current_footsteps_marker.type = 8;
-            current_footsteps_marker.header.frame_id = "map";
+            current_footsteps_marker.header.frame_id = "backpack";
             current_footsteps_marker.id = 0;
 
             visualization_msgs::msg::Marker previous_footsteps_marker;
             previous_footsteps_marker.type = 8;
-            previous_footsteps_marker.header.frame_id = "map";
+            previous_footsteps_marker.header.frame_id = "backpack";
             previous_footsteps_marker.id = 1;
 
             geometry_msgs::msg::Point marker_container;
 
             nav_msgs::msg::Path com_path;
-            com_path.header.frame_id = "map";
+            com_path.header.frame_id = "backpack";
 
             nav_msgs::msg::Path zmp_path;
-            zmp_path.header.frame_id = "map";
+            zmp_path.header.frame_id = "backpack";
 
             geometry_msgs::msg::PoseStamped com_path_wrapper;
-            com_path_wrapper.header.frame_id = "map";
+            com_path_wrapper.header.frame_id = "backpack";
 
             geometry_msgs::msg::PoseStamped zmp_path_wrapper;
-            zmp_path_wrapper.header.frame_id = "map";
+            zmp_path_wrapper.header.frame_id = "backpack";
 
             std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
 
@@ -273,7 +273,7 @@ void SolverNode::timer_callback()
 // {
 //     visualization_msgs::msg::Marker com_marker;
 //     com_marker.type = 4;
-//     com_marker.header.frame_id = "map";
+//     com_marker.header.frame_id = "backpack";
 //     com_marker.id = 0;
 //     geometry_msgs::msg::Point com_marker_point;
 //     std::vector<double> m_real_time_com_trajectory_x = m_zmp_solver.get_real_time_com_trajectory_x();

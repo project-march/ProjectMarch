@@ -146,13 +146,13 @@ void SensorFusionNode::publishMPCEstimation()
 
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = this->now();
-    foot_positions_msg.header.frame_id = "world";
+    foot_positions_msg.header.frame_id = "backpack";
     foot_positions_msg.poses = foot_poses;
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = this->now();
-    com_msg.header.frame_id = "world";
+    com_msg.header.frame_id = "backpack";
     com_msg.position.x = com_position.x();
     com_msg.position.y = com_position.y();
     com_msg.position.z = com_position.z();
@@ -163,7 +163,7 @@ void SensorFusionNode::publishMPCEstimation()
 
     geometry_msgs::msg::PointStamped zmp_msg;
     zmp_msg.header.stamp = this->now();
-    zmp_msg.header.frame_id = "world";
+    zmp_msg.header.frame_id = "backpack";
     zmp_msg.point.x = zmp_x;
     zmp_msg.point.y = zmp_y;
     zmp_msg.point.z = 0.0;

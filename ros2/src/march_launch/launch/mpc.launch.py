@@ -215,11 +215,11 @@ def generate_launch_description() -> LaunchDescription:
 
 
     # region Launch Swing Leg Trajectory Generator
-    swing_leg_trajectory_generator_launch_dir = os.path.join(get_package_share_directory("swing_leg_trajectory_generator"), "launch")
+    # swing_leg_trajectory_generator_launch_dir = os.path.join(get_package_share_directory("swing_leg_trajectory_generator"), "launch")
 
-    swing_leg_trajectory_generator = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([swing_leg_trajectory_generator_launch_dir, '/swing_leg_trajectory_generator.launch.py']),
-    )
+    # swing_leg_trajectory_generator = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([swing_leg_trajectory_generator_launch_dir, '/swing_leg_trajectory_generator.launch.py']),
+    # )
     # endregion
 
 
@@ -270,5 +270,5 @@ def generate_launch_description() -> LaunchDescription:
         state_estimator,
         ipd_node,
         footstep_generator,
-        swing_leg_trajectory_generator,
+        # swing_leg_trajectory_generator,
     ])
