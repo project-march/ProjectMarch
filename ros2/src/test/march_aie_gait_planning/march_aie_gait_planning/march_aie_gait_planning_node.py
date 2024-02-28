@@ -21,22 +21,32 @@ class MarchAieGaitPlanningNode(Node):
             10
         )
 
+        self.current_stance_leg = 0b11
+        self.desired_stance_leg = 0b11
+        self.step_height = 0.05
+        self.step_width = 0.2
+        
+        self.home_stance = self.generate_home_stance()
+
         self.get_logger().info('March AIE Gait Planning Node Started')
 
     def state_estimation_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg)
+        self.current_stance_leg = msg.stance_leg
+        self.publish_iks_foot_positions(self.home_stance)
 
-        iks_foot_positions_msg = IksFootPositions()
-        iks_foot_positions_msg.header = msg.header
-        iks_foot_positions_msg.left_foot_position.x = 0.0
-        iks_foot_positions_msg.left_foot_position.y = 0.0
-        iks_foot_positions_msg.left_foot_position.z = 0.0
-        iks_foot_positions_msg.right_foot_position.x = 0.0
-        iks_foot_positions_msg.right_foot_position.y = 0.0
-        iks_foot_positions_msg.right_foot_position.z = 0.0
+    def publish_iks_foot_positions(self, msg):
+        msg.header.stamp = self.get_clock().now().to_msg()
+        self.iks_foot_position_publisher.publish(msg)
 
-        self.iks_foot_position_publisher.publish(iks_foot_positions_msg)
-
+    def generate_home_stance(self):
+        home_stance = IksFootPositions()
+        home_stance.left_foot_position.x = 0.3
+        home_stance.left_foot_position.y = 0.12
+        home_stance.left_foot_position.z = -0.7
+        home_stance.right_foot_position.x = 0.3
+        home_stance.right_foot_position.y = -0.12
+        home_stance.right_foot_position.z = -0.7
+        return home_stance
 
 def main(args=None):
     rclpy.init(args=args)
