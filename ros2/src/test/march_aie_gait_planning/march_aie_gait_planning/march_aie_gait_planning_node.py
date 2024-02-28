@@ -28,8 +28,12 @@ class MarchAieGaitPlanningNode(Node):
 
         iks_foot_positions_msg = IksFootPositions()
         iks_foot_positions_msg.header = msg.header
-        # iks_foot_position_msg.left_foot = msg.left_foot
-        # iks_foot_position_msg.right_foot = msg.right_foot
+        iks_foot_positions_msg.left_foot_position.x = 0.0
+        iks_foot_positions_msg.left_foot_position.y = 0.0
+        iks_foot_positions_msg.left_foot_position.z = 0.0
+        iks_foot_positions_msg.right_foot_position.x = 0.0
+        iks_foot_positions_msg.right_foot_position.y = 0.0
+        iks_foot_positions_msg.right_foot_position.z = 0.0
 
         self.iks_foot_position_publisher.publish(iks_foot_positions_msg)
 
