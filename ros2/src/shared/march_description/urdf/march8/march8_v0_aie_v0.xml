@@ -116,9 +116,9 @@ See <https://www.gnu.org/licenses/>.
       <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/> -->
       <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 15" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/> -->
 
 
       <body name="backpack"
@@ -183,8 +183,8 @@ See <https://www.gnu.org/licenses/>.
                   <geom type="mesh" mesh="L_foot"/>
 
                   <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                  <geom name="L_foot" type="box" size="0.159 0.057 0.007"
-                      pos="0.069 -0.086 -0.118"  class="L_collision"
+                  <geom name="L_foot" type="box" size="0.159 0.057 0.005"
+                      pos="0.069 -0.086 -0.138"  class="L_collision"
                       friction="3.0"/>
                   </body>
               </body>
@@ -234,8 +234,8 @@ See <https://www.gnu.org/licenses/>.
                 <geom type="mesh" mesh="R_foot"/>
                 
                 <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                <geom name="R_foot" type="box" size="0.159 0.057 0.007"
-                    pos="0.069 0.086 -0.118"  class="R_collision"
+                <geom name="R_foot" type="box" size="0.159 0.057 0.005"
+                    pos="0.069 0.086 -0.138"  class="R_collision"
                     friction="3.0"/>
                 </body>
             </body>
@@ -248,7 +248,7 @@ See <https://www.gnu.org/licenses/>.
 
 
   <tendon>
-    <spatial range="0 0.45" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
+    <spatial range="0 0.5" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
