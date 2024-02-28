@@ -35,7 +35,7 @@ march_motor_controller_state_broadcaster:
 
 march_fuzzy_weights_controller:
   ros__parameters:
-    possible_joints:
+    joints:
       - left_ankle
       - left_hip_aa
       - left_hip_fe

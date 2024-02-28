@@ -19,7 +19,7 @@ march_motor_controller_state_broadcaster:
 
 march_fuzzy_weights_controller:
   ros__parameters:
-    possible_joints:
+    joints:
       - linear_joint
     command_interfaces:
       - torque_weight

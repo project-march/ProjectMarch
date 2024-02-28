@@ -77,6 +77,13 @@ def generate_launch_description():
         executable="spawner.py",
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
     )
+
+    fuzzy_weights_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=["march_fuzzy_weights_controller", "-t", "march_fuzzy_weights_controller/FuzzyWeightsController",
+                   "--controller-manager", "/controller_manager"],
+    )
     # endregion
 
     # region Start broadcasters
@@ -123,6 +130,7 @@ def generate_launch_description():
     nodes = [
         joint_state_broadcaster_spawner,
         joint_trajectory_controller_spawner,
+        fuzzy_weights_controller_spawner,
         pdb_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
         pressure_sole_state_broadcaster_spawner,

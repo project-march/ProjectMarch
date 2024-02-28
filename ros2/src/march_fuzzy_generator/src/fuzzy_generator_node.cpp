@@ -54,7 +54,7 @@ void FuzzyGeneratorNode::measuredTorquesCallback(const control_msgs::msg::JointT
 }
 
 
-// Method to get the actual joint torques from the hardware interface
+// TODO: get torque values from the motor controller state broadcaster (has to be tested itself first)
 double FuzzyGeneratorNode::getActualJointTorque(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr& msg, const std::string& joint_name) {
     for (size_t i = 0; i < msg->joint_names.size(); ++i) {
         if (msg->joint_names[i] == joint_name) {

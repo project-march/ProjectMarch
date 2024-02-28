@@ -152,12 +152,13 @@ void FuzzyGenerator::setConfigPath(const exoMode &new_gait_type) {
     m_gait_type = new_gait_type;
 
     if (new_gait_type == static_cast<exoMode>(m_walk_index)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights.yaml");  
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/walk_weights_tsu.yaml");  
         m_control_type = "position";
     } else if (new_gait_type == static_cast<exoMode>(m_sideways_walk_index)) {
-        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sideways_walk_weights.yaml");
-        m_control_type = "stance_swing_leg";    // should throw an error unless it receives torques from the HWI
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/sideways_walk_weights_tsu.yaml");
+        m_control_type = "stance_swing_leg";    
     } else {
+        m_config = YAML::LoadFile("src/march_fuzzy_generator/config/default_weights_tsu.yaml");
         m_control_type = "constant";
     }
 
