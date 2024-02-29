@@ -31,6 +31,8 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     // int64_t dt = this->get_parameter("dt").as_int();
     int64_t dt = 50;
 
+    m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+
     m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_sensors_subscription_options.callback_group = m_sensors_callback_group;
 
@@ -45,7 +47,6 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub 
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
-    m_imu_pose_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("state_estimation/imu_pose", 10);
 
     // M8's MPC
     m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
@@ -92,9 +93,23 @@ void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
     m_sensor_fusion->updateImu(m_imu);
-    // if (m_joint_state != nullptr) {
-    //     m_sensor_fusion->updateKalmanFilter();
-    // }
+
+    if (m_joint_state != nullptr) {
+        m_sensor_fusion->updateKalmanFilter();
+    }
+    
+    geometry_msgs::msg::TransformStamped transform_stamped;
+    transform_stamped.header.stamp = this->now();
+    transform_stamped.header.frame_id = "world";
+    transform_stamped.child_frame_id = "backpack";
+    transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+
+    transform_stamped.transform.rotation.x = msg->orientation.x;
+    transform_stamped.transform.rotation.y = msg->orientation.y;
+    transform_stamped.transform.rotation.z = msg->orientation.z;
+    transform_stamped.transform.rotation.w = msg->orientation.w;
+
+    m_tf_broadcaster->sendTransform(transform_stamped);
 }
 
 void SensorFusionNode::publishStateEstimation()
@@ -104,12 +119,6 @@ void SensorFusionNode::publishStateEstimation()
 
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
-
-    geometry_msgs::msg::PoseStamped imu_pose_msg;
-    imu_pose_msg.header.stamp = this->now();
-    imu_pose_msg.header.frame_id = "world";
-    imu_pose_msg.pose = m_sensor_fusion->getImuPose();
-    m_imu_pose_pub->publish(imu_pose_msg);
 
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
