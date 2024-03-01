@@ -34,7 +34,7 @@ find_package(march_shared_msgs REQUIRED)
 find_package(realsense2 REQUIRED)
 
 find_package(pcl_conversions REQUIRED)
-find_package(PCL 1.7 REQUIRED COMPONENTS)
+find_package(PCL 1.10 REQUIRED COMPONENTS)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -130,8 +130,3 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}/
 )
-
-ament_export_dependencies(eigen3_cmake_module)
-ament_export_dependencies(Eigen3)
-
-ament_package()
