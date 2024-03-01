@@ -6,6 +6,8 @@
 #include "controller_interface/controller_interface.hpp"
 #include "log_broadcaster/log_semantic_component.hpp"
 #include "log_broadcaster/visibility_control.h"
+#include <rcl_interfaces/msg/log.hpp>
+#include "rclcpp/rclcpp.hpp"
 
 namespace march_log_broadcaster {
 
@@ -26,6 +28,8 @@ public:
     LOG_BROADCASTER_PUBLIC
     controller_interface::return_type update() override;
 
+    void publish_to_rosout();
+
     LOG_BROADCASTER_PUBLIC
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
         const rclcpp_lifecycle::State& previous_state) override;
@@ -40,6 +44,7 @@ public:
 
 private:
     std::shared_ptr<rclcpp::Logger> logger_;
+    rclcpp::Publisher<rcl_interfaces::msg::Log>::SharedPtr rosout_publisher_;
 };
 
 } // namespace march_log_broadcaster

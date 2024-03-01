@@ -167,9 +167,7 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     RCLCPP_INFO((*logger_), "Export state interface.");
     
     // // For the Log broadcaster.
-    for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
-        state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
-    }
+    state_interfaces.emplace_back(hardware_interface::StateInterface("ERROR", "error_message", ));
     
     for (JointInfo& jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
@@ -434,7 +432,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
-
+    
         // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
     }
     return hardware_interface::return_type::OK;

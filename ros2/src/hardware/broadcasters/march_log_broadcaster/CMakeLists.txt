@@ -23,6 +23,9 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(rcutils REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(realtime_tools REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+
 
 
 add_library(${PROJECT_NAME}
@@ -38,6 +41,8 @@ ament_target_dependencies(${PROJECT_NAME}
   rcutils
   march_shared_msgs
   realtime_tools
+  rclcpp
+  rcl_interfaces
 )
 
 # Causes the visibility macros to use dllexport rather than dllimport,
