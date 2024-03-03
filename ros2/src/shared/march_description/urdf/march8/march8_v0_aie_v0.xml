@@ -319,7 +319,7 @@ See <https://www.gnu.org/licenses/>.
     <!-- Noise & cutoff must be determined -->
     <framequat name='backpack_orientation' objtype='site' objname='imu_backpack'/>
     <gyro name='vel_imu_backpack' site='imu_backpack' noise='5e-4' cutoff='34.9'/>
-    <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-2' cutoff='157'/>
+    <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-5' cutoff='157'/>
     <magnetometer name='magnet_imu_backpack' site='imu_backpack'/>
 
     <framequat name='torso_orientation' objtype='site' objname='imu_torso'/>

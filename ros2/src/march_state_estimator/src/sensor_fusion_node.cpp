@@ -79,9 +79,6 @@ void SensorFusionNode::timerCallback()
         return;
     }
 
-    if (m_joint_state != nullptr || m_imu != nullptr) {
-        m_sensor_fusion->updateKalmanFilter();
-    }
     geometry_msgs::msg::TransformStamped transform_stamped;
     transform_stamped.header.stamp = this->now();
     transform_stamped.header.frame_id = "world";
@@ -104,6 +101,10 @@ void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
     m_sensor_fusion->updateImu(m_imu);
+
+    if (m_joint_state != nullptr) {
+        m_sensor_fusion->updateKalmanFilter();
+    }
 }
 
 void SensorFusionNode::publishStateEstimation()

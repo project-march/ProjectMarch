@@ -16,9 +16,9 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
     m_state_posterior.imu_position = Eigen::Vector3d(0.0, 0.0, 0.77);
     m_state_posterior.left_foot_position = Eigen::Vector3d(0.38, 0.037, 0.0);
     m_state_posterior.right_foot_position = Eigen::Vector3d(0.38, -0.049, 0.0);
-    m_timestep = 0.05; // 20 Hz
+    m_timestep = 1e-3;
 
-    m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 1.94e-5);
+    m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 2.16e-5); // 1.94e-5);
     m_process_noise_angular_velocity = Eigen::Vector3d(0.118174, 0.118174, 0.118174);
     setProcessNoiseCovarianceMatrix(
         m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
@@ -31,20 +31,6 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
         Eigen::Vector3d(1e-23, 1e-23, 1e-23), // feet position
         Eigen::Vector3d(1e-23, 1e-23, 1e-23) // feet slippage
     );
-
-    // m_process_noise_acceleration = Eigen::Vector3d::Zero();
-    // m_process_noise_angular_velocity = Eigen::Vector3d::Zero();
-    // setProcessNoiseCovarianceMatrix(
-    //     m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
-    //     Eigen::Vector3d::Zero(), // feet position
-    //     Eigen::Vector3d::Zero(), // accelerometer bias
-    //     Eigen::Vector3d::Zero(), // gyroscope bias
-    //     Eigen::Vector3d::Zero() // feet slippage
-    // );
-    // setMeasurementNoiseCovarianceMatrix(
-    //     Eigen::Vector3d::Zero(), // feet position
-    //     Eigen::Vector3d::Zero() // feet slippage
-    // );
 }
 
 void SensorFusion::configureJointNames(const std::vector<std::string>& joint_names)
