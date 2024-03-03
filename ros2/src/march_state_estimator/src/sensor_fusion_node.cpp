@@ -78,6 +78,17 @@ void SensorFusionNode::timerCallback()
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state or imu data received yet");
         return;
     }
+
+    if (m_joint_state != nullptr || m_imu != nullptr) {
+        m_sensor_fusion->updateKalmanFilter();
+    }
+    geometry_msgs::msg::TransformStamped transform_stamped;
+    transform_stamped.header.stamp = this->now();
+    transform_stamped.header.frame_id = "world";
+    transform_stamped.child_frame_id = "backpack";
+    transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+    m_tf_broadcaster->sendTransform(transform_stamped);
+
     publishStateEstimation();
     publishFeetHeight();
     publishMPCEstimation();
@@ -93,23 +104,6 @@ void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
     m_sensor_fusion->updateImu(m_imu);
-
-    if (m_joint_state != nullptr) {
-        m_sensor_fusion->updateKalmanFilter();
-    }
-    
-    geometry_msgs::msg::TransformStamped transform_stamped;
-    transform_stamped.header.stamp = this->now();
-    transform_stamped.header.frame_id = "world";
-    transform_stamped.child_frame_id = "backpack";
-    transform_stamped.transform = m_sensor_fusion->getRobotTransform();
-
-    transform_stamped.transform.rotation.x = msg->orientation.x;
-    transform_stamped.transform.rotation.y = msg->orientation.y;
-    transform_stamped.transform.rotation.z = msg->orientation.z;
-    transform_stamped.transform.rotation.w = msg->orientation.w;
-
-    m_tf_broadcaster->sendTransform(transform_stamped);
 }
 
 void SensorFusionNode::publishStateEstimation()
@@ -124,8 +118,8 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
-    // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
-    state_estimation_msg.imu = *m_imu;
+    state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
+    // state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);

@@ -16,35 +16,35 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
     m_state_posterior.imu_position = Eigen::Vector3d(0.0, 0.0, 0.77);
     m_state_posterior.left_foot_position = Eigen::Vector3d(0.38, 0.037, 0.0);
     m_state_posterior.right_foot_position = Eigen::Vector3d(0.38, -0.049, 0.0);
-    m_timestep = 1e-15;
+    m_timestep = 0.05; // 20 Hz
 
-    // m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 1.94e-5);
-    // m_process_noise_angular_velocity = Eigen::Vector3d(0.118174, 0.118174, 0.118174);
-    // setProcessNoiseCovarianceMatrix(
-    //     m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
-    //     Eigen::Vector3d(1e-23, 1e-23, 1e-23), // feet position
-    //     Eigen::Vector3d(3e-7, 3e-7, 3e-7), // accelerometer bias
-    //     Eigen::Vector3d(1.454e-5, 1.454e-5, 1.454e-5), // gyroscope bias
-    //     Eigen::Vector3d(1e-23, 1e-23, 1e-23) // feet slippage
-    // );
-    // setMeasurementNoiseCovarianceMatrix(
-    //     Eigen::Vector3d(1e-23, 1e-23, 1e-23), // feet position
-    //     Eigen::Vector3d(1e-23, 1e-23, 1e-23) // feet slippage
-    // );
-
-    m_process_noise_acceleration = Eigen::Vector3d::Zero();
-    m_process_noise_angular_velocity = Eigen::Vector3d::Zero();
+    m_process_noise_acceleration = Eigen::Vector3d(2.16e-5, 2.16e-5, 1.94e-5);
+    m_process_noise_angular_velocity = Eigen::Vector3d(0.118174, 0.118174, 0.118174);
     setProcessNoiseCovarianceMatrix(
         m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
-        Eigen::Vector3d::Zero(), // feet position
-        Eigen::Vector3d::Zero(), // accelerometer bias
-        Eigen::Vector3d::Zero(), // gyroscope bias
-        Eigen::Vector3d::Zero() // feet slippage
+        Eigen::Vector3d(1e-23, 1e-23, 1e-23), // feet position
+        Eigen::Vector3d(3e-7, 3e-7, 3e-7), // accelerometer bias
+        Eigen::Vector3d(1.454e-5, 1.454e-5, 1.454e-5), // gyroscope bias
+        Eigen::Vector3d(1e-23, 1e-23, 1e-23) // feet slippage
     );
     setMeasurementNoiseCovarianceMatrix(
-        Eigen::Vector3d::Zero(), // feet position
-        Eigen::Vector3d::Zero() // feet slippage
+        Eigen::Vector3d(1e-23, 1e-23, 1e-23), // feet position
+        Eigen::Vector3d(1e-23, 1e-23, 1e-23) // feet slippage
     );
+
+    // m_process_noise_acceleration = Eigen::Vector3d::Zero();
+    // m_process_noise_angular_velocity = Eigen::Vector3d::Zero();
+    // setProcessNoiseCovarianceMatrix(
+    //     m_process_noise_acceleration, m_process_noise_acceleration, m_process_noise_angular_velocity,
+    //     Eigen::Vector3d::Zero(), // feet position
+    //     Eigen::Vector3d::Zero(), // accelerometer bias
+    //     Eigen::Vector3d::Zero(), // gyroscope bias
+    //     Eigen::Vector3d::Zero() // feet slippage
+    // );
+    // setMeasurementNoiseCovarianceMatrix(
+    //     Eigen::Vector3d::Zero(), // feet position
+    //     Eigen::Vector3d::Zero() // feet slippage
+    // );
 }
 
 void SensorFusion::configureJointNames(const std::vector<std::string>& joint_names)
@@ -340,14 +340,14 @@ Eigen::MatrixXd SensorFusion::calculatePriorCovarianceMatrix(const EKFState& sta
 Eigen::Vector3d SensorFusion::calculateExpectedMeasuredAcceleration(const Eigen::Vector3d& accelerometer_bias) const
 {
     Eigen::Vector3d expected_measured_acceleration;
-    expected_measured_acceleration.noalias() = msgToEigenVector3d(m_recent_imu_msg->linear_acceleration) - accelerometer_bias - m_process_noise_acceleration;
+    expected_measured_acceleration.noalias() = msgToEigenVector3d(m_recent_imu_msg->linear_acceleration) - accelerometer_bias;
     return expected_measured_acceleration;
 }
 
 Eigen::Vector3d SensorFusion::calculateExpectedMeasuredAngularVelocity(const Eigen::Vector3d& gyroscope_bias) const
 {
     Eigen::Vector3d expected_measured_angular_velocity;
-    expected_measured_angular_velocity.noalias() = msgToEigenVector3d(m_recent_imu_msg->angular_velocity) - gyroscope_bias - m_process_noise_angular_velocity;
+    expected_measured_angular_velocity.noalias() = msgToEigenVector3d(m_recent_imu_msg->angular_velocity) - gyroscope_bias;
     return expected_measured_angular_velocity;
 }
 
@@ -361,14 +361,14 @@ Eigen::VectorXd SensorFusion::calculateInnovation(const EKFState& state_priori) 
     residual_left_foot_position.noalias() = m_robot_description->findNode("L_foot")->getGlobalPosition(m_joint_positions) - rotation_matrix * (state_priori.left_foot_position - state_priori.imu_position);
     residual_right_foot_position.noalias() = m_robot_description->findNode("R_foot")->getGlobalPosition(m_joint_positions) - rotation_matrix * (state_priori.right_foot_position - state_priori.imu_position);
     
-    residual_left_foot_slippage.noalias() = rotationMatrixToEulerAngles(m_robot_description->findNode("L_foot")->getGlobalRotation(m_joint_positions)) - quaternionToEulerAngles(state_priori.imu_orientation * state_priori.left_foot_slippage.inverse());
-    residual_right_foot_slippage.noalias() = rotationMatrixToEulerAngles(m_robot_description->findNode("R_foot")->getGlobalRotation(m_joint_positions)) - quaternionToEulerAngles(state_priori.imu_orientation * state_priori.right_foot_slippage.inverse());
+    // residual_left_foot_slippage.noalias() = rotationMatrixToEulerAngles(m_robot_description->findNode("L_foot")->getGlobalRotation(m_joint_positions)) - quaternionToEulerAngles(state_priori.imu_orientation * state_priori.left_foot_slippage.inverse());
+    // residual_right_foot_slippage.noalias() = rotationMatrixToEulerAngles(m_robot_description->findNode("R_foot")->getGlobalRotation(m_joint_positions)) - quaternionToEulerAngles(state_priori.imu_orientation * state_priori.right_foot_slippage.inverse());
 
     // residual_left_foot_position.noalias() = Eigen::Vector3d::Zero();
     // residual_right_foot_position.noalias() = Eigen::Vector3d::Zero();
     
-    // residual_left_foot_slippage.noalias() = Eigen::Vector3d::Zero();
-    // residual_right_foot_slippage.noalias() = Eigen::Vector3d::Zero();
+    residual_left_foot_slippage.noalias() = Eigen::Vector3d::Zero();
+    residual_right_foot_slippage.noalias() = Eigen::Vector3d::Zero();
 
     innovation <<  residual_left_foot_position, residual_right_foot_position, residual_left_foot_slippage, residual_right_foot_slippage;
     return innovation;
