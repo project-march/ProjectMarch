@@ -270,5 +270,5 @@ def generate_launch_description() -> LaunchDescription:
         state_estimator,
         ipd_node,
         footstep_generator,
-        swing_leg_trajectory_generator,
+        # swing_leg_trajectory_generator,
     ])

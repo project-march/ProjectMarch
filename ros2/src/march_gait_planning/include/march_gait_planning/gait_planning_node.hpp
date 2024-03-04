@@ -34,7 +34,7 @@ class GaitPlanningNode:public rclcpp::Node {
 
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
     void currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
-    void variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg); 
+    void variableFootstepCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 

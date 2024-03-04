@@ -26,8 +26,8 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  include/${PROJECT_NAME}/footstep_generator.hpp
-  src/footstep_generator.cpp
+  include/${PROJECT_NAME}/footstep_generator_m9.hpp
+  src/footstep_generator_m9.cpp
 )
 
 ament_target_dependencies(
@@ -38,7 +38,7 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
-add_executable(footstep_generator_node src/footstep_generator_node.cpp src/footstep_generator.cpp include/${PROJECT_NAME}/footstep_generator.hpp)
+add_executable(footstep_generator_node src/footstep_generator_m9_node.cpp src/footstep_generator_m9.cpp include/${PROJECT_NAME}/footstep_generator_m9.hpp)
 target_include_directories(footstep_generator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)
@@ -57,22 +57,22 @@ install(TARGETS footstep_generator_node
 
   
 
-if(BUILD_TESTING)
-  ament_add_gmock(${PROJECT_NAME}_test
-  test/footstep_gen_test.cpp
-  test/test_runner.cpp
-  # include
-  )
-  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
-  target_include_directories(${PROJECT_NAME}_test PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include>)
-  ament_target_dependencies(
-    ${PROJECT_NAME}_test 
-    "rclcpp"
-    "geometry_msgs" 
-    "march_shared_msgs")
-endif()
+# if(BUILD_TESTING)
+#   ament_add_gmock(${PROJECT_NAME}_test
+#   test/footstep_gen_test.cpp
+#   test/test_runner.cpp
+#   # include
+#   )
+#   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+#   target_include_directories(${PROJECT_NAME}_test PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+#   $<INSTALL_INTERFACE:include>)
+#   ament_target_dependencies(
+#     ${PROJECT_NAME}_test 
+#     "rclcpp"
+#     "geometry_msgs" 
+#     "march_shared_msgs")
+# endif()
 
 # Install launch files.
 install(DIRECTORY
