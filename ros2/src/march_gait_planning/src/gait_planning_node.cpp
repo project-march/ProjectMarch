@@ -17,7 +17,9 @@ GaitPlanningNode::GaitPlanningNode()
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
-    m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
+    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
+
+    m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("final_feet_position", 10, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
@@ -44,11 +46,18 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     footPositionsPublish(); 
 }
 
-void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
-    float dist = msg->distance; 
+void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
+    geometry_msgs::msg::Point foot_pos = msg->poses[0].position; 
+    float dist = foot_pos.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 
+
+    // When distance coming from mode machine 
+    // float dist = msg->distance; 
+    // m_current_trajectory.clear(); 
+    // m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
+    // footPositionsPublish(); 
 }
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 

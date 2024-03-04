@@ -13,6 +13,7 @@
 #include "march_shared_msgs/msg/foot_step_output.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/srv/get_current_stance_leg.hpp"
 
 
@@ -28,7 +29,8 @@ class GaitPlanningNode:public rclcpp::Node {
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
 
     //Create subscription to the output of the footstep planner, aka the distance of the next step. 
-    rclcpp::Subscription<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_variable_foot_step_subscriber; 
+    // rclcpp::Subscription<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_variable_foot_step_subscriber; 
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_subscriber; 
 
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
     void currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
