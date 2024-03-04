@@ -266,12 +266,12 @@ class MujocoSimNode(Node):
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
 
-        backpack_imu, torso_imu = self.sensor_data_extraction.get_imu_data()
+        backpack_imu, torso_imu, backpack_position = self.sensor_data_extraction.get_imu_data()
         sensor_msg.joint_state = state_msg
         sensor_msg.backpack_imu = backpack_imu
         sensor_msg.torso_imu = torso_imu
+        sensor_msg.backpack_pos = backpack_position
 
-        # publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 1000)
         self.reader_publisher.publish(sensor_msg)
 
 

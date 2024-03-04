@@ -179,7 +179,7 @@ See <https://www.gnu.org/licenses/>.
                 <body name="L_foot" pos="0.0 0.0 -0.029">
                   <inertial pos="0.007 -0.054 -0.035" mass="1.964"
                       fullinertia="0.015 0.021 0.013 0.003 0.007 -0.003"/>
-                  <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/>
+                  <!-- <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/> -->
                   <geom type="mesh" mesh="L_foot"/>
 
                   <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -230,7 +230,7 @@ See <https://www.gnu.org/licenses/>.
               <body name="R_foot" pos="0.0 0.0 -0.029">
                 <inertial pos="0.007 0.054 -0.035" mass="2.964"
                     fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
-                <joint name="R_AIE" axis="-1 0 0" range="-8 8" class="AIE_joint"/>
+                <!-- <joint name="R_AIE" axis="-1 0 0" range="-8 8" class="AIE_joint"/> -->
                 <geom type="mesh" mesh="R_foot"/>
                 
                 <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
@@ -248,7 +248,7 @@ See <https://www.gnu.org/licenses/>.
 
 
   <tendon>
-    <spatial range="0 0.45" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
+    <spatial range="0 0.5" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
@@ -317,14 +317,15 @@ See <https://www.gnu.org/licenses/>.
     <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
 
     <!-- Noise & cutoff must be determined -->
+    <framepos name='backpack_position' objtype='site' objname='imu_backpack'/>
     <framequat name='backpack_orientation' objtype='site' objname='imu_backpack'/>
     <gyro name='vel_imu_backpack' site='imu_backpack' noise='5e-4' cutoff='34.9'/>
-    <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-2' cutoff='157'/>
+    <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-5' cutoff='157'/>
     <magnetometer name='magnet_imu_backpack' site='imu_backpack'/>
 
     <framequat name='torso_orientation' objtype='site' objname='imu_torso'/>
     <gyro name='vel_imu_torso' site='imu_torso' noise='5e-4' cutoff='34.9'/>
-    <accelerometer name='acc_imu_torso' site='imu_torso' noise='1e-2' cutoff='157'/>
+    <accelerometer name='acc_imu_torso' site='imu_torso' noise='1e-5' cutoff='157'/>
     <magnetometer name='magnet_imu_torso' site='imu_torso'/>
 
   </sensor>

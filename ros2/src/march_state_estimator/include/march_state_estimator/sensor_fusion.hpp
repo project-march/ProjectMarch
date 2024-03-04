@@ -16,6 +16,7 @@
 
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/transform.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -66,10 +67,11 @@ public:
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;
     geometry_msgs::msg::Point getZMP() const;
-    geometry_msgs::msg::Pose getImuPose() const;
+    geometry_msgs::msg::Transform getRobotTransform() const;
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
     std::vector<double> getFootContactHeight() const;
 
+    Eigen::VectorXd getPosteriorStateVector() const;
     Eigen::Quaterniond getFilteredOrientation() const;
     Eigen::Quaterniond getExponentialMap(const Eigen::Vector3d& vector) const;
     Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vector) const;
