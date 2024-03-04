@@ -39,23 +39,23 @@ controller_interface::InterfaceConfiguration LogBroadcaster::state_interface_con
 
 controller_interface::return_type LogBroadcaster::update()
 {
-    make_rosout_message("Hi");
+    publish_rosout_message("Hi", rosout_publisher_);
 
     return controller_interface::return_type::OK;
 }
 
-std::shared_ptr<rcl_interfaces::msg::Log> LogBroadcaster::make_rosout_message(std::string msg)
+void LogBroadcaster::publish_rosout_message(const std::string& msg)
 {
     auto log_msg = std::make_shared<rcl_interfaces::msg::Log>();
     log_msg->stamp = node_->now();
     log_msg->level = rcl_interfaces::msg::Log::ERROR;
     log_msg->name = "hardware_interface_logger_node";
-    log_msg->msg = "This log comes from the rosout publisher";
+    log_msg->msg = msg;
     log_msg->file = "hardware_interface_logger_node.cpp";
     log_msg->function = "rclcpp:spin(node)";
     log_msg->line = 5;
-
-    return log_msg;
+    
+    rosout_publisher_->publish(log_msg);
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn LogBroadcaster::on_activate(

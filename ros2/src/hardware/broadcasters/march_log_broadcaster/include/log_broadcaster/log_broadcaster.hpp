@@ -28,7 +28,7 @@ public:
     LOG_BROADCASTER_PUBLIC
     controller_interface::return_type update() override;
 
-    void publish_to_rosout();
+    void publish_rosout_message();
 
     LOG_BROADCASTER_PUBLIC
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(

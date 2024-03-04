@@ -307,6 +307,7 @@ public:
 
     std::shared_ptr<WeightNode> weight_node;
     std::shared_ptr<GainsNode> gains_node;
+    march_log_broadcaster::LogBroadcaster log_broadcaster;
 
 private:
     rclcpp::executors::SingleThreadedExecutor executor_; // Executor needed to subscriber
