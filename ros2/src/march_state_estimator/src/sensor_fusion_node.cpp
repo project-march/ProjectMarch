@@ -160,7 +160,7 @@ void SensorFusionNode::publishMPCEstimation()
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
-    Eigen::Vector3d com_position = m_sensor_fusion->getCOM();
+    Eigen::Vector3d com_position = m_sensor_fusion->getCOM() + Eigen::Vector3d(m_imu_position->point.x, m_imu_position->point.y, m_imu_position->point.z);
     Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity();
 
     const double gravity = 9.81;
@@ -169,13 +169,13 @@ void SensorFusionNode::publishMPCEstimation()
 
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = this->now();
-    foot_positions_msg.header.frame_id = "backpack";
+    foot_positions_msg.header.frame_id = "world";
     foot_positions_msg.poses = foot_poses;
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = this->now();
-    com_msg.header.frame_id = "backpack";
+    com_msg.header.frame_id = "world";
     com_msg.position.x = com_position.x();
     com_msg.position.y = com_position.y();
     com_msg.position.z = com_position.z();
@@ -186,7 +186,7 @@ void SensorFusionNode::publishMPCEstimation()
 
     geometry_msgs::msg::PointStamped zmp_msg;
     zmp_msg.header.stamp = this->now();
-    zmp_msg.header.frame_id = "backpack";
+    zmp_msg.header.frame_id = "world";
     zmp_msg.point.x = zmp_x;
     zmp_msg.point.y = zmp_y;
     zmp_msg.point.z = 0.0;
