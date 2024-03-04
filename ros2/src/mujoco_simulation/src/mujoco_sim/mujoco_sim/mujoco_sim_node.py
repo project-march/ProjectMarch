@@ -271,7 +271,11 @@ class MujocoSimNode(Node):
         sensor_msg.backpack_imu = backpack_imu
         sensor_msg.torso_imu = torso_imu
 
-        # publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 1000)
+        backpack_pos = self.data.geom_xpos[self.model.geom('backpack').id]
+        sensor_msg.backpack_pos.x = backpack_pos[0]
+        sensor_msg.backpack_pos.y = backpack_pos[1]
+        sensor_msg.backpack_pos.z = backpack_pos[2]
+
         self.reader_publisher.publish(sensor_msg)
 
 
