@@ -39,6 +39,7 @@ private:
     void timerCallback();
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+    void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
@@ -46,6 +47,7 @@ private:
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
     sensor_msgs::msg::Imu::SharedPtr m_imu;
+    geometry_msgs::msg::PointStamped::SharedPtr m_imu_position;
     std::vector<std::string> m_node_feet_names;
     std::vector<geometry_msgs::msg::Point> m_foot_positions;
 
@@ -56,6 +58,7 @@ private:
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
+    rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 

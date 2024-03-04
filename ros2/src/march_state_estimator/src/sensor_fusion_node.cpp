@@ -43,6 +43,8 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         m_sensors_subscription_options);
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub 
@@ -79,11 +81,23 @@ void SensorFusionNode::timerCallback()
         return;
     }
 
+    if (m_imu_position == nullptr) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu position data received yet");
+        return;
+    }
+
     geometry_msgs::msg::TransformStamped transform_stamped;
     transform_stamped.header.stamp = this->now();
     transform_stamped.header.frame_id = "world";
     transform_stamped.child_frame_id = "backpack";
-    transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+    // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+    transform_stamped.transform.translation.x = m_imu_position->point.x;
+    transform_stamped.transform.translation.y = m_imu_position->point.y;
+    transform_stamped.transform.translation.z = m_imu_position->point.z;
+    transform_stamped.transform.rotation.x = m_imu->orientation.x;
+    transform_stamped.transform.rotation.y = m_imu->orientation.y;
+    transform_stamped.transform.rotation.z = m_imu->orientation.z;
+    transform_stamped.transform.rotation.w = m_imu->orientation.w;
     m_tf_broadcaster->sendTransform(transform_stamped);
 
     publishStateEstimation();
@@ -102,9 +116,14 @@ void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
     m_imu = msg;
     m_sensor_fusion->updateImu(m_imu);
 
-    if (m_joint_state != nullptr) {
-        m_sensor_fusion->updateKalmanFilter();
-    }
+    // if (m_joint_state != nullptr) {
+    //     m_sensor_fusion->updateKalmanFilter();
+    // }
+}
+
+void SensorFusionNode::imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg)
+{
+    m_imu_position = msg;
 }
 
 void SensorFusionNode::publishStateEstimation()
@@ -119,8 +138,8 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
-    state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
-    // state_estimation_msg.imu = *m_imu;
+    // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
+    state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);

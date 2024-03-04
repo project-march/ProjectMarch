@@ -317,6 +317,7 @@ See <https://www.gnu.org/licenses/>.
     <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
 
     <!-- Noise & cutoff must be determined -->
+    <framepos name='backpack_position' objtype='site' objname='imu_backpack'/>
     <framequat name='backpack_orientation' objtype='site' objname='imu_backpack'/>
     <gyro name='vel_imu_backpack' site='imu_backpack' noise='5e-4' cutoff='34.9'/>
     <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-5' cutoff='157'/>
