@@ -31,7 +31,9 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     // int64_t dt = this->get_parameter("dt").as_int();
     int64_t dt = 50;
 
+    m_tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
     m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_sensors_subscription_options.callback_group = m_sensors_callback_group;
@@ -141,6 +143,36 @@ void SensorFusionNode::publishStateEstimation()
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
+    std::vector<geometry_msgs::msg::Pose> inertial_foot_positions;
+    try {
+        geometry_msgs::msg::Pose foot_pose;
+        
+        geometry_msgs::msg::TransformStamped transform_stamped;
+        transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", rclcpp::Time(0));
+        foot_pose.position.x = transform_stamped.transform.translation.x;
+        foot_pose.position.y = transform_stamped.transform.translation.y;
+        foot_pose.position.z = 0;
+        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+        inertial_foot_positions.push_back(foot_pose);
+
+        transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", rclcpp::Time(0));
+        foot_pose.position.x = transform_stamped.transform.translation.x;
+        foot_pose.position.y = transform_stamped.transform.translation.y;
+        foot_pose.position.z = 0;
+        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+        inertial_foot_positions.push_back(foot_pose);
+
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions: %s", e.what());
+        return;
+    }
+
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
@@ -148,6 +180,7 @@ void SensorFusionNode::publishStateEstimation()
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
+    state_estimation_msg.inertial_foot_position = inertial_foot_positions;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);
 }
@@ -167,6 +200,36 @@ void SensorFusionNode::publishMPCEstimation()
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
+    std::vector<geometry_msgs::msg::Pose> inertial_foot_positions;
+    try {
+        geometry_msgs::msg::Pose foot_pose;
+        
+        geometry_msgs::msg::TransformStamped transform_stamped;
+        transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", rclcpp::Time(0));
+        foot_pose.position.x = transform_stamped.transform.translation.x;
+        foot_pose.position.y = transform_stamped.transform.translation.y;
+        foot_pose.position.z = 0;
+        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+        inertial_foot_positions.push_back(foot_pose);
+
+        transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", rclcpp::Time(0));
+        foot_pose.position.x = transform_stamped.transform.translation.x;
+        foot_pose.position.y = transform_stamped.transform.translation.y;
+        foot_pose.position.z = 0;
+        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+        inertial_foot_positions.push_back(foot_pose);
+
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions: %s", e.what());
+        return;
+    }
+
     Eigen::Vector3d com_position = m_sensor_fusion->getCOM() + Eigen::Vector3d(m_imu_position->point.x, m_imu_position->point.y, m_imu_position->point.z);
     Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity() + Eigen::Vector3d(m_imu_velocity->vector.x, m_imu_velocity->vector.y, m_imu_velocity->vector.z);
 
@@ -177,7 +240,7 @@ void SensorFusionNode::publishMPCEstimation()
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = this->now();
     foot_positions_msg.header.frame_id = "world";
-    foot_positions_msg.poses = foot_poses;
+    foot_positions_msg.poses = inertial_foot_positions;
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;

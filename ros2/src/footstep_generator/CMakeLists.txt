@@ -26,8 +26,10 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  include/${PROJECT_NAME}/footstep_generator_m9.hpp
   src/footstep_generator_m9.cpp
+  src/footstep_generator_m9_node.cpp
+  src/footstep_generator.cpp
+  src/footstep_generator_node.cpp
 )
 
 ament_target_dependencies(
@@ -38,7 +40,8 @@ ament_target_dependencies(
   "march_shared_msgs"
 )
 
-add_executable(footstep_generator_node src/footstep_generator_m9_node.cpp src/footstep_generator_m9.cpp include/${PROJECT_NAME}/footstep_generator_m9.hpp)
+# add_executable(footstep_generator_node src/footstep_generator_m9_node.cpp src/footstep_generator_m9.cpp)
+add_executable(footstep_generator_node src/footstep_generator_node.cpp src/footstep_generator.cpp)
 target_include_directories(footstep_generator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include>)

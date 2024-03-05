@@ -24,8 +24,8 @@ FootstepGenerator::FootstepGenerator()
 }
 
 void FootstepGenerator::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
-    m_current_left_foot = msg->foot_pose[0]; 
-    m_current_right_foot = msg->foot_pose[1]; 
+    m_current_left_foot = msg->inertial_foot_position[0]; 
+    m_current_right_foot = msg->inertial_foot_position[1]; 
 }
 
 void FootstepGenerator::publishFootPlacements(

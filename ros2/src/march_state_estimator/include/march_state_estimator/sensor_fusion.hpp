@@ -64,6 +64,7 @@ public:
     void updateKalmanFilter();
 
     // TODO: Move these to RobotDescription
+    Eigen::Quaterniond getInertialOrientation() const;
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;
     geometry_msgs::msg::Point getZMP() const;

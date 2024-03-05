@@ -11,6 +11,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_listener.h"
 #include "tf2/LinearMath/Quaternion.h"
 
 #include "march_shared_msgs/msg/state_estimation.hpp"
@@ -57,6 +58,8 @@ private:
     std::unique_ptr<SensorFusion> m_sensor_fusion;
     std::shared_ptr<RobotDescription> m_robot_description; // TODO: TO be obtained from SensorFusion.
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
+    std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
+    std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
 
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
