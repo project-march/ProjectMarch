@@ -45,6 +45,8 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub 
@@ -126,6 +128,11 @@ void SensorFusionNode::imuPositionCallback(const geometry_msgs::msg::PointStampe
     m_imu_position = msg;
 }
 
+void SensorFusionNode::imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg)
+{
+    m_imu_velocity = msg;
+}
+
 void SensorFusionNode::publishStateEstimation()
 {
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
@@ -161,7 +168,7 @@ void SensorFusionNode::publishMPCEstimation()
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
     Eigen::Vector3d com_position = m_sensor_fusion->getCOM() + Eigen::Vector3d(m_imu_position->point.x, m_imu_position->point.y, m_imu_position->point.z);
-    Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity();
+    Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity() + Eigen::Vector3d(m_imu_velocity->vector.x, m_imu_velocity->vector.y, m_imu_velocity->vector.z);
 
     const double gravity = 9.81;
     double zmp_x = com_position.x() + (com_velocity.x() / sqrt(gravity / com_position.z())) * com_position.y();

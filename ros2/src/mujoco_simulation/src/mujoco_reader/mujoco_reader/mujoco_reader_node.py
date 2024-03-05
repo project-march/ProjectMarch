@@ -2,7 +2,7 @@
 
 from mujoco_interfaces.msg import MujocoDataSensing
 from sensor_msgs.msg import JointState, Imu
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import PointStamped, Vector3Stamped
 import rclpy
 from rclpy.node import Node
 
@@ -35,6 +35,7 @@ class MujocoReaderNode(Node):
         self.torso_imu_publisher = self.create_publisher(Imu, "upper_imu", 10)
         self.backpack_imu_publisher = self.create_publisher(Imu, "lower_imu", 10)
         self.backpack_position_publisher = self.create_publisher(PointStamped, "lower_imu/position", 10)
+        self.backpack_velocity_publisher = self.create_publisher(Vector3Stamped, "lower_imu/velocity", 10)
 
         self.sensor_subscription = self.create_subscription(
             MujocoDataSensing, "mujoco_sensor_output", self.sensor_listener_callback, 100
@@ -62,6 +63,12 @@ class MujocoReaderNode(Node):
         backpack_position.header.frame_id = "world"
         backpack_position.point = msg.backpack_pos
         self.backpack_position_publisher.publish(backpack_position)
+
+        backpack_velocity = Vector3Stamped()
+        backpack_velocity.header.stamp = self.get_clock().now().to_msg()
+        backpack_velocity.header.frame_id = "world"
+        backpack_velocity.vector = msg.backpack_vel
+        self.backpack_velocity_publisher.publish(backpack_velocity)
 
         names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
                  "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
