@@ -104,7 +104,7 @@ Eigen::Vector3d SensorFusion::getCOM() const
 {
     Eigen::Vector3d com_body_position = m_robot_description->findNode("com")->getGlobalPosition(m_joint_positions);
     Eigen::Vector3d com_inertial_position;
-    com_inertial_position.noalias() = m_state_posterior.imu_orientation * com_body_position + m_state_posterior.imu_position;
+    com_inertial_position.noalias() = m_state_posterior.imu_orientation * com_body_position; // + m_state_posterior.imu_position;
     return com_inertial_position;
 }
 
@@ -112,7 +112,7 @@ Eigen::Vector3d SensorFusion::getCOMVelocity() const
 {
     Eigen::Vector3d com_body_velocity = m_robot_description->findNode("com")->getGlobalVelocity(m_joint_positions, m_joint_velocities);
     Eigen::Vector3d com_inertial_velocity;
-    com_inertial_velocity.noalias() = m_state_posterior.imu_orientation * com_body_velocity + m_state_posterior.imu_velocity;
+    com_inertial_velocity.noalias() = m_state_posterior.imu_orientation * com_body_velocity; // + m_state_posterior.imu_velocity;
     return com_inertial_velocity;
 }
 

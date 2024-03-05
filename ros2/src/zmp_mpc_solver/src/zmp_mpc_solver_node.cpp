@@ -52,8 +52,8 @@ SolverNode::SolverNode()
 
 void SolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
-    m_zmp_solver.set_current_com(msg->position.x, msg->position.y, msg->velocity.x, msg->velocity.y);
-    m_zmp_solver.set_com_height(msg->position.z);
+    m_zmp_solver.set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
+    m_zmp_solver.set_com_height(msg->position.point.z);
 }
 
 void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)

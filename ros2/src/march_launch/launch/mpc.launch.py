@@ -250,7 +250,7 @@ def generate_launch_description() -> LaunchDescription:
             executable='rviz2',
             name='rviz2',
             output='screen',
-            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen.rviz")],
+            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen_mpc.rviz")],
             condition=IfCondition(rviz),
         ),
         Node(

@@ -5,6 +5,7 @@
 
 #include "march_state_estimator/sensor_fusion_node.hpp"
 
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -246,9 +247,10 @@ void SensorFusionNode::publishMPCEstimation()
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = this->now();
     com_msg.header.frame_id = "world";
-    com_msg.position.x = com_position.x();
-    com_msg.position.y = com_position.y();
-    com_msg.position.z = com_position.z();
+    com_msg.position.header = com_msg.header;
+    com_msg.position.point.x = com_position.x();
+    com_msg.position.point.y = com_position.y();
+    com_msg.position.point.z = com_position.z();
     com_msg.velocity.x = com_velocity.x();
     com_msg.velocity.y = com_velocity.y();
     com_msg.velocity.z = com_velocity.z();
