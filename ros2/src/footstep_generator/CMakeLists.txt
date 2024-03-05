@@ -26,8 +26,7 @@ include_directories(include)
 
 add_library(${PROJECT_NAME}
   STATIC
-  src/footstep_generator_m9.cpp
-  src/footstep_generator_m9_node.cpp
+
   src/footstep_generator.cpp
   src/footstep_generator_node.cpp
 )

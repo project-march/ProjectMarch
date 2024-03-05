@@ -36,9 +36,9 @@ ModeMachineCartesianNode::~ModeMachineCartesianNode()
     RCLCPP_WARN(this->get_logger(), "Deconstructor of Mode Machine node called");
 }
 
-void ModeMachineCartesianNode::sendRequest(const exoMode& desired_mode){
-    int requested_gait = (int)desired_mode;
-    m_footstep_request->gait_type = requested_gait;
+void ModeMachineCartesianNode::sendRequest(const int& desired_mode){
+    m_footstep_request->gait_type = desired_mode;
+    m_footstep_request->stance_leg = 0; 
     m_footstep_future = m_footstep_client->async_send_request(
         m_footstep_request, std::bind(&ModeMachineCartesianNode::responseFootstepCallback, this, _1));
 
@@ -83,9 +83,9 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         auto mode_msg = march_shared_msgs::msg::ExoMode();
         mode_msg.mode = m_mode_machine.getCurrentMode();
         m_mode_publisher->publish(mode_msg);
-
+        
         if (m_mode_machine.getCurrentMode() == 10){
-            sendRequest(static_cast<exoMode>(m_mode_machine.getCurrentMode())); 
+            sendRequest(2); 
         }
 
         //TODO: Remove following logic from here. When you now activate the VariableWalk, the mode machine will send a distance of 0.4 to the gait planning module. This distance should come from footstepplanner. Somewhere
