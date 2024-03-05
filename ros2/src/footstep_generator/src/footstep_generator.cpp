@@ -119,7 +119,8 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
             footstep.position.y = y;
             footstep.position.z = 0;
             footstep_array.poses.push_back(footstep);
-
+;
+    m_steps = 
             x = 0.0;
             y += m_vy * 1.0 + stance_leg * m_l;
             footstep.position.x = x;

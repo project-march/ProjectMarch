@@ -4,6 +4,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/srv/request_footsteps.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <chrono>
