@@ -138,6 +138,70 @@ TEST_F(TorqueConverterTest, test_should_get_zero_dynamical_joint_acceleration_fr
     EXPECT_EQ(expected_dynamical_joint_acceleration, actual_dynamical_joint_acceleration);
 }
 
+TEST_F(TorqueConverterTest, test_should_get_nonzero_static_dynamical_torque_from_rotational_test_setup_in_zero_position)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", 0.0 } };
+    RobotNode::JointNameToValueMap joint_velocities = { { "bar", 0.0 } };
+    RobotNode::JointNameToValueMap joint_accelerations = { { "bar", 0.0 } };
+
+    double actual_dynamical_torque_at_joint_bar
+        = m_torque_converter
+              ->getDynamicalTorques(joint_positions, joint_velocities, joint_accelerations).at("bar");
+
+    std::cout << "actual_dynamical_torque_at_joint_bar: " << actual_dynamical_torque_at_joint_bar << std::endl;
+
+    EXPECT_NE(0.0, actual_dynamical_torque_at_joint_bar);
+}
+
+TEST_F(TorqueConverterTest, test_should_get_zero_static_dynamical_torque_from_rotational_test_setup_in_upright_position)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", M_PI_4 } };
+    RobotNode::JointNameToValueMap joint_velocities = { { "bar", 0.0 } };
+    RobotNode::JointNameToValueMap joint_accelerations = { { "bar", 0.0 } };
+
+    double actual_dynamical_torque_at_joint_bar
+        = m_torque_converter
+              ->getDynamicalTorques(joint_positions, joint_velocities, joint_accelerations).at("bar");
+
+    std::cout << "actual_dynamical_torque_at_joint_bar: " << actual_dynamical_torque_at_joint_bar << std::endl;
+
+    EXPECT_NEAR(0.0, actual_dynamical_torque_at_joint_bar, 1e-12);
+}
+
+TEST_F(TorqueConverterTest, test_should_get_zero_static_dynamical_torque_from_rotational_test_setup_in_hanging_position)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", -3 * M_PI_4 } };
+    RobotNode::JointNameToValueMap joint_velocities = { { "bar", 0.0 } };
+    RobotNode::JointNameToValueMap joint_accelerations = { { "bar", 0.0 } };
+
+    double actual_dynamical_torque_at_joint_bar
+        = m_torque_converter
+              ->getDynamicalTorques(joint_positions, joint_velocities, joint_accelerations).at("bar");
+
+    std::cout << "actual_dynamical_torque_at_joint_bar: " << actual_dynamical_torque_at_joint_bar << std::endl;
+
+    EXPECT_NEAR(0.0, actual_dynamical_torque_at_joint_bar, 1e-12);
+}
+
+TEST_F(TorqueConverterTest, test_should_get_max_static_dynamical_torque_from_rotational_test_setup_in_horizontal_position)
+{
+    setupRotationalTestSetup();
+    RobotNode::JointNameToValueMap joint_positions = { { "bar", -M_PI_4 } };
+    RobotNode::JointNameToValueMap joint_velocities = { { "bar", 0.0 } };
+    RobotNode::JointNameToValueMap joint_accelerations = { { "bar", 0.0 } };
+
+    double actual_dynamical_torque_at_joint_bar
+        = m_torque_converter
+              ->getDynamicalTorques(joint_positions, joint_velocities, joint_accelerations).at("bar");
+
+    std::cout << "actual_dynamical_torque_at_joint_bar: " << actual_dynamical_torque_at_joint_bar << std::endl;
+
+    EXPECT_NEAR(-2.3383617890432653, actual_dynamical_torque_at_joint_bar, 1e-12);
+}
+
 TEST_F(TorqueConverterTest, test_should_be_able_to_calculate_external_forces_from_dummy_total_joint_torques_and_dummy_dynamical_joint_torques_from_rotational_test_setup)
 {
     setupRotationalTestSetup();

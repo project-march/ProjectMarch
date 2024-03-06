@@ -36,11 +36,13 @@ public:
 
     void setDt(const double& dt);
     void setJointConfigurations(const std::vector<std::string>& joint_names,
-        const std::vector<double>& joint_lower_limits, const std::vector<double>& joint_upper_limits);
+        const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
+        const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits);
     void setTaskNames(const std::vector<std::string>& task_names);
 
 private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
+    Eigen::VectorXd clampJointVelocities(Eigen::VectorXd desired_joint_velocities);
 
     const unsigned int LOWER_JOINT_LIMIT = 0;
     const unsigned int UPPER_JOINT_LIMIT = 1;
@@ -53,7 +55,8 @@ private:
     Eigen::VectorXd m_desired_joint_velocities;
 
     std::vector<std::string> m_joint_names;
-    std::vector<JointLimit> m_joint_limits;
+    std::vector<JointLimit> m_joint_position_limits;
+    std::vector<JointLimit> m_joint_velocity_limits;
 };
 
 #endif // IK_SOLVER__IK_SOLVER_HPP_

@@ -14,7 +14,7 @@ RobotZMP::RobotZMP()
     setNormOrder(2); // TODO: Make this a parameter
 }
 
-Eigen::Vector3d RobotZMP::getGlobalPosition(JointNameToValueMap joint_positions) const
+Eigen::Vector3d RobotZMP::getGlobalPosition(const JointNameToValueMap& joint_positions) const
 {
     Eigen::Vector3d global_position = Eigen::Map<Eigen::Vector3d>(
         evaluateExpression(m_global_position_expressions, m_joint_nodes, WORKSPACE_DIM, 1, joint_positions).data());
@@ -22,7 +22,7 @@ Eigen::Vector3d RobotZMP::getGlobalPosition(JointNameToValueMap joint_positions)
     return normalizeZmp(global_position);
 }
 
-Eigen::MatrixXd RobotZMP::getGlobalPositionJacobian(JointNameToValueMap joint_positions) const
+Eigen::MatrixXd RobotZMP::getGlobalPositionJacobian(const JointNameToValueMap& joint_positions) const
 {
     Eigen::MatrixXd global_position_jacobian = evaluateExpression(
         m_global_position_jacobian_expressions, m_joint_nodes, WORKSPACE_DIM, m_joint_nodes.size(), joint_positions);
@@ -70,10 +70,10 @@ Eigen::MatrixXd RobotZMP::getFootBoundingPolygon(const Eigen::Vector2d& foot_pos
 {
     Eigen::MatrixXd polygon(NUM_POLYGON_VERTICES, NUM_POLYGON_AXES);
 
-    polygon.row(0) = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, FOOT_WIDTH_2);
-    polygon.row(1) = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, FOOT_WIDTH_2);
-    polygon.row(2) = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, -FOOT_WIDTH_2);
-    polygon.row(3) = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, -FOOT_WIDTH_2);
+    polygon.row(0).noalias() = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, FOOT_WIDTH_2);
+    polygon.row(1).noalias() = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, FOOT_WIDTH_2);
+    polygon.row(2).noalias() = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, -FOOT_WIDTH_2);
+    polygon.row(3).noalias() = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, -FOOT_WIDTH_2);
 
     return polygon;
 }

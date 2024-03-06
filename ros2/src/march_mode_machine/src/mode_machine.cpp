@@ -17,19 +17,7 @@ ModeMachine::ModeMachine()
     RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Mode Machine created");
     m_current_mode = exoMode::BootUp;
     // NOTE: Possible improvement is that the modes and allowed transitions are loaded from a config file.
-    m_exo_transitions = {
-        /*{CurrentMode, PossibleModes}*/
-        { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
-        { exoMode::Stand,
-            { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending} },
-        { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
-        { exoMode::BootUp, { exoMode::Stand } },
-        { exoMode::Error, {}},
-        { exoMode::Sideways, { exoMode::Stand}},
-        { exoMode::Ascending, { exoMode::Stand}},
-        { exoMode::Descending, { exoMode::Stand}}
-
-    };
+    m_exo_transitions = ExoModeTransitions("Joint Angles");
     
 }
 
@@ -65,8 +53,8 @@ bool ModeMachine::performTransition(const exoMode& desired_mode)
  */
 bool ModeMachine::isValidTransition(const exoMode& desired_mode) const
 {
-    std::set<exoMode> possibleTransitions = m_exo_transitions.at(m_current_mode);
-    return possibleTransitions.count(desired_mode) == 1;
+    std::set<exoMode> possible_transitions = m_exo_transitions.getPossibleTransitions(m_current_mode);
+    return possible_transitions.count(desired_mode) == 1;
 }
 
 /**
@@ -81,7 +69,7 @@ int ModeMachine::getCurrentMode() const
 
 std::set<exoMode> ModeMachine::getAvailableModes(exoMode current_mode) const
 {
-    return m_exo_transitions.at(current_mode);
+    return m_exo_transitions.getPossibleTransitions(current_mode);
 }
 
 void ModeMachine::setCurrentMode(const exoMode& mode)
@@ -89,7 +77,3 @@ void ModeMachine::setCurrentMode(const exoMode& mode)
         m_current_mode = mode;
 }
 
-void ModeMachine::setExoTransitions(const std::map<exoMode, std::set<exoMode>>& transitions)
-{
-        m_exo_transitions = transitions;
-}
