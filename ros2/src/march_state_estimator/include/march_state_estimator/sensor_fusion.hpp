@@ -56,6 +56,7 @@ public:
 
     void configureJointNames(const std::vector<std::string>& joint_names);
     void updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state);
+    void updateJointDynamics();
     void updateImu(const sensor_msgs::msg::Imu::SharedPtr imu);
     uint8_t updateStaticStanceLeg(
         const geometry_msgs::msg::Point* left_foot_position, 

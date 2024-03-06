@@ -38,6 +38,8 @@ public:
         const RobotNode::JointNameToValueMap& external_torques) const;
     std::vector<std::string> getJointNames() const;
 
+    
+
 private:
     Eigen::VectorXd convertToEigenVector(const RobotNode::JointNameToValueMap& joint_values) const;
 

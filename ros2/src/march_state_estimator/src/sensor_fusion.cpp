@@ -51,8 +51,16 @@ void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPt
         m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
         m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
     }
+}
+
+void SensorFusion::updateJointDynamics()
+{
     m_joint_accelerations
         = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
+    m_joint_dynamical_torques
+        = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
+    m_joint_external_torques
+        = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
 }
 
 void SensorFusion::updateImu(const sensor_msgs::msg::Imu::SharedPtr imu)

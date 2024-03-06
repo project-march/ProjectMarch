@@ -68,6 +68,9 @@ void SensorFusionNode::timerCallback()
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state or imu data received yet");
         return;
     }
+
+    m_sensor_fusion->updateJointDynamics();
+
     publishStateEstimation();
 }
 
@@ -100,8 +103,8 @@ void SensorFusionNode::publishStateEstimation()
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
-    // state_estimation_msg.stance_leg = m_sensor_fusion->updateStaticStanceLeg(
-    //     &foot_poses[0].position, &foot_poses[1].position);
-    state_estimation_msg.stance_leg = m_sensor_fusion->updateDynamicStanceLeg();
+    state_estimation_msg.stance_leg = m_sensor_fusion->updateStaticStanceLeg(
+        &foot_poses[0].position, &foot_poses[1].position);
+    // state_estimation_msg.stance_leg = m_sensor_fusion->updateDynamicStanceLeg();
     m_state_estimation_pub->publish(state_estimation_msg);
 }
