@@ -808,5 +808,12 @@ TEST_F(SensorFusionTest, test_should_get_foot_poses_for_hennie_with_koen)
     ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getFootPoses());
 }
 
+TEST_F(SensorFusionTest, test_should_get_feet_contact_heights_for_hennie_with_koen)
+{
+    setupHennieWithKoen();
+    sensor_msgs::msg::JointState::SharedPtr joint_state = createEmptyJointStateForHennieWithKoen();
+    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getFootContactHeight());
+}
+
 // NOLINTEND
 #endif // __clang_analyzer__
