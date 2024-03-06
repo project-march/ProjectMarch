@@ -97,6 +97,9 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
             break;
         }
 
+        default :
+            break; 
+
     }
     m_current_joint_angles_msg->points[0].positions = m_current_joint_angles_msg->points[1].positions; 
     m_current_joint_angles_msg->points[1].positions.clear();

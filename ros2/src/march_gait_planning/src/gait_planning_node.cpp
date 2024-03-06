@@ -47,7 +47,10 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
+    // desired footsteps will arrive here. Somehow determine if left or right foot should step and process accordingly. 
     geometry_msgs::msg::Point foot_pos = msg->poses[0].position; 
+    // determine if left or right, maybe by tracking the previous desired step? 
+
     float dist = foot_pos.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
@@ -149,6 +152,9 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
             break;
+        
+        case exoMode::VariableWalk :
+        //input from MPC comes in here. 
 
         default :
             break; 
