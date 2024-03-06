@@ -34,6 +34,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MujocoDataRequest.msg"
   "msg/MujocoInput.msg"
   "srv/ReadMujoco.srv"
+  "srv/MujocoKeyframe.srv"
 	DEPENDENCIES geometry_msgs control_msgs sensor_msgs trajectory_msgs
  )
 

@@ -9,6 +9,7 @@ from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from sensor_msgs.msg import JointState
+from mujoco_interfaces.srv import MujocoKeyframe
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -101,6 +102,8 @@ class MujocoSimNode(Node):
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 100)
         # Create a publisher for the reading-from-mujoco action
         self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
+        # Create a service for resetting to keyframe
+        self.keyframe_service = self.create_service(MujocoKeyframe, "mujoco_keyframe", self.keyframe_callback)
 
         # Initialize the low-level controller
         self.declare_parameters(
@@ -207,6 +210,12 @@ class MujocoSimNode(Node):
         for i, name in enumerate(msg.trajectory.joint_names):
             joint_pos_dict[name] = msg.trajectory.desired.positions[i]
         self.msg_queue.put(joint_pos_dict)
+
+    def keyframe_callback(self, request, response):
+        mujoco.mj_resetDataKeyframe(self.model, self.data, request.keyframe_id)
+        mujoco.mj_step(self.model, self.data)
+        response.success = True
+        return response
 
     def sim_step(self):
         """This function performs the simulation update.

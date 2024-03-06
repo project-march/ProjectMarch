@@ -45,7 +45,7 @@ See <https://www.gnu.org/licenses/>.
   <default>
     <site group="5"/>
     <motor ctrlrange="-1 1" ctrllimited="true"/>
-    <geom contype="0" conaffinity="0" condim="1" solref="0.005 1"/>
+    <geom contype="0" conaffinity="0" condim="4" solref="0.005 1"/>
     <equality solref="0.005 1"/>
     <default class="exoskeleton">
       <geom material="march_grey" group="2"/>
@@ -93,22 +93,15 @@ See <https://www.gnu.org/licenses/>.
     <light name="spotlight" mode="targetbodycom" target="backpack"
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
+
+    <body name="low_box_collision" pos="0.45 0 0" >
+      <geom type="box" size="0.5 0.5 0.05" rgba="0.49 0.2 0.49 1" condim="6" conaffinity="15"/>
+    </body>
+
     <body name="tendon_slider_top" pos="0.05 0 1.95">
       <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
       <joint name="tendon_slider_top" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <site name="tendon_fixture_top" size="0.05" pos="0 0 0"></site>
-    </body>
-
-    <body name="tendon_slider_left" pos="0.2 0.5 1">
-      <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
-      <joint name="tendon_slider_left" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <site name="tendon_fixture_left" size="0.05" pos="0 0 0"></site>
-    </body>
-
-    <body name="tendon_slider_right" pos="0.2 -0.5 1">
-      <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
-      <joint name="tendon_slider_right" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <site name="tendon_fixture_right" size="0.05" pos="0 0 0"></site>
     </body>
 
     <body name="safety_catcher" pos="-0.2 0 1">
@@ -116,9 +109,9 @@ See <https://www.gnu.org/licenses/>.
       <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
-      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/> -->
+      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 15" pos="0 0 0"/>
-      <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/> -->
+      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/>
 
 
       <body name="backpack"
@@ -183,9 +176,12 @@ See <https://www.gnu.org/licenses/>.
                   <geom type="mesh" mesh="L_foot"/>
 
                   <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                  <geom name="L_foot" type="box" size="0.159 0.057 0.005"
-                      pos="0.069 -0.086 -0.138"  class="L_collision"
+                  <geom name="L_foot" type="box" size="0.159 0.057 0.007"
+                      pos="0.069 -0.086 -0.128"  class="L_collision"
                       friction="3.0"/>
+
+                  <geom name="L_foot_collision" type="box" size="0.159 0.057 0.007"
+                      pos="0.069 -0.086 -0.128" rgba="1 0 0 0.5"/>
                   </body>
               </body>
             </body>
@@ -234,9 +230,11 @@ See <https://www.gnu.org/licenses/>.
                 <geom type="mesh" mesh="R_foot"/>
                 
                 <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                <geom name="R_foot" type="box" size="0.159 0.057 0.005"
-                    pos="0.069 0.086 -0.138"  class="R_collision"
+                <geom name="R_foot" type="box" size="0.159 0.057 0.007"
+                    pos="0.069 0.086 -0.128"  class="R_collision"
                     friction="3.0"/>
+                <geom name="R_foot_collision" type="box" size="0.159 0.057 0.007"
+                    pos="0.069 0.086 -0.128"  rgba="0 1 0 0.5"/>
                 </body>
             </body>
           </body>
@@ -254,20 +252,6 @@ See <https://www.gnu.org/licenses/>.
     </spatial>
   </tendon>
 
-  <!-- <tendon>
-    <spatial range="0 0.37" limited="true" width=".004" rgba=".3 .95 .3 1" stiffness="100">
-      <site site="tendon_left" />
-      <site site="tendon_fixture_left" />
-    </spatial>
-  </tendon>
-
-  <tendon>
-    <spatial range="0 0.37" limited="true" width=".004" rgba=".95 .95 .3 1" stiffness="100">
-      <site site="tendon_right" />
-      <site site="tendon_fixture_right" />
-    </spatial>
-  </tendon> -->
-
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
     <motor name="left_ankle"    gear="179"  joint="L_ADPF"  />
@@ -279,6 +263,48 @@ See <https://www.gnu.org/licenses/>.
     <motor name="right_hip_fe"     gear="250" joint="R_HFE"   />
     <motor name="right_knee"     gear="250"  joint="R_KFE" />
   </actuator>
+
+  <keyframe>
+      <!-- 
+      initial positions for the joints in the kinematic chain 
+            sx sy sz hx hy hz < - safety catcher joints [s = slider, h = hinge]
+            L_HAA
+            L_HFE
+            L_KFE
+            L_ADPF
+            L_AIE
+            R_HAA
+            R_HFE
+            R_KFE
+            R_ADPF
+            R_AIE
+      -->
+    <key name="zero"
+      qpos="0 0 0 0 0 0 0
+            0
+            0
+            0
+            0
+            0
+            0
+            0
+            0
+            0
+            0"/>
+    <key name="test"
+      qpos="0 0 0 0 0 0 0
+            0
+            0
+            45
+            0
+            0
+            0
+            0
+            45
+            0
+            0"/>
+    
+  </keyframe>
 
   <sensor>
     <!-- User parameter is the number of absolute encoder bits -->

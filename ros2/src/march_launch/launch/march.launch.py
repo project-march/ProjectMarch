@@ -238,13 +238,13 @@ def generate_launch_description() -> LaunchDescription:
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen.rviz")],
             condition=IfCondition(rviz),
         ),
-        Node(
-            package='march_aie_gait_planning',
-            executable='one_leg_balance_node',
-            name='one_leg_balance_node',
-            output='screen',
-            condition=IfCondition(aie_force),
-        ),
+        # Node(
+        #     package='march_aie_gait_planning',
+        #     executable='one_leg_balance_node',
+        #     name='one_leg_balance_node',
+        #     output='screen',
+        #     condition=IfCondition(aie_force),
+        # ),
 
         mujoco_node,
         march_control,
