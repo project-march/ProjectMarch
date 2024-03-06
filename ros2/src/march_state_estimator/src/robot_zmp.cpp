@@ -70,10 +70,10 @@ Eigen::MatrixXd RobotZMP::getFootBoundingPolygon(const Eigen::Vector2d& foot_pos
 {
     Eigen::MatrixXd polygon(NUM_POLYGON_VERTICES, NUM_POLYGON_AXES);
 
-    polygon.row(0) = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, FOOT_WIDTH_2);
-    polygon.row(1) = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, FOOT_WIDTH_2);
-    polygon.row(2) = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, -FOOT_WIDTH_2);
-    polygon.row(3) = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, -FOOT_WIDTH_2);
+    polygon.row(0).noalias() = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, FOOT_WIDTH_2);
+    polygon.row(1).noalias() = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, FOOT_WIDTH_2);
+    polygon.row(2).noalias() = foot_position + Eigen::Vector2d(-FOOT_LENGTH_2, -FOOT_WIDTH_2);
+    polygon.row(3).noalias() = foot_position + Eigen::Vector2d(FOOT_LENGTH_2, -FOOT_WIDTH_2);
 
     return polygon;
 }

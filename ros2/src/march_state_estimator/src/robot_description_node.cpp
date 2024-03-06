@@ -26,12 +26,12 @@ RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> rob
 
     m_service_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
-    m_subscription_state_estimation
-        = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10,
-            std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
-    m_publisher_state_estimator_visualization
-        = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
-            "state_estimation/visualization", 10);
+    // m_subscription_state_estimation
+    //     = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10,
+    //         std::bind(&RobotDescriptionNode::stateEstimationCallback, this, std::placeholders::_1));
+    // m_publisher_state_estimator_visualization
+    //     = this->create_publisher<march_shared_msgs::msg::StateEstimatorVisualization>(
+    //         "state_estimation/visualization", 10);
 
     m_service_node_position = this->create_service<march_shared_msgs::srv::GetNodePosition>(
         "state_estimation/get_node_position",
@@ -60,12 +60,12 @@ void RobotDescriptionNode::stateEstimationCallback(const march_shared_msgs::msg:
         return;
     }
 
-    // std::unordered_map<std::string, double> joint_positions;
-    // std::transform(msg->joint_state.name.begin(), msg->joint_state.name.end(), msg->joint_state.position.begin(),
-    //     std::inserter(joint_positions, joint_positions.end()), [](const std::string& name, const double& position) {
-    //         return std::make_pair(name, position);
-    //     });
-    // publishVisualization(joint_positions);
+    std::unordered_map<std::string, double> joint_positions;
+    std::transform(msg->joint_state.name.begin(), msg->joint_state.name.end(), msg->joint_state.position.begin(),
+        std::inserter(joint_positions, joint_positions.end()), [](const std::string& name, const double& position) {
+            return std::make_pair(name, position);
+        });
+    publishVisualization(joint_positions);
 }
 
 void RobotDescriptionNode::publishVisualization(const std::unordered_map<std::string, double>& joint_positions)
@@ -120,16 +120,22 @@ void RobotDescriptionNode::handleNodePositionRequest(
 
     for (auto& robot_node : robot_nodes) {
         Eigen::Vector3d position = robot_node->getGlobalPosition(joint_positions);
-        Eigen::Quaterniond quaternion = Eigen::Quaterniond(robot_node->getGlobalRotation(joint_positions));
+        Eigen::Quaterniond orientation = Eigen::Quaterniond(robot_node->getGlobalRotation(joint_positions));
+
+        if (request->reference_frame == "inertial") {
+            Eigen::Quaterniond inertial_quaternion = m_robot_description->getInertialOrientation();
+            position.noalias() = inertial_quaternion.toRotationMatrix() * position;
+            orientation = inertial_quaternion * orientation;
+        }
 
         geometry_msgs::msg::Pose node_pose;
         node_pose.position.x = position.x();
         node_pose.position.y = position.y();
         node_pose.position.z = position.z();
-        node_pose.orientation.x = quaternion.x();
-        node_pose.orientation.y = quaternion.y();
-        node_pose.orientation.z = quaternion.z();
-        node_pose.orientation.w = quaternion.w();
+        node_pose.orientation.x = orientation.x();
+        node_pose.orientation.y = orientation.y();
+        node_pose.orientation.z = orientation.z();
+        node_pose.orientation.w = orientation.w();
 
         response->node_poses.push_back(node_pose);
     }
@@ -169,6 +175,13 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
 
         Eigen::MatrixXd position_jacobian = robot_node->getGlobalPositionJacobian(joint_positions);
         Eigen::MatrixXd rotation_jacobian = robot_node->getGlobalRotationJacobian(joint_positions);
+
+        if (request->reference_frame == "inertial") {
+            Eigen::Matrix3d orientation_matrix = m_robot_description->getInertialOrientation().toRotationMatrix();
+            position_jacobian.noalias() = orientation_matrix * position_jacobian;
+            rotation_jacobian.noalias() = orientation_matrix * rotation_jacobian;
+        }
+
         Eigen::MatrixXd jacobian(position_jacobian.rows() + rotation_jacobian.rows(), position_jacobian.cols());
         jacobian << position_jacobian, rotation_jacobian;
 
