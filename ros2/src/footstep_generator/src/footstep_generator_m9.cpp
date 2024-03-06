@@ -49,7 +49,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generateFootPlacements(int gait
     footstep_array.header.frame_id = "world";
 
     switch (gait_type) {
-        case 10: // VariableWalk  
+        case 10: // VariableStep  
         // publish 3x a footstep with the right foot 
         for (auto i = 0; i < m_steps; ++i){
             footstep.position.x = m_current_right_foot.position.x + (i+1)*m_step_length; 

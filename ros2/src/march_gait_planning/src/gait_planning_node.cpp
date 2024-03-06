@@ -135,7 +135,7 @@ void GaitPlanningNode::footPositionsPublish(){
             }
             break;
 
-        case exoMode::VariableWalk : 
+        case exoMode::VariableStep : 
             if (m_current_trajectory.empty()){
                // eventually this will be the stepclose function
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);

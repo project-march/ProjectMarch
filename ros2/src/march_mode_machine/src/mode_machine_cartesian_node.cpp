@@ -88,7 +88,7 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
             sendRequest(2); 
         }
 
-        //TODO: Remove following logic from here. When you now activate the VariableWalk, the mode machine will send a distance of 0.4 to the gait planning module. This distance should come from footstepplanner. Somewhere
+        //TODO: Remove following logic from here. When you now activate the VariableStep, the mode machine will send a distance of 0.4 to the gait planning module. This distance should come from footstepplanner. Somewhere
         // the logic to identify when we use the cameras should be included (maybe a boolean?)
         if (mode_msg.mode == 10){
             march_shared_msgs::msg::FootStepOutput feet_msg; 

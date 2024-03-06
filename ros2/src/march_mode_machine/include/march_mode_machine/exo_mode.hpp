@@ -15,7 +15,7 @@ enum class exoMode {
     SmallWalk = 7,
     Ascending = 8,
     Descending = 9,
-    VariableWalk = 10,
+    VariableStep = 10,
 };
 
 inline std::string toString(exoMode state) {
@@ -30,7 +30,7 @@ inline std::string toString(exoMode state) {
         case exoMode::SmallWalk: return "SmallWalk";
         case exoMode::Ascending: return "Ascending";
         case exoMode::Descending: return "Descending";
-        case exoMode::VariableWalk: return "VariableWalk";
+        case exoMode::VariableStep: return "VariableStep";
         default: return "Unknown";
     }
 }
