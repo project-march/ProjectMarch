@@ -45,6 +45,12 @@
   ],
   [
     {
+      "name": "VariableWalk",
+      "exoMode": 11
+    }
+  ],
+  [
+    {
       "name": "Error",
       "exoMode": 4
     },

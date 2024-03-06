@@ -149,6 +149,9 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
             break;
+
+        default :
+            break; 
     }
 }
 
