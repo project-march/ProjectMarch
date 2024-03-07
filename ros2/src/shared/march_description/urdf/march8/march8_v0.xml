@@ -312,14 +312,22 @@ See <https://www.gnu.org/licenses/>.
     <!-- torque sensors; connected to the actuator-->
 
 <!--    TODO: This could also be of the type actuatorvel -->
-    <torque name="L_ADPF_tor_output" site="tor_L_ADPF" user="13" noise="000"/>
-    <torque name="L_HAA_tor_output" site="tor_L_HAA" user="13" noise="000"/>
-    <torque name="L_HFE_tor_output" site="tor_L_HFE" user="13" noise="000"/>
-    <torque name="L_KFE_tor_output" site="tor_L_KFE" user="13" noise="000"/>
-    <torque name="R_ADPF_tor_output" site="tor_R_ADPF" user="13" noise="000"/>
-    <torque name="R_HAA_tor_output" site="tor_R_HAA" user="13" noise="000"/>
-    <torque name="R_HFE_tor_output" site="tor_R_HFE" user="13" noise="000"/>
-    <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
+    <!-- <torque name="L_ADPF_tor_output" site="tor_L_ADPF" user="13" noise="000"/> -->
+    <!-- <torque name="L_HAA_tor_output" site="tor_L_HAA" user="13" noise="000"/> -->
+    <!-- <torque name="L_HFE_tor_output" site="tor_L_HFE" user="13" noise="000"/> -->
+    <!-- <torque name="L_KFE_tor_output" site="tor_L_KFE" user="13" noise="000"/> -->
+    <!-- <torque name="R_ADPF_tor_output" site="tor_R_ADPF" user="13" noise="000"/> -->
+    <!-- <torque name="R_HAA_tor_output" site="tor_R_HAA" user="13" noise="000"/> -->
+    <!-- <torque name="R_HFE_tor_output" site="tor_R_HFE" user="13" noise="000"/> -->
+    <!-- <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/> -->
+    <jointactuatorfrc name="L_ADPF_tor_output" joint="L_ADPF" user="13" noise="000"/>
+    <jointactuatorfrc name="L_HAA_tor_output" joint="L_HAA" user="13" noise="000"/>
+    <jointactuatorfrc name="L_HFE_tor_output" joint="L_HFE" user="13" noise="000"/>
+    <jointactuatorfrc name="L_KFE_tor_output" joint="L_KFE" user="13" noise="000"/>
+    <jointactuatorfrc name="R_ADPF_tor_output" joint="R_ADPF" user="13" noise="000"/>
+    <jointactuatorfrc name="R_HAA_tor_output" joint="R_HAA" user="13" noise="000"/>
+    <jointactuatorfrc name="R_HFE_tor_output" joint="R_HFE" user="13" noise="000"/>
+    <jointactuatorfrc name="R_KFE_tor_output" joint="R_KFE" user="13" noise="000"/>
 
     <!-- pressure soles not finished yet -->
     <force name="L_pressuresole_1_output" site="pres_L_0" noise="000" cutoff="000"/>

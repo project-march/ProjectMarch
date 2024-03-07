@@ -70,13 +70,14 @@ class SensorDataExtraction:
         joint_acc = []
         joint_acc_sensor_adr = []
         for i, sensor_type in enumerate(self.sensor_type):
-            if sensor_type == mjtSensor.mjSENS_TORQUE:
+            if sensor_type == mjtSensor.mjSENS_JOINTACTFRC:
                 joint_acc_sensor_adr.append(self.sensor_adr[i])
         for adr in joint_acc_sensor_adr:
-            torque_x = self.sensordata[adr]
-            torque_y = self.sensordata[adr + 1]
-            torque_z = self.sensordata[adr + 2]
-            torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
+            # torque_x = self.sensordata[adr]
+            # torque_y = self.sensordata[adr + 1]
+            # torque_z = self.sensordata[adr + 2]
+            # torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
+            torque_res = self.sensordata[adr]
             joint_acc.append(torque_res)
         return joint_acc
 
