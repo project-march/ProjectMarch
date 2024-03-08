@@ -28,7 +28,7 @@ public:
         // TODO: Change the node threads
         std::thread thread_left(&CamerasInterface::readParameters, left, parameters);
         thread_left.detach();
-        std::thread thread_right(&CamerasInterface::readParameters, right, parameters);
+        std::thread thread_right(&CameraInterface::readParameters, right, parameters);
         thread_right.detach();
 
         rcl_interfaces::msg::SetParametersResult result;
