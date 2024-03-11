@@ -35,7 +35,9 @@ private:
     void configureIKSolutions();
     bool isWithinTimeWindow(const rclcpp::Time& time_stamp);
     bool isWithinMaxIterations(const unsigned int& iterations);
+
     std::vector<double> createZeroVector();
+    Eigen::VectorXd calculateJointVelocities(const Eigen::VectorXd& m_desired_joint_positions) const;
 
     std::unique_ptr<IKSolver> m_ik_solver;
     uint64_t m_joint_trajectory_controller_period;

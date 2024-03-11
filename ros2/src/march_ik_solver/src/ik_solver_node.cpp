@@ -133,7 +133,6 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         Eigen::VectorXd desired_joint_positions = m_ik_solver->integrateJointVelocities();
         double error = m_ik_solver->getTasksError();
         if (error < best_error) {
-            m_desired_joint_velocities = desired_joint_velocities;
             m_desired_joint_positions = desired_joint_positions;
             best_error = error;
         }
@@ -145,6 +144,9 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
     RCLCPP_INFO_THROTTLE(
         this->get_logger(), *get_clock(), 2000, "Iteration: %d, Error norm: %f", iteration, best_error);
+
+    // Calculate the joint velocities.
+    m_desired_joint_velocities = calculateJointVelocities(m_desired_joint_positions);
 
     // Publish the error norm and iterations.
     publishErrorNorm(best_error);
@@ -250,6 +252,15 @@ std::vector<double> IKSolverNode::createZeroVector()
 {
     std::vector<double> zero_vector(m_joint_names.size(), 0.0);
     return zero_vector;
+}
+
+Eigen::VectorXd IKSolverNode::calculateJointVelocities(const Eigen::VectorXd& desired_joint_positions) const
+{
+    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    for (unsigned int i = 0; i < m_joint_names.size(); i++) {
+        joint_velocities(i) = (desired_joint_positions(i) - m_actual_joint_positions[i]) / m_state_estimator_time_offset;
+    }
+    return joint_velocities;
 }
 
 int main(int argc, char** argv)
