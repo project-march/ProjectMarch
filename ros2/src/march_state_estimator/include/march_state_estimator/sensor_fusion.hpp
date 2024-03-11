@@ -18,6 +18,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
+#include "geometry_msgs/msg/wrench.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -71,6 +72,7 @@ public:
     geometry_msgs::msg::Pose getImuPose() const;
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
     std::vector<double> getFootContactHeight() const;
+    std::vector<geometry_msgs::msg::Wrench> getFootContactForce() const;
 
     Eigen::Quaterniond getFilteredOrientation() const;
     Eigen::Quaterniond getExponentialMap(const Eigen::Vector3d& vector) const;

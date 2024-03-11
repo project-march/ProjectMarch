@@ -72,6 +72,7 @@ void SensorFusion::updateImu(const sensor_msgs::msg::Imu::SharedPtr imu)
     m_recent_imu_msg = imu;
     m_quaternion = Eigen::Quaterniond(imu->orientation.w, imu->orientation.x, imu->orientation.y, imu->orientation.z);
     m_robot_description->setInertialOrientation(m_quaternion);
+    m_torque_converter->setInertialToBackpackOrientation(m_quaternion);
 }
 
 uint8_t SensorFusion::updateStaticStanceLeg(
@@ -88,6 +89,8 @@ uint8_t SensorFusion::updateStaticStanceLeg(
     } else if (left_foot_position->x - margin > right_foot_position->x) {
         stance_leg = 0b01;
     }
+
+    Eigen::VectorXd rnea = m_torque_converter->rnea(m_joint_positions, m_joint_velocities, m_joint_accelerations);
 
     m_robot_description->setStanceLeg(stance_leg,
         Eigen::Vector3d(left_foot_position->x, left_foot_position->y, left_foot_position->z),
@@ -204,6 +207,28 @@ std::vector<double> SensorFusion::getFootContactHeight() const
     }
 
     return foot_contact_height;
+}
+
+std::vector<geometry_msgs::msg::Wrench> SensorFusion::getFootContactForce() const
+{
+    std::vector<geometry_msgs::msg::Wrench> foot_wrenches;
+    std::vector<std::string> feet_names = { "L_foot", "R_foot" };
+
+    for (const auto& foot_name : feet_names) {
+        geometry_msgs::msg::Wrench foot_wrench;
+        Eigen::Vector3d foot_force = m_torque_converter->getExternalForceByNode(foot_name, m_joint_positions, m_joint_external_torques);
+        Eigen::Vector3d foot_position = m_robot_description->findNode(foot_name)->getGlobalPosition(m_joint_positions);
+        Eigen::Vector3d foot_torque = foot_position.cross(foot_force);
+        foot_wrench.force.x = foot_force.x();
+        foot_wrench.force.y = foot_force.y();
+        foot_wrench.force.z = foot_force.z();
+        foot_wrench.torque.x = foot_torque.x();
+        foot_wrench.torque.y = foot_torque.y();
+        foot_wrench.torque.z = foot_torque.z();
+        foot_wrenches.push_back(foot_wrench);
+    }
+
+    return foot_wrenches;
 }
 
 Eigen::Quaterniond SensorFusion::getFilteredOrientation() const

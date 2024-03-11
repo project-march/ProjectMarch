@@ -36,6 +36,8 @@ find_package(urdf REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(kdl_parser REQUIRED)
+find_package(orocos_kdl REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -67,6 +69,8 @@ ament_target_dependencies(${PROJECT_NAME}
   march_shared_msgs
   urdf
   Eigen3
+  kdl_parser
+  orocos_kdl
 )
 
 # Create state_estimator_node executable
@@ -96,6 +100,8 @@ ament_target_dependencies(state_estimator_node
   march_shared_msgs
   urdf
   Eigen3
+  kdl_parser
+  orocos_kdl
 )
 
 target_link_libraries(state_estimator_node

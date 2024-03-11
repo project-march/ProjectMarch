@@ -47,6 +47,9 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
     m_imu_pose_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("state_estimation/imu_pose", 10);
 
+    m_left_foot_wrench_pub = this->create_publisher<geometry_msgs::msg::WrenchStamped>("state_estimation/left_foot_wrench", 10);
+    m_right_foot_wrench_pub = this->create_publisher<geometry_msgs::msg::WrenchStamped>("state_estimation/right_foot_wrench", 10);
+
     // M8's MPC
     m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
     m_mpc_com_pub = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 10);
@@ -82,6 +85,7 @@ void SensorFusionNode::timerCallback()
 
     publishStateEstimation();
     publishFeetHeight();
+    publishFeetContactForces();
     publishMPCEstimation();
 }
 
@@ -135,11 +139,28 @@ void SensorFusionNode::publishFeetHeight()
     m_feet_height_pub->publish(feet_height_msg);
 }
 
+void SensorFusionNode::publishFeetContactForces()
+{
+    std::vector<geometry_msgs::msg::Wrench> foot_wrenches_msg = m_sensor_fusion->getFootContactForce();
+
+    geometry_msgs::msg::WrenchStamped left_foot_wrench_msg;
+    left_foot_wrench_msg.header.stamp = this->now();
+    left_foot_wrench_msg.header.frame_id = "L_ground";
+    left_foot_wrench_msg.wrench = foot_wrenches_msg[0];
+    m_left_foot_wrench_pub->publish(left_foot_wrench_msg);
+
+    geometry_msgs::msg::WrenchStamped right_foot_wrench_msg;
+    right_foot_wrench_msg.header.stamp = this->now();
+    right_foot_wrench_msg.header.frame_id = "R_ground";
+    right_foot_wrench_msg.wrench = foot_wrenches_msg[1];
+    m_right_foot_wrench_pub->publish(right_foot_wrench_msg);
+}
+
 void SensorFusionNode::publishMPCEstimation()
 {
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
-    uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
+    uint8_t stance_leg = m_sensor_fusion->updateStaticStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
 
     Eigen::Vector3d com_position = m_sensor_fusion->getCOM();
     Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity();

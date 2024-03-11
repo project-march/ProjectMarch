@@ -22,6 +22,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
+#include "geometry_msgs/msg/wrench_stamped.hpp"
 #include "std_msgs/msg/int32.hpp"
 
 #include "march_state_estimator/robot_description.hpp"
@@ -40,6 +41,7 @@ private:
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
+    void publishFeetContactForces();
 
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
@@ -55,6 +57,9 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr m_imu_pose_pub;
+
+    rclcpp::Publisher<geometry_msgs::msg::WrenchStamped>::SharedPtr m_left_foot_wrench_pub;
+    rclcpp::Publisher<geometry_msgs::msg::WrenchStamped>::SharedPtr m_right_foot_wrench_pub;
 
     // M8's MPC
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_pub;
