@@ -28,18 +28,33 @@
 namespace hardware_interface
 {
     constexpr char HW_IF_PROPORTIONAL_GAIN[] = "proportional_gain";
+    constexpr char HW_IF_DERIVATIVE_GAIN[] = "derivative_gain";
+    constexpr char HW_IF_INTEGRAL_GAIN[] = "integral_gain";
 }
 
 namespace march_scheduled_gains_controller
 {
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+using CmdType = std_msgs::msg::Float64MultiArray;
 class ScheduledGainsController : public forward_command_controller::ForwardCommandController
 {
 public:
   SCHEDULED_GAINS_CONTROLLER_PUBLIC
   ScheduledGainsController();
 
-  SCHEDULED_GAINS_CONTROLLER_PUBLIC controller_interface::return_type init(
-    const std::string & controller_name) override;
+  SCHEDULED_GAINS_CONTROLLER_PUBLIC 
+  controller_interface::return_type init(const std::string & controller_name) override;
+
+  SCHEDULED_GAINS_CONTROLLER_PUBLIC
+  controller_interface::InterfaceConfiguration command_interface_configuration() const override;
+
+  SCHEDULED_GAINS_CONTROLLER_PUBLIC 
+  CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
+
+
+private:
+  std::vector<std::string> m_joint_names;
+  std::vector<std::string> m_interface_names;
 };
 
 }  // namespace march_scheduled_gains_controller
