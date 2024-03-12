@@ -6,6 +6,8 @@
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include <sstream>
 #include <string>
+#include <optional>
+#include <iostream>
 
 namespace march {
 
@@ -114,6 +116,7 @@ public:
 
     bool dataIsValid() const override
     {
+        std::cout << axis_state_.value_ << '\n';
         return axis_state_.value_ != ODriveAxisState::UNDEFINED;
     }
 
@@ -158,6 +161,7 @@ public:
         return axis_state_.toString();
     }
 
+    // TODO: examine why the reference for axis_state_ cannot be found.
     ODriveAxisState axis_state_;
     uint32_t odrive_error_ {};
     uint32_t axis_error_ {};

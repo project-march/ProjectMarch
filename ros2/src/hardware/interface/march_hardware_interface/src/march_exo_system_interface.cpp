@@ -204,7 +204,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
+        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         // command_interfaces.emplace_back(hardware_interface::CommandInterface(
         //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
@@ -221,10 +221,10 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 {
     try {
         // Start ethercat cycle in the hardware
-        RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
+        // RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
         march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
         auto jointPtrs = march_robot_->getJoints();
-        RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
+        // RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
         repeat_function_on_joints_until_timeout(
             /*function_goal=*/"Waiting on ethercat data.",
             /*function=*/
@@ -242,8 +242,9 @@ hardware_interface::return_type MarchExoSystemInterface::start()
         for (JointInfo& jointInfo : joints_info_) {
             // Send PID values to the joints to initialize them
             jointInfo.joint.sendPID();
-            RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
+            // RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
 
+            // TODO: examine why this check is set to false.
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
             jointInfo.target_torque = jointInfo.joint.getTorque();
@@ -479,7 +480,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     // }
 
     RCLCPP_WARN((*logger_),
-        "The fuzzy target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
+        "Actuation target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
         "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
         jointInfo.torque, jointInfo.torque_weight);

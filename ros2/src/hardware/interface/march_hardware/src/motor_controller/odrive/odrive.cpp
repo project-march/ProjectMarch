@@ -191,6 +191,9 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
+    // logger_->info(logger_->fstring(
+    //         "Current axis state: '%f'", state->axis_state_.toString().c_str()));
+    // logger_->info('Current axis state: %f', state->axis_state_);
     state->odrive_error_ = getOdriveError();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();

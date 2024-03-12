@@ -102,7 +102,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
     // Preconditions check
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
-        if (!motor_controller_state->isOperational()) {
+        if (!motor_controller_state->isOperational()) {     
             logger_->fatal(logger_->fstring(
                 "[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().value().c_str()));
             throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
@@ -111,10 +111,11 @@ void Joint::readFirstEncoderValues(bool operational_check)
 
     if (motor_controller_->hasIncrementalEncoder()) {
         initial_incremental_position_ = motor_controller_->getIncrementalPosition();
+        logger_->warn(logger_->fstring("Initial incremental position: %f", initial_incremental_position_));
     }
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
-        logger_->warn(logger_->fstring("get absolute pos: %f", initial_absolute_position_));
+        logger_->warn(logger_->fstring("Initial absolute position: %f", initial_absolute_position_));
 
         position_ = initial_absolute_position_;
         if (operational_check && !isWithinHardLimits()) {
@@ -126,7 +127,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
     }
     if (motor_controller_->hasTorqueSensor()) {
         initial_torque_ = motor_controller_->getTorque();
-        logger_->warn(logger_->fstring("get initial torque: %f", initial_torque_));
+        logger_->warn(logger_->fstring("Initial torque: %f", initial_torque_));
         torque_ = initial_torque_;
         
         // Comment back in after debugging
@@ -136,7 +137,7 @@ void Joint::readFirstEncoderValues(bool operational_check)
                 initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
         }
     }
-    logger_->info(logger_->fstring("[%s] Read first values", this->name_.c_str()));
+    logger_->info(logger_->fstring("[%s] Read initial values", this->name_.c_str()));
 }
 
 void Joint::readEncoders()

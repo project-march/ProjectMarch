@@ -69,6 +69,7 @@ public:
      * @return string describing the current state as well as the error state(s)
      * of the motor controller
      */
+    // TODO: examine why virtual std::optional isn't allowed.
     virtual std::optional<std::string> getErrorStatus() const = 0;
 
     /**
