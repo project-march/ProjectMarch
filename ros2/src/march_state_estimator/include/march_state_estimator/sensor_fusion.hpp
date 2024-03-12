@@ -73,6 +73,7 @@ public:
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
     std::vector<double> getFootContactHeight() const;
     std::vector<geometry_msgs::msg::Wrench> getFootContactForce() const;
+    std::vector<double> getJointAcceleration() const;
 
     Eigen::Quaterniond getFilteredOrientation() const;
     Eigen::Quaterniond getExponentialMap(const Eigen::Vector3d& vector) const;
@@ -127,7 +128,7 @@ private:
     sensor_msgs::msg::JointState::SharedPtr m_recent_joint_state_msg;
     sensor_msgs::msg::Imu::SharedPtr m_recent_imu_msg;
 
-    // TODO: Remove these
+    std::vector<std::string> m_joint_names;
     RobotNode::JointNameToValueMap m_joint_positions;
     RobotNode::JointNameToValueMap m_joint_velocities;
     RobotNode::JointNameToValueMap m_joint_accelerations;

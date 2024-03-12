@@ -8,6 +8,7 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "march_shared_msgs/msg/joint_acceleration_state.hpp"
 
 #include <chrono>
 #include <functional>
@@ -121,6 +122,8 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
+    state_estimation_msg.joint_acceleration_state.name = m_joint_state->name;
+    state_estimation_msg.joint_acceleration_state.acceleration = m_sensor_fusion->getJointAcceleration();
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
@@ -141,6 +144,7 @@ void SensorFusionNode::publishFeetHeight()
 
 void SensorFusionNode::publishFeetContactForces()
 {
+    std::vector<std::string> foot_names = { "L_foot", "R_foot" };
     std::vector<geometry_msgs::msg::Wrench> foot_wrenches_msg = m_sensor_fusion->getFootContactForce();
 
     geometry_msgs::msg::WrenchStamped left_foot_wrench_msg;

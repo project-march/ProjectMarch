@@ -61,6 +61,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitResponse.msg"
   "msg/HighVoltageState.msg"
   "msg/IksFootPositions.msg"
+  "msg/JointAccelerationState.msg"
   "msg/JointMotorControllerState.msg"
   "msg/LowVoltageState.msg"
   "msg/MotorControllerStates.msg"

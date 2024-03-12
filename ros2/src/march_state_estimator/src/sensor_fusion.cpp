@@ -50,6 +50,7 @@ void SensorFusion::configureJointNames(const std::vector<std::string>& joint_nam
 
 void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state)
 {
+    m_joint_names = joint_state->name;
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
         m_joint_positions[joint_state->name[i]] = joint_state->position[i];
         m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
@@ -229,6 +230,15 @@ std::vector<geometry_msgs::msg::Wrench> SensorFusion::getFootContactForce() cons
     }
 
     return foot_wrenches;
+}
+
+std::vector<double> SensorFusion::getJointAcceleration() const
+{
+    std::vector<double> joint_acceleration;
+    for (const auto& joint_name : m_joint_names) {
+        joint_acceleration.push_back(m_joint_accelerations.at(joint_name));
+    }
+    return joint_acceleration;
 }
 
 Eigen::Quaterniond SensorFusion::getFilteredOrientation() const
