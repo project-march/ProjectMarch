@@ -10,6 +10,9 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
     m_robot_description = robot_description;
     m_torque_converter = std::make_unique<TorqueConverter>(robot_description);
 
+    m_number_of_joint_state_msgs = 0;
+    m_moving_average_weight_joint_acceleration = 0.95;
+
     m_state_posterior = EKFState();
 
     // TODO: get from parameter server
@@ -54,14 +57,21 @@ void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPt
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
         m_joint_positions[joint_state->name[i]] = joint_state->position[i];
         m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
-        m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
+        // m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
+        m_joint_total_torques[joint_state->name[i]] += joint_state->effort[i];
     }
 }
 
 void SensorFusion::updateJointDynamics()
 {
+    // Average the total joint torques
+    for (auto& joint_total_torque : m_joint_total_torques) {
+        joint_total_torque.second = joint_total_torque.second / (m_number_of_joint_state_msgs + 1);
+    }
+
     m_joint_accelerations
-        = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
+        = calculateMovingAverageJointAcceleration(
+            m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques));
     m_joint_dynamical_torques
         = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
     m_joint_external_torques
@@ -104,7 +114,8 @@ uint8_t SensorFusion::updateDynamicStanceLeg()
     uint8_t stance_leg = 0b00;
 
     m_joint_accelerations
-        = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
+        = calculateMovingAverageJointAcceleration(
+            m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques));
     m_joint_dynamical_torques
         = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
     m_joint_external_torques
@@ -132,6 +143,14 @@ void SensorFusion::updateKalmanFilter()
     updateProcessNoiseCovarianceMatrix(m_state_posterior);
     EKFState state_prior = calculatePriorState(m_state_posterior);
     m_state_posterior = calculatePosteriorState(state_prior);
+}
+
+void SensorFusion::clearJointTotalTorques()
+{
+    m_number_of_joint_state_msgs = 0;
+    for (auto& joint_total_torque : m_joint_total_torques) {
+        joint_total_torque.second = 0.0;
+    }
 }
 
 Eigen::Vector3d SensorFusion::getCOM() const
@@ -521,6 +540,18 @@ geometry_msgs::msg::Vector3::SharedPtr SensorFusion::getFilteredOrientationMsg()
     filtered_orientation->y = euler_angles.y();
     filtered_orientation->z = euler_angles.z();
     return filtered_orientation;
+}
+
+RobotNode::JointNameToValueMap SensorFusion::calculateMovingAverageJointAcceleration(
+    const RobotNode::JointNameToValueMap& joint_accelerations) const
+{
+    RobotNode::JointNameToValueMap moving_average_joint_acceleration;
+    for (const auto& joint_acceleration : joint_accelerations) {
+        moving_average_joint_acceleration[joint_acceleration.first] = 
+            m_moving_average_weight_joint_acceleration * m_joint_accelerations.at(joint_acceleration.first) +
+            (1 - m_moving_average_weight_joint_acceleration) * joint_acceleration.second;
+    }
+    return moving_average_joint_acceleration;
 }
 
 bool SensorFusion::isFootFlat(const std::string foot_name) const

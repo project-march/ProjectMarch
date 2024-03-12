@@ -88,6 +88,8 @@ void SensorFusionNode::timerCallback()
     publishFeetHeight();
     publishFeetContactForces();
     publishMPCEstimation();
+
+    m_sensor_fusion->clearJointTotalTorques();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)

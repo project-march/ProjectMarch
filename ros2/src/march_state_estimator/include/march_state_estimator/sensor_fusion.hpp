@@ -65,6 +65,8 @@ public:
     uint8_t updateDynamicStanceLeg();
     void updateKalmanFilter();
 
+    void clearJointTotalTorques();
+
     // TODO: Move these to RobotDescription
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;
@@ -118,6 +120,7 @@ public:
 
 private:
     
+    inline RobotNode::JointNameToValueMap calculateMovingAverageJointAcceleration(const RobotNode::JointNameToValueMap& m_joint_accelerations) const;
     inline bool isFootFlat(const std::string foot_name) const;
     inline Eigen::Vector3d msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const;
     inline Eigen::Vector3d quaternionToEulerAngles(const Eigen::Quaterniond& quaternion) const;
@@ -135,6 +138,9 @@ private:
     RobotNode::JointNameToValueMap m_joint_total_torques;
     RobotNode::JointNameToValueMap m_joint_dynamical_torques;
     RobotNode::JointNameToValueMap m_joint_external_torques;
+
+    uint64_t m_number_of_joint_state_msgs;
+    double m_moving_average_weight_joint_acceleration;
 
     Eigen::Quaterniond m_quaternion;
 
