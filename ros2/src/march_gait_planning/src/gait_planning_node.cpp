@@ -27,6 +27,7 @@ GaitPlanningNode::GaitPlanningNode()
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    RCLCPP_INFO(get_logger(), "Previous mode: %d", m_gait_planning.getGaitType());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
     footPositionsPublish(); 
@@ -94,7 +95,9 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_gait_planning.setPreviousGaitType(exoMode::Stand);
             }
 
-            else if (m_gait_planning.getPreviousGaitType() == exoMode::HighStep1){
+            else if (m_gait_planning.getPreviousGaitType() == exoMode::HighStep1 || 
+                        m_gait_planning.getPreviousGaitType() == exoMode::HighStep2 || 
+                        m_gait_planning.getPreviousGaitType() == exoMode::HighStep3){
                 RCLCPP_INFO(this->get_logger(), "Stepping down from box"); 
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 RCLCPP_INFO(this->get_logger(), "Size of step down trajectory: %d", m_current_trajectory.size()); 
@@ -152,6 +155,8 @@ void GaitPlanningNode::footPositionsPublish(){
             break;
         
         case exoMode::HighStep1 :
+        case exoMode::HighStep2 :
+        case exoMode::HighStep3 :
             if (m_current_trajectory.empty() && !m_single_execution_done){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 m_single_execution_done = true;
