@@ -85,31 +85,37 @@ void GaitPlanningNode::footPositionsPublish(){
                                     current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-            }
+            } 
 
-            // Step close if previous gait was walk. Note how variable walk already has a step close implemented by default.
-            else if (m_gait_planning.getPreviousGaitType() == exoMode::LargeWalk || m_gait_planning.getPreviousGaitType() == exoMode::SmallWalk){
-                RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %d", m_gait_planning.getPreviousGaitType());
-                m_current_trajectory = m_gait_planning.getTrajectory();
-                RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
-                m_gait_planning.setPreviousGaitType(exoMode::Stand);
-            }
+            else{
+                switch (m_gait_planning.getPreviousGaitType()){
 
-            else if (m_gait_planning.getPreviousGaitType() == exoMode::HighStep1 || 
-                        m_gait_planning.getPreviousGaitType() == exoMode::HighStep2 || 
-                        m_gait_planning.getPreviousGaitType() == exoMode::HighStep3){
-                RCLCPP_INFO(this->get_logger(), "Stepping down from box"); 
-                m_current_trajectory = m_gait_planning.getTrajectory(); 
-                RCLCPP_INFO(this->get_logger(), "Size of step down trajectory: %d", m_current_trajectory.size()); 
-                m_gait_planning.setPreviousGaitType(exoMode::Stand); 
-                RCLCPP_INFO(this->get_logger(), "set previous gait type to stand"); 
-            }
+                    // Step close if previous gait was walk. Note how variable walk already has a step close implemented by default.
+                    case exoMode::LargeWalk :
+                    case exoMode::SmallWalk :
+                        RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %d", m_gait_planning.getPreviousGaitType());
+                        m_current_trajectory = m_gait_planning.getTrajectory();
+                        RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
+                        m_gait_planning.setPreviousGaitType(exoMode::Stand);
+                        break;
 
-            else {
-                m_current_trajectory.clear();
-                setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
-                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-                RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
+
+                    case exoMode::HighStep1 :
+                    case exoMode::HighStep2 :
+                    case exoMode::HighStep3 :
+                        RCLCPP_INFO(this->get_logger(), "Stepping down from box"); 
+                        m_current_trajectory = m_gait_planning.getTrajectory(); 
+                        RCLCPP_INFO(this->get_logger(), "Size of step down trajectory: %d", m_current_trajectory.size()); 
+                        m_gait_planning.setPreviousGaitType(exoMode::Stand); 
+                        RCLCPP_INFO(this->get_logger(), "set previous gait type to stand"); 
+                        break;
+
+                    default :
+                        m_current_trajectory.clear();
+                        setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+                        m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
+                }
             }
             break;
 
