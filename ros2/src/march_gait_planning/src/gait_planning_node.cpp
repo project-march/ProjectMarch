@@ -8,7 +8,8 @@ using std::placeholders::_1;
 GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
-   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>())
+   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
+   m_single_execution_done(false)
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -67,6 +68,7 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
 void GaitPlanningNode::footPositionsPublish(){
     switch (m_gait_planning.getGaitType()){
         case exoMode::Stand :
+            m_single_execution_done = false;
             // If the current trajectory is not empty, finish it before going to step close or stand.
             if (!m_current_trajectory.empty()){
                 RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
@@ -150,13 +152,12 @@ void GaitPlanningNode::footPositionsPublish(){
             break;
         
         case exoMode::HighStep1 :
-            static bool is_trajectory_filled = false; // Add this line
-            if (m_current_trajectory.empty() && !is_trajectory_filled){
+            if (m_current_trajectory.empty() && !m_single_execution_done){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
-                is_trajectory_filled = true;
+                m_single_execution_done = true;
                 RCLCPP_INFO(this->get_logger(), "High step trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
             }
-            else if (m_current_trajectory.empty() && is_trajectory_filled){
+            else if (m_current_trajectory.empty() && m_single_execution_done){
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             }
