@@ -259,8 +259,8 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             }
 
             RCLCPP_WARN((*logger_),
-                "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
-                "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
+                "The fuzzy target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
+                "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
                 jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
                 jointInfo.torque, jointInfo.torque_weight);
 
@@ -273,9 +273,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.effort_actual = 0;
             jointInfo.effort_command = 0;
-
-            RCLCPP_WARN((*logger_), "The second read pos value is %f", jointInfo.target_position);
-            RCLCPP_WARN((*logger_), "The second set torque value is %f", jointInfo.target_torque);
 
         }
         weight_node = std::make_shared<WeightNode>();
@@ -426,12 +423,6 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
 
-        RCLCPP_WARN((*logger_),
-        "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
-        "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
-        jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-        jointInfo.torque, jointInfo.torque_weight);
-
         // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
     }
     return hardware_interface::return_type::OK;
@@ -467,7 +458,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
-
+    
     // publish the measured torque each iteration
     weight_node->publish_measured_torque();
 
@@ -486,8 +477,15 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
     //     (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     // }
+
+    RCLCPP_WARN((*logger_),
+        "The fuzzy target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
+        "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
+        jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
+        jointInfo.torque, jointInfo.torque_weight);
     }
 
+    RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
     return hardware_interface::return_type::OK;
 }
 
