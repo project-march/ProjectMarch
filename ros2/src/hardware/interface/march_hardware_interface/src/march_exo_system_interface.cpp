@@ -260,7 +260,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             }
 
             RCLCPP_WARN((*logger_),
-                "The fuzzy target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
+                "The fuzzy target values at start() for the %s are as follows: \n target position: %f \n measured position: %f \n position "
                 "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
                 jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
                 jointInfo.torque, jointInfo.torque_weight);
@@ -469,12 +469,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-// either this or setting the target torque to the real-time measured torque in the weight node
-// jointInfo.target_torque = jointInfo.joint.getMotorController()->getTorqueSensor()->getAverageTorque();
-
-// TORQUEDEBUG LINE
-
-        // ACTUAL TORQUE LINE
     // jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
     //     (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     // }
@@ -491,12 +485,9 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 }
 
 // Checks whether the joint and its motor controller are in a valid state.
+// TODO: (re)move to hwi_util. Possibly add additional checks. 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    if (jointInfo.position == 0) {
-        RCLCPP_WARN((*logger_), "The joint %s has position 0, the absolute encoder probably isn't working correctly.",
-            jointInfo.name.c_str());
-    }
     return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
 }
 

@@ -109,15 +109,25 @@ void Joint::readFirstEncoderValues(bool operational_check)
         }
     }
 
+    // Outdated check since all joints have an incremental encoder
     if (motor_controller_->hasIncrementalEncoder()) {
         initial_incremental_position_ = motor_controller_->getIncrementalPosition();
         logger_->warn(logger_->fstring("Initial incremental position: %f", initial_incremental_position_));
     }
+
+    // Outdated check since all joints have an absolute encoder
     if (motor_controller_->hasAbsoluteEncoder()) {
         initial_absolute_position_ = motor_controller_->getAbsolutePosition();
         logger_->warn(logger_->fstring("Initial absolute position: %f", initial_absolute_position_));
 
+        // Check that used to be in the exo system interface 
+        if (initial_absolute_position_ == 0) {
+            throw error::HardwareException(error::ErrorType::ABSOLUTE_ENCODER_ZERO,
+                "Joint %s has an initial absolute position of 0, which is not allowed", name_.c_str());
+        }
+
         position_ = initial_absolute_position_;
+
         if (operational_check && !isWithinHardLimits()) {
             throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
                 "Joint %s is outside hard limits, value is %d, limits are [%d, %d]", name_.c_str(), position_,
@@ -125,6 +135,8 @@ void Joint::readFirstEncoderValues(bool operational_check)
                 motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
     }
+
+    // Soon to be outdated check since all joints will have a torque sensor
     if (motor_controller_->hasTorqueSensor()) {
         initial_torque_ = motor_controller_->getTorque();
         logger_->warn(logger_->fstring("Initial torque: %f", initial_torque_));
