@@ -29,7 +29,8 @@ GaitPlanning::GaitPlanning()
   m_small_bezier_trajectory(), 
   m_small_first_step_trajectory(),
   m_large_step_close_trajectory(),
-  m_small_step_close_trajectory()
+  m_small_step_close_trajectory(),
+  m_high_step_26cm_trajectory()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
     setBezierGait(); 
@@ -61,17 +62,43 @@ void GaitPlanning::setBezierGait(){
     m_small_bezier_trajectory = processCSV(cartesian_files_directory + "normal_gait_small.csv");
     m_large_step_close_trajectory = processCSV(cartesian_files_directory + "large_step_close.csv");
     m_small_step_close_trajectory = processCSV(cartesian_files_directory + "small_step_close.csv");
+    m_high_step_26cm_trajectory = processCSV(cartesian_files_directory + "high_step1.csv");
+    m_high_step_26cm_close_trajectory = processCSV(cartesian_files_directory + "high_step1_down.csv"); 
+    m_high_step_22cm_trajectory = processCSV(cartesian_files_directory + "high_step2.csv");
+    m_high_step_22cm_close_trajectory = processCSV(cartesian_files_directory + "high_step2_down.csv"); 
+    m_high_step_18cm_trajectory = processCSV(cartesian_files_directory + "high_step3.csv");
+    m_high_step_18cm_close_trajectory = processCSV(cartesian_files_directory + "high_step3_down.csv"); 
 }
 
 std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getTrajectory() const{
-    std::vector<GaitPlanning::XZFeetPositionsArray> result;  
+    // std::vector<GaitPlanning::XZFeetPositionsArray> result;  
     switch (m_gait_type){
         case exoMode::LargeWalk : 
             return (m_current_stance_foot == 3) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
         case exoMode::SmallWalk : 
             return  (m_current_stance_foot == 3) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
         case exoMode::Stand :
-            return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
+            switch (m_previous_gait_type){
+                case exoMode::LargeWalk :
+                    return m_large_step_close_trajectory; 
+                case exoMode::SmallWalk :
+                    return m_small_step_close_trajectory; 
+                case exoMode::HighStep1 : 
+                    return m_high_step_26cm_close_trajectory; 
+                case exoMode::HighStep2 : 
+                    return m_high_step_22cm_close_trajectory; 
+                case exoMode::HighStep3 : 
+                    return m_high_step_18cm_close_trajectory; 
+                default :
+                    return {}; 
+            }
+            // return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
+        case exoMode::HighStep1 :
+            return m_high_step_26cm_trajectory;
+        case exoMode::HighStep2 :
+            return m_high_step_22cm_trajectory;
+        case exoMode::HighStep3 :
+            return m_high_step_18cm_trajectory;
         default : 
             return {}; 
     }
