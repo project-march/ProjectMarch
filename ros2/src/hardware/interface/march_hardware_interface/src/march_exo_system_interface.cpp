@@ -259,14 +259,16 @@ hardware_interface::return_type MarchExoSystemInterface::start()
                 jointInfo.position_weight = 1.0f;
             }
 
+            auto motor_controller_state = jointInfo.joint.getMotorController()->getState();
+            RCLCPP_WARN((*logger_),
+                "The %s is in state: %s",jointInfo.joint.getName().c_str(),motor_controller_state->getOperationalState().c_str());
+            }
+
             RCLCPP_WARN((*logger_),
                 "The fuzzy target values at start() for the %s are as follows: \n target position: %f \n measured position: %f \n position "
                 "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
                 jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
                 jointInfo.torque, jointInfo.torque_weight);
-            RCLCPP_WARN((*logger_),
-                "The %s is in state: %s",jointInfo.joint.getName().c_str(),
-                jointInfo.motor_controller_data.getErrorStatus().c_str());
 
             // jointInfo.joint.actuate(
             //     jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
@@ -476,15 +478,16 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     //     (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     // }
 
+    auto motor_controller_state = jointInfo.joint.getMotorController()->getState();
+            RCLCPP_WARN((*logger_),
+                "The %s is in state: %s",jointInfo.joint.getName().c_str(),motor_controller_state->getOperationalState().c_str());
+    }
+
     RCLCPP_WARN((*logger_),
         "Actuation target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
         "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
         jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
         jointInfo.torque, jointInfo.torque_weight);
-    RCLCPP_WARN((*logger_),
-                "The %s is in state: %s",jointInfo.joint.getName().c_str(),
-                jointInfo.motor_controller_data.getErrorStatus().c_str());
-    }
 
     RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
     return hardware_interface::return_type::OK;
