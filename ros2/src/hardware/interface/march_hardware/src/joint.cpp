@@ -102,9 +102,9 @@ void Joint::readFirstEncoderValues(bool operational_check)
     // Preconditions check
     if (operational_check) {
         auto motor_controller_state = motor_controller_->getState();
-        if (!motor_controller_state->hasError()) {     
+        if (motor_controller_state->hasError()) {     
             logger_->fatal(logger_->fstring(
-                "[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus()));
+                "[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().c_str()));
             throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
         }
     }

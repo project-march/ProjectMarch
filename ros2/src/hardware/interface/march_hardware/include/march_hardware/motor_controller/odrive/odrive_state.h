@@ -8,6 +8,7 @@
 #include <string>
 #include <optional>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
 
 namespace march {
 
@@ -134,26 +135,22 @@ public:
 
     std::string getErrorStatus() const override
     {
-        if (hasError()) {
-            std::ostringstream error_stream;
-            error_stream << "State: " << axis_state_.toString() << " (" << axis_state_.value_ << ")" << std::endl
-                         << "System: " << error::parseError(odrive_error_, error::ErrorRegister::ODRIVE_ERROR)
-                         << std::endl
-                         << "Axis: " << error::parseError(axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
-                         << std::endl
-                         << "Motor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
-                         << std::endl
-                         << "Encoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR)
-                         << std::endl
-                         << "DieBOSlave: "
-                         << error::parseError(dieboslave_error_, error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
-                         << std::endl
-                         << "Controller: "
-                         << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
-            return error_stream.str();
-        } else {
-            return "No errors!";
-        }
+        std::ostringstream error_stream;
+        error_stream << "State: " << axis_state_.toString() << " (" << axis_state_.value_ << ")" << std::endl
+                        << "System: " << error::parseError(odrive_error_, error::ErrorRegister::ODRIVE_ERROR)
+                        << std::endl
+                        << "Axis: " << error::parseError(axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR)
+                        << std::endl
+                        << "Motor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR)
+                        << std::endl
+                        << "Encoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR)
+                        << std::endl
+                        << "DieBOSlave: "
+                        << error::parseError(dieboslave_error_, error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
+                        << std::endl
+                        << "Controller: "
+                        << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
+        return error_stream.str();
     }
 
     // TODO: rename to getCurrentState/getMotorControllerState

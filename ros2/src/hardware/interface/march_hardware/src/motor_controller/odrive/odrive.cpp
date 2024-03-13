@@ -48,6 +48,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
     }
 }
 
+// TODO: add check afterwards if ODrives are indeed in state 8
 void ODrive::enableActuation()
 {
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
@@ -56,9 +57,6 @@ void ODrive::enableActuation()
         logger_->info("ODrive state already in closed loop control");
     }
 
-    // TODO: Check if this is needed.
-    // Reset target torque
-    //    actuateTorque(/*target_effort=*/0.0);
 }
 
 void ODrive::waitForState(ODriveAxisState target_state)
@@ -192,9 +190,6 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
-    // logger_->info(logger_->fstring(
-    //         "Current axis state: '%f'", state->axis_state_.toString().c_str()));
-    // logger_->info('Current axis state: %f', state->axis_state_);
     state->odrive_error_ = getOdriveError();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();

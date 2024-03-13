@@ -219,10 +219,10 @@ inline bool is_ethercat_alive(const std::exception_ptr& exceptionPtr, const rclc
 inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclcpp::Logger& logger)
 {
     auto motor_controller_state = joint.getMotorController()->getState();
-    if (!motor_controller_state->hasError()) {
+    if (motor_controller_state->hasError()) {
         RCLCPP_ERROR(logger, "MotorController of joint %s is in fault state %s.\n Error Status: \n%s",
             joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
-            motor_controller_state->getErrorStatus());
+            motor_controller_state->getErrorStatus().c_str());
         return false;
     }
     return true;
