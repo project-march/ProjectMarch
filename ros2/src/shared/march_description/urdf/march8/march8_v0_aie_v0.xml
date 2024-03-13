@@ -32,11 +32,13 @@ See <https://www.gnu.org/licenses/>.
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
     <mesh name="backpack"    file="Backpack.obj"/>
-    <mesh name="L_foot"      file="FootLeft.obj"/>
+    <mesh name="L_ankle"     file="AnkleLeft.obj"/>
+    <mesh name="L_foot"      file="SoleLeft.obj"/>
     <mesh name="L_hip"       file="HipLeft.obj"/>
     <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
     <mesh name="L_shin"      file="LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
+    <mesh name="R_ankle"    scale="1 -1 1"    file="AnkleLeft.obj"/>
+    <mesh name="R_foot"     scale="1 -1 1"    file="SoleLeft.obj"/>
     <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
     <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
     <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
@@ -45,7 +47,7 @@ See <https://www.gnu.org/licenses/>.
   <default>
     <site group="5"/>
     <motor ctrlrange="-1 1" ctrllimited="true"/>
-    <geom contype="0" conaffinity="0" condim="4" solref="0.005 1"/>
+    <geom contype="0" conaffinity="0" condim="3" solref="0.005 1"/>
     <equality solref="0.005 1"/>
     <default class="exoskeleton">
       <geom material="march_grey" group="2"/>
@@ -114,9 +116,7 @@ See <https://www.gnu.org/licenses/>.
       <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/> -->
 
 
-      <body name="backpack"
-            pos="0 0 0"
-            childclass="exoskeleton">
+      <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
         <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
         <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
@@ -133,7 +133,7 @@ See <https://www.gnu.org/licenses/>.
               size="0.051 0.189 0.165"
               pos="-0.02 0 0.13" class="collision"/>
 
-      <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
+        <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
         <!--  LEFT LEG -->
         <body name="L_hip" pos="-0.021 0.08 0.025">
@@ -163,26 +163,26 @@ See <https://www.gnu.org/licenses/>.
                 size="0.047" class="L_collision"/>
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
 
-              <body name="L_ankle" pos="0.0 -0.037 -0.385">
+              <body name="L_ankle" pos="0.0 -0.074 -0.427">
                 <inertial pos="0.0 0.0 0.0" mass="1.0"
                     fullinertia="0.008 0.010 0.006 0.001 0.004 -0.001"/>
                 <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+                <geom type="mesh" mesh="L_ankle" pos="-0.08 0 -0.12"/>
                 <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
-                <body name="L_foot" pos="0.0 0.0 -0.029">
+                <body name="L_foot" pos="-0.09 -0.115 -0.123">
                   <inertial pos="0.007 -0.054 -0.035" mass="1.964"
                       fullinertia="0.015 0.021 0.013 0.003 0.007 -0.003"/>
-                  <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/>
+                  <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint" pos="0 0.065 0"/>
                   <geom type="mesh" mesh="L_foot"/>
 
                   <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                  <geom name="L_foot" type="box" size="0.159 0.057 0.007"
-                      pos="0.069 -0.086 -0.128"  class="L_collision"
+                  <geom name="L_foot" type="box" size="0.154 0.057 0.005"
+                      pos="0.151 0.064 -0.015"  class="L_collision"
                       friction="3.0"/>
-
-                  <geom name="L_foot_collision" type="box" size="0.159 0.057 0.007"
-                      pos="0.069 -0.086 -0.128" rgba="1 0 0 0.5"/>
-                  </body>
+                  <geom name="L_foot_box" type="box" size="0.154 0.057 0.005"
+                      pos="0.151 0.064 0.005" rgba="0 1 0 0.1"/>
+                </body>
               </body>
             </body>
           </body>
@@ -217,24 +217,25 @@ See <https://www.gnu.org/licenses/>.
               size="0.047" class="R_collision"/>
             <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
-            <body name="R_ankle" pos="0.0 0.037 -0.385">
+            <body name="R_ankle" pos="0.0 0.074 -0.427">
               <inertial pos="0.0 0.0 0.0" mass="1.0"
                   fullinertia="0.008 0.010 0.006 -0.001 0.004 0.001"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+              <joint name="R_ADPF" axis="0 -1 0" range="-10 10" class="ADPF_joint"/>
+              <geom type="mesh" mesh="R_ankle" pos="-0.08 0 -0.12"/>
               <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
-              <body name="R_foot" pos="0.0 0.0 -0.029">
+              <body name="R_foot" pos="-0.09 0.115 -0.123">
                 <inertial pos="0.007 0.054 -0.035" mass="2.964"
                     fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
-                <joint name="R_AIE" axis="-1 0 0" range="-8 8" class="AIE_joint"/>
+                <joint name="R_AIE" axis="-1 0 0" range="-8 8" class="AIE_joint" pos="0 -0.065 0"/>
                 <geom type="mesh" mesh="R_foot"/>
                 
                 <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                <geom name="R_foot" type="box" size="0.159 0.057 0.007"
-                    pos="0.069 0.086 -0.128"  class="R_collision"
+                  <geom name="R_foot" type="box" size="0.154 0.057 0.005"
+                    pos="0.151 -0.064 -0.015"  class="R_collision"
                     friction="3.0"/>
-                <geom name="R_foot_collision" type="box" size="0.159 0.057 0.007"
-                    pos="0.069 0.086 -0.128"  rgba="0 1 0 0.5"/>
+                  <geom name="R_foot_box" type="box" size="0.154 0.057 0.005"
+                    pos="0.151 -0.064 0.005" rgba="1 0 0 0.1"/>
                 </body>
             </body>
           </body>

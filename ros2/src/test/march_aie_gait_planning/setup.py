@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'march_aie_gait_planning_node = march_aie_gait_planning.march_aie_gait_planning_node:main',
             'one_leg_balance_node = march_aie_gait_planning.one_leg_balance_node:main',
+            'two_legs_weightshift_node = march_aie_gait_planning.two_legs_weightshift_node:main',
         ],
     },
 )
