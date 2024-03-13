@@ -163,6 +163,7 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::HighStep1 :
         case exoMode::HighStep2 :
         case exoMode::HighStep3 :
+        case exoMode::Ascending :
             if (m_current_trajectory.empty() && !m_single_execution_done){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 m_single_execution_done = true;
