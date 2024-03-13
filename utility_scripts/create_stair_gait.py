@@ -19,9 +19,8 @@ def ascend_stairs(step_height, array_size, step_length):
 
     first_points_stairs = np.column_stack((x_swing_high_step, z_swing_high_step, x_stance_high_step, z_stance_high_step))
 
-    # Part 2: swing leg goes down two step, stance leg stays still
+    # Part 2: swing leg goes down two steps, stance leg stays still
     swing_leg_stair = np.asfortranarray([[-step_length/2, (0.02/0.1)*(step_length/2), (0.0533/0.1)*(step_length/2), (step_length/2)], [0.0, 0.4, 0.2 + step_height, step_height]])
-    print(swing_leg_stair)
     curve_stair = bezier.Curve(swing_leg_stair, degree=3)
     number_of_time_points_stair = np.linspace(0, 1.0, int(array_size/2))
     points_stair= curve_stair.evaluate_multi(number_of_time_points_stair)
@@ -31,9 +30,28 @@ def ascend_stairs(step_height, array_size, step_length):
     x_stance_stair = np.linspace((step_length/2), 0 - (step_length/2), int(array_size/2))
     z_stance_stair = np.linspace(step_height, 0, int(array_size/2))
 
-    final_points_stairs = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
+    # Part 3: swing leg closes to stance leg (top of the stairs)
+    swing_leg_last_step = np.asfortranarray([[-step_length/2, -(0.02/0.1)*(step_length/2), 0, 0], [0.0, 0.4, 0.2, 0]])
+    curve_last_step = bezier.Curve(swing_leg_last_step, degree=3)
+    number_of_time_points_last_step = np.linspace(0, 1.0, int(array_size/2))
+    points_last_step = curve_last_step.evaluate_multi(number_of_time_points_last_step)
 
-    final_points_high_step = np.concatenate((first_points_stairs, final_points_stairs), axis=0)
+    x_swing_last_step = points_last_step[0,:]
+    z_swing_last_step = points_last_step[1,:]
+    x_stance_last_step = np.linspace((step_length/2), 0 , int(array_size/2))
+    z_stance_last_step = np.linspace(step_height, 0, int(array_size/2))
+
+    second_step_points_stairs = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
+
+    third_step_points_stairs = np.column_stack((x_swing_stair, z_swing_stair, x_stance_stair, z_stance_stair))
+
+    forth_step_points_stairs = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
+
+    final_step_points_stairs = np.column_stack((x_swing_last_step, z_swing_last_step, x_stance_last_step, z_stance_last_step))
+
+
+
+    final_points_high_step = np.concatenate((first_points_stairs, second_step_points_stairs, third_step_points_stairs, forth_step_points_stairs, final_step_points_stairs), axis=0)
 
     print(final_points_high_step.shape)
 
