@@ -94,9 +94,9 @@ See <https://www.gnu.org/licenses/>.
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
 
-    <body name="low_box_collision" pos="0.45 0 0" >
+    <!-- <body name="low_box_collision" pos="0.45 0 0" >
       <geom type="box" size="0.5 0.5 0.05" rgba="0.49 0.2 0.49 1" condim="6" conaffinity="15"/>
-    </body>
+    </body> -->
 
     <body name="tendon_slider_top" pos="0.05 0 1.95">
       <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
@@ -109,9 +109,9 @@ See <https://www.gnu.org/licenses/>.
       <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 15" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/>
+      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="0 45" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 15" pos="0 0 0" ref="15"/> -->
+      <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/> -->
 
 
       <body name="backpack"
@@ -244,13 +244,13 @@ See <https://www.gnu.org/licenses/>.
     </body>
   </worldbody>
 
-
+<!-- 
   <tendon>
     <spatial range="0 0.5" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
-  </tendon>
+  </tendon> -->
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
@@ -279,7 +279,9 @@ See <https://www.gnu.org/licenses/>.
             R_ADPF
             R_AIE
       -->
-    <key name="zero"
+      <key qpos='0 0 0 0 0.106029 -0.11564 0 1.49467 0 0 -0.0501945 0 0 -0.033172 0.004188'/>
+    <!-- <key name="hello" qpos='0 0 0 -0.05 0.070686 -0.0763725 0 0 0 0 0.047973 0 0 0 0.107492'/> -->
+    <!-- <key name="zero"
       qpos="0 0 0 0 0 0 0
             0
             0
@@ -302,7 +304,7 @@ See <https://www.gnu.org/licenses/>.
             0
             45
             0
-            0"/>
+            0"/> -->
     
   </keyframe>
 
@@ -354,4 +356,10 @@ See <https://www.gnu.org/licenses/>.
     <magnetometer name='magnet_imu_torso' site='imu_torso'/>
 
   </sensor>
+
+
+  <!-- <keyframe>
+    <key name="R_AIE_STAND" qpos='0 0 0 0 0 -0.05 0.070686 -0.0763725 0 0 0 0 0.047973 0 0 0 0.107492'/>
+  </keyframe> -->
+
 </mujoco>

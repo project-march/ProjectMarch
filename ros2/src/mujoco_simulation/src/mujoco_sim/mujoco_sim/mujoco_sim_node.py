@@ -84,8 +84,8 @@ class MujocoSimNode(Node):
         self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
-
         self.data = mujoco.MjData(self.model)
+        mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
 
         self.actuator_names = get_actuator_names(self.model)
         self.use_aie_force = self.get_parameter("aie_force")
@@ -211,11 +211,9 @@ class MujocoSimNode(Node):
             joint_pos_dict[name] = msg.trajectory.desired.positions[i]
         self.msg_queue.put(joint_pos_dict)
 
-    def keyframe_callback(self, request, response):
-        mujoco.mj_resetDataKeyframe(self.model, self.data, request.keyframe_id)
+    def keyframe_callback(self, keyframe):
+        mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe)
         mujoco.mj_step(self.model, self.data)
-        response.success = True
-        return response
 
     def sim_step(self):
         """This function performs the simulation update.
