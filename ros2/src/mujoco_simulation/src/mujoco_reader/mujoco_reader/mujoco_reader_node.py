@@ -45,7 +45,14 @@ class MujocoReaderNode(Node):
         :param msg: a msg of MujocoDataSensing type
         :return: None
         """
-        self.state_publisher.publish(msg.joint_state)
+        joint_state = JointState()
+        joint_state.header.stamp = self.get_clock().now().to_msg()
+        joint_state.header.frame_id = "joint_link"
+        joint_state.name = msg.joint_state.name + ["left_ankle_ie", "right_ankle_ie"]
+        joint_state.position = msg.joint_state.position
+        joint_state.velocity = msg.joint_state.velocity
+        joint_state.effort = msg.joint_state.effort.tolist() + [0.0, 0.0]
+        self.state_publisher.publish(joint_state)
         backpack_imu = msg.backpack_imu
         backpack_imu.header.stamp = self.get_clock().now().to_msg()
         backpack_imu.header.frame_id = "imu_link"

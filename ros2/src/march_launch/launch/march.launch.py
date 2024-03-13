@@ -240,8 +240,8 @@ def generate_launch_description() -> LaunchDescription:
         ),
         # Node(
         #     package='march_aie_gait_planning',
-        #     executable='one_leg_balance_node',
-        #     name='one_leg_balance_node',
+        #     executable='two_legs_weightshift_node',
+        #     name='two_legs_weightshift_node',
         #     output='screen',
         #     condition=IfCondition(aie_force),
         # ),
