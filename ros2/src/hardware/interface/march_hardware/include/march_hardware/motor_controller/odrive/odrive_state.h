@@ -116,10 +116,11 @@ public:
 
     bool dataIsValid() const override
     {
-        std::cout << axis_state_.value_ << '\n';
+        // std::cout << axis_state_.value_ << '\n';
         return axis_state_.value_ != ODriveAxisState::UNDEFINED;
     }
 
+    // TODO: possibly rename since 'operational' is a bit ambiguous
     bool isOperational() const override
     {
         return axis_state_.value_ == ODriveAxisState::CLOSED_LOOP_CONTROL;
@@ -127,12 +128,11 @@ public:
 
     bool hasError() const override
     {
-        return !isOperational();
-        // axis_error_ || motor_error_ || encoder_error_
-        //    || encoder_manager_error_ || controller_error_;
+        return odrive_error_ != 0 || axis_error_ != 0 || motor_error_ != 0 || encoder_error_ != 0
+            || dieboslave_error_ != 0 || controller_error_ != 0;
     }
 
-    std::optional<std::string> getErrorStatus() const override
+    std::string getErrorStatus() const override
     {
         if (hasError()) {
             std::ostringstream error_stream;
@@ -152,16 +152,16 @@ public:
                          << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
             return error_stream.str();
         } else {
-            return std::nullopt;
+            return "No errors!";
         }
     }
 
+    // TODO: rename to getCurrentState/getMotorControllerState
     std::string getOperationalState() const override
     {
         return axis_state_.toString();
     }
 
-    // TODO: examine why the reference for axis_state_ cannot be found.
     ODriveAxisState axis_state_;
     uint32_t odrive_error_ {};
     uint32_t axis_error_ {};

@@ -38,7 +38,8 @@ public:
             && lhs.absolute_position_ == rhs.absolute_position_
             && lhs.incremental_position_ == rhs.incremental_position_
             && lhs.absolute_velocity_ == rhs.absolute_velocity_
-            && lhs.incremental_velocity_ == rhs.incremental_velocity_ && lhs.isOperational() == rhs.isOperational()
+            && lhs.incremental_velocity_ == rhs.incremental_velocity_ 
+            && lhs.isOperational() == rhs.isOperational()
             && lhs.hasError() == rhs.hasError();
     }
 
@@ -51,7 +52,7 @@ public:
     virtual bool dataIsValid() const = 0;
 
     /**
-     * Check whether the motor controller is in an operational state
+     * Check whether the motor controller is in state 8 (closed loop control), and can be actively actuated.
      * @return true if the motor controller is in an operational state,
      * otherwise false
      */
@@ -69,8 +70,7 @@ public:
      * @return string describing the current state as well as the error state(s)
      * of the motor controller
      */
-    // TODO: examine why virtual std::optional isn't allowed.
-    virtual std::optional<std::string> getErrorStatus() const = 0;
+    virtual std::string getErrorStatus() const = 0;
 
     /**
      * Get a string description of the operational state

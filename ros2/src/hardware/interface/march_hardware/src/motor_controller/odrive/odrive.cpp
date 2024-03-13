@@ -168,6 +168,7 @@ bool ODrive::requiresUniqueSlaves() const
     return false;
 }
 
+// TODO: rename to something more descriptive.
 std::unique_ptr<MotorControllerState> ODrive::getState()
 {
     auto state = std::make_unique<ODriveState>();

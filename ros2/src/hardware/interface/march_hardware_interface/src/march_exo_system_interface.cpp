@@ -245,7 +245,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             // RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
 
             // TODO: examine why this check is set to false.
-            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true);
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
             jointInfo.target_torque = jointInfo.joint.getTorque();
 
@@ -490,6 +490,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     return hardware_interface::return_type::OK;
 }
 
+// Checks whether the joint and its motor controller are in a valid state.
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
     if (jointInfo.position == 0) {
