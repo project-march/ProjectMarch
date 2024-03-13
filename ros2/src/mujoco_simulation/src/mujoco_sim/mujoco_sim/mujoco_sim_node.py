@@ -85,7 +85,7 @@ class MujocoSimNode(Node):
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
         self.data = mujoco.MjData(self.model)
-        # mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
+        mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
 
         self.actuator_names = get_actuator_names(self.model)
         self.use_aie_force = self.get_parameter("aie_force")
