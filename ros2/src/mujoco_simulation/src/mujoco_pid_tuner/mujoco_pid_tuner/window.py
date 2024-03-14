@@ -68,14 +68,9 @@ class Window(QMainWindow):
         self.publish_gains(kp, kd, ki)
 
     def update_slider_range(self):
-        min_value = self.min_spin_box.value()
-        max_value = self.max_spin_box.value()
-        self.slider.setMinimum(self.step_size * min_value)
-        self.slider.setMaximum(self.step_size * max_value)
-
-    # def update_slider_value(self):
-    #     value = self.spin_box.value()
-    #     self.slider.setValue(value)
+        self.actual_min = self.min_spin_box.value()
+        self.actual_max = self.max_spin_box.value()
+        self.gradient = (self.actual_max - self.actual_min) / self.step_size
 
     def set_step_size(self):
         self.step_size = self.step_spin_box.value()
