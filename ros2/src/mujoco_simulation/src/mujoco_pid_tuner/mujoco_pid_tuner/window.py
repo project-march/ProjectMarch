@@ -3,7 +3,7 @@ Project MARCH IX, 2023-2024
 Author: Alexander James Becoy @alexanderjamesbecoy
 """
 
-from PyQt5.QtWidgets import QMainWindow, QSlider, QVBoxLayout, QWidget, QSpinBox
+from PyQt5.QtWidgets import QMainWindow, QSlider, QWidget, QSpinBox, QGridLayout, QLabel
 from PyQt5.QtCore import Qt
 
 class Window(QMainWindow):
@@ -15,7 +15,12 @@ class Window(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.layout = QVBoxLayout()
+        self.step_size = 1
+        self.actual_min = 0
+        self.actual_max = 100
+        self.gradient = (self.actual_max - self.actual_min) / self.step_size
+
+        self.layout = QGridLayout()
         self.central_widget.setLayout(self.layout)
 
         # Spin Boxes
@@ -31,14 +36,13 @@ class Window(QMainWindow):
         self.min_spin_box.valueChanged.connect(self.update_slider_range)
         self.max_spin_box.valueChanged.connect(self.update_slider_range)
 
-        self.layout.addWidget(self.min_spin_box)
-        self.layout.addWidget(self.max_spin_box)
+        self.min_label = QLabel("Min range")
+        self.max_label = QLabel("Max range")
 
-        # Slider
-        self.step_size = 1
-        self.actual_min = 0
-        self.actual_max = 100
-        self.gradient = (self.actual_max - self.actual_min) / self.step_size
+        self.layout.addWidget(self.min_label, 0, 0)
+        self.layout.addWidget(self.min_spin_box, 0, 1)
+        self.layout.addWidget(self.max_label, 1, 0)
+        self.layout.addWidget(self.max_spin_box, 1, 1)
 
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(0)
@@ -47,7 +51,7 @@ class Window(QMainWindow):
         self.slider.setTickInterval(10)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.valueChanged.connect(self.changed_value)
-        self.layout.addWidget(self.slider)
+        self.layout.addWidget(self.slider, 2, 0, 1, 2)
 
         # Spin Box to change the slider value step size
         self.step_spin_box = QSpinBox()
@@ -55,7 +59,7 @@ class Window(QMainWindow):
         self.step_spin_box.setMaximum(10000)
         self.step_spin_box.setValue(self.step_size)
         self.step_spin_box.valueChanged.connect(self.set_step_size)
-        self.layout.addWidget(self.step_spin_box)
+        self.layout.addWidget(self.step_spin_box, 3, 0, 1, 2)
 
     def set_functions(self, publish_gains) -> None:
         self.publish_gains = publish_gains

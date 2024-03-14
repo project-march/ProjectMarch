@@ -37,13 +37,18 @@ def ros_spin(node):
         rclpy.shutdown()
 
 def main():
+    # Initialize ROS2 and the node
     rclpy.init()
     mujoco_pid_tuner_node = MujocoPidTunerNode()
 
+    # Create the application
     app = QApplication(sys.argv)
+
+    # Create the ROS2 spin thread
     ros_thread = threading.Thread(target=ros_spin, args=(mujoco_pid_tuner_node,), daemon=True)
     ros_thread.start()
 
+    # Create the window and show it
     window = Window()
     window.set_functions(mujoco_pid_tuner_node.publish_gains)
     window.show()
