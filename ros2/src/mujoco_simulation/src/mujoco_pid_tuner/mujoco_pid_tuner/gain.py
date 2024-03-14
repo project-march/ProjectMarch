@@ -16,6 +16,8 @@ class Gain:
         self.actual_max = 20
         self.update_gradient()
 
+        self.gain = 0.0
+
     def create_layout(self) -> QGridLayout:
         self.layout = QGridLayout()
 
@@ -54,7 +56,7 @@ class Gain:
         self.slider.setValue(0)
         self.slider.setTickInterval(10)
         self.slider.setTickPosition(QSlider.TicksBelow)
-        self.slider.valueChanged.connect(self.changed_value)
+        self.slider.valueChanged.connect(self.update_gain_value)
         self.layout.addWidget(self.slider, 3, 0, 1, 2)
 
         # Spin Box to change the slider value step size
@@ -78,9 +80,8 @@ class Gain:
         self.slider.setMaximum(self.step_size)
         self.update_gradient()
 
-    def changed_value(self) -> None:
-        new_gain = float(self.slider.value()) * self.gradient
-        self.callback(new_gain)
+    def update_gain_value(self) -> None:
+        self.gain = float(self.slider.value()) * self.gradient
 
     def update_slider_range(self):
         self.actual_min = self.min_spin_box.value()
@@ -89,3 +90,6 @@ class Gain:
 
     def update_gradient(self):
         self.gradient = (self.actual_max - self.actual_min) / self.step_size
+
+    def get_gain(self) -> float:
+        return self.gain

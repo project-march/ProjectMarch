@@ -16,18 +16,31 @@ class MujocoPidTunerNode(Node):
 
     def __init__(self) -> None:
         super().__init__('mujoco_pid_tuner_node')
+
+        self.timer_period = 1.0
+        self.timer = self.create_timer(self.timer_period, self.timer_callback)
         
         self.pid_gains_publisher = self.create_publisher(MujocoGains, 'mujoco_gains', 10)
 
         self.get_logger().info('Mujoco PID Tuner Node has been initialized.')
 
+        self.get_gains = None
+
+    def timer_callback(self) -> None:
+        if self.get_gains is not None:
+            kp, kd, ki = self.get_gains()
+            self.publish_gains(kp, kd, ki)
+
     def publish_gains(self, kp, kd, ki) -> None:
         msg = MujocoGains()
-        msg.controller_mode = 0
+        msg.controller_mode = 0 # Fixed at 0 for now
         msg.proportional_gains = kp
         msg.derivative_gains = kd
         msg.integral_gains = ki
         self.pid_gains_publisher.publish(msg)
+
+    def configure_callback(self, get_gains) -> None:
+        self.get_gains = get_gains
 
 def ros_spin(node):
     try:
@@ -50,9 +63,11 @@ def main():
 
     # Create the window and show it
     window = Window()
-    # window.set_functions(mujoco_pid_tuner_node.publish_gains)
     window.configure_ui()
     window.show()
+
+    # Set the callback for the node
+    mujoco_pid_tuner_node.configure_callback(window.get_gains)
 
     sys.exit(app.exec_())
 

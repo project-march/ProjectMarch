@@ -38,3 +38,9 @@ class Joint:
         self.layout.addLayout(self.ki.create_layout())
 
         return self.layout
+    
+    def get_gains(self):
+        gain_p = self.kp.get_gain()
+        gain_d = self.kd.get_gain()
+        gain_i = self.ki.get_gain()
+        return gain_p, gain_d, gain_i

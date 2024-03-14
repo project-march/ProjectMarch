@@ -17,10 +17,10 @@ class Window(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.joints = {
-            'HAA': Joint('Hip Abduction/Adduction'),
-            'HFE': Joint('Hip Flexion/Extension'),
-            'KFE': Joint('Knee Flexion/Extension'),
-            'ADPF': Joint('Ankle Dorsiflexion/Plantarflexion'),
+            'HAA': Joint('HAA'),
+            'HFE': Joint('HFE'),
+            'KFE': Joint('KFE'),
+            'ADPF': Joint('ADPF'),
         }
 
     def configure_ui(self) -> None:
@@ -32,9 +32,15 @@ class Window(QMainWindow):
         for i, joint in enumerate(self.joints.values()):
             self.layout.addLayout(joint.create_layout())
 
-    # def set_publish(self, publish) -> None:
-    #     self.publish = publish
+    def get_gains(self):
+        kp = []
+        kd = []
+        ki = []
 
+        for joint in self.joints.values():
+            p, d, i = joint.get_gains()
+            kp.append(p)
+            kd.append(d)
+            ki.append(i)
 
-    # def update(self, value) -> None:
-    #     self.publish(self.kp_box.slider.value(), self.kd_box.slider.value(), 0)
+        return kp, kd, ki
