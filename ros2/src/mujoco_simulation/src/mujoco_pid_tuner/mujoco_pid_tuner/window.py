@@ -29,8 +29,18 @@ class Window(QMainWindow):
         self.central_widget.setLayout(self.layout)
 
         # Set the layout for each joint with equal width
-        for i, joint in enumerate(self.joints.values()):
+        for _, joint in enumerate(self.joints.values()):
             self.layout.addLayout(joint.create_layout())
+
+    def create_menu(self) -> None:
+        """
+        TODO:
+        - Create a button to set the gains to the default values
+        - Create a button and functionality to save the gains to a file
+        - Create a button and functionality to load the gains from a file
+        - Create a functionality to store the gains as YAML
+        """
+        pass
 
     def get_gains(self):
         kp = []
