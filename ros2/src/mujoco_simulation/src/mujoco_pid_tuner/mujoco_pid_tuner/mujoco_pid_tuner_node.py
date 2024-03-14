@@ -50,7 +50,8 @@ def main():
 
     # Create the window and show it
     window = Window()
-    window.set_functions(mujoco_pid_tuner_node.publish_gains)
+    # window.set_functions(mujoco_pid_tuner_node.publish_gains)
+    window.configure_ui()
     window.show()
 
     sys.exit(app.exec_())
