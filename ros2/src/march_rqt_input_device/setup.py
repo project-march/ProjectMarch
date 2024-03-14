@@ -23,6 +23,10 @@ setup(
             [os.path.join("resource", "input_device.ui")],
         ),
         (
+            os.path.join("share", package_name, "generate"),
+            glob("generate/*.json"),
+        ),
+        (
             os.path.join("share", package_name, "resource", "img"),
             glob("resource/img/*.png"),
         ),
