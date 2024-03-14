@@ -46,7 +46,8 @@ public:
                 { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
                 { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},
                 { exoMode::HighStep3, { exoMode::Stand, exoMode::Error}},
-                { exoMode::Ascending, { exoMode::Stand, exoMode::Error}}
+                { exoMode::Ascending, { exoMode::Descending, exoMode::Error}}, 
+                { exoMode::Descending, { exoMode::Stand, exoMode::Error}}
             };
         }
         else if(type == "Test Joints") {

@@ -27,9 +27,15 @@ GaitPlanningNode::GaitPlanningNode()
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    RCLCPP_INFO(get_logger(), "Previous mode: %d", m_gait_planning.getGaitType());
+    RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str()); 
+    // RCLCPP_INFO(get_logger(), "Previous mode: %d", m_gait_planning.getGaitType());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
+
+    if ((exoMode)msg->mode == exoMode::Descending){
+        m_single_execution_done = false; 
+    }
+
     footPositionsPublish(); 
 }
 
@@ -164,6 +170,7 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::HighStep2 :
         case exoMode::HighStep3 :
         case exoMode::Ascending :
+        case exoMode::Descending :
             if (m_current_trajectory.empty() && !m_single_execution_done){
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 m_single_execution_done = true;
