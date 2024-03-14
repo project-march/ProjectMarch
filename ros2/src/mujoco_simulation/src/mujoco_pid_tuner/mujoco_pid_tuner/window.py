@@ -21,10 +21,12 @@ class Window(QMainWindow):
         # Spin Boxes
         self.min_spin_box = QSpinBox()
         self.max_spin_box = QSpinBox()
-        self.min_spin_box.setMinimum(-1000)
+        self.min_spin_box.setMinimum(0)
         self.min_spin_box.setMaximum(1000)
-        self.max_spin_box.setMinimum(-1000)
+        self.max_spin_box.setMinimum(0)
         self.max_spin_box.setMaximum(1000)
+        self.min_spin_box.setValue(0)
+        self.max_spin_box.setValue(100)
 
         self.min_spin_box.valueChanged.connect(self.update_slider_range)
         self.max_spin_box.valueChanged.connect(self.update_slider_range)
@@ -33,38 +35,49 @@ class Window(QMainWindow):
         self.layout.addWidget(self.max_spin_box)
 
         # Slider
+        self.step_size = 1
+        self.actual_min = 0
+        self.actual_max = 100
+        self.gradient = (self.actual_max - self.actual_min) / self.step_size
+
         self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(-1000)
-        self.slider.setMaximum(1000)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(self.step_size)
         self.slider.setValue(0)
         self.slider.setTickInterval(10)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.valueChanged.connect(self.changed_value)
         self.layout.addWidget(self.slider)
 
-        # Spin Box to change the slider value
-        self.spin_box = QSpinBox()
-        self.spin_box.setMinimum(-1000)
-        self.spin_box.setMaximum(1000)
-        self.spin_box.valueChanged.connect(self.update_slider_value)
-        self.layout.addWidget(self.spin_box)
+        # Spin Box to change the slider value step size
+        self.step_spin_box = QSpinBox()
+        self.step_spin_box.setMinimum(1)
+        self.step_spin_box.setMaximum(10000)
+        self.step_spin_box.setValue(self.step_size)
+        self.step_spin_box.valueChanged.connect(self.set_step_size)
+        self.layout.addWidget(self.step_spin_box)
 
     def set_functions(self, publish_gains) -> None:
         self.publish_gains = publish_gains
 
     def changed_value(self) -> None:
         print("Slider Value:", self.slider.value())
-        kp = [float(self.slider.value())]
-        kd = [float(self.slider.value())]
-        ki = [float(self.slider.value())]
+        kp = [float(self.slider.value()) * self.gradient] * 8
+        kd = [0.0] * 8
+        ki = [0.0] * 8
         self.publish_gains(kp, kd, ki)
 
     def update_slider_range(self):
         min_value = self.min_spin_box.value()
         max_value = self.max_spin_box.value()
-        self.slider.setMinimum(min_value)
-        self.slider.setMaximum(max_value)
+        self.slider.setMinimum(self.step_size * min_value)
+        self.slider.setMaximum(self.step_size * max_value)
 
-    def update_slider_value(self):
-        value = self.spin_box.value()
-        self.slider.setValue(value)
+    # def update_slider_value(self):
+    #     value = self.spin_box.value()
+    #     self.slider.setValue(value)
+
+    def set_step_size(self):
+        self.step_size = self.step_spin_box.value()
+        self.slider.setMaximum(self.step_size)
+        self.gradient = (self.actual_max - self.actual_min) / self.step_size
