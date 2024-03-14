@@ -27,6 +27,7 @@ class MujocoPidTunerNode(Node):
         self.get_gains = None
 
     def timer_callback(self) -> None:
+        # TODO: Create button to publish the gains instead of publishing them every second
         if self.get_gains is not None:
             kp, kd, ki = self.get_gains()
             self.publish_gains(kp, kd, ki)
