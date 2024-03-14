@@ -33,10 +33,10 @@ class MujocoPidTunerNode(Node):
 
     def publish_gains(self, kp, kd, ki) -> None:
         msg = MujocoGains()
-        msg.controller_mode = 0 # Fixed at 0 for now
-        msg.proportional_gains = kp
-        msg.derivative_gains = kd
-        msg.integral_gains = ki
+        msg.controller_mode = 0         # Fixed at 0 for now
+        msg.proportional_gains = kp * 2 # Multiply by 2 to match the gains in the mujoco simulation
+        msg.derivative_gains = kd * 2
+        msg.integral_gains = ki * 2
         self.pid_gains_publisher.publish(msg)
 
     def configure_callback(self, get_gains) -> None:
