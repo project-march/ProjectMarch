@@ -13,13 +13,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='gungnir',
-    maintainer_email='gungnir@todo.todo',
-    description='TODO: Package description',
+    maintainer='Alexander James Becoy',
+    maintainer_email='alexanderjames.becoy@outlook.com',
+    description='Updates the PID/PD gains for the position/torque controllers in Mujoco simulation.',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'mujoco_pid_tuner_node = mujoco_pid_tuner.mujoco_pid_tuner_node:main'
         ],
     },
 )
