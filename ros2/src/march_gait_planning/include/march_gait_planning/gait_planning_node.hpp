@@ -45,5 +45,6 @@ class GaitPlanningNode:public rclcpp::Node {
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
+    bool m_single_execution_done;
 
 };

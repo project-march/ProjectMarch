@@ -29,7 +29,7 @@ void GainSchedulerNode::setTimer(int publish_time) {
 
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
-    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode);
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str());
     m_scheduler.setConfigPath((exoMode)msg->mode);
 }
 
