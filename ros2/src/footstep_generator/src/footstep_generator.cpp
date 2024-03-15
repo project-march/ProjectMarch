@@ -5,7 +5,7 @@ using std::placeholders::_2;
 
 FootstepGenerator::FootstepGenerator()
     : Node("footstep_generator_node")
-    , m_steps(5) // Change this so we can interactively edit the amount of footsteps while Koengaiting
+    , m_steps(20) // Change this so we can interactively edit the amount of footsteps while Koengaiting
     , m_vx(0.15)
     , m_vy(0.0)
     , m_l(0.33)
@@ -13,9 +13,9 @@ FootstepGenerator::FootstepGenerator()
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
-    m_swing_trajectory_command_publisher
-        = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
-    declare_parameter("n_footsteps", 5);
+    // m_swing_trajectory_command_publisher
+    //     = this->create_publisher<std_msgs::msg::Int32>("/publish_swing_leg_command", 10);
+    declare_parameter("n_footsteps", 20);
     declare_parameter("step_length", 0.1);
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();
@@ -30,11 +30,11 @@ void FootstepGenerator::publish_foot_placements(
     if (request->gait_type != 0) {
         auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
         // ADD THE EMPTY REQUEST HERE
-        if (request->gait_type == 3) {
-            std_msgs::msg::Int32 msg;
-            msg.data = 0;
-            m_swing_trajectory_command_publisher->publish(msg);
-        }
+        // if (request->gait_type == 3) {
+        //     std_msgs::msg::Int32 msg;
+        //     msg.data = 0;
+        //     m_swing_trajectory_command_publisher->publish(msg);
+        // }
         m_publisher->publish(footsteps);
         response->status = true;
     }
