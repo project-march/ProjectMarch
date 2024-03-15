@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <array>  
+#include <set>
 #include "rclcpp/rclcpp.hpp" 
 #include "march_gait_planning/gait_planning.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
