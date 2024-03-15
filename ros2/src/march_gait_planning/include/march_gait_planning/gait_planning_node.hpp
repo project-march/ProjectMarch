@@ -25,6 +25,18 @@ class GaitPlanningNode:public rclcpp::Node {
     typedef std::array<double, 3> XYZFootPositionArray; 
 
     private: 
+
+    //Temporary struct to help remove duplicate values from the final_feet_position message (7 digits after decimal)
+    struct PoseXComparator {
+        bool operator()(const geometry_msgs::msg::Pose& pose1, const geometry_msgs::msg::Pose& pose2) const {
+            // return pose1.position.x < pose2.position.x;
+
+            double rounded_x1 = round(pose1.position.x * 1e7) / 1e7;
+            double rounded_x2 = round(pose2.position.x * 1e7) / 1e7;
+            return rounded_x1 < rounded_x2;
+        }
+    };
+    
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; // exo_mode == gait_type 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 

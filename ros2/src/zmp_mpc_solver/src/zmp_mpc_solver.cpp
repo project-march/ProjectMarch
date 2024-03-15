@@ -278,7 +278,7 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;
-    printf("Shooting nodes: %i\n", N);
+    //printf("Shooting nodes: %i\n", N);
     // First, we do some checks so the mpc works
     if ((N - 1) % m_number_of_footsteps != 0) {
 
@@ -287,7 +287,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     int status = ZMP_pendulum_ode_acados_create_with_discretization(acados_ocp_capsule, N, new_time_steps);
 
     if (status) {
-        printf("ZMP_pendulum_ode_acados_create() returned status %d. Exiting.\n", status);
+        //printf("ZMP_pendulum_ode_acados_create() returned status %d. Exiting.\n", status);
         exit(1);
     }
 
@@ -458,9 +458,9 @@ inline int ZmpSolver::solve_zmp_mpc(
     }
     // RCLCPP_INFO(rclcpp::get_logger("Internal stance foot"), "current count is %i \n", m_current_count);
 
-    printf("step_counter %i\n", m_step_counter);
-    printf("current stance foot is %i\n", m_current_stance_foot);
-    printf("current count is %i\n", m_current_count);
+    //printf("step_counter %i\n", m_step_counter);
+    //printf("current stance foot is %i\n", m_current_stance_foot);
+    //printf("current count is %i\n", m_current_count);
 
     // correction so that current shooting node doesn't turn negative
     if (m_current_shooting_node == -1) {
@@ -475,15 +475,15 @@ inline int ZmpSolver::solve_zmp_mpc(
             * (1 / (1 - step_duration)) / (((N - 1)) / (m_number_of_footsteps));
         count = -count;
         step_number += 1;
-        printf("now going into current_shooting node %i\n", m_current_shooting_node);
-        printf("with timing value %f\n", m_timing_value);
+        //printf("now going into current_shooting node %i\n", m_current_shooting_node);
+        //printf("with timing value %f\n", m_timing_value);
     } else if (m_current_shooting_node != 0
         && m_current_shooting_node < step_duration * ((N - 1) / m_number_of_footsteps)) {
         m_timing_value = 0;
         count = -count;
         step_number += 1;
-        printf("now going into current_shooting node %i\n", m_current_shooting_node);
-        printf("with timing value in else if %f\n", m_timing_value);
+        //printf("now going into current_shooting node %i\n", m_current_shooting_node);
+        //printf("with timing value in else if %f\n", m_timing_value);
 
     } else {
         ;
@@ -515,7 +515,7 @@ inline int ZmpSolver::solve_zmp_mpc(
             p[3] = m_timing_value;
             p[4] = 0;
             step_number += 1;
-            printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
+            //printf("Shooting node %i: [%f, %f, %f, %f, %f] \n", ii, p[0], p[1], p[2], p[3], p[4]);
 
             ZMP_pendulum_ode_acados_update_params(acados_ocp_capsule, ii, p, NP);
             m_timing_value = 0;
@@ -662,16 +662,16 @@ inline int ZmpSolver::solve_zmp_mpc(
     // printf("\n--- utraj ---\n");
     // d_print_exp_tran_mat(NU, N, utraj, NU);
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
-    printf("The current state is \n\n");
+    //printf("The current state is \n\n");
 
     for (int i = 0; i < 12; i++) {
-        printf(" %f", xtraj[i]);
+        //printf(" %f", xtraj[i]);
     }
 
-    printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
+    //printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
 
     if (status == ACADOS_SUCCESS) {
-        printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
+        //printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
         for (int ii = 0; ii < nlp_dims->N; ii++) {
             u_current[ii] = utraj[ii];
         }
@@ -681,7 +681,7 @@ inline int ZmpSolver::solve_zmp_mpc(
         }
         std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     } else {
-        printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
+        //printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
     }
 
     // here, we copy our array into the std::array
@@ -721,19 +721,19 @@ inline int ZmpSolver::solve_zmp_mpc(
 
     // printf("the solution x is %f\n:", m_x_trajectory[6+12]);
     // printf("the solution y is %f\n:", m_x_trajectory[8+12]);
-    printf("\nSolver info:\n");
-    printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n", sqp_iter, NTIMINGS, min_time * 1000,
-        kkt_norm_inf);
+    //printf("\nSolver info:\n");
+    //printf(" SQP iterations %2d\n minimum time for %d solve %f [ms]\n KKT %e\n", sqp_iter, NTIMINGS, min_time * 1000,
+        //kkt_norm_inf);
 
     // free solver
     status = ZMP_pendulum_ode_acados_free(acados_ocp_capsule);
     if (status) {
-        printf("ZMP_pendulum_ode_acados_free() returned status %d. \n", status);
+        //printf("ZMP_pendulum_ode_acados_free() returned status %d. \n", status);
     }
     // free solver capsule
     status = ZMP_pendulum_ode_acados_free_capsule(acados_ocp_capsule);
     if (status) {
-        printf("ZMP_pendulum_ode_acados_free_capsule() returned status %d. \n", status);
+        //printf("ZMP_pendulum_ode_acados_free_capsule() returned status %d. \n", status);
     }
 
     return status;
