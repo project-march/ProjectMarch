@@ -215,7 +215,7 @@ inline bool is_ethercat_alive(const std::exception_ptr& exceptionPtr, const rclc
 
 // Original: check whether the motor controller is in a valid state > state 8 (closed loop control).
 // Currently: check whether the motor controller has an error.
-// TODO: check which one is better. Rename function if current implementation is used.
+// TODO: check which one is better > rename function in the cleanup if current implementation is used.
 inline bool is_motor_controller_in_a_valid_state(march::Joint& joint, const rclcpp::Logger& logger)
 {
     auto motor_controller_state = joint.getMotorController()->getState();

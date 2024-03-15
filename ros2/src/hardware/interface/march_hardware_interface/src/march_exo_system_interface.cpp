@@ -31,9 +31,6 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
-#define DEBUG
-#define TORQUEDEBUG
-
 using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
@@ -221,10 +218,10 @@ hardware_interface::return_type MarchExoSystemInterface::start()
 {
     try {
         // Start ethercat cycle in the hardware
-        // RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
+        RCLCPP_INFO((*logger_), "Starting EthercatCycle...");
         march_robot_->startEtherCAT(/*reset_motor_controllers=*/false);
         auto jointPtrs = march_robot_->getJoints();
-        // RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
+        RCLCPP_INFO((*logger_), "Waiting for Joints to sent ethercat data...");
         repeat_function_on_joints_until_timeout(
             /*function_goal=*/"Waiting on ethercat data.",
             /*function=*/
@@ -236,53 +233,36 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             [this](march::Joint& joint) {
                 RCLCPP_ERROR((*logger_), "Joints %s is not receiving data", joint.getName().c_str());
             });
+
         RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
 
-        // Read the first encoder values for each joint
+        // Set initial values for the joints.
         for (JointInfo& jointInfo : joints_info_) {
-            // Send PID values to the joints to initialize them
-            jointInfo.joint.sendPID();
-            // RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
-
-            // TODO: examine why this check is set to false.
-            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true);
+            jointInfo.joint.sendPID();             
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true); // Operational check: check if there are already incoming low level errors
+            jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
+            jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.target_torque = jointInfo.joint.getTorque();
+            jointInfo.velocity = 0;
 
             RCLCPP_WARN((*logger_), "The first read pos value is %f", jointInfo.target_position);
             RCLCPP_WARN((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
-            // if no weight has been assigned, we start in position control
+            // If no weight has been assigned, we start in position control.
             if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight
                 || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
-            }
-
-            auto motor_controller_state = jointInfo.joint.getMotorController()->getState();
-            RCLCPP_WARN((*logger_),
-                "The %s is in state: %s",jointInfo.joint.getName().c_str(),motor_controller_state->getOperationalState().c_str());
-
-            RCLCPP_WARN((*logger_),
-                "The fuzzy target values at start() for the %s are as follows: \n target position: %f \n measured position: %f \n position "
-                "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
-                jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-                jointInfo.torque, jointInfo.torque_weight);
-
-            // Set the first target as the current position
-            jointInfo.position = jointInfo.joint.getPosition();
-            jointInfo.velocity = 0;
-            jointInfo.torque = jointInfo.joint.getTorque();
-            jointInfo.effort_actual = 0;
-            jointInfo.effort_command = 0;
-
+            }    
         }
+
         weight_node = std::make_shared<WeightNode>();
         weight_node->joints_info_ = getJointsInfo();
         executor_.add_node(weight_node);
-        // gains_node = std::make_shared<GainsNode>();
-        // gains_node->joints_info_ = getJointsInfo();
-        // executor_.add_node(gains_node);
+        gains_node = std::make_shared<GainsNode>();
+        gains_node->joints_info_ = getJointsInfo();
+        executor_.add_node(gains_node);
         std::thread([this]() {
             executor_.spin();
         }).detach();
@@ -323,26 +303,15 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
             RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
+            
             for (JointInfo& jointInfo : joints_info_) {
 
                 jointInfo.joint.readEncoders();
                 jointInfo.position = jointInfo.joint.getPosition();
                 jointInfo.target_position = jointInfo.joint.getPosition();
-                jointInfo.velocity = jointInfo.joint.getVelocity();
                 jointInfo.torque = jointInfo.joint.getTorque();
                 jointInfo.target_torque = jointInfo.joint.getTorque();
-                jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
                 jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
-
-                auto motor_controller_state = jointInfo.joint.getMotorController()->getState();
-                RCLCPP_WARN((*logger_),
-                    "The %s is in state: %s",jointInfo.joint.getName().c_str(),motor_controller_state->getOperationalState().c_str());
-
-                RCLCPP_WARN((*logger_),
-                    "The fuzzy target values at start() for the %s are as follows: \n target position: %f \n measured position: %f \n position "
-                    "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
-                    jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-                    jointInfo.torque, jointInfo.torque_weight);
 
                 jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
             }
@@ -444,8 +413,10 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
+    }  
 
-    }    
+    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+
     return hardware_interface::return_type::OK;
 }
 
@@ -479,9 +450,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
-    
-    RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
-    
+        
     // publish the measured torque each iteration
     weight_node->publish_measured_torque();
 
@@ -493,17 +462,9 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 
     jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
         (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
-
-    auto motor_controller_state = jointInfo.joint.getMotorController()->getState();
-            RCLCPP_WARN((*logger_),
-                "The %s is in state: %s",jointInfo.joint.getName().c_str(),motor_controller_state->getOperationalState().c_str());
-    
-    RCLCPP_WARN((*logger_),
-        "Actuation target values for the %s are as follows: \n target position: %f \n measured position: %f \n position "
-        "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",jointInfo.joint.getName().c_str(),
-        jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-        jointInfo.torque, jointInfo.torque_weight);    
     }
+
+    RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
 
     return hardware_interface::return_type::OK;
 }
