@@ -48,6 +48,8 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
 
 void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
     // desired footsteps will arrive here. Somehow determine if left or right foot should step and process accordingly. 
+    // std::set<geometry_msgs::msg::Pose> final_feet(msg->poses.begin(), msg->poses.end()); 
+    // RCLCPP_INFO(this->get_logger(), "Size of final foot positions set: %i", final_feet.size()); 
     geometry_msgs::msg::Point foot_pos = msg->poses[0].position; 
     // determine if left or right, maybe by tracking the previous desired step? 
 
