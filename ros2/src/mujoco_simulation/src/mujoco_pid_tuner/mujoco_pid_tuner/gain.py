@@ -70,7 +70,7 @@ class Gain:
         self.layout.addWidget(self.slider, 4, 0, 1, 2)
 
         # Spin Box to change the slider value directly
-        self.slider_label = QLabel("Value")
+        self.slider_label = QLabel("Current gain")
         self.layout.addWidget(self.slider_label, 5, 0)
 
         self.slider_spin_box = QDoubleSpinBox()
