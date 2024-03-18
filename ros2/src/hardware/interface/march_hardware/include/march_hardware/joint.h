@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include <march_hardware/motor_controller/motor_controller.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>

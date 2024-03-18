@@ -1,4 +1,4 @@
-# ExoMode.msg
+#ExoMode.msg
 std_msgs/Header header
 int8 mode
 
@@ -14,3 +14,6 @@ int8 SMALLWALK = 7
 int8 ASCENDING = 8
 int8 DESCENDING = 9
 int8 VARIABLEWALK = 10
+int8 HIGHSTEP1 = 11
+int8 HIGHSTEP2 = 12
+int8 HIGHSTEP3 = 13

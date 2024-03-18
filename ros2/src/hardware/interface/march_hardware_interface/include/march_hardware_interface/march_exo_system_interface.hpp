@@ -59,6 +59,8 @@ struct JointInfo {
     double velocity;
     double torque;
     double target_torque;
+
+    // TODO: outdated parameters that should be completely removed in the cleanup.
     double effort_actual;
     double effort_command;
     double effort_command_converted;

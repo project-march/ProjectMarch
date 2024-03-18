@@ -25,40 +25,33 @@ using std::placeholders::_2;
 SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_description)
     : Node("state_estimator_node")
 {
+    RCLCPP_INFO(this->get_logger(), "Initializing State Estimator Node");
+
     // this->declare_parameter<int64_t>("dt", 50);
     // int64_t dt = this->get_parameter("dt").as_int();
     int64_t dt = 50;
 
-    m_joint_state_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_imu_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_timer_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_node_position_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_joint_state_subscription_options.callback_group = m_joint_state_callback_group;
-    m_imu_subscription_options.callback_group = m_imu_callback_group;
+    m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_sensors_subscription_options.callback_group = m_sensors_callback_group;
 
     m_timer = this->create_wall_timer(
-        std::chrono::milliseconds(dt), std::bind(&SensorFusionNode::timerCallback, this), m_timer_callback_group);
+        std::chrono::milliseconds(dt), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1),
-        m_joint_state_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("imu", rclcpp::SensorDataQoS(),
-        std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_imu_subscription_options);
+        m_sensors_subscription_options);
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
-        = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 1);
+        = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+    m_feet_height_pub 
+        = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
+    m_imu_pose_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("state_estimation/imu_pose", 10);
 
-    sensor_msgs::msg::Imu init_imu_msg;
-    init_imu_msg.header.stamp = this->now();
-    init_imu_msg.header.frame_id = "backpack";
-    init_imu_msg.orientation.x = 0.0;
-    init_imu_msg.orientation.y = 0.0;
-    init_imu_msg.orientation.z = 0.0;
-    init_imu_msg.orientation.w = 1.0;
-    init_imu_msg.angular_velocity.x = 0.0;
-    init_imu_msg.angular_velocity.y = 0.0;
-    init_imu_msg.angular_velocity.z = 0.0;
-    init_imu_msg.linear_acceleration.x = 0.0;
-    init_imu_msg.linear_acceleration.y = 0.0;
-    init_imu_msg.linear_acceleration.z = 0.0;
+    // M8's MPC
+    m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
+    m_mpc_com_pub = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 10);
+    m_mpc_zmp_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 10);
+    m_mpc_stance_foot_pub = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 10);
 
     std::vector<std::string> joint_names = { "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa",
         "right_hip_fe", "right_knee", "right_ankle" };
@@ -67,10 +60,10 @@ SensorFusionNode::SensorFusionNode(std::shared_ptr<RobotDescription> robot_descr
     m_robot_description = robot_description;
     m_dt = static_cast<double>(dt) / 1000.0;
     m_joint_state = nullptr;
-    m_imu = std::make_shared<sensor_msgs::msg::Imu>(init_imu_msg);
+    m_imu = nullptr;
     m_node_feet_names = { "L_foot", "R_foot" };
 
-    RCLCPP_DEBUG(this->get_logger(), "State Estimator Node initialized");
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
 
 SensorFusionNode::~SensorFusionNode()
@@ -80,26 +73,28 @@ SensorFusionNode::~SensorFusionNode()
 
 void SensorFusionNode::timerCallback()
 {
-    // if (m_joint_state == nullptr || m_imu == nullptr) {
-    if (m_joint_state == nullptr) {
+    if (m_joint_state == nullptr || m_imu == nullptr) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state or imu data received yet");
         return;
     }
-
-    m_sensor_fusion->updateQuaternionValues(&m_imu->orientation);
-    m_sensor_fusion->updateJointState(m_joint_state);
-
     publishStateEstimation();
+    publishFeetHeight();
+    publishMPCEstimation();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
 {
     m_joint_state = msg;
+    m_sensor_fusion->updateJointState(m_joint_state);
 }
 
 void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
+    m_sensor_fusion->updateImu(m_imu);
+    // if (m_joint_state != nullptr) {
+    //     m_sensor_fusion->updateKalmanFilter();
+    // }
 }
 
 void SensorFusionNode::publishStateEstimation()
@@ -107,22 +102,79 @@ void SensorFusionNode::publishStateEstimation()
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
 
-    // Find a way to optimize this
-    std::unordered_map<std::string, double> joint_positions;
-    for (long unsigned int i = 0; i < m_joint_state->name.size(); i++) {
-        joint_positions[m_joint_state->name[i]] = m_joint_state->position[i];
-    }
-
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
+
+    geometry_msgs::msg::PoseStamped imu_pose_msg;
+    imu_pose_msg.header.stamp = this->now();
+    imu_pose_msg.header.frame_id = "world";
+    imu_pose_msg.pose = m_sensor_fusion->getImuPose();
+    m_imu_pose_pub->publish(imu_pose_msg);
 
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
+    // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.foot_pose = foot_poses;
     state_estimation_msg.stance_leg = stance_leg;
-    state_estimation_msg.zmp = m_sensor_fusion->getZMP();
     m_state_estimation_pub->publish(state_estimation_msg);
+}
+
+void SensorFusionNode::publishFeetHeight()
+{
+    march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
+    feet_height_msg.header.stamp = this->now();
+    feet_height_msg.header.frame_id = "world";
+    feet_height_msg.heights = m_sensor_fusion->getFootContactHeight();
+    m_feet_height_pub->publish(feet_height_msg);
+}
+
+void SensorFusionNode::publishMPCEstimation()
+{
+    std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
+    std::vector<geometry_msgs::msg::Pose> foot_poses = m_sensor_fusion->getFootPoses();
+    uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&foot_poses[0].position, &foot_poses[1].position);
+
+    Eigen::Vector3d com_position = m_sensor_fusion->getCOM();
+    Eigen::Vector3d com_velocity = m_sensor_fusion->getCOMVelocity();
+
+    const double gravity = 9.81;
+    double zmp_x = com_position.x() + (com_velocity.x() / sqrt(gravity / com_position.z())) * com_position.y();
+    double zmp_y = com_position.y() + (com_velocity.y() / sqrt(gravity / com_position.z())) * com_position.z();
+
+    geometry_msgs::msg::PoseArray foot_positions_msg;
+    foot_positions_msg.header.stamp = this->now();
+    foot_positions_msg.header.frame_id = "world";
+    foot_positions_msg.poses = foot_poses;
+    m_mpc_foot_positions_pub->publish(foot_positions_msg);
+
+    march_shared_msgs::msg::CenterOfMass com_msg;
+    com_msg.header.stamp = this->now();
+    com_msg.header.frame_id = "world";
+    com_msg.position.x = com_position.x();
+    com_msg.position.y = com_position.y();
+    com_msg.position.z = com_position.z();
+    com_msg.velocity.x = com_velocity.x();
+    com_msg.velocity.y = com_velocity.y();
+    com_msg.velocity.z = com_velocity.z();
+    m_mpc_com_pub->publish(com_msg);
+
+    geometry_msgs::msg::PointStamped zmp_msg;
+    zmp_msg.header.stamp = this->now();
+    zmp_msg.header.frame_id = "world";
+    zmp_msg.point.x = zmp_x;
+    zmp_msg.point.y = zmp_y;
+    zmp_msg.point.z = 0.0;
+    m_mpc_zmp_pub->publish(zmp_msg);
+
+    std_msgs::msg::Int32 stance_foot_msg;
+    if (stance_leg == 0b11)
+        stance_foot_msg.data = 0;
+    else if (stance_leg == 0b10)
+        stance_foot_msg.data = -1;
+    else if (stance_leg == 0b01)
+        stance_foot_msg.data = 1;
+    m_mpc_stance_foot_pub->publish(stance_foot_msg);
 }

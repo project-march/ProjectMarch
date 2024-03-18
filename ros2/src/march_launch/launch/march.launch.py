@@ -1,6 +1,6 @@
 """Author: MARCH."""
 import os
-from ament_index_python import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription, condition
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition, UnlessCondition
@@ -12,13 +12,20 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_toload = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
     airgait = LaunchConfiguration("airgait", default="false")
     robot = LaunchConfiguration("robot")
+    rviz = LaunchConfiguration("rviz", default="false")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+    
+    # TODO: Configurable urdf
+    urdf_location = os.path.join(
+        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf")
+    with open(urdf_location, 'r') as infp:
+        robot_desc = infp.read()
 
     declared_arguments = [
         DeclareLaunchArgument(
@@ -51,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
         launch_arguments=[
-            ("model_to_load", mujoco_toload),
+            ("model_to_load", mujoco_to_load),
             ("tunings_to_load_path",
                 PathJoinSubstitution(
                     [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
@@ -145,8 +152,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     #endregion
 
-
-
     # region Launch State Estimator
     state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
 
@@ -158,9 +163,6 @@ def generate_launch_description() -> LaunchDescription:
 
     # region Launch IK Solver
     ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
-    urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf"
-    )
     # declare parameters
     # in ms
     trajectory_dt = 50
@@ -217,7 +219,23 @@ def generate_launch_description() -> LaunchDescription:
             namespace='', 
             executable='gait_planning_node', 
             name='march_gait_planning', 
-        ), 
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='screen',
+            parameters=[{'use_sim_time': simulation, 'robot_description': robot_desc}],
+            arguments=[urdf_location],
+        ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen.rviz")],
+            condition=IfCondition(rviz),
+        ),
 
         mujoco_node,
         march_control,
