@@ -5,6 +5,7 @@ Author: Alexander James Becoy @alexanderjamesbecoy
 
 from PyQt5.QtWidgets import QSlider, QSpinBox, QGridLayout, QLabel, QDoubleSpinBox
 from PyQt5.QtCore import Qt
+import numpy as np
 
 class Gain:
 
@@ -48,7 +49,7 @@ class Gain:
         self.layout.addWidget(self.max_spin_box, 2, 1)
 
         # Spin Box to change the slider value step size
-        self.step_label = QLabel("Step size")
+        self.step_label = QLabel("Decimal size")
         self.layout.addWidget(self.step_label, 3, 0)
 
         self.step_spin_box = QSpinBox()
@@ -77,6 +78,7 @@ class Gain:
         self.slider_spin_box.setMaximum(self.actual_max)
         self.slider_spin_box.setValue(self.gain)
         self.slider_spin_box.valueChanged.connect(self.update_slider_value)
+        self.slider_spin_box.setDecimals(np.log10(self.step_size))
         self.layout.addWidget(self.slider_spin_box, 5, 1)
 
         return self.layout
@@ -86,6 +88,7 @@ class Gain:
 
     def set_step_size(self):
         self.step_size = self.step_spin_box.value()
+        self.slider_spin_box.setDecimals(np.log10(self.step_size))
         self.slider.setMaximum(self.step_size)
         self.update_gradient()
 
