@@ -54,6 +54,8 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
     geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
     // determine if left or right, maybe by tracking the previous desired step? 
     float dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    // float dist_using_entire_array = msg->poses[0].position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    RCLCPP_INFO(this->get_logger(), "Distance sent to be interpolated: %f", dist); 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 

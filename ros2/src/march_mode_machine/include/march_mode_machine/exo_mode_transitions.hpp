@@ -43,7 +43,7 @@ public:
                 { exoMode::BootUp, { exoMode::Stand } },
                 { exoMode::Error, {}},
                 { exoMode::VariableStep, { exoMode::Stand, exoMode::Error}}, 
-                { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}
+                { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
                 { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
                 { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},
                 { exoMode::HighStep3, { exoMode::Stand, exoMode::Error}},
