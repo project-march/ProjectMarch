@@ -53,6 +53,7 @@ class Gain:
 
         self.step_spin_box = QSpinBox()
         self.step_spin_box.setMinimum(1)
+        self.step_spin_box.setMaximum(100000)
         self.step_spin_box.setValue(self.step_size)
         self.step_spin_box.valueChanged.connect(self.set_step_size)
         self.layout.addWidget(self.step_spin_box, 3, 1)
