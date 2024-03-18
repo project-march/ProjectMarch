@@ -3,7 +3,7 @@ Project MARCH IX, 2023-2024
 Author: Alexander James Becoy @alexanderjamesbecoy
 """
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QFileDialog
 import yaml
 import os
 import datetime
@@ -57,6 +57,7 @@ class Window(QMainWindow):
         self.load_button = QPushButton('Load Gains')
 
         self.save_button.clicked.connect(self.save_gains)
+        self.load_button.clicked.connect(self.load_gains)
 
         self.layout.addWidget(self.save_button)
         self.layout.addWidget(self.load_button)
@@ -102,3 +103,24 @@ class Window(QMainWindow):
         with open(output_path, 'w') as output_file:
             yaml.dump(data, output_file, default_flow_style=False)
         print(f'Gains have been saved to {output_path}')
+
+    def load_gains(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, 'Open Gains File', os.path.join(os.path.dirname(__file__), '../outputs'), 'YAML Files (*.yaml)')
+        if file_path:
+            with open(file_path, 'r') as input_file:
+                data = yaml.load(input_file, Loader=yaml.FullLoader)
+
+            position_gains = data['mujoco_sim']['ros__parameters']['position']
+            # torque_gains = data['mujoco_sim']['ros__parameters']['torque']
+
+            position_kp = position_gains['P'][0:len(self.joints)]
+            position_kd = position_gains['D'][0:len(self.joints)]
+            position_ki = position_gains['I'][0:len(self.joints)]
+            
+            for i, joint in enumerate(self.joints.values()):
+                joint.set_gains(position_kp[i], position_kd[i], position_ki[i])
+
+            print(f'Gains have been loaded from {file_path}')
+            print(f'Position KP: {position_kp}')
+            print(f'Position KD: {position_kd}')
+            print(f'Position KI: {position_ki}')

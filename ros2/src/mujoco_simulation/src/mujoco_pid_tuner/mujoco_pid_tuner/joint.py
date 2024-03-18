@@ -44,3 +44,8 @@ class Joint:
         gain_d = self.kd.get_gain()
         gain_i = self.ki.get_gain()
         return gain_p, gain_d, gain_i
+    
+    def set_gains(self, kp, kd, ki):
+        self.kp.set_gain(kp)
+        self.kd.set_gain(kd)
+        self.ki.set_gain(ki)
