@@ -112,6 +112,6 @@ class Gain:
     
     def set_gain(self, gain) -> None:
         self.gain = gain
-        self.slider_spin_box.setValue(gain)
         self.update_slider_value()
         self.update_gain_value()
+        self.slider_spin_box.setValue(gain)

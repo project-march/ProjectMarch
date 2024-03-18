@@ -3,6 +3,7 @@ Project MARCH IX, 2023-2024
 Author: Alexander James Becoy @alexanderjamesbecoy
 """
 
+from ament_index_python.packages import get_package_share_directory
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QFileDialog
 import yaml
 import os
@@ -41,6 +42,10 @@ class Window(QMainWindow):
 
         # Set the layout for the menu
         self.layout.addLayout(self.create_menu())
+
+            # Load gains from a file
+        default_gains_file = get_package_share_directory('march_control') + '/config/mujoco/low_level_controller_tunings.yaml'
+        self.load_yaml(default_gains_file)
 
     def create_menu(self) -> None:
         """
@@ -111,26 +116,33 @@ class Window(QMainWindow):
             yaml.dump(data, output_file, default_flow_style=False)
         print(f'Gains have been saved to {output_path}')
 
+    def load_yaml(self, file_path):
+        with open(file_path, 'r') as input_file:
+            data = yaml.load(input_file, Loader=yaml.FullLoader)
+        
+        position_gains = data['mujoco_sim']['ros__parameters']['position']
+        # torque_gains = data['mujoco_sim']['ros__parameters']['torque']
+
+        position_kp = position_gains['P'][0:len(self.joints)]
+        position_kd = position_gains['D'][0:len(self.joints)]
+        position_ki = position_gains['I'][0:len(self.joints)]
+
+        for i, joint in enumerate(self.joints.values()):
+            joint.set_gains(position_kp[i], position_kd[i], position_ki[i])
+
+        print(f'Gains have been loaded from {file_path}')
+        print(f'Position KP: {position_kp}')
+        print(f'Position KD: {position_kd}')
+        print(f'Position KI: {position_ki}')
+
     def load_gains(self):
         file_path, _ = QFileDialog.getOpenFileName(self, 'Open Gains File', os.path.join(os.path.dirname(__file__), '../outputs'), 'YAML Files (*.yaml)')
-        if file_path:
-            with open(file_path, 'r') as input_file:
-                data = yaml.load(input_file, Loader=yaml.FullLoader)
-
-            position_gains = data['mujoco_sim']['ros__parameters']['position']
-            # torque_gains = data['mujoco_sim']['ros__parameters']['torque']
-
-            position_kp = position_gains['P'][0:len(self.joints)]
-            position_kd = position_gains['D'][0:len(self.joints)]
-            position_ki = position_gains['I'][0:len(self.joints)]
-            
-            for i, joint in enumerate(self.joints.values()):
-                joint.set_gains(position_kp[i], position_kd[i], position_ki[i])
-
-            print(f'Gains have been loaded from {file_path}')
-            print(f'Position KP: {position_kp}')
-            print(f'Position KD: {position_kd}')
-            print(f'Position KI: {position_ki}')
+        
+        if file_path == '' or file_path is None:
+            print('No file selected')
+            return
+        
+        self.load_yaml(file_path)
 
     def set_callback(self, callback) -> None:
         self.callback = callback
