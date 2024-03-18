@@ -17,20 +17,9 @@ class MujocoPidTunerNode(Node):
     def __init__(self) -> None:
         super().__init__('mujoco_pid_tuner_node')
 
-        # self.timer_period = 1.0
-        # self.timer = self.create_timer(self.timer_period, self.timer_callback)
-        
         self.pid_gains_publisher = self.create_publisher(MujocoGains, 'mujoco_gains', 10)
-
         self.get_logger().info('Mujoco PID Tuner Node has been initialized.')
-
         self.get_gains = None
-
-    # def timer_callback(self) -> None:
-    #     # TODO: Create button to publish the gains instead of publishing them every second
-    #     if self.get_gains is not None:
-    #         kp, kd, ki = self.get_gains()
-    #         self.publish_gains(kp, kd, ki)
 
     def publish_gains(self, kp, kd, ki) -> None:
         msg = MujocoGains()
@@ -69,7 +58,6 @@ def main():
 
     # Set the callback for the node
     window.set_callback(mujoco_pid_tuner_node.publish_gains)
-    # mujoco_pid_tuner_node.configure_callback(window.get_gains)
 
     sys.exit(app.exec_())
 
