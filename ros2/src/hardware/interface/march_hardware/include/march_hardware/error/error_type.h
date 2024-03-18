@@ -40,6 +40,7 @@ namespace error {
         INITIAL_TORQUE_NOT_ZERO = 131,
         MAX_TORQUE_EXCEEDED = 132,
         TOTAL_FUZZY_NOT_ONE = 133,
+        ABSOLUTE_ENCODER_ZERO = 134,
         UNKNOWN = 999,
     };
 

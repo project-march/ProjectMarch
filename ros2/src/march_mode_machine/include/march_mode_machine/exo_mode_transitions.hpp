@@ -37,13 +37,16 @@ public:
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 { exoMode::Stand,
-                    { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error, exoMode::VariableStep, exoMode::VariableWalk}},
+                    { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error, exoMode::VariableStep, exoMode::VariableWalk, exoMode::HighStep1, exoMode::HighStep2, exoMode::HighStep3}},
                 { exoMode::LargeWalk, { exoMode::Stand, exoMode::Error} },
                 { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
                 { exoMode::BootUp, { exoMode::Stand } },
                 { exoMode::Error, {}},
                 { exoMode::VariableStep, { exoMode::Stand, exoMode::Error}}, 
                 { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}
+                { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
+                { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},
+                { exoMode::HighStep3, { exoMode::Stand, exoMode::Error}},
             };
         }
         else if(type == "Test Joints") {

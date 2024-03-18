@@ -49,7 +49,7 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 }
 
 void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
     setActuatedJoint(msg->joint.data);
 }
@@ -97,7 +97,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
             break;
         }
 
-        default :
+        default : 
             break; 
 
     }
