@@ -53,12 +53,15 @@ class Window(QMainWindow):
         self.layout = QVBoxLayout()
         
         # Add buttons to the layout
+        self.set_button = QPushButton('Set Gains')
         self.save_button = QPushButton('Save Gains')
         self.load_button = QPushButton('Load Gains')
 
+        self.set_button.clicked.connect(self.set_gains)
         self.save_button.clicked.connect(self.save_gains)
         self.load_button.clicked.connect(self.load_gains)
 
+        self.layout.addWidget(self.set_button)
         self.layout.addWidget(self.save_button)
         self.layout.addWidget(self.load_button)
 
@@ -76,6 +79,10 @@ class Window(QMainWindow):
             self.ki.append(i)
 
         return self.kp, self.kd, self.ki
+    
+    def set_gains(self):
+        kp, kd, ki = self.get_gains()
+        self.callback(kp, kd, ki)
     
     def save_gains(self):
         output_path_dir = os.path.join(os.path.dirname(__file__), '../outputs')
@@ -124,3 +131,6 @@ class Window(QMainWindow):
             print(f'Position KP: {position_kp}')
             print(f'Position KD: {position_kd}')
             print(f'Position KI: {position_ki}')
+
+    def set_callback(self, callback) -> None:
+        self.callback = callback
