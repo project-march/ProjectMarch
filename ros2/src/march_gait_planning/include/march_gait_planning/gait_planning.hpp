@@ -53,6 +53,12 @@ private:
     std::vector<XZFeetPositionsArray> m_small_first_step_trajectory; 
     std::vector<XZFeetPositionsArray> m_large_step_close_trajectory;
     std::vector<XZFeetPositionsArray> m_small_step_close_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_26cm_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_26cm_close_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_22cm_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_22cm_close_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_18cm_trajectory;
+    std::vector<XZFeetPositionsArray> m_high_step_18cm_close_trajectory;
     
     //Create trajectory for variable step size. This should already include a stepclose. 
     std::vector<XZFeetPositionsArray> m_variable_step_trajectory; 
