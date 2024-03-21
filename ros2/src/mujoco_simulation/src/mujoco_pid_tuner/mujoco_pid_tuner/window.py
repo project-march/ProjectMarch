@@ -21,10 +21,10 @@ class Window(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.joints = {
+            'ADPF': Joint('ADPF'),
             'HAA': Joint('HAA'),
             'HFE': Joint('HFE'),
             'KFE': Joint('KFE'),
-            'ADPF': Joint('ADPF'),
         }
 
         self.kp = []
