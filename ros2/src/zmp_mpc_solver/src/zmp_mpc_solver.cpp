@@ -717,7 +717,7 @@ inline int ZmpSolver::solve_zmp_mpc(
     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, 0, "kkt_norm_inf", &kkt_norm_inf);
     ocp_nlp_get(nlp_config, nlp_solver, "sqp_iter", &sqp_iter);
 
-    ZMP_pendulum_ode_acados_print_stats(acados_ocp_capsule);
+    // ZMP_pendulum_ode_acados_print_stats(acados_ocp_capsule);
 
     // printf("the solution x is %f\n:", m_x_trajectory[6+12]);
     // printf("the solution y is %f\n:", m_x_trajectory[8+12]);
