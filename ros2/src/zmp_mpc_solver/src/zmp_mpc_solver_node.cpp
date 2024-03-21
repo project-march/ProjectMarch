@@ -189,7 +189,7 @@ void SolverNode::timer_callback()
                 // Visualize the ZMP trajectory
                 pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
                 pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
-                pose_container.position.z = m_zmp_solver.get_com_height();
+                pose_container.position.z = 0 ; // m_zmp_solver.get_com_height();
                 zmp_path_wrapper.pose = pose_container;
                 zmp_path.poses.push_back(zmp_path_wrapper);
                 // std::cout << "Pose Stamped:" << std::endl;
