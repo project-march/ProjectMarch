@@ -259,6 +259,12 @@ def generate_launch_description() -> LaunchDescription:
             name='zmp_mpc_solver',
             output='screen',
         ),
+        Node(
+            package='march_mpc_buffer',
+            executable='march_mpc_buffer_node',
+            name='march_mpc_buffer_node',
+            output='screen',
+        ),
 
         mujoco_node,
         march_control,
