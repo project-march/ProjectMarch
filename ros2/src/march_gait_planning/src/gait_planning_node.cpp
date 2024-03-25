@@ -52,8 +52,22 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
     std::set<geometry_msgs::msg::Pose, GaitPlanningNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
     geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
-    // determine if left or right, maybe by tracking the previous desired step? 
-    float dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    float dist; 
+
+    // determine if left or right, maybe by tracking the previous desired step? Or if the y is + or -, after transforming that should be a good representation of left or right footstep.  
+    if (foot_pos.position.y > 0.0){
+        // left foot 
+        dist = foot_pos.position.x - m_gait_planning.getCurrentLeftFootPos()[0]; 
+        RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
+    } else if (foot_pos.position.y < 0.0){
+        // right foot 
+        dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+        RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
+    }
+
+    // float dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    // float dist = msg->poses[0].position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+
     // float dist_using_entire_array = msg->poses[0].position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     RCLCPP_INFO(this->get_logger(), "Distance sent to be interpolated: %f", dist); 
     m_current_trajectory.clear(); 
@@ -194,6 +208,11 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             }
             break;
+        
+        case exoMode::VariableWalk :
+        // here publish trajectory based on left or right foot desired step. maybe include stance leg? --> check first if dynamic stance leg determination is reliable. 
+        // The interpolation in the callback stays the same, here there needs to be a difference in left or right swingleg. 
+            break; 
 
         default :
             break;
