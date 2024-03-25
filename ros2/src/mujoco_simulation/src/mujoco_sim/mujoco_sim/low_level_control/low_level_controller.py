@@ -57,3 +57,13 @@ class LowLvlController:
             sensor_map (integer list): A mapping matrix from sensor data to joint reference
         """
         self.sensor_map = sensor_map
+
+    def update_gains(self, p, d, i) -> None:
+        """Updates the PID gains.
+
+        Args:
+            p (float list): The proportional gains
+            d (float list): The derivative gains
+            i (float list): The integral gains
+        """
+        pass
