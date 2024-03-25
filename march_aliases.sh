@@ -56,6 +56,9 @@ alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch mar
 # Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
 
+# Alias to build packages with dependencies
+alias mbpa='mba --packages-up-to'
+
 # Alias to run tests on a package
 alias mbt='mbt'
 mbt() {
