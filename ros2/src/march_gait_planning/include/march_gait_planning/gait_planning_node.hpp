@@ -61,5 +61,6 @@ class GaitPlanningNode:public rclcpp::Node {
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
     bool m_single_execution_done;
+    int m_variable_walk_swing_leg; 
 
 };

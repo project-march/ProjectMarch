@@ -9,7 +9,8 @@ GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
    m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
-   m_single_execution_done(false)
+   m_single_execution_done(false), 
+   m_variable_walk_swing_leg()
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -20,7 +21,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
 
-    m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("final_feet_position", 10, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
+    m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
@@ -52,33 +53,27 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
     std::set<geometry_msgs::msg::Pose, GaitPlanningNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
     geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
+    final_feet.erase(final_feet.begin());
+
     float dist; 
 
     // determine if left or right, maybe by tracking the previous desired step? Or if the y is + or -, after transforming that should be a good representation of left or right footstep.  
     if (foot_pos.position.y > 0.0){
         // left foot 
         dist = foot_pos.position.x - m_gait_planning.getCurrentLeftFootPos()[0]; 
+        m_variable_walk_swing_leg = 0; 
         RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
     } else if (foot_pos.position.y < 0.0){
         // right foot 
         dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+        m_variable_walk_swing_leg = 1; 
         RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
     }
 
-    // float dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
-    // float dist = msg->poses[0].position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
-
-    // float dist_using_entire_array = msg->poses[0].position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
-    RCLCPP_INFO(this->get_logger(), "Distance sent to be interpolated: %f", dist); 
+    RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", dist); 
     m_current_trajectory.clear(); 
     m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
     footPositionsPublish(); 
-
-    // When distance coming from mode machine 
-    // float dist = msg->distance; 
-    // m_current_trajectory.clear(); 
-    // m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
-    // footPositionsPublish(); 
 }
 
 void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
@@ -154,6 +149,7 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::LargeWalk :
         case exoMode::SmallWalk :
             if (m_current_trajectory.empty()) {
+                // Shouldn't get trajectory, that doesn't interpolate for us 
                 m_current_trajectory = m_gait_planning.getTrajectory(); 
                 RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
             }
@@ -212,6 +208,25 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::VariableWalk :
         // here publish trajectory based on left or right foot desired step. maybe include stance leg? --> check first if dynamic stance leg determination is reliable. 
         // The interpolation in the callback stays the same, here there needs to be a difference in left or right swingleg. 
+            
+            m_single_execution_done = false;
+            // If the current trajectory is not empty, finish it before going to step close or stand.
+            if (!m_current_trajectory.empty()){
+                RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
+                GaitPlanningNode::XZFeetPositionsArray current_step = m_current_trajectory.front();
+                m_current_trajectory.erase(m_current_trajectory.begin());
+                if (m_variable_walk_swing_leg == 1){
+                    // right swing leg 
+                    setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3]+m_home_stand[2], 
+                                    current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1]+m_home_stand[5]);
+                } else if (m_variable_walk_swing_leg == 0){
+                    // left swing leg 
+                    setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
+                                    current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
+                }
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            }
+
             break; 
 
         default :

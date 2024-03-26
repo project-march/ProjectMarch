@@ -85,7 +85,7 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         m_mode_publisher->publish(mode_msg);
         
         // In case of VariableWalk, request footsteps from MPC footstep planner 
-        if (m_mode_machine.getCurrentMode() == 10){
+        if (m_mode_machine.getCurrentMode() == 11){
             sendRequest(2); 
         }
 

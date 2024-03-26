@@ -5,6 +5,8 @@
 
 #include "march_mpc_buffer/march_mpc_buffer_node.hpp"
 
+#include <string>
+#include <vector> 
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
@@ -20,7 +22,8 @@ MarchMpcBufferNode::MarchMpcBufferNode() : Node("march_mpc_buffer_node") {
 void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
     // Transform the footsteps from the right foot frame to the backpack frame.
     geometry_msgs::msg::PoseArray transformed_footsteps;
-    transformed_footsteps.header = msg->header;
+    transformed_footsteps.header.frame_id = "backpack"; 
+    transformed_footsteps.header.stamp = msg->header.stamp; 
 
     for (auto& pose : msg->poses) {
         geometry_msgs::msg::TransformStamped transform;
