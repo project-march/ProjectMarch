@@ -66,3 +66,15 @@ class PositionController(LowLvlController):
                 self.e_prev[index] = e
         except IndexError:
             pass
+
+    def update_gains(self, p, d, i) -> None:
+        """Updates the PID gains.
+
+        Args:
+            p (float list): The proportional gains
+            d (float list): The derivative gains
+            i (float list): The integral gains
+        """
+        self.p = p
+        self.d = d
+        self.i = i

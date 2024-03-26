@@ -47,3 +47,13 @@ class TorqueController(LowLvlController):
             data.ctrl[index] += ctrl_input
 
             self.e_prev[index] = e
+
+    def update_gains(self, p, d, i=None) -> None:
+        """Update the PD gains.
+        
+        :param p: (float list): Proportional-value of a PD controller
+        :param d: (float list): Derivative-value of a PD controller
+        :param i: (float list): Integration term (not used in this implementation)
+        """
+        self.p = p
+        self.d = d

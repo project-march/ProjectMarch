@@ -31,9 +31,6 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
-#define DEBUG
-#define TORQUEDEBUG
-
 using namespace march_hardware_interface_util;
 
 namespace march_hardware_interface {
@@ -204,7 +201,7 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interfacefor joint %s", jointInfo.name.c_str());
+        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
         // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
         // command_interfaces.emplace_back(hardware_interface::CommandInterface(
         //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
@@ -236,50 +233,30 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             [this](march::Joint& joint) {
                 RCLCPP_ERROR((*logger_), "Joints %s is not receiving data", joint.getName().c_str());
             });
+
         RCLCPP_INFO((*logger_), "All slaves are sending EtherCAT data.");
 
-        // Read the first encoder values for each joint
+        // Set initial values for the joints.
         for (JointInfo& jointInfo : joints_info_) {
-            // Send PID values to the joints to initialize them
-            jointInfo.joint.sendPID();
-            RCLCPP_INFO((*logger_), "Set PID's for joint %s", jointInfo.name.c_str());
-
-            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/false);
+            jointInfo.joint.sendPID();             
+            jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true); // Operational check: check if there are already incoming low level errors
+            jointInfo.position = jointInfo.joint.getPosition();
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
+            jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.target_torque = jointInfo.joint.getTorque();
+            jointInfo.velocity = 0;
 
-            RCLCPP_INFO((*logger_), "The first read pos value is %f", jointInfo.target_position);
-            RCLCPP_INFO((*logger_), "The first set torque value is %f", jointInfo.target_torque);
+            RCLCPP_WARN((*logger_), "The first read pos value is %f", jointInfo.target_position);
+            RCLCPP_WARN((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
-            // if no weight has been assigned, we start in position control
+            // If no weight has been assigned, we start in position control.
             if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight
                 || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
-            }
-            // if no weight has been assigned, we start in torque control
-            // if(!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight ||
-            // isnan(jointInfo.position_weight) ){
-            //     jointInfo.torque_weight = 1.0f;
-            //     jointInfo.position_weight = 0.0f;
-            // }
-
-            RCLCPP_INFO_ONCE((*logger_),
-                "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
-                "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
-                jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-                jointInfo.torque, jointInfo.torque_weight);
-
-            jointInfo.joint.actuate(
-                jointInfo.target_position, jointInfo.target_torque, jointInfo.position_weight, jointInfo.torque_weight);
-
-            // Set the first target as the current position
-            jointInfo.position = jointInfo.joint.getPosition();
-            jointInfo.velocity = 0;
-            jointInfo.torque = jointInfo.joint.getTorque();
-            jointInfo.effort_actual = 0;
-            jointInfo.effort_command = 0;
+            }    
         }
+
         weight_node = std::make_shared<WeightNode>();
         weight_node->joints_info_ = getJointsInfo();
         executor_.add_node(weight_node);
@@ -326,7 +303,16 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
             make_joints_operational(march_robot_->getNotOperationalJoints());
             joints_ready_for_actuation_ = true;
             RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
+            
             for (JointInfo& jointInfo : joints_info_) {
+
+                jointInfo.joint.readEncoders();
+                jointInfo.position = jointInfo.joint.getPosition();
+                jointInfo.target_position = jointInfo.joint.getPosition();
+                jointInfo.torque = jointInfo.joint.getTorque();
+                jointInfo.target_torque = jointInfo.joint.getTorque();
+                jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
+
                 jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
             }
         }
@@ -427,9 +413,10 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
+    }  
 
-        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
-    }
+    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+
     return hardware_interface::return_type::OK;
 }
 
@@ -463,7 +450,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
-
+        
     // publish the measured torque each iteration
     weight_node->publish_measured_torque();
 
@@ -473,49 +460,19 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-// either this or setting the target torque to the real-time measured torque in the weight node
-// jointInfo.target_torque = jointInfo.joint.getMotorController()->getTorqueSensor()->getAverageTorque();
-
-// TORQUEDEBUG LINE
-#ifdef TORQUEDEBUG
-        RCLCPP_INFO_ONCE((*logger_),
-            "The fuzzy target values are as follows: \n target position: %f \n measured position: %f \n position "
-            "weight: %f \n target torque: %f \n measured torque: %f \n torque weight: %f",
-            jointInfo.target_position, jointInfo.position, jointInfo.position_weight, jointInfo.target_torque,
-            jointInfo.torque, jointInfo.torque_weight);
-#endif
-
-        // FIXME: BEUNFIX
-        // RCLCPP_INFO_STREAM((*logger_), "The fuzzy target values for " << jointInfo.name << " are as follows: \n
-        // target position: " << jointInfo.target_position << " \n measured position: " << jointInfo.position << "\n
-        // position weight: " << jointInfo.position_weight << " \n target torque: " << jointInfo.target_torque << " \n
-        // measured torque: " << jointInfo.torque << " \n torque weight: " << jointInfo.torque_weight);
-        // if(jointInfo.name.compare("left_ankle") == 0){
-        // RCLCPP_INFO((*logger_), "left ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque,
-        // jointInfo.position_weight, jointInfo.torque_weight);
-        // jointInfo.joint.actuate((float)jointInfo.target_position, -0.012, 0.6f, 0.4f);
-        // }
-        // else if(jointInfo.name.compare("right_ankle") == 0){
-        // RCLCPP_INFO((*logger_), "right ankle target torque: %f pos_w: %f tor_w: %f", jointInfo.target_torque,
-        // jointInfo.position_weight, jointInfo.torque_weight);
-        // jointInfo.joint.actuate((float)jointInfo.target_position, -0.185f, 0.6f, 0.4f);
-        // }
-        // else{
-        // ACTUAL TORQUE LINE
-        jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
-            (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
-        // }
+    jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
+        (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
+
+    RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
 
     return hardware_interface::return_type::OK;
 }
 
+// Checks whether the joint and its motor controller are in a valid state.
+// TODO: (re)move to hwi_util. Possibly add additional checks. 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    if (jointInfo.position == 0) {
-        RCLCPP_WARN((*logger_), "The joint %s has position 0, the absolute encoder probably isn't working correctly.",
-            jointInfo.name.c_str());
-    }
     return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
 }
 

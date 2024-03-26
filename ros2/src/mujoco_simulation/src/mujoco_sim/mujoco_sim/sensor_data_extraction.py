@@ -113,10 +113,10 @@ class SensorDataExtraction:
             accel.x = self.sensordata[accelero_adr[i]]
             accel.y = self.sensordata[accelero_adr[i] + 1]
             accel.z = self.sensordata[accelero_adr[i] + 2]
-            quat.x = self.sensordata[quat_adr[i]]
-            quat.y = self.sensordata[quat_adr[i] + 1]
-            quat.z = self.sensordata[quat_adr[i] + 2]
-            quat.w = self.sensordata[quat_adr[i] + 3]
+            quat.w = self.sensordata[quat_adr[i]]
+            quat.x = self.sensordata[quat_adr[i] + 1]
+            quat.y = self.sensordata[quat_adr[i] + 2]
+            quat.z = self.sensordata[quat_adr[i] + 3]
 
             if i == 0:
                 backpack_imu.angular_velocity = gyro

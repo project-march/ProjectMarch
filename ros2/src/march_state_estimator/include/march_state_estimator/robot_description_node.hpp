@@ -25,6 +25,7 @@
 class RobotDescriptionNode : public rclcpp::Node {
 public:
     RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
+    ~RobotDescriptionNode();
 
 private:
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
@@ -38,8 +39,7 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_subscription_state_estimation;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimatorVisualization>::SharedPtr
         m_publisher_state_estimator_visualization;
-    rclcpp::CallbackGroup::SharedPtr m_node_positions_callback_group;
-    rclcpp::CallbackGroup::SharedPtr m_node_jacobian_callback_group;
+    rclcpp::CallbackGroup::SharedPtr m_service_callback_group;
     rclcpp::Service<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_service_node_position;
     rclcpp::Service<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_service_node_jacobian;
 };

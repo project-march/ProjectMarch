@@ -8,11 +8,13 @@ from controller_torque import TorqueController
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
+from mujoco_interfaces.msg import MujocoGains
 from sensor_msgs.msg import JointState
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
 from rclpy.node import Node
+import aie_passive_force
 
 
 def get_actuator_names(model):
@@ -69,14 +71,15 @@ class MujocoSimNode(Node):
         the sim_step function.
         """
         super().__init__("mujoco_sim")
-        self.declare_parameter("model_toload")
+        self.declare_parameter("model_to_load")
+        self.declare_parameter("aie_force")
 
         self.SIM_TIMESTEP_ROS = 0.008
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
         # The model can be found in the robot_description package.
-        self.model_name = self.get_parameter("model_toload")
+        self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
@@ -85,6 +88,10 @@ class MujocoSimNode(Node):
         self.data = mujoco.MjData(self.model)
 
         self.actuator_names = get_actuator_names(self.model)
+        self.use_aie_force = self.get_parameter("aie_force")
+
+        if self.use_aie_force.value:
+            self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.005
@@ -93,6 +100,8 @@ class MujocoSimNode(Node):
         self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 100)
+        # Create a subscriber for updating the gains
+        self.gains_subscriber = self.create_subscription(MujocoGains, "mujoco_gains", self.gains_callback, 100)
         # Create a publisher for the reading-from-mujoco action
         self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
 
@@ -202,6 +211,34 @@ class MujocoSimNode(Node):
             joint_pos_dict[name] = msg.trajectory.desired.positions[i]
         self.msg_queue.put(joint_pos_dict)
 
+    def gains_callback(self, msg):
+        """Callback function for the gains service.
+
+        This function updates the gains of the controller.
+            msg (MujocoControl message): Contains the gains to be changed
+        """
+        if msg.controller_mode is None:
+            self.get_logger().info("No controller mode received")
+            return
+        
+        if msg.controller_mode < 0 or msg.controller_mode > 1:
+            self.get_logger().info("Invalid controller mode received")
+            return
+
+        if len(msg.proportional_gains) == 0 or len(msg.derivative_gains) == 0:
+            self.get_logger().info("No gains received")
+            return
+        
+        if len(msg.proportional_gains) != len(self.actuator_names) or len(msg.derivative_gains) != len(self.actuator_names):
+            self.get_logger().info("Invalid number of gains received")
+            return
+
+        self.controller[msg.controller_mode].update_gains(msg.proportional_gains, msg.derivative_gains, msg.integral_gains)
+        self.get_logger().info("Gains updated. New gains in " + str(msg.controller_mode))
+        self.get_logger().info("P: " + str(msg.proportional_gains))
+        self.get_logger().info("D: " + str(msg.derivative_gains))
+        self.get_logger().info("I: " + str(msg.integral_gains))
+
     def sim_step(self):
         """This function performs the simulation update.
 
@@ -216,8 +253,13 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        while self.data.time <= time_difference_withseconds:
-            mujoco.mj_step(self.model, self.data)
+        if self.use_aie_force.value == 'true':
+            while self.data.time <= time_difference_withseconds:
+                mujoco.set_mjcb_passive(self.aie_passive_force.callback)
+                mujoco.mj_step(self.model, self.data)
+        else:
+            while self.data.time <= time_difference_withseconds:
+                mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
 

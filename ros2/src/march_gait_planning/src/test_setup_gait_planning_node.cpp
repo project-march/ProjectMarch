@@ -45,7 +45,7 @@ TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
 }
 
 void TestSetupGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %d", msg->mode); 
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
 }
 
