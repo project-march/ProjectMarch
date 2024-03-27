@@ -74,6 +74,7 @@ private:
     rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_mpc_com_pub;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_zmp_pub;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_mpc_stance_foot_pub;
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_com_pos_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
     rclcpp::SubscriptionOptions m_sensors_subscription_options;

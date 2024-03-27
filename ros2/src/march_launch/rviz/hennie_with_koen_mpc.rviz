@@ -87,22 +87,23 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
+        backpack:
+          L_hip:
+            L_UL:
+              L_LL:
+                L_foot:
+                  L_ground:
+                    L_toe:
+                      {}
+          R_hip:
+            R_UL:
+              R_LL:
+                R_foot:
+                  R_ground:
+                    R_toe:
+                      {}
         world:
-          backpack:
-            L_hip:
-              L_UL:
-                L_LL:
-                  L_foot:
-                    L_ground:
-                      L_toe:
-                        {}
-            R_hip:
-              R_UL:
-                R_LL:
-                  R_foot:
-                    R_ground:
-                      R_toe:
-                        {}
+          {}
       Update Interval: 0
       Value: true
     - Alpha: 0.20000000298023224
@@ -246,7 +247,7 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz_default_plugins/PointStamped
       Color: 52; 101; 164
-      Enabled: true
+      Enabled: false
       History Length: 1
       Name: PointStamped
       Radius: 0.20000000298023224
@@ -256,7 +257,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /robot_com_position/position
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
@@ -327,7 +328,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: world
+    Fixed Frame: backpack
     Frame Rate: 30
   Name: root
   Tools:
@@ -382,10 +383,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6197962164878845
+      Pitch: 0.09479627758264542
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.228628158569336
+      Yaw: 1.0804390907287598
     Saved: ~
 Window Geometry:
   Displays:
