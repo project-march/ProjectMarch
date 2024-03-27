@@ -44,7 +44,7 @@ geometry_msgs::msg::PoseArray FootstepGenerator::generate_foot_placements(int st
 {
     geometry_msgs::msg::PoseArray footstep_array;
     geometry_msgs::msg::Pose footstep;
-    footstep_array.header.frame_id = "world";
+    footstep_array.header.frame_id = "R_ground";
     double x = 0.0;
     // Our frame is from the right foot, where y=0;
     // 1 is right leg
