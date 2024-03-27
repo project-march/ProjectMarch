@@ -41,7 +41,8 @@ std::chrono::nanoseconds ODrive::reset()
 std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+        logger_->info("Initializing the full calibration.");
         return std::chrono::seconds { 20 };
     } else {
         return std::chrono::nanoseconds(0);
@@ -321,6 +322,9 @@ void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct {};
     write_struct.ui = state.value_;
+    auto current_state = getAxisState();
+    logger_->info(logger_->fstring(
+            "Setting state to '%s', currently in '%s'", state.toString().c_str(), current_state.toString().c_str()));
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 

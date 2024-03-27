@@ -22,7 +22,7 @@ TestJointsModeMachineNode::TestJointsModeMachineNode()
         std::bind(&TestJointsModeMachineNode::handleGetExoModeArray, this, _1, _2));
 
     m_mode_publisher = create_publisher<march_shared_msgs::msg::ExoModeAndJoint>("current_mode", 10);
-    RCLCPP_WARN(rclcpp::get_logger("joint_test_mode_machine"), "Joint Mode Machine Node succesfully initialized");
+    RCLCPP_WARN(rclcpp::get_logger("joint_test_mode_machine"), "Test Joint Mode Machine Node succesfully initialized");
 }
 
 TestJointsModeMachineNode::~TestJointsModeMachineNode()
