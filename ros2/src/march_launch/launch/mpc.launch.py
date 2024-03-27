@@ -222,6 +222,14 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    # region Launch Bezier Visualization
+    bezier_visualization_launch_dir = os.path.join(get_package_share_directory("march_visualization"), "launch")
+
+    bezier_visualization = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([bezier_visualization_launch_dir, '/bezier_visualization.launch.py']),
+    )
+    # endregion
+
 
     return LaunchDescription(declared_arguments + [
         Node(
@@ -276,5 +284,6 @@ def generate_launch_description() -> LaunchDescription:
         state_estimator,
         ipd_node,
         footstep_generator,
+        bezier_visualization, 
         # swing_leg_trajectory_generator,
     ])
