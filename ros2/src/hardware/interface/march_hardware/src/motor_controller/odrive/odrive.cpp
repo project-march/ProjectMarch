@@ -43,7 +43,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
         logger_->info("Initializing the full calibration.");
-        return std::chrono::seconds { 20 };
+        return std::chrono::seconds { 30 };
     } else {
         return std::chrono::nanoseconds(0);
     }

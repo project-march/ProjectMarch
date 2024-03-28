@@ -465,6 +465,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
+    // Actuate joint in state 8, comment for debugging
     jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
         (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
