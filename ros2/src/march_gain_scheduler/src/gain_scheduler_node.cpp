@@ -12,7 +12,7 @@ GainSchedulerNode::GainSchedulerNode()
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
-    m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
+    m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoModeAndJoint>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
 
 
@@ -28,7 +28,7 @@ void GainSchedulerNode::setTimer(int publish_time) {
 }
 
 
-void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
+void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
     RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str());
     m_scheduler.setConfigPath((exoMode)msg->mode);
 }

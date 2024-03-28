@@ -60,6 +60,7 @@ void TestJointsModeMachineNode::handleGetExoModeArray(const std::shared_ptr<marc
         mode_msg.joint.data = request->actuated_joint.data;
 
         m_mode_publisher->publish(mode_msg);
+        RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Publishing current mode!");
     } else 
     {
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Invalid mode transition! Ignoring new mode.");

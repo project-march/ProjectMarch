@@ -23,7 +23,7 @@ testsetup:
             direction: 1
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 314 
+            transmission: 204 
             direction: 1
           torqueSensor:
             maxTorque: 1
