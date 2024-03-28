@@ -9,7 +9,8 @@ GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
    m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
-   m_pose(), 
+   m_pose(std::make_shared<geometry_msgs::msg::Pose>()), 
+   m_visualization_msg(std::make_shared<geometry_msgs::msg::PoseArray>()), 
    m_single_execution_done(false), 
    m_variable_walk_swing_leg()
  {
@@ -83,13 +84,13 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
         m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
         // for loop to convert to PoseArray
         for (auto element : m_current_trajectory){
-            RCLCPP_INFO(this->get_logger(), "entered for loop"); 
-            m_pose.position.x = element[0]; 
-            m_pose.position.z = element[1]; 
-            m_visualization_msg->poses.push_back(m_pose); 
-            RCLCPP_INFO(this->get_logger(), "pushed back pose"); 
+            // RCLCPP_INFO(this->get_logger(), "entered for loop"); 
+            m_pose->position.x = static_cast<float>(element[0]);
+            m_pose->position.z = static_cast<float>(element[1]);
+            m_visualization_msg->poses.push_back(*m_pose); 
         }
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+        RCLCPP_INFO(this->get_logger(), "Visualization msg filled and sent "); 
 
         footPositionsPublish(); 
     }

@@ -60,7 +60,7 @@ class GaitPlanningNode:public rclcpp::Node {
 
     std::vector<XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg;
-    geometry_msgs::msg::Pose m_pose;  
+    geometry_msgs::msg::Pose::SharedPtr m_pose;  
     geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
