@@ -90,6 +90,7 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
             m_visualization_msg->poses.push_back(*m_pose); 
         }
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+        m_visualization_msg->poses.clear(); 
         RCLCPP_INFO(this->get_logger(), "Visualization msg filled and sent "); 
 
         footPositionsPublish(); 

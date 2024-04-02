@@ -11,16 +11,20 @@ class BezierVisualization(Node):
             '/bezier_visualization',  # Change this to the topic you want to subscribe to
             self.callback,
             10)
-        self.visualization_subscriber  # prevent unused variable warning
+        self.visualization_subscriber  # prevent unused variable warnings
+        self.figure = plt.figure("Bezier Curve")
+        self.ax = plt.subplot()
+        self.plot = None
 
     def callback(self, msg):
         try:
-            self.figure = plt.figure("Bezier Curve")
+            self.get_logger().info(f"received new message with length {len(msg.poses)}")
+            if self.plot: 
+                self.plot.remove()
             x = [pose.position.x for pose in msg.poses]
             z = [pose.position.z for pose in msg.poses]
-            plt.plot(x, z, color="green")
-            self.get_logger().info("Tried to plot bezier points")
-            plt.show()
+            self.plot, = self.ax.plot(x, z)
+            plt.pause(0.001)
         except Exception as e:
             print(e)
 
