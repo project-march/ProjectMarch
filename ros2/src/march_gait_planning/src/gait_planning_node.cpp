@@ -64,8 +64,6 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
 
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
         auto second_foot = next(final_feet.begin(), 1); 
-        RCLCPP_INFO(this->get_logger(), "first footsteps: %f", foot_pos.position.y); 
-        RCLCPP_INFO(this->get_logger(), "second footsteps: %f", second_foot->position.y); 
 
         float dist; 
 
@@ -96,6 +94,7 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
         RCLCPP_INFO(this->get_logger(), "Visualization msg filled and sent "); 
 
         footPositionsPublish(); 
+
     }
 
 }
