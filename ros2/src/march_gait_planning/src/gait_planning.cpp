@@ -131,21 +131,21 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getVariableTraject
     return m_variable_step_trajectory; 
 }
 
-std::vector<double> GaitPlanning::linspace(const double &min, const double &max, const int &size)
-{
-	std::vector<double> result;
-	int iterator = 0;
-	for (int i = 0; i <= size-2; i++)	
-	{
-		double temp = min + i*(max-min)/(floor((double)size) - 1);
-		result.insert(result.begin() + iterator, temp);
-		iterator += 1;
-	}
-	result.insert(result.begin() + iterator, max);
-	return result;
-}
+// std::vector<double> GaitPlanning::linspace(const double &min, const double &max, const int &size)
+// {
+// 	std::vector<double> result;
+// 	int iterator = 0;
+// 	for (int i = 0; i <= size-2; i++)	
+// 	{
+// 		double temp = min + i*(max-min)/(floor((double)size) - 1);
+// 		result.insert(result.begin() + iterator, temp);
+// 		iterator += 1;
+// 	}
+// 	result.insert(result.begin() + iterator, max);
+// 	return result;
+// }
 
-// std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableTrajectory(const float &step_distance){
+// std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableStepCloseTrajectory(const float &step_distance){
 //     /*
 //     This function interpolates the variable walk between the standard LargeWalk and SmallWalk, given the desired step distance. 
 //     The variable walk consists of first the right foot taking a step forward for half te step distance and the left foot moving backwards for half the step distance, 
@@ -184,7 +184,7 @@ std::vector<double> GaitPlanning::linspace(const double &min, const double &max,
 //     return m_variable_step_trajectory;  
 // }
 
-std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableTrajectory(const float &step_distance) {
+std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableStepCloseTrajectory(const float &step_distance) {
     m_variable_step_trajectory.clear();
 
     // Calculate array length
@@ -221,6 +221,52 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariabl
 
 float GaitPlanning::interpolateZ(float x1, float z1, float x2, float z2, float x) {
     return z1 + (x - x1) * ((z2 - z1) / (x2 - x1));
+}
+
+std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableFirstStepTrajectory(const float &step_distance){
+    m_variable_step_trajectory.clear();
+
+    // Calculate array length
+    int array_length = m_small_first_step_trajectory.size();
+
+    // Interpolate first right step and left move backwards
+    for (int i = 0; i < array_length; i++) {
+        float x_right_i = step_distance / 2 * static_cast<float>(i) / static_cast<float>(array_length - 1);
+        float x_left_i = -step_distance / 2 * static_cast<float>(i) / static_cast<float>(array_length - 1);
+        float z = interpolateZ(m_small_first_step_trajectory[i][0], m_small_first_step_trajectory[i][1],
+                               m_large_first_step_trajectory[i][0], m_large_first_step_trajectory[i][1], x_right_i);
+        if (std::isnan(z)) {
+            m_variable_step_trajectory.push_back({x_right_i, 0.0, x_left_i, 0.0});
+        } else {
+            m_variable_step_trajectory.push_back({x_right_i, z, x_left_i, 0.0});
+        }
+    }
+
+    return m_variable_step_trajectory;
+
+}
+
+std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::interpolateVariableFullStepTrajectory(const float &step_distance){
+    m_variable_step_trajectory.clear();
+
+    // Calculate array length
+    int array_length = m_small_bezier_trajectory.size();
+
+    // Interpolate first right step and left move backwards
+    for (int i = 0; i < array_length; i++) {
+        float x_right_i = step_distance * static_cast<float>(i) / static_cast<float>(array_length - 1);
+        float x_left_i = -step_distance * static_cast<float>(i) / static_cast<float>(array_length - 1);
+        float z = interpolateZ(m_small_bezier_trajectory[i][0], m_small_bezier_trajectory[i][1],
+                               m_large_bezier_trajectory[i][0], m_large_bezier_trajectory[i][1], x_right_i);
+        if (std::isnan(z)) {
+            m_variable_step_trajectory.push_back({x_right_i, 0.0, x_left_i, 0.0});
+        } else {
+            m_variable_step_trajectory.push_back({x_right_i, z, x_left_i, 0.0});
+        }
+    }
+
+    return m_variable_step_trajectory;
+
 }
 
 std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::processCSV(const std::string& filename){

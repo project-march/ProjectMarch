@@ -32,10 +32,12 @@ public:
     //Getter for variable step size 
     std::vector<XZFeetPositionsArray> getVariableTrajectory() const; 
 
-    std::vector<double> linspace(const double &min, const double &max, const int &size); 
+    // std::vector<double> linspace(const double &min, const double &max, const int &size); 
 
     //Interpolate between small and large bezier gait 
-    std::vector<XZFeetPositionsArray> interpolateVariableTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> interpolateVariableStepCloseTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> interpolateVariableFullStepTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> interpolateVariableFirstStepTrajectory(const float &step_distance); 
     float interpolateZ(float x1, float z1, float x2, float z2, float x); 
 
 
