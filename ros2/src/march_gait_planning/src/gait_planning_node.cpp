@@ -63,16 +63,19 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
         std::set<geometry_msgs::msg::Pose, GaitPlanningNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
+        auto second_foot = next(final_feet.begin(), 1); 
+        RCLCPP_INFO(this->get_logger(), "first footsteps: %f", foot_pos.position.y); 
+        RCLCPP_INFO(this->get_logger(), "second footsteps: %f", second_foot->position.y); 
 
         float dist; 
 
         // determine if left or right, maybe by tracking the previous desired step? Or if the y is + or -, after transforming that should be a good representation of left or right footstep.  
-        if (foot_pos.position.y > 0.0){
+        if (foot_pos.position.y > second_foot->position.y){
             // left foot 
             dist = foot_pos.position.x - m_gait_planning.getCurrentLeftFootPos()[0]; 
             m_variable_walk_swing_leg = 0; 
             RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
-        } else if (foot_pos.position.y < 0.0){
+        } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
             dist = foot_pos.position.x - m_gait_planning.getCurrentRightFootPos()[0]; 
             m_variable_walk_swing_leg = 1; 
@@ -84,7 +87,6 @@ void GaitPlanningNode::variableFootstepCallback(const geometry_msgs::msg::PoseAr
         m_current_trajectory = m_gait_planning.interpolateVariableTrajectory(dist); 
         // for loop to convert to PoseArray
         for (auto element : m_current_trajectory){
-            // RCLCPP_INFO(this->get_logger(), "entered for loop"); 
             m_pose->position.x = static_cast<float>(element[0]);
             m_pose->position.z = static_cast<float>(element[1]);
             m_visualization_msg->poses.push_back(*m_pose); 
