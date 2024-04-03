@@ -20,14 +20,16 @@ public:
     void setGaitType(const exoMode &new_gait_type);
     void setPreviousGaitType(const exoMode &previous_gait_type);  
     void setBezierGait();
+    void setVariableDistance(const float &distance); 
 
     // Getters
-    std::vector<XZFeetPositionsArray> getTrajectory() const;
+    std::vector<XZFeetPositionsArray> getTrajectory();
     int getCurrentStanceFoot() const; 
     XYZFootPositionArray getCurrentLeftFootPos() const; 
     XYZFootPositionArray getCurrentRightFootPos() const; 
     exoMode getGaitType() const; 
     exoMode getPreviousGaitType() const;
+    float getVariableDistance() const; 
 
     //Getter for variable step size 
     std::vector<XZFeetPositionsArray> getVariableTrajectory() const; 
@@ -67,6 +69,7 @@ private:
     
     //Create trajectory for variable step size. This should already include a stepclose. 
     std::vector<XZFeetPositionsArray> m_variable_step_trajectory; 
+    mutable float m_variable_distance; 
 
     std::vector<XZFeetPositionsArray> processCSV(const std::string& filename);
     

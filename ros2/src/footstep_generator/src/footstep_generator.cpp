@@ -27,7 +27,7 @@ void FootstepGenerator::publish_foot_placements(
 {
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();
-    if (request->gait_type != 0) {
+    if (request->gait_type == 2) {
         auto footsteps = generate_foot_placements(request->stance_leg, request->gait_type);
         // ADD THE EMPTY REQUEST HERE
         // if (request->gait_type == 3) {

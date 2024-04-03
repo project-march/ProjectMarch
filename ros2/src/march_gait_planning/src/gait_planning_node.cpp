@@ -73,26 +73,26 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
         auto second_foot = next(final_feet.begin(), 1); 
 
-        float dist; 
-
         if (!m_variable_first_step_done){
             RCLCPP_DEBUG(this->get_logger(), "Publishing first step"); 
             // first step 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                dist = foot_pos.position.x - m_left_foot_offset[0]; 
+                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
+                m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                dist = foot_pos.position.x - m_right_foot_offset[0]; 
+                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0]; 
+                m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]); 
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
             }
 
-            RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", dist); 
+            RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", m_gait_planning.getVariableDistance()); 
             m_current_trajectory.clear(); 
-            m_current_trajectory = m_gait_planning.variableFirstStepTrajectory(dist); 
+            m_current_trajectory = m_gait_planning.variableFirstStepTrajectory(m_gait_planning.getVariableDistance()); 
             RCLCPP_INFO(this->get_logger(), "Trajectory interpolated with size %d, %d", m_current_trajectory.size(), m_current_trajectory[0].size()); 
             m_variable_first_step_done = true; 
             RCLCPP_DEBUG(this->get_logger(), "First step done!"); 
@@ -102,19 +102,21 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
             // full steps 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                dist = foot_pos.position.x - m_left_foot_offset[0]; 
+                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
+                m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                dist = foot_pos.position.x - m_right_foot_offset[0]; 
+                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0];
+                m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]);  
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
             }
 
-            RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", dist); 
+            RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", m_gait_planning.getVariableDistance()); 
             m_current_trajectory.clear(); 
-            m_current_trajectory = m_gait_planning.variableFullStepTrajectory(dist); 
+            m_current_trajectory = m_gait_planning.variableFullStepTrajectory(m_gait_planning.getVariableDistance()); 
         }
 
         for (auto element : m_current_trajectory){
@@ -154,11 +156,11 @@ void GaitPlanningNode::footPositionsPublish(){
                 RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
                 GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
-                if (m_gait_planning.getCurrentStanceFoot() & 0b1){
+                if (m_gait_planning.getCurrentStanceFoot() & 0b1 || m_variable_walk_swing_leg == 1){
                     // 01 is left stance leg, 11 is both, 00 is neither and 10 is right. 1 as last int means left or both. 
                     setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3]+m_home_stand[2], 
                                     current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1]+m_home_stand[5]);
-                } else if (m_gait_planning.getCurrentStanceFoot() & 0b10){
+                } else if (m_gait_planning.getCurrentStanceFoot() & 0b10 || m_variable_walk_swing_leg == 0){
                     // 10 is right stance leg
                     setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
                                     current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
@@ -188,6 +190,12 @@ void GaitPlanningNode::footPositionsPublish(){
                         m_gait_planning.setPreviousGaitType(exoMode::Stand); 
                         RCLCPP_INFO(this->get_logger(), "set previous gait type to stand"); 
                         break;
+
+                    case exoMode::VariableWalk :
+                        // get step close trajectory and publish. 
+                        m_current_trajectory = m_gait_planning.getTrajectory(); 
+                        m_gait_planning.setPreviousGaitType(exoMode::Stand);
+                        break; 
 
                     default :
                         m_current_trajectory.clear();
