@@ -22,8 +22,8 @@
 class GaitPlanningNode:public rclcpp::Node {
     public: 
     explicit GaitPlanningNode();
-    typedef std::array<double, 4> XZFeetPositionsArray; 
-    typedef std::array<double, 3> XYZFootPositionArray; 
+    // typedef std::array<double, 4> XZFeetPositionsArray; 
+    // typedef std::array<double, 3> XYZFootPositionArray; 
 
     private: 
 
@@ -49,16 +49,18 @@ class GaitPlanningNode:public rclcpp::Node {
 
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
     void currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
-    void variableFootstepCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
+    void MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
 
-    void timerCallback();
 
     GaitPlanning m_gait_planning; 
 
-    std::vector<XZFeetPositionsArray> m_current_trajectory; 
+    GaitPlanning::XYZFootPositionArray m_left_foot_offset; 
+    GaitPlanning::XYZFootPositionArray m_right_foot_offset; 
+
+    std::vector<GaitPlanning::XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg;
     geometry_msgs::msg::Pose::SharedPtr m_pose;  
     geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg; 

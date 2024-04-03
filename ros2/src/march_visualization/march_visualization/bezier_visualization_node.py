@@ -18,7 +18,7 @@ class BezierVisualization(Node):
 
     def callback(self, msg):
         try:
-            self.get_logger().info(f"received new message with length {len(msg.poses)}")
+            self.get_logger().debug(f"received new message with length {len(msg.poses)}")
             if self.plot: 
                 self.plot.remove()
             x = [pose.position.x for pose in msg.poses]
