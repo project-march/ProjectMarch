@@ -48,6 +48,7 @@ class MujocoReaderNode(Node):
         joint_state = JointState()
         joint_state.header.stamp = self.get_clock().now().to_msg()
         joint_state.header.frame_id = "joint_link"
+        # joint_state.name = msg.joint_state.name 
         joint_state.name = msg.joint_state.name + ["left_ankle_ie", "right_ankle_ie"]
         joint_state.position = msg.joint_state.position
         joint_state.velocity = msg.joint_state.velocity
@@ -61,9 +62,6 @@ class MujocoReaderNode(Node):
         torso_imu.header.stamp = self.get_clock().now().to_msg()
         torso_imu.header.frame_id = "imu_link"
         self.torso_imu_publisher.publish(torso_imu)
-
-        names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
-                 "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
     
 
 

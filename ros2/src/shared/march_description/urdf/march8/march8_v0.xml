@@ -353,43 +353,10 @@ See <https://www.gnu.org/licenses/>.
 
   </sensor>
 
-    <keyframe>
-      <!-- 
-      initial positions for the joints in the kinematic chain 
-            sx sy sz hx hy hz < - safety catcher joints [s = slider, h = hinge]
-            L_HAA
-            L_HFE
-            L_KFE
-            L_ADPF
-            L_AIE
-            R_HAA
-            R_HFE
-            R_KFE
-            R_ADPF
-            R_AIE
-      -->
-    <key name="zero"
-      qpos="
-            0
-            0
-            0
-            0
-            0
-            0
-            0
-            0"/>
-    <key name="test"
-      qpos="
-            0
-            69
-            0
-            0
-            22
-            31
-            90
-            0"/>
-    
-  </keyframe>
+<keyframe>
+  <key name="weird-stand" qpos='0 1 0 0 0 1 0 0'/>
+  <!-- <key qpos='0 0 0 0 0 0 0 0'/> -->
+</keyframe>
 
 
 </mujoco>

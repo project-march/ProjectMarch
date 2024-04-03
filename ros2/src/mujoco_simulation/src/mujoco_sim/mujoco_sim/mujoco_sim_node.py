@@ -1,5 +1,6 @@
 """Author: MVIII."""
 
+import time
 import mujoco
 import rclpy
 from ament_index_python.packages import get_package_share_directory
@@ -85,7 +86,6 @@ class MujocoSimNode(Node):
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
         self.data = mujoco.MjData(self.model)
-        mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
 
         self.actuator_names = get_actuator_names(self.model)
         self.use_aie_force = self.get_parameter("aie_force")
@@ -121,7 +121,7 @@ class MujocoSimNode(Node):
         self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
                                                            self.model.sensor_adr)
 
-        self.set_init_joint_qpos(None)
+        self.set_init_joint_qpos(0)
 
         joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
@@ -167,12 +167,17 @@ class MujocoSimNode(Node):
         self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
 
-    def set_init_joint_qpos(self, qpos_init):
+        # time.sleep(3)
+        # mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
+        # mujoco.mj_step(self.model, self.data)
+        # time.sleep(5)
+
+    def set_init_joint_qpos(self, keyframe_id):
         """Set initial qpos to make eo not falling over in sim."""
-        if qpos_init is None:
+        if keyframe_id is None:
             return
 
-        self.data.qpos[-8:] = qpos_init
+        mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe_id)
         mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
@@ -207,8 +212,8 @@ class MujocoSimNode(Node):
         if msg.reset == 1:
             self.msg_queue = Queue()
         joint_pos_dict = {}
-        for i, name in enumerate(msg.trajectory.joint_names):
-            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        for i, name in enumerate(msg.joint_names):
+            joint_pos_dict[name] = msg.points[0].positions[i]
         self.msg_queue.put(joint_pos_dict)
 
     def keyframe_callback(self, keyframe):

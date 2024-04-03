@@ -36,7 +36,7 @@ class MujocoVisualizer:
         self.cam.azimuth = 180.0
         self.cam.trackbodyid = 1
         self.cam.elevation = 1
-        self.cam.lookat[2] += 0.4
+        self.cam.lookat[2] += 0.85
 
         self.opt.flags[mujoco.mjtVisFlag.mjVIS_JOINT] = True
         self.opt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = True
