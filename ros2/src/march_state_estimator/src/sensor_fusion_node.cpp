@@ -210,7 +210,7 @@ void SensorFusionNode::publishStateEstimation()
     //     return;
     // }
 
-    std::vector<std::string> ankle_names = {"L_foot", "R_foot"};
+    std::vector<std::string> ankle_names = {"left_ankle", "right_ankle"};
     std::vector<RobotNode::SharedPtr> ankle_nodes = m_robot_description->findNodes(ankle_names);
     std::vector<geometry_msgs::msg::Pose> body_ankle_poses;
     for (const auto& ankle_node : ankle_nodes) {
