@@ -143,7 +143,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_DEBUG_THROTTLE(
+    RCLCPP_INFO_THROTTLE(
         this->get_logger(), *get_clock(), 2000, "Iteration: %d, Error norm: %f", iteration, best_error);
 
     // Publish the error norm and iterations.

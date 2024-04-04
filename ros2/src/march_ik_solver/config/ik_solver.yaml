@@ -28,10 +28,10 @@ ik_solver:
     # - stability # Comment to disable stability task
     motion:
       reference_frame: "body"
-      nodes: ["left_ankle", "right_ankle"]
+      nodes: ["L_foot", "R_foot"]
       m: 12
       n: 8
-      kp: [100.0, 200.0, 100.0, 0.0, 0.0, 0.0, 100.0, 200.0, 100.0, 0.0, 0.0, 0.0]
+      kp: [100.0, 200.0, 100.0, 6.0, 0.0, 0.0, 100.0, 200.0, 100.0, 6.0, 0.0, 0.0]
       kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       damp_coeff: 1e-12

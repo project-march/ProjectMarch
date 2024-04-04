@@ -35,7 +35,7 @@ GaitPlanningNode::GaitPlanningNode()
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
+    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
@@ -49,8 +49,8 @@ void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode
 
 void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current foot positions");
-    GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->foot_pose[0].position.x, msg->foot_pose[0].position.y, msg->foot_pose[0].position.z};
-    GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->foot_pose[1].position.x, msg->foot_pose[1].position.y, msg->foot_pose[1].position.z};
+    GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
+    GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
     m_desired_footpositions_msg->header = msg->header;
     if (m_current_trajectory.empty()){
@@ -175,9 +175,9 @@ void GaitPlanningNode::footPositionsPublish(){
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
             if (!m_home_stand_trajectory.empty()){
-                RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
+                // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
                 std::array<double, 6> current_step = m_home_stand_trajectory.front();
-                RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
+                // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
                 m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
                 setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
