@@ -30,7 +30,8 @@ GaitPlanning::GaitPlanning()
   m_small_first_step_trajectory(),
   m_large_step_close_trajectory(),
   m_small_step_close_trajectory(),
-  m_high_step_26cm_trajectory()
+  m_high_step_26cm_trajectory(),
+  m_ascending_trajectory()
   {
     std::cout << "Gait Planning Class created" << std::endl; 
     setBezierGait(); 
@@ -68,6 +69,8 @@ void GaitPlanning::setBezierGait(){
     m_high_step_22cm_close_trajectory = processCSV(cartesian_files_directory + "high_step2_down.csv"); 
     m_high_step_18cm_trajectory = processCSV(cartesian_files_directory + "high_step3.csv");
     m_high_step_18cm_close_trajectory = processCSV(cartesian_files_directory + "high_step3_down.csv"); 
+    m_ascending_trajectory = processCSV(cartesian_files_directory + "ascend_test.csv");
+    m_descending_trajectory = processCSV(cartesian_files_directory + "descend_test.csv"); 
 }
 
 void GaitPlanning::setVariableDistance(const float &distance){
@@ -105,10 +108,14 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getTrajectory() {
             return m_high_step_22cm_trajectory;
         case exoMode::HighStep3 :
             return m_high_step_18cm_trajectory;
+            return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
+        case exoMode::Ascending :
+            return m_ascending_trajectory;
+        case exoMode::Descending :
+            return m_descending_trajectory; 
         default : 
             return {}; 
     }
-    // return result; 
 }
 
 int GaitPlanning::getCurrentStanceFoot() const {
