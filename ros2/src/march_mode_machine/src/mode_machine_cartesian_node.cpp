@@ -88,9 +88,9 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         if (m_mode_machine.getCurrentMode() == 11){
             sendRequest(2); 
         }
-        if (m_mode_machine.getCurrentMode() ==  1){
-            sendRequest(3); 
-        }
+        // if (m_mode_machine.getCurrentMode() ==  1){
+        //     sendRequest(3); 
+        // }
 
         //TODO: Remove following logic from here. When you now activate the VariableStep, the mode machine will send a distance of 0.4 to the gait planning module. This distance should come from footstepplanner. Somewhere
         // the logic to identify when we use the cameras should be included (maybe a boolean?)

@@ -36,7 +36,7 @@ GaitPlanningNode::GaitPlanningNode()
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    RCLCPP_INFO(get_logger(), "Previous mode: %d", m_gait_planning.getGaitType());
+    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
 
@@ -65,8 +65,8 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
 
     m_left_foot_offset = m_gait_planning.getCurrentLeftFootPos(); 
     m_right_foot_offset = m_gait_planning.getCurrentRightFootPos(); 
-    RCLCPP_INFO(this->get_logger(), "Current left foot stance: %f, %f, %f", m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2]); 
-    RCLCPP_INFO(this->get_logger(), "Current right foot stance: %f, %f, %f", m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]); 
+    RCLCPP_DEBUG(this->get_logger(), "Current left foot stance: %f, %f, %f", m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2]); 
+    RCLCPP_DEBUG(this->get_logger(), "Current right foot stance: %f, %f, %f", m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]); 
 
     if (!m_current_trajectory.empty()){
         // wait until trajectory is finished
@@ -99,7 +99,7 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
             RCLCPP_INFO(this->get_logger(), "Distance to be interpolated: %f", m_gait_planning.getVariableDistance()); 
             m_current_trajectory.clear(); 
             m_current_trajectory = m_gait_planning.variableFirstStepTrajectory(m_gait_planning.getVariableDistance()); 
-            RCLCPP_INFO(this->get_logger(), "Trajectory interpolated with size %d, %d", m_current_trajectory.size(), m_current_trajectory[0].size()); 
+            RCLCPP_DEBUG(this->get_logger(), "Trajectory interpolated with size %d, %d", m_current_trajectory.size(), m_current_trajectory[0].size()); 
             m_variable_first_step_done = true; 
             RCLCPP_DEBUG(this->get_logger(), "First step done!"); 
            
@@ -132,7 +132,7 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
         }
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
         m_visualization_msg->poses.clear(); 
-        RCLCPP_INFO(this->get_logger(), "Visualization msg filled and sent "); 
+        RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
 
         footPositionsPublish(); 
 
@@ -160,6 +160,7 @@ void GaitPlanningNode::footPositionsPublish(){
             // If the current trajectory is not empty, finish it before going to step close or stand.
             if (!m_current_trajectory.empty()){
                 RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
+                // RCLCPP_INFO(this->get_logger(), "current trajectory size: %d \n", m_current_trajectory.size()); 
                 GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 if (m_gait_planning.getCurrentStanceFoot() & 0b1 || m_variable_walk_swing_leg == 1){
@@ -199,6 +200,7 @@ void GaitPlanningNode::footPositionsPublish(){
 
                     case exoMode::VariableWalk :
                         // get step close trajectory and publish. 
+                        RCLCPP_INFO(this->get_logger(), "Going to stand from variablewalk \n"); 
                         m_current_trajectory = m_gait_planning.getTrajectory(); 
                         m_gait_planning.setPreviousGaitType(exoMode::Stand);
                         break; 

@@ -17,6 +17,7 @@
 //#include "march_shared_msgs/msg/point_stamped_list.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -24,6 +25,7 @@
 #include "std_msgs/msg/int32.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -44,6 +46,7 @@ private:
     void visualize_trajectory();
     void right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
     void left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
+    void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
 
     double m_desired_previous_foot_x;
     double m_desired_previous_foot_y;
@@ -67,8 +70,11 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_feet_pos_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_desired_steps_subscriber;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_zmp_subscriber;
+    rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
+
+    exoMode m_mode; 
 };
 
 #endif
