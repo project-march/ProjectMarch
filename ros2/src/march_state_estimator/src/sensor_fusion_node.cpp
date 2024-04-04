@@ -210,12 +210,30 @@ void SensorFusionNode::publishStateEstimation()
         return;
     }
 
+    std::vector<std::string> ankle_names = {"left_ankle", "right_ankle"};
+    std::vector<RobotNode::SharedPtr> ankle_nodes = m_robot_description->findNodes(ankle_names);
+    std::vector<geometry_msgs::msg::Pose> body_ankle_poses;
+    for (const auto& ankle_node : ankle_nodes) {
+        geometry_msgs::msg::Pose ankle_pose;
+        Eigen::Vector3d ankle_position = ankle_node->getGlobalPosition(m_sensor_fusion->getJointPositions());
+        Eigen::Quaterniond ankle_orientation(ankle_node->getGlobalRotation(m_sensor_fusion->getJointPositions()));
+        ankle_pose.position.x = ankle_position.x();
+        ankle_pose.position.y = ankle_position.y();
+        ankle_pose.position.z = ankle_position.z();
+        ankle_pose.orientation.x = ankle_orientation.x();
+        ankle_pose.orientation.y = ankle_orientation.y();
+        ankle_pose.orientation.z = ankle_orientation.z();
+        ankle_pose.orientation.w = ankle_orientation.w();
+        body_ankle_poses.push_back(ankle_pose);
+    }
+
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
+    state_estimation_msg.body_ankle_pose = body_ankle_poses;
     state_estimation_msg.foot_pose = body_foot_poses;
     state_estimation_msg.inertial_foot_position = inertial_foot_positions;
     state_estimation_msg.stance_leg = stance_leg;

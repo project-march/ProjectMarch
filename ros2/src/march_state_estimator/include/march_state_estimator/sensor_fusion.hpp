@@ -64,6 +64,7 @@ public:
     void updateKalmanFilter();
 
     // TODO: Move these to RobotDescription
+    RobotNode::JointNameToValueMap getJointPositions() const;
     Eigen::Quaterniond getInertialOrientation() const;
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;

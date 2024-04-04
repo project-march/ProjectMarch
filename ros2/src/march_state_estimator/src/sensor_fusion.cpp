@@ -100,6 +100,11 @@ Eigen::Quaterniond SensorFusion::getInertialOrientation() const
     return m_quaternion;
 }
 
+RobotNode::JointNameToValueMap SensorFusion::getJointPositions() const
+{
+    return m_joint_positions;
+}
+
 Eigen::Vector3d SensorFusion::getCOM() const
 {
     Eigen::Vector3d com_body_position = m_robot_description->findNode("com")->getGlobalPosition(m_joint_positions);
