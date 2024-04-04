@@ -30,12 +30,12 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.3, 0.12, -0.70, 0.3, -0.12, -0.70}; 
+    m_home_stand = {0.3, 0.12, -0.67, 0.3, -0.12, -0.67}; 
     // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
+    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
