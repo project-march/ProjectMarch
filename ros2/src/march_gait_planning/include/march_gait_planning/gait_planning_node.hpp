@@ -53,7 +53,15 @@ class GaitPlanningNode:public rclcpp::Node {
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void footPositionsPublish(); 
-
+    void processStand(); 
+    void finishCurrentTrajectory(); 
+    void publishIncrements(); 
+    void stepClose(); 
+    void calculateIncrements(); 
+    void publishHomeStand(); 
+    void processWalk(); 
+    void processHeightGaits(); 
+    void processVariableWalk(); 
 
     GaitPlanning m_gait_planning; 
 
