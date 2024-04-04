@@ -59,6 +59,9 @@ class GaitPlanningNode:public rclcpp::Node {
 
     GaitPlanning::XYZFootPositionArray m_left_foot_offset; 
     GaitPlanning::XYZFootPositionArray m_right_foot_offset; 
+    std::vector<std::array<double, 6>> m_home_stand_trajectory; 
+    std::array<double, 6> m_initial_position; 
+    std::vector<double> m_increments; 
 
     std::vector<GaitPlanning::XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg;

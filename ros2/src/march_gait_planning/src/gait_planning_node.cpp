@@ -174,6 +174,14 @@ void GaitPlanningNode::footPositionsPublish(){
                 }
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
+            if (!m_home_stand_trajectory.empty()){
+                RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
+                std::array<double, 6> current_step = m_home_stand_trajectory.front();
+                RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
+                m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
+                setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
+                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            }
 
             else{
                 switch (m_gait_planning.getPreviousGaitType()){
@@ -205,12 +213,35 @@ void GaitPlanningNode::footPositionsPublish(){
                         m_gait_planning.setPreviousGaitType(exoMode::Stand);
                         break; 
 
+                    case exoMode::BootUp :
+                        m_current_trajectory.clear(); 
+                        m_home_stand_trajectory.clear();  
+                        RCLCPP_INFO(this->get_logger(), "Incrementing to homestand"); 
+                        m_left_foot_offset = m_gait_planning.getCurrentLeftFootPos(); 
+                        m_right_foot_offset = m_gait_planning.getCurrentRightFootPos(); 
+                        m_initial_position = {m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2], m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]}; 
+                        RCLCPP_INFO(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
+                        for (unsigned i = 0; i < m_home_stand.size(); i++){
+                            m_increments.push_back((m_home_stand[i] - m_initial_position[i])/40); 
+                        }
+                        RCLCPP_INFO(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
+                        for (unsigned i = 0; i < 40; i++){
+                            for (unsigned i = 0; i < m_initial_position.size(); i++){
+                            m_initial_position[i] += m_increments[i]; 
+                            }
+                            m_home_stand_trajectory.push_back(m_initial_position); 
+                        }
+                        RCLCPP_INFO(this->get_logger(), "Calculated incremental steps %d", m_home_stand_trajectory.size()); 
+                        m_gait_planning.setPreviousGaitType(exoMode::Stand); 
+                        break; 
+
                     default :
                         m_current_trajectory.clear();
                         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
                         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
                         m_single_execution_done = false; 
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
+                        break; 
                 }
             }
             break;
