@@ -242,7 +242,7 @@ void GaitPlanningNode::processStand(){
     }
 }
 
-void GaitPlanningNode::processWalk(){
+void GaitPlanningNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
@@ -262,7 +262,7 @@ void GaitPlanningNode::processWalk(){
     }
 }
 
-void GaitPlanningNode::processHeightGaits(){
+void GaitPlanningNode::publishHeightGaits(){
     if (m_current_trajectory.empty() && !m_single_execution_done){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
@@ -281,7 +281,7 @@ void GaitPlanningNode::processHeightGaits(){
     }
 }
 
-void GaitPlanningNode::processVariableWalk(){
+void GaitPlanningNode::publishVariableWalk(){
     // TODO: figure out if offset is still needed. 
     if (!m_current_trajectory.empty()){
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -311,7 +311,7 @@ void GaitPlanningNode::footPositionsPublish(){
         
         case exoMode::LargeWalk :
         case exoMode::SmallWalk :
-            processWalk(); 
+            publishWalk(); 
             break;
 
         case exoMode::VariableStep : 
@@ -333,11 +333,11 @@ void GaitPlanningNode::footPositionsPublish(){
         case exoMode::HighStep3 :
         case exoMode::Ascending :
         case exoMode::Descending :
-            processHeightGaits(); 
+            publishHeightGaits(); 
             break;
         
         case exoMode::VariableWalk :
-            processVariableWalk(); 
+            publishVariableWalk(); 
             break; 
 
         default :

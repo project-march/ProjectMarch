@@ -59,9 +59,9 @@ class GaitPlanningNode:public rclcpp::Node {
     void stepClose(); 
     void calculateIncrements(); 
     void publishHomeStand(); 
-    void processWalk(); 
-    void processHeightGaits(); 
-    void processVariableWalk(); 
+    void publishWalk(); 
+    void publishHeightGaits(); 
+    void publishVariableWalk(); 
 
     GaitPlanning m_gait_planning; 
 
