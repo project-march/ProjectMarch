@@ -88,28 +88,28 @@ void SensorFusionNode::timerCallback()
         return;
     }
 
-    if (m_imu_position == nullptr) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu position data received yet");
-        return;
-    }
+    // if (m_imu_position == nullptr) {
+    //     RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu position data received yet");
+    //     return;
+    // }
 
-    geometry_msgs::msg::TransformStamped transform_stamped;
-    transform_stamped.header.stamp = this->now();
-    transform_stamped.header.frame_id = "world";
-    transform_stamped.child_frame_id = "backpack";
-    // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
-    transform_stamped.transform.translation.x = m_imu_position->point.x;
-    transform_stamped.transform.translation.y = m_imu_position->point.y;
-    transform_stamped.transform.translation.z = m_imu_position->point.z;
-    transform_stamped.transform.rotation.x = m_imu->orientation.x;
-    transform_stamped.transform.rotation.y = m_imu->orientation.y;
-    transform_stamped.transform.rotation.z = m_imu->orientation.z;
-    transform_stamped.transform.rotation.w = m_imu->orientation.w;
-    m_tf_broadcaster->sendTransform(transform_stamped);
+    // geometry_msgs::msg::TransformStamped transform_stamped;
+    // transform_stamped.header.stamp = this->now();
+    // transform_stamped.header.frame_id = "world";
+    // transform_stamped.child_frame_id = "backpack";
+    // // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+    // transform_stamped.transform.translation.x = m_imu_position->point.x;
+    // transform_stamped.transform.translation.y = m_imu_position->point.y;
+    // transform_stamped.transform.translation.z = m_imu_position->point.z;
+    // transform_stamped.transform.rotation.x = m_imu->orientation.x;
+    // transform_stamped.transform.rotation.y = m_imu->orientation.y;
+    // transform_stamped.transform.rotation.z = m_imu->orientation.z;
+    // transform_stamped.transform.rotation.w = m_imu->orientation.w;
+    // m_tf_broadcaster->sendTransform(transform_stamped);
 
     publishStateEstimation();
-    publishFeetHeight();
-    publishMPCEstimation();
+    // publishFeetHeight();
+    // publishMPCEstimation();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
@@ -178,37 +178,37 @@ void SensorFusionNode::publishStateEstimation()
 
     uint8_t stance_leg = m_sensor_fusion->updateStanceLeg(&body_foot_poses[0].position, &body_foot_poses[1].position);
 
-    std::vector<geometry_msgs::msg::Pose> inertial_foot_positions;
-    try {
-        geometry_msgs::msg::Pose foot_pose;
-        geometry_msgs::msg::TransformStamped transform_stamped;
+    // std::vector<geometry_msgs::msg::Pose> inertial_foot_positions;
+    // try {
+    //     geometry_msgs::msg::Pose foot_pose;
+    //     geometry_msgs::msg::TransformStamped transform_stamped;
 
-        // Get left foot position in world frame w.r.t. right ground frame.
-        transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", tf2::TimePointZero);
-        foot_pose.position.x = transform_stamped.transform.translation.x;
-        foot_pose.position.y = transform_stamped.transform.translation.y;
-        foot_pose.position.z = transform_stamped.transform.translation.z;
-        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
-        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
-        inertial_foot_positions.push_back(foot_pose);
+    //     // Get left foot position in world frame w.r.t. right ground frame.
+    //     transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", tf2::TimePointZero);
+    //     foot_pose.position.x = transform_stamped.transform.translation.x;
+    //     foot_pose.position.y = transform_stamped.transform.translation.y;
+    //     foot_pose.position.z = transform_stamped.transform.translation.z;
+    //     foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+    //     foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+    //     foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+    //     foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+    //     inertial_foot_positions.push_back(foot_pose);
 
-        // Get right foot position in world frame w.r.t. right ground frame
-        transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", tf2::TimePointZero);
-        foot_pose.position.x = transform_stamped.transform.translation.x;
-        foot_pose.position.y = transform_stamped.transform.translation.y;
-        foot_pose.position.z = transform_stamped.transform.translation.z;
-        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
-        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
-        inertial_foot_positions.push_back(foot_pose);
+    //     // Get right foot position in world frame w.r.t. right ground frame
+    //     transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", tf2::TimePointZero);
+    //     foot_pose.position.x = transform_stamped.transform.translation.x;
+    //     foot_pose.position.y = transform_stamped.transform.translation.y;
+    //     foot_pose.position.z = transform_stamped.transform.translation.z;
+    //     foot_pose.orientation.x = transform_stamped.transform.rotation.x;
+    //     foot_pose.orientation.y = transform_stamped.transform.rotation.y;
+    //     foot_pose.orientation.z = transform_stamped.transform.rotation.z;
+    //     foot_pose.orientation.w = transform_stamped.transform.rotation.w;
+    //     inertial_foot_positions.push_back(foot_pose);
 
-    } catch (const std::exception& e) {
-        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in world frame: %s", e.what());
-        return;
-    }
+    // } catch (const std::exception& e) {
+    //     RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in world frame: %s", e.what());
+    //     return;
+    // }
 
     std::vector<std::string> ankle_names = {"L_foot", "R_foot"};
     std::vector<RobotNode::SharedPtr> ankle_nodes = m_robot_description->findNodes(ankle_names);
@@ -235,7 +235,7 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.body_ankle_pose = body_ankle_poses;
     state_estimation_msg.foot_pose = body_foot_poses;
-    state_estimation_msg.inertial_foot_position = inertial_foot_positions;
+    // state_estimation_msg.inertial_foot_position = inertial_foot_positions;
     state_estimation_msg.stance_leg = stance_leg;
     m_state_estimation_pub->publish(state_estimation_msg);
 }
