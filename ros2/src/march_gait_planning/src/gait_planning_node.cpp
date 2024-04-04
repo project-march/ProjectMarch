@@ -44,7 +44,7 @@ void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode
         m_single_execution_done = false; 
     }
 
-    footPositionsPublish(); 
+    publishFootPositions(); 
 }
 
 void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
@@ -57,7 +57,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
         m_gait_planning.setStanceFoot(msg->stance_leg); 
         // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
     }
-    footPositionsPublish(); 
+    publishFootPositions(); 
 }
 
 void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
@@ -134,7 +134,7 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
         m_visualization_msg->poses.clear(); 
         RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
 
-        footPositionsPublish(); 
+        publishFootPositions(); 
 
     }
 
@@ -299,7 +299,7 @@ void GaitPlanningNode::publishVariableWalk(){
     }
 }
  
-void GaitPlanningNode::footPositionsPublish(){
+void GaitPlanningNode::publishFootPositions(){
     switch (m_gait_planning.getGaitType()){
         case exoMode::Stand :
             processStand(); 
