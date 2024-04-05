@@ -360,10 +360,12 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
         /*function_goal=*/"Check if joints are in operational state.",
         /*function=*/
         [this](march::Joint& joint) {
-            auto motor_controller_state = joint.getMotorController()->getState();
-            RCLCPP_WARN((*logger_), "MotorController of joint %s is in fault state %s.\n Error Status: \n%s",
-            joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
-            motor_controller_state->getErrorStatus().c_str());
+            
+            // For debugging purposes.
+            // auto motor_controller_state = joint.getMotorController()->getState();
+            // RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
+            // joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
+            // motor_controller_state->getErrorStatus().c_str());
 
             return joint.getMotorController()->getState()->isOperational();
         },
