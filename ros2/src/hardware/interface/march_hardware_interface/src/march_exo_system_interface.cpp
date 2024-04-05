@@ -254,7 +254,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
                 || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
-            }    
+            }               
         }
 
         weight_node = std::make_shared<WeightNode>();
@@ -351,7 +351,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
 
     // Tell every joint to enable actuation.
     // TODO: Check if this needs be done for every joint or the non operational once.
-    RCLCPP_INFO((*logger_), "Enabling every joint for actuation");
+    RCLCPP_INFO((*logger_), "Enabling every joint for actuation");   
     for (auto joint : joints) {
         joint->enableActuation();
     }
@@ -359,7 +359,14 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
     repeat_function_on_joints_until_timeout(
         /*function_goal=*/"Check if joints are in operational state.",
         /*function=*/
-        [](march::Joint& joint) {
+        [this](march::Joint& joint) {
+            
+            // For debugging purposes.
+            // auto motor_controller_state = joint.getMotorController()->getState();
+            // RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
+            // joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
+            // motor_controller_state->getErrorStatus().c_str());
+
             return joint.getMotorController()->getState()->isOperational();
         },
         /*logger=*/(*logger_), /*joints=*/joints,
@@ -460,6 +467,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
+    // Actuate joint in state 8, comment for debugging
     jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
         (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
     }
