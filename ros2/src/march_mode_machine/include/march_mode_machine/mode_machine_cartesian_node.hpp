@@ -40,11 +40,5 @@ class ModeMachineCartesianNode : public rclcpp::Node
 
     rclcpp::Service<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_service;
 
-    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_footstep_client;
-
-    march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
-
-    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture m_footstep_future;
-
     ModeMachineCartesian m_mode_machine;
 }; 
