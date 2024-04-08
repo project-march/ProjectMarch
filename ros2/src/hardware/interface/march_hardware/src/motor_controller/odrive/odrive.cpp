@@ -41,8 +41,18 @@ std::chrono::nanoseconds ODrive::reset()
 std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
+        
+        // For the MDrives and M9 joints
+        // setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+        // logger_->info("Initializing the full calibration.");
+        // return std::chrono::seconds { 30 };
+
+        // For the ODrives and M8 joints
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+        logger_->info("Initializing the encoder index search.");
         return std::chrono::seconds { 20 };
+
+
     } else {
         return std::chrono::nanoseconds(0);
     }
