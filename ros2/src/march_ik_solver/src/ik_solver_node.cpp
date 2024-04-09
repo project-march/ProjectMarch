@@ -57,8 +57,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
     desired_posture << 
-        0, 0, 0, 0, M_PI_2, 0,
-        0, 0, 0, 0, M_PI_2, 0;
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0;
     desired_tasks["posture"] = desired_posture;
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
@@ -138,7 +138,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
             best_error = error;
         }
         if (best_error <= m_convergence_threshold) {
-            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
             break;
         }
         iteration++;

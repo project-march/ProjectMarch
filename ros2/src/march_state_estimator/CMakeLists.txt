@@ -96,6 +96,8 @@ ament_target_dependencies(state_estimator_node
   march_shared_msgs
   urdf
   Eigen3
+  tf2
+  tf2_ros
 )
 
 target_link_libraries(state_estimator_node

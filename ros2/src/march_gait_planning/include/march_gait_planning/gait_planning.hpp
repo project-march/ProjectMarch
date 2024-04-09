@@ -20,22 +20,29 @@ public:
     void setGaitType(const exoMode &new_gait_type);
     void setPreviousGaitType(const exoMode &previous_gait_type);  
     void setBezierGait();
+    void setVariableDistance(const float &distance); 
 
     // Getters
-    std::vector<XZFeetPositionsArray> getTrajectory() const;
+    std::vector<XZFeetPositionsArray> getTrajectory();
     int getCurrentStanceFoot() const; 
     XYZFootPositionArray getCurrentLeftFootPos() const; 
     XYZFootPositionArray getCurrentRightFootPos() const; 
     exoMode getGaitType() const; 
     exoMode getPreviousGaitType() const;
+    float getVariableDistance() const; 
 
     //Getter for variable step size 
     std::vector<XZFeetPositionsArray> getVariableTrajectory() const; 
 
-    std::vector<double> linspace(const double &min, const double &max, const int &size); 
 
     //Interpolate between small and large bezier gait 
-    std::vector<XZFeetPositionsArray> interpolateVariableTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> variableStepStoneTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> variableFullStepTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> variableFirstStepTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> variableCloseStepTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> interpolateVariableTrajectory(const float &step_distance, const std::vector<XZFeetPositionsArray> &small_trajectory, const std::vector<XZFeetPositionsArray> &large_trajectory, bool full_step); 
+    float interpolateZ(float x1, float z1, float x2, float z2, float x); 
+
 
 private: 
     exoMode m_gait_type; 
@@ -65,6 +72,7 @@ private:
     
     //Create trajectory for variable step size. This should already include a stepclose. 
     std::vector<XZFeetPositionsArray> m_variable_step_trajectory; 
+    mutable float m_variable_distance; 
 
     std::vector<XZFeetPositionsArray> processCSV(const std::string& filename);
     
