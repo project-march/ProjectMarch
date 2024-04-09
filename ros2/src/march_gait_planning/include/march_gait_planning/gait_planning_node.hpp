@@ -27,7 +27,7 @@ class GaitPlanningNode:public rclcpp::Node {
 
     private: 
 
-    //Temporary struct to help remove duplicate values from the final_feet_position message (7 digits after decimal)
+    //TODO: ultimately see if this is still necessary. Struct to help remove duplicate values from the final_feet_position message (7 digits after decimal)
     struct PoseXComparator {
         bool operator()(const geometry_msgs::msg::Pose& pose1, const geometry_msgs::msg::Pose& pose2) const {
             // return pose1.position.x < pose2.position.x;

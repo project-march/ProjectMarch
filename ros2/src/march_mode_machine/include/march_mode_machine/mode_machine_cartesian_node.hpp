@@ -22,11 +22,13 @@ class ModeMachineCartesianNode : public rclcpp::Node
     ~ModeMachineCartesianNode(); 
 
     private: 
-    void sendRequest(const int& desired_mode);
+    
+    void sendRequest(const exoMode& desired_mode);
     void responseFootstepCallback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
     void newModeCallback(const std_msgs::msg::Int32::SharedPtr msg);
+
 
     void fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_Response::SharedPtr response) const;
     void publishAvailableExoModes(march_shared_msgs::msg::ExoModeArray::SharedPtr msg) const;
