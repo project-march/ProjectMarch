@@ -22,7 +22,7 @@ struct CSVRow {
 };
 
 GaitPlanningAnglesNode::GaitPlanningAnglesNode()
- : Node("gait_planning_angles_node"), 
+ : rclcpp_lifecycle::LifecycleNode("gait_planning_angles_node"), 
    m_gait_planning(GaitPlanningAngles()),
    m_joints_msg(),
    m_trajectory_des_point(),
@@ -31,27 +31,65 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
    m_first_stand(true),
    m_initial_point()
 {
+    // m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+    //                     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+    // initializeConstantsPoints(m_trajectory_prev_point);
+    // initializeConstantsPoints(m_trajectory_des_point); 
+    // m_trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
+
+    // m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1)); 
+    
+    // m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1)); 
+    // m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
+    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
+    
+    // auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
+    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
+    // std::cout << "Timer function created" << std::endl; 
+
+    // m_gait_planning.setGaitType(exoMode::BootUp);
+    // m_gait_planning.setPrevGaitType(exoMode::BootUp); 
+    // m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
+
+    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &state) {
+
     m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
                         "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
     initializeConstantsPoints(m_trajectory_prev_point);
     initializeConstantsPoints(m_trajectory_des_point); 
     m_trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
 
-    m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1)); 
-    
-    m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1)); 
-    m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
-    
-    // auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
-    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
-    // std::cout << "Timer function created" << std::endl; 
+    // m_current_state_subscriber = nullptr; 
+    // m_exo_mode_subscriber = nullptr; 
+    // m_joint_angle_trajectory_publisher = nullptr; 
 
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
     m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
+    RCLCPP_INFO(this->get_logger(), "Gait planning angles node configured");
 
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &state) {
+    m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1));
+    m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));
+    m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10);
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &state) {
+    m_current_state_subscriber.reset(); 
+    m_exo_mode_subscriber.reset(); 
+    m_joint_angle_trajectory_publisher.reset(); 
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 
@@ -307,14 +345,4 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 break;
         }
     }
-}
-
-int main(int argc, char *argv[]){
-    
-    rclcpp::init(argc, argv); 
-
-    rclcpp::spin(std::make_shared<GaitPlanningAnglesNode>()); 
-    rclcpp::shutdown(); 
-
-    return 0; 
 }

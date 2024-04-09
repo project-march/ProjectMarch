@@ -23,11 +23,13 @@ find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(ament_cmake_gtest)
+find_package(rclcpp_lifecycle REQUIRED)
 
 # Include directories
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
+  src/node_manager_gait_planning_node.cpp
   src/gait_planning_joint_angles_node.cpp
   src/gait_planning_joint_angles.cpp
   src/gait_planning_node.cpp
@@ -46,15 +48,22 @@ ament_target_dependencies(${PROJECT_NAME}
   ament_index_cpp
 )
 
+# Create the node_manager executable
+add_executable(node_manager_gait_planning_node
+  src/node_manager_gait_planning_node.cpp 
+  src/gait_planning_joint_angles.cpp 
+  src/gait_planning_joint_angles_node.cpp
+)
+
 # Create the gait_planning_node executable
 add_executable(gait_planning_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
-add_executable(gait_planning_angles_node
-  src/gait_planning_joint_angles_node.cpp
-  src/gait_planning_joint_angles.cpp
-)
+# add_executable(gait_planning_angles_node
+#   src/gait_planning_joint_angles_node.cpp
+#   src/gait_planning_joint_angles.cpp
+# )
 
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_node
@@ -65,11 +74,17 @@ ament_target_dependencies(gait_planning_node
   # filesystem
   )
 
-ament_target_dependencies(gait_planning_angles_node
+# ament_target_dependencies(gait_planning_angles_node
+#   rclcpp
+#   trajectory_msgs
+#   march_shared_msgs
+#   ament_index_cpp
+#   )
+
+ament_target_dependencies(node_manager_gait_planning_node
   rclcpp
-  trajectory_msgs
   march_shared_msgs
-  ament_index_cpp
+  rclcpp_lifecycle
   )
 
 # Install the executable
@@ -77,9 +92,12 @@ install(TARGETS gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS gait_planning_angles_node
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(TARGETS gait_planning_angles_node
+#   DESTINATION lib/${PROJECT_NAME}
+# )
+
+install(TARGETS node_manager_gait_planning_node
+  DESTINATION lib/${PROJECT_NAME})
 
 # Create the test_gait_planning executable in the test_setup_gait_planning folder
 add_executable(test_setup_gait_planning_node
