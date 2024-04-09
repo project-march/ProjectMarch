@@ -38,9 +38,7 @@ class InputDevicePlugin(Plugin):
         self.setObjectName("rqt_input_device")
 
         ui_file = os.path.join(get_package_share_directory("march_rqt_input_device"), "input_device.ui")
-        layout_file = os.path.join(get_package_share_directory("march_rqt_input_device"), "modes.json")
-
-        # layout_file = os.path.join("src/march_mode_machine/", "generate", "modes.json")
+        layout_file = os.path.join(get_package_share_directory("march_mode_machine"), "generate","modes.json")
 
         self._node: Node = context.node
 
