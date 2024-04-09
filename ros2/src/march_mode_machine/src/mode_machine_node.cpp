@@ -60,6 +60,18 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
         mode_msg.mode = m_mode_machine.getCurrentMode();
+        // To test the lifecycle nodes
+        switch (m_mode_machine.getCurrentMode()){
+            case 0 :
+            case 1 :
+            case 2 : 
+            case 5 : 
+                mode_msg.node_type = "joint_angles"; 
+                break; 
+            default : 
+                break; 
+        }
+        // end test lifecycle nodes 
         m_mode_publisher->publish(mode_msg);
     } else 
     {
