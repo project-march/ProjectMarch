@@ -6,7 +6,7 @@
 using std::placeholders::_1;
 
 
-std::vector<exoMode> all_possible_modes;
+std::vector<exoMode> all_possible_modes = {exoMode::Stand, exoMode::Walk, exoMode::BootUp};;
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
@@ -32,6 +32,7 @@ void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
     request->desired_mode.mode = static_cast<int32_t>(desired_mode);
 
     auto result_future = m_get_exo_mode_array_client->async_send_request(request);
+    RCLCPP_INFO(this->get_logger(), "Request sent");
 
 
     // Wait for the result
@@ -45,10 +46,43 @@ void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
             exo_modes_set.insert(static_cast<exoMode>(exo_mode_msg.mode));
         }
         m_ipd.setAvailableModes(exo_modes_set);
+        exoMode desired_mode = askMode();
+        sendNewMode(desired_mode);
     }
     else {
         RCLCPP_ERROR(this->get_logger(), "Failed to call service GetExoModeArray");
     }
+}
+
+exoMode inputDeviceNode::askMode() const
+{
+  std::set<exoMode> available_modes = m_ipd.getAvailableModes();
+
+  std::map<std::string, exoMode> mode_map;
+  for (const auto& mode : all_possible_modes) {
+    mode_map[toString(mode)] = mode;
+  }
+
+  while (rclcpp::ok()){
+    std::cout << "Available modes are: ";
+    for (const auto& mode : available_modes) {
+      std::cout << toString(mode) << " ";
+    }
+    std::cout<<std::endl;
+    std::cout << "Enter desired mode: ";
+
+    std::string userInput;
+    std::cin >> userInput;
+    
+    auto it = mode_map.find(userInput);
+    if (it != mode_map.end()) {
+        return it->second;
+    } else {
+        std::cout << "Invalid mode. Please enter a valid mode." << std::endl;
+    }
+  }
+  rclcpp::shutdown();
+  return exoMode::BootUp;
 }
 
 int main(int argc, char *argv[]) 
