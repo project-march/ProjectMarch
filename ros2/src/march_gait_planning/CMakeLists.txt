@@ -20,6 +20,8 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(ament_cmake_gtest)
@@ -46,13 +48,14 @@ ament_target_dependencies(${PROJECT_NAME}
   geometry_msgs
   trajectory_msgs
   ament_index_cpp
+  rclcpp_lifecycle
+  lifecycle_msgs
+  std_msgs
 )
 
 # Create the node_manager executable
 add_executable(node_manager_gait_planning_node
   src/node_manager_gait_planning_node.cpp 
-  src/gait_planning_joint_angles.cpp 
-  src/gait_planning_joint_angles_node.cpp
 )
 
 # Create the gait_planning_node executable
@@ -60,10 +63,11 @@ add_executable(gait_planning_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
-# add_executable(gait_planning_angles_node
-#   src/gait_planning_joint_angles_node.cpp
-#   src/gait_planning_joint_angles.cpp
-# )
+
+add_executable(gait_planning_angles_node
+  src/gait_planning_joint_angles_node.cpp
+  src/gait_planning_joint_angles.cpp
+)
 
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_node
@@ -74,17 +78,22 @@ ament_target_dependencies(gait_planning_node
   # filesystem
   )
 
-# ament_target_dependencies(gait_planning_angles_node
-#   rclcpp
-#   trajectory_msgs
-#   march_shared_msgs
-#   ament_index_cpp
-#   )
+ament_target_dependencies(gait_planning_angles_node
+  rclcpp
+  trajectory_msgs
+  march_shared_msgs
+  ament_index_cpp
+  rclcpp_lifecycle
+  lifecycle_msgs
+  std_msgs
+  )
 
 ament_target_dependencies(node_manager_gait_planning_node
   rclcpp
   march_shared_msgs
   rclcpp_lifecycle
+  lifecycle_msgs
+  std_msgs
   )
 
 # Install the executable
@@ -92,9 +101,9 @@ install(TARGETS gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# install(TARGETS gait_planning_angles_node
-#   DESTINATION lib/${PROJECT_NAME}
-# )
+install(TARGETS gait_planning_angles_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(TARGETS node_manager_gait_planning_node
   DESTINATION lib/${PROJECT_NAME})

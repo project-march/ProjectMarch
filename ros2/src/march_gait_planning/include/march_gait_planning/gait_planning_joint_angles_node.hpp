@@ -9,10 +9,12 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "std_msgs/msg/string.hpp"
 #include "march_gait_planning/gait_planning_joint_angles.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include <vector>
 #include <array> 
 #include <iostream> 
@@ -20,16 +22,31 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include <sstream> 
 #include <cmath>
 
-class GaitPlanningAnglesNode:public rclcpp_lifecycle::LifecycleNode 
+//FILMPJE
+using namespace std::chrono_literals; 
+// 
+class GaitPlanningAnglesNode : public rclcpp_lifecycle::LifecycleNode 
 {
 public: 
     explicit GaitPlanningAnglesNode(); 
 
-protected: 
+    void setFirstCallbackMsg(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
+
+    //FILMPJE
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &state) override;
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &state) override; 
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &state) override; 
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &state) override; 
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &state) override;
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State &state) override;
+
+    void publish();   
+    //
+
+protected: 
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &state) override;
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &state) override; 
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &state) override; 
+    // rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &state) override; 
 
 private: 
     // std::vector<double> getCurrentJointAngles();
@@ -57,6 +74,11 @@ private:
     // rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
+
+    //FILMPJE
+    std::shared_ptr<rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>> m_publisher; 
+    std::shared_ptr<rclcpp::TimerBase> m_timer; 
+    //
     
     GaitPlanningAngles m_gait_planning; 
     trajectory_msgs::msg::JointTrajectory m_joints_msg;
@@ -68,5 +90,9 @@ private:
     std::vector<double> m_incremental_steps_to_home_stand;
     bool m_first_stand;
     std::vector<double> m_initial_point;
+
+    std::shared_ptr<march_shared_msgs::msg::ExoMode> m_first_callback_msg; 
+    bool m_active; 
+
 
 };

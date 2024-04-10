@@ -71,6 +71,7 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
             default : 
                 break; 
         }
+        RCLCPP_INFO(this->get_logger(), "node_type set to %s", mode_msg.node_type.c_str()); 
         // end test lifecycle nodes 
         m_mode_publisher->publish(mode_msg);
     } else 
