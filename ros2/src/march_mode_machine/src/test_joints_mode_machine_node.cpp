@@ -22,7 +22,7 @@ TestJointsModeMachineNode::TestJointsModeMachineNode()
         std::bind(&TestJointsModeMachineNode::handleGetExoModeArray, this, _1, _2));
 
     m_mode_publisher = create_publisher<march_shared_msgs::msg::ExoModeAndJoint>("current_mode", 10);
-    RCLCPP_WARN(rclcpp::get_logger("joint_test_mode_machine"), "Joint Mode Machine Node succesfully initialized");
+    RCLCPP_WARN(rclcpp::get_logger("joint_test_mode_machine"), "Test Joint Mode Machine Node succesfully initialized");
 }
 
 TestJointsModeMachineNode::~TestJointsModeMachineNode()
@@ -60,6 +60,7 @@ void TestJointsModeMachineNode::handleGetExoModeArray(const std::shared_ptr<marc
         mode_msg.joint.data = request->actuated_joint.data;
 
         m_mode_publisher->publish(mode_msg);
+        RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Publishing current mode!");
     } else 
     {
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Invalid mode transition! Ignoring new mode.");

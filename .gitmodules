@@ -31,10 +31,10 @@
 	path = ros2/src/libraries/rosbag2
 	url = https://github.com/ros2/rosbag2.git
     branch = foxy-future
-# [submodule "ros2/src/libraries/acados"]
-# 	path = ros2/src/libraries/acados
-# 	url = ../libraries/acados.git
-# 	branch = master
+[submodule "ros2/src/libraries/acados"]
+	path = ros2/src/libraries/acados
+	url = ../libraries/acados.git
+	branch = master
 [submodule "ros2/src/libraries/bluespace_ai_xsens_ros_mti_driver"]
 	path = ros2/src/libraries/bluespace_ai_xsens_ros_mti_driver
 	url = https://gitlab.com/project-march/libraries/bluespace_ai_xsens_ros_mti_driver

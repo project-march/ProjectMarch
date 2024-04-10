@@ -236,8 +236,13 @@ Eigen::MatrixXd Task::getJacobianInverse() const
 
 Eigen::Vector3d Task::calculateEulerAnglesFromQuaternion(const geometry_msgs::msg::Quaternion& quaternion)
 {
-    Eigen::Vector3d euler_angles;
+    Eigen::Vector3d euler_angles = Eigen::Vector3d::Zero();
     double norm, norm_sine_2;
+
+    // Avoid division by zero
+    if (quaternion.w >= 1.0) {
+        return euler_angles;
+    }
 
     norm = 2 * acos(quaternion.w);
     norm_sine_2 = sin(0.5 * norm);

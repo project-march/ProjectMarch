@@ -57,7 +57,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "received current mode: %d", msg->mode); 
+    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
     m_gait_planning.setGaitType((exoMode)msg->mode);
     // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 

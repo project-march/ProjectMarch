@@ -121,7 +121,7 @@ def generate_launch_description() -> LaunchDescription:
         Node(
             package='march_mode_machine',
             namespace='',
-            executable='mode_machine_node',
+            executable='test_joints_mode_machine_node',
             name='mode_machine',
         ),
         Node(

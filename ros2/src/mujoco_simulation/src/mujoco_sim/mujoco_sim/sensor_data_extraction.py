@@ -2,7 +2,7 @@
 
 import math
 from mujoco import mjtSensor
-from geometry_msgs.msg import Vector3, Quaternion
+from geometry_msgs.msg import Vector3, Quaternion, Point
 from sensor_msgs.msg import Imu
 
 
@@ -93,6 +93,8 @@ class SensorDataExtraction:
         gyro_adr = []
         accelero_adr = []
         quat_adr = []
+        pos_adr = []
+        lin_vel_adr = []
         for i, sensor_type in enumerate(self.sensor_type):
             if sensor_type == mjtSensor.mjSENS_ACCELEROMETER:
                 accelero_adr.append(self.sensor_adr[i])
@@ -100,8 +102,13 @@ class SensorDataExtraction:
                 gyro_adr.append(self.sensor_adr[i])
             elif sensor_type == mjtSensor.mjSENS_FRAMEQUAT:
                 quat_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_FRAMEPOS:
+                pos_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_FRAMELINVEL:
+                lin_vel_adr.append(self.sensor_adr[i])
         backpack_imu = Imu()
         torso_imu = Imu()
+        backpack_position = Point()
 
         for i in range(len(gyro_adr)):
             gyro = Vector3()
@@ -127,4 +134,14 @@ class SensorDataExtraction:
                 torso_imu.linear_acceleration = accel
                 torso_imu.orientation = quat
 
-        return backpack_imu, torso_imu
+        backpack_position = Point()
+        backpack_position.x = self.sensordata[pos_adr[0]]
+        backpack_position.y = self.sensordata[pos_adr[0] + 1]
+        backpack_position.z = self.sensordata[pos_adr[0] + 2]
+
+        backpack_velocity = Vector3()
+        backpack_velocity.x = self.sensordata[lin_vel_adr[0]]
+        backpack_velocity.y = self.sensordata[lin_vel_adr[0] + 1]
+        backpack_velocity.z = self.sensordata[lin_vel_adr[0] + 2]
+
+        return backpack_imu, torso_imu, backpack_position, backpack_velocity

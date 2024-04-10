@@ -39,22 +39,28 @@
       "exoMode": 7
     },
     {
-      "name": "VariableWalk",
+      "name": "VariableStep",
       "exoMode": 10
     }
   ],
   [
     {
-      "name": "HighStep1",
+      "name": "VariableWalk",
       "exoMode": 11
-    },
+    }
+  ],
+  [
     {
-      "name": "HighStep2",
+      "name": "HighStep1",
       "exoMode": 12
     },
     {
-      "name": "HighStep3",
+      "name": "HighStep2",
       "exoMode": 13
+    },
+    {
+      "name": "HighStep3",
+      "exoMode": 14
     }
   ],
   [

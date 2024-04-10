@@ -53,8 +53,14 @@ alias angles_air='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.la
 alias angles_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
 alias cartesian_air='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="true"'
 alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+
+alias test_mpc='cm2 && sros2 && sfox && ros2 launch march_launch mpc.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" rviz:=true'
+
 # Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
+
+# Alias to build packages with dependencies
+alias mbpa='mba --packages-up-to'
 
 # Alias to run tests on a package
 alias mbt='mbt'

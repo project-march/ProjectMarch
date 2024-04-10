@@ -28,9 +28,23 @@ def normal_large_step():
     step_close = step_close.rename(columns={'LHFE': 'RHFE', 'LKFE': 'RKFE', 'RHFE':'LHFE', 'RKFE':'LKFE'})
     step_close = step_close[['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF']]
     
-    plot_joints(step_close)
+    # plot_joints(first_step)
+    # plot_joints(full_step)
+    # plot_joints(step_close)
 
     return first_step, full_step, step_close, df_gait_joint
+
+def no_shooting_approaching_stand(step_close, first_step):
+    # print(step_close.shape)
+    begin_point = step_close.iloc[-1]
+    end_point = first_step.iloc[0]
+    df2 = step_close.iloc[:0,:].copy()  
+    print(df2)  
+    for i in range(len(step_close.columns)):
+        res = np.linspace(begin_point[i], end_point[i], 20)
+        df2[step_close.columns[i]] = res 
+    step_close = pd.concat([step_close, df2])
+    return step_close
 
 def step_close_update(step_close, full_step, first_step):
 
@@ -163,14 +177,18 @@ def sideways():
 
     
 
-first_step, one_step, step_close, full_gait = normal_large_step()
-first_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-one_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-step_close_updated = step_close_update(step_close, one_step_updated, first_step_updated)
+first_step_def, one_step, step_close_def, full_gait = normal_large_step()
+step_close_updated = no_shooting_approaching_stand(step_close_def, first_step_def)
+# first_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+# one_step_updated = pd.read_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', names=['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
+# step_close_updated = step_close_update(step_close, one_step_updated, first_step_updated)
 
+# first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step.csv', sep=',', header=False, index=False)
+# one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step.csv', sep=',', header=False, index=False)
+step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close.csv', sep=',', header=False, index=False)
 
-one_step_updated = step_close_update(one_step_updated, one_step_updated, one_step_updated)
-one_step_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv', sep=',', header=False, index=False)
+# one_step_updated = step_close_update(one_step_updated, one_step_updated, one_step_updated)
+# one_step_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q_updated.csv', sep=',', header=False, index=False)
 
 # first_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/first_step_q.csv', sep=',', header=False, index=False)
 # one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
