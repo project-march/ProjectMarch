@@ -78,64 +78,47 @@ class Advertisement(dbus.service.Object):
     def Release(self):
         print('%s: Released' % self.path)
 
-class TemperatureCharacteristic(bluetooth_gatt.Characteristic):
-    temperature = 0
-    delta = 0
+class ExoModeCharacteristic(bluetooth_gatt.Characteristic):
+    exoMode = 3
     notifying = False
     callback = None
 
     def __init__(self, bus, index, service, callback=None):
         bluetooth_gatt.Characteristic.__init__(self, bus, index,
-                                                bluetooth_constants.TEMPERATURE_CHR_UUID,
+                                                bluetooth_constants.EXOMODE_CHR_UUID,
                                                 ['write', 'read'],
                                                 service)
         self.notifying = True
-        self.temperature = random.randint(0, 50)
-        print("Initial temperature set to "+str(self.temperature))
-        self.delta = 0
+        self.exoMode = 3 # Bootup
+        print("Initial exoMode set to "+str(self.exoMode))
         self.callback = callback
-        # GLib.timeout_add(1000, self.simulate_temperature)
 
     def ReadValue(self, options):
-        print('ReadValue in TemperatureCharacteristic called')
-        print('Returning '+str(self.temperature))
+        print('ReadValue in ExoModeCharacteristic called')
+        print('Returning '+str(self.exoMode))
         value = []
-        value.append(dbus.UInt16(self.temperature))
+        value.append(dbus.UInt16(self.exoMode))
         return value
     
     def WriteValue(self, value, options):
-        print('WriteValue in TemperatureCharacteristic called')
-        print(int(value[0]))
-        self.temperature = int(value[0])  # interpret the first byte as an integer
-        print('New temperature is '+str(self.temperature))
+        print('WriteValue in ExoModeCharacteristic called')
+        self.exoMode = int(value[0])  # interpret the first byte as an integer
+        print('New exoMode is '+str(self.exoMode))
         # send a write response back to the client
-        self.PropertiesChanged(bluetooth_constants.GATT_CHARACTERISTIC_INTERFACE, {'Value': [dbus.Byte(self.temperature)]}, [])
+        self.PropertiesChanged(bluetooth_constants.GATT_CHARACTERISTIC_INTERFACE, {'Value': [dbus.Byte(self.exoMode)]}, [])
 
         print("callback="+str(self.callback))
         if self.callback:
             print("entering correct if statement")
             try:
-                self.callback(self.temperature)
+                self.callback(self.exoMode)
             except Exception as e:
                 print(f"Error occurred while calling callback: {e}")
-            print("calling callback with temperature="+str(self.temperature)+"C")
-    
-    def simulate_temperature(self):
-        self.delta = random.randint(-1, 1)
-        self.temperature = self.temperature + self.delta
-        if (self.temperature > 50):
-            self.temperature = 50
-        elif (self.temperature < 0):
-            self.temperature = 0
-        print("simulated temperature: "+str(self.temperature)+"C")
-        if self.notifying:  # Only notify if notifications are enabled
-            self.notify_temperature()
-        GLib.timeout_add(1000, self.simulate_temperature)
 
-    def notify_temperature(self):
+    def notify_exoMode(self):
         value = []
-        value.append(dbus.Byte(self.temperature))
-        print("notifying temperature="+str(self.temperature))
+        value.append(dbus.Byte(self.exoMode))
+        print("notifying exoMode="+str(self.exoMode))
         self.PropertiesChanged(bluetooth_constants.GATT_CHARACTERISTIC_INTERFACE, { 'Value': value }, [])
         return self.notifying
     
@@ -147,16 +130,13 @@ class TemperatureCharacteristic(bluetooth_gatt.Characteristic):
         print("stopping notifications")
         self.notifying = False
 
-class TemperatureService(bluetooth_gatt.Service):
-    # Fake micro:bit temperature service that simulates temperature sensor measurements
-    #ref: https://lancaster-university.github.io/microbit-docs/resources/bluetooth/bluetooth_profile.html
-    #temperature_period characteristic not implemented to keep things simple
+class ExoModeService(bluetooth_gatt.Service):
     def __init__(self, bus, path_base, index, callback=None):
-        print("Initialising TemperatureService object")
+        print("Initialising ExoModeService object")
         bluetooth_gatt.Service.__init__(self, bus, path_base, index,
-                                        bluetooth_constants.TEMPERATURE_SVC_UUID, True)
-        print("Adding TemperatureCharacteristic to the service")
-        self.add_characteristic(TemperatureCharacteristic(bus, 0, self, callback))
+                                        bluetooth_constants.EXOMODE_SVC_UUID, True)
+        print("Adding ExoModeCharacteristic to the service")
+        self.add_characteristic(ExoModeCharacteristic(bus, 0, self, callback))
 
 class Application(dbus.service.Object):
     """
@@ -166,8 +146,8 @@ class Application(dbus.service.Object):
         self.path = '/'
         self.services = []
         dbus.service.Object.__init__(self, bus, self.path)
-        print("Adding TemperatureService to the Application")
-        self.add_service(TemperatureService(bus, '/org/bluez/ldsg', 0, callback))
+        print("Adding ExoModeService to the Application")
+        self.add_service(ExoModeService(bus, '/org/bluez/ldsg', 0, callback))
     
     def get_path(self):
         return dbus.ObjectPath(self.path)
