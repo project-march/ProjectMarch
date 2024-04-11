@@ -69,6 +69,19 @@ add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles.cpp
 )
 
+add_executable(service_client_node
+  src/manager_nodes_service_client.cpp 
+)
+
+ament_target_dependencies(service_client_node
+  rclcpp
+  lifecycle_msgs
+  std_msgs
+  rclcpp_lifecycle
+)
+
+
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_node
   rclcpp
@@ -96,6 +109,7 @@ ament_target_dependencies(node_manager_gait_planning_node
   std_msgs
   )
 
+
 # Install the executable
 install(TARGETS gait_planning_node
   DESTINATION lib/${PROJECT_NAME}
@@ -106,6 +120,9 @@ install(TARGETS gait_planning_angles_node
 )
 
 install(TARGETS node_manager_gait_planning_node
+  DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS service_client_node
   DESTINATION lib/${PROJECT_NAME})
 
 # Create the test_gait_planning executable in the test_setup_gait_planning folder
