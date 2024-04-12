@@ -1,21 +1,23 @@
 //
 // Created by marco on 13-2-23.
 //
-#pragma once
+
+#include "march_mode_machine/mode_machine.hpp"
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
+#include "march_shared_msgs/msg/foot_step_output.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
 #include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "march_shared_msgs/srv/request_gait.hpp"
+#include "march_shared_msgs/msg/exo_mode_array.hpp"
+#include "march_shared_msgs/srv/get_exo_mode_array.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "march_mode_machine/mode_machine.hpp"
+#include "march_mode_machine/mode_machine_cartesian.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <chrono>
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
-#include "march_shared_msgs/msg/exo_mode_array.hpp"
-#include "march_shared_msgs/srv/get_exo_mode_array.hpp"
 
 class ModeMachineNode : public rclcpp::Node 
 {
@@ -38,6 +40,8 @@ private:
         std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Response> response);
 
     rclcpp::Publisher<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_publisher;
+
+    rclcpp::Publisher<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_footsteps_dummy_publisher; 
 
     rclcpp::Service<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_service;
 

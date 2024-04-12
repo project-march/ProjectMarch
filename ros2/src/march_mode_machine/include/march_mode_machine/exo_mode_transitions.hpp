@@ -59,6 +59,27 @@ public:
                 {exoMode::Walk, {exoMode::Stand}}
             };
         }
+        else if (type == "Test Lifecycle Node"){
+            transitions = {
+                /*{CurrentMode, PossibleModes}*/
+                { exoMode::Stand,
+                    { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error, exoMode::VariableStep, exoMode::VariableWalk, exoMode::HighStep1, exoMode::HighStep2, exoMode::HighStep3, exoMode::Ascending, exoMode::Descending, exoMode::Sit, exoMode::Walk, exoMode::Sideways}},
+                { exoMode::LargeWalk, { exoMode::Stand, exoMode::Error} },
+                { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
+                { exoMode::BootUp, { exoMode::Stand } },
+                { exoMode::Error, {}},
+                { exoMode::VariableStep, { exoMode::Stand, exoMode::Error}}, 
+                { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
+                { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
+                { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},
+                { exoMode::HighStep3, { exoMode::Stand, exoMode::Error}},
+                { exoMode::Ascending, { exoMode::Stand, exoMode::Error}}, 
+                { exoMode::Descending, { exoMode::Stand, exoMode::Error}}, 
+                { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
+                { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
+                { exoMode::Sideways, { exoMode::Stand}}
+            };
+        }
 
     }
 
