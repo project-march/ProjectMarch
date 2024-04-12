@@ -207,6 +207,12 @@ def generate_launch_description() -> LaunchDescription:
             name='gait_planning_angles_node', 
         ), 
         Node(
+            package='march_gait_planning', 
+            namespace='', 
+            executable='gait_planning_cartesian_node', 
+            name='gait_planning_cartesian_node', 
+        ), 
+        Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher',

@@ -9,15 +9,19 @@ class NodeManagerGaitPlanning : public rclcpp::Node {
     explicit NodeManagerGaitPlanning(); 
 
     //FILPMJE
-    void messageCallback(const std_msgs::msg::String::SharedPtr msg); 
-    void notificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg); 
+    void anglesMessageCallback(const std_msgs::msg::String::SharedPtr msg); 
+    void cartesianMessageCallback(const std_msgs::msg::String::SharedPtr msg); 
+    void anglesNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg); 
+    void cartesianNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg); 
     // 
 
     private: 
 
     //FILMPJE 
-    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::String>> m_message_subscriber; 
-    std::shared_ptr<rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>> m_notification_subscriber; 
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::String>> m_angles_message_subscriber; 
+    std::shared_ptr<rclcpp::Subscription<std_msgs::msg::String>> m_cartesian_message_subscriber; 
+    std::shared_ptr<rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>> m_angles_notification_subscriber; 
+    std::shared_ptr<rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>> m_cartesian_notification_subscriber; 
     //
 
     void activationCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 

@@ -4,8 +4,10 @@
 ServiceClient::ServiceClient()
  : Node("manager_nodes_service_client")
  {
-    m_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(nodeGetStateTopic); 
-    m_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(nodeChangeStateTopic); 
+    m_angles_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(anglesNodeGetStateTopic); 
+    m_angles_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(anglesNodeChangeStateTopic); 
+    m_cartesian_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(cartesianNodeGetStateTopic); 
+    m_cartesian_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(cartesianNodeChangeStateTopic); 
  }
 
 template <typename FutureT, typename WaitTimeT> std::future_status ServiceClient::waitForResult(FutureT &future, WaitTimeT timeout){
@@ -24,40 +26,63 @@ template <typename FutureT, typename WaitTimeT> std::future_status ServiceClient
     return status; 
 }
 
-unsigned int ServiceClient::getState(std::chrono::seconds timeout){
+unsigned int ServiceClient::getAnglesState(std::chrono::seconds timeout){
     auto request = std::make_shared<lifecycle_msgs::srv::GetState::Request>(); 
-    if (!m_client_get_state->wait_for_service(timeout)){
-        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_client_get_state->get_service_name()); 
+    if (!m_angles_client_get_state->wait_for_service(timeout)){
+        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_angles_client_get_state->get_service_name()); 
         return lifecycle_msgs::msg::State::PRIMARY_STATE_UNKNOWN; 
     }
-    auto futureResult = m_client_get_state->async_send_request(request); 
+    auto futureResult = m_angles_client_get_state->async_send_request(request); 
     auto futureStatus = waitForResult(futureResult, timeout); 
     if (futureStatus != std::future_status::ready){
-        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", talkerNode); 
+        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", anglesNode); 
         return lifecycle_msgs::msg::State::PRIMARY_STATE_UNKNOWN; 
     }
     if (futureResult.get()){
         auto state = futureResult.get()->current_state.id; 
-        RCLCPP_INFO(this->get_logger(), "Node %s has current state %s", talkerNode, futureResult.get()->current_state.label.c_str()); 
+        RCLCPP_INFO(this->get_logger(), "Node %s has current state %s", anglesNode, futureResult.get()->current_state.label.c_str()); 
         return state; 
     } 
     else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to get current state of node %s", talkerNode); 
+        RCLCPP_ERROR(this->get_logger(), "Failed to get current state of node %s", anglesNode); 
     }
 
 }
 
-bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds timeout){
+unsigned int ServiceClient::getCartesianState(std::chrono::seconds timeout){
+    auto request = std::make_shared<lifecycle_msgs::srv::GetState::Request>(); 
+    if (!m_cartesian_client_get_state->wait_for_service(timeout)){
+        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_cartesian_client_get_state->get_service_name()); 
+        return lifecycle_msgs::msg::State::PRIMARY_STATE_UNKNOWN; 
+    }
+    auto futureResult = m_cartesian_client_get_state->async_send_request(request); 
+    auto futureStatus = waitForResult(futureResult, timeout); 
+    if (futureStatus != std::future_status::ready){
+        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", cartesianNode); 
+        return lifecycle_msgs::msg::State::PRIMARY_STATE_UNKNOWN; 
+    }
+    if (futureResult.get()){
+        auto state = futureResult.get()->current_state.id; 
+        RCLCPP_INFO(this->get_logger(), "Node %s has current state %s", cartesianNode, futureResult.get()->current_state.label.c_str()); 
+        return state; 
+    } 
+    else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to get current state of node %s", cartesianNode); 
+    }
+
+}
+
+bool ServiceClient::changeCartesianState(std::uint8_t transition, std::chrono::seconds timeout){
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>(); 
     request->transition.id = transition; 
-    if (!m_client_change_state->wait_for_service(timeout)){
-        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_client_change_state->get_service_name()); 
+    if (!m_cartesian_client_change_state->wait_for_service(timeout)){
+        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_cartesian_client_change_state->get_service_name()); 
         return false; 
     }
-    auto futureResult = m_client_change_state->async_send_request(request); 
+    auto futureResult = m_cartesian_client_change_state->async_send_request(request); 
     auto futureState = waitForResult(futureResult, timeout); 
     if (futureState != std::future_status::ready){
-        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", talkerNode); 
+        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", cartesianNode); 
         return false; 
     }
     if (futureResult.get()->success){
@@ -65,7 +90,30 @@ bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds ti
         return true; 
     }
     else {
-        RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s", static_cast<unsigned int>(transition), talkerNode);
+        RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s", static_cast<unsigned int>(transition), cartesianNode);
+        return false; 
+    }
+}
+
+bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout){
+    auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>(); 
+    request->transition.id = transition; 
+    if (!m_angles_client_change_state->wait_for_service(timeout)){
+        RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_angles_client_change_state->get_service_name()); 
+        return false; 
+    }
+    auto futureResult = m_angles_client_change_state->async_send_request(request); 
+    auto futureState = waitForResult(futureResult, timeout); 
+    if (futureState != std::future_status::ready){
+        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", anglesNode); 
+        return false; 
+    }
+    if (futureResult.get()->success){
+        RCLCPP_INFO(this->get_logger(), "Transition %d successfully triggered", static_cast<unsigned int>(transition)); 
+        return true; 
+    }
+    else {
+        RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s", static_cast<unsigned int>(transition), anglesNode);
         return false; 
     }
 }
@@ -74,82 +122,34 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
 {
   rclcpp::WallRate stateChangeTime(0.2); //5s, higher Hz = shorter wait time 
 
-  //configure
+  //configure angles and cartesian
   {
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE)){
+    if(!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE) || !service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE)){
       return;
     }
-    if (!service_client->getState()){
+    if (!service_client->getAnglesState() || !service_client->getCartesianState()){
       return;
     }
   }
+
+
 
   //activate
   {
     stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
+    if(!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
       return;
     }
-    if (!service_client->getState()){
+    if(!service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
+      return;
+    }
+    if (!service_client->getAnglesState()){
+      return;
+    }
+    if (!service_client->getCartesianState()){
       return;
     }
   }
-
-  // //deactivate
-  // {
-  //   stateChangeTime.sleep();
-  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
-  //     return;
-  //   }
-  //   if (!service_client->getState()){
-  //     return;
-  //   }
-  // }
-
-  // //activate
-  // {
-  //   stateChangeTime.sleep();
-  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
-  //     return;
-  //   }
-  //   if (!service_client->getState()){
-  //     return;
-  //   }
-  // }
-
-  // //deactivate
-  // {
-  //   stateChangeTime.sleep();
-  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
-  //     return;
-  //   }
-  //   if (!service_client->getState()){
-  //     return;
-  //   }
-  // }
-
-  // //cleanup
-  // {
-  //   stateChangeTime.sleep();
-  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CLEANUP)){
-  //     return;
-  //   }
-  //   if (!service_client->getState()){
-  //     return;
-  //   }
-  // }
-
-  // //unconfigured shutdown
-  // {
-  //   stateChangeTime.sleep();
-  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_UNCONFIGURED_SHUTDOWN)){
-  //     return;
-  //   }
-  //   if (!service_client->getState()){
-  //     return;
-  //   }
-  // }
-
 }
  
 

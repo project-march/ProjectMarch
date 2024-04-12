@@ -23,37 +23,7 @@ struct CSVRow {
 
 GaitPlanningAnglesNode::GaitPlanningAnglesNode()
  : rclcpp_lifecycle::LifecycleNode("gait_planning_angles_node", rclcpp::NodeOptions().use_intra_process_comms(false))
-//    m_gait_planning(GaitPlanningAngles()),
-//    m_joints_msg(),
-//    m_trajectory_des_point(),
-//    m_current_trajectory(),
-//    m_incremental_steps_to_home_stand(),
-//    m_first_stand(true),
-//    m_initial_point(), 
-//    m_first_callback_msg(), 
-//    m_active(false)
 {
-    // m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
-    //                     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
-    // initializeConstantsPoints(m_trajectory_prev_point);
-    // initializeConstantsPoints(m_trajectory_des_point); 
-    // m_trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
-
-    // m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1)); 
-    
-    // m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1)); 
-    // m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
-    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
-    
-    // auto timer_publish = std::bind(&GaitPlanningAnglesNode::publishJointTrajectoryPoints, this);
-    // m_timer = this->create_wall_timer(std::chrono::milliseconds(50), timer_publish);
-    // std::cout << "Timer function created" << std::endl; 
-
-    // m_gait_planning.setGaitType(exoMode::BootUp);
-    // m_gait_planning.setPrevGaitType(exoMode::BootUp); 
-    // m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
-
-    // RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &state) {
@@ -73,7 +43,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_joint_angle_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10);
 
     //FILMPJE 
-    m_publisher = this->create_publisher<std_msgs::msg::String>("messages", 10); 
+    m_publisher = this->create_publisher<std_msgs::msg::String>("angles_messages", 10); 
     // m_timer = this->create_wall_timer(1s, std::bind(&GaitPlanningAnglesNode::publish, this)); 
     // 
 
@@ -97,7 +67,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_active = true;  
 
-    RCLCPP_INFO(this->get_logger(), "angles activated!"); 
+    RCLCPP_INFO(this->get_logger(), "Joint angles node activated!"); 
 
     // currentModeCallback(m_first_callback_msg); 
 
@@ -108,6 +78,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     //FILMPJE
     m_publisher->on_deactivate(); 
+    m_joint_angle_trajectory_publisher->on_deactivate(); 
     RCLCPP_INFO(this->get_logger(), "angles deactivated!"); 
     //
 
@@ -119,7 +90,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
     
     //FILMPJE
-    m_publisher.reset(); 
+    m_publisher.reset();
+    m_joint_angle_trajectory_publisher.reset();  
     // m_timer.reset(); 
     RCLCPP_INFO(this->get_logger(), "angles cleaned up!"); 
     //
@@ -166,24 +138,10 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
             publishJointTrajectoryPoints();
             RCLCPP_INFO(this->get_logger(), "\n Publish function called! \n "); 
         }
-        } else {
+    } else {
             RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
 
-
-    // m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
-    // m_gait_planning.setGaitType((exoMode)msg->mode);
-    // // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
-    // if ((exoMode)msg->mode == exoMode::Stand){
-    //     if (m_gait_planning.getPrevGaitType() == exoMode::Walk || m_gait_planning.getPrevGaitType() == exoMode::Ascending || m_gait_planning.getPrevGaitType() == exoMode::Descending || m_gait_planning.getPrevGaitType() == exoMode::Sideways){
-    //     }   
-    // } else {
-    //     m_gait_planning.setCounter(0); 
-    //     RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!"); 
-    // }
-    // if (!m_first_stand){
-    //     publishJointTrajectoryPoints(); 
-    // }
 }
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
@@ -202,21 +160,8 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
     }
     publishJointTrajectoryPoints(); 
     } else {
-        RCLCPP_INFO(this->get_logger(), "not active"); 
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
-
-    // if (m_first_stand && m_gait_planning.getGaitType() == exoMode::Stand) {
-    //     std::vector<double> point = msg->joint_state.position; 
-    //     if (point.size() >= 8) {
-    //         m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
-    //         // m_gait_planning.setPrevPoint(point); 
-    //         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
-    //         m_first_stand = false;
-    //     } else {
-    //         RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
-    //     }
-    // }
-    // publishJointTrajectoryPoints(); 
     
 }
 

@@ -32,6 +32,7 @@ include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
   src/listener_gait_planning.cpp
+  src/manager_nodes_service_client.cpp 
   src/gait_planning_joint_angles_node.cpp
   src/gait_planning_joint_angles.cpp
   src/gait_planning_node.cpp
@@ -59,7 +60,7 @@ add_executable(listener_gait_planning
 )
 
 # Create the gait_planning_node executable
-add_executable(gait_planning_node
+add_executable(gait_planning_cartesian_node
   src/gait_planning_node.cpp
   src/gait_planning.cpp
 )
@@ -84,11 +85,13 @@ ament_target_dependencies(service_client_node
 
 
 # Link against ROS 2 dependencies
-ament_target_dependencies(gait_planning_node
+ament_target_dependencies(gait_planning_cartesian_node
   rclcpp
   march_shared_msgs
   geometry_msgs
   ament_index_cpp
+  rclcpp_lifecycle
+  lifecycle_msgs
   # filesystem
   )
 
@@ -112,7 +115,7 @@ ament_target_dependencies(listener_gait_planning
 
 
 # Install the executable
-install(TARGETS gait_planning_node
+install(TARGETS gait_planning_cartesian_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
