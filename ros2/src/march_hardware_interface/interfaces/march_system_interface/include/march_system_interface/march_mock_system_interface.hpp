@@ -2,8 +2,8 @@
 // Created by george on 13-6-22.
 //
 
-#ifndef MARCH_HARDWARE_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_
-#define MARCH_HARDWARE_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_
+#ifndef MARCH_SYSTEM_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_
+#define MARCH_SYSTEM_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -24,13 +24,13 @@
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
-#include "march_hardware_interface/march_mock_system_interface.hpp"
-#include "march_hardware_interface/visibility_control.h"
+#include "march_system_interface/march_mock_system_interface.hpp"
+#include "march_system_interface/visibility_control.h"
 #include "rclcpp/macros.hpp"
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
-namespace march_hardware_interface {
+namespace march_system_interface {
 
 /// Contains all the needed information for the Hardware Interface.
 struct HwStateInfo {
@@ -68,10 +68,10 @@ class MarchMockSystemInterface : public hardware_interface::BaseInterface<hardwa
 public:
     RCLCPP_SHARED_PTR_DEFINITIONS(MarchMockSystemInterface);
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     MarchMockSystemInterface();
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     ~MarchMockSystemInterface() override;
 
     hardware_interface::return_type configure(const hardware_interface::HardwareInfo& info) override;
@@ -101,6 +101,6 @@ private:
     std::vector<march::ODriveState> motor_controllers_data_;
 };
 
-} // namespace march_hardware_interface
+} // namespace march_system_interface
 
-#endif // MARCH_HARDWARE_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_
+#endif // MARCH_SYSTEM_INTERFACE__MARCH_MOCK_SYSTEM_INTERFACE_HPP_

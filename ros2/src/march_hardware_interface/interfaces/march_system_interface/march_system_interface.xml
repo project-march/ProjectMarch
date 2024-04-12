@@ -1,0 +1,17 @@
+<library path="march_system_interface">
+    <class name="march_system_interface/MarchMockSystemInterface"
+           type="march_system_interface::MarchMockSystemInterface"
+           base_class_type="hardware_interface::SystemInterface">
+        <description>
+            A dumbed down version of the HW Interface to use in rviz, with position control.
+        </description>
+    </class>
+
+    <class name="march_system_interface/MarchExoSystemInterface"
+           type="march_system_interface::MarchExoSystemInterface"
+           base_class_type="hardware_interface::SystemInterface">
+        <description>
+            The HW Interface to use the exo with ros2 effort control.
+        </description>
+    </class>
+</library>
