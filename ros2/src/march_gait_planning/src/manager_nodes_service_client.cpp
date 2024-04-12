@@ -1,8 +1,5 @@
 #include "march_gait_planning/manager_nodes_service_client.hpp"
 
-static constexpr char const * talkerNode = "gait_planning_angles_node"; 
-static constexpr char const * nodeGetStateTopic = "gait_planning_angles_node/get_state"; 
-static constexpr char const * nodeChangeStateTopic = "gait_planning_angles_node/change_state"; 
 
 ServiceClient::ServiceClient()
  : Node("manager_nodes_service_client")
@@ -27,7 +24,7 @@ template <typename FutureT, typename WaitTimeT> std::future_status ServiceClient
     return status; 
 }
 
-unsigned int ServiceClient::getState(std::chrono::seconds timeout = 3s){
+unsigned int ServiceClient::getState(std::chrono::seconds timeout){
     auto request = std::make_shared<lifecycle_msgs::srv::GetState::Request>(); 
     if (!m_client_get_state->wait_for_service(timeout)){
         RCLCPP_ERROR(this->get_logger(), "Service %s not available", m_client_get_state->get_service_name()); 
@@ -50,7 +47,7 @@ unsigned int ServiceClient::getState(std::chrono::seconds timeout = 3s){
 
 }
 
-bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds timeout = 3s){
+bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds timeout){
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>(); 
     request->transition.id = transition; 
     if (!m_client_change_state->wait_for_service(timeout)){
@@ -59,12 +56,12 @@ bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds ti
     }
     auto futureResult = m_client_change_state->async_send_request(request); 
     auto futureState = waitForResult(futureResult, timeout); 
-    if (futureStatus != std::future_status::ready){
+    if (futureState != std::future_status::ready){
         RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s", talkerNode); 
         return false; 
     }
     if (futureResult.get()->success){
-        RCLCPP_INFO(this->get_logger(), "Transition %d successfully triggered", static_cast<unsinged_int>(transition)); 
+        RCLCPP_INFO(this->get_logger(), "Transition %d successfully triggered", static_cast<unsigned int>(transition)); 
         return true; 
     }
     else {
@@ -73,9 +70,9 @@ bool ServiceClient::changeState(std::uint8_t transition, std::chrono::seconds ti
     }
 }
 
-void callee_script(std::shared_ptr<ServiceClient> service_client)
+void call_script(std::shared_ptr<ServiceClient> service_client)
 {
-  rclcpp::WallRate stateChangeTime(0.1); //10s
+  rclcpp::WallRate stateChangeTime(0.2); //5s, higher Hz = shorter wait time 
 
   //configure
   {
@@ -98,60 +95,60 @@ void callee_script(std::shared_ptr<ServiceClient> service_client)
     }
   }
 
-  //deactivate
-  {
-    stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
-      return;
-    }
-    if (!service_client->getState()){
-      return;
-    }
-  }
+  // //deactivate
+  // {
+  //   stateChangeTime.sleep();
+  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
+  //     return;
+  //   }
+  //   if (!service_client->getState()){
+  //     return;
+  //   }
+  // }
 
-  //activate
-  {
-    stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
-      return;
-    }
-    if (!service_client->getState()){
-      return;
-    }
-  }
+  // //activate
+  // {
+  //   stateChangeTime.sleep();
+  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
+  //     return;
+  //   }
+  //   if (!service_client->getState()){
+  //     return;
+  //   }
+  // }
 
-  //deactivate
-  {
-    stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
-      return;
-    }
-    if (!service_client->getState()){
-      return;
-    }
-  }
+  // //deactivate
+  // {
+  //   stateChangeTime.sleep();
+  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE)){
+  //     return;
+  //   }
+  //   if (!service_client->getState()){
+  //     return;
+  //   }
+  // }
 
-  //cleanup
-  {
-    stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CLEANUP)){
-      return;
-    }
-    if (!service_client->getState()){
-      return;
-    }
-  }
+  // //cleanup
+  // {
+  //   stateChangeTime.sleep();
+  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CLEANUP)){
+  //     return;
+  //   }
+  //   if (!service_client->getState()){
+  //     return;
+  //   }
+  // }
 
-  //unconfigured shutdown
-  {
-    stateChangeTime.sleep();
-    if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_UNCONFIGURED_SHUTDOWN)){
-      return;
-    }
-    if (!service_client->getState()){
-      return;
-    }
-  }
+  // //unconfigured shutdown
+  // {
+  //   stateChangeTime.sleep();
+  //   if(!service_client->changeState(lifecycle_msgs::msg::Transition::TRANSITION_UNCONFIGURED_SHUTDOWN)){
+  //     return;
+  //   }
+  //   if (!service_client->getState()){
+  //     return;
+  //   }
+  // }
 
 }
  
@@ -165,7 +162,7 @@ int main(int argc, char *argv[]){
 
     rclcpp::executors::SingleThreadedExecutor executor; 
     executor.add_node(service_client); 
-    std::shared_future<void> script = std::async(std::launch::async, std::bind(callee_script, service_client)); 
+    std::shared_future<void> script = std::async(std::launch::async, std::bind(call_script, service_client)); 
     executor.spin_until_future_complete(script); 
 
     rclcpp::shutdown(); 

@@ -8,6 +8,10 @@
 
 using namespace std::chrono_literals; 
 
+static constexpr char const * talkerNode = "gait_planning_angles_node"; 
+static constexpr char const * nodeGetStateTopic = "gait_planning_angles_node/get_state"; 
+static constexpr char const * nodeChangeStateTopic = "gait_planning_angles_node/change_state"; 
+
 class ServiceClient : public rclcpp::Node 
 {
     public: 
@@ -15,14 +19,14 @@ class ServiceClient : public rclcpp::Node
     explicit ServiceClient();
 
     template <typename FutureT, typename WaitTimeT> std::future_status waitForResult(FutureT &future, WaitTimeT timeout); 
-    void callee_script(std::shared_ptr<ServiceClient> service_client); 
+    void call_script(std::shared_ptr<ServiceClient> service_client); 
 
     unsigned int getState(std::chrono::seconds timeout = 3s);
-    bool changeState(std::unint8_t transition, std::chrono::seconds timeout = 3s); 
+    bool changeState(std::uint8_t transition, std::chrono::seconds timeout = 3s); 
 
 
     private: 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> m_client_get_state; 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> m_client_change_state; 
 
-}
+}; 

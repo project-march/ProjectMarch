@@ -31,7 +31,7 @@ find_package(rclcpp_lifecycle REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
-  src/node_manager_gait_planning_node.cpp
+  src/listener_gait_planning.cpp
   src/gait_planning_joint_angles_node.cpp
   src/gait_planning_joint_angles.cpp
   src/gait_planning_node.cpp
@@ -53,9 +53,9 @@ ament_target_dependencies(${PROJECT_NAME}
   std_msgs
 )
 
-# Create the node_manager executable
-add_executable(node_manager_gait_planning_node
-  src/node_manager_gait_planning_node.cpp 
+# Create the listener executable
+add_executable(listener_gait_planning
+  src/listener_gait_planning.cpp 
 )
 
 # Create the gait_planning_node executable
@@ -69,6 +69,7 @@ add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles.cpp
 )
 
+# create the service client manager node 
 add_executable(service_client_node
   src/manager_nodes_service_client.cpp 
 )
@@ -101,7 +102,7 @@ ament_target_dependencies(gait_planning_angles_node
   std_msgs
   )
 
-ament_target_dependencies(node_manager_gait_planning_node
+ament_target_dependencies(listener_gait_planning
   rclcpp
   march_shared_msgs
   rclcpp_lifecycle
@@ -119,7 +120,7 @@ install(TARGETS gait_planning_angles_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS node_manager_gait_planning_node
+install(TARGETS listener_gait_planning
   DESTINATION lib/${PROJECT_NAME})
 
 install(TARGETS service_client_node

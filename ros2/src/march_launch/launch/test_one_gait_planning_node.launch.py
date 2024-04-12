@@ -191,7 +191,13 @@ def generate_launch_description() -> LaunchDescription:
         Node(
             package='march_gait_planning', 
             namespace='', 
-            executable='node_manager_gait_planning_node', 
+            executable='listener_gait_planning', 
+            name='listener_gait_planning', 
+        ),
+        Node(
+            package='march_gait_planning', 
+            namespace='', 
+            executable='service_client_node', 
             name='gait_planning_manager', 
         ),
         Node(

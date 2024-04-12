@@ -70,13 +70,14 @@ private:
 
     // Member variables 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
+    // rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     // rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
 
     //FILMPJE
     std::shared_ptr<rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>> m_publisher; 
+    rclcpp_lifecycle::LifecyclePublisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     std::shared_ptr<rclcpp::TimerBase> m_timer; 
     //
     

@@ -1,13 +1,13 @@
-#include "march_gait_planning/node_manager_gait_planning_node.hpp"
+#include "march_gait_planning/listener_gait_planning.hpp"
 
 using std::placeholders::_1; 
 
 NodeManagerGaitPlanning::NodeManagerGaitPlanning()
- : Node("gait_planning_manager")
+ : Node("listener_gait_planning")
  {
     //FILMPJE
     m_message_subscriber = this->create_subscription<std_msgs::msg::String>("messages", 10, std::bind(&NodeManagerGaitPlanning::messageCallback, this, _1));
-    m_notification_subscriber = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>("lc_talker/transition_event", 10, std::bind(&NodeManagerGaitPlanning::notificationCallback, this, _1));
+    m_notification_subscriber = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>("gait_planning_angles_node/transition_event", 10, std::bind(&NodeManagerGaitPlanning::notificationCallback, this, _1));
     //
 
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
