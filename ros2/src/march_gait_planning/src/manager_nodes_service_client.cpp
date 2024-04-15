@@ -124,14 +124,10 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
 
   //configure angles and cartesian
   {
-    if(!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE) || !service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE)){
-      return;
-    }
-    if (!service_client->getAnglesState() || !service_client->getCartesianState()){
+    if(!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE)){
       return;
     }
   }
-
 
 
   //activate
@@ -140,13 +136,7 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
     if(!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
       return;
     }
-    if(!service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
-      return;
-    }
     if (!service_client->getAnglesState()){
-      return;
-    }
-    if (!service_client->getCartesianState()){
       return;
     }
   }
@@ -163,7 +153,8 @@ int main(int argc, char *argv[]){
     rclcpp::executors::SingleThreadedExecutor executor; 
     executor.add_node(service_client); 
     std::shared_future<void> script = std::async(std::launch::async, std::bind(call_script, service_client)); 
-    executor.spin_until_future_complete(script); 
+    // executor.spin_until_future_complete(script); 
+    executor.spin(); 
 
     rclcpp::shutdown(); 
 
