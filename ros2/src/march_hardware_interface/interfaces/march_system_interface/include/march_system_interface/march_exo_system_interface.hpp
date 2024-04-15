@@ -4,8 +4,8 @@
 
 #pragma once
 
-#ifndef MARCH_HARDWARE_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
-#define MARCH_HARDWARE_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
+#ifndef MARCH_SYSTEM_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
+#define MARCH_SYSTEM_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
 
 #include <chrono>
 #include <functional>
@@ -40,7 +40,7 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-namespace march_hardware_interface {
+namespace march_system_interface {
 struct JointLimit {
     int soft_limit_warning_throttle_msec;
     std::chrono::time_point<std::chrono::steady_clock> last_time_not_in_soft_error_limit;
@@ -100,7 +100,7 @@ public:
     void setPidValues(std::string joint_name, const std::array<double, 3>& new_position_pid)
     {
         bool jointFound = false;
-        for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
             if (jointInfo.name == joint_name) {
                 jointInfo.joint.setPositionPIDValues(new_position_pid);
                 jointFound = true;
@@ -162,7 +162,7 @@ public:
         control_msgs::msg::JointTrajectoryControllerState torque_points;
 
         trajectory_msgs::msg::JointTrajectoryPoint point;
-        for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
             // RCLCPP_INFO(this->get_logger(), "Publishing the measured torque: %f", jointInfo.torque);
             torque_points.joint_names.push_back(jointInfo.name);
             point.effort.push_back(jointInfo.torque);
@@ -191,7 +191,7 @@ public:
         // RCLCPP_INFO_STREAM(this->get_logger(), "Setting weights of " << joint_name);
 
         bool found_joint = false;
-        for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
             // RCLCPP_INFO_STREAM(this->get_logger(), "joint name is " << jointInfo.name);
             // if not passing a specific joint, we set the value for all joints
             if (joint_name == "" || jointInfo.name == joint_name) {
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        for (march_hardware_interface::JointInfo& jointInfo : *joints_info_) {
+        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
             std::vector<float> total = measured_torques[jointInfo.name];
             float avg_torque = std::accumulate(total.begin(), total.end(), 0.0) / total.size();
             RCLCPP_INFO_STREAM(this->get_logger(),
@@ -264,36 +264,36 @@ class MarchExoSystemInterface : public hardware_interface::BaseInterface<hardwar
 public:
     RCLCPP_SHARED_PTR_DEFINITIONS(MarchExoSystemInterface);
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC MarchExoSystemInterface();
+    MARCH_SYSTEM_INTERFACE_PUBLIC MarchExoSystemInterface();
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC ~MarchExoSystemInterface() override;
+    MARCH_SYSTEM_INTERFACE_PUBLIC ~MarchExoSystemInterface() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type configure(const hardware_interface::HardwareInfo& info) override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type perform_command_mode_switch(
         const std::vector<std::string>& start_interfaces, const std::vector<std::string>& stop_interfaces) override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type start() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type stop() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type read() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     hardware_interface::return_type write() override;
 
-    MARCH_HARDWARE_INTERFACE_PUBLIC
+    MARCH_SYSTEM_INTERFACE_PUBLIC
     std::vector<JointInfo>* getJointsInfo()
     {
         return &joints_info_;
@@ -321,6 +321,6 @@ private:
     rclcpp::Clock clock_;
 };
 
-} // namespace march_hardware_interface
+} // namespace march_system_interface
 
-#endif // MARCH_HARDWARE_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_
+#endif // MARCH_SYSTEM_INTERFACE__MARCH_EXO_SYSTEM_INTERFACE_HPP_

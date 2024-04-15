@@ -49,12 +49,12 @@
     <hardware>
       <xacro:if value="${type == 'rviz'}">
         <!--        <plugin>fake_components/GenericSystem</plugin>-->
-        <!-- Switch the 'march_hardware_interface/MarchMockSystemInterface' with 'fake_components/GenericSystem' -->
+        <!-- Switch the 'march_system_interface/MarchMockSystemInterface' with 'fake_components/GenericSystem' -->
         <!-- If you wish to debug and play around with RVIZ, otherwise use the mock interface for mujoco-->
-        <plugin>march_hardware_interface/MarchMockSystemInterface</plugin>
+        <plugin>march_system_interface/MarchMockSystemInterface</plugin>
       </xacro:if>
       <xacro:if value="${type == 'effort'}">
-        <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
+        <plugin>march_system_interface/MarchExoSystemInterface</plugin>
         <param name="robot">march7</param>
       </xacro:if>
     </hardware>

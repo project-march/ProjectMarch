@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(march_hardware_interface)
+project(march_system_interface)
 
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
@@ -25,9 +25,9 @@ add_library(
         ${PROJECT_NAME}
         SHARED
         src/march_mock_system_interface.cpp
-        include/march_hardware_interface/march_mock_system_interface.hpp
+        include/march_system_interface/march_mock_system_interface.hpp
         src/march_exo_system_interface.cpp
-        include/march_hardware_interface/hwi_util.h
+        include/march_system_interface/hwi_util.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -47,7 +47,7 @@ ament_target_dependencies(
         sensor_msgs
 )
 
-pluginlib_export_plugin_description_file(hardware_interface march_hardware_interface.xml)
+pluginlib_export_plugin_description_file(hardware_interface march_system_interface.xml)
 
 # EXPORT
 # These must be above the two installs otherwise can't be recognized by other packages.

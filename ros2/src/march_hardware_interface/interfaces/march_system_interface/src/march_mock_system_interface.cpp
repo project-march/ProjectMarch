@@ -21,12 +21,12 @@
 #include <vector>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
-#include "march_hardware_interface/hwi_util.h"
-#include "march_hardware_interface/march_mock_system_interface.hpp"
+#include "march_system_interface/hwi_util.h"
+#include "march_system_interface/march_mock_system_interface.hpp"
 #include "march_utility/logger_colors.hpp"
 #include <csignal>
 
-namespace march_hardware_interface {
+namespace march_system_interface {
 
 const std::string MarchMockSystemInterface::COMMAND_AND_STATE_TYPE = hardware_interface::HW_IF_POSITION;
 
@@ -34,12 +34,12 @@ const std::string MarchMockSystemInterface::COMMAND_AND_STATE_TYPE = hardware_in
 MarchMockSystemInterface::MarchMockSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("MarchMockSystemInterface")))
 {
-    march_hardware_interface_util::go_to_stop_state_on_crash(this);
+    march_system_interface_util::go_to_stop_state_on_crash(this);
 }
 
 /** \brief This should ensure that it goes to the stop state when the instance is being deleted.
  *  \note This doesn't work for thrown exceptions this is why we still call
- *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
+ *  `march_system_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
  */
 MarchMockSystemInterface::~MarchMockSystemInterface()
 {
@@ -68,7 +68,7 @@ hardware_interface::return_type MarchMockSystemInterface::configure(const hardwa
 
     motor_controllers_data_.resize(info_.joints.size(), march::ODriveState());
     RCLCPP_INFO(rclcpp::get_logger("MarchMockSystemInterface"), "%s-----Here!!---", LColor::BLUE);
-    if (!march_hardware_interface_util::joints_have_interface_types(
+    if (!march_system_interface_util::joints_have_interface_types(
             info.joints, { COMMAND_AND_STATE_TYPE }, { COMMAND_AND_STATE_TYPE }, (*logger_))) {
         return hardware_interface::return_type::ERROR;
     }
@@ -208,8 +208,8 @@ hardware_interface::return_type MarchMockSystemInterface::write()
     return hardware_interface::return_type::OK;
 }
 
-} // namespace march_hardware_interface
+} // namespace march_system_interface
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(march_hardware_interface::MarchMockSystemInterface, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(march_system_interface::MarchMockSystemInterface, hardware_interface::SystemInterface)
