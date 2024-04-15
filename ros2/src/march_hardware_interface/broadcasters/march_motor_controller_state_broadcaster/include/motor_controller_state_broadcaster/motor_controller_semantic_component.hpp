@@ -48,7 +48,7 @@ public:
      *  @attention Make sure this happens in the same order as they are placed in the constructor, and the same names
      *  are defined in `march_hardware/.../motor_controller_state.h::get_pointers()`.
      *
-     *  How this method works is that within the march_hardware_interface state interfaces are registered.
+     *  How this method works is that within the march_system_interface state interfaces are registered.
      *  These state interfaces contain a pointer to a member variable of type double.
      *  This pointer can be retrieved via the `this->state_interfaces_` but in the order that they are assigned in
      *  `this->interface_names_`. So we use the method `state_interface::get(index, ...)` method which updates the index

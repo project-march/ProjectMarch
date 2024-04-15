@@ -19,38 +19,38 @@
  * library cannot have, but the consuming code must have inorder to link.
  */
 
-#ifndef MARCH_HARDWARE_INTERFACE__VISIBILITY_CONTROL_H_
-#define MARCH_HARDWARE_INTERFACE__VISIBILITY_CONTROL_H_
+#ifndef MARCH_SYSTEM_INTERFACE__VISIBILITY_CONTROL_H_
+#define MARCH_SYSTEM_INTERFACE__VISIBILITY_CONTROL_H_
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define MARCH_HARDWARE_INTERFACE_EXPORT __attribute__((dllexport))
-#define MARCH_HARDWARE_INTERFACE_IMPORT __attribute__((dllimport))
+#define MARCH_SYSTEM_INTERFACE_EXPORT __attribute__((dllexport))
+#define MARCH_SYSTEM_INTERFACE_IMPORT __attribute__((dllimport))
 #else
-#define MARCH_HARDWARE_INTERFACE_EXPORT __declspec(dllexport)
-#define MARCH_HARDWARE_INTERFACE_IMPORT __declspec(dllimport)
+#define MARCH_SYSTEM_INTERFACE_EXPORT __declspec(dllexport)
+#define MARCH_SYSTEM_INTERFACE_IMPORT __declspec(dllimport)
 #endif
-#ifdef MARCH_HARDWARE_INTERFACE_BUILDING_DLL
-#define MARCH_HARDWARE_INTERFACE_PUBLIC MARCH_HARDWARE_INTERFACE_EXPORT
+#ifdef MARCH_SYSTEM_INTERFACE_BUILDING_DLL
+#define MARCH_SYSTEM_INTERFACE_PUBLIC MARCH_SYSTEM_INTERFACE_EXPORT
 #else
-#define MARCH_HARDWARE_INTERFACE_PUBLIC MARCH_HARDWARE_INTERFACE_IMPORT
+#define MARCH_SYSTEM_INTERFACE_PUBLIC MARCH_SYSTEM_INTERFACE_IMPORT
 #endif
-#define MARCH_HARDWARE_INTERFACE_PUBLIC_TYPE MARCH_HARDWARE_INTERFACE_PUBLIC
-#define MARCH_HARDWARE_INTERFACE_LOCAL
+#define MARCH_SYSTEM_INTERFACE_PUBLIC_TYPE MARCH_SYSTEM_INTERFACE_PUBLIC
+#define MARCH_SYSTEM_INTERFACE_LOCAL
 #else
-#define MARCH_HARDWARE_INTERFACE_EXPORT __attribute__((visibility("default")))
-#define MARCH_HARDWARE_INTERFACE_IMPORT
+#define MARCH_SYSTEM_INTERFACE_EXPORT __attribute__((visibility("default")))
+#define MARCH_SYSTEM_INTERFACE_IMPORT
 #if __GNUC__ >= 4
-#define MARCH_HARDWARE_INTERFACE_PUBLIC __attribute__((visibility("default")))
-#define MARCH_HARDWARE_INTERFACE_LOCAL __attribute__((visibility("hidden")))
+#define MARCH_SYSTEM_INTERFACE_PUBLIC __attribute__((visibility("default")))
+#define MARCH_SYSTEM_INTERFACE_LOCAL __attribute__((visibility("hidden")))
 #else
-#define MARCH_HARDWARE_INTERFACE_PUBLIC
-#define MARCH_HARDWARE_INTERFACE_LOCAL
+#define MARCH_SYSTEM_INTERFACE_PUBLIC
+#define MARCH_SYSTEM_INTERFACE_LOCAL
 #endif
-#define MARCH_HARDWARE_INTERFACE_PUBLIC_TYPE
+#define MARCH_SYSTEM_INTERFACE_PUBLIC_TYPE
 #endif
 
-#endif // MARCH_HARDWARE_INTERFACE__VISIBILITY_CONTROL_H_
+#endif // MARCH_SYSTEM_INTERFACE__VISIBILITY_CONTROL_H_
