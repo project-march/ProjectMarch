@@ -24,8 +24,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_interpolated_bezier_visualization_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
 
-    m_publisher = this->create_publisher<std_msgs::msg::String>("cartesian_messages", 10); 
-
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "gait_planning_mode", 10, std::bind(&GaitPlanningCartesianNode::currentModeCallback, this, _1)); 
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
@@ -47,7 +45,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &state) {
 
-    m_publisher->on_activate(); 
     m_iks_foot_positions_publisher->on_activate(); 
     m_interpolated_bezier_visualization_publisher->on_activate();
     m_active = true;  
@@ -57,7 +54,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_deactivate(const rclcpp_lifecycle::State &state) {
 
-    m_publisher->on_activate(); 
     m_iks_foot_positions_publisher->on_deactivate(); 
     m_interpolated_bezier_visualization_publisher->on_deactivate(); 
     m_active = false; 
@@ -68,7 +64,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_cleanup(const rclcpp_lifecycle::State &state) {
     
-    m_publisher.reset(); 
     m_iks_foot_positions_publisher.reset();
     m_interpolated_bezier_visualization_publisher.reset();  
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node cleaned up!"); 

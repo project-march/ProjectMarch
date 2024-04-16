@@ -28,10 +28,10 @@ class ServiceClient : public rclcpp::Node
     template <typename FutureT, typename WaitTimeT> std::future_status waitForResult(FutureT &future, WaitTimeT timeout); 
     void call_script(std::shared_ptr<ServiceClient> service_client); 
 
-    unsigned int getAnglesState(std::chrono::seconds timeout = 1s);
-    bool changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout = 1s); 
-    unsigned int getCartesianState(std::chrono::seconds timeout = 1s);
-    bool changeCartesianState(std::uint8_t transition, std::chrono::seconds timeout = 1s);
+    unsigned int getAnglesState(std::chrono::seconds timeout = 3s);
+    bool changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout = 3s); 
+    unsigned int getCartesianState(std::chrono::seconds timeout = 3s);
+    bool changeCartesianState(std::uint8_t transition, std::chrono::seconds timeout = 3s);
 
     void modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
 

@@ -42,11 +42,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_exo_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));
     m_joint_angle_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10);
 
-    //FILMPJE 
-    m_publisher = this->create_publisher<std_msgs::msg::String>("angles_messages", 10); 
-    // m_timer = this->create_wall_timer(1s, std::bind(&GaitPlanningAnglesNode::publish, this)); 
-    // 
-
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
     m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
@@ -57,30 +52,19 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &state) {
 
-
-    //FILMPJE
-    m_publisher->on_activate(); 
     m_joint_angle_trajectory_publisher->on_activate(); 
-    // std::this_thread::sleep_for(2s); 
-    //FILMPJE
-    // publish(); 
 
     m_active = true;  
 
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node activated!"); 
-
-    // currentModeCallback(m_first_callback_msg); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &state) {
 
-    //FILMPJE
-    m_publisher->on_deactivate(); 
     m_joint_angle_trajectory_publisher->on_deactivate(); 
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
-    //
 
     m_active = false; 
 
@@ -89,30 +73,14 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
     
-    //FILMPJE
-    m_publisher.reset();
     m_joint_angle_trajectory_publisher.reset();  
-    // m_timer.reset(); 
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node cleaned up!"); 
-    //
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &state) {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
-
-void GaitPlanningAnglesNode::publish(){
-    static size_t count = 0; 
-    auto msg = std::make_unique<std_msgs::msg::String>(); 
-    msg->data = "gait planning node says hello " + std::to_string(++count); 
-    if (!m_publisher->is_activated()){
-        RCLCPP_INFO(this->get_logger(), "publisher inactive"); 
-    } else{
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "publisher active. publishing %s", msg->data.c_str()); 
-    }
-    m_publisher->publish(std::move(msg)); 
 }
 
 void GaitPlanningAnglesNode::setFirstCallbackMsg(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -389,14 +357,11 @@ int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
 
-    //FILMPJE
     rclcpp::executors::SingleThreadedExecutor executor; 
     std::shared_ptr<GaitPlanningAnglesNode> gait_planning_node = std::make_shared<GaitPlanningAnglesNode>();
     executor.add_node(gait_planning_node->get_node_base_interface()); 
     executor.spin(); 
-    //
 
-    // rclcpp::spin(std::make_shared<GaitPlanningAnglesNode>()); 
     rclcpp::shutdown(); 
 
     return 0; 

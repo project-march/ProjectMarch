@@ -47,7 +47,6 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     
     rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
     rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseArray>::SharedPtr m_interpolated_bezier_visualization_publisher; 
-    rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr m_publisher; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; // exo_mode == gait_type 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
 

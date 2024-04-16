@@ -4,9 +4,9 @@
 ServiceClient::ServiceClient()
  : Node("manager_nodes_service_client")
  {
-    m_angles_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(anglesNodeGetStateTopic); 
+    m_angles_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>("gait_planning_angles_node/get_state"); 
     m_angles_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(anglesNodeChangeStateTopic); 
-    m_cartesian_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(cartesianNodeGetStateTopic); 
+    m_cartesian_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>("gait_planning_cartesian_node/get_state"); 
     m_cartesian_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(cartesianNodeChangeStateTopic); 
 
     m_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>(
@@ -17,34 +17,21 @@ ServiceClient::ServiceClient()
 }
 
 void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+    RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     auto mode_msg = march_shared_msgs::msg::ExoMode();
-
     if (msg->node_type == "joint_angles"){
-        if (getCartesianState() != lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE){
-            changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
-        }
-        // changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
-        if (getAnglesState() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE){
-            changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
-        }
-        // changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
-        // getCartesianState();
-        // getAnglesState();
+        RCLCPP_INFO(this->get_logger(), "This gait needs the Joint angles node"); 
+        changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
+        changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
         RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
     } else if (msg->node_type == "cartesian"){
-        if (getAnglesState() != lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE){
+        RCLCPP_INFO(this->get_logger(), "This gait needs the Cartesian node"); 
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
-        }
-        // changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
-        if (getCartesianState() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE){
-        changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);           
-        }
-        // changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
-        // getAnglesState();
-        // getCartesianState();
+        changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);   
+        RCLCPP_INFO(this->get_logger(), "Activated Cartesian node");  
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
@@ -85,7 +72,7 @@ unsigned int ServiceClient::getAnglesState(std::chrono::seconds timeout){
     }
     if (futureResult.get()){
         auto state = futureResult.get()->current_state.id; 
-        RCLCPP_INFO(this->get_logger(), "Node %s has current state %s \n", anglesNode, futureResult.get()->current_state.label.c_str()); 
+        RCLCPP_WARN(this->get_logger(), "Node %s has current state %s \n", anglesNode, futureResult.get()->current_state.label.c_str()); 
         return state; 
     } 
     else {
@@ -109,7 +96,7 @@ unsigned int ServiceClient::getCartesianState(std::chrono::seconds timeout){
     }
     if (futureResult.get()){
         auto state = futureResult.get()->current_state.id; 
-        RCLCPP_INFO(this->get_logger(), "Node %s has current state %s \n", cartesianNode, futureResult.get()->current_state.label.c_str()); 
+        RCLCPP_WARN(this->get_logger(), "Node %s has current state %s \n", cartesianNode, futureResult.get()->current_state.label.c_str()); 
         return state; 
     } 
     else {

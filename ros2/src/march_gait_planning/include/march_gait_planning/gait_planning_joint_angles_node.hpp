@@ -7,6 +7,8 @@ This is the header file for the GaitPlanningAnglesNode class.
 
 #include "rclcpp/rclcpp.hpp" 
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "lifecycle_msgs/srv/get_state.hpp"
+#include "lifecycle_msgs/msg/state.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -70,7 +72,6 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
 
     //FILMPJE
-    std::shared_ptr<rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>> m_publisher; 
     rclcpp_lifecycle::LifecyclePublisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     std::shared_ptr<rclcpp::TimerBase> m_timer; 
     //
