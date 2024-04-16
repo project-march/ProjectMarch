@@ -12,7 +12,7 @@
   <depend>march_control</depend>
   <depend>mujoco_interfaces</depend>
   <depend>geometry_msgs</depend>
-  <depend>march_hardware_interface</depend>
+  <depend>march_system_interface</depend>
   <depend>sensor_msgs</depend>
   <build_depend>rosidl_default_generators</build_depend>
 	<exec_depend>rosidl_default_runtime</exec_depend>

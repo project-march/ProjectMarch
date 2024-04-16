@@ -2,8 +2,8 @@
 // Created by george on 14-6-22.
 //
 
-#ifndef MARCH_HARDWARE_INTERFACE__HWI_UTIL_H
-#define MARCH_HARDWARE_INTERFACE__HWI_UTIL_H
+#ifndef MARCH_SYSTEM_INTERFACE__HWI_UTIL_H
+#define MARCH_SYSTEM_INTERFACE__HWI_UTIL_H
 
 #include "march_hardware/march_robot.h"
 #include "march_utility/logger_colors.hpp"
@@ -18,7 +18,7 @@
 
 using namespace std;
 
-namespace march_hardware_interface_util {
+namespace march_system_interface_util {
 
 inline string string_array_to_string(const vector<string>& string_array)
 {
@@ -252,6 +252,6 @@ inline void go_to_stop_state_on_crash(hardware_interface::BaseInterface<hardware
     signal(SIGABRT, teardown_state_cb); // For abnormal termination condition, (e.g. thrown exceptions).
 }
 
-} // namespace march_hardware_interface_util
+} // namespace march_system_interface_util
 
-#endif // MARCH_HARDWARE_INTERFACE__HWI_UTIL_H
+#endif // MARCH_SYSTEM_INTERFACE__HWI_UTIL_H
