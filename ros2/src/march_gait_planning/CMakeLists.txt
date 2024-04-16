@@ -80,6 +80,7 @@ ament_target_dependencies(service_client_node
   lifecycle_msgs
   std_msgs
   rclcpp_lifecycle
+  march_shared_msgs
 )
 
 

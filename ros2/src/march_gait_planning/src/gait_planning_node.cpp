@@ -20,14 +20,14 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_variable_first_step_done = false; 
     m_active = false; 
 
-    m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
+    m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
-    m_interpolated_bezier_visualization_publisher = create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
+    m_interpolated_bezier_visualization_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
 
     m_publisher = this->create_publisher<std_msgs::msg::String>("cartesian_messages", 10); 
 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "current_mode", 10, std::bind(&GaitPlanningCartesianNode::currentModeCallback, this, _1)); 
+        "gait_planning_mode", 10, std::bind(&GaitPlanningCartesianNode::currentModeCallback, this, _1)); 
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 100, std::bind(&GaitPlanningCartesianNode::currentExoJointStateCallback, this, _1)); 
 
@@ -40,6 +40,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_home_stand = {0.3, 0.12, -0.67, 0.3, -0.12, -0.67}; 
     // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
 
+    RCLCPP_INFO(this->get_logger(), "Cartesian node configured! "); 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &state) {
@@ -48,7 +51,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_iks_foot_positions_publisher->on_activate(); 
     m_interpolated_bezier_visualization_publisher->on_activate();
     m_active = true;  
-    RCLCPP_INFO(this->get_logger(), "Cartesian node activated!"); 
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node activated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -58,7 +61,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_iks_foot_positions_publisher->on_deactivate(); 
     m_interpolated_bezier_visualization_publisher->on_deactivate(); 
     m_active = false; 
-    RCLCPP_INFO(this->get_logger(), "Cartesian node deactivated!"); 
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node deactivated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -68,7 +71,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_publisher.reset(); 
     m_iks_foot_positions_publisher.reset();
     m_interpolated_bezier_visualization_publisher.reset();  
-    RCLCPP_INFO(this->get_logger(), "Cartesian node cleaned up!"); 
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node cleaned up!"); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }

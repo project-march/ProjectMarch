@@ -12,27 +12,27 @@ NodeManagerGaitPlanning::NodeManagerGaitPlanning()
     m_cartesian_notification_subscriber = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>("gait_planning_cartesian_node/transition_event", 10, std::bind(&NodeManagerGaitPlanning::cartesianNotificationCallback, this, _1));
     //
 
-    m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "current_mode", 10, std::bind(&NodeManagerGaitPlanning::activationCallback, this, _1)); 
+    // m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
+    //     "current_mode", 10, std::bind(&NodeManagerGaitPlanning::activationCallback, this, _1)); 
     // m_angles_node = std::make_shared<GaitPlanningAnglesNode>(); 
     // m_angles_node->configure(); 
  }
 
  //FILMPJE
 void NodeManagerGaitPlanning::anglesMessageCallback(const std_msgs::msg::String::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "messageCallback: %s", msg->data.c_str()); 
+    RCLCPP_INFO(this->get_logger(), "messageCallback: %s \n", msg->data.c_str()); 
  }
 
 void NodeManagerGaitPlanning::cartesianMessageCallback(const std_msgs::msg::String::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "messageCallback: %s", msg->data.c_str()); 
+    RCLCPP_INFO(this->get_logger(), "messageCallback: %s \n", msg->data.c_str()); 
  }
 
 void NodeManagerGaitPlanning::anglesNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition from state %s to %s", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
+    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
  }
 
  void NodeManagerGaitPlanning::cartesianNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition from state %s to %s", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
+    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
  }
  //
 

@@ -1,10 +1,14 @@
 #include <chrono>
 
 #include "rclcpp/rclcpp.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
 #include "lifecycle_msgs/msg/state.hpp"
 #include "lifecycle_msgs/msg/transition.hpp"
 #include "lifecycle_msgs/srv/change_state.hpp"
 #include "lifecycle_msgs/srv/get_state.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include <string>
+
 
 using namespace std::chrono_literals; 
 
@@ -24,10 +28,12 @@ class ServiceClient : public rclcpp::Node
     template <typename FutureT, typename WaitTimeT> std::future_status waitForResult(FutureT &future, WaitTimeT timeout); 
     void call_script(std::shared_ptr<ServiceClient> service_client); 
 
-    unsigned int getAnglesState(std::chrono::seconds timeout = 3s);
-    bool changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout = 3s); 
-    unsigned int getCartesianState(std::chrono::seconds timeout = 3s);
-    bool changeCartesianState(std::uint8_t transition, std::chrono::seconds timeout = 3s); 
+    unsigned int getAnglesState(std::chrono::seconds timeout = 1s);
+    bool changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout = 1s); 
+    unsigned int getCartesianState(std::chrono::seconds timeout = 1s);
+    bool changeCartesianState(std::uint8_t transition, std::chrono::seconds timeout = 1s);
+
+    void modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
 
     private: 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> m_angles_client_get_state; 
@@ -35,4 +41,9 @@ class ServiceClient : public rclcpp::Node
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> m_cartesian_client_get_state; 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> m_cartesian_client_change_state; 
 
+    rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscriber;
+    rclcpp::Publisher<march_shared_msgs::msg::ExoMode>::SharedPtr m_gaitplanning_mode_publisher; 
+
+    exoMode m_mode_type; 
+    std::string m_node_type; 
 }; 
