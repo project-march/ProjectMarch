@@ -5,15 +5,21 @@ from std_msgs.msg import String
 from march_shared_msgs.srv import GetExoModeArray
 from march_shared_msgs.msg import Alive
 
+import getpass
+import socket
+
 from march_ble_ipd.bluetooth_server import BluetoothServer
 
 
 class BLEInputDeviceNode(Node):
 
+    ID_FORMAT = "rqt@{machine}@{user}ros2"
+
     def __init__(self):
         super().__init__('bluetooth_input_device_node')
         self._requested_mode = GetExoModeArray.Request()
         self._available_modes_future = None
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         self._get_exo_mode_array_client = self.create_client(GetExoModeArray, 'get_exo_mode_array')
 
@@ -34,10 +40,12 @@ class BLEInputDeviceNode(Node):
         self._requested_mode.desired_mode.mode = mode
         self._available_modes_future = self._get_exo_mode_array_client.call_async(self._requested_mode)
         self.get_logger().info("Requested mode: " + str(mode))
+        rclpy.spin_until_future_complete(self, self._available_modes_future)
+        self.store_available_modes(self._available_modes_future)
 
     def store_available_modes(self, future) -> None:
         if future.result() is None:
-            self._node.get_logger().warn("No available modes received")
+            self.get_logger().warn("No available modes received")
             return
         
         available_modes = future.result().mode_array.modes
@@ -46,7 +54,7 @@ class BLEInputDeviceNode(Node):
     
     def alive_callback(self) -> None:
         """Callback to send out an alive message."""
-        msg = Alive(stamp=self._node.get_clock().now().to_msg(), id=self._id)
+        msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
         self._alive_pub.publish(msg)
 
 
