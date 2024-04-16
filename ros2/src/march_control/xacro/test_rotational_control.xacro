@@ -45,10 +45,10 @@
 <ros2_control name="march" type="system">
   <hardware>
     <xacro:if value="${type == 'simulation'}">
-      <plugin>march_hardware_interface/MarchMockSystemInterface</plugin>
+      <plugin>march_system_interface/MarchMockSystemInterface</plugin>
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
-      <plugin>march_hardware_interface/MarchExoSystemInterface</plugin>
+      <plugin>march_system_interface/MarchExoSystemInterface</plugin>
       <param name="robot">test_joint_rotational</param>
     </xacro:if>
   </hardware>

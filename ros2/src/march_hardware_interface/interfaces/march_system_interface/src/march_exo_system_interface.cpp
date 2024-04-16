@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "march_hardware_interface/march_exo_system_interface.hpp"
-//#include "march_hardware_interface/weight_node.h"
+#include "march_system_interface/march_exo_system_interface.hpp"
+//#include "march_system_interface/weight_node.h"
 
 #include <cassert>
 #include <chrono>
@@ -25,15 +25,15 @@
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "march_hardware_builder/hardware_builder.h"
-#include "march_hardware_interface/hwi_util.h"
+#include "march_system_interface/hwi_util.h"
 #include "march_logger_cpp/ros_logger.hpp"
 #include "march_utility/logger_colors.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
-using namespace march_hardware_interface_util;
+using namespace march_system_interface_util;
 
-namespace march_hardware_interface {
+namespace march_system_interface {
 
 // NOLINTNEXTLINE(hicpp-member-init) The pdb_data_ should be initialized at the configure step.
 MarchExoSystemInterface::MarchExoSystemInterface()
@@ -49,7 +49,7 @@ MarchExoSystemInterface::MarchExoSystemInterface()
 
 /** \brief This should ensure that it goes to the stop state when the instance is being deleted.
  *  \note This doesn't work for thrown exceptions this is why we still call
- *  `march_hardware_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
+ *  `march_system_interface_util::go_to_stop_state_on_crash(this);` in the constructor.
  */
 MarchExoSystemInterface::~MarchExoSystemInterface()
 {
@@ -572,8 +572,8 @@ bool MarchExoSystemInterface::has_correct_actuation_mode(march::Joint& joint) co
     return true;
 }
 
-} // namespace march_hardware_interface
+} // namespace march_system_interface
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(march_hardware_interface::MarchExoSystemInterface, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(march_system_interface::MarchExoSystemInterface, hardware_interface::SystemInterface)
