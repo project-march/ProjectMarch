@@ -10,7 +10,7 @@ GaitPlanningCartesianNode::GaitPlanningCartesianNode()
  {
  }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_configure(const rclcpp_lifecycle::State &state){
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_configure(const rclcpp_lifecycle::State &){
 
     m_gait_planning = GaitPlanning(); 
     m_desired_footpositions_msg = std::make_shared<march_shared_msgs::msg::IksFootPositions>();
@@ -43,7 +43,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &) {
 
     m_iks_foot_positions_publisher->on_activate(); 
     m_interpolated_bezier_visualization_publisher->on_activate();
@@ -52,7 +52,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_deactivate(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_deactivate(const rclcpp_lifecycle::State &) {
 
     m_iks_foot_positions_publisher->on_deactivate(); 
     m_interpolated_bezier_visualization_publisher->on_deactivate(); 
@@ -62,7 +62,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 }
 
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_cleanup(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_cleanup(const rclcpp_lifecycle::State &) {
     
     m_iks_foot_positions_publisher.reset();
     m_interpolated_bezier_visualization_publisher.reset();  
@@ -71,7 +71,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_shutdown(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_shutdown(const rclcpp_lifecycle::State &) {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 

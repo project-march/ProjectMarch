@@ -26,7 +26,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 {
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &) {
 
     m_gait_planning = GaitPlanningAngles(); 
     m_first_stand = true; 
@@ -50,7 +50,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &) {
 
     m_joint_angle_trajectory_publisher->on_activate(); 
 
@@ -61,7 +61,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &) {
 
     m_joint_angle_trajectory_publisher->on_deactivate(); 
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
@@ -71,7 +71,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &) {
     
     m_joint_angle_trajectory_publisher.reset();  
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node cleaned up!"); 
@@ -79,7 +79,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &state) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &) {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
