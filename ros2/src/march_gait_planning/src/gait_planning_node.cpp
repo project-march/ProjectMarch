@@ -89,7 +89,7 @@ void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg
 
         publishFootPositions(); 
     } else {
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
 }
 
@@ -107,7 +107,7 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         }
         publishFootPositions();
     } else {
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
 }
 

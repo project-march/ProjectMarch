@@ -73,7 +73,6 @@ private:
 
     //FILMPJE
     rclcpp_lifecycle::LifecyclePublisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
-    std::shared_ptr<rclcpp::TimerBase> m_timer; 
     //
     
     GaitPlanningAngles m_gait_planning; 

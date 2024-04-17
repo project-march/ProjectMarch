@@ -4,16 +4,15 @@
 ServiceClient::ServiceClient()
  : Node("manager_nodes_service_client")
  {
-    m_angles_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>("gait_planning_angles_node/get_state"); 
+    m_angles_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(anglesNodeGetStateTopic); 
     m_angles_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(anglesNodeChangeStateTopic); 
-    m_cartesian_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>("gait_planning_cartesian_node/get_state"); 
+    m_cartesian_client_get_state = this->create_client<lifecycle_msgs::srv::GetState>(cartesianNodeGetStateTopic); 
     m_cartesian_client_change_state = this->create_client<lifecycle_msgs::srv::ChangeState>(cartesianNodeChangeStateTopic); 
 
     m_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&ServiceClient::modeCallback, this, std::placeholders::_1));  
 
     m_gaitplanning_mode_publisher = this->create_publisher<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10);
-
 }
 
 void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -21,7 +20,7 @@ void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPt
     auto mode_msg = march_shared_msgs::msg::ExoMode();
     if (msg->node_type == "joint_angles"){
         RCLCPP_INFO(this->get_logger(), "This gait needs the Joint angles node"); 
-        changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
+        changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
@@ -59,7 +58,9 @@ template <typename FutureT, typename WaitTimeT> std::future_status ServiceClient
 }
 
 unsigned int ServiceClient::getAnglesState(std::chrono::seconds timeout){
+    RCLCPP_WARN(this->get_logger(), "getAnglesState() called"); 
     auto request = std::make_shared<lifecycle_msgs::srv::GetState::Request>(); 
+
     if (!m_angles_client_get_state->wait_for_service(timeout)){
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_angles_client_get_state->get_service_name()); 
         return lifecycle_msgs::msg::State::PRIMARY_STATE_UNKNOWN; 
@@ -83,6 +84,7 @@ unsigned int ServiceClient::getAnglesState(std::chrono::seconds timeout){
 }
 
 unsigned int ServiceClient::getCartesianState(std::chrono::seconds timeout){
+    RCLCPP_WARN(this->get_logger(), "getCartesianState() called"); 
     auto request = std::make_shared<lifecycle_msgs::srv::GetState::Request>(); 
     if (!m_cartesian_client_get_state->wait_for_service(timeout)){
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_cartesian_client_get_state->get_service_name()); 
@@ -113,7 +115,7 @@ bool ServiceClient::changeCartesianState(std::uint8_t transition, std::chrono::s
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_cartesian_client_change_state->get_service_name()); 
         return false; 
     }
-    auto futureResult = m_cartesian_client_change_state->async_send_request(request); 
+    auto futureResult = m_cartesian_client_change_state->async_send_request(request);
     auto futureState = waitForResult(futureResult, timeout); 
     if (futureState != std::future_status::ready){
         RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", cartesianNode); 
@@ -143,7 +145,7 @@ bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seco
         return false; 
     }
     if (futureResult.get()->success){
-        RCLCPP_INFO(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
+        RCLCPP_WARN(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
         return true; 
     }
     else {
@@ -162,12 +164,12 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
     if (!service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE)){
         return; 
     }
-    if (!service_client->getAnglesState()){
-        return; 
-    }
-    if (!service_client->getCartesianState()){
-        return; 
-    }
+    // if (!service_client->getAnglesState()){
+    //     return; 
+    // }
+    // if (!service_client->getCartesianState()){
+    //     return; 
+    // }
     stateChangeTime.sleep(); 
     if (!service_client->changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
         return; 
@@ -175,12 +177,12 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
     if (!service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
         return; 
     }
-    if (!service_client->getAnglesState()){
-        return; 
-    }
-    if (!service_client->getCartesianState()){
-        return; 
-    }
+    // if (!service_client->getAnglesState()){
+    //     return; 
+    // }
+    // if (!service_client->getCartesianState()){
+    //     return; 
+    // }
 }
  
 int main(int argc, char *argv[]){

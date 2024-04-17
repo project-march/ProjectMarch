@@ -107,7 +107,7 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
             RCLCPP_INFO(this->get_logger(), "\n Publish function called! \n "); 
         }
     } else {
-            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
 
 }
@@ -128,7 +128,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
     }
     publishJointTrajectoryPoints(); 
     } else {
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
     
 }
