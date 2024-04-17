@@ -31,15 +31,18 @@ See <https://www.gnu.org/licenses/>.
     <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="march_grey" rgba=".87 .89 .91 1"/>
-    <mesh name="backpack"    file="Backpack.obj"/>
-    <mesh name="L_foot"      file="FootLeft.obj"/>
-    <mesh name="L_hip"       file="HipLeft.obj"/>
-    <mesh name="L_thigh"     file="UpperLegLeft.obj"/>
-    <mesh name="L_shin"      file="LowerLegLeft.obj"/>
-    <mesh name="R_foot"     scale="1 -1 1"    file="FootLeft.obj"/>
-    <mesh name="R_hip"      scale="1 -1 1"    file="HipLeft.obj"/>
-    <mesh name="R_thigh"    scale="1 -1 1"    file="UpperLegLeft.obj"/>
-    <mesh name="R_shin"     scale="1 -1 1"    file="LowerLegLeft.obj"/>
+    <mesh name="backpack"    scale="0.001 0.001 0.001" file="Backpack.obj"/>
+    <mesh name="L_Ankle"     scale="0.001 0.001 0.001" file="L_Ankle.obj"/>
+    <mesh name="L_Hip"       scale="0.001 0.001 0.001" file="L_Hip.obj"/>
+    <mesh name="L_UpperLeg"  scale="0.001 0.001 0.001" file="L_UpperLeg.obj"/>
+    <mesh name="L_LowerLeg"  scale="0.001 0.001 0.001" file="L_LowerLeg.obj"/>
+    <mesh name="L_Sole"      scale="0.001 0.001 0.001" file="L_Sole.obj"/>
+
+    <mesh name="R_Ankle"     scale="0.001 -.001 0.001"    file="L_Ankle.obj"/>
+    <mesh name="R_Hip"       scale="0.001 -.001 0.001"    file="L_Hip.obj"/>
+    <mesh name="R_UpperLeg"  scale="0.001 -.001 0.001"    file="L_UpperLeg.obj"/>
+    <mesh name="R_LowerLeg"  scale="0.001 -.001 0.001"    file="L_LowerLeg.obj"/>
+    <mesh name="R_Sole"      scale="0.001 -.001 0.001"    file="L_Sole.obj"/>
   </asset>
 
   <default>
@@ -109,8 +112,8 @@ See <https://www.gnu.org/licenses/>.
         <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
         <site name='imu_backpack' size='0.01' pos="0 0 0"/>
 
-        <inertial pos="0.171 -0.006 0.342" mass="57.096"
-                  fullinertia="2.931 2.492 1.522 0.023 -0.1 0.025"/>
+        <inertial pos="0.015 0 0.194" mass="3.362"
+                  fullinertia="0.1373 0.0379 0.1005 0.000 -0.0002 0.000"/>
             <!-- <freejoint/> -->
         <geom type="mesh" mesh="backpack" />
         <geom name="backpack" type="box"
@@ -120,44 +123,44 @@ See <https://www.gnu.org/licenses/>.
       <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
         <!--  LEFT LEG -->
-        <body name="L_hip" pos="-0.021 0.08 0.025">
-          <inertial pos="0.05 0.109 0.033" mass="1.849"
-                    fullinertia="0.012 0.013 0.012 -0.004 0.002 0"/>
+        <body name="L_hip" pos="0.021 0.092 0.028">
+          <inertial pos="0.130 0.174 0.000" mass="3.684"
+                    fullinertia="0.015 0.026 0.032 0.011 0.000 0.000"/>
           <joint name="L_HAA" axis="-1 0 0" range="-15 10" class="HAA_joint" />
-          <geom type="mesh" mesh="L_hip" />
+          <geom type="mesh" mesh="L_Hip" />
           <geom name="L_hip" fromto="0 0 0 0.182 0.182 0"
                 size="0.032" class="L_collision"/>
           <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
-          <body name="L_UL" pos="0.182 0.182 0">
-          <inertial pos="0.012 -0.098 -0.151" mass="26.104"
-                    fullinertia="0.859 0.733 0.23 0.021 -0.025 0.055"/>
+          <body name="L_UL" pos="0.169 0.173 0">
+          <inertial pos="0.000 -0.044 -0.408" mass="1.520"
+                    fullinertia="0.083 0.082 0.007 0.000 -0.011 0"/>
             <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint" />
-            <geom type="mesh" mesh="L_thigh" pos="0 .013 0" />
+            <geom type="mesh" mesh="L_UpperLeg" pos="0 .013 0" />
             <geom name="L_UL" fromto="0 0 0 0 -0.06 -0.413"
                 size="0.069" class="L_collision"/>
             <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
-            <body name="L_LL" pos="0 -0.06 -0.413">
-              <inertial pos="-0.021 -0.079 -0.157" mass="7.061"
-                    fullinertia="0.12 0.117 0.034 0.003 -0.008 0.012"/>
+            <body name="L_LL" pos="0 -0.077 -0.478">
+              <inertial pos="-0.051 0.000 -0.261" mass="1.821"
+                    fullinertia="0.039 0.036 0.004 0.000 -0.001 0.006"/>
               <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint" />
-              <geom type="mesh" mesh="L_shin"/>
+              <geom type="mesh" mesh="L_LowerLeg"/>
               <geom name="L_LL" fromto="0 0 0 0.0 -0.037 -0.414"
                 size="0.047" class="L_collision"/>
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
 
-              <body name="L_ankle" pos="0.0 -0.037 -0.385">
-                <inertial pos="0.0 0.0 0.0" mass="1.0"
-                    fullinertia="0.008 0.010 0.006 0.001 0.004 -0.001"/>
+              <body name="L_ankle" pos="0.000 -0.016 -0.474">
+                <inertial pos="0.070 0.043 -0.002" mass="0.683"
+                    fullinertia="0.0011 0.0047 0.0043 0.0006 0.0010 -0.0003"/>
                 <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
                 <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
-                <body name="L_foot" pos="0.0 0.0 -0.029">
-                  <inertial pos="0.007 -0.054 -0.035" mass="1.964"
-                      fullinertia="0.015 0.021 0.013 0.003 0.007 -0.003"/>
+                <body name="L_foot" pos="-0.093 -0.061 -0.025">
+                  <inertial pos="0.139 0.001 -0.052" mass="0.589"
+                      fullinertia="0.002 0.008 0.008 0.0 0.0 0.0"/>
                   <!-- <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/> -->
-                  <geom type="mesh" mesh="L_foot"/>
+                  <geom type="mesh" mesh="L_Ankle"/>
 
                   <!-- The L_foot geometry models a footplate which extends past the pressure pads on the soles-->
                   <geom name="L_foot" type="box" size="0.159 0.057 0.007"
@@ -170,66 +173,66 @@ See <https://www.gnu.org/licenses/>.
         </body>
       </body>
 
-      <!--  RIGHT LEG -->
-      <body name="R_hip" pos="-0.021 -0.08 0.025">
-        <inertial pos="0.05 -0.109 0.033" mass="1.849"
-                  fullinertia="0.012 0.013 0.012 0.004 0.002 -0"/>
-        <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint"/>
-        <geom type="mesh" mesh="R_hip" />
-        <geom name="R_hip" fromto="0 0 0 0.182 -0.182 0"
-              size="0.032" class="R_collision"/>
-        <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
+        <!--  RIGHT LEG -->
+        <body name="R_hip" pos="0.021 -0.092 0.028">
+          <inertial pos="0.130 -0.174 0.000" mass="3.684"
+              fullinertia="0.0146 0.0255 0.0321 -0.0106 0.000 0.000"/>
+          <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint" />
+          <geom type="mesh" mesh="R_Hip" />
+          <geom name="R_hip" fromto="0 0 0 0.182 -0.182 0"
+          size="0.032" class="R_collision"/>
+          <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
-        <body name="R_UL" pos="0.182 -0.182 0">
-          <inertial pos="0.012 0.098 -0.151" mass="26.104"
-                  fullinertia="0.859 0.733 0.23 -0.021 -0.025 -0.055"/>
-          <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint"/>
-          <geom type="mesh" mesh="R_thigh"/>
-          <geom name="R_UL" fromto="0 0 0 0 0.06 -0.413"
-              size="0.069" class="R_collision"/>
-          <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
+          <body name="R_UL" pos="0.169 -0.173 0">
+          <inertial pos="0.000 -0.044 -0.408" mass="1.520"
+              fullinertia="0.0831 0.0816 0.0069 0.000 -0.0115 0.0000"/>
+            <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint" />
+            <geom type="mesh" mesh="R_UpperLeg" pos="0 .013 0" />
+            <geom name="R_UL" fromto="0 0 0 0 -0.06 -0.413"
+          size="0.069" class="R_collision"/>
+            <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
-          <body name="R_LL" pos="0 0.06 -0.413">
-            <inertial pos="-0.021 0.079 -0.157" mass="7.061"
-                  fullinertia="0.12 0.117 0.034 -0.003 -0.008 -0.012"/>
-            <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint"/>
-            <geom type="mesh" mesh="R_shin"/>
-            <geom name="R_LL" fromto="0 0 0 0.0 0.037 -0.414"
-              size="0.047" class="R_collision"/>
-            <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
+            <body name="R_LL" pos="0 -0.077 -0.478">
+              <inertial pos="-0.051 0.000 -0.261" mass="1.821"
+              fullinertia="0.0393 0.0355 0.0044 -0.0005 -0.0015 -0.0057"/>
+              <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint" />
+              <geom type="mesh" mesh="R_LowerLeg"/>
+              <geom name="R_LL" fromto="0 0 0 0.0 -0.037 -0.414"
+          size="0.047" class="R_collision"/>
+              <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
-            <body name="R_ankle" pos="0.0 0.037 -0.385">
-              <inertial pos="0.0 0.0 0.0" mass="1.0"
-                  fullinertia="0.008 0.010 0.006 -0.001 0.004 0.001"/>
-              <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
-              <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
+              <body name="R_ankle" pos="0.000 -0.016 -0.474">
+          <inertial pos="0.070 0.043 -0.002" mass="0.683"
+              fullinertia="0.0011 0.0047 0.0043 -0.0006 0.0010 0.0003"/>
+          <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+          <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
-              <body name="R_foot" pos="0.0 0.0 -0.029">
-                <inertial pos="0.007 0.054 -0.035" mass="2.964"
-                    fullinertia="0.023 0.031 0.019 -0.004 0.011 0.004"/>
-                <!-- <joint name="R_AIE" axis="-1 0 0" range="-8 8" class="AIE_joint"/> -->
-                <geom type="mesh" mesh="R_foot"/>
-                
-                <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
-                <geom name="R_foot" type="box" size="0.159 0.057 0.007"
-                    pos="0.069 0.086 -0.118"  class="R_collision"
-                    friction="3.0"/>
-                </body>
+          <body name="R_foot" pos="-0.093 -0.061 -0.025">
+            <inertial pos="0.139 0.001 -0.052" mass="0.589"
+                fullinertia="0.0016 0.0077 0.0083 0.0 0.0001 0.0"/>
+            <!-- <joint name="R_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/> -->
+            <geom type="mesh" mesh="R_Ankle"/>
+
+            <!-- The R_foot geometry models a footplate which extends past the pressure pads on the soles-->
+            <geom name="R_foot" type="box" size="0.159 0.057 0.007"
+                pos="0.069 -0.086 -0.118"  class="R_collision"
+                friction="3.0"/>
+            </body>
+              </body>
             </body>
           </body>
         </body>
-      </body>
+            </body>
 
-    </body>
   </worldbody>
 
 
-  <tendon>
+  <!-- <tendon>
     <spatial range="0 0.5" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
-  </tendon>
+  </tendon> -->
 
   <!-- <tendon>
     <spatial range="0 0.37" limited="true" width=".004" rgba=".3 .95 .3 1" stiffness="100">
