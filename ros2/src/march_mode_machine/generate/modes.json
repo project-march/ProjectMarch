@@ -47,6 +47,10 @@
     {
       "name": "VariableWalk",
       "exoMode": 11
+    },
+    {
+      "name": "Hinge",
+      "exoMode": 15
     }
   ],
   [

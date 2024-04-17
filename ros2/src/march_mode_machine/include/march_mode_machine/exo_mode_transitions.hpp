@@ -30,7 +30,8 @@ public:
                 { exoMode::Error, {}},
                 { exoMode::Sideways, { exoMode::Stand}},
                 { exoMode::Ascending, { exoMode::Stand}},
-                { exoMode::Descending, { exoMode::Stand}}
+                { exoMode::Descending, { exoMode::Stand}},
+                { exoMode::Hinge, { exoMode::Stand}}
             };
         }
         else if (type == "Cartesian") {
