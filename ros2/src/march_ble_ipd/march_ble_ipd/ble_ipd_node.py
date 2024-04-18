@@ -34,7 +34,7 @@ class BLEInputDeviceNode(Node):
                                                 clock=self.get_clock())
         
         
-        self._bluetooth_server = BluetoothServer(lambda temperature: self.publish_mode(temperature))
+        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode))
 
     def publish_mode(self, mode: int) -> None:
         self._requested_mode.desired_mode.mode = mode
