@@ -30,6 +30,7 @@ private:
 
     void solveInverseKinematics(const rclcpp::Time& start_time);
     void updatePreviousJointTrajectoryPoint(const trajectory_msgs::msg::JointTrajectoryPoint& joint_trajectory_point);
+    void alphabetizeJointTrajectory(const trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr joint_trajectory_point);
     void configureIKSolverParameters();
     void configureTasksParameters();
     void configureIKSolutions();
@@ -44,6 +45,8 @@ private:
     unsigned int m_max_iterations;
 
     std::vector<std::string> m_joint_names;
+    std::vector<std::string> m_joint_names_alphabetical;
+    std::vector<unsigned int> m_alphabetical_joint_indices;
     std::vector<double> m_actual_joint_positions;
     std::vector<double> m_actual_joint_velocities;
     Eigen::VectorXd m_desired_joint_positions;
