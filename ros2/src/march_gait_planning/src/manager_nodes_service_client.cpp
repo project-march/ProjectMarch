@@ -13,28 +13,52 @@ ServiceClient::ServiceClient()
         "current_mode", 10, std::bind(&ServiceClient::modeCallback, this, std::placeholders::_1));  
 
     m_gaitplanning_mode_publisher = this->create_publisher<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10);
+
+    m_angles_active = true; 
+    m_cartesian_active = true; 
 }
 
 void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     auto mode_msg = march_shared_msgs::msg::ExoMode();
-    if (msg->node_type == "joint_angles"){
-        // RCLCPP_INFO(this->get_logger(), "This gait needs the Joint angles node"); 
+    if ((exoMode)msg->mode == exoMode::Stand){
+        if (m_angles_active == true && m_cartesian_active == true){
+            changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
+            changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+            m_angles_active = true; 
+            m_cartesian_active = false; 
+            mode_msg.mode = msg->mode; 
+            mode_msg.node_type = msg->node_type; 
+            m_gaitplanning_mode_publisher->publish(mode_msg);
+        } else if (m_angles_active == true && m_cartesian_active == false){
+            RCLCPP_INFO(this->get_logger(), "Letting the gait finish"); 
+            mode_msg.mode = msg->mode; 
+            mode_msg.node_type = msg->node_type; 
+            m_gaitplanning_mode_publisher->publish(mode_msg);
+        } else if (m_angles_active == false && m_cartesian_active == true){
+            RCLCPP_INFO(this->get_logger(), "Letting the gait finish"); 
+            mode_msg.mode = msg->mode; 
+            mode_msg.node_type = msg->node_type; 
+            m_gaitplanning_mode_publisher->publish(mode_msg);
+        } else {
+            RCLCPP_ERROR(this->get_logger(), "Both gait planning nodes inactive!"); 
+        }
+    } else if (msg->node_type == "joint_angles" && (exoMode)msg->mode != exoMode::Stand){
         changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+        m_angles_active = true; 
+        m_cartesian_active = false; 
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
-        // RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
-    } else if (msg->node_type == "cartesian"){
-        // RCLCPP_INFO(this->get_logger(), "This gait needs the Cartesian node"); 
+    } else if (msg->node_type == "cartesian" && (exoMode)msg->mode != exoMode::Stand){
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
         changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);   
-        // RCLCPP_INFO(this->get_logger(), "Activated Cartesian node");  
+        m_angles_active = false;
+        m_cartesian_active = true; 
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
-        // RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
     }
     else {
         RCLCPP_WARN(this->get_logger(), "Unknown node type: %s", msg->node_type.c_str()); 
@@ -115,6 +139,7 @@ bool ServiceClient::changeCartesianState(std::uint8_t transition, std::chrono::s
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_cartesian_client_change_state->get_service_name()); 
         return false; 
     }
+    //TODO: FIX FUTURE STATE RETURN
     auto futureResult = m_cartesian_client_change_state->async_send_request(request);
     // auto futureState = waitForResult(futureResult, timeout); 
     auto futureState = futureResult.wait_for(timeout); 
@@ -141,6 +166,7 @@ bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seco
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_angles_client_change_state->get_service_name()); 
         return false; 
     }
+    //TODO: FIX FUTURE STATE RETURN
     auto futureResult = m_angles_client_change_state->async_send_request(request);
     // auto futureState = waitForResult(futureResult, timeout); 
     auto futureState = futureResult.wait_for(timeout); 
@@ -182,7 +208,7 @@ void call_script(std::shared_ptr<ServiceClient> service_client)
     }
     if (!service_client->changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE)){
         return; 
-    }
+    } 
     // if (!service_client->getAnglesState()){
     //     return; 
     // }

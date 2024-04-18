@@ -45,6 +45,6 @@ class ServiceClient : public rclcpp::Node
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscriber;
     rclcpp::Publisher<march_shared_msgs::msg::ExoMode>::SharedPtr m_gaitplanning_mode_publisher; 
 
-    exoMode m_mode_type; 
-    std::string m_node_type; 
+    bool m_cartesian_active; 
+    bool m_angles_active; 
 }; 
