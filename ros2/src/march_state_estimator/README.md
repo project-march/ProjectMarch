@@ -159,6 +159,23 @@ TODO: Provide description of this node
 
 ...
 
+## Troubleshooting
+
+### GiNaC is empty, missing files, or has faulty files
+
+If the folder that contains GiNaC is empty, is missing files, or faulty files, it is best to delete it, redownload, and reinstall it.
+
+To delete and redownload it, follow the following instruction:
+
+```
+cd path/to/ros2_workspace/src/libraries
+rm -rf ./ginac
+git submodule update --init --recursive
+```
+
+To reinstall, follow the installation procedure describing above.
+
+
 ## Bugs & Feature Requests
 
 Please report bugs and request features using the Issue Tracker (TODO: Provide link to issue page).
