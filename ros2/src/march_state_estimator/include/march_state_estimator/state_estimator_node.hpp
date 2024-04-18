@@ -3,8 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
-#define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_
+#define MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_
 
 #include <string>
 #include <vector>
@@ -14,27 +14,31 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2/LinearMath/Quaternion.h"
 
-#include "march_shared_msgs/msg/state_estimation.hpp"
-#include "march_shared_msgs/msg/feet_height_stamped.hpp"
-#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
-#include "march_shared_msgs/srv/get_node_position.hpp"
-#include "march_shared_msgs/msg/center_of_mass.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "sensor_msgs/msg/joint_state.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/vector3_stamped.hpp"
+#include "march_shared_msgs/msg/center_of_mass.hpp"
+#include "march_shared_msgs/msg/feet_height_stamped.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
+#include "march_shared_msgs/srv/get_current_joint_positions.hpp"
+#include "march_shared_msgs/srv/get_node_position.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "std_msgs/msg/float64.hpp"
 
 #include "march_state_estimator/robot_description.hpp"
 #include "march_state_estimator/sensor_fusion.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
+#define LEFT_FOOT_ID    0
+#define RIGHT_FOOT_ID   1
+
 class SensorFusionNode : public rclcpp::Node {
 public:
-    SensorFusionNode(std::shared_ptr<RobotDescription> robot_description);
+    SensorFusionNode();
     ~SensorFusionNode();
 
 private:
@@ -43,9 +47,11 @@ private:
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
     void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg);
+
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
+    void publishTorqueEstimation();
 
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
@@ -60,6 +66,8 @@ private:
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
     std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
+
+    std::vector<Eigen::Vector3d> m_force_feet;
 
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
@@ -76,8 +84,12 @@ private:
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_mpc_stance_foot_pub;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_com_pos_pub;
 
+    // Temp
+    rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_left_pub;
+    rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_right_pub;
+
     rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
     rclcpp::SubscriptionOptions m_sensors_subscription_options;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__SENSOR_FUSION_NODE_HPP_
+#endif // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_

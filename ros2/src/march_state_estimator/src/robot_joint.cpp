@@ -7,7 +7,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-RobotJoint::RobotJoint(const std::string& name, const uint64_t& id)
+RobotJoint::RobotJoint(const std::string& name, const uint64_t& id, const std::vector<double>& joint_axis)
 {
     m_name = name;
     m_id = id;
@@ -16,6 +16,7 @@ RobotJoint::RobotJoint(const std::string& name, const uint64_t& id)
     m_joint_symbol_position = GiNaC::symbol("q_" + name);
     m_joint_symbol_velocity = GiNaC::symbol("dq_" + name);
     m_joint_symbol_acceleration = GiNaC::symbol("ddq_" + name);
+    m_joint_axis = joint_axis;
 }
 
 void RobotJoint::setLimits(const double& lower_limit, const double& upper_limit)

@@ -93,7 +93,7 @@ See <https://www.gnu.org/licenses/>.
     <light name="spotlight" mode="targetbodycom" target="backpack"
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
-    <body name="tendon_slider_top" pos="0.05 0 1.95">
+    <!-- <body name="tendon_slider_top" pos="0.05 0 1.95">
       <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
       <joint name="tendon_slider_top" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <site name="tendon_fixture_top" size="0.05" pos="0 0 0"></site>
@@ -109,15 +109,15 @@ See <https://www.gnu.org/licenses/>.
       <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
       <joint name="tendon_slider_right" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <site name="tendon_fixture_right" size="0.05" pos="0 0 0"></site>
-    </body>
+    </body> -->
 
     <body name="safety_catcher" pos="-0.2 0 1">
       <inertial pos="0 0 0" mass="0.1" diaginertia="0.1 0.1 0.1"/>
       <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 15" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="0 0" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="0 0" pos="0 0 0"/> -->
       <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-10 10" pos="0 0 0"/>
 
 
@@ -247,12 +247,12 @@ See <https://www.gnu.org/licenses/>.
   </worldbody>
 
 
-  <tendon>
+  <!-- <tendon>
     <spatial range="0 0.5" limited="true" width=".004" rgba=".95 .3 .3 1" stiffness="100">
       <site site="tendon_top" />
       <site site="tendon_fixture_top" />
     </spatial>
-  </tendon>
+  </tendon> -->
 
   <!-- <tendon>
     <spatial range="0 0.37" limited="true" width=".004" rgba=".3 .95 .3 1" stiffness="100">

@@ -15,14 +15,22 @@
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"
 
+#include "omp.h"
 #include "yaml-cpp/yaml.h"
 
-RobotDescriptionNode::RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description)
+RobotDescriptionNode::RobotDescriptionNode()
     : Node("robot_description_node")
 {
-    RCLCPP_INFO(this->get_logger(), "Initializing Robot Description Node");
+    declare_parameter("robot_definition", std::string());
+    std::string yaml_filename = get_parameter("robot_definition").as_string();
+    RCLCPP_INFO(this->get_logger(), "Robot description file: %s", yaml_filename.c_str());
 
-    m_robot_description = robot_description;
+    if (yaml_filename.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "No robot description file has been provided.");
+        return;
+    }
+
+    m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
 
     m_service_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
@@ -125,7 +133,7 @@ void RobotDescriptionNode::handleNodePositionRequest(
         if (request->reference_frame == "inertial") {
             Eigen::Quaterniond inertial_quaternion = m_robot_description->getInertialOrientation();
             position.noalias() = inertial_quaternion.toRotationMatrix() * position;
-            orientation = inertial_quaternion * orientation;
+            orientation = inertial_quaternion.inverse() * orientation;
         }
 
         geometry_msgs::msg::Pose node_pose;
@@ -178,8 +186,8 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
 
         if (request->reference_frame == "inertial") {
             Eigen::Matrix3d orientation_matrix = m_robot_description->getInertialOrientation().toRotationMatrix();
-            position_jacobian.noalias() = orientation_matrix * position_jacobian;
-            rotation_jacobian.noalias() = orientation_matrix * rotation_jacobian;
+            position_jacobian.noalias() = orientation_matrix.transpose() * position_jacobian;
+            rotation_jacobian.noalias() = orientation_matrix.transpose() * rotation_jacobian;
         }
 
         Eigen::MatrixXd jacobian(position_jacobian.rows() + rotation_jacobian.rows(), position_jacobian.cols());
@@ -194,4 +202,14 @@ void RobotDescriptionNode::handleNodeJacobianRequest(
     }
     response->node_jacobians = node_jacobians;
     RCLCPP_DEBUG(rclcpp::get_logger("state_estimator_node"), "RobotDescriptionNode::handleNodeJacobianRequest done");
+}
+
+int main(int argc, char** argv)
+{
+    Eigen::initParallel();
+    rclcpp::init(argc, argv);
+    rclcpp::Node::SharedPtr node_robot_description = std::make_shared<RobotDescriptionNode>();
+    rclcpp::spin(node_robot_description);
+    rclcpp::shutdown();
+    return 0;
 }

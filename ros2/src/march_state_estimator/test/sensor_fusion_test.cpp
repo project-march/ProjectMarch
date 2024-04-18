@@ -42,8 +42,9 @@ protected:
     void setupRotationalTestSetup()
     {
         std::string yaml_filename = "robot_definition-rotational_test_setup.yaml";
+        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/rotational_test_setup.urdf";
         m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-        m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description);
+        m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
 
         std::vector<std::string> joint_names = { "bar" };
         m_sensor_fusion->configureJointNames(joint_names);
@@ -52,8 +53,9 @@ protected:
     void setupHennieWithKoen()
     {
         std::string yaml_filename = "robot_definition-hennie_with_koen.yaml";
+        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf";
         m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-        m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description);
+        m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
         m_sensor_fusion->configureJointNames(m_joint_names);
     }
 
@@ -161,7 +163,7 @@ protected:
         imu->orientation.y = 0.707106781;
         imu->orientation.z = 0.0;
         imu->orientation.w = 0.707106781;
-        m_sensor_fusion->updateImu(imu);
+        m_sensor_fusion->updateImuState(imu);
 
         sensor_msgs::msg::JointState::SharedPtr joint_state = std::make_shared<sensor_msgs::msg::JointState>();
         joint_state->name = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
@@ -212,7 +214,7 @@ protected:
         imu->orientation.y = 0.707106781;
         imu->orientation.z = 0.0;
         imu->orientation.w = 0.707106781;
-        m_sensor_fusion->updateImu(imu);
+        m_sensor_fusion->updateImuState(imu);
 
         sensor_msgs::msg::JointState::SharedPtr joint_state = std::make_shared<sensor_msgs::msg::JointState>();
         joint_state->name = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
@@ -237,7 +239,7 @@ protected:
                     noisy_imu->linear_acceleration.x += accelerometer_noise_distribution(m_random_engine);
                     noisy_imu->linear_acceleration.y += accelerometer_noise_distribution(m_random_engine);
                     noisy_imu->linear_acceleration.z += accelerometer_noise_distribution(m_random_engine);
-                    m_sensor_fusion->updateImu(noisy_imu);
+                    m_sensor_fusion->updateImuState(noisy_imu);
 
                     m_sensor_fusion->updateKalmanFilter();
                     end_time = std::chrono::steady_clock::now();
@@ -279,7 +281,7 @@ TEST_F(SensorFusionTest, test_should_update_imu_for_hennie_with_koen)
 {
     setupHennieWithKoen();
     sensor_msgs::msg::Imu::SharedPtr imu = std::make_shared<sensor_msgs::msg::Imu>();
-    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->updateImu(imu));
+    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->updateImuState(imu));
 }
 
 TEST_F(SensorFusionTest, test_should_update_joint_state_for_hennie_with_koen)
@@ -300,7 +302,7 @@ TEST_F(SensorFusionTest, test_should_update_stance_leg_for_hennie_with_koen)
     setupHennieWithKoen();
     geometry_msgs::msg::Point left_foot_position = createZeroPoint();
     geometry_msgs::msg::Point right_foot_position = createZeroPoint();
-    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->updateStanceLeg(&left_foot_position, &right_foot_position));
+    ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getNextStanceLeg(left_foot_position.x, right_foot_position.x));
 }
 
 TEST_F(SensorFusionTest, test_should_calculate_exponential_map_and_get_correct_results_for_hennie_with_koen)
@@ -333,7 +335,7 @@ TEST_F(SensorFusionTest, test_should_calculate_expected_measured_acceleration_fo
     setupHennieWithKoen();
     setupZeroSensorFusionNoise();
     Eigen::Vector3d accelerometer_bias = Eigen::Vector3d::Zero();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
 
     Eigen::Vector3d expected_acceleration = Eigen::Vector3d::Zero();
     Eigen::Vector3d actual_acceleration = m_sensor_fusion->calculateExpectedMeasuredAcceleration(accelerometer_bias);
@@ -345,7 +347,7 @@ TEST_F(SensorFusionTest, test_should_calculate_expected_measured_angular_velocit
     setupHennieWithKoen();
     setupZeroSensorFusionNoise();
     Eigen::Vector3d gyroscope_bias = Eigen::Vector3d::Zero();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
 
     Eigen::Vector3d expected_angular_velocity = Eigen::Vector3d::Zero();
     Eigen::Vector3d actual_angular_velocity = m_sensor_fusion->calculateExpectedMeasuredAngularVelocity(gyroscope_bias);
@@ -363,7 +365,7 @@ TEST_F(SensorFusionTest, test_should_calculate_zero_prior_state_for_hennie_with_
         Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), 
         Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), 
         Eigen::Vector3d::Zero());
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
 
     EKFState expected_prior_state = state_posterior;
     expected_prior_state.imu_position = Eigen::Vector3d(0.0, 0.0, -0.0004903325);
@@ -412,7 +414,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_get_state_transition_matrix)
     imu_msg->linear_acceleration.x = 1.0;
     imu_msg->linear_acceleration.y = 2.0;
     imu_msg->linear_acceleration.z = 3.0;
-    m_sensor_fusion->updateImu(imu_msg);
+    m_sensor_fusion->updateImuState(imu_msg);
 
     Eigen::MatrixXd expected_state_transition_matrix = Eigen::MatrixXd::Zero(27, 27);
     expected_state_transition_matrix.row(0) << 1.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -471,7 +473,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_calculate_identity_prior_covaria
     imu_msg->linear_acceleration.x = 1.0;
     imu_msg->linear_acceleration.y = 2.0;
     imu_msg->linear_acceleration.z = 3.0;
-    m_sensor_fusion->updateImu(imu_msg);
+    m_sensor_fusion->updateImuState(imu_msg);
 
     Eigen::MatrixXd expected_prior_covariance_matrix = Eigen::MatrixXd::Identity(27, 27);
     expected_prior_covariance_matrix.row(0) << 1.0101, 0, 0, 0.0100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
@@ -522,7 +524,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_calculate_innovation)
 {
     setupHennieWithKoen();
     setupZeroSensorFusionNoise();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
     m_sensor_fusion->updateJointState(createEmptyJointStateForHennieWithKoen());
     EKFState state_prior;
 
@@ -550,7 +552,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_calculate_innovation)
 TEST_F(SensorFusionTest, test_should_be_able_to_calculate_observation_model)
 {
     setupHennieWithKoen();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
     m_sensor_fusion->updateJointState(createEmptyJointStateForHennieWithKoen());
     EKFState state_prior;
 
@@ -580,7 +582,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_calculate_innovation_covariance_
 {
     setupHennieWithKoen();
     setupZeroSensorFusionNoise();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
     m_sensor_fusion->updateJointState(createEmptyJointStateForHennieWithKoen());
     EKFState state_prior;
 
@@ -610,7 +612,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_calculate_kalman_gain)
 {
     setupHennieWithKoen();
     setupDummySensorFusionNoise();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
     m_sensor_fusion->updateJointState(createEmptyJointStateForHennieWithKoen());
     EKFState state_prior;
 
@@ -669,7 +671,7 @@ TEST_F(SensorFusionTest, test_should_be_able_to_compute_estimated_covariance_mat
 {
     setupHennieWithKoen();
     setupZeroSensorFusionNoise();
-    m_sensor_fusion->updateImu(std::make_shared<sensor_msgs::msg::Imu>());
+    m_sensor_fusion->updateImuState(std::make_shared<sensor_msgs::msg::Imu>());
     m_sensor_fusion->updateJointState(createEmptyJointStateForHennieWithKoen());
     EKFState state_prior;
 
@@ -780,7 +782,7 @@ TEST_F(SensorFusionTest, test_should_get_com_for_hennie_with_koen)
     sensor_msgs::msg::Imu::SharedPtr imu = std::make_shared<sensor_msgs::msg::Imu>();
     sensor_msgs::msg::JointState::SharedPtr joint_state = createEmptyJointStateForHennieWithKoen();
 
-    m_sensor_fusion->updateImu(imu);
+    m_sensor_fusion->updateImuState(imu);
     m_sensor_fusion->updateJointState(joint_state);
 
     ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getCOM());
@@ -791,12 +793,10 @@ TEST_F(SensorFusionTest, test_should_get_zmp_for_hennie_with_koen)
     setupHennieWithKoen();
     sensor_msgs::msg::Imu::SharedPtr imu = std::make_shared<sensor_msgs::msg::Imu>();
     sensor_msgs::msg::JointState::SharedPtr joint_state = createEmptyJointStateForHennieWithKoen();
-    geometry_msgs::msg::Point left_foot_position = createZeroPoint();
-    geometry_msgs::msg::Point right_foot_position = createZeroPoint();
 
-    m_sensor_fusion->updateImu(imu);
+    m_sensor_fusion->updateImuState(imu);
     m_sensor_fusion->updateJointState(joint_state);
-    m_sensor_fusion->updateStanceLeg(&left_foot_position, &right_foot_position);
+    m_sensor_fusion->updateDynamicsState();
 
     ASSERT_NO_FATAL_FAILURE(m_sensor_fusion->getZMP());
 }

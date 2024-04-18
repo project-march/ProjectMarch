@@ -17,15 +17,20 @@
 
 class RobotJoint : public RobotNode {
 public:
-    RobotJoint(const std::string& name, const uint64_t& id);
+    typedef std::shared_ptr<RobotJoint> SharedPtr;
+
+    RobotJoint(const std::string& name, const uint64_t& id, const std::vector<double>& joint_axis);
     ~RobotJoint() = default;
 
     void setLimits(const double& lower_limit, const double& upper_limit);
     Eigen::MatrixXd getGlobalRotationJacobian(JointNameToValueMap joint_positions) const;
 
+    inline std::vector<double> getJointAxis() const { return m_joint_axis; }
+
 private:
     double m_lower_limit;
     double m_upper_limit;
+    std::vector<double> m_joint_axis;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
