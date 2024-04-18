@@ -54,7 +54,7 @@ void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg
     m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
     m_desired_footpositions_msg->header = msg->header;
     if (m_current_trajectory.empty()){
-        m_gait_planning.setStanceFoot(msg->stance_leg); 
+        m_gait_planning.setStanceFoot(msg->next_stance_leg); 
         // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
     }
     publishFootPositions(); 
