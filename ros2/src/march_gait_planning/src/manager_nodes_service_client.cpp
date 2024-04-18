@@ -18,28 +18,28 @@ ServiceClient::ServiceClient()
     m_cartesian_active = true; 
 }
 
+void ServiceClient::publishModeToGaitPlanning(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+    auto mode_msg = march_shared_msgs::msg::ExoMode();
+    mode_msg.mode = msg->mode; 
+    mode_msg.node_type = msg->node_type; 
+    m_gaitplanning_mode_publisher->publish(mode_msg);
+}
+
 void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    auto mode_msg = march_shared_msgs::msg::ExoMode();
     if ((exoMode)msg->mode == exoMode::Stand){
         if (m_angles_active == true && m_cartesian_active == true){
             changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
             changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
             m_angles_active = true; 
             m_cartesian_active = false; 
-            mode_msg.mode = msg->mode; 
-            mode_msg.node_type = msg->node_type; 
-            m_gaitplanning_mode_publisher->publish(mode_msg);
+            publishModeToGaitPlanning(msg); 
         } else if (m_angles_active == true && m_cartesian_active == false){
             RCLCPP_INFO(this->get_logger(), "Letting the gait finish"); 
-            mode_msg.mode = msg->mode; 
-            mode_msg.node_type = msg->node_type; 
-            m_gaitplanning_mode_publisher->publish(mode_msg);
+            publishModeToGaitPlanning(msg); 
         } else if (m_angles_active == false && m_cartesian_active == true){
             RCLCPP_INFO(this->get_logger(), "Letting the gait finish"); 
-            mode_msg.mode = msg->mode; 
-            mode_msg.node_type = msg->node_type; 
-            m_gaitplanning_mode_publisher->publish(mode_msg);
+            publishModeToGaitPlanning(msg); 
         } else {
             RCLCPP_ERROR(this->get_logger(), "Both gait planning nodes inactive!"); 
         }
@@ -48,17 +48,13 @@ void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPt
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
         m_angles_active = true; 
         m_cartesian_active = false; 
-        mode_msg.mode = msg->mode; 
-        mode_msg.node_type = msg->node_type; 
-        m_gaitplanning_mode_publisher->publish(mode_msg); 
+        publishModeToGaitPlanning(msg); 
     } else if (msg->node_type == "cartesian" && (exoMode)msg->mode != exoMode::Stand){
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
         changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);   
         m_angles_active = false;
         m_cartesian_active = true; 
-        mode_msg.mode = msg->mode; 
-        mode_msg.node_type = msg->node_type; 
-        m_gaitplanning_mode_publisher->publish(mode_msg); 
+        publishModeToGaitPlanning(msg); 
     }
     else {
         RCLCPP_WARN(this->get_logger(), "Unknown node type: %s", msg->node_type.c_str()); 

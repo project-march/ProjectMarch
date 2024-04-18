@@ -36,6 +36,8 @@ class ServiceClient : public rclcpp::Node
 
     void modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
 
+    void publishModeToGaitPlanning(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
+
     private: 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> m_angles_client_get_state; 
     std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> m_angles_client_change_state;
