@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <algorithm>
 
 IKSolverNode::IKSolverNode()
     : Node("ik_solver", rclcpp::NodeOptions())
@@ -84,30 +85,33 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
 void IKSolverNode::publishJointTrajectory()
 {
     // Create the message to be published.
-    trajectory_msgs::msg::JointTrajectory joint_trajectory_msg;
-    joint_trajectory_msg.header.stamp = this->now();
-    joint_trajectory_msg.joint_names = m_joint_names;
+    trajectory_msgs::msg::JointTrajectory::SharedPtr joint_trajectory_msg = std::make_shared<trajectory_msgs::msg::JointTrajectory>();
+    joint_trajectory_msg->header.stamp = this->now();
+
+    // Alphabetize the vector of joint names according to the alphabetical joint indices.
+    joint_trajectory_msg->joint_names = m_joint_names_alphabetical;
 
     // Publish the previous joint trajectory point.
-    joint_trajectory_msg.points.push_back(m_joint_trajectory_point_prev);
+    joint_trajectory_msg->points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
-    trajectory_msgs::msg::JointTrajectoryPoint joint_trajectory_point_desired;
-    joint_trajectory_point_desired.positions = std::vector<double>(
+    trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr joint_trajectory_point_desired = std::make_shared<trajectory_msgs::msg::JointTrajectoryPoint>();
+    joint_trajectory_point_desired->positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
-    joint_trajectory_point_desired.velocities = std::vector<double>(
+    joint_trajectory_point_desired->velocities = std::vector<double>(
         m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
-    joint_trajectory_point_desired.accelerations = createZeroVector();
-    joint_trajectory_point_desired.effort = createZeroVector();
-    joint_trajectory_point_desired.time_from_start.sec = 0;
-    joint_trajectory_point_desired.time_from_start.nanosec = m_joint_trajectory_controller_period;
-    joint_trajectory_msg.points.push_back(joint_trajectory_point_desired);
+    joint_trajectory_point_desired->accelerations = createZeroVector();
+    joint_trajectory_point_desired->effort = createZeroVector();
+    joint_trajectory_point_desired->time_from_start.sec = 0;
+    joint_trajectory_point_desired->time_from_start.nanosec = m_joint_trajectory_controller_period;
+    alphabetizeJointTrajectory(joint_trajectory_point_desired);
+    joint_trajectory_msg->points.push_back(*joint_trajectory_point_desired);
 
     // Publish the message.
-    m_joint_trajectory_pub->publish(joint_trajectory_msg);
+    m_joint_trajectory_pub->publish(*joint_trajectory_msg);
 
     // Update the previous joint trajectory point.
-    updatePreviousJointTrajectoryPoint(joint_trajectory_point_desired);
+    updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
 }
 
 void IKSolverNode::publishErrorNorm(const double& error_norm)
@@ -159,6 +163,19 @@ void IKSolverNode::updatePreviousJointTrajectoryPoint(
     m_joint_trajectory_point_prev.time_from_start.nanosec = 0;
 }
 
+void IKSolverNode::alphabetizeJointTrajectory(const trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr msg)
+{
+    // Alphabetize the desired joint positions and velocities according to the joint names.
+    std::vector<double> desired_joint_positions = msg->positions;
+    std::vector<double> desired_joint_velocities = msg->velocities;
+
+    // Sort the desired joint positions and velocities in the message according to the alphabetical joint indices.
+    for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
+        msg->positions[i] = desired_joint_positions[m_alphabetical_joint_indices[i]];
+        msg->velocities[i] = desired_joint_velocities[m_alphabetical_joint_indices[i]];
+    }
+}
+
 void IKSolverNode::configureIKSolverParameters()
 {
     declare_parameter("state_estimator_time_offset", 0.05);
@@ -190,6 +207,22 @@ void IKSolverNode::configureIKSolverParameters()
     m_ik_solver->setJointConfigurations(m_joint_names, 
         joint_position_limits_lower, joint_position_limits_upper,
         joint_velocity_limits_lower, joint_velocity_limits_upper);
+
+    // Store the joint indices in alphabetical order according to the joint names.
+    m_alphabetical_joint_indices.clear();
+    m_alphabetical_joint_indices.resize(m_joint_names.size());
+    std::iota(m_alphabetical_joint_indices.begin(), m_alphabetical_joint_indices.end(), 0);
+    std::sort(m_alphabetical_joint_indices.begin(), m_alphabetical_joint_indices.end(),
+        [&](const unsigned int& a, const unsigned int& b) {
+            return m_joint_names[a] < m_joint_names[b];
+        });
+    
+    // Create the alphabetical joint names, and print the joint indices and names.
+    RCLCPP_INFO(this->get_logger(), "Alphabetical joint indices:");
+    for (const auto& joint_index : m_alphabetical_joint_indices) {
+        m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
+        RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
+    }
 }
 
 void IKSolverNode::configureTasksParameters()
