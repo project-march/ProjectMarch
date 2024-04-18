@@ -107,7 +107,6 @@ See <https://www.gnu.org/licenses/>.
       <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/>
       <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/>
 
-
       <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
         <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -121,10 +120,6 @@ See <https://www.gnu.org/licenses/>.
         <geom name="backpack" type="box"
               size="0.051 0.189 0.165"
               pos="0 0 0.17" class="collision"/>
-        <!-- temporary -->
-        <geom name="backpack_collision" type="box"
-              size="0.025 0.189 0.165"
-              pos="0 0 0.17" rgba="1 0 0 0.4"/>
 
         <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
@@ -139,8 +134,6 @@ See <https://www.gnu.org/licenses/>.
           <geom name="L_hip" fromto="0 0 0 0.169 0.173 0"
             size="0.032" class="L_collision"/>
           <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
-          <!-- temporary -->
-          <geom name="L_hip_collision" type="capsule" size="0.032" fromto="0 0 0 0.169 0.173 0" rgba="1 0 0 0.4"/>
 
           <body name="L_UL" pos="0.169 0.173 0">
             <inertial 
@@ -152,8 +145,6 @@ See <https://www.gnu.org/licenses/>.
             <geom name="L_UL" fromto="0 0 0 0 -0.077 -0.478"
               size="0.069" class="L_collision"/>
             <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
-            <!-- temporary -->
-            <geom name="L_UL_collision" type="capsule" size="0.069" fromto="0 0 0 0 -0.077 -0.478" rgba="1 0 0 0.4"/>
 
             <body name="L_LL" pos="0 -0.077 -0.478">
               <inertial 
@@ -165,8 +156,6 @@ See <https://www.gnu.org/licenses/>.
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
               <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.474"
                 size="0.047" class="L_collision"/>
-              <!-- temporary -->
-              <geom name="L_LL_collision" type="capsule" size="0.047" fromto="0 0 0 0.000 -0.016 -0.474" rgba="1 0 0 0.4"/>
 
               <body name="L_ankle" pos="0.000 -0.016 -0.474">
                 <inertial 
@@ -189,9 +178,6 @@ See <https://www.gnu.org/licenses/>.
                       pos="0.151 0 -.045"  class="L_collision"
                       friction="3.0"/>
 
-                  <!-- temporary -->
-                  <geom name="L_foot_collision" type="box" size="0.166 0.07 0.035"
-                    pos="0.151 0 -.045" rgba="1 0 0 0.4"/>
                   </body>
               </body>
             </body>
@@ -210,9 +196,6 @@ See <https://www.gnu.org/licenses/>.
           <geom name="R_hip" fromto="0 0 0 0.169 -0.173 0"
             size="0.032" class="R_collision"/>
           <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
-          <!-- temporary -->
-          <geom name="R_hip_collision" fromto="0 0 0 0.169 -0.173 0"
-            size="0.032" type="capsule" rgba="0 1 0 0.4"/>
 
           <body name="R_UL" pos="0.169 -0.173 0">
             <inertial 
@@ -225,10 +208,6 @@ See <https://www.gnu.org/licenses/>.
               size="0.069" class="R_collision"/>
             <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
-            <!-- temporary -->
-              <geom name="R_UL_collision" fromto="0 0 0 0 0.077 -0.478"
-                size="0.069" type="capsule" rgba="0 1 0 0.4"/>
-
             <body name="R_LL" pos="0 0.077 -0.478">
               <inertial 
                 mass="1.895"
@@ -239,10 +218,6 @@ See <https://www.gnu.org/licenses/>.
               <geom name="R_LL" fromto="0 0 0 0.000 0.016 -0.474"
                 size="0.047" class="R_collision"/>
               <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
-
-              <!-- temporary -->
-              <geom name="R_LL_collision" fromto="0 0 0 0.000 0.016 -0.474"
-                size="0.047" type="capsule" rgba="0 1 0 0.4"/>
 
               <body name="R_ankle" pos="0.000 0.016 -0.474">
                 <inertial 
@@ -263,10 +238,6 @@ See <https://www.gnu.org/licenses/>.
                   <geom name="R_foot" type="box" size="0.166 0.07 0.035"
                     pos="0 0 0" class="R_collision"
                     friction="3.0"/>
-              
-              <!-- temporary -->
-                  <geom name="R_foot_collision" type="box" size="0.166 0.07 0.035"
-                    pos="0.151 0 -.045" rgba="0 1 0 0.4"/>
 
                 </body>
               </body>
