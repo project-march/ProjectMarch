@@ -22,8 +22,7 @@ class ModeMachineCartesianNode : public rclcpp::Node
     ~ModeMachineCartesianNode(); 
 
     private: 
-    
-    void sendRequest(const exoMode& desired_mode);
+    void sendRequest(const int& desired_mode);
     void responseFootstepCallback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
@@ -41,6 +40,12 @@ class ModeMachineCartesianNode : public rclcpp::Node
     rclcpp::Publisher<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_footsteps_dummy_publisher; 
 
     rclcpp::Service<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_service;
+
+    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_footstep_client;
+
+    march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
+
+    rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture m_footstep_future;
 
     ModeMachineCartesian m_mode_machine;
 }; 

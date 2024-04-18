@@ -16,6 +16,18 @@ ModeMachineCartesianNode::ModeMachineCartesianNode()
     //TODO: This publisher should not be here, this information should come from the footstepplanner. We do not have this module as of yet so this is a replacement mock. 
     m_footsteps_dummy_publisher = create_publisher<march_shared_msgs::msg::FootStepOutput>("footsteps", 100); 
 
+    // Restore service client relation with footstep planner 
+    m_footstep_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+    m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
+
+    while (!m_footstep_client->wait_for_service(std::chrono::seconds(1))) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(this->get_logger(), "footstep_planner service not available, waiting again...");
+    }
+    RCLCPP_INFO(this->get_logger(), "footstep_planner service connected");
 }
 
 ModeMachineCartesianNode::~ModeMachineCartesianNode()
@@ -23,6 +35,23 @@ ModeMachineCartesianNode::~ModeMachineCartesianNode()
     RCLCPP_WARN(this->get_logger(), "Deconstructor of Mode Machine node called");
 }
 
+
+void ModeMachineCartesianNode::sendRequest(const int& desired_mode){
+    m_footstep_request->gait_type = desired_mode;
+    m_footstep_request->stance_leg = 0; 
+    m_footstep_future = m_footstep_client->async_send_request(
+        m_footstep_request, std::bind(&ModeMachineCartesianNode::responseFootstepCallback, this, _1));
+}
+
+void ModeMachineCartesianNode::responseFootstepCallback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
+{
+    if (future.get()->status) {
+        RCLCPP_INFO(this->get_logger(), "Footstep request received successful!");
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Footstep request was not a success!");
+    }
+}
 
 void ModeMachineCartesianNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_Response::SharedPtr response) const
 {
@@ -54,10 +83,11 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         m_mode_publisher->publish(mode_msg);
         
         // In case of VariableWalk, request footsteps from MPC footstep planner 
-        if (mode_msg.mode == 10){
-            march_shared_msgs::msg::FootStepOutput feet_msg; 
-            feet_msg.distance = 0.4;
-            m_footsteps_dummy_publisher->publish(feet_msg); 
+        if (mode_msg.mode == 11){
+            // march_shared_msgs::msg::FootStepOutput feet_msg; 
+            // feet_msg.distance = 0.4;
+            // m_footsteps_dummy_publisher->publish(feet_msg); 
+            sendRequest(2);
         }
 
 
