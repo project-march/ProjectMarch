@@ -30,7 +30,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.3, 0.12, -0.67, 0.3, -0.12, -0.67}; 
+    m_home_stand = {0.16, 0.15, -0.75, 0.16, -0.15, -0.75}; 
     // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
  }
 

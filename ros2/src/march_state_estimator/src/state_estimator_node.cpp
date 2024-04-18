@@ -335,6 +335,7 @@ void SensorFusionNode::publishMPCEstimation()
     }
     Eigen::Quaterniond q(transform_stamped.transform.rotation.w, transform_stamped.transform.rotation.x,
         transform_stamped.transform.rotation.y, transform_stamped.transform.rotation.z);
+    q.normalize();
 
     // Calculate COM and ZMP
     Eigen::Vector3d com_position = m_sensor_fusion->getCOM() + Eigen::Vector3d(m_imu_position->point.x, m_imu_position->point.y, m_imu_position->point.z);

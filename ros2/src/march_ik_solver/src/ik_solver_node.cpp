@@ -142,7 +142,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
             best_error = error;
         }
         if (best_error <= m_convergence_threshold) {
-            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 10000, "Convergence reached.");
             break;
         }
         iteration++;
