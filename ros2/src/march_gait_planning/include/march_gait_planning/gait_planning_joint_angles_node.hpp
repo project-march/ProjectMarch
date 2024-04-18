@@ -74,6 +74,7 @@ private:
     //FILMPJE
     rclcpp_lifecycle::LifecyclePublisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_angle_trajectory_publisher; 
     //
+
     
     GaitPlanningAngles m_gait_planning; 
     trajectory_msgs::msg::JointTrajectory m_joints_msg;

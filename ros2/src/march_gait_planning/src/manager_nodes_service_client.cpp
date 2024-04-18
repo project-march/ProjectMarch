@@ -19,22 +19,22 @@ void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPt
     RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     auto mode_msg = march_shared_msgs::msg::ExoMode();
     if (msg->node_type == "joint_angles"){
-        RCLCPP_INFO(this->get_logger(), "This gait needs the Joint angles node"); 
+        // RCLCPP_INFO(this->get_logger(), "This gait needs the Joint angles node"); 
         changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
-        RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
+        // RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
     } else if (msg->node_type == "cartesian"){
-        RCLCPP_INFO(this->get_logger(), "This gait needs the Cartesian node"); 
+        // RCLCPP_INFO(this->get_logger(), "This gait needs the Cartesian node"); 
         changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);
         changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);   
-        RCLCPP_INFO(this->get_logger(), "Activated Cartesian node");  
+        // RCLCPP_INFO(this->get_logger(), "Activated Cartesian node");  
         mode_msg.mode = msg->mode; 
         mode_msg.node_type = msg->node_type; 
         m_gaitplanning_mode_publisher->publish(mode_msg); 
-        RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
+        // RCLCPP_INFO(this->get_logger(), "Message published to gaitplanning subnode! \n"); 
     }
     else {
         RCLCPP_WARN(this->get_logger(), "Unknown node type: %s", msg->node_type.c_str()); 
@@ -116,19 +116,22 @@ bool ServiceClient::changeCartesianState(std::uint8_t transition, std::chrono::s
         return false; 
     }
     auto futureResult = m_cartesian_client_change_state->async_send_request(request);
-    auto futureState = waitForResult(futureResult, timeout); 
-    if (futureState != std::future_status::ready){
-        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", cartesianNode); 
-        return false; 
-    }
-    if (futureResult.get()->success){
-        RCLCPP_DEBUG(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
-        return true; 
-    }
-    else {
-        RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s \n", static_cast<unsigned int>(transition), cartesianNode);
-        return false; 
-    }
+    // auto futureState = waitForResult(futureResult, timeout); 
+    auto futureState = futureResult.wait_for(timeout); 
+    // if (futureState != std::future_status::ready){
+    //     RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", cartesianNode); 
+    //     return false; 
+    // }
+    // if (futureResult.get()->success){
+    //     RCLCPP_DEBUG(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
+    //     return true; 
+    // }
+    // else {
+    //     RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s \n", static_cast<unsigned int>(transition), cartesianNode);
+    //     return false; 
+    // }
+    // RCLCPP_INFO(this->get_logger(), "transition initiated!");
+    return true;
 }
 
 bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seconds timeout){
@@ -138,20 +141,23 @@ bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seco
         RCLCPP_ERROR(this->get_logger(), "Service %s not available \n", m_angles_client_change_state->get_service_name()); 
         return false; 
     }
-    auto futureResult = m_angles_client_change_state->async_send_request(request); 
-    auto futureState = waitForResult(futureResult, timeout); 
-    if (futureState != std::future_status::ready){
-        RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", anglesNode); 
-        return false; 
-    }
-    if (futureResult.get()->success){
-        RCLCPP_WARN(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
-        return true; 
-    }
-    else {
-        RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s \n", static_cast<unsigned int>(transition), anglesNode);
-        return false; 
-    }
+    auto futureResult = m_angles_client_change_state->async_send_request(request);
+    // auto futureState = waitForResult(futureResult, timeout); 
+    auto futureState = futureResult.wait_for(timeout); 
+    // if (futureState != std::future_status::ready){
+    //     RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", anglesNode); 
+    //     return false; 
+    // }
+    // if (futureResult.get()->success){
+    //     RCLCPP_WARN(this->get_logger(), "Transition %d successfully triggered \n", static_cast<unsigned int>(transition)); 
+    //     return true; 
+    // }
+    // else {
+    //     RCLCPP_WARN(this->get_logger(), "Failed to trigger transition %d for node %s \n", static_cast<unsigned int>(transition), anglesNode);
+    //     return false; 
+    // }
+    // RCLCPP_INFO(this->get_logger(), "transition initiated!");
+    return true; 
 }
 
 void call_script(std::shared_ptr<ServiceClient> service_client)
@@ -195,6 +201,7 @@ int main(int argc, char *argv[]){
     executor.add_node(service_client); 
     std::shared_future<void> script = std::async(std::launch::async, std::bind(call_script, service_client)); 
     executor.spin(); 
+    // rclcpp::spin(service_client); 
 
     rclcpp::shutdown(); 
 
