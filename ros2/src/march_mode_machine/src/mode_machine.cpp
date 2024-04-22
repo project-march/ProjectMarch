@@ -17,7 +17,7 @@ ModeMachine::ModeMachine()
     RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Mode Machine created");
     m_current_mode = exoMode::BootUp;
     // NOTE: Possible improvement is that the modes and allowed transitions are loaded from a config file.
-    m_exo_transitions = ExoModeTransitions("Test Lifecycle Node");
+    m_exo_transitions = ExoModeTransitions("Lifecycle nodes");
     
 }
 

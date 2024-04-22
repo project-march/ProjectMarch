@@ -21,37 +21,7 @@ public:
     }  
 
     ExoModeTransitions(const std::string& type) {
-        if (type == "Joint Angles"){
-            transitions = {
-                { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
-                { exoMode::Stand, { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending} },
-                { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
-                { exoMode::BootUp, { exoMode::Stand } },
-                { exoMode::Error, {}},
-                { exoMode::Sideways, { exoMode::Stand}},
-                { exoMode::Ascending, { exoMode::Stand}},
-                { exoMode::Descending, { exoMode::Stand}}
-            };
-        }
-        else if (type == "Cartesian") {
-            transitions = {
-                /*{CurrentMode, PossibleModes}*/
-                { exoMode::Stand,
-                    { exoMode::LargeWalk, exoMode::SmallWalk, exoMode::BootUp, exoMode::Error, exoMode::VariableStep, exoMode::VariableWalk, exoMode::HighStep1, exoMode::HighStep2, exoMode::HighStep3, exoMode::Ascending, exoMode::Descending}},
-                { exoMode::LargeWalk, { exoMode::Stand, exoMode::Error} },
-                { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
-                { exoMode::BootUp, { exoMode::Stand } },
-                { exoMode::Error, {}},
-                { exoMode::VariableStep, { exoMode::Stand, exoMode::Error}}, 
-                { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
-                { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
-                { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},
-                { exoMode::HighStep3, { exoMode::Stand, exoMode::Error}},
-                { exoMode::Ascending, { exoMode::Stand, exoMode::Error}}, 
-                { exoMode::Descending, { exoMode::Stand, exoMode::Error}}
-            };
-        }
-        else if(type == "Test Joints") {
+        if(type == "Test Joints") {
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 {exoMode::BootUp, {exoMode::Stand}},
@@ -59,7 +29,7 @@ public:
                 {exoMode::Walk, {exoMode::Stand}}
             };
         }
-        else if (type == "Test Lifecycle Node"){
+        else if (type == "Lifecycle nodes"){
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 { exoMode::Stand,
