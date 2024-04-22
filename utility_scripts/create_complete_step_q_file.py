@@ -132,6 +132,26 @@ def sit_to_stand():
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
                sit_to_stand, delimiter=',')
+    
+def hinge_gait():
+    time_points = 100
+    lhaa = np.linspace(-0.06, -0.06, time_points)
+    lhfe = np.linspace(0.351166, 1.5, time_points)
+    lkfe = np.linspace(0.372236, 0.372236, time_points)
+    ladpf = np.linspace(0.119176, 0.119176, time_points)
+
+    rhaa = np.linspace(-0.06, -0.06, time_points)
+    rhfe = np.linspace(0.274982, 1.5, time_points)
+    rkfe = np.linspace(0.286291, 0.286291, time_points)
+    radpf = np.linspace(0.077083, 0.077083, time_points)
+
+
+    hinge_gait = np.column_stack([
+        lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
+    ])
+
+    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv', 
+               hinge_gait, delimiter=',')
 
 def sideways(): 
     times = 100
@@ -194,3 +214,5 @@ step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_an
 # one_step.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/one_step_q.csv', sep=',', header=False, index=False)
 # step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
 # full_gait.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
+
+hinge_gait()

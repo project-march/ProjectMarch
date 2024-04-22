@@ -52,18 +52,23 @@ struct EKFMeasurement {
 
 class SensorFusion {
 public:
-    SensorFusion(const RobotDescription::SharedPtr robot_description);
+    SensorFusion(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path);
     ~SensorFusion() = default;
 
     void configureJointNames(const std::vector<std::string>& joint_names);
+    void configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold);
+
     void updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state);
-    void updateImu(const sensor_msgs::msg::Imu::SharedPtr imu);
-    uint8_t updateStanceLeg(
-        const geometry_msgs::msg::Point* left_foot_position, 
-        const geometry_msgs::msg::Point* right_foot_position);
+    void updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu);
+    void updateDynamicsState();
     void updateKalmanFilter();
 
-    // TODO: Move these to RobotDescription
+    Eigen::Vector3d getLeftFootForce() const;
+    Eigen::Vector3d getRightFootForce() const;
+    uint8_t getCurrentStanceLeg() const;
+    uint8_t getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const;
+
+
     RobotNode::JointNameToValueMap getJointPositions() const;
     Eigen::Quaterniond getInertialOrientation() const;
     Eigen::Vector3d getCOM() const;
@@ -72,6 +77,12 @@ public:
     geometry_msgs::msg::Transform getRobotTransform() const;
     std::vector<geometry_msgs::msg::Pose> getFootPoses() const;
     std::vector<double> getFootContactHeight() const;
+    std::vector<double> getJointAcceleration(const std::vector<std::string>& joint_names) const;
+    std::vector<double> getJointDynamicalTorques(const std::vector<std::string>& joint_names) const;
+    std::vector<double> getJointExternalTorques(const std::vector<std::string>& joint_names) const;
+
+    std::vector<Eigen::Vector3d> getWorldTorqueInLegs() const;
+    std::vector<Eigen::Vector3d> getWorldForceInLegs() const;
 
     Eigen::VectorXd getPosteriorStateVector() const;
     Eigen::Quaterniond getFilteredOrientation() const;
@@ -116,7 +127,10 @@ public:
     geometry_msgs::msg::Vector3::SharedPtr getFilteredOrientationMsg() const;
 
 private:
-    
+    void updateCurrentStanceLeg(
+        const double& left_foot_torque, const double& right_foot_torque,
+        const Eigen::Vector3d& left_foot_force, const Eigen::Vector3d& right_foot_force);
+
     inline Eigen::Vector3d msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const;
     inline Eigen::Vector3d quaternionToEulerAngles(const Eigen::Quaterniond& quaternion) const;
     inline Eigen::Vector3d rotationMatrixToEulerAngles(const Eigen::Matrix3d& rotation_matrix) const;
@@ -125,12 +139,21 @@ private:
     TorqueConverter::UniquePtr m_torque_converter;
     sensor_msgs::msg::JointState::SharedPtr m_recent_joint_state_msg;
     sensor_msgs::msg::Imu::SharedPtr m_recent_imu_msg;
+    double m_state_estimator_timestep;
 
-    // TODO: Remove these
+    std::vector<std::string> m_joint_names;
     RobotNode::JointNameToValueMap m_joint_positions;
     RobotNode::JointNameToValueMap m_joint_velocities;
     RobotNode::JointNameToValueMap m_joint_accelerations;
     RobotNode::JointNameToValueMap m_joint_total_torques;
+    RobotNode::JointNameToValueMap m_joint_dynamical_torques;
+    RobotNode::JointNameToValueMap m_joint_external_torques;
+    Eigen::Vector3d m_left_foot_force;
+    Eigen::Vector3d m_right_foot_force;
+
+    double m_left_foot_threshold;
+    double m_right_foot_threshold;
+    uint8_t m_current_stance_leg;
 
     Eigen::Quaterniond m_quaternion;
 
