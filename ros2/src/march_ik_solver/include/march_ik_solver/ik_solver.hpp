@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef IK_SOLVER__IK_SOLVER_HPP_
 #define IK_SOLVER__IK_SOLVER_HPP_
 

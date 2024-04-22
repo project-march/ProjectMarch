@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 

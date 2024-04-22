@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver.hpp"
 
 #include <algorithm>
