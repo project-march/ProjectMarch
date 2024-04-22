@@ -32,6 +32,7 @@ IKSolverNode::IKSolverNode()
         "joint_trajectory_controller/joint_trajectory", 10);
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
     m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
+    m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
 
     RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
 }
@@ -153,6 +154,10 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     // Publish the error norm and iterations.
     publishErrorNorm(best_error);
     publishIterations(iteration);
+
+    // Publish the IK status.
+    march_shared_msgs::msg::IksStatus iks_status = m_ik_solver->getIKStatus();
+    m_iks_status_pub->publish(iks_status);
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
