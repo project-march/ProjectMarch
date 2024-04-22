@@ -138,7 +138,7 @@ bool ServiceClient::changeCartesianState(std::uint8_t transition, std::chrono::s
     //TODO: FIX FUTURE STATE RETURN
     auto futureResult = m_cartesian_client_change_state->async_send_request(request);
     // auto futureState = waitForResult(futureResult, timeout); 
-    auto futureState = futureResult.wait_for(timeout); 
+    futureResult.wait_for(timeout); 
     // if (futureState != std::future_status::ready){
     //     RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", cartesianNode); 
     //     return false; 
@@ -165,7 +165,7 @@ bool ServiceClient::changeAnglesState(std::uint8_t transition, std::chrono::seco
     //TODO: FIX FUTURE STATE RETURN
     auto futureResult = m_angles_client_change_state->async_send_request(request);
     // auto futureState = waitForResult(futureResult, timeout); 
-    auto futureState = futureResult.wait_for(timeout); 
+    futureResult.wait_for(timeout); 
     // if (futureState != std::future_status::ready){
     //     RCLCPP_ERROR(this->get_logger(), "Server timed out while getting current state of node %s \n", anglesNode); 
     //     return false; 

@@ -104,7 +104,7 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
         }
         if (!m_first_stand){
             publishJointTrajectoryPoints();
-            RCLCPP_INFO(this->get_logger(), "\n Publish function called! \n "); 
+            RCLCPP_DEBUG(this->get_logger(), "\n Publish function called! \n "); 
         }
     } else {
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
