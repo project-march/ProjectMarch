@@ -180,7 +180,7 @@ double Task::getErrorNorm() const
 
 std::vector<double> Task::getError() const
 {
-    return m_previous_error;
+    return std::vector<double>(m_previous_error.data(), m_previous_error.data() + m_previous_error.size());
 }
 
 Eigen::VectorXd Task::getDesiredTask() const
@@ -213,6 +213,14 @@ void Task::setJointNamesPtr(std::vector<std::string>* joint_names_ptr)
 void Task::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)
 {
     m_current_joint_positions_ptr = current_joint_positions_ptr;
+}
+
+march_shared_msgs::msg::IksTaskStatus Task::getTaskStatus() const
+{
+    march_shared_msgs::msg::IksTaskStatus task_status;
+    task_status.task_name = m_task_name;
+    task_status.error = std::vector<double>(m_previous_error.data(), m_previous_error.data() + m_previous_error.size());
+    return task_status;
 }
 
 void Task::setCurrentTask(const Eigen::VectorXd& current_task)

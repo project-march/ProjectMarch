@@ -13,6 +13,7 @@
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "march_shared_msgs/msg/iks_task_status.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
@@ -46,6 +47,7 @@ public:
     Eigen::MatrixXd getJacobianInverse() const;
     const std::vector<std::string>* getJointNamesPtr() const;
     const Eigen::VectorXd* getCurrentJointPositionsPtr() const;
+    march_shared_msgs::msg::IksTaskStatus getTaskStatus() const;
 
     void setTaskName(const std::string& task_name);
     void setNodeNames(const std::vector<std::string>& node_names);
