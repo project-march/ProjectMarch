@@ -110,7 +110,6 @@ Eigen::VectorXd Task::calculateError()
     Eigen::VectorXd error, pid_error;
 
     error.noalias() = m_desired_task - m_current_task;
-    m_previous_error = error;
     
     m_error_norm = 0.0;
     for (const auto& nonzero_gain_p_idx : m_nonzero_gain_p_indices) {
@@ -120,6 +119,8 @@ Eigen::VectorXd Task::calculateError()
 
     pid_error.noalias()
         = m_gain_p * error; // + calculateIntegralError(error) + calculateDerivativeError(error);
+
+    m_previous_error = error;
     return pid_error;
 }
 
@@ -175,6 +176,11 @@ unsigned int Task::getTaskN() const
 double Task::getErrorNorm() const
 {
     return m_error_norm;
+}
+
+std::vector<double> Task::getError() const
+{
+    return m_previous_error;
 }
 
 Eigen::VectorXd Task::getDesiredTask() const

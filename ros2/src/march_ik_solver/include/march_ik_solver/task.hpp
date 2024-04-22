@@ -39,6 +39,7 @@ public:
     unsigned int getTaskM() const;
     unsigned int getTaskN() const;
     double getErrorNorm() const;
+    std::vector<double> getError() const;
     Eigen::VectorXd getDesiredTask() const;
     Eigen::MatrixXd getNullspaceProjection() const;
     Eigen::MatrixXd getJacobian() const;
@@ -76,9 +77,9 @@ private:
 
     std::string m_task_name;
     std::string m_reference_frame;
+    std::vector<std::string> m_node_names;
     unsigned int m_task_m;
     unsigned int m_task_n;
-    std::vector<std::string> m_node_names;
     bool m_unit_test = false;
 
     std::vector<std::string>* m_joint_names_ptr;
