@@ -1,7 +1,5 @@
 <!-- 
 Copyright (C) 2024. Stichting Moving Bird 
-M8 - Joy Brand, joy.brand@projectmarch.nl 
-M8 - Thijn Hoekstra, thijn.hoekstra@projectmarch.nl 
 M9 - Martijn Habers, martijn@habers.eu
 
 This program is free software: you can redistribute it and/or modify 
@@ -100,12 +98,12 @@ See <https://www.gnu.org/licenses/>.
 
     <body name="safety_catcher" pos="-0.2 0 1.2">
       <inertial pos="0 0 0" mass="0.1" diaginertia="10 10 10"/>
-      <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-180 180" pos="0 0 0"/>
       <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/>
+      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
 
       <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
@@ -129,7 +127,7 @@ See <https://www.gnu.org/licenses/>.
             mass="3.684"
             pos="0.130 0.174 0.000" 
             fullinertia="0.0146 0.0255 0.0321 -0.0106 0.0000 0.000"/>
-          <joint name="L_HAA" axis="-1 0 0" range="-15 10" class="HAA_joint" />
+          <joint name="left_hip_aa" axis="-1 0 0" range="-20 10" class="HAA_joint" />
           <geom type="mesh" mesh="L_Hip" />
           <geom name="L_hip" fromto="0 0 0 0.169 0.173 0"
             size="0.032" class="L_collision"/>
@@ -140,7 +138,7 @@ See <https://www.gnu.org/licenses/>.
               mass="1.520"
               pos="0.000 -0.044 -0.408" 
               fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 -0.0115"/>
-            <joint name="L_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint" />
+            <joint name="left_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="L_UpperLeg"/>
             <geom name="L_UL" fromto="0 0 0 0 -0.077 -0.478"
               size="0.069" class="L_collision"/>
@@ -151,7 +149,7 @@ See <https://www.gnu.org/licenses/>.
                 mass="1.895"
                 pos="-0.049 0.000 -0.269" 
                 fullinertia="0.0388 0.0427 0.0046 -0.0005 -0.0049 -0.0015"/>
-              <joint name="L_KFE" axis="0 1 0" range="0 125" class="rotational_joint" />
+              <joint name="left_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="L_LowerLeg"/>
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
               <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.474"
@@ -162,7 +160,7 @@ See <https://www.gnu.org/licenses/>.
                   mass="0.683"
                   pos="0.070 0.043 -0.002" 
                   fullinertia="0.0011 0.0043 0.0047 -0.0010 -0.0006 -0.0003"/>
-                <joint name="L_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+                <joint name="left_ankle_dpf" axis="0 -1 0" range="-28 20" class="ADPF_joint"/>
                 <geom type="mesh" mesh="L_Ankle"/>
                 <site name="tor_L_ADPF" size="0.01" pos="0 0 0"/>
 
@@ -171,7 +169,7 @@ See <https://www.gnu.org/licenses/>.
                     mass="0.589" 
                     pos="0.139 0.001 -0.052" 
                     fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
-                  <joint name="L_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/>
+                  <joint name="left_ankle_ie" axis="1 0 0" range="-8 8" class="AIE_joint"/>
                   <geom type="mesh" mesh="L_Sole"/>
 
                   <geom name="L_foot" type="box" size="0.166 0.07 0.035"
@@ -191,7 +189,7 @@ See <https://www.gnu.org/licenses/>.
               mass="3.684"
               pos="0.130 -0.174 0.000" 
               fullinertia="0.0146 0.0255 0.0321 0.0106 0.000 0.000"/>
-          <joint name="R_HAA" axis="1 0 0" range="-15 10" class="HAA_joint" />
+          <joint name="right_hip_aa" axis="1 0 0" range="-20 10" class="HAA_joint" />
           <geom type="mesh" mesh="R_Hip" />
           <geom name="R_hip" fromto="0 0 0 0.169 -0.173 0"
             size="0.032" class="R_collision"/>
@@ -202,7 +200,7 @@ See <https://www.gnu.org/licenses/>.
               mass="1.520"
               pos="0.000 0.044 -0.408"
               fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 0.0115"/>
-            <joint name="R_HFE" axis="0 -1 0" range="-10 112.5" class="rotational_joint" />
+            <joint name="right_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="R_UpperLeg"/>
             <geom name="R_UL" fromto="0 0 0 0 0.077 -0.478"
               size="0.069" class="R_collision"/>
@@ -213,7 +211,7 @@ See <https://www.gnu.org/licenses/>.
                 mass="1.895"
                 pos="-0.049 0.000 -0.269"
                 fullinertia="0.0388 0.0427 0.0046 0.0005 -0.0049 0.0015"/>
-              <joint name="R_KFE" axis="0 1 0" range="0 125" class="rotational_joint" />
+              <joint name="right_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="R_LowerLeg"/>
               <geom name="R_LL" fromto="0 0 0 0.000 0.016 -0.474"
                 size="0.047" class="R_collision"/>
@@ -224,7 +222,7 @@ See <https://www.gnu.org/licenses/>.
                   mass="0.683"
                   pos="0.070 -0.043 -0.002"
                   fullinertia="0.0011 0.0043 0.0047 0.0010 -0.0006 0.0003"/>
-                <joint name="R_ADPF" axis="0 -1 0" range="-25 10" class="ADPF_joint"/>
+                <joint name="right_ankle_dpf" axis="0 -1 0" range="-28 20" class="ADPF_joint"/>
                 <geom type="mesh" mesh="R_Ankle"/>
                 <site name="tor_R_ADPF" size="0.01" pos="0 0 0"/>
 
@@ -233,7 +231,7 @@ See <https://www.gnu.org/licenses/>.
                     mass="0.589"
                     pos="0.139 -0.001 -0.052" 
                     fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
-                  <joint name="R_AIE" axis="1 0 0" range="-8 8" class="AIE_joint"/>
+                  <joint name="right_ankle_ie" axis="1 0 0" range="-8 8" class="AIE_joint"/>
                   <geom type="mesh" mesh="R_Sole"/>
                   <geom name="R_foot" type="box" size="0.166 0.07 0.035"
                     pos="0 0 0" class="R_collision"
@@ -249,40 +247,40 @@ See <https://www.gnu.org/licenses/>.
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="left_ankle"    gear="179"  joint="L_ADPF"  />
-    <motor name="left_hip_aa"     gear="280"  joint="L_HAA"  />
-    <motor name="left_hip_fe"     gear="250" joint="L_HFE"   />
-    <motor name="left_knee"     gear="250"  joint="L_KFE"   />
-    <motor name="right_ankle"    gear="179"  joint="R_ADPF"  />
-    <motor name="right_hip_aa"     gear="280"  joint="R_HAA"  />
-    <motor name="right_hip_fe"     gear="250" joint="R_HFE"   />
-    <motor name="right_knee"     gear="250"  joint="R_KFE" />
+    <motor name="left_ankle_dpf"    gear="179"  joint="left_ankle_dpf"  />
+    <motor name="left_hip_aa"     gear="280"  joint="left_hip_aa"  />
+    <motor name="left_hip_fe"     gear="250" joint="left_hip_fe"   />
+    <motor name="left_knee"     gear="250"  joint="left_knee"   />
+    <motor name="right_ankle_dpf"    gear="179"  joint="right_ankle_dpf"  />
+    <motor name="right_hip_aa"     gear="280"  joint="right_hip_aa"  />
+    <motor name="right_hip_fe"     gear="250" joint="right_hip_fe"   />
+    <motor name="right_knee"     gear="250"  joint="right_knee" />
   </actuator>
 
   <sensor>
     <!-- User parameter is the number of absolute encoder bits -->
     <!-- encodersoutput position; connected to the actuator -->
-    <jointpos name="L_ADPF_pos_output" joint="L_ADPF" user="18" noise="000"/>
-    <jointpos name="L_HAA_pos_output" joint="L_HAA" user="18" noise="000"/>
-    <jointpos name="L_HFE_pos_output" joint="L_HFE" user="18" noise="000"/>
-    <jointpos name="L_KFE_pos_output" joint="L_KFE" user="18" noise="000"/>
-    <jointpos name="R_ADPF_output" joint="R_ADPF" user="18" noise="000"/>
-    <jointpos name="R_HAA_output" joint="R_HAA" user="18" noise="000"/>
-    <jointpos name="R_HFE_output" joint="R_HFE" user="18" noise="000"/>
-    <jointpos name="R_KFE_output" joint="R_KFE" user="18" noise="000"/>
-    <jointpos name="L_AIE_pos_output" joint="L_AIE" user="18" noise="000"/>
-    <jointpos name="R_AIE_output" joint="R_AIE" user="18" noise="000"/>
+    <jointpos name="L_ADPF_pos_output" joint="left_ankle_dpf" user="18" noise="000"/>
+    <jointpos name="L_HAA_pos_output" joint="left_hip_aa" user="18" noise="000"/>
+    <jointpos name="L_HFE_pos_output" joint="left_hip_fe" user="18" noise="000"/>
+    <jointpos name="L_KFE_pos_output" joint="left_knee" user="18" noise="000"/>
+    <jointpos name="R_ADPF_output" joint="right_ankle_dpf" user="18" noise="000"/>
+    <jointpos name="R_HAA_output" joint="right_hip_aa" user="18" noise="000"/>
+    <jointpos name="R_HFE_output" joint="right_hip_fe" user="18" noise="000"/>
+    <jointpos name="R_KFE_output" joint="right_knee" user="18" noise="000"/>
+    <jointpos name="L_AIE_pos_output" joint="left_ankle_ie" user="18" noise="000"/>
+    <jointpos name="R_AIE_output" joint="right_ankle_ie" user="18" noise="000"/>
     <!-- encodersoutput velocity; connected to the actuator -->
-    <jointvel name="L_ADPF_vel_output" joint="L_ADPF" user="18" noise="000"/>
-    <jointvel name="L_HAA_vel_output" joint="L_HAA" user="18" noise="000"/>
-    <jointvel name="L_HFE_vel_output" joint="L_HFE" user="18" noise="000"/>
-    <jointvel name="L_KFE_vel_output" joint="L_KFE" user="18" noise="000"/>
-    <jointvel name="R_ADPF_vel_output" joint="R_ADPF" user="18" noise="000"/>
-    <jointvel name="R_HAA_vel_output" joint="R_HAA" user="18" noise="000"/>
-    <jointvel name="R_HFE_vel_output" joint="R_HFE" user="18" noise="000"/>
-    <jointvel name="R_KFE_vel_output" joint="R_KFE" user="18" noise="000"/>
-    <jointvel name="L_AIE_vel_output" joint="L_AIE" user="18" noise="000"/>
-    <jointvel name="R_AIE_vel_output" joint="R_AIE" user="18" noise="000"/>
+    <jointvel name="L_ADPF_vel_output" joint="left_ankle_dpf" user="18" noise="000"/>
+    <jointvel name="L_HAA_vel_output" joint="left_hip_aa" user="18" noise="000"/>
+    <jointvel name="L_HFE_vel_output" joint="left_hip_fe" user="18" noise="000"/>
+    <jointvel name="L_KFE_vel_output" joint="left_knee" user="18" noise="000"/>
+    <jointvel name="R_ADPF_vel_output" joint="right_ankle_dpf" user="18" noise="000"/>
+    <jointvel name="R_HAA_vel_output" joint="right_hip_aa" user="18" noise="000"/>
+    <jointvel name="R_HFE_vel_output" joint="right_hip_fe" user="18" noise="000"/>
+    <jointvel name="R_KFE_vel_output" joint="right_knee" user="18" noise="000"/>
+    <jointvel name="L_AIE_vel_output" joint="left_ankle_ie" user="18" noise="000"/>
+    <jointvel name="R_AIE_vel_output" joint="right_ankle_ie" user="18" noise="000"/>
     <!-- torque sensors; connected to the actuator-->
 
 <!--    TODO: This could also be of the type actuatorvel -->
