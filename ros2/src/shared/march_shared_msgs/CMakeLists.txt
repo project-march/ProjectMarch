@@ -62,6 +62,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GaitResponse.msg"
   "msg/GaitType.msg"
   "msg/HighVoltageState.msg"
+  "msg/IksCommand.msg"
   "msg/IksFootPositions.msg"
   "msg/IksTaskStatus.msg"
   "msg/IksStatus.msg"
