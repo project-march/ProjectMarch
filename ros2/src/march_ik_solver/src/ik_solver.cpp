@@ -108,6 +108,15 @@ double IKSolver::getTasksError() const
     return tasks_error.norm();
 }
 
+march_shared_msgs::msg::IksStatus IKSolver::getIKStatus() const
+{
+    march_shared_msgs::msg::IksStatus iks_status;
+    for (const auto& task_name : m_task_names) {
+        iks_status.tasks.push_back(m_task_map.at(task_name)->getTaskStatus());
+    }
+    return iks_status;
+}
+
 void IKSolver::setDt(const double& dt)
 {
     m_dt = dt;

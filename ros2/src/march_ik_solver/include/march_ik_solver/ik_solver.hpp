@@ -8,6 +8,7 @@
 
 #include "march_ik_solver/task.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "march_shared_msgs/msg/iks_status.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
@@ -33,6 +34,7 @@ public:
     std::vector<double> getCurrentJointVelocities() const;
     std::vector<double> getDesiredJointVelocities() const;
     double getTasksError() const;
+    march_shared_msgs::msg::IksStatus getIKStatus() const;
 
     void setDt(const double& dt);
     void setJointConfigurations(const std::vector<std::string>& joint_names,
