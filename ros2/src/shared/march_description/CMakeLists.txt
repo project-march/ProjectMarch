@@ -11,8 +11,6 @@ find_package(ament_cmake REQUIRED)
 find_package(xacro REQUIRED)
 find_package(urdf REQUIRED)
 
-install(DIRECTORY launch
-  DESTINATION share/${PROJECT_NAME})
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
@@ -23,8 +21,6 @@ install(DIRECTORY meshes
   DESTINATION share/${PROJECT_NAME})
 
 set(XACRO_FILES
-        urdf/test_xacros/test_joint_linear.xacro
-        urdf/test_xacros/test_joint_rotational.xacro
         urdf/march8.xacro
 )
 
