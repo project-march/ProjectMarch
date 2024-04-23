@@ -33,6 +33,25 @@ def get_actuator_names(model):
         names.append(name)
     return names
 
+def get_joint_names(model):
+    """This function returns an string array containing the joint names defined in the mujoco model.
+    
+    The names are stored in an array with all other model objet names, with lined addresses.
+    To retrieve the names, a loop from the starting address to the terminating char is used.
+    """
+    names = []
+    for i in range(model.nq):
+        name = ""
+        j = model.name_jntadr[i]
+        while model.names[j] != 0:
+            name = name + chr(model.names[j])
+            j = j + 1
+        names.append(name)
+
+    # Sort the names in the alphabetical order
+    names.sort()
+
+    return names
 
 def get_controller_data(msg):
     """Get correct joint positions, linked to the joint name, form the incoming message."""
@@ -81,12 +100,15 @@ class MujocoSimNode(Node):
         # The model can be found in the robot_description package.
         self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
         self.data = mujoco.MjData(self.model)
 
+        self.joint_names = get_joint_names(self.model)
+        for name in self.joint_names:
+            self.get_logger().info(f"Joint name: {name}")
         self.actuator_names = get_actuator_names(self.model)
         self.use_aie_force = self.get_parameter("aie_force")
 
@@ -127,7 +149,7 @@ class MujocoSimNode(Node):
 
         joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
-        for index, name in enumerate(self.actuator_names):
+        for index, name in enumerate(self.joint_names):
             joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
                                f"set desired positions to {joint_val_dict}")
@@ -294,7 +316,7 @@ class MujocoSimNode(Node):
         state_msg = JointState()
         state_msg.header.stamp = self.get_clock().now().to_msg()
         state_msg.header.frame_id = "joint_link"
-        state_msg.name = self.actuator_names
+        state_msg.name = self.joint_names
         state_msg.position = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
