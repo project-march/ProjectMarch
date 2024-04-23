@@ -13,6 +13,7 @@
 
 #include "geometry_msgs/msg/point.hpp"
 #include "march_ik_solver/ik_solver.hpp"
+#include "march_shared_msgs/msg/iks_command.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
 #include "march_shared_msgs/msg/iks_status.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
@@ -26,6 +27,7 @@ public:
     ~IKSolverNode();
 
 private:
+    void iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg);
     void iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void publishJointTrajectory();
@@ -56,7 +58,8 @@ private:
     trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
 
     // ROS2 communication
-    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_command_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksCommand>::SharedPtr m_ik_solver_command_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_foot_positions_sub;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
     rclcpp::Publisher<march_shared_msgs::msg::IksStatus>::SharedPtr m_iks_status_pub;

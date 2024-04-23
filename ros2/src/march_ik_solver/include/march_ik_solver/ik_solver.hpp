@@ -35,6 +35,7 @@ public:
     Eigen::VectorXd solveInverseKinematics();
     Eigen::VectorXd integrateJointVelocities();
 
+    std::vector<std::string> getTaskNames() const;
     std::vector<double> getCurrentJointPositions() const;
     std::vector<double> getCurrentJointVelocities() const;
     std::vector<double> getDesiredJointVelocities() const;

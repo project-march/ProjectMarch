@@ -84,6 +84,11 @@ Eigen::VectorXd IKSolver::clampJointVelocities(Eigen::VectorXd desired_joint_vel
     return limited_joint_velocities;
 }
 
+std::vector<std::string> IKSolver::getTaskNames() const
+{
+    return m_task_names;
+}
+
 std::vector<double> IKSolver::getCurrentJointPositions() const
 {
     return std::vector<double>(

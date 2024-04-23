@@ -27,7 +27,10 @@ IKSolverNode::IKSolverNode()
     m_subscription_options.callback_group = m_callback_group;
 
     // Create the subscriptions and publishers.
-    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
+        "ik_solver/command", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
+    m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
     m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
@@ -45,8 +48,20 @@ IKSolverNode::~IKSolverNode()
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
 }
 
+void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver command received.");
+    m_ik_solver->setTaskNames(msg->task_names);
+}
+
 void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
+    std::vector<std::string> task_names = m_ik_solver->getTaskNames();
+
+    if (task_names.empty()) {
+        return;
+    }
+
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
