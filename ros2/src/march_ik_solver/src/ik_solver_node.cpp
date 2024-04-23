@@ -35,8 +35,6 @@ IKSolverNode::IKSolverNode()
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
-    m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
-    m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
     m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
 
     RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
@@ -120,20 +118,6 @@ void IKSolverNode::publishJointTrajectory()
     updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
 }
 
-void IKSolverNode::publishErrorNorm(const double& error_norm)
-{
-    std_msgs::msg::Float64 error_norm_msg;
-    error_norm_msg.data = error_norm;
-    m_error_norm_pub->publish(error_norm_msg);
-}
-
-void IKSolverNode::publishIterations(const unsigned int& iterations)
-{
-    std_msgs::msg::UInt64 iterations_msg;
-    iterations_msg.data = iterations;
-    m_iterations_pub->publish(iterations_msg);
-}
-
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
@@ -153,16 +137,14 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_INFO_THROTTLE(
-        this->get_logger(), *get_clock(), 2000, "Iteration: %d, Error norm: %f", iteration, best_error);
-
-    // Publish the error norm and iterations.
-    publishErrorNorm(best_error);
-    publishIterations(iteration);
+    RCLCPP_DEBUG_THROTTLE(
+        this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, best_error);
 
     // Publish the IK status.
-    march_shared_msgs::msg::IksStatus iks_status = m_ik_solver->getIKStatus();
-    m_iks_status_pub->publish(iks_status);
+    march_shared_msgs::msg::IksStatus iks_status_msg = m_ik_solver->getIKStatus();
+    iks_status_msg.header.stamp = this->now();
+    iks_status_msg.iteration = iteration;
+    m_iks_status_pub->publish(iks_status_msg);
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
