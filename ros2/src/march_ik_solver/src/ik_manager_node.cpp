@@ -5,23 +5,31 @@
 
 #include "march_ik_solver/ik_manager_node.hpp"
 
-IKManagerNode::IKManagerNode() : Node("ik_manager_node") {
+#include <functional>
+
+IKManagerNode::IKManagerNode() : Node("ik_manager")
+{
+    RCLCPP_INFO(this->get_logger(), "Initializing IK Manager Node...");
     configureStackOfTasks();
 
     m_exo_mode_sub = this->create_subscription<march_shared_msgs::msg::ExoMode>(
-        "exo_mode", 10, std::bind(&IKManagerNode::exoModeCallback, this, std::placeholders::_1));
-    m_iks_command_pub = this->create_publisher<march_shared_msgs::msg::IksCommand>("iks_command", 10);
+        "current_mode", 10, std::bind(&IKManagerNode::exoModeCallback, this, std::placeholders::_1));
+    m_iks_command_pub = this->create_publisher<march_shared_msgs::msg::IksCommand>("ik_solver/command", 10);
 
     RCLCPP_INFO(this->get_logger(), "IK Manager Node has been initialized.");
 }
 
-void IKManagerNode::exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
+void IKManagerNode::exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
+{
     publishIksCommand(msg->mode);
 }
 
-void IKManagerNode::publishIksCommand(const int iks_command) {
+void IKManagerNode::publishIksCommand(const int iks_command)
+{
     try {
         march_shared_msgs::msg::IksCommand msg;
+        msg.header.stamp = this->now();
+        msg.exo_mode = m_exo_modes[iks_command];
         msg.task_names = m_exo_mode_to_task_stack_map[iks_command];
         m_iks_command_pub->publish(msg);
 
@@ -36,7 +44,18 @@ void IKManagerNode::publishIksCommand(const int iks_command) {
 
 void IKManagerNode::configureStackOfTasks()
 {
+    declare_parameter("exo_modes", std::vector<std::string>());
+    m_exo_modes = get_parameter("exo_modes").as_string_array();
+    RCLCPP_INFO(this->get_logger(), "Configuring stack of tasks for %lu exo modes.", m_exo_modes.size());
 
+    for (unsigned long int i = 0; i < m_exo_modes.size(); i++) {
+        std::string exo_mode_param = "stack_of_tasks." + m_exo_modes[i];
+        declare_parameter(exo_mode_param, std::vector<std::string>());
+        std::vector<std::string> stack_of_tasks = get_parameter(exo_mode_param).as_string_array();
+        m_exo_mode_to_task_stack_map[i] = stack_of_tasks;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Stack of tasks has been configured. There are %lu exo modes with stack of tasks.", m_exo_mode_to_task_stack_map.size());
 }
 
 int main(int argc, char* argv[]) {

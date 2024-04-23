@@ -14,8 +14,6 @@
 #include <vector>
 #include <unordered_map>
 
-typedef std::vector<std::string> StackOfTasks;
-
 class IKManagerNode : public rclcpp::Node {
 public:
     IKManagerNode();
@@ -30,7 +28,8 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_sub;
     rclcpp::Publisher<march_shared_msgs::msg::IksCommand>::SharedPtr m_iks_command_pub;
 
-    std::unordered_map<int, StackOfTasks> m_exo_mode_to_task_stack_map;
+    std::vector<std::string> m_exo_modes;
+    std::unordered_map<int, std::vector<std::string>> m_exo_mode_to_task_stack_map;
 };
 
 #endif  // MARCH_IK_SOLVER__IK_MANAGER_NODE_HPP_
