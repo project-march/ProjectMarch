@@ -26,7 +26,7 @@ public:
                 /*{CurrentMode, PossibleModes}*/
                 {exoMode::BootUp, {exoMode::Stand}},
                 {exoMode::Stand, {exoMode::Walk, exoMode::BootUp}},
-                {exoMode::Walk, {exoMode::Stand}}
+                {exoMode::Walk, {exoMode::Stand}}, 
                 { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
                 { exoMode::Stand, { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending, exoMode::Hinge} },
                 { exoMode::Walk, { exoMode::Stand, exoMode::Error} },

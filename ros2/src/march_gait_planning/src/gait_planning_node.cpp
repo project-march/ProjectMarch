@@ -44,19 +44,21 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &) {
-
+    
+    m_active = true;  
     m_iks_foot_positions_publisher->on_activate(); 
     m_interpolated_bezier_visualization_publisher->on_activate();
-    m_active = true;  
+    // m_active = true;  
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node activated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_deactivate(const rclcpp_lifecycle::State &) {
-
+    
+    m_active = false; 
     m_iks_foot_positions_publisher->on_deactivate(); 
     m_interpolated_bezier_visualization_publisher->on_deactivate(); 
-    m_active = false; 
+    // m_active = false; 
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node deactivated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -95,7 +97,6 @@ void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg
 
 void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current foot positions");
-<<<<<<< HEAD
 
     if (m_active){
         GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
@@ -103,21 +104,12 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
         m_desired_footpositions_msg->header = msg->header;
         if (m_current_trajectory.empty()){
-            m_gait_planning.setStanceFoot(msg->stance_leg); 
-            // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
+            m_gait_planning.setStanceFoot(msg->next_stance_leg); 
+            RCLCPP_INFO(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
         }
         publishFootPositions();
     } else {
         RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
-=======
-    GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
-    GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
-    m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
-    m_desired_footpositions_msg->header = msg->header;
-    if (m_current_trajectory.empty()){
-        m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-        // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
->>>>>>> origin/dev
     }
 }
 
