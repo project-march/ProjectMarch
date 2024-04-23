@@ -22,10 +22,12 @@ march_motor_controller_state_broadcaster:
     # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
     possible_joints:
       - left_ankle_dpf
+      - left_ankle_ie
       - left_hip_aa
       - left_hip_fe
       - left_knee
       - right_ankle_dpf
+      - right_ankle_ie
       - right_hip_aa
       - right_hip_fe
       - right_knee
@@ -35,10 +37,12 @@ joint_trajectory_controller:
     update_rate: 50
     joints:
       - left_ankle_dpf
+      - left_ankle_ie
       - left_hip_aa
       - left_hip_fe
       - left_knee
       - right_ankle_dpf
+      - right_ankle_ie
       - right_hip_aa
       - right_hip_fe
       - right_knee
@@ -52,10 +56,12 @@ joint_trajectory_controller:
       # - effort
     gains:
       left_ankle_dpf: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
+      left_ankle_ie: {p: 0.0, i: 0.0, d: 0.0, i_clamp: 0.0 }
       left_hip_aa: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 2.0, ff_effort: 1.5 }
       left_hip_fe: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
       left_knee: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
       right_ankle_dpf: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
+      right_ankle_ie: {p: 0.0, i: 0.0, d: 0.0, i_clamp: 0.0 }
       right_hip_aa: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 2.0, ff_effort: 1.5 }
       right_hip_fe: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
       right_knee: {p: 10.0, i: 0.0, d: 0.2, i_clamp: 100.0 }
@@ -73,6 +79,10 @@ joint_trajectory_controller:
         margin_soft_limit_error: 0.5
         trajectory: 2.0
         goal: 2.0
+      left_ankle_ie:
+        margin_soft_limit_error: 0.5
+        trajectory: 2.0
+        goal: 2.0
       left_hip_aa:
         margin_soft_limit_error: 0.5
         trajectory: 2.0
@@ -86,6 +96,10 @@ joint_trajectory_controller:
         trajectory: 2.0
         goal: 2.0
       right_ankle_dpf:
+        margin_soft_limit_error: 0.5
+        trajectory: 2.0
+        goal: 2.0
+      right_ankle_ie:
         margin_soft_limit_error: 0.5
         trajectory: 2.0
         goal: 2.0

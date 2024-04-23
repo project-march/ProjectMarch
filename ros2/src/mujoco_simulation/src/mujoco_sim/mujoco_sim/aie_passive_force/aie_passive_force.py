@@ -5,8 +5,8 @@ class AIEPassiveForce:
 
     def __init__(self, model):
         self.model = model
-        self.L_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "L_AIE")
-        self.R_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "R_AIE")
+        self.L_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "left_ankle_ie")
+        self.R_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "right_ankle_ie")
 
     def aie_passive_force(self, x):
         x *= 180.0/np.pi # Convert x (deg) to x (radians)

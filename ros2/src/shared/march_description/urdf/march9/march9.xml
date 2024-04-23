@@ -104,7 +104,7 @@ See <https://www.gnu.org/licenses/>.
       <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-180 180" pos="0 0 0"/>
       <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/>
       <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
-
+      
       <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
         <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
@@ -177,12 +177,11 @@ See <https://www.gnu.org/licenses/>.
                       pos="0.151 0 -.045"  class="L_collision"
                       friction="3.0"/>
 
-                  </body>
+                </body>
               </body>
             </body>
           </body>
         </body>
-      </body>
 
         <!--  RIGHT LEG -->
         <body name="R_hip" pos="0.021 -0.092 0.028">
@@ -246,18 +245,19 @@ See <https://www.gnu.org/licenses/>.
           </body>
         </body>
       </body>
+    </body>
   </worldbody>
 
   <actuator>
     <!-- User parameter is the maximum no-load motor RPM -->
-    <motor name="left_ankle_dpf"    gear="179"  joint="left_ankle_dpf"  />
-    <motor name="left_hip_aa"     gear="280"  joint="left_hip_aa"  />
-    <motor name="left_hip_fe"     gear="250" joint="left_hip_fe"   />
-    <motor name="left_knee"     gear="250"  joint="left_knee"   />
-    <motor name="right_ankle_dpf"    gear="179"  joint="right_ankle_dpf"  />
-    <motor name="right_hip_aa"     gear="280"  joint="right_hip_aa"  />
-    <motor name="right_hip_fe"     gear="250" joint="right_hip_fe"   />
-    <motor name="right_knee"     gear="250"  joint="right_knee" />
+    <motor name="left_ankle_dpf"    gear="179"  joint="left_ankle_dpf" forcerange="-3.8 3.8"/>
+    <motor name="left_hip_aa"     gear="280"  joint="left_hip_aa" forcerange="-3.8 3.8"/>
+    <motor name="left_hip_fe"     gear="250" joint="left_hip_fe" forcerange="-3.8 3.8"/>
+    <motor name="left_knee"     gear="250"  joint="left_knee" forcerange="-3.8 3.8"/>
+    <motor name="right_ankle_dpf"    gear="179"  joint="right_ankle_dpf" forcerange="-3.8 3.8"/>
+    <motor name="right_hip_aa"     gear="280"  joint="right_hip_aa" forcerange="-3.8 3.8"/>
+    <motor name="right_hip_fe"     gear="250" joint="right_hip_fe" forcerange="-3.8 3.8"/>
+    <motor name="right_knee"     gear="250"  joint="right_knee" forcerange="-3.8 3.8"/>
   </actuator>
 
   <sensor>

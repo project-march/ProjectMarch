@@ -31,6 +31,8 @@ def get_actuator_names(model):
             name = name + chr(model.names[j])
             j = j + 1
         names.append(name)
+    # Sort the names in the alphabetical order
+    names.sort()
     return names
 
 def get_joint_names(model):
@@ -47,10 +49,8 @@ def get_joint_names(model):
             name = name + chr(model.names[j])
             j = j + 1
         names.append(name)
-
     # Sort the names in the alphabetical order
     names.sort()
-
     return names
 
 def get_controller_data(msg):
@@ -107,8 +107,6 @@ class MujocoSimNode(Node):
         self.data = mujoco.MjData(self.model)
 
         self.joint_names = get_joint_names(self.model)
-        for name in self.joint_names:
-            self.get_logger().info(f"Joint name: {name}")
         self.actuator_names = get_actuator_names(self.model)
         self.use_aie_force = self.get_parameter("aie_force")
 
@@ -149,7 +147,7 @@ class MujocoSimNode(Node):
 
         joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
-        for index, name in enumerate(self.joint_names):
+        for index, name in enumerate(self.actuator_names):
             joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
                                f"set desired positions to {joint_val_dict}")
@@ -196,7 +194,7 @@ class MujocoSimNode(Node):
         if qpos_init is None:
             return
 
-        self.data.qpos[-8:] = qpos_init
+        self.data.qpos[-self.model.njnt:] = qpos_init
         mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
@@ -232,6 +230,8 @@ class MujocoSimNode(Node):
             self.msg_queue = Queue()
         joint_pos_dict = {}
         for i, name in enumerate(msg.trajectory.joint_names):
+            if name not in self.actuator_names:
+                continue
             joint_pos_dict[name] = msg.trajectory.desired.positions[i]
         self.msg_queue.put(joint_pos_dict)
 
@@ -277,13 +277,13 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        if self.use_aie_force.value == 'true':
-            while self.data.time <= time_difference_withseconds:
-                mujoco.set_mjcb_passive(self.aie_passive_force.callback)
-                mujoco.mj_step(self.model, self.data)
-        else:
-            while self.data.time <= time_difference_withseconds:
-                mujoco.mj_step(self.model, self.data)
+        # if self.use_aie_force.value == 'true':
+        #     while self.data.time <= time_difference_withseconds:
+        #         mujoco.set_mjcb_passive(self.aie_passive_force.callback)
+        #         mujoco.mj_step(self.model, self.data)
+        # else:
+        while self.data.time <= time_difference_withseconds:
+            mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
 
