@@ -326,7 +326,7 @@
 		<child link="R_ankle"/>
 		<limit effort="179" lower="-0.488692" upper="0.349066" velocity="4.1"/>
 	</joint> 
-   	<joint name="right_foot_ie" type="revolute">
+   	<joint name="right_ankle_ie" type="revolute">
 		<origin rpy="0 0 0" xyz="-0.093 0.061 -0.025"/>
 		<axis xyz="1 0 0"/>
 		<parent link="R_ankle"/>
@@ -374,7 +374,7 @@
             </actuator>
   	</transmission>
   	<transmission name="L_ADPFTransmission">
-            <joint name="left_ankle"/>
+            <joint name="left_ankle_dpf"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>
@@ -402,7 +402,7 @@
             </actuator>
   	</transmission>
   	<transmission name="R_ADPFTransmission">
-            <joint name="right_ankle"/>
+            <joint name="right_ankle_dpf"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>

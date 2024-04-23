@@ -168,7 +168,6 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_izzy.launch.py']),
-        condition=UnlessCondition(airgait),
     )
     # endregion
 
