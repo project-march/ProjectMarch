@@ -1,0 +1,80 @@
+[
+  [
+    {
+      "name": "Stand",
+      "exoMode": 1
+    },
+    {
+      "name": "Walk",
+      "exoMode": 2
+    },
+    {
+      "name": "Sit",
+      "exoMode": 0
+    }
+  ],
+
+
+  [
+    {
+      "name": "Sideways",
+      "exoMode": 5
+    },
+    {
+      "name": "Ascending",
+      "exoMode": 8
+    },
+    {
+      "name": "Descending",
+      "exoMode": 9
+    }
+  ],
+  [
+    {
+      "name": "LargeWalk",
+      "exoMode": 6
+    },
+    {
+      "name": "SmallWalk",
+      "exoMode": 7
+    },
+    {
+      "name": "VariableStep",
+      "exoMode": 10
+    }
+  ],
+  [
+    {
+      "name": "VariableWalk",
+      "exoMode": 11
+    },
+    {
+      "name": "Hinge",
+      "exoMode": 15
+    }
+  ],
+  [
+    {
+      "name": "HighStep1",
+      "exoMode": 12
+    },
+    {
+      "name": "HighStep2",
+      "exoMode": 13
+    },
+    {
+      "name": "HighStep3",
+      "exoMode": 14
+    }
+  ],
+  [
+    {
+      "name": "Error",
+      "exoMode": 4
+    },
+    {
+      "name": "BootUp",
+      "exoMode": 3
+    }
+  ]
+]

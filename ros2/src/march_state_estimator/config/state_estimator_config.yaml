@@ -1,0 +1,7 @@
+state_estimator_node:
+  ros__parameters:
+    dt: 50    # The time between two state estimation steps in milliseconds.
+
+transform_broadcaster:
+  ros__parameters:
+    refresh_rate: 1000  # Hz

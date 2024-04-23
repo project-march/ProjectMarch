@@ -1,0 +1,5 @@
+march_shared_msgs/ExoMode desired_mode
+std_msgs/String actuated_joint
+---
+march_shared_msgs/ExoModeArray mode_array
+march_shared_msgs/ExoMode current_mode

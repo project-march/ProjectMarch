@@ -47,10 +47,10 @@ See <https://www.gnu.org/licenses/>.
 -->
 """
 SYMBOLS = [
-    ' + ',
-    ' - ',
-    ' * ',
-    ' / ',
+    " + ",
+    " - ",
+    " * ",
+    " / ",
 ]
 
 
@@ -129,9 +129,7 @@ class XMLGenerator:
 
         verbatim_placeholder = self._get_placeholders(attribute)
 
-        placeholders, new_attribute = self._add_prefix_to_relative_placeholders(verbatim_placeholder,
-                                                                                attribute,
-                                                                                prefix)
+        placeholders, new_attribute = self._add_prefix_to_relative_placeholders(verbatim_placeholder, attribute, prefix)
         placeholders = list(set(placeholders))
 
         keys = self._get_keys_from_string(placeholders)
@@ -142,10 +140,11 @@ class XMLGenerator:
 
             if replacement is None:
                 raise KeyError(
-                    f'Error: Could not find requested data {key}, as specified '
+                    f"Error: Could not find requested data {key}, as specified "
                     f'in line {ii} of {self.prexml_fname} at "{placeholder}". '
-                    f'Please check that the placeholder in {self.prexml_fname} matches '
-                    f'with {self.yaml_fname}.')
+                    f"Please check that the placeholder in {self.prexml_fname} matches "
+                    f"with {self.yaml_fname}."
+                )
 
             new_attribute = new_attribute.replace(placeholder, str(replacement))
 
@@ -158,10 +157,10 @@ class XMLGenerator:
         abs_placeholders = copy.copy(placeholders)
 
         def replacer(text):
-            return text.replace('./', prefix)
+            return text.replace("./", prefix)
 
         for i, placeholder in enumerate(abs_placeholders):
-            if './' in placeholder:
+            if "./" in placeholder:
                 abs_placeholders[i] = replacer(placeholder)
                 completed_line = replacer(completed_line)
 
@@ -180,7 +179,7 @@ class XMLGenerator:
         new_attr_contents = self._cancel_plusminus_in_eqs(new_attr_contents)
 
         parsed_attr_contents = []
-        for value_to_parse in new_attr_contents.split(' '):
+        for value_to_parse in new_attr_contents.split(" "):
             try:
                 ast = pp.parse(value_to_parse)
                 result = compute.compute(ast)
@@ -190,7 +189,7 @@ class XMLGenerator:
                 result = value_to_parse
 
             parsed_attr_contents.append(str(result))
-        parsed_attr_contents = ' '.join(parsed_attr_contents)
+        parsed_attr_contents = " ".join(parsed_attr_contents)
         return new_attribute.replace(attr_contents, str(parsed_attr_contents))
 
     def _cancel_double_neg_in_eqs(self, text):
@@ -198,21 +197,20 @@ class XMLGenerator:
 
         Replaces double negatives in equations with a plus or with a blank space
         """
-        text = re.sub('--', r'+', text)
-        return re.sub(r'^\+(.)', r'\1', text)
+        text = re.sub("--", r"+", text)
+        return re.sub(r"^\+(.)", r"\1", text)
 
     def _cancel_plusminus_in_eqs(self, text):
         """Replaces +- or -+ with - in equations."""
-        return re.sub(r'\+-|-\+', '-', text)
+        return re.sub(r"\+-|-\+", "-", text)
 
     def _get_attributes_in_line(self, line):
-        return re.findall(r'\${.*?}', line)
+        return re.findall(r"\${.*?}", line)
 
     def _add_timestamp_and_disclaimer(self, out):
         text = DISCLAIMER_TEXT.format(
-            datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-            self.prexml_fname,
-            self.yaml_fname)
+            datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"), self.prexml_fname, self.yaml_fname
+        )
         out.write(text)
 
     def __call__(self, prexml_fname: str, yaml_fname: str, output_fname: str = None) -> None:
@@ -227,24 +225,22 @@ class XMLGenerator:
         self.yaml_fname = yaml_fname
 
         if not output_fname:
-            output_fname = (prexml_fname
-                            .replace('_pre.xml', '.xml')
-                            .replace('pre.xml', '.xml'))
+            output_fname = prexml_fname.replace("_pre.xml", ".xml").replace("pre.xml", ".xml")
 
-        with open(yaml_fname, mode='r') as file:
+        with open(yaml_fname, mode="r") as file:
             data = self._read_yaml(file)
 
-        with open(prexml_fname, mode='r') as file, open(output_fname, mode='w') as out:
+        with open(prexml_fname, mode="r") as file, open(output_fname, mode="w") as out:
             self._main(file, data, out)
 
     def _read_yaml(self, yaml_file):
         return yaml.safe_load(yaml_file)
 
     def _cancel_double_negs_naive(self, text):
-        return text.replace('--', '')
+        return text.replace("--", "")
 
     def _remove_flags(self, text):
-        return re.sub(r'\${([^;]*?)}', r'\1', text)
+        return re.sub(r"\${([^;]*?)}", r"\1", text)
 
     def _get_value_from_yaml_dict(self, data, key_list):
         result = copy.copy(data)
@@ -256,20 +252,20 @@ class XMLGenerator:
         return result
 
     def _get_placeholders(self, attribute):
-        return re.findall(r'([\w.]+(?:\/\w+)+)\}*', attribute)
+        return re.findall(r"([\w.]+(?:\/\w+)+)\}*", attribute)
 
     def _get_contents_inside_flag(self, text):
-        return re.match(r'\${([^;]*?)}', text).group(1)
+        return re.match(r"\${([^;]*?)}", text).group(1)
 
     def _add_prefix_to_key(self, key, prefix_keys):
         return prefix_keys + [key]
 
     def _get_suffix_for_relative_keys(self, attribute):
-        return re.findall(r'/(\w+)[ })]', attribute)
+        return re.findall(r"/(\w+)[ })]", attribute)
 
     def _get_keys_from_string(self, placeholders):
         def convert(placeholder):
-            return placeholder.split('/')
+            return placeholder.split("/")
 
         if isinstance(placeholders, (list, tuple)):
             out = []
@@ -281,11 +277,11 @@ class XMLGenerator:
             return convert(placeholders)
 
         else:
-            raise ValueError('Could not get keys to YAML from.')
+            raise ValueError("Could not get keys to YAML from.")
 
     def _get_prefix(self, attribute):
-        return re.search(r'(\w+/)+', attribute).group(0)
+        return re.search(r"(\w+/)+", attribute).group(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

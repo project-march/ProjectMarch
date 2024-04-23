@@ -1,12 +1,13 @@
 """Author: MVIII."""
 
 
-class LowLvlController():
+class LowLvlController:
     """A Baseclass which imitates the low-level control of the robot.
 
     Functions as a PID right now which directly applies control
     to the Mujoco simulation
     """
+
     def __init__(self, node, model):
         """A class which imitates the low-level control of the robot.
 
@@ -56,3 +57,13 @@ class LowLvlController():
             sensor_map (integer list): A mapping matrix from sensor data to joint reference
         """
         self.sensor_map = sensor_map
+
+    def update_gains(self, p, d, i) -> None:
+        """Updates the PID gains.
+
+        Args:
+            p (float list): The proportional gains
+            d (float list): The derivative gains
+            i (float list): The integral gains
+        """
+        pass

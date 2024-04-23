@@ -2,7 +2,7 @@
 
 import math
 from mujoco import mjtSensor
-from geometry_msgs.msg import Vector3, Quaternion
+from geometry_msgs.msg import Vector3, Quaternion, Point
 from sensor_msgs.msg import Imu
 
 
@@ -13,7 +13,7 @@ class SensorDataExtraction:
     Also the sensors should receive incoming commands from the March gait follower
     """
 
-    def __init__(self, sensordata, sensor_type, sensor_adr):
+    def __init__(self, data, sensordata, sensor_type, sensor_adr):
         """A class that extracts and rewrites the sensor data from mujoco.
 
         Args:
@@ -22,6 +22,7 @@ class SensorDataExtraction:
             sensor_adr (array): array with the sensor_adr of the sensor in the sensordata array
             model (Mujoco struct): refers to the simulated body in Mujoco
         """
+        self.data = data
         self.sensordata = sensordata
         self.sensor_type = sensor_type
         self.sensor_adr = sensor_adr
@@ -78,31 +79,16 @@ class SensorDataExtraction:
             torque_z = self.sensordata[adr + 2]
             torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
             joint_acc.append(torque_res)
+
+        # # TODO: This is a temporary solution, the torque sensors are not working correctly in the simulation
+        # joint_names = ["L_ADPF", "L_HAA", "L_HFE", "L_KFE", "R_ADPF", "R_HAA", "R_HFE", "R_KFE"]
+        # for joint_name in joint_names:
+        #     joint_torque = self.data.joint(joint_name).qfrc_constraint.item() + self.data.joint(joint_name).qfrc_smooth.item()
+        #     joint_acc.append(joint_torque)
+
         return joint_acc
 
-    def get_pressure_sole_data(self):
-        """This class extracts the data from the pressure soles from the model.
 
-        The data is retrieved from the sensordata array of the simulation.
-        To make sure that the data is correctly retrieved, the address of the torque sensors should be retrieved
-        from the sensor_adr array.
-        Since the force sensors give a 3d x y z output, this should be generalized using the following formula:
-        sqrt(x^ + y^2 + z^2).
-
-        Each pressure sle has 8 sensors, so the function will return 1 arrays with the 8 sensor outputs.
-        """
-        pressure_sole_adr = []
-        pressure_soles = []
-        for i, sensor_type in enumerate(self.sensor_type):
-            if sensor_type == mjtSensor.mjSENS_FORCE:
-                pressure_sole_adr.append(self.sensor_adr[i])
-        for adr in pressure_sole_adr:
-            force_x = self.sensordata[adr]
-            force_y = self.sensordata[adr + 1]
-            force_z = self.sensordata[adr + 2]
-            force_res = math.sqrt(force_x**2 + force_y**2 + force_z**2)
-            pressure_soles.append(force_res)
-        return pressure_soles
 
     def get_imu_data(self):
         """This class extracts the data from the imus of the model.
@@ -115,6 +101,8 @@ class SensorDataExtraction:
         gyro_adr = []
         accelero_adr = []
         quat_adr = []
+        pos_adr = []
+        lin_vel_adr = []
         for i, sensor_type in enumerate(self.sensor_type):
             if sensor_type == mjtSensor.mjSENS_ACCELEROMETER:
                 accelero_adr.append(self.sensor_adr[i])
@@ -122,8 +110,13 @@ class SensorDataExtraction:
                 gyro_adr.append(self.sensor_adr[i])
             elif sensor_type == mjtSensor.mjSENS_FRAMEQUAT:
                 quat_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_FRAMEPOS:
+                pos_adr.append(self.sensor_adr[i])
+            elif sensor_type == mjtSensor.mjSENS_FRAMELINVEL:
+                lin_vel_adr.append(self.sensor_adr[i])
         backpack_imu = Imu()
         torso_imu = Imu()
+        backpack_position = Point()
 
         for i in range(len(gyro_adr)):
             gyro = Vector3()
@@ -135,10 +128,10 @@ class SensorDataExtraction:
             accel.x = self.sensordata[accelero_adr[i]]
             accel.y = self.sensordata[accelero_adr[i] + 1]
             accel.z = self.sensordata[accelero_adr[i] + 2]
-            quat.x = self.sensordata[quat_adr[i]]
-            quat.y = self.sensordata[quat_adr[i] + 1]
-            quat.z = self.sensordata[quat_adr[i] + 2]
-            quat.w = self.sensordata[quat_adr[i] + 3]
+            quat.w = self.sensordata[quat_adr[i]]
+            quat.x = self.sensordata[quat_adr[i] + 1]
+            quat.y = self.sensordata[quat_adr[i] + 2]
+            quat.z = self.sensordata[quat_adr[i] + 3]
 
             if i == 0:
                 backpack_imu.angular_velocity = gyro
@@ -149,4 +142,14 @@ class SensorDataExtraction:
                 torso_imu.linear_acceleration = accel
                 torso_imu.orientation = quat
 
-        return backpack_imu, torso_imu
+        backpack_position = Point()
+        backpack_position.x = self.sensordata[pos_adr[0]]
+        backpack_position.y = self.sensordata[pos_adr[0] + 1]
+        backpack_position.z = self.sensordata[pos_adr[0] + 2]
+
+        backpack_velocity = Vector3()
+        backpack_velocity.x = self.sensordata[lin_vel_adr[0]]
+        backpack_velocity.y = self.sensordata[lin_vel_adr[0] + 1]
+        backpack_velocity.z = self.sensordata[lin_vel_adr[0] + 2]
+
+        return backpack_imu, torso_imu, backpack_position, backpack_velocity

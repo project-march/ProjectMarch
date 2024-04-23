@@ -9,10 +9,12 @@ def generate_launch_description():
 
     These nodes are started when the  Bezier visualization has be run.
     """
-    return LaunchDescription([
-        Node(
-            package='bezier_visualization',
-            executable='bezier_visualization_node',
-            name='bezier_visualization',
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="bezier_visualization",
+                executable="bezier_visualization_node",
+                name="bezier_visualization",
+            ),
+        ]
+    )

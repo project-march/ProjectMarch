@@ -219,15 +219,7 @@ class Subgait:
         subgait_type = subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
         subgait_description = subgait_dict["description"] if subgait_dict.get("description") else ""
 
-        return cls(
-            joint_list,
-            duration,
-            subgait_type,
-            gait_name,
-            subgait_name,
-            version,
-            subgait_description
-        )
+        return cls(joint_list, duration, subgait_type, gait_name, subgait_name, version, subgait_description)
 
     # endregion
 

@@ -25,9 +25,11 @@ def generate_launch_description():
 
     control_yaml = LaunchConfiguration("control_yaml")
 
-    control_xacro = "test_rotational_control.xacro"
-    if test_rotational == "true":
-        control_xacro = "test_rotational_control.xacro"
+    print("CHECK THIS ASSHOLE: {}".format(test_rotational))
+
+    control_xacro = "test_rotational_control.xacro" if (test_rotational == "true") else "test_linear_control.xacro"
+    
+    print("CHECK THIS ASSSHOLE PART 2 {}".format(control_xacro))
 
     declared_arguments = [
         DeclareLaunchArgument(
@@ -36,35 +38,31 @@ def generate_launch_description():
             description="Whether the exoskeleton is ran physically or in simulation.",
             choices=["true", "false"],
         ),
-
         DeclareLaunchArgument(
             name="start_broadcasters",
             default_value="true",
             description="Whether the exoskeleton is ran physically or in simulation.",
             choices=["true", "false"],
         ),
-
         # region set control type. (This section set the control types for either gazebo, exo, or simulation control)
         DeclareLaunchArgument(
             name="control_type",
             default_value="effort",
-            description="Decides which controller is being used. "
-                        "'Effort' when you are running the real exo",
+            description="Decides which controller is being used. " "'Effort' when you are running the real exo",
             choices=["simulation", "effort"],
         ),
-
         DeclareLaunchArgument(
             name="control_yaml",
             default_value="effort_control/test_joint_rotational_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=IfCondition(test_rotational),
         ),
         DeclareLaunchArgument(
             name="control_yaml",
             default_value="effort_control/test_joint_linear_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
-                        "(not used if gazebo control is used). Must be in: `march_control/config/`.",
+            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
             condition=UnlessCondition(test_rotational),
         ),
         # endregion

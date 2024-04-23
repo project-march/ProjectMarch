@@ -7,6 +7,7 @@ from rclpy.node import Node
 
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
+
 WARN_PERCENTAGE = 5
 
 
@@ -39,8 +40,8 @@ class CheckJointValues:
         """
         with contextlib.suppress(AttributeError):
             for name in joint.keys():
-                self._lower_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
-                self._upper_soft_limits[name] = joint[name]['motor_controller']['absoluteEncoder']['minPositionIU']
+                self._lower_soft_limits[name] = joint[name]["motor_controller"]["absoluteEncoder"]["minPositionIU"]
+                self._upper_soft_limits[name] = joint[name]["motor_controller"]["absoluteEncoder"]["minPositionIU"]
 
     def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""

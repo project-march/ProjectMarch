@@ -1,0 +1,3 @@
+bool gait_complete
+---
+int32 stance_leg 

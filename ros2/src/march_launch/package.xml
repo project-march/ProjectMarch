@@ -11,16 +11,21 @@
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
-    <exec_depend>march_gait_selection</exec_depend>
-    <exec_depend>march_gait_preprocessor</exec_depend>
-    <exec_depend>march_gait_files</exec_depend>
-    <exec_depend>march_foot_position_finder</exec_depend>
-    <exec_depend>march_wireless_ipd</exec_depend>
-    <exec_depend>march_utility</exec_depend>
-    <exec_depend>march_shared_msgs</exec_depend>
-    <exec_depend>march_rqt_input_device</exec_depend>
-    <exec_depend>march_description</exec_depend>
+    <depend>robot_state_publisher</depend>
+    <depend>tf2_ros</depend>
+    <depend>urdf</depend>
+
+    <!-- <exec_depend>march_gait_selection</exec_depend> -->
+    <!-- <exec_depend>march_gait_preprocessor</exec_depend> -->
+    <!-- <exec_depend>march_gait_files</exec_depend> -->
+    <!-- <exec_depend>march_foot_position_finder</exec_depend> -->
+    <!-- <exec_depend>march_wireless_ipd</exec_depend> -->
+    <!-- <exec_depend>march_utility</exec_depend> -->
+    <!-- <exec_depend>march_shared_msgs</exec_depend> -->
+    <!-- <exec_depend>march_rqt_input_device</exec_depend> -->
+    <!-- <exec_depend>march_description</exec_depend> -->
     <exec_depend>ros2bag</exec_depend>
+    <exec_depend>rviz2</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

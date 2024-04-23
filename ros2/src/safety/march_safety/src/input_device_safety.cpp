@@ -24,7 +24,7 @@ const float THROTTLE_DURATION_MS { 5000.0 };
 InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler)
     : node_(std::move(node))
     , safety_handler_(std::move(safety_handler))
-    , connection_timeout_(/*nanoseconds=*/0)
+    , connection_timeout_(/*nanoseconds=*/5e8)
 {
     int milliseconds;
     node_->get_parameter("input_device_connection_timeout", milliseconds);
@@ -48,6 +48,7 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shar
 void InputDeviceSafety::inputDeviceAliveCallback(const AliveMsg::SharedPtr& msg)
 {
     last_alive_stamps_[msg->id] = msg->stamp;
+    RCLCPP_DEBUG_STREAM(node_->get_logger(), "Received alive message from input device `");
 }
 
 void InputDeviceSafety::ipd_error_callback(const ErrorMsg::SharedPtr msg)
@@ -121,6 +122,11 @@ void InputDeviceSafety::check_last_alive_stamp(const std::string& id, const rclc
             RCLCPP_ERROR_STREAM(node_->get_logger(), "Input device `" << id << "` lost");
         } else {
             RCLCPP_WARN_STREAM(node_->get_logger(), "Input device `" << id << "` lost");
+
+            // Print the values of last_alive and connection_timeout_
+            RCLCPP_WARN_STREAM(node_->get_logger(), "Now: " << now.seconds());
+            RCLCPP_WARN_STREAM(node_->get_logger(), "last_alive: " << last_alive.seconds());
+            RCLCPP_WARN_STREAM(node_->get_logger(), "connection_timeout_: " << connection_timeout_.seconds());
         }
     } else if (!is_connected && !timed_out) {
         connected_devices_.insert(id);

@@ -1,0 +1,7 @@
+uint8 task_id
+string[] joint_names
+float64[] joint_angles
+---
+float64 operation_time
+float64[] current_pose
+float64[] jacobians

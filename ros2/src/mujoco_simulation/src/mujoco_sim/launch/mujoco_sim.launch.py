@@ -10,32 +10,33 @@ def generate_launch_description():
 
     These nodes are started when the mujoco simulation has be run.
     """
-    model_to_load = LaunchConfiguration('model_to_load', default='model_to_load.xml')
-    tunings_to_load = LaunchConfiguration('tunings_to_load_path')
+    model_to_load = LaunchConfiguration("model_to_load", default="model_to_load.xml")
+    tunings_to_load = LaunchConfiguration("tunings_to_load_path")
+    aie_force = LaunchConfiguration("aie_force", default="false")
 
-    return LaunchDescription([
-        Node(
-            package='mujoco_sim',
-            namespace='',
-            executable='mujoco_sim_node',
-            name='mujoco_sim',
-            parameters=[
-                tunings_to_load,
-                {"model_toload": model_to_load}
-            ]
-        ),
-        Node(
-            package='mujoco_reader',
-            namespace='',
-            executable='mujoco_reader_node',
-            name='mujoco_reader',
-            parameters=[
-                {"reader_data_type": 0}
-            ]
-        ),
-        Node(
-            package='mujoco_writer',
-            executable='mujoco_writer_node',
-            name='mujoco_writer',
-        ),
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="mujoco_sim",
+                namespace="",
+                executable="mujoco_sim_node",
+                name="mujoco_sim",
+                parameters=[tunings_to_load, 
+                            {"model_to_load": model_to_load}, 
+                            {"aie_force": aie_force},
+                            ],
+            ),
+            Node(
+                package="mujoco_reader",
+                namespace="",
+                executable="mujoco_reader_node",
+                name="mujoco_reader",
+                parameters=[{"reader_data_type": 0}],
+            ),
+            Node(
+                package="mujoco_writer",
+                executable="mujoco_writer_node",
+                name="mujoco_writer",
+            ),
+        ]
+    )

@@ -44,9 +44,34 @@ alias m8_sim_gaitloader='sfox && sros2 && ros2 launch march_launch march8_gaitlo
 alias training='march_run_ros2_training'
 alias gits='git status'
 
-# Alias to build one package, appended with specified pakage
+# NEW M9 ALIASES
+alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
+alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py'
+alias convert_db3_to_mcap='cm && sros2 && ./utility_scripts/convert_db3_to_mcap.sh'
+
+alias angles_air='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="false"'
+alias angles_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+alias cartesian_air='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="true"'
+alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+
+alias test_mpc='cm2 && sros2 && sfox && ros2 launch march_launch mpc.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" rviz:=true'
+
+# Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
 
+# Alias to build packages with dependencies
+alias mbpa='mba --packages-up-to'
+
+# Alias to run tests on a package
+alias mbt='mbt'
+mbt() {
+  if [ $# -eq 0 ]; then
+    echo "Please specify a package to test"
+    return 1
+  fi
+  colcon build --packages-select "$@"
+  colcon test --packages-select "$@" && colcon test-result --verbose
+}
 
 # Training aliases
 export URDF6='robot:=march6_three_cameras'

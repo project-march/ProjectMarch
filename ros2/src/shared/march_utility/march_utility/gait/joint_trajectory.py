@@ -38,9 +38,7 @@ class JointTrajectory:
         self.interpolate_setpoints()
 
     @classmethod
-    def from_setpoint_dict(
-        cls, name: str, setpoint_dict: List[dict], duration: Duration
-    ) -> JointTrajectory:
+    def from_setpoint_dict(cls, name: str, setpoint_dict: List[dict], duration: Duration) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
         Args:

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot name="rotational_test_setup">
+
+  <!-- Define base link -->
+  <link name="base_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.3743"/>
+      <inertia ixx="0.006" ixy="0.004" ixz="0.0" iyy="0.006" iyz="0.0" izz="0.011"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.1"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Define endpoint link -->
+  <link name="weight">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.2383 0 0.2383"/>
+      <mass value="0.7073"/>
+      <inertia ixx="0.259" ixy="0.001" ixz="0.0" iyy="0.256" iyz="0.036" izz="0.023"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="1.0" radius="0.05"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Define rotational joint -->
+  <joint name="bar" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <parent link="base_link"/>
+    <child link="weight"/>
+    <limit effort="250" lower="-0.78539816339" upper="0.78539816339" velocity="3.94"/>
+  </joint>
+
+</robot>

@@ -3,27 +3,72 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='true')
-
+    test_rotational = LaunchConfiguration("test_rotational", default="true")
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
+    
     # region Launch march control
-    march_control = IncludeLaunchDescription(
+    rotational_launch_file = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("march_control"),
+                FindPackageShare("march_control").find("march_control"),
                 "launch",
-                "control_test_setup.launch.py",
+                "rotational_control.launch.py",
             )
         ),
         launch_arguments=[
             ("test_rotational", test_rotational)
+        ],
+        condition=IfCondition(test_rotational),
+    )
+
+    linear_launch_file = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                FindPackageShare("march_control").find("march_control"),
+                "launch",
+                "linear_control.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("test_rotational", test_rotational)
+        ],
+        condition=UnlessCondition(test_rotational),
+    )
+    # endregion
+    # march_control = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("march_control"),
+    #             "launch",
+    #             "control_test_setup.launch.py",
+    #         )
+    #     ),
+    #     launch_arguments=[
+    #         ("test_rotational", test_rotational)
+    #     ],
+    # )
+    
+
+    # region Launch input device
+    input_device = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_input_device"),
+                "launch",
+                "input_device.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("IPD_new_terminal", IPD_new_terminal)
         ],
     )
     # endregion
@@ -61,40 +106,29 @@ def generate_launch_description() -> LaunchDescription:
         'config',
         'joints.yaml'
     )
+    
+    default_gainscheduler_config = os.path.join(
+        get_package_share_directory('march_gain_scheduler'),
+        'config',
+        'stand_gains.yaml'
+    )    
 
     # parameters
     fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
-
-    # region Launch input device
-    rqt_input_device = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_rqt_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("ping_safety_node", "true"),
-            ("use_sim_time", "false"),
-            ("layout", "test_joint"),
-            ("testing", "true"),
-        ],
-    )
-    # endregion
+    gainscheduler_config_path = LaunchConfiguration("config_path", default=default_gainscheduler_config)
 
     return LaunchDescription([
         Node(
-            package='state_machine',
+            package='march_mode_machine',
             namespace='',
-            executable='state_machine_node',
-            name='state_machine',
+            executable='test_joints_mode_machine_node',
+            name='mode_machine',
         ),
         Node(
-            package='test_setup_gait_selection',
+            package='march_gait_planning',
             namespace='',
-            executable='test_setup_gait_selection_node',
-            name='test_setup_gait_selection',
+            executable='test_setup_gait_planning_node',
+            name='test_setup_gait_planning',
             parameters=[
                 {"test_rotational": test_rotational}
             ],
@@ -105,7 +139,15 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_node',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
-        rqt_input_device,
-        march_control,
+        Node(
+            package='march_gain_scheduler',
+            executable='gain_scheduler_node',
+            name='gain_scheduler',
+            parameters=[{'config_path': gainscheduler_config_path}]
+        ),
+
+        input_device,
+        rotational_launch_file,
+        linear_launch_file,
         record_rosbags_action,
     ])

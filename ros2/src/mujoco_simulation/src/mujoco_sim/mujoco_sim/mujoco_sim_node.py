@@ -8,11 +8,13 @@ from controller_torque import TorqueController
 from mujoco_interfaces.msg import MujocoDataState
 from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
+from mujoco_interfaces.msg import MujocoGains
 from sensor_msgs.msg import JointState
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
 from rclpy.node import Node
+import aie_passive_force
 
 
 def get_actuator_names(model):
@@ -43,14 +45,15 @@ def get_data_state_msg(actuator_names, mjc_data):
     """Create a state message from the mujoco data, where the data is linked to the correct joint name."""
     state_msg = MujocoDataState()
     state_msg.names = actuator_names
-    for data in mjc_data.qpos:
-        state_msg.qpos.append(data)
-    for data in mjc_data.qvel:
-        state_msg.qvel.append(data)
-    for data in mjc_data.qacc:
-        state_msg.qacc.append(data)
-    for data in mjc_data.act:
-        state_msg.act.append(data)
+    state_msg.qpos = mjc_data.qpos.tolist()
+    state_msg.qvel = mjc_data.qvel.tolist()
+    state_msg.qacc = mjc_data.qacc.tolist()
+    state_msg.act = mjc_data.act.tolist()
+    # for qpos, qvel, qacc, act in zip(mjc_data.qpos, mjc_data.qvel, mjc_data.qacc, mjc_data.act):
+    #     state_msg.qpos.append(qpos)
+    #     state_msg.qvel.append(qvel)
+    #     state_msg.qacc.append(qacc)
+    #     state_msg.act.append(act)
     return state_msg
 
 
@@ -68,14 +71,15 @@ class MujocoSimNode(Node):
         the sim_step function.
         """
         super().__init__("mujoco_sim")
-        self.declare_parameter("model_toload")
+        self.declare_parameter("model_to_load")
+        self.declare_parameter("aie_force")
 
         self.SIM_TIMESTEP_ROS = 0.008
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
         # The model can be found in the robot_description package.
-        self.model_name = self.get_parameter("model_toload")
+        self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
         self.model_string = open(self.file_path, "r").read()
@@ -84,6 +88,10 @@ class MujocoSimNode(Node):
         self.data = mujoco.MjData(self.model)
 
         self.actuator_names = get_actuator_names(self.model)
+        self.use_aie_force = self.get_parameter("aie_force")
+
+        if self.use_aie_force.value:
+            self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.005
@@ -91,7 +99,11 @@ class MujocoSimNode(Node):
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
         # Create a subscriber for the writing-to-mujoco action
-        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 10)
+        self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 100)
+        # Create a subscriber for updating the gains
+        self.gains_subscriber = self.create_subscription(MujocoGains, "mujoco_gains", self.gains_callback, 100)
+        # Create a publisher for the reading-from-mujoco action
+        self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
 
         # Initialize the low-level controller
         self.declare_parameters(
@@ -106,7 +118,9 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+        self.sensor_data_extraction = SensorDataExtraction(self.data, 
+                                                           self.data.sensordata, 
+                                                           self.model.sensor_type,
                                                            self.model.sensor_adr)
 
         self.set_init_joint_qpos(None)
@@ -139,8 +153,9 @@ class MujocoSimNode(Node):
         mujoco.set_mjcb_control(self.controller[self.controller_mode].low_level_update)
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
-                                                           self.model.sensor_adr)
+        self.sensor_data_extraction = SensorDataExtraction(
+            self.data, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+        )
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
@@ -198,6 +213,34 @@ class MujocoSimNode(Node):
             joint_pos_dict[name] = msg.trajectory.desired.positions[i]
         self.msg_queue.put(joint_pos_dict)
 
+    def gains_callback(self, msg):
+        """Callback function for the gains service.
+
+        This function updates the gains of the controller.
+            msg (MujocoControl message): Contains the gains to be changed
+        """
+        if msg.controller_mode is None:
+            self.get_logger().info("No controller mode received")
+            return
+        
+        if msg.controller_mode < 0 or msg.controller_mode > 1:
+            self.get_logger().info("Invalid controller mode received")
+            return
+
+        if len(msg.proportional_gains) == 0 or len(msg.derivative_gains) == 0:
+            self.get_logger().info("No gains received")
+            return
+        
+        if len(msg.proportional_gains) != len(self.actuator_names) or len(msg.derivative_gains) != len(self.actuator_names):
+            self.get_logger().info("Invalid number of gains received")
+            return
+
+        self.controller[msg.controller_mode].update_gains(msg.proportional_gains, msg.derivative_gains, msg.integral_gains)
+        self.get_logger().info("Gains updated. New gains in " + str(msg.controller_mode))
+        self.get_logger().info("P: " + str(msg.proportional_gains))
+        self.get_logger().info("D: " + str(msg.derivative_gains))
+        self.get_logger().info("I: " + str(msg.integral_gains))
+
     def sim_step(self):
         """This function performs the simulation update.
 
@@ -212,8 +255,13 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        while self.data.time <= time_difference_withseconds:
-            mujoco.mj_step(self.model, self.data)
+        if self.use_aie_force.value == 'true':
+            while self.data.time <= time_difference_withseconds:
+                mujoco.set_mjcb_passive(self.aie_passive_force.callback)
+                mujoco.mj_step(self.model, self.data)
+        else:
+            while self.data.time <= time_difference_withseconds:
+                mujoco.mj_step(self.model, self.data)
 
         self.time_last_updated = self.get_clock().now()
 
@@ -251,15 +299,14 @@ class MujocoSimNode(Node):
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
 
-        sensor_msg.pressure_soles = self.sensor_data_extraction.get_pressure_sole_data()
-
-        backpack_imu, torso_imu = self.sensor_data_extraction.get_imu_data()
+        backpack_imu, torso_imu, backpack_position, backpack_velocity = self.sensor_data_extraction.get_imu_data()
         sensor_msg.joint_state = state_msg
         sensor_msg.backpack_imu = backpack_imu
         sensor_msg.torso_imu = torso_imu
+        sensor_msg.backpack_pos = backpack_position
+        sensor_msg.backpack_vel = backpack_velocity
 
-        publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
-        publisher.publish(sensor_msg)
+        self.reader_publisher.publish(sensor_msg)
 
 
 def main(args=None):

@@ -12,6 +12,7 @@ class PositionController(LowLvlController):
     Args:
         LowLvlController (Class): Low level controller baseclass
     """
+
     def __init__(self, node, model, p, d, i, joint_desired=None):
         """A class which imitates the low-level control of the robot.
 
@@ -60,8 +61,20 @@ class PositionController(LowLvlController):
                 ie_prev = (e - self.e_prev[index]) * dt
 
                 ctrl_input = self.p[index] * e + self.d[index] * de_prev + self.i[index] * ie_prev
-                data.ctrl[index] += ctrl_input
+                data.ctrl[index] = ctrl_input
 
                 self.e_prev[index] = e
         except IndexError:
             pass
+
+    def update_gains(self, p, d, i) -> None:
+        """Updates the PID gains.
+
+        Args:
+            p (float list): The proportional gains
+            d (float list): The derivative gains
+            i (float list): The integral gains
+        """
+        self.p = p
+        self.d = d
+        self.i = i

@@ -1,6 +1,0 @@
-name: sit
-subgaits:
-  sit_down:
-    to: end
-  start:
-    to: sit_down
