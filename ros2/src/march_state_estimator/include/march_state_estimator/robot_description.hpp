@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "march_state_estimator/robot_node.hpp"
+#include "march_state_estimator/robot_joint.hpp"
 #include "yaml-cpp/yaml.h"
 
 struct RobotPartData {
@@ -37,6 +38,7 @@ public:
 
     RobotNode::SharedPtr findNode(const std::string& name);
     std::vector<RobotNode::SharedPtr> findNodes(std::vector<std::string> names);
+    inline std::vector<RobotJoint::SharedPtr> getJointNodes() const { return m_joint_node_ptrs; }
 
     std::vector<std::string> getAllNodeNames() const;
     std::vector<std::string> getAllParentNames() const;
@@ -56,6 +58,7 @@ private:
         const YAML::Node& yaml_node, const unsigned int& rows, const unsigned int& cols);
 
     std::vector<RobotNode::SharedPtr> m_robot_node_ptrs;
+    std::vector<RobotJoint::SharedPtr> m_joint_node_ptrs;
     std::unordered_map<std::string, RobotNode::SharedPtr> m_robot_nodes_map;
     Eigen::Quaterniond m_inertial_orientation;
 };

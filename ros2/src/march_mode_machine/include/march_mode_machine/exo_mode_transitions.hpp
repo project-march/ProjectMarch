@@ -27,6 +27,15 @@ public:
                 {exoMode::BootUp, {exoMode::Stand}},
                 {exoMode::Stand, {exoMode::Walk, exoMode::BootUp}},
                 {exoMode::Walk, {exoMode::Stand}}
+                { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
+                { exoMode::Stand, { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending, exoMode::Hinge} },
+                { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
+                { exoMode::BootUp, { exoMode::Stand } },
+                { exoMode::Error, {}},
+                { exoMode::Sideways, { exoMode::Stand}},
+                { exoMode::Ascending, { exoMode::Stand}},
+                { exoMode::Descending, { exoMode::Stand}},
+                { exoMode::Hinge, { exoMode::Stand}}
             };
         }
         else if (type == "Lifecycle nodes"){

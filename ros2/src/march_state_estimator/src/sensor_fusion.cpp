@@ -4,11 +4,17 @@
  */
 
 #include "march_state_estimator/sensor_fusion.hpp"
+#include <cmath>
 
-SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
+SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path)
 {
     m_robot_description = robot_description;
-    m_torque_converter = std::make_unique<TorqueConverter>(robot_description);
+    m_torque_converter = std::make_unique<TorqueConverter>(robot_description, urdf_file_path);
+    m_state_estimator_timestep = 0.05; // TODO: Make this a parameter
+    
+    m_current_stance_leg = 0b11;
+    m_left_foot_force = Eigen::Vector3d::Zero();
+    m_right_foot_force = Eigen::Vector3d::Zero();
 
     m_state_posterior = EKFState();
 
@@ -35,56 +41,105 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description)
 
 void SensorFusion::configureJointNames(const std::vector<std::string>& joint_names)
 {
+    m_joint_names = joint_names;
     m_joint_positions.clear();
     m_joint_velocities.clear();
     m_joint_accelerations.clear();
     m_joint_total_torques.clear();
+    m_joint_external_torques.clear();
 
     for (const auto& joint_name : joint_names) {
         m_joint_positions[joint_name] = 0.0;
         m_joint_velocities[joint_name] = 0.0;
         m_joint_accelerations[joint_name] = 0.0;
         m_joint_total_torques[joint_name] = 0.0;
+        m_joint_dynamical_torques[joint_name] = 0.0;
+        m_joint_external_torques[joint_name] = 0.0;
     }
+}
+
+void SensorFusion::configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold)
+{
+    m_left_foot_threshold = left_foot_threshold;
+    m_right_foot_threshold = right_foot_threshold;
 }
 
 void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state)
 {
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
-        m_joint_positions[joint_state->name[i]] = joint_state->position[i];
-        m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
-        m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
+        m_joint_accelerations[joint_state->name[i]] = (joint_state->velocity[i] - m_joint_velocities[joint_state->name[i]]) / m_state_estimator_timestep;
+        
+        if (!isnanl(joint_state->position[i])) {
+            m_joint_positions[joint_state->name[i]] = joint_state->position[i];
+        }
+
+        if (!isnanl(joint_state->velocity[i])) {
+            m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
+        }
+
+        if (!isnanl(joint_state->effort[i])) {
+            m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
+        }
     }
-    m_joint_accelerations
-        = m_torque_converter->getDynamicalJointAccelerations(m_joint_positions, m_joint_total_torques);
 }
 
-void SensorFusion::updateImu(const sensor_msgs::msg::Imu::SharedPtr imu)
+void SensorFusion::updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu)
 {
     m_recent_imu_msg = imu;
     m_quaternion = Eigen::Quaterniond(imu->orientation.w, imu->orientation.x, imu->orientation.y, imu->orientation.z);
     m_robot_description->setInertialOrientation(m_quaternion);
+    m_torque_converter->setInertialOrientation(m_quaternion);
 }
 
-uint8_t SensorFusion::updateStanceLeg(
-    const geometry_msgs::msg::Point* left_foot_position, const geometry_msgs::msg::Point* right_foot_position)
+void SensorFusion::updateDynamicsState()
 {
-    uint8_t stance_leg = 0b11;
+    m_joint_dynamical_torques = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
+    m_joint_external_torques = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
+
+    m_left_foot_force = m_torque_converter->getExternalForceByNode("L_foot", m_joint_positions, m_joint_external_torques);
+    m_right_foot_force = m_torque_converter->getExternalForceByNode("R_foot", m_joint_positions, m_joint_external_torques);
+
+    updateCurrentStanceLeg(m_left_foot_force.z(), m_right_foot_force.z(),
+        m_robot_description->findNode("L_foot")->getGlobalPosition(m_joint_positions),
+        m_robot_description->findNode("R_foot")->getGlobalPosition(m_joint_positions));
+}
+
+Eigen::Vector3d SensorFusion::getLeftFootForce() const
+{
+    return m_left_foot_force;
+}
+
+Eigen::Vector3d SensorFusion::getRightFootForce() const
+{
+    return m_right_foot_force;
+}
+
+uint8_t SensorFusion::getCurrentStanceLeg() const
+{
+    return m_current_stance_leg;
+}
+
+uint8_t SensorFusion::getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const
+{
     const double margin = 0.01;
 
-    // TODO: Optimize this function.
-    if (abs(left_foot_position->x - right_foot_position->x) <= margin) {
-        stance_leg = 0b11;
-    } else if (left_foot_position->x + margin <= right_foot_position->x) {
-        stance_leg = 0b10;
-    } else if (left_foot_position->x - margin > right_foot_position->x) {
-        stance_leg = 0b01;
+    if (left_foot_position + margin <= right_foot_position) {
+        return 0b10;
+    } else if (left_foot_position - margin > right_foot_position) {
+        return 0b01;
+    } else {
+        return 0b11;
     }
+}
 
-    m_robot_description->setStanceLeg(stance_leg,
-        Eigen::Vector3d(left_foot_position->x, left_foot_position->y, left_foot_position->z),
-        Eigen::Vector3d(right_foot_position->x, right_foot_position->y, right_foot_position->z));
-    return stance_leg;
+void SensorFusion::updateCurrentStanceLeg(
+    const double& left_foot_torque, const double& right_foot_torque,
+    const Eigen::Vector3d& left_foot_position, const Eigen::Vector3d& right_foot_position)
+{
+    m_current_stance_leg = ((right_foot_torque > m_left_foot_threshold) << 1) | (left_foot_torque > m_right_foot_threshold);
+    m_robot_description->setStanceLeg(m_current_stance_leg, 
+        Eigen::Vector3d(left_foot_position.x(), left_foot_position.y(), left_foot_position.z()),
+        Eigen::Vector3d(right_foot_position.x(), right_foot_position.y(), right_foot_position.z()));
 }
 
 void SensorFusion::updateKalmanFilter()
@@ -183,6 +238,59 @@ std::vector<double> SensorFusion::getFootContactHeight() const
     return foot_contact_height;
 }
 
+std::vector<double> SensorFusion::getJointAcceleration(const std::vector<std::string>& joint_names) const
+{
+    std::vector<double> joint_acceleration;
+    for (const auto& joint_name : joint_names) {
+        joint_acceleration.push_back(m_joint_accelerations.at(joint_name));
+    }
+    return joint_acceleration;
+}
+
+std::vector<double> SensorFusion::getJointDynamicalTorques(const std::vector<std::string>& joint_names) const
+{
+    std::vector<double> joint_dynamical_torques;
+    for (const auto& joint_name : joint_names) {
+        joint_dynamical_torques.push_back(m_joint_dynamical_torques.at(joint_name));
+    }
+    return joint_dynamical_torques;
+}
+
+std::vector<double> SensorFusion::getJointExternalTorques(const std::vector<std::string>& joint_names) const
+{
+    std::vector<double> joint_total_torques;
+    for (const auto& joint_name : joint_names) {
+        joint_total_torques.push_back(m_joint_external_torques.at(joint_name));
+    }
+    return joint_total_torques;
+}
+
+std::vector<Eigen::Vector3d> SensorFusion::getWorldTorqueInLegs() const
+{
+    std::vector<Eigen::Vector3d> world_torque_in_legs
+        = m_torque_converter->getWorldTorqueInLegs(m_joint_positions, m_joint_total_torques);
+
+    // Orientate the torque vectors to the world frame.
+    for (auto& torque : world_torque_in_legs) {
+        torque.noalias() = m_quaternion.inverse() * torque;
+    }
+
+    return world_torque_in_legs;
+}
+
+std::vector<Eigen::Vector3d> SensorFusion::getWorldForceInLegs() const
+{
+    std::vector<Eigen::Vector3d> world_torque_in_legs = getWorldTorqueInLegs();
+    std::vector<Eigen::Vector3d> world_force_in_legs;
+
+    for (const auto& torque : world_torque_in_legs) {
+        Eigen::Vector3d force = m_quaternion.inverse() * torque;
+        world_force_in_legs.push_back(force);
+    }
+
+    return world_force_in_legs;
+}
+
 Eigen::VectorXd SensorFusion::getPosteriorStateVector() const
 {
     Eigen::VectorXd state_vector = getEKFStateVector(m_state_posterior);
@@ -218,8 +326,6 @@ Eigen::Matrix3d SensorFusion::getSkewSymmetricMatrix(const Eigen::Vector3d& vect
 Eigen::MatrixXd SensorFusion::getStateTransitionMatrix(const EKFState& state) const
 {
     Eigen::MatrixXd state_transition_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
-
-    // TODO: Replace these as arguments
     Eigen::Matrix3d ss_expected_measured_angular_velocity = getSkewSymmetricMatrix(calculateExpectedMeasuredAngularVelocity(state.gyroscope_bias));
     Eigen::Matrix3d ss_expected_measured_acceleration = getSkewSymmetricMatrix(calculateExpectedMeasuredAcceleration(state.accelerometer_bias));
     Eigen::Matrix3d rotation_matrix = state.imu_orientation.toRotationMatrix().transpose();

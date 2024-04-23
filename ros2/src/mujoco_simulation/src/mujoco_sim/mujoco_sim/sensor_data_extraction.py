@@ -13,7 +13,7 @@ class SensorDataExtraction:
     Also the sensors should receive incoming commands from the March gait follower
     """
 
-    def __init__(self, sensordata, sensor_type, sensor_adr):
+    def __init__(self, data, sensordata, sensor_type, sensor_adr):
         """A class that extracts and rewrites the sensor data from mujoco.
 
         Args:
@@ -22,6 +22,7 @@ class SensorDataExtraction:
             sensor_adr (array): array with the sensor_adr of the sensor in the sensordata array
             model (Mujoco struct): refers to the simulated body in Mujoco
         """
+        self.data = data
         self.sensordata = sensordata
         self.sensor_type = sensor_type
         self.sensor_adr = sensor_adr
@@ -78,6 +79,13 @@ class SensorDataExtraction:
             torque_z = self.sensordata[adr + 2]
             torque_res = math.sqrt(torque_x**2 + torque_y**2 + torque_z**2)
             joint_acc.append(torque_res)
+
+        # # TODO: This is a temporary solution, the torque sensors are not working correctly in the simulation
+        # joint_names = ["L_ADPF", "L_HAA", "L_HFE", "L_KFE", "R_ADPF", "R_HAA", "R_HFE", "R_KFE"]
+        # for joint_name in joint_names:
+        #     joint_torque = self.data.joint(joint_name).qfrc_constraint.item() + self.data.joint(joint_name).qfrc_smooth.item()
+        #     joint_acc.append(joint_torque)
+
         return joint_acc
 
 

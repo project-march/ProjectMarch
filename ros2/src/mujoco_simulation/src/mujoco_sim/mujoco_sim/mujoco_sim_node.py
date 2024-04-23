@@ -118,7 +118,9 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data.sensordata, self.model.sensor_type,
+        self.sensor_data_extraction = SensorDataExtraction(self.data, 
+                                                           self.data.sensordata, 
+                                                           self.model.sensor_type,
                                                            self.model.sensor_adr)
 
         self.set_init_joint_qpos(None)
@@ -152,7 +154,7 @@ class MujocoSimNode(Node):
 
         # Create an instance of that data extractor.
         self.sensor_data_extraction = SensorDataExtraction(
-            self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+            self.data, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
         )
 
         # Create a queue to store all incoming messages for a correctly timed simulation

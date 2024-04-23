@@ -37,15 +37,17 @@ protected:
     void setupRotationalTestSetup()
     {
         std::string yaml_filename = "robot_definition-rotational_test_setup.yaml";
+        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/rotational_test_setup.urdf";
         m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-        m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description);
+        m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description, urdf_file_path);
     }
 
     void setupHennieWithKoen()
     {
         std::string yaml_filename = "robot_definition-hennie_with_koen.yaml";
+        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march8/hennie_with_koen.urdf";
         m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-        m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description);
+        m_torque_converter = std::make_unique<TorqueConverter>(m_robot_description, urdf_file_path);
     }
 
     RobotNode::JointNameToValueMap createJointValueForRotationalTestSetup(const double& joint_value)

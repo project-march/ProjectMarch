@@ -24,7 +24,7 @@
 
 class RobotDescriptionNode : public rclcpp::Node {
 public:
-    RobotDescriptionNode(std::shared_ptr<RobotDescription> robot_description);
+    RobotDescriptionNode();
     ~RobotDescriptionNode();
 
 private:

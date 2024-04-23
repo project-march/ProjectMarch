@@ -5,7 +5,6 @@
 
 #include "march_state_estimator/robot_description.hpp"
 
-#include "march_state_estimator/robot_joint.hpp"
 #include "march_state_estimator/robot_mass.hpp"
 #include "march_state_estimator/robot_zmp.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -27,62 +26,74 @@ RobotDescription::RobotDescription(std::string yaml_filename)
 
 void RobotDescription::parseYAML(const std::string& yaml_path)
 {
-    YAML::Node yaml_node = YAML::LoadFile(yaml_path);
+    try {
+        YAML::Node yaml_node = YAML::LoadFile(yaml_path);
 
-    const std::vector<std::string> part_names = yaml_node["names"].as<std::vector<std::string>>();
-    std::vector<RobotPartData> robot_part_datas;
+        const std::vector<std::string> part_names = yaml_node["names"].as<std::vector<std::string>>();
+        std::vector<RobotPartData> robot_part_datas;
 
-    // Create data structures for robot parts and initialize the robot parts.
-    for (auto& name : part_names) {
-        RobotPartData robot_part_data;
-        robot_part_data.name = name;
-        robot_part_data.type = yaml_node[name]["type"].as<std::string>();
-        robot_part_data.mass = yaml_node[name]["dynamics"]["mass"].as<double>();
-        const unsigned int ABSOLUTE_DOF
-            = yaml_node[name]["joint_names"]["absolute"].as<std::vector<std::string>>().size();
-        const unsigned int RELATIVE_DOF
-            = yaml_node[name]["joint_names"]["relative"].as<std::vector<std::string>>().size();
+        // Create data structures for robot parts and initialize the robot parts.
+        std::cout << "Create data structures for robot parts and initialize the robot parts." << std::endl;
+        for (auto& name : part_names) {
+            RobotPartData robot_part_data;
+            robot_part_data.name = name;
+            robot_part_data.type = yaml_node[name]["type"].as<std::string>();
 
-        robot_part_data.inertia = yaml_node[name]["dynamics"]["inertia"].as<std::string>();
-        robot_part_data.global_rotation
-            = vectorizeExpressions(yaml_node[name]["rotation"], WORKSPACE_DIM, WORKSPACE_DIM);
-        robot_part_data.global_linear_position
-            = vectorizeExpressions(yaml_node[name]["linear"]["position"], WORKSPACE_DIM, 1);
-        robot_part_data.global_linear_velocity
-            = vectorizeExpressions(yaml_node[name]["linear"]["velocity"], WORKSPACE_DIM, 1);
-        robot_part_data.global_linear_acceleration
-            = vectorizeExpressions(yaml_node[name]["linear"]["acceleration"], WORKSPACE_DIM, 1);
-        robot_part_data.global_linear_position_jacobian
-            = vectorizeExpressions(yaml_node[name]["jacobian"]["position"], WORKSPACE_DIM, ABSOLUTE_DOF);
-        robot_part_data.global_rotation_jacobian
-            = vectorizeExpressions(yaml_node[name]["jacobian"]["rotation"], WORKSPACE_DIM, ABSOLUTE_DOF);
-        robot_part_data.dynamical_torque = vectorizeExpressions(yaml_node[name]["dynamics"]["torque"], RELATIVE_DOF, 1);
+            robot_part_data.mass = yaml_node[name]["dynamics"]["mass"].as<double>();
+            robot_part_data.inertia = yaml_node[name]["dynamics"]["inertia"].as<std::string>();
 
-        createRobotPart(robot_part_data);
-        robot_part_datas.push_back(robot_part_data);
-    }
+            robot_part_data.joint_axis = yaml_node[name]["axis"].as<std::vector<double>>();
+            const unsigned int ABSOLUTE_DOF
+                = yaml_node[name]["joint_names"]["absolute"].as<std::vector<std::string>>().size();
+            const unsigned int RELATIVE_DOF
+                = yaml_node[name]["joint_names"]["relative"].as<std::vector<std::string>>().size();
 
-    // Set the parent and children of each robot node, including the absolute and relative joints.
-    for (const auto& robot_node : m_robot_node_ptrs) {
-        std::vector<std::string> children_name
-            = yaml_node[robot_node->getName()]["children"].as<std::vector<std::string>>();
-        for (const auto child_name : children_name) {
-            robot_node->addChild(findNode(child_name));
+            robot_part_data.global_rotation
+                = vectorizeExpressions(yaml_node[name]["rotation"], WORKSPACE_DIM, WORKSPACE_DIM);
+            robot_part_data.global_linear_position
+                = vectorizeExpressions(yaml_node[name]["linear"]["position"], WORKSPACE_DIM, 1);
+            robot_part_data.global_linear_velocity
+                = vectorizeExpressions(yaml_node[name]["linear"]["velocity"], WORKSPACE_DIM, 1);
+            robot_part_data.global_linear_acceleration
+                = vectorizeExpressions(yaml_node[name]["linear"]["acceleration"], WORKSPACE_DIM, 1);
+            robot_part_data.global_linear_position_jacobian
+                = vectorizeExpressions(yaml_node[name]["jacobian"]["position"], WORKSPACE_DIM, ABSOLUTE_DOF);
+            robot_part_data.global_rotation_jacobian
+                = vectorizeExpressions(yaml_node[name]["jacobian"]["rotation"], WORKSPACE_DIM, ABSOLUTE_DOF);
+            robot_part_data.dynamical_torque = vectorizeExpressions(yaml_node[name]["dynamics"]["torque"], RELATIVE_DOF, 1);
+
+            createRobotPart(robot_part_data);
+            robot_part_datas.push_back(robot_part_data);
         }
 
-        std::vector<RobotNode::SharedPtr> absolute_joint_nodes
-            = findNodes(yaml_node[robot_node->getName()]["joint_names"]["absolute"].as<std::vector<std::string>>());
-        std::vector<RobotNode::SharedPtr> relative_joint_nodes
-            = findNodes(yaml_node[robot_node->getName()]["joint_names"]["relative"].as<std::vector<std::string>>());
-        robot_node->setJointNodes(absolute_joint_nodes, relative_joint_nodes);
-    }
+        // Set the parent and children of each robot node, including the absolute and relative joints.
+        std::cout << "Set the parent and children of each robot node, including the absolute and relative joints." << std::endl;
+        for (const auto& robot_node : m_robot_node_ptrs) {
+            std::vector<std::string> children_name
+                = yaml_node[robot_node->getName()]["children"].as<std::vector<std::string>>();
+            for (const auto child_name : children_name) {
+                robot_node->addChild(findNode(child_name));
+            }
 
-    // Set the expressions for each robot node.
-    for (auto tuple : boost::combine(m_robot_node_ptrs, robot_part_datas)) {
-        RobotNode::SharedPtr robot_node;
-        RobotPartData robot_data;
-        boost::tie(robot_node, robot_data) = tuple;
-        setRobotPart(robot_node, robot_data);
+            std::vector<RobotNode::SharedPtr> absolute_joint_nodes
+                = findNodes(yaml_node[robot_node->getName()]["joint_names"]["absolute"].as<std::vector<std::string>>());
+            std::vector<RobotNode::SharedPtr> relative_joint_nodes
+                = findNodes(yaml_node[robot_node->getName()]["joint_names"]["relative"].as<std::vector<std::string>>());
+            robot_node->setJointNodes(absolute_joint_nodes, relative_joint_nodes);
+        }
+
+        // Set the expressions for each robot node.
+        std::cout << "Set the expressions for each robot node." << std::endl;
+        for (auto tuple : boost::combine(m_robot_node_ptrs, robot_part_datas)) {
+            RobotNode::SharedPtr robot_node;
+            RobotPartData robot_data;
+            boost::tie(robot_node, robot_data) = tuple;
+            setRobotPart(robot_node, robot_data);
+        }
+    } catch (const YAML::Exception& e) {
+        // TODO: Store logger in a member variable
+        RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"),
+            "RobotDescription::parseYAML: Cannot parse YAML file %s, error %s", yaml_path.c_str(), e.what());
     }
 }
 
@@ -161,8 +172,9 @@ void RobotDescription::createRobotPart(const RobotPartData& robot_part_data)
         m_robot_nodes_map[robot_part_data.name] = robot_mass;
     } else if (robot_part_data.type == "joint") {
         std::shared_ptr<RobotJoint> robot_joint
-            = std::make_shared<RobotJoint>(robot_part_data.name, m_robot_node_ptrs.size());
+            = std::make_shared<RobotJoint>(robot_part_data.name, m_robot_node_ptrs.size(), robot_part_data.joint_axis);
         m_robot_node_ptrs.push_back(robot_joint);
+        m_joint_node_ptrs.push_back(std::dynamic_pointer_cast<RobotJoint>(robot_joint));
         m_robot_nodes_map[robot_part_data.name] = robot_joint;
     } else {
         RCLCPP_ERROR(
