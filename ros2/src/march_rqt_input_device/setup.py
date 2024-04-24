@@ -30,6 +30,10 @@ setup(
             os.path.join("share", package_name, "config"),
             glob("config/*.json"),
         ),
+        (
+            os.path.join("share", package_name, "resource"),
+            glob("resource/*.json"),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -39,6 +43,7 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["input_device = march_rqt_input_device.input_device_plugin:main"],
+        "console_scripts": ["input_device = march_rqt_input_device.input_device_plugin:main",
+                            "test_joints_input_device = march_rqt_input_device.test_joints_input_device_plugin:main"],
     },
 )

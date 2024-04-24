@@ -15,6 +15,7 @@
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/u_int64.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 class IKSolverNode : public rclcpp::Node {
 public:
@@ -25,6 +26,7 @@ private:
     void iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void publishJointTrajectory();
+    void publishDesiredJointPositions();
     void publishErrorNorm(const double& error_norm);
     void publishIterations(const unsigned int& iterations);
 
@@ -57,6 +59,7 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_command_sub;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_pub;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr m_error_norm_pub;
     rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr m_iterations_pub;
 

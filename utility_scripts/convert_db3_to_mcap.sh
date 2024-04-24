@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change directory to the specified location
-cd /home/pmarch/rosbags2 || exit
+cd /home/march/rosbags2 || exit
 
 # Find the most recently modified directory
 most_recent_dir=$(ls -td -- */ | head -n 1)

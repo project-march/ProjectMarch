@@ -22,6 +22,7 @@ find_package(rclcpp REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(ament_cmake_gtest)
 
 # Include directories
@@ -44,6 +45,7 @@ ament_target_dependencies(${PROJECT_NAME}
   geometry_msgs
   trajectory_msgs
   ament_index_cpp
+  std_msgs
 )
 
 # Create the gait_planning_node executable
@@ -62,6 +64,7 @@ ament_target_dependencies(gait_planning_node
   march_shared_msgs
   geometry_msgs
   ament_index_cpp
+  std_msgs
   # filesystem
   )
 
@@ -70,6 +73,7 @@ ament_target_dependencies(gait_planning_angles_node
   trajectory_msgs
   march_shared_msgs
   ament_index_cpp
+  std_msgs
   )
 
 # Install the executable

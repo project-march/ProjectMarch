@@ -33,3 +33,11 @@ void TestSetupGaitPlanning::setGaitType(const exoMode &new_gait_type){
 exoMode TestSetupGaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
+
+void TestSetupGaitPlanning::setPrevPoint(const std::vector<double> &point){
+    m_prev_point = point; 
+}
+
+std::vector<double> TestSetupGaitPlanning::getPrevPoint() const{
+    return m_prev_point; 
+}

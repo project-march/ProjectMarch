@@ -7,6 +7,8 @@
 #include "march_gait_planning/test_setup_gait_planning.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/exo_mode_and_joint.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
 
 class TestJointsGaitPlanningNode : public rclcpp::Node
 {
@@ -22,16 +24,22 @@ private:
     
 
     void setActuatedJoint(const std::string &actuated_joint);
-    std::string getActuatedJoint() const;
+    int getActuatedJoint() const;
 
+    void currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
+    void processHomeStandGait(int counter);
+
+    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoModeAndJoint>::SharedPtr m_exo_mode_subscriber;
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_test_joint_trajectory_controller_mode_pub_;
-    rclcpp::TimerBase::SharedPtr m_timer;
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_joint_angle_trajectory_publisher; 
 
     TestSetupGaitPlanning m_gait_planning;
     std::vector<double> m_current_trajectory;
-    trajectory_msgs::msg::JointTrajectory::SharedPtr m_current_joint_angles_msg;
-    std::string m_actuated_joint;
+    std_msgs::msg::Float64MultiArray m_joints_msg;
+    int m_actuated_joint;
+    bool m_first_stand;
+
+    std::vector<double> m_home_stand;
 };
 
 #endif // TEST_GAIT_PLANNING_NODE_HPP
