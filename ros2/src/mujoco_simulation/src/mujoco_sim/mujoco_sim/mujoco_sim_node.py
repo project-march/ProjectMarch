@@ -50,6 +50,9 @@ def get_joint_names(model):
         while model.names[j] != 0:
             name = name + chr(model.names[j])
             j = j + 1
+        # Skip the safety catch joints
+        if "safety_catch" in name:
+            continue
         names.append(name)
     # Sort the names in the alphabetical order
     names.sort()
@@ -121,8 +124,7 @@ class MujocoSimNode(Node):
         self.get_logger().info("Actuator names: " + str(self.actuator_names))
         self.use_aie_force = self.get_parameter("aie_force")
 
-        if self.use_aie_force.value:
-            self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
+        self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
         self.TIME_STEP_MJC = 0.005
@@ -149,7 +151,8 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data, 
+        self.sensor_data_extraction = SensorDataExtraction(self.data,
+                                                           self.model,
                                                            self.data.sensordata, 
                                                            self.model.sensor_type,
                                                            self.model.sensor_adr)
@@ -157,7 +160,7 @@ class MujocoSimNode(Node):
         self.set_initial_keyframe(None)
 
         joint_val_dict = {}
-        joint_val = self.sensor_data_extraction.get_joint_pos()
+        joint_val, _ = self.sensor_data_extraction.get_joint_pos()
         for index, name in enumerate(self.actuator_names):
             joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
@@ -185,8 +188,9 @@ class MujocoSimNode(Node):
 
         # Create an instance of that data extractor.
         self.sensor_data_extraction = SensorDataExtraction(
-            self.data, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+            self.data, self.model, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
         )
+        self.get_logger().info("Sensor data extraction joints: " + str(self.sensor_data_extraction.joint_names))
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
@@ -204,9 +208,9 @@ class MujocoSimNode(Node):
         """Set initial xml keyframe taken from xml model"""
         if keyframe_id is None:
             return
-
+        # mujoco.mj_step(self.model, self.data)
         mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe_id)
-        mujoco.mj_step(self.model, self.data)
+        # mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
@@ -312,7 +316,8 @@ class MujocoSimNode(Node):
 
         :return: None
         """
-        self.visualizer.update_window(self.model, self.data)
+        pass
+        # self.visualizer.update_window(self.model, self.data)
 
     def publish_sensor_msg(self):
         """This function creates and publishes the sensor message.
@@ -326,7 +331,7 @@ class MujocoSimNode(Node):
         state_msg.header.stamp = self.get_clock().now().to_msg()
         state_msg.header.frame_id = "joint_link"
         state_msg.name = self.joint_names
-        state_msg.position = self.sensor_data_extraction.get_joint_pos()
+        state_msg.position, _ = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
 

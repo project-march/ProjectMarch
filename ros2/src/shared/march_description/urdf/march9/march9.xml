@@ -56,10 +56,10 @@ See <https://www.gnu.org/licenses/>.
     <default class="collision">
       <geom contype="1" group="3" type="capsule"/>
       <default class="L_collision">
-        <!-- <geom contype="2" conaffinity="4"/> -->
+        <geom contype="2" conaffinity="4"/>
       </default>
       <default class="R_collision">
-        <!-- <geom contype="4" conaffinity="2"/> -->
+        <geom contype="4" conaffinity="2"/>
       </default>
     </default>
     <default class="HAA_joint">
@@ -98,12 +98,12 @@ See <https://www.gnu.org/licenses/>.
 
     <body name="safety_catcher" pos="-0.2 0 1.2">
       <inertial pos="0 0 0" mass="0.1" diaginertia="10 10 10"/>
-      <!-- <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
+      <!-- <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/> -->
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
       <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-180 180" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/>
-      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
       
       <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
@@ -236,7 +236,7 @@ See <https://www.gnu.org/licenses/>.
                   <site name="tor_R_AIE" size="0.01" pos="0 0 0"/>
 
                   <geom name="R_foot" type="box" size="0.166 0.07 0.035"
-                    pos="0 0 0" class="R_collision"
+                    pos="0.151 0 -.045" class="R_collision"
                     friction="3.0"/>
 
                 </body>
@@ -312,4 +312,11 @@ See <https://www.gnu.org/licenses/>.
     <magnetometer name='magnet_imu_torso' site='imu_torso'/>
 
   </sensor>
+
+  <!-- <keyframe>
+    <key name="test" qpos='-0.3491 0 0 0 0 -0.3491 0 0 0 0'/>
+    <key name="right" qpos='0.1745 0 0 0 0 -0.3491 0 0 0 0'/>
+    <key name="left" qpos='-0.3491 0 0 0 0 0.1745 0 0 0 0'/>
+  </keyframe> -->
+
 </mujoco>
