@@ -354,4 +354,9 @@ See <https://www.gnu.org/licenses/>.
     <magnetometer name='magnet_imu_torso' site='imu_torso'/>
 
   </sensor>
+
+<keyframe>
+  <key name="test" qpos='0 1 0.3 0.5 0 1 0.3 0.5'/>
+</keyframe>
+
 </mujoco>

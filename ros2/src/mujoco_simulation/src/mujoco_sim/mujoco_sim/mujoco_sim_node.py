@@ -2,6 +2,8 @@
 
 import mujoco
 import rclpy
+import yaml
+import os
 from ament_index_python.packages import get_package_share_directory
 from controller_position import PositionController
 from controller_torque import TorqueController
@@ -98,9 +100,16 @@ class MujocoSimNode(Node):
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
         # The model can be found in the robot_description package.
+
+
         self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
+        
+        with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march8_control.yaml")) as file:
+            yaml_data = yaml.safe_load(file)
+            self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
+
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
@@ -143,7 +152,7 @@ class MujocoSimNode(Node):
                                                            self.model.sensor_type,
                                                            self.model.sensor_adr)
 
-        self.set_init_joint_qpos(None)
+        self.set_initial_keyframe(None)
 
         joint_val_dict = {}
         joint_val = self.sensor_data_extraction.get_joint_pos()
@@ -189,12 +198,12 @@ class MujocoSimNode(Node):
         self.TIME_STEP_TRAJECTORY = 0.008
         self.trajectory_last_updated = self.get_clock().now()
 
-    def set_init_joint_qpos(self, qpos_init):
-        """Set initial qpos to make eo not falling over in sim."""
-        if qpos_init is None:
+    def set_initial_keyframe(self, keyframe_id):
+        """Set initial xml keyframe taken from xml model"""
+        if keyframe_id is None:
             return
 
-        self.data.qpos[-self.model.njnt:] = qpos_init
+        mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe_id)
         mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
@@ -229,10 +238,8 @@ class MujocoSimNode(Node):
         if msg.reset == 1:
             self.msg_queue = Queue()
         joint_pos_dict = {}
-        for i, name in enumerate(msg.trajectory.joint_names):
-            if name not in self.actuator_names:
-                continue
-            joint_pos_dict[name] = msg.trajectory.desired.positions[i]
+        for i, name in enumerate(self.actuator_names):
+            joint_pos_dict[name] = msg.points.data[i]
         self.msg_queue.put(joint_pos_dict)
 
     def gains_callback(self, msg):
