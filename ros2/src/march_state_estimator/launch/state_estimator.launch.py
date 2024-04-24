@@ -25,7 +25,7 @@ def generate_launch_description():
     #     'config',
     #     'robot_definition-hennie_with_koen.yaml'
     # )
-    timestep = 0.05 # in seconds
+    timestep = 0.025 # in seconds
     robot_description = 'robot_definition-hennie_with_koen.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),

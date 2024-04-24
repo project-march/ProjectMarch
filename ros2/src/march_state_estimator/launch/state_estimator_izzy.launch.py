@@ -25,7 +25,7 @@ def generate_launch_description():
     #     'config',
     #     'robot_definition-hennie_with_koen.yaml'
     # )
-    timestep = 0.05 # in seconds
+    timestep = 0.025 # in seconds
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),
@@ -44,6 +44,8 @@ def generate_launch_description():
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
                 {"timestep_in_ms": int(timestep * 1000)},
+                {"left_stance_threshold": 100.0},
+                {"right_stance_threshold": 100.0},
             ]
         ),
         Node(

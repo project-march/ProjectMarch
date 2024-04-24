@@ -123,7 +123,7 @@ void SensorFusionNode::timerCallback()
     // Update and estimate current state
     m_sensor_fusion->updateJointState(m_joint_state);
     m_sensor_fusion->updateImuState(m_imu);
-    // m_sensor_fusion->updateDynamicsState();
+    m_sensor_fusion->updateDynamicsState();
     // m_sensor_fusion->updateKalmanFilter();
 
     geometry_msgs::msg::TransformStamped transform_stamped;
@@ -142,7 +142,7 @@ void SensorFusionNode::timerCallback()
 
     // publishFeetHeight();
     // publishMPCEstimation();
-    // publishTorqueEstimation();
+    publishTorqueEstimation();
     publishStateEstimation();
 }
 

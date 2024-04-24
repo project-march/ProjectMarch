@@ -1,10 +1,10 @@
 ik_solver:
   ros__parameters:
-    state_estimator_time_offset: 50e-3
+    state_estimator_time_offset: 25e-3
     joint_trajectory_controller_period: 5e-3
-    convergence_threshold: 1e-6
+    convergence_threshold: 1e-3
     max_iterations: 100
-    integral_dt: 10e-3
+    integral_dt: 5e-3
     joint:
       names:
       - left_hip_aa
@@ -42,7 +42,7 @@ ik_solver:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
     task_names:
-    - posture
+    # - posture
     - motion
     # - stability # Comment to disable stability task
     motion:
@@ -50,7 +50,7 @@ ik_solver:
       nodes: ["L_ankle", "R_ankle"]
       m: 12
       n: 8
-      kp: [100.0, 300.0, 100.0, 0.0, 0.0, 0.0, 100.0, 300.0, 100.0, 0.0, 0.0, 0.0]
+      kp: [100.0, 300.0, 200.0, 10.0, 0.0, 0.0, 100.0, 300.0, 200.0, 10.0, 0.0, 0.0]
       kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       damp_coeff: 1e-12
