@@ -56,10 +56,10 @@ See <https://www.gnu.org/licenses/>.
     <default class="collision">
       <geom contype="1" group="3" type="capsule"/>
       <default class="L_collision">
-        <geom contype="2" conaffinity="4"/>
+        <!-- <geom contype="2" conaffinity="4"/> -->
       </default>
       <default class="R_collision">
-        <geom contype="4" conaffinity="2"/>
+        <!-- <geom contype="4" conaffinity="2"/> -->
       </default>
     </default>
     <default class="HAA_joint">

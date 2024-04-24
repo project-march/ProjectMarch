@@ -104,9 +104,9 @@ class MujocoSimNode(Node):
 
         self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory("march_description") + "/urdf/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/march9/" + str(self.model_name.value)
         
-        with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march8_control.yaml")) as file:
+        with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march9_control.yaml")) as file:
             yaml_data = yaml.safe_load(file)
             self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
 
@@ -117,6 +117,8 @@ class MujocoSimNode(Node):
 
         self.joint_names = get_joint_names(self.model)
         self.actuator_names = get_actuator_names(self.model)
+        self.get_logger().info("Joint names: " + str(self.joint_names))
+        self.get_logger().info("Actuator names: " + str(self.actuator_names))
         self.use_aie_force = self.get_parameter("aie_force")
 
         if self.use_aie_force.value:

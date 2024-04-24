@@ -2,7 +2,6 @@
 
 from low_level_controller import LowLvlController
 
-
 class PositionController(LowLvlController):
     """A class which imitates the low-level control of the robot.
 
@@ -53,7 +52,15 @@ class PositionController(LowLvlController):
         dt = self.node.TIME_STEP_MJC
         # update the control inputs based on PID
         try:
-            joint_val = self.node.sensor_data_extraction.get_joint_pos()
+            joint_val_all = self.node.sensor_data_extraction.get_joint_pos()
+
+            # TODO: This is a temporary fix for the joint order. Please fix this in the future.
+            # Put in issue. This is a temporary fix for the joint order. Please fix this in the future.
+            joint_val = []
+            joint_val.append(joint_val_all[0])
+            joint_val.extend(joint_val_all[2:6])
+            joint_val.extend(joint_val_all[7:])
+
             for index in range(self.actuator_amount):
                 joint_name = self.joint_names[index]
                 e = self.joint_desired.get(joint_name) - joint_val[index]
