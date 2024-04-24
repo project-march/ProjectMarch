@@ -316,8 +316,7 @@ class MujocoSimNode(Node):
 
         :return: None
         """
-        pass
-        # self.visualizer.update_window(self.model, self.data)
+        self.visualizer.update_window(self.model, self.data)
 
     def publish_sensor_msg(self):
         """This function creates and publishes the sensor message.

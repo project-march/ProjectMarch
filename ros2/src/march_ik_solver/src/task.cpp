@@ -112,7 +112,7 @@ Eigen::VectorXd Task::solveTask()
     joint_velocities_extended(7) = joint_velocities(6);
     joint_velocities_extended(8) = joint_velocities(7);
 
-    return joint_velocities;
+    return joint_velocities_extended;
 }
 
 Eigen::VectorXd Task::calculateError()

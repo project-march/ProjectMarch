@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march9 node structure."""
-    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9/march9.xml")
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
