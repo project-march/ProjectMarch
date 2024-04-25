@@ -27,6 +27,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(pinocchio REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(OpenMP REQUIRED)
 include_directories(include)
 
@@ -44,6 +46,8 @@ ament_target_dependencies(${PROJECT_NAME}
   sensor_msgs
   trajectory_msgs
   march_shared_msgs
+  pinocchio
+  ament_index_cpp
 )
 
 add_executable(ik_solver_node src/ik_solver_node.cpp src/ik_solver.cpp src/task.cpp)
@@ -60,6 +64,8 @@ ament_target_dependencies(ik_solver_node
   sensor_msgs
   trajectory_msgs
   march_shared_msgs
+  pinocchio
+  ament_index_cpp
 )
 
 target_link_libraries(ik_solver_node

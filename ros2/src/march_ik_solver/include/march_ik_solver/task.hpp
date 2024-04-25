@@ -18,6 +18,8 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
+#include "pinocchio/algorithm/kinematics.hpp"
+
 class Task {
 public:
     typedef std::unique_ptr<Task> UniquePtr;
@@ -98,6 +100,9 @@ private:
     Eigen::MatrixXd m_jacobian;
     Eigen::MatrixXd m_jacobian_inverse;
     Eigen::MatrixXd m_damping_identity;
+
+    pinocchio::Model m_model;
+    std::unique_ptr<pinocchio::Data> m_data;
 };
 
 #endif // IK_SOLVER__TASK_HPP

@@ -1,8 +1,12 @@
 #include "march_ik_solver/task.hpp"
-#include "math.h"
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "march_shared_msgs/msg/node_jacobian.hpp"
+
+#include "pinocchio/parsers/urdf.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
+#include "math.h"
 
 Task::Task(const std::string& task_name, const std::string& reference_frame, const unsigned int& workspace_dim,
     const unsigned int& configuration_dim, const float& dt)
@@ -21,6 +25,20 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
         = m_node->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position");
     m_client_node_jacobian
         = m_node->create_client<march_shared_msgs::srv::GetNodeJacobian>("state_estimation/get_node_jacobian");
+
+    // Load URDF model
+    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description")
+        + "/urdf/march9/march9.urdf";
+    pinocchio::urdf::buildModel(urdf_file_path, m_model);
+    m_data = std::make_unique<pinocchio::Data>(m_model);
+
+    // Test pinocchio
+    Eigen::VectorXd q = pinocchio::neutral(m_model);
+    std::cout << "q: " << q.transpose() << std::endl;
+    pinocchio::forwardKinematics(m_model, *m_data, q);
+    for (unsigned int i = 0; i < m_model.njoints; i++) {
+        std::cout << "Joint " << i << " position: " << m_data->oMi[i].translation().transpose() << std::endl;
+    }
 }
 
 void Task::setTaskName(const std::string& task_name)
