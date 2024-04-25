@@ -82,6 +82,8 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
             m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
         }
     }
+    // m_world_to_base_orientation = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x,
+    //     msg->imu.orientation.y, msg->imu.orientation.z);
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -121,12 +123,9 @@ void IKSolverNode::publishDesiredJointPositions()
     std_msgs::msg::Float64MultiArray desired_joint_positions_msg;
     std::vector<double> desired_joint_positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
-    // std::cout << "Desired joint positions: " << m_desired_joint_positions.transpose() << std::endl;
     for (const auto& idx : m_alphabetical_joint_indices) {
-        // RCLCPP_INFO(this->get_logger(), "Joint index: %d", idx);
         desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
     }
-    // RCLCPP_INFO(this->get_logger(), "Desired joint positions published.");
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
 }
 

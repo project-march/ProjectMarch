@@ -43,6 +43,7 @@ public:
 private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
     Eigen::VectorXd clampJointVelocities(Eigen::VectorXd desired_joint_velocities);
+    inline double deg2rad(const double& deg) { return deg * M_PI / 180.0; };
 
     const unsigned int LOWER_JOINT_LIMIT = 0;
     const unsigned int UPPER_JOINT_LIMIT = 1;

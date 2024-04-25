@@ -40,8 +40,8 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
     for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->requestCurrentTask();
-        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
-            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
+        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask();
+            // + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
     m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
     return m_desired_joint_velocities;
@@ -126,10 +126,8 @@ void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_name
     }
 
     for (long unsigned int i = 0; i < joint_names.size(); i++) {
-        double joint_lower_limit_rad = joint_position_lower_limits[i] * M_PI / 180.0;
-        double joint_upper_limit_rad = joint_position_upper_limits[i] * M_PI / 180.0;
-        m_joint_position_limits.push_back({ joint_lower_limit_rad, joint_upper_limit_rad });
-        m_joint_velocity_limits.push_back({ joint_velocity_lower_limits[i], joint_velocity_upper_limits[i] });
+        m_joint_position_limits.push_back({ deg2rad(joint_position_lower_limits[i]), deg2rad(joint_position_upper_limits[i]) });
+        m_joint_velocity_limits.push_back({ deg2rad(joint_velocity_lower_limits[i]), deg2rad(joint_velocity_upper_limits[i]) });
     }
 }
 

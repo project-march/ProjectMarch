@@ -30,9 +30,8 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.19, 0.19, -0.9, 0.19, -0.19, -0.9}; 
-    // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
- }
+    m_home_stand = {0.19, 0.2, -0.9, 0.19, -0.2, -0.9}; 
+}
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
@@ -169,9 +168,9 @@ void GaitPlanningNode::finishCurrentTrajectory(){
 }
 
 void GaitPlanningNode::publishIncrements(){
-    RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
+    // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
-    RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
+    // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
     m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
     setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);

@@ -14,7 +14,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    timestep = 0.020 # in seconds
+    timestep = 0.05 # in seconds
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),
