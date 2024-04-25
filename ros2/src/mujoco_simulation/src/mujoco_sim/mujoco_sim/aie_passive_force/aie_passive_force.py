@@ -8,18 +8,29 @@ class AIEPassiveForce:
         self.L_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "left_ankle_ie")
         self.R_AIE_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "right_ankle_ie")
 
+    # CAM v6
     def aie_passive_force(self, x):
-        x = np.rad2deg(x)
-        if x > -0.5926 and x < 1.86:
-            return -(35.998*x+10.277+23.361*x**2-19.496*x**3+7.171*x**4+15.106*x**5-26.608*x**6+4.693*x**7+1.651*x**10-8.751*x**9+13.087*x**8)
-        elif x >= 1.86 and x < 8.0:
-            # return -(105.2095-15.94*x)
-            return -1e6
+        x = - np.rad2deg(x)
+        if x > 9.000:
+            return 0
+        elif x > 6.451:
+            return 18.967*x - 122.354
+        elif x > 0.510:
+            return 0
+        elif x > -0.659:
+            return 8.720*x - 4.447
+        elif x > -3.679:
+            return -16.305*x - 20.939
+        elif x > -9:
+            return 16.469*x + 99.634   
         else:
             return 0
 
-
+        
     def callback(self, model, data):
         angles = data.qpos
-        data.qfrc_passive[self.L_AIE_id] = 1000 * self.aie_passive_force(angles[self.L_AIE_id])
-        data.qfrc_passive[self.R_AIE_id] = 1000 * self.aie_passive_force(angles[self.R_AIE_id])
+        velocity = data.qvel
+        b = 0.95
+
+        data.qfrc_passive[self.L_AIE_id] = 0.5 * self.aie_passive_force(angles[self.L_AIE_id]) - b * velocity[self.L_AIE_id]
+        data.qfrc_passive[self.R_AIE_id] = 0.5 * self.aie_passive_force(angles[self.R_AIE_id]) - b * velocity[self.R_AIE_id]
