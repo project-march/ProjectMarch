@@ -1,6 +1,6 @@
 ik_solver:
   ros__parameters:
-    state_estimator_time_offset: 25e-3
+    state_estimator_time_offset: 20e-3
     joint_trajectory_controller_period: 5e-3
     convergence_threshold: 1e-3
     max_iterations: 100
