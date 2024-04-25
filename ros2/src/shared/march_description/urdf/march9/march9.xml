@@ -99,16 +99,16 @@ See <https://www.gnu.org/licenses/>.
     <body name="safety_catcher" pos="-0.2 0 1.2">
       <inertial pos="0 0 0" mass="0.1" diaginertia="10 10 10"/>
       <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/>
-      <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/>
+      <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-1 1" pos="0 0 0"/>
       <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/>
-      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-180 180" pos="0 0 0"/> -->
+      <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/>
       <!-- <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/> -->
-      <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
+      <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/>
       
       <body name="backpack" pos="0 0 0" childclass="exoskeleton">
         <light name="top" pos="0 0 2" mode="trackcom"/>
-        <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="trackcom"/>
-        <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
+        <camera name="diag" pos="3 -2.5 1" xyaxes="1 1 0 0 1 2" mode="track"/>
+        <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="track"/>
         <site name='imu_backpack' size='0.01' pos="0 0 0"/>
 
         <inertial pos="0.015 0 0.194" mass="3.362"
