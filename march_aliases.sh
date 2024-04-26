@@ -32,16 +32,6 @@ ros2controlcli soem transmission_interface velocity_controllers'
 alias mb2='march_build_ros2'
 alias mb='march_build'
 alias mba='march_build_all'
-alias sim2='march_run_ros2_sim'
-alias mujoco='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march8_v0.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
-alias mujoco_guus='march_run_ros2_sim mujoco:=true model_to_load_mujoco:="march7_v1.xml" tunings_to_load:="low_level_controller_tunings.yaml" rviz:=false'
-alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
-alias sim='cm2 && sros2 && ros2 launch march_launch march8.launch.py'
-alias m8_airgait='sudo -v && sfox && sros2 && ros2 launch march_launch march8.launch.py simulation:="false" airgait:="true"'
-alias m8_training='sudo -v && sfox && sros2 && ros2 launch march_launch march8.launch.py simulation:="false"'
-alias m8_gaitloader_training='sudo -v && sfox && sros2 && ros2 launch march_launch march8_gaitloader.launch.py simulation:=false'
-alias m8_sim_gaitloader='sfox && sros2 && ros2 launch march_launch march8_gaitloader.launch.py simulation:=true'
-alias training='march_run_ros2_training'
 alias gits='git status'
 
 # NEW M9 ALIASES
@@ -53,6 +43,8 @@ alias angles_air='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.la
 alias angles_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
 alias cartesian_air='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="true"'
 alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+
+alias test_joints='cm2 && sros2 && sfox && ros2 launch march_launch test_joints.launch.py model_to_load_mujoco:="march9.xml"'
 
 alias test_mpc='cm2 && sros2 && sfox && ros2 launch march_launch mpc.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" rviz:=true'
 
@@ -72,14 +64,6 @@ mbt() {
   colcon build --packages-select "$@"
   colcon test --packages-select "$@" && colcon test-result --verbose
 }
-
-# Training aliases
-export URDF6='robot:=march6_three_cameras'
-
-alias cov2='march_run_ros2_sim realsense_simulation:=true ground_gait:=true use_imu_data:=false'
-alias ag2='march_run_ros2_training use_imu_data:=true wireless_ipd:=true'
-alias gg2='ag2'
-
 
 # Tools for during monitor sessions 
 alias march_run_monitor='sfox && sros2 && ros2 launch march_monitor monitor.launch.py'
@@ -156,13 +140,6 @@ alias clion_no_out='clion > /dev/null 2> /dev/null & disown'
 
 # Hardware aliases
 alias odrive='cd ~/projects/odrivepython && python main.py'
-
-#aliases for ros1 that might be usefull to create for ros2
-#alias odrive_temp='export_asrock_master_uri && snoe && sros1 && rostopic echo /march/motor_controller/states/temperature'
-#alias battery='snoe && sros1 && rostopic echo /march/pdb_data/battery_state -n 1'
-#alias pdb_echo='snoe && sros1 && rostopic echo /march/pdb_data'
-#alias pdb='snoe && sros1 && rostopic echo /march/pdb_data -n 1'
-
 
 # Sourcing ROS distributions on the Asrock
 alias export_asrock_master_uri='export ROS_MASTER_URI=http://192.168.1.177:11311/'

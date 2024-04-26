@@ -41,6 +41,8 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
+    m_counter = 0;
+
     m_home_stand = {-0.016, -0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0}; // This is already in alphabetical order
 
 }
@@ -48,50 +50,61 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setGaitType((exoMode)msg->mode);
+    if ((exoMode)msg->mode == exoMode::Walk){
+        m_current_trajectory= m_gait_planning.getTrajectory();
+    }
+
+    if ((exoMode)msg->mode == exoMode::Stand){
+        m_counter = 0;
+    }
+
     setActuatedJoint(msg->joint.data);
 }
 
 void TestJointsGaitPlanningNode::footPositionsPublish(){
-    static int counter = 0 ;
     // RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Current mode: %s", toString(m_gait_planning.getGaitType()).c_str());
     switch (m_gait_planning.getGaitType()){
         case exoMode::BootUp: {
-            counter = 0;
+            m_counter = 0;
             break;
         }
 
         case exoMode::Stand: {
-            processHomeStandGait(counter);
-            counter++;
+            processHomeStandGait();
             break;
         }
 
         case exoMode::Walk: {
-            counter = 0;
-            if (m_current_trajectory.empty()) {
-                //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
-                m_current_trajectory = m_gait_planning.getTrajectory();
+            if (m_counter < INTERPOLATING_TIMESTEPS){
+                processHomeStandGait();
             }
-            else{
-                double new_angle = ROTATION_RANGE* m_current_trajectory.front();
-                
-                if (m_actuated_joint == 1 || m_actuated_joint == 5) {
-                    new_angle = -new_angle;
-                }
 
-                m_current_trajectory.erase(m_current_trajectory.begin());
-                m_joints_msg.data = {};
-                for (int i = 0; i < 8; i++) {
-                    if (i == getActuatedJoint()) {
-                        // This is the joint we want to actuate, set the new position
-                        m_joints_msg.data.push_back(new_angle + m_home_stand[i]);
-                    } else {
-                        // This is not the joint we want to actuate, set the current position
-                        m_joints_msg.data.push_back(m_home_stand[i]);
-                    }
+            else {
+                if (m_current_trajectory.empty()) {
+                    //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
+                    m_current_trajectory = m_gait_planning.getTrajectory();
                 }
-                m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-                RCLCPP_DEBUG(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
+                else{
+                    double new_angle = ROTATION_RANGE* m_current_trajectory.front();
+                    
+                    if (m_actuated_joint == 1 || m_actuated_joint == 5) {
+                        new_angle = -new_angle;
+                    }
+
+                    m_current_trajectory.erase(m_current_trajectory.begin());
+                    m_joints_msg.data = {};
+                    for (int i = 0; i < 8; i++) {
+                        if (i == getActuatedJoint()) {
+                            // This is the joint we want to actuate, set the new position
+                            m_joints_msg.data.push_back(new_angle + m_home_stand[i]);
+                        } else {
+                            // This is not the joint we want to actuate, set the current position
+                            m_joints_msg.data.push_back(m_home_stand[i]);
+                        }
+                    }
+                    m_joint_angle_trajectory_publisher->publish(m_joints_msg);
+                    RCLCPP_DEBUG(rclcpp::get_logger("march_test_gait_planning_node"), "Foot positions published!");
+                }
             }
             break;
         }
@@ -137,10 +150,10 @@ void TestJointsGaitPlanningNode::currentJointAnglesCallback(const march_shared_m
     
 }
 
-void TestJointsGaitPlanningNode::processHomeStandGait(int counter){
+void TestJointsGaitPlanningNode::processHomeStandGait(){
     static std::vector<double> m_initial_point;
     static std::vector<double> m_incremental_steps_to_home_stand;
-    if (counter == 0){ // When switching to homestand
+    if (m_counter == 0){ // When switching to homestand
         m_incremental_steps_to_home_stand.clear();
         for (unsigned i = 0; i < 8; ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_home_stand[i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
@@ -150,12 +163,13 @@ void TestJointsGaitPlanningNode::processHomeStandGait(int counter){
     }
     std::vector<double> temp_moving_to_home_stand;
    
-    if (counter < INTERPOLATING_TIMESTEPS){
+    if (m_counter < INTERPOLATING_TIMESTEPS){
         RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
         for (unsigned i = 0; i < 8; ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
         } 
+        m_counter += 1;
     }
 
     else{

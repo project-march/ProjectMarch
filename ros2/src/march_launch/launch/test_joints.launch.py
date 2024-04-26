@@ -217,10 +217,10 @@ def generate_launch_description() -> LaunchDescription:
         imu_nodes,
         state_estimator,
         ipd_node,
-        Node(
-            package='plotjuggler',
-            executable='plotjuggler',
-            name='plotjuggler',
-        #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
-        ),
+        # Node(
+        #     package='plotjuggler',
+        #     executable='plotjuggler',
+        #     name='plotjuggler',
+        # #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
+        # ),
     ])
