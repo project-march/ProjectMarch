@@ -8,8 +8,8 @@ from rclpy.node import Node
 from rqt_gui.main import Main
 import sys
 import rclpy
-from .input_device_controller import InputDeviceController
-from .input_device_view import InputDeviceView
+from .test_joints_input_device_controller import TestJointsInputDeviceController
+from .test_joints_input_device_view import TestJointsInputDeviceView
 import python_qt_binding.QtWidgets as QtWidgets
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QPushButton
@@ -19,9 +19,10 @@ from PyQt5.QtWidgets import QToolButton
 def main(args=None):
     """The main function used to start up the rqt input device."""
     rclpy.init(args=args)
+    print("correct")
 
     try:
-        plugin = "ExoInputDevicePlugin"
+        plugin = "TestJointsInputDevicePlugin"
         main_plugin = Main(filename=plugin)
         sys.exit(main_plugin.main(standalone=plugin))
 
@@ -32,19 +33,21 @@ def main(args=None):
 
 
 
-class InputDevicePlugin(Plugin):
+class TestJointsInputDevicePlugin(Plugin):
     def __init__(self, context):
-        super(InputDevicePlugin, self).__init__(context)
+        super(TestJointsInputDevicePlugin, self).__init__(context)
+        print("correct")
         self.setObjectName("rqt_input_device")
 
         ui_file = os.path.join(get_package_share_directory("march_rqt_input_device"), "input_device.ui")
-        layout_file = os.path.join(get_package_share_directory("march_mode_machine"), "generate","modes.json")
+        modes_layout_file = os.path.join(get_package_share_directory("march_mode_machine"), "generate","modes.json")
+        joints_layout_file = os.path.join(get_package_share_directory("march_rqt_input_device"), "resource","joints.json")
 
         self._node: Node = context.node
-        self._node.get_logger().info('InputDevicePlugin instantiated')
+        self._node.get_logger().info('TestJointsInputDevicePlugin instantiated')
 
-        self._controller = InputDeviceController(self._node)
-        self._widget = InputDeviceView(ui_file, self._controller, layout_file)
+        self._controller = TestJointsInputDeviceController(self._node)
+        self._widget = TestJointsInputDeviceView(ui_file, self._controller, modes_layout_file, joints_layout_file)
 
         self._controller.set_view(self._widget)
         

@@ -20,6 +20,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 class IKSolverNode : public rclcpp::Node {
 public:
@@ -31,6 +32,7 @@ private:
     void iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void publishJointTrajectory();
+    void publishDesiredJointPositions();
 
     void solveInverseKinematics(const rclcpp::Time& start_time);
     void updatePreviousJointTrajectoryPoint(const trajectory_msgs::msg::JointTrajectoryPoint& joint_trajectory_point);
@@ -63,6 +65,7 @@ private:
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
     rclcpp::Publisher<march_shared_msgs::msg::IksStatus>::SharedPtr m_iks_status_pub;
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_callback_group;
     rclcpp::SubscriptionOptions m_subscription_options;

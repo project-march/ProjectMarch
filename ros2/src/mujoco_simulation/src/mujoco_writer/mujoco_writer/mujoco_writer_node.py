@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from control_msgs.msg import JointTrajectoryControllerState
 from std_msgs.msg import Bool
+from std_msgs.msg import Float64MultiArray
 
 from mujoco_interfaces.msg import MujocoInput
 
@@ -25,7 +26,7 @@ class MujocoWriterNode(Node):
         super().__init__("mujoco_writer")
         self.publisher = self.create_publisher(MujocoInput, "mujoco_input", 10)
         self.subscription = self.create_subscription(
-            JointTrajectoryControllerState, "joint_trajectory_controller/state", self.listener_callback, 100
+            Float64MultiArray, "march_joint_position_controller/commands", self.listener_callback, 100
         )
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.
@@ -39,21 +40,30 @@ class MujocoWriterNode(Node):
         This callback is just a simple passthrough to keep the flow clear.
         """
         msg_to_send = MujocoInput()
-        skip = False
-        if len(msg.desired.positions) == 0:
-            skip = True
-        for i, x in enumerate(msg.desired.positions):
-            if x != x:
-                skip = True
-                break
-            else:
-                msg.desired.positions[i] *= 1
-        if not skip:
-            msg_to_send.trajectory = msg
-            if self.reset:
-                msg_to_send.reset = 1
-                self.reset = False
-            self.publisher.publish(msg_to_send)
+        msg_to_send.points = msg
+        
+        if self.reset:
+            msg_to_send.reset = 1
+            self.reset = False
+
+        self.publisher.publish(msg_to_send)
+
+        # msg_to_send = MujocoInput()
+        # skip = False
+        # if len(msg.desired.positions) == 0:
+        #     skip = True
+        # for i, x in enumerate(msg.desired.positions):
+        #     if x != x:
+        #         skip = True
+        #         break
+        #     else:
+        #         msg.desired.positions[i] *= 1
+        # if not skip:
+        #     msg_to_send.trajectory = msg
+        #     if self.reset:
+        #         msg_to_send.reset = 1
+        #         self.reset = False
+        #     self.publisher.publish(msg_to_send)
 
     def reset_callback(self, msg):
         """Set the reset flag when a message is received with data True."""

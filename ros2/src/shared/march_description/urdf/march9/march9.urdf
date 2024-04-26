@@ -128,6 +128,12 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="L_toe">
+	</link>
+	<link name="L_heel">
+	</link>
+	<link name="L_sole">
+	</link>
 	<link name="R_hip">
       <inertial>
          <origin rpy="0 0 0" xyz="0.130 -0.174 0.000"/>
@@ -228,6 +234,12 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="R_toe">
+	</link>
+	<link name="R_heel">
+	</link>
+	<link name="R_sole">
+	</link>
 
 	<!-- Robot Joint Definitions -->
 
@@ -237,7 +249,7 @@
 		<child link="backpack"/>
 	</joint>
 	<joint name="left_hip_aa" type="revolute">
-	<origin rpy="0 0 0" xyz="0.021 0.092 0.028"/>
+		<origin rpy="0 0 0" xyz="0.021 0.092 0.028"/>
 		<axis xyz="-1 0 0"/>
 		<parent link="backpack"/>
 		<child link="L_hip"/>
@@ -270,6 +282,21 @@
 		<parent link="L_ankle"/>
 		<child link="L_foot"/>
 		<limit effort="179" lower="-0.1396263" upper="0.1396263" velocity="4.1"/>
+	</joint>
+	<joint name="L_foot_to_L_heel" type="fixed">
+		<origin rpy="0 0 0" xyz="-0.015 0.0 -0.08"/>
+		<parent link="L_foot"/>
+		<child link="L_heel"/>
+	</joint>
+	<joint name="L_foot_to_L_sole" type="fixed">
+		<origin rpy="0 0 0" xyz="0.151 0.0 -0.080"/>
+		<parent link="L_foot"/>
+		<child link="L_sole"/>
+	</joint>
+	<joint name="L_foot_to_L_toe" type="fixed">
+		<origin rpy="0 0 0" xyz="0.317 0.0 -0.080"/>
+		<parent link="L_foot"/>
+		<child link="L_toe"/>
 	</joint>
 	<joint name="right_hip_aa" type="revolute">
 		<origin rpy="0 0 0" xyz="0.021 -0.092 0.028"/>
@@ -305,7 +332,23 @@
 		<parent link="R_ankle"/>
 		<child link="R_foot"/>
 		<limit effort="179" lower="-0.1396263" upper="0.1396263" velocity="4.1"/>
-	</joint>	
+	</joint>
+	<joint name="R_foot_to_R_heel" type="fixed">
+		<origin rpy="0 0 0" xyz="-0.015 0.0 -0.08"/>
+		<parent link="R_foot"/>
+		<child link="R_heel"/>
+	</joint>
+	<joint name="R_foot_to_R_sole" type="fixed">
+		<origin rpy="0 0 0" xyz="0.151 0.0 -0.080"/>
+		<parent link="R_foot"/>
+		<child link="R_sole"/>
+	</joint>
+	<joint name="R_foot_to_R_toe" type="fixed">
+		<origin rpy="0 0 0" xyz="0.317 0.0 -0.080"/>
+		<parent link="R_foot"/>
+		<child link="R_toe"/>
+	</joint>
+	
 
 	<!-- Robot Transmission Definitions -->
 
