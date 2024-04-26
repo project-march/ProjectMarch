@@ -37,6 +37,7 @@ public:
     void calculateJacobianInverse();
 
     std::vector<std::string> getNodeNames() const;
+    inline std::vector<int> getJointIndices() const { return m_joint_indices; }
     std::string getTaskName() const;
     unsigned int getTaskM() const;
     unsigned int getTaskN() const;
@@ -50,6 +51,7 @@ public:
 
     void setTaskName(const std::string& task_name);
     void setNodeNames(const std::vector<std::string>& node_names);
+    inline void setJointIndices(const std::vector<int>& joint_indices) { m_joint_indices = joint_indices; }
     void setTaskM(const unsigned int& task_m);
     void setTaskN(const unsigned int& task_n);
     void setDt(const float& dt);
@@ -70,8 +72,6 @@ private:
     void sendRequestNodePosition();
     void sendRequestNodeJacobian();
 
-    const uint64_t m_service_timeout = 10; // ms
-
     rclcpp::Node::SharedPtr m_node;
     rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_client_node_position;
     rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_client_node_jacobian;
@@ -81,6 +81,7 @@ private:
     unsigned int m_task_m;
     unsigned int m_task_n;
     std::vector<std::string> m_node_names;
+    std::vector<int> m_joint_indices;
     bool m_unit_test = false;
 
     std::vector<std::string>* m_joint_names_ptr;
@@ -103,6 +104,8 @@ private:
 
     pinocchio::Model m_model;
     std::unique_ptr<pinocchio::Data> m_data;
+    
+    const unsigned int SE3_SIZE = 6;
 };
 
 #endif // IK_SOLVER__TASK_HPP

@@ -34,13 +34,12 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
     pinocchio::urdf::buildModel(urdf_file_path, m_model);
     m_data = std::make_unique<pinocchio::Data>(m_model);
 
-    // Test pinocchio
-    Eigen::VectorXd q = pinocchio::neutral(m_model);
-    std::cout << "q: " << q.transpose() << std::endl;
-    pinocchio::forwardKinematics(m_model, *m_data, q);
-    for (unsigned int i = 0; i < m_model.njoints; i++) {
-        std::cout << "Joint " << i << " position: " << m_data->oMi[i].translation().transpose() << std::endl;
-    }
+    // Set joint indices
+    m_joint_indices = {4, 9};
+
+    // Configure variables
+    const unsigned int TOTAL_SE3_SIZE = SE3_SIZE * m_joint_indices.size();
+    m_jacobian = Eigen::MatrixXd::Zero(TOTAL_SE3_SIZE, m_model.nv);
 }
 
 void Task::setTaskName(const std::string& task_name)
@@ -289,19 +288,11 @@ void Task::sendRequestNodePosition()
 
 void Task::sendRequestNodeJacobian()
 {
-    const int LEFT_ANKLE_JOINT_ID = 4;
-    const int RIGHT_ANKLE_JOINT_ID = 9;
+    for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
+        pinocchio::Data::Matrix6x jacobian_joint(SE3_SIZE, m_model.nv);
+        jacobian_joint.setZero();
 
-    pinocchio::Data::Matrix6x J_left(6, m_model.nv);
-    pinocchio::Data::Matrix6x J_right(6, m_model.nv);
-
-    J_left.setZero();
-    J_right.setZero();
-
-    pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, LEFT_ANKLE_JOINT_ID, J_left);
-    pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, RIGHT_ANKLE_JOINT_ID, J_right);
-
-    m_jacobian = Eigen::MatrixXd::Zero(12, 10);
-    m_jacobian.block(0, 0, 6, 10) = J_left;
-    m_jacobian.block(6, 0, 6, 10) = J_right;
+        pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, m_joint_indices[i], jacobian_joint);
+        m_jacobian.block(SE3_SIZE * i, 0, SE3_SIZE, m_model.nv) = jacobian_joint;
+    }
 }

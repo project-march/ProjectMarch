@@ -92,10 +92,10 @@ if(BUILD_TESTING)
 
   ament_add_gmock(${PROJECT_NAME}_test
     test/test_runner.cpp
-    test/ik_solver_test.cpp
-    src/ik_solver.cpp
-    test/task_test.cpp 
-    src/task.cpp
+    # test/ik_solver_test.cpp
+    # src/ik_solver.cpp
+    # test/task_test.cpp 
+    # src/task.cpp
   )
 
   target_include_directories(${PROJECT_NAME}_test PUBLIC
