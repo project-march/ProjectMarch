@@ -127,7 +127,7 @@ class MujocoSimNode(Node):
         self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.005
+        self.TIME_STEP_MJC = 0.001
         self.model.opt.timestep = self.TIME_STEP_MJC
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
