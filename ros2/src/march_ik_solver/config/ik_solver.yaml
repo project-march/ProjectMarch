@@ -53,7 +53,7 @@ ik_solver:
       kp: [100.0, 200.0, 300.0, 0.0, 0.0, 0.0, 100.0, 200.0, 300.0, 0.0, 0.0, 0.0]
       kd: [0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0]
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-6
+      damp_coeff: 1e-12
     stability:
       reference_frame: "inertial"
       nodes: ["zmp"]
@@ -64,7 +64,7 @@ ik_solver:
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       damp_coeff: 1e-12
     posture:
-      reference_frame: "body"
+      reference_frame: "inertial"
       nodes: ["L_ankle", "R_ankle"]
       m: 12
       n: 8
