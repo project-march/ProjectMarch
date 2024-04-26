@@ -9,9 +9,6 @@
 #include <string>
 #include <vector>
 
-#include "march_shared_msgs/srv/get_node_jacobian.hpp"
-#include "march_shared_msgs/srv/get_node_position.hpp"
-#include "geometry_msgs/msg/quaternion.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <eigen3/Eigen/Core>
@@ -34,7 +31,6 @@ public:
     Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd& error);
     Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd& error);
     void requestCurrentTask();
-    void calculateJacobianInverse();
 
     std::vector<std::string> getNodeNames() const;
     inline std::vector<int> getJointIndices() const { return m_joint_indices; }
@@ -59,22 +55,18 @@ public:
     void setGainD(const std::vector<double>& gain_d);
     void setGainI(const std::vector<double>& gain_i);
     void setDampingCoefficient(const float& damping_coefficient);
-    void setDesiredTask(const Eigen::VectorXd& desired_task);
-    void setJointNamesPtr(std::vector<std::string>* joint_names);
-    void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr);
+    inline void setDesiredTask(const Eigen::VectorXd& desired_task) { m_desired_task = desired_task; }
+    inline void setJointNamesPtr(std::vector<std::string>* joint_names) { m_joint_names_ptr = joint_names; }
+    inline void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr) { m_current_joint_positions_ptr = current_joint_positions_ptr; }
 
-    void setCurrentTask(const Eigen::VectorXd& current_task);
-    void setJacobian(const Eigen::MatrixXd& jacobian);
-    void setUnitTest(const bool& unit_test);
+    inline void setCurrentTask(const Eigen::VectorXd& current_task) { m_current_task = current_task; }
+    inline void setJacobian(const Eigen::MatrixXd& jacobian) { m_jacobian = jacobian; }
+    inline void setUnitTest(const bool& unit_test) { m_unit_test = unit_test; }
 
 private:
-    Eigen::Vector3d calculateEulerAnglesFromQuaternion(const geometry_msgs::msg::Quaternion& quaternion);
-    void sendRequestNodePosition();
-    void sendRequestNodeJacobian();
-
-    rclcpp::Node::SharedPtr m_node;
-    rclcpp::Client<march_shared_msgs::srv::GetNodePosition>::SharedPtr m_client_node_position;
-    rclcpp::Client<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_client_node_jacobian;
+    void computeCurrentTask();
+    void computeJacobian();
+    void computeJacobianInverse();
 
     std::string m_task_name;
     std::string m_reference_frame;
@@ -105,6 +97,7 @@ private:
     pinocchio::Model m_model;
     std::unique_ptr<pinocchio::Data> m_data;
     
+    const unsigned int EUCLIDEAN_SIZE = 3;
     const unsigned int SE3_SIZE = 6;
 };
 

@@ -21,13 +21,6 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
     m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
     m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
 
-    // Initialize ROS node and service clients.
-    m_node = std::make_shared<rclcpp::Node>("task_" + m_task_name + "_client");
-    m_client_node_position
-        = m_node->create_client<march_shared_msgs::srv::GetNodePosition>("state_estimation/get_node_position");
-    m_client_node_jacobian
-        = m_node->create_client<march_shared_msgs::srv::GetNodeJacobian>("state_estimation/get_node_jacobian");
-
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description")
         + "/urdf/march9/march9.urdf";
@@ -37,8 +30,9 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
     // Set joint indices
     m_joint_indices = {4, 9};
 
-    // Configure variables
+    // Configure ik solver variables
     const unsigned int TOTAL_SE3_SIZE = SE3_SIZE * m_joint_indices.size();
+    m_current_task = Eigen::VectorXd::Zero(TOTAL_SE3_SIZE);
     m_jacobian = Eigen::MatrixXd::Zero(TOTAL_SE3_SIZE, m_model.nv);
 }
 
@@ -111,11 +105,6 @@ void Task::setDampingCoefficient(const float& damping_coefficient)
     m_damping_identity.noalias() = damping_coefficient * m_damping_identity;
 }
 
-void Task::setDesiredTask(const Eigen::VectorXd& desired_task)
-{
-    m_desired_task = desired_task;
-}
-
 Eigen::VectorXd Task::solveTask()
 {
     Eigen::VectorXd error = calculateError();
@@ -161,12 +150,12 @@ Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd& error)
 void Task::requestCurrentTask()
 {
     pinocchio::forwardKinematics(m_model, *m_data, *m_current_joint_positions_ptr);
-    sendRequestNodePosition();
-    sendRequestNodeJacobian();
-    calculateJacobianInverse();
+    computeCurrentTask();
+    computeJacobian();
+    computeJacobianInverse();
 }
 
-void Task::calculateJacobianInverse()
+void Task::computeJacobianInverse()
 {
     Eigen::MatrixXd damped_jacobian = Eigen::MatrixXd::Zero(12, 10);
     damped_jacobian.noalias() = m_jacobian + m_damping_identity;
@@ -198,11 +187,6 @@ double Task::getErrorNorm() const
     return m_error_norm;
 }
 
-Eigen::VectorXd Task::getDesiredTask() const
-{
-    return m_desired_task;
-}
-
 Eigen::MatrixXd Task::getNullspaceProjection() const
 {
     Eigen::MatrixXd nullspace_projection;
@@ -220,31 +204,6 @@ const Eigen::VectorXd* Task::getCurrentJointPositionsPtr() const
     return m_current_joint_positions_ptr;
 }
 
-void Task::setJointNamesPtr(std::vector<std::string>* joint_names_ptr)
-{
-    m_joint_names_ptr = joint_names_ptr;
-}
-
-void Task::setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr)
-{
-    m_current_joint_positions_ptr = current_joint_positions_ptr;
-}
-
-void Task::setCurrentTask(const Eigen::VectorXd& current_task)
-{
-    m_current_task = current_task;
-}
-
-void Task::setJacobian(const Eigen::MatrixXd& jacobian)
-{
-    m_jacobian = jacobian;
-}
-
-void Task::setUnitTest(const bool& unit_test)
-{
-    m_unit_test = unit_test;
-}
-
 Eigen::MatrixXd Task::getJacobian() const
 {
     return m_jacobian;
@@ -255,38 +214,16 @@ Eigen::MatrixXd Task::getJacobianInverse() const
     return m_jacobian_inverse;
 }
 
-Eigen::Vector3d Task::calculateEulerAnglesFromQuaternion(const geometry_msgs::msg::Quaternion& quaternion)
+void Task::computeCurrentTask()
 {
-    Eigen::Vector3d euler_angles = Eigen::Vector3d::Zero();
-    double norm, norm_sine_2;
-
-    // Avoid division by zero
-    if (quaternion.w >= 1.0) {
-        return euler_angles;
+    for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
+        // Fixed-size template cannot be used with anti-aliased types
+        m_current_task.segment<3>(SE3_SIZE * i) = m_data->oMi[m_joint_indices[i]].translation();
+        m_current_task.segment<3>(SE3_SIZE * EUCLIDEAN_SIZE) = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(2, 1, 0);
     }
-
-    norm = 2 * acos(quaternion.w);
-    norm_sine_2 = sin(0.5 * norm);
-    euler_angles.x() = quaternion.x / norm_sine_2;
-    euler_angles.y() = quaternion.y / norm_sine_2;
-    euler_angles.z() = quaternion.z / norm_sine_2;
-
-    return euler_angles;
 }
 
-void Task::sendRequestNodePosition()
-{
-    const int LEFT_ANKLE_JOINT_ID = 4;
-    const int RIGHT_ANKLE_JOINT_ID = 9;
-
-    m_current_task = Eigen::VectorXd::Zero(12);
-    m_current_task.segment<3>(0) = m_data->oMi[LEFT_ANKLE_JOINT_ID].translation();
-    m_current_task.segment<3>(3) = m_data->oMi[LEFT_ANKLE_JOINT_ID].rotation().eulerAngles(0, 1, 2);
-    m_current_task.segment<3>(6) = m_data->oMi[RIGHT_ANKLE_JOINT_ID].translation();
-    m_current_task.segment<3>(9) = m_data->oMi[RIGHT_ANKLE_JOINT_ID].rotation().eulerAngles(0, 1, 2);
-}
-
-void Task::sendRequestNodeJacobian()
+void Task::computeJacobian()
 {
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
         pinocchio::Data::Matrix6x jacobian_joint(SE3_SIZE, m_model.nv);

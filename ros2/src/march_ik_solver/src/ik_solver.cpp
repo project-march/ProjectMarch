@@ -79,40 +79,6 @@ Eigen::VectorXd IKSolver::clampJointVelocities(Eigen::VectorXd desired_joint_vel
     return limited_joint_velocities;
 }
 
-std::vector<double> IKSolver::getCurrentJointPositions() const
-{
-    return std::vector<double>(
-        m_current_joint_positions.data(), m_current_joint_positions.data() + m_current_joint_positions.size());
-}
-
-std::vector<double> IKSolver::getCurrentJointVelocities() const
-{
-    return std::vector<double>(
-        m_current_joint_velocities.data(), m_current_joint_velocities.data() + m_current_joint_velocities.size());
-}
-
-std::vector<double> IKSolver::getDesiredJointVelocities() const
-{
-    return std::vector<double>(
-        m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
-}
-
-double IKSolver::getTasksError() const
-{
-    Eigen::VectorXd tasks_error = Eigen::VectorXd::Zero(m_task_names.size());
-
-    for (long unsigned int i = 0; i < m_task_names.size(); i++) {
-        tasks_error(i) = m_task_map.at(m_task_names[i])->getErrorNorm();
-    }
-
-    return tasks_error.norm();
-}
-
-void IKSolver::setDt(const double& dt)
-{
-    m_dt = dt;
-}
-
 void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_names,
     const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
     const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits)
@@ -129,9 +95,4 @@ void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_name
         m_joint_position_limits.push_back({ deg2rad(joint_position_lower_limits[i]), deg2rad(joint_position_upper_limits[i]) });
         m_joint_velocity_limits.push_back({ deg2rad(joint_velocity_lower_limits[i]), deg2rad(joint_velocity_upper_limits[i]) });
     }
-}
-
-void IKSolver::setTaskNames(const std::vector<std::string>& task_names)
-{
-    m_task_names = task_names;
 }

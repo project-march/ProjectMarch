@@ -29,16 +29,22 @@ public:
     Eigen::VectorXd solveInverseKinematics();
     Eigen::VectorXd integrateJointVelocities();
 
-    std::vector<double> getCurrentJointPositions() const;
-    std::vector<double> getCurrentJointVelocities() const;
-    std::vector<double> getDesiredJointVelocities() const;
-    double getTasksError() const;
+    inline std::vector<double> getCurrentJointPositions() const { return std::vector<double>(m_current_joint_positions.data(), m_current_joint_positions.data() + m_current_joint_positions.size()); };
+    inline std::vector<double> getCurrentJointVelocities() const { return std::vector<double>(m_current_joint_velocities.data(), m_current_joint_velocities.data() + m_current_joint_velocities.size()); };
+    inline std::vector<double> getDesiredJointVelocities() const { return std::vector<double>(m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size()); };
+    inline double getTasksError() const {
+        double error = 0.0;
+        for (const auto& task_name : m_task_names) {
+            error += m_task_map.at(task_name)->getErrorNorm();
+        }
+        return error;
+    };
 
-    void setDt(const double& dt);
+    inline void setDt(const double& dt) { m_dt = dt; };
+    inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
     void setJointConfigurations(const std::vector<std::string>& joint_names,
         const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
         const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits);
-    void setTaskNames(const std::vector<std::string>& task_names);
 
 private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
