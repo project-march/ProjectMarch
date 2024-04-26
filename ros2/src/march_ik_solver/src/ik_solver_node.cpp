@@ -204,6 +204,7 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.limits.positions.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
+    declare_parameter("joint.limits.positions.soft", 0.0);
 
     m_state_estimator_time_offset = get_parameter("state_estimator_time_offset").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -220,6 +221,18 @@ void IKSolverNode::configureIKSolverParameters()
     std::vector<double> joint_velocity_limits_upper = get_parameter("joint.limits.velocities.upper").as_double_array();
     std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
+    // Apply soft limits to the joint position limits.
+    double soft_limit = get_parameter("joint.limits.positions.soft").as_double();
+    if (soft_limit < 0.0) {
+        RCLCPP_WARN(this->get_logger(), "Soft limit must be greater than or equal to zero. Setting to zero.");
+        soft_limit = 0.0;
+    }
+    for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
+        joint_position_limits_upper[i] -= soft_limit;
+        joint_position_limits_lower[i] += soft_limit;
+    }
+
+    // Set the joint positions and velocities limits in the IK solver.
     m_ik_solver->setJointConfigurations(m_joint_names, 
         joint_position_limits_lower, joint_position_limits_upper,
         joint_velocity_limits_lower, joint_velocity_limits_upper);
