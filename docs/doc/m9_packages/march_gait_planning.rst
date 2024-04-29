@@ -5,40 +5,45 @@ march_gait_planning
 
 Overview
 --------
-what
+This package contains all the Gait Planning nodes for the March9 exo. For now, there are four different implementations for the Gait Planning node, each with their own launch file: 
+* Joint angle based gaits
+* Cartesian based gaits 
+* Test Setup gaits
+* Test individual joints gaits 
 
 ROS API
 -------
 
 Nodes
 ^^^^^
-*ble_ipd_node* - Responsible for doing the thing.
+*gait_planning_angles_node* - joint angle based gaits 
+*gait_planninbg_node* - cartesian based gaits 
+*test_setup_gait_planning_node* - Test Setup gaits
+*test_joints_gait_planning_node* - individual joint gaits 
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
+*state_estimation/state*
+Published on a 20ms timer, which triggers the gait planning nodes to publish at the same time intervals. Contains current stance leg, joint states (joint angle configurations) and foot positions. 
 
-*/march/template/command/other* (template_msgs/TemplateCommand)
-Does the other thing.
+*current_mode*
+Contains the current requested mode (or gait type) from the Input Device. 
+
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
-Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
+*ik_solver/buffer/input* 
+Published by the *gait_planning_node* to send desired foot positions in cartesian coordinates to the Inverse Kinematics Solver. 
 
-*/march/template/result* (template_msgs/Boolean)
-Tells you if it worked
+*bezier_visualization* 
+Published by the *gait_planning_node* to send the calculated swing leg bezier trajectory to a visualization node. 
 
-Services
-^^^^^^^^
-*/march/template/do* (template_msgs/Do)
-Does something
+*march_joint_position_controller/commands* 
+Published by the *gait_planning_angles_node* to send the desired joint angles straight to the Hardware Interface. 
 
-Parameters
-^^^^^^^^^^
-*/march/template/counter* (*int*, required)
-How many to count
-*/march/template/countings* (*int[]*, default: [])
-List of countings
+Services/Clients
+^^^^^^^^^^^^^^^^
+
 
 Tutorials
 ---------
