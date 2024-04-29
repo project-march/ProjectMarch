@@ -29,7 +29,7 @@ IKSolverNode::IKSolverNode()
         "state_estimation/state", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
-        "joint_trajectory_controller/joint_trajectory", 10);
+        "ik_solver/joint_trajectory", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
     m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
@@ -72,8 +72,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
-    // publishJointTrajectory();
-    publishDesiredJointPositions();
+    publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
+    publishJointTrajectory();       // Publish the desired joint trajectory to the torque controller.
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -99,29 +99,33 @@ void IKSolverNode::publishJointTrajectory()
     joint_trajectory_msg->header.stamp = this->now();
 
     // Alphabetize the vector of joint names according to the alphabetical joint indices.
-    joint_trajectory_msg->joint_names = m_joint_names_alphabetical;
+    joint_trajectory_msg->joint_names = m_joint_names;
 
-    // Publish the previous joint trajectory point.
-    joint_trajectory_msg->points.push_back(m_joint_trajectory_point_prev);
+    // Calculate the desired joint velocities.
+    Eigen::VectorXd desired_joint_velocities;
+    desired_joint_velocities.noalias()
+        = (m_desired_joint_positions - Eigen::Map<const Eigen::VectorXd>(m_actual_joint_positions.data(), m_actual_joint_positions.size())) / m_state_estimator_time_offset;
+
+    // // Publish the previous joint trajectory point.
+    // joint_trajectory_msg->points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
     trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr joint_trajectory_point_desired = std::make_shared<trajectory_msgs::msg::JointTrajectoryPoint>();
     joint_trajectory_point_desired->positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     joint_trajectory_point_desired->velocities = std::vector<double>(
-        m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
+        desired_joint_velocities.data(), desired_joint_velocities.data() + desired_joint_velocities.size());
     joint_trajectory_point_desired->accelerations = createZeroVector();
     joint_trajectory_point_desired->effort = createZeroVector();
     joint_trajectory_point_desired->time_from_start.sec = 0;
     joint_trajectory_point_desired->time_from_start.nanosec = m_joint_trajectory_controller_period;
-    alphabetizeJointTrajectory(joint_trajectory_point_desired);
     joint_trajectory_msg->points.push_back(*joint_trajectory_point_desired);
 
     // Publish the message.
     m_joint_trajectory_pub->publish(*joint_trajectory_msg);
 
-    // Update the previous joint trajectory point.
-    updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
+    // // Update the previous joint trajectory point.
+    // updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
 }
 
 void IKSolverNode::publishDesiredJointPositions()
