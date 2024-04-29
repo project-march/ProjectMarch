@@ -71,27 +71,9 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
     desired_tasks["motion"] = desired_motion;
 
-    Eigen::VectorXd desired_left_foot = Eigen::VectorXd::Zero(6);
-    desired_left_foot << 
-        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0;
-    desired_tasks["left_foot"] = desired_left_foot;
-
-    Eigen::VectorXd desired_right_foot = Eigen::VectorXd::Zero(6);
-    desired_right_foot << 
-        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
-    desired_tasks["right_foot"] = desired_right_foot;
-
     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(6);
     desired_stability << 0.295, 0.0, 0.0, 0.0, 0.0, 0.0;
     desired_tasks["stability"] = desired_stability;
-
-    Eigen::VectorXd desired_slippage_left = Eigen::VectorXd::Zero(6);
-    desired_slippage_left << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    desired_tasks["slippage_left"] = desired_slippage_left;
-
-    Eigen::VectorXd desired_slippage_right = Eigen::VectorXd::Zero(6);
-    desired_slippage_right << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    desired_tasks["slippage_right"] = desired_slippage_right;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
     desired_posture << 
@@ -192,7 +174,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
             break;
         }
-        
+
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
     RCLCPP_INFO_THROTTLE(

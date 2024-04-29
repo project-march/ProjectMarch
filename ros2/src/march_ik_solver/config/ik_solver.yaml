@@ -51,24 +51,6 @@ ik_solver:
       kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       damp_coeff: 1e-6
-    # left_foot:
-    #   reference_frame: "body"
-    #   joint_indices: [4]
-    #   m: 6
-    #   n: 10
-    #   kp: [30.0, 4.0, 30.0, 0.0, 0.0, 0.0]
-    #   kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    #   ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    #   damp_coeff: 1e-3
-    # right_foot:
-    #   reference_frame: "body"
-    #   joint_indices: [9]
-    #   m: 6
-    #   n: 10
-    #   kp: [30.0, 4.0, 30.0, 0.0, 0.0, 0.0]
-    #   kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    #   ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    #   damp_coeff: 1e-3
     # stability:
     #   reference_frame: "inertial"
     #   joint_indices: [4, 9]
