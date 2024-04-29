@@ -41,6 +41,7 @@ private:
     int m_actuated_joint;
     bool m_first_stand;
     int m_counter;
+    std::vector<int> m_mapping;
 
     std::vector<double> m_home_stand;
 };
