@@ -42,7 +42,7 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
         m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
             + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
-    // m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
+    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
     return m_desired_joint_velocities;
 }
 
