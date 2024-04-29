@@ -109,9 +109,9 @@ class MujocoSimNode(Node):
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/march9/" + str(self.model_name.value)
         
-        with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march9_control.yaml")) as file:
-            yaml_data = yaml.safe_load(file)
-            self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
+        # with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march9_control.yaml")) as file:
+        #     yaml_data = yaml.safe_load(file)
+        #     self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
 
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
@@ -290,15 +290,14 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        # if self.use_aie_force.value == 'true':
-        #     while self.data.time <= time_difference_withseconds:
-        #         mujoco.set_mjcb_passive(self.aie_passive_force.callback)
-        #         mujoco.mj_step(self.model, self.data)
-        # else:
-        while self.data.time <= time_difference_withseconds:
-            mujoco.mj_step(self.model, self.data)
-
-        self.time_last_updated = self.get_clock().now()
+        if self.use_aie_force.value == True:
+            while self.data.time <= time_difference_withseconds:
+                mujoco.set_mjcb_passive(self.aie_passive_force.callback)
+                mujoco.mj_step(self.model, self.data)
+        else:
+            while self.data.time <= time_difference_withseconds:
+                mujoco.mj_step(self.model, self.data)
+            self.time_last_updated = self.get_clock().now()
 
     def sim_update_timer_callback(self):
         """Callback function to perform the simulation step.
