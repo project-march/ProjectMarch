@@ -53,18 +53,6 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
-    // Eigen::VectorXd desired_forward_motion = Eigen::VectorXd::Zero(12);
-    // desired_forward_motion << 
-    //     msg->left_foot_position.x, 0, msg->left_foot_position.z, 0, 0, 0,
-    //     msg->right_foot_position.x, 0, msg->right_foot_position.z, 0, 0, 0;
-    // desired_tasks["forward_motion"] = desired_forward_motion;
-
-    // Eigen::VectorXd desired_lateral_motion = Eigen::VectorXd::Zero(12);
-    // desired_lateral_motion <<
-    //     0, msg->left_foot_position.y, 0, 0, 0, 0,
-    //     0, msg->right_foot_position.y, 0, 0, 0, 0;
-    // desired_tasks["lateral_motion"] = desired_lateral_motion;
-
     Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(12);
     desired_motion << 
         msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0,
@@ -165,6 +153,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
     double best_error = 1e9;
+    
     do {
         m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
         m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
@@ -174,7 +163,6 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
             break;
         }
-
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
     RCLCPP_INFO_THROTTLE(

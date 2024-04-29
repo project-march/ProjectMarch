@@ -104,7 +104,6 @@ Eigen::VectorXd Task::solveTask()
     Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
     jacobian_decomposition.setThreshold(m_damping_coefficient);
     joint_velocities.noalias() = jacobian_decomposition.solve(error);
-    // joint_velocities.noalias() = m_jacobian_inverse * error;
     return joint_velocities;
 }
 
@@ -153,15 +152,6 @@ void Task::computeCurrentTask()
 void Task::computeJacobianInverse()
 {
     m_jacobian_inverse = Eigen::MatrixXd::Zero(m_model.nv, m_task_m);
-    // // The damping coefficient is added to the diagonal of the Jacobian transpose times Jacobian matrix
-    // if (m_task_m > m_task_n) {
-    //     m_jacobian_inverse.noalias()
-    //         = (m_jacobian.transpose() * m_jacobian + m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_n, m_task_n)).inverse() * m_jacobian.transpose();
-    // } else { // m_task_m <= m_task_n
-    //     m_jacobian_inverse.noalias()
-    //         = m_jacobian.transpose() * (m_jacobian * m_jacobian.transpose() + m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_m)).inverse();
-    // }
-
     Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
     jacobian_decomposition.setThreshold(m_damping_coefficient);
     m_jacobian_inverse.noalias() = jacobian_decomposition.pseudoInverse();
