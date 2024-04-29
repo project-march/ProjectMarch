@@ -20,7 +20,7 @@ public:
     ~IKSolver() = default;
 
     void createTask(const std::string& name, const std::string reference_frame,
-        const std::vector<std::string>& node_names, const unsigned int& workspace_dim,
+        const std::vector<int>& joint_indices, const unsigned int& workspace_dim,
         const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
         const std::vector<double>& gain_i, const double& damping_coefficient);
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);

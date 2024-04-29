@@ -1,49 +1,41 @@
 #include "march_ik_solver/task.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "geometry_msgs/msg/point.hpp"
-#include "march_shared_msgs/msg/node_jacobian.hpp"
+
+#include <algorithm>
+#include <functional>
+#include <memory>
 
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/jacobian.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
-#include "pinocchio/spatial/explog.hpp"
 #include "math.h"
 
-Task::Task(const std::string& task_name, const std::string& reference_frame, const unsigned int& workspace_dim,
-    const unsigned int& configuration_dim, const float& dt)
+Task::Task(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
+    const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt)
 {
     m_task_name = task_name;
     m_reference_frame = reference_frame;
+    m_joint_indices = joint_indices;
     setTaskM(workspace_dim);
     setTaskN(configuration_dim);
     m_dt = dt;
-    m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
-    m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
 
     // Load URDF model
-    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description")
-        + "/urdf/march9/march9.urdf";
+    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_model);
     m_data = std::make_unique<pinocchio::Data>(m_model);
 
-    // Set joint indices
-    m_joint_indices = {4, 9};
-
     // Configure ik solver variables
-    const unsigned int TOTAL_SE3_SIZE = SE3_SIZE * m_joint_indices.size();
+    const unsigned int TOTAL_SE3_SIZE = SE3_SIZE * joint_indices.size();
     m_current_task = Eigen::VectorXd::Zero(TOTAL_SE3_SIZE);
     m_jacobian = Eigen::MatrixXd::Zero(TOTAL_SE3_SIZE, m_model.nv);
+    m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
+    m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
 }
 
 void Task::setTaskName(const std::string& task_name)
 {
     m_task_name = task_name;
-}
-
-void Task::setNodeNames(const std::vector<std::string>& node_names)
-{
-    m_node_names = node_names;
 }
 
 void Task::setTaskM(const unsigned int& task_m)
@@ -66,7 +58,7 @@ void Task::setTaskN(const unsigned int& task_n)
     m_task_n = task_n;
 
     // Initialize damping identity matrix for singularity-robustness
-    m_damping_identity = Eigen::MatrixXd::Identity(12, 10);
+    m_damping_identity = Eigen::MatrixXd::Identity(m_task_n, m_task_n);
 }
 
 void Task::setDt(const float& dt)
@@ -108,8 +100,11 @@ void Task::setDampingCoefficient(const float& damping_coefficient)
 Eigen::VectorXd Task::solveTask()
 {
     Eigen::VectorXd error = calculateError();
-    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(10);
-    joint_velocities.noalias() = m_jacobian_inverse * error;
+    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_model.nv);
+    Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
+    jacobian_decomposition.setThreshold(m_damping_coefficient);
+    joint_velocities.noalias() = jacobian_decomposition.solve(error);
+    // joint_velocities.noalias() = m_jacobian_inverse * error;
     return joint_velocities;
 }
 
@@ -147,39 +142,29 @@ Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd& error)
     return derivative_error;
 }
 
-void Task::requestCurrentTask()
+void Task::computeCurrentTask()
 {
     pinocchio::forwardKinematics(m_model, *m_data, *m_current_joint_positions_ptr);
-    computeCurrentTask();
-    computeJacobian();
+    computeCurrentTaskCoordinates();
+    computeCurrentTaskJacobian();
     computeJacobianInverse();
 }
 
 void Task::computeJacobianInverse()
 {
-    Eigen::MatrixXd damped_jacobian = Eigen::MatrixXd::Zero(12, 10);
-    damped_jacobian.noalias() = m_jacobian + m_damping_identity;
-    m_jacobian_inverse.noalias() = damped_jacobian.completeOrthogonalDecomposition().pseudoInverse();
-}
+    m_jacobian_inverse = Eigen::MatrixXd::Zero(m_model.nv, m_task_m);
+    // // The damping coefficient is added to the diagonal of the Jacobian transpose times Jacobian matrix
+    // if (m_task_m > m_task_n) {
+    //     m_jacobian_inverse.noalias()
+    //         = (m_jacobian.transpose() * m_jacobian + m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_n, m_task_n)).inverse() * m_jacobian.transpose();
+    // } else { // m_task_m <= m_task_n
+    //     m_jacobian_inverse.noalias()
+    //         = m_jacobian.transpose() * (m_jacobian * m_jacobian.transpose() + m_damping_coefficient * Eigen::MatrixXd::Identity(m_task_m, m_task_m)).inverse();
+    // }
 
-std::vector<std::string> Task::getNodeNames() const
-{
-    return m_node_names;
-}
-
-std::string Task::getTaskName() const
-{
-    return m_task_name;
-}
-
-unsigned int Task::getTaskM() const
-{
-    return m_task_m;
-}
-
-unsigned int Task::getTaskN() const
-{
-    return m_task_n;
+    Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
+    jacobian_decomposition.setThreshold(m_damping_coefficient);
+    m_jacobian_inverse.noalias() = jacobian_decomposition.pseudoInverse();
 }
 
 double Task::getErrorNorm() const
@@ -194,36 +179,17 @@ Eigen::MatrixXd Task::getNullspaceProjection() const
     return nullspace_projection;
 }
 
-const std::vector<std::string>* Task::getJointNamesPtr() const
-{
-    return m_joint_names_ptr;
-}
-
-const Eigen::VectorXd* Task::getCurrentJointPositionsPtr() const
-{
-    return m_current_joint_positions_ptr;
-}
-
-Eigen::MatrixXd Task::getJacobian() const
-{
-    return m_jacobian;
-}
-
-Eigen::MatrixXd Task::getJacobianInverse() const
-{
-    return m_jacobian_inverse;
-}
-
-void Task::computeCurrentTask()
+void Task::computeCurrentTaskCoordinates()
 {
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
-        // Fixed-size template cannot be used with anti-aliased types
+        // Fixed-size template cannot be used with aliases
         m_current_task.segment<3>(SE3_SIZE * i) = m_data->oMi[m_joint_indices[i]].translation();
-        m_current_task.segment<3>(SE3_SIZE * EUCLIDEAN_SIZE) = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(2, 1, 0);
+        m_current_task.segment<3>(SE3_SIZE * i + EUCLIDEAN_SIZE) 
+            = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(ROTATION_YAW_INDEX, ROTATION_PITCH_INDEX, ROTATION_ROLL_INDEX);
     }
 }
 
-void Task::computeJacobian()
+void Task::computeCurrentTaskJacobian()
 {
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
         pinocchio::Data::Matrix6x jacobian_joint(SE3_SIZE, m_model.nv);

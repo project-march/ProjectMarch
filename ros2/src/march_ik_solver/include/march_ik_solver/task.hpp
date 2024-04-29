@@ -3,50 +3,44 @@
 
 #define EIGEN_RUNTIME_NO_MALLOC
 
-#include <algorithm>
-#include <functional>
-#include <memory>
 #include <string>
 #include <vector>
-
-#include "rclcpp/rclcpp.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
 #include "pinocchio/algorithm/kinematics.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
 
 class Task {
 public:
     typedef std::unique_ptr<Task> UniquePtr;
     typedef std::shared_ptr<Task> SharedPtr;
 
-    Task(const std::string& task_name, const std::string& reference_frame, const unsigned int& workspace_dim,
-        const unsigned int& configuration_dim, const float& dt);
+    Task(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
+        const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt);
     ~Task() = default;
 
     Eigen::VectorXd solveTask();
     Eigen::VectorXd calculateError();
     Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd& error);
     Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd& error);
-    void requestCurrentTask();
+    void computeCurrentTask();
 
-    std::vector<std::string> getNodeNames() const;
     inline std::vector<int> getJointIndices() const { return m_joint_indices; }
-    std::string getTaskName() const;
-    unsigned int getTaskM() const;
-    unsigned int getTaskN() const;
+    inline std::string getTaskName() const { return m_task_name; }
+    inline unsigned int getTaskM() const { return m_task_m; }
+    inline unsigned int getTaskN() const { return m_task_n; }
     double getErrorNorm() const;
-    Eigen::VectorXd getDesiredTask() const;
+    inline Eigen::VectorXd getDesiredTask() const { return m_desired_task; }
     Eigen::MatrixXd getNullspaceProjection() const;
-    Eigen::MatrixXd getJacobian() const;
-    Eigen::MatrixXd getJacobianInverse() const;
-    const std::vector<std::string>* getJointNamesPtr() const;
-    const Eigen::VectorXd* getCurrentJointPositionsPtr() const;
+    inline Eigen::MatrixXd getJacobian() const { return m_jacobian; }
+    inline Eigen::MatrixXd getJacobianInverse() const { return m_jacobian_inverse; }
+    inline const std::vector<std::string>* getJointNamesPtr() const { return m_joint_names_ptr; }
+    inline const Eigen::VectorXd* getCurrentJointPositionsPtr() const { return m_current_joint_positions_ptr; }
 
     void setTaskName(const std::string& task_name);
-    void setNodeNames(const std::vector<std::string>& node_names);
     inline void setJointIndices(const std::vector<int>& joint_indices) { m_joint_indices = joint_indices; }
     void setTaskM(const unsigned int& task_m);
     void setTaskN(const unsigned int& task_n);
@@ -64,20 +58,20 @@ public:
     inline void setUnitTest(const bool& unit_test) { m_unit_test = unit_test; }
 
 private:
-    void computeCurrentTask();
-    void computeJacobian();
+    void computeCurrentTaskCoordinates();
+    void computeCurrentTaskJacobian();
     void computeJacobianInverse();
 
     std::string m_task_name;
     std::string m_reference_frame;
     unsigned int m_task_m;
     unsigned int m_task_n;
-    std::vector<std::string> m_node_names;
     std::vector<int> m_joint_indices;
     bool m_unit_test = false;
 
     std::vector<std::string>* m_joint_names_ptr;
     Eigen::VectorXd* m_current_joint_positions_ptr;
+    Eigen::Quaterniond* m_world_to_base_orientation_ptr;
     Eigen::VectorXd m_desired_task;
     Eigen::MatrixXd m_gain_p;
     Eigen::MatrixXd m_gain_d;
@@ -99,6 +93,9 @@ private:
     
     const unsigned int EUCLIDEAN_SIZE = 3;
     const unsigned int SE3_SIZE = 6;
+    const unsigned int ROTATION_ROLL_INDEX = 0;
+    const unsigned int ROTATION_PITCH_INDEX = 1;
+    const unsigned int ROTATION_YAW_INDEX = 2;
 };
 
 #endif // IK_SOLVER__TASK_HPP

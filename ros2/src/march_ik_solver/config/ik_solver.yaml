@@ -1,10 +1,10 @@
 ik_solver:
   ros__parameters:
-    state_estimator_time_offset: 50e-3
+    state_estimator_time_offset: 30e-3
     joint_trajectory_controller_period: 5e-3
     convergence_threshold: 1e-4
     max_iterations: 100000
-    integral_dt: 25e-5
+    integral_dt: 1e-3
     joint:
       names:
       - left_hip_aa
@@ -32,38 +32,58 @@ ik_solver:
         positions:
           upper: [10.0, 115.0, 125.0, 20.0, 8.0, 10.0, 115.0, 125.0, 20.0, 8.0]
           lower: [-20.0, -20.0, 0.0, -28.0, -8.0, -20.0, -20.0, 0.0, -28.0, -8.0]
-          soft: 3.0
+          soft: 5.0
         velocities:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
     task_names:
     # - posture
     - motion
+    # - left_foot
+    # - right_foot
     # - stability # Comment to disable stability task
     motion:
       reference_frame: "body"
-      nodes: ["L_ankle", "R_ankle"]
+      joint_indices: [4, 9]
       m: 12
       n: 10
-      kp: [100.0, 200.0, 300.0, 0.0, 0.0, 0.0, 100.0, 200.0, 300.0, 0.0, 0.0, 0.0]
-      kd: [0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-6
-    stability:
-      reference_frame: "inertial"
-      nodes: ["zmp"]
-      m: 6
-      n: 8
-      kp: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
-    posture:
-      reference_frame: "inertial"
-      nodes: ["L_ankle", "R_ankle"]
-      m: 12
-      n: 8
-      kp: [0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0]
+      kp: [25.0, 25.0, 25.0, 0.0, 10.0, 0.0, 25.0, 25.0, 25.0, 0.0, 10.0, 0.0]
       kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
+      damp_coeff: 1e-6
+    # left_foot:
+    #   reference_frame: "body"
+    #   joint_indices: [4]
+    #   m: 6
+    #   n: 10
+    #   kp: [30.0, 4.0, 30.0, 0.0, 0.0, 0.0]
+    #   kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   damp_coeff: 1e-3
+    # right_foot:
+    #   reference_frame: "body"
+    #   joint_indices: [9]
+    #   m: 6
+    #   n: 10
+    #   kp: [30.0, 4.0, 30.0, 0.0, 0.0, 0.0]
+    #   kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   damp_coeff: 1e-3
+    # stability:
+    #   reference_frame: "inertial"
+    #   joint_indices: [4, 9]
+    #   m: 6
+    #   n: 8
+    #   kp: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #   damp_coeff: 1e-12
+    posture:
+      reference_frame: "body"
+      joint_indices: [4, 9]
+      m: 12
+      n: 10
+      kp: [0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0]
+      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      damp_coeff: 1e-3

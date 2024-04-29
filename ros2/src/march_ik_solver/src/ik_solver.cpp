@@ -5,12 +5,11 @@
 #include <math.h>
 
 void IKSolver::createTask(const std::string& name, const std::string reference_frame,
-    const std::vector<std::string>& node_names, const unsigned int& workspace_dim,
+    const std::vector<int>& joint_indices, const unsigned int& workspace_dim,
     const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
     const std::vector<double>& gain_i, const double& damping_coefficient)
 {
-    m_task_map[name] = std::make_unique<Task>(name, reference_frame, workspace_dim, configuration_dim, m_dt);
-    m_task_map[name]->setNodeNames(node_names);
+    m_task_map[name] = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);
     m_task_map[name]->setGainI(gain_i);
@@ -39,11 +38,11 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
 {
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
     for (const auto& task_name : m_task_names) {
-        m_task_map.at(task_name)->requestCurrentTask();
-        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask();
-            // + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
+        m_task_map.at(task_name)->computeCurrentTask();
+        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
+            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
-    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
+    // m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
     return m_desired_joint_velocities;
 }
 
@@ -91,8 +90,9 @@ void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_name
         return;
     }
 
+    double multiplier = 1.0;
     for (long unsigned int i = 0; i < joint_names.size(); i++) {
         m_joint_position_limits.push_back({ deg2rad(joint_position_lower_limits[i]), deg2rad(joint_position_upper_limits[i]) });
-        m_joint_velocity_limits.push_back({ deg2rad(joint_velocity_lower_limits[i]), deg2rad(joint_velocity_upper_limits[i]) });
+        m_joint_velocity_limits.push_back({ multiplier * deg2rad(joint_velocity_lower_limits[i]), multiplier * deg2rad(joint_velocity_upper_limits[i]) });
     }
 }

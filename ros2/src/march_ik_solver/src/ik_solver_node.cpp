@@ -44,18 +44,54 @@ IKSolverNode::~IKSolverNode()
 
 void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
+    /*
+        Big TODO: Expand the stack of tasks
+        - Separate Y-motion from "motion" task and create a new task for it.
+            - This will allow the robot to stick to the desired Y-motion while the "motion" task is being solved.
+    */
+
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
-    Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(12);
-    desired_pose << 
+    // Eigen::VectorXd desired_forward_motion = Eigen::VectorXd::Zero(12);
+    // desired_forward_motion << 
+    //     msg->left_foot_position.x, 0, msg->left_foot_position.z, 0, 0, 0,
+    //     msg->right_foot_position.x, 0, msg->right_foot_position.z, 0, 0, 0;
+    // desired_tasks["forward_motion"] = desired_forward_motion;
+
+    // Eigen::VectorXd desired_lateral_motion = Eigen::VectorXd::Zero(12);
+    // desired_lateral_motion <<
+    //     0, msg->left_foot_position.y, 0, 0, 0, 0,
+    //     0, msg->right_foot_position.y, 0, 0, 0, 0;
+    // desired_tasks["lateral_motion"] = desired_lateral_motion;
+
+    Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(12);
+    desired_motion << 
         msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0,
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
-    desired_tasks["motion"] = desired_pose;
+    desired_tasks["motion"] = desired_motion;
+
+    Eigen::VectorXd desired_left_foot = Eigen::VectorXd::Zero(6);
+    desired_left_foot << 
+        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0;
+    desired_tasks["left_foot"] = desired_left_foot;
+
+    Eigen::VectorXd desired_right_foot = Eigen::VectorXd::Zero(6);
+    desired_right_foot << 
+        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
+    desired_tasks["right_foot"] = desired_right_foot;
 
     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(6);
     desired_stability << 0.295, 0.0, 0.0, 0.0, 0.0, 0.0;
     desired_tasks["stability"] = desired_stability;
+
+    Eigen::VectorXd desired_slippage_left = Eigen::VectorXd::Zero(6);
+    desired_slippage_left << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    desired_tasks["slippage_left"] = desired_slippage_left;
+
+    Eigen::VectorXd desired_slippage_right = Eigen::VectorXd::Zero(6);
+    desired_slippage_right << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    desired_tasks["slippage_right"] = desired_slippage_right;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
     desired_posture << 
@@ -148,18 +184,15 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     uint32_t iteration = 0;
     double best_error = 1e9;
     do {
-        Eigen::VectorXd desired_joint_velocities = m_ik_solver->solveInverseKinematics();
-        Eigen::VectorXd desired_joint_positions = m_ik_solver->integrateJointVelocities();
-        double error = m_ik_solver->getTasksError();
-        if (error < best_error) {
-            m_desired_joint_velocities = desired_joint_velocities;
-            m_desired_joint_positions = desired_joint_positions;
-            best_error = error;
-        }
+        m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
+        m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
+        best_error = m_ik_solver->getTasksError();
+
         if (best_error <= m_convergence_threshold) {
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
             break;
         }
+        
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
     RCLCPP_INFO_THROTTLE(
@@ -280,9 +313,9 @@ void IKSolverNode::configureTasksParameters()
     m_ik_solver->setTaskNames(task_names);
 
     for (const auto& task_name : task_names) {
-        RCLCPP_DEBUG(this->get_logger(), "Task name: %s", task_name.c_str());
+        RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
         declare_parameter(task_name + ".reference_frame", "body");
-        declare_parameter(task_name + ".nodes", std::vector<std::string>());
+        declare_parameter(task_name + ".joint_indices", std::vector<long int>());
         declare_parameter(task_name + ".m", 0);
         declare_parameter(task_name + ".n", 0);
         declare_parameter(task_name + ".kp", std::vector<double>());
@@ -291,7 +324,7 @@ void IKSolverNode::configureTasksParameters()
         declare_parameter(task_name + ".damp_coeff", 0.0);
 
         std::string reference_frame = get_parameter(task_name + ".reference_frame").as_string();
-        std::vector<std::string> nodes = get_parameter(task_name + ".nodes").as_string_array();
+        std::vector<long int> joint_indices = get_parameter(task_name + ".joint_indices").as_integer_array();
         long unsigned int task_dim = get_parameter(task_name + ".m").as_int();
         long unsigned int workspace_dim = get_parameter(task_name + ".n").as_int();
         std::vector<double> kp = get_parameter(task_name + ".kp").as_double_array();
@@ -299,7 +332,12 @@ void IKSolverNode::configureTasksParameters()
         std::vector<double> ki = get_parameter(task_name + ".ki").as_double_array();
         double damp_coeff = get_parameter(task_name + ".damp_coeff").as_double();
 
-        m_ik_solver->createTask(task_name, reference_frame, nodes, task_dim, workspace_dim, kp, kd, ki, damp_coeff);
+        // Convert the joint indices to int.
+        std::vector<int> joint_indices_int(joint_indices.begin(), joint_indices.end());
+        for (const auto& joint_index : joint_indices_int) {
+            RCLCPP_INFO(this->get_logger(), "Joint index: %d", joint_index);
+        }
+        m_ik_solver->createTask(task_name, reference_frame, joint_indices_int, task_dim, workspace_dim, kp, kd, ki, damp_coeff);
     }
 }
 
