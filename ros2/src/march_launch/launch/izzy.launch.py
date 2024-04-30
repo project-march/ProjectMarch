@@ -246,6 +246,12 @@ def generate_launch_description() -> LaunchDescription:
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
         ),
+        Node(
+            package='march_filters',
+            executable='filters_node',
+            name='filters_node',
+            output='screen',
+        ),
 
         mujoco_node,
         march_control,
