@@ -34,11 +34,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_first_stand = true; 
     m_active = false; 
 
-    m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
-                        "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
-    initializeConstantsPoints(m_trajectory_prev_point);
-    initializeConstantsPoints(m_trajectory_des_point); 
-    m_trajectory_des_point.time_from_start.nanosec = int(50*1e6); 
+    // m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+    //                     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
 
     m_current_state_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1));
     m_exo_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));

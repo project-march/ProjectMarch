@@ -64,7 +64,6 @@ private:
     std::vector<double> remapKinematicChaintoAlphabetical(const std::vector<double> &kinematic_vector);
     // Member variables 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; 
-    // rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_joint_angle_trajectory_publisher; 
     // rclcpp::TimerBase::SharedPtr m_timer;
     // rclcpp::Client<march_shared_msgs::srv::GetCurrentJointPositions>::SharedPtr m_get_current_joint_angles_client;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
@@ -76,8 +75,6 @@ private:
     
     GaitPlanningAngles m_gait_planning; 
     std_msgs::msg::Float64MultiArray m_joints_msg;
-    // trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_prev_point;
-    // trajectory_msgs::msg::JointTrajectoryPoint m_trajectory_des_point;
 
     std::vector<std::vector<double>> m_current_trajectory; 
 
