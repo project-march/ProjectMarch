@@ -164,6 +164,10 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::variableStepStoneT
     }
 
     m_variable_step_trajectory.insert(m_variable_step_trajectory.end(), left_close.begin(), left_close.end());
+    for (int i = m_variable_step_trajectory.size() - 5; i < m_variable_step_trajectory.size(); ++i) {
+        m_variable_step_trajectory[i][0] = m_variable_step_trajectory[m_variable_step_trajectory.size() - 5][0];
+        m_variable_step_trajectory[i][1] = m_variable_step_trajectory[m_variable_step_trajectory.size() - 5][1];
+    }
     return m_variable_step_trajectory; 
 
 }
