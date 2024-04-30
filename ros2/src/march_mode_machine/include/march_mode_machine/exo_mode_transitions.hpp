@@ -7,6 +7,7 @@
 
 class ExoModeTransitions {
 public:
+    // Default constructor is never used, but needs to be defined
     ExoModeTransitions() {
         transitions = {
             { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
@@ -43,7 +44,7 @@ public:
                 { exoMode::SmallWalk, {exoMode::Stand, exoMode::Error}}, 
                 { exoMode::BootUp, { exoMode::Stand } },
                 { exoMode::Error, {}},
-                { exoMode::VariableStep, { exoMode::Stand, exoMode::Error}}, 
+                { exoMode::VariableStep, { exoMode::VariableStep, exoMode::Stand, exoMode::Error}}, 
                 { exoMode::VariableWalk, { exoMode::Stand, exoMode::Error}}, 
                 { exoMode::HighStep1, { exoMode::Stand, exoMode::Error}},
                 { exoMode::HighStep2, { exoMode::Stand, exoMode::Error}},

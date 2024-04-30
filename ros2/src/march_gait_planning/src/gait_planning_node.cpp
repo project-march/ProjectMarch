@@ -325,17 +325,23 @@ void GaitPlanningNode::publishFootPositions(){
             break;
 
         case exoMode::VariableStep : 
-            if (m_current_trajectory.empty()){
-                setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
-                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+            if (m_gait_planning.getPreviousGaitType() == exoMode::Stand){
+                // First stepping stone
+                if (m_current_trajectory.empty()){
+                    m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                }
+                else { 
+                    GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
+                    m_current_trajectory.erase(m_current_trajectory.begin());
+                    setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
+                                    current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
+                    m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                } 
             }
-            else { 
-                GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
-                m_current_trajectory.erase(m_current_trajectory.begin());
-                setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
-                                current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
-                m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
-            } 
+            if (m_gait_planning.getPreviousGaitType() == exoMode::VariableStep){
+                // Remaining stepping stones
+            }
+           
             break;
         
         case exoMode::HighStep1 :
