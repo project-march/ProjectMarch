@@ -10,6 +10,9 @@ import socket
 
 from march_ble_ipd.bluetooth_server import BluetoothServer
 
+COLOR = "\u001b[38;5;201m"
+RESET = "\033[0m"
+
 
 class BLEInputDeviceNode(Node):
 
@@ -33,8 +36,8 @@ class BLEInputDeviceNode(Node):
                                                 callback=self.alive_callback,
                                                 clock=self.get_clock())
         
-        
-        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode))
+        self.get_logger().info(f"{COLOR}Ready to connect to bluetooth device{RESET}")
+        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode))    
 
     def publish_mode(self, mode: int) -> None:
         self._requested_mode.desired_mode.mode = mode
