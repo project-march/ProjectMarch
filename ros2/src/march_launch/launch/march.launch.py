@@ -82,6 +82,16 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
+    footstep_planner = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_footstep_planner"),
+                "launch",
+                "footstep_planner.launch.py",
+            )
+        ),
+    )
+
     # region Launch Footstep Generator
     # footstep_generator_launch_dir = os.path.join(get_package_share_directory("footstep_generator"), "launch")
     # n_footsteps = 20
@@ -257,5 +267,6 @@ def generate_launch_description() -> LaunchDescription:
         ik_solver,
         state_estimator,
         ipd_node,
+        footstep_planner, 
         # footstep_generator, 
     ])
