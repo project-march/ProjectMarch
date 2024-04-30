@@ -44,12 +44,13 @@ class GaitPlanningNode:public rclcpp::Node {
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
 
     //Create subscription to the output of the footstep planner, aka the distance of the next step. 
-    // rclcpp::Subscription<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_variable_foot_step_subscriber; 
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_subscriber; 
+    rclcpp::Subscription<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_variable_foot_step_subscriber; 
 
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg); 
     void currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg); 
     void MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
+    void variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
     void publishFootPositions(); 
