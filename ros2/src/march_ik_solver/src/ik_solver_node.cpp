@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
@@ -59,8 +64,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
     desired_tasks["motion"] = desired_motion;
 
-    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(6);
-    desired_stability << 0.295, 0.0, 0.0, 0.0, 0.0, 0.0;
+    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(3);
+    desired_stability << m_x_stance_leg, m_y_stance_leg, -0.3;
     desired_tasks["stability"] = desired_stability;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
@@ -90,6 +95,18 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     }
     // m_world_to_base_orientation = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x,
     //     msg->imu.orientation.y, msg->imu.orientation.z);
+
+    m_ik_solver->setCurrentStanceLeg(msg->current_stance_leg);
+    if (msg->current_stance_leg == 0b10) {
+        m_x_stance_leg = msg->body_sole_pose[1].position.x;
+        m_y_stance_leg = msg->body_sole_pose[1].position.y;
+    } else if (msg->current_stance_leg == 0b01) {
+        m_x_stance_leg = msg->body_sole_pose[0].position.x;
+        m_y_stance_leg = msg->body_sole_pose[0].position.y;
+    } else {
+        m_x_stance_leg = (msg->body_sole_pose[0].position.x + msg->body_sole_pose[1].position.x) / 2;
+        m_y_stance_leg = (msg->body_sole_pose[0].position.y + msg->body_sole_pose[1].position.y) / 2;
+    }
 }
 
 void IKSolverNode::publishJointTrajectory()

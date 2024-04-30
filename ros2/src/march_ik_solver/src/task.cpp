@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/task.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -143,7 +148,10 @@ Eigen::VectorXd Task::calculateDerivativeError(const Eigen::VectorXd& error)
 
 void Task::computeCurrentTask()
 {
+    // Update joint positions in data
     pinocchio::forwardKinematics(m_model, *m_data, *m_current_joint_positions_ptr);
+
+    // Compute current task coordinates and Jacobian
     computeCurrentTaskCoordinates();
     computeCurrentTaskJacobian();
     computeJacobianInverse();

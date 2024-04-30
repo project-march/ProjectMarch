@@ -1,4 +1,10 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver.hpp"
+#include "march_ik_solver/task_stability.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/clamp.hpp>
@@ -9,7 +15,11 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
     const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
     const std::vector<double>& gain_i, const double& damping_coefficient)
 {
-    m_task_map[name] = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+    if (name == "stability") {
+        m_task_map[name] = std::make_unique<TaskStability>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+    } else {
+        m_task_map[name] = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+    }
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);
     m_task_map[name]->setGainI(gain_i);
@@ -39,7 +49,18 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
     for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->computeCurrentTask();
-        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
+        Eigen::VectorXd task_desired_joint_velocities = m_task_map.at(task_name)->solveTask();
+
+        if (task_name == "stability") {
+            if (!(m_current_stance_leg & 0b01)) {
+                task_desired_joint_velocities.segment(0, 5) = Eigen::VectorXd::Zero(5);
+            }
+            if (!((m_current_stance_leg & 0b10) >> 1)) {
+                task_desired_joint_velocities.segment(5, 5) = Eigen::VectorXd::Zero(5);
+            }
+        }
+
+        m_desired_joint_velocities.noalias() += task_desired_joint_velocities
             + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
     m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);

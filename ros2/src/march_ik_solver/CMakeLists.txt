@@ -33,9 +33,10 @@ find_package(OpenMP REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
-  src/task.cpp
-  src/ik_solver.cpp
   src/ik_solver_node.cpp
+  src/ik_solver.cpp
+  src/task.cpp
+  src/task_stability.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -50,7 +51,12 @@ ament_target_dependencies(${PROJECT_NAME}
   ament_index_cpp
 )
 
-add_executable(ik_solver_node src/ik_solver_node.cpp src/ik_solver.cpp src/task.cpp)
+add_executable(ik_solver_node 
+  src/ik_solver_node.cpp 
+  src/ik_solver.cpp 
+  src/task.cpp
+  src/task_stability.cpp
+)
 
 target_include_directories(ik_solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

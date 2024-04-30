@@ -250,6 +250,38 @@ void SensorFusionNode::publishStateEstimation()
         body_ankle_poses.push_back(ankle_pose);
     }
 
+    std::vector<geometry_msgs::msg::Pose> body_sole_poses;
+    try {
+        geometry_msgs::msg::PoseStamped sole_pose;
+        geometry_msgs::msg::TransformStamped transform_stamped;
+
+        // Get left foot positions w.r.t. backpack frame
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
+
+        // Get right foot positions in body frame w.r.t. backpack frame
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
+    }
+    catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in body frame: %s", e.what());
+        return;
+    }
+
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "joint_link";
     state_estimation_msg.step_time = m_dt;
@@ -264,6 +296,7 @@ void SensorFusionNode::publishStateEstimation()
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
     state_estimation_msg.body_ankle_pose = body_ankle_poses;
+    state_estimation_msg.body_sole_pose = body_sole_poses;
     state_estimation_msg.foot_pose = body_foot_poses;
     state_estimation_msg.inertial_foot_position = inertial_foot_positions;
     state_estimation_msg.current_stance_leg = m_sensor_fusion->getCurrentStanceLeg();

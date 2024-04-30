@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef IK_SOLVER__IK_SOLVER_HPP_
 #define IK_SOLVER__IK_SOLVER_HPP_
 
@@ -41,6 +46,7 @@ public:
     };
 
     inline void setDt(const double& dt) { m_dt = dt; };
+    inline void setCurrentStanceLeg(const uint8_t& current_stance_leg) { m_current_stance_leg = current_stance_leg; };
     inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
     void setJointConfigurations(const std::vector<std::string>& joint_names,
         const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
@@ -55,6 +61,7 @@ private:
     const unsigned int UPPER_JOINT_LIMIT = 1;
 
     double m_dt;
+    uint8_t m_current_stance_leg;
     std::vector<std::string> m_task_names;
     std::unordered_map<std::string, Task::UniquePtr> m_task_map;
     Eigen::VectorXd m_current_joint_positions;

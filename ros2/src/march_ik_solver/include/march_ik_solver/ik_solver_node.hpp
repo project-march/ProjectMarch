@@ -1,3 +1,9 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
+
 #ifndef IK_SOLVER__IK_SOLVER_NODE_HPP_
 #define IK_SOLVER__IK_SOLVER_NODE_HPP_
 
@@ -45,6 +51,8 @@ private:
     double m_state_estimator_time_offset;
     double m_convergence_threshold;
     unsigned int m_max_iterations;
+    double m_x_stance_leg;
+    double m_y_stance_leg;
 
     std::vector<std::string> m_joint_names;
     std::vector<std::string> m_joint_names_alphabetical;

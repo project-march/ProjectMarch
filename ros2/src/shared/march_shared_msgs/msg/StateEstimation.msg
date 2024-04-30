@@ -3,6 +3,7 @@ float64 step_time
 sensor_msgs/JointState joint_state
 march_shared_msgs/DynamicalJointState dynamical_joint_state
 sensor_msgs/Imu imu
+geometry_msgs/Pose[] body_sole_pose
 geometry_msgs/Pose[] body_ankle_pose
 geometry_msgs/Pose[] foot_pose
 geometry_msgs/Pose[] inertial_foot_position

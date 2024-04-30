@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef IK_SOLVER__TASK_HPP
 #define IK_SOLVER__TASK_HPP
 
@@ -57,9 +62,9 @@ public:
     inline void setJacobian(const Eigen::MatrixXd& jacobian) { m_jacobian = jacobian; }
     inline void setUnitTest(const bool& unit_test) { m_unit_test = unit_test; }
 
-private:
-    void computeCurrentTaskCoordinates();
-    void computeCurrentTaskJacobian();
+protected:
+    virtual void computeCurrentTaskCoordinates();
+    virtual void computeCurrentTaskJacobian();
     void computeJacobianInverse();
 
     std::string m_task_name;
