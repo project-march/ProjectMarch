@@ -10,6 +10,7 @@
 
 #include "march_hardware/motor_controller/actuation_mode.h"
 
+#include <rclcpp/rclcpp.hpp>
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -17,7 +18,9 @@
 #include <unistd.h>
 #include <utility>
 
-//#define DEBUG_EFFORT
+// Allows easy debugging of all incoming errors
+// #define DEBUG_MODE
+
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -43,15 +46,9 @@ std::chrono::nanoseconds ODrive::prepareActuation()
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
         
         // For the MDrives and M9 joints
-        // setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
-        // logger_->info("Initializing the full calibration.");
-        // return std::chrono::seconds { 30 };
-
-        // For the ODrives and M8 joints
-        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-        logger_->info("Initializing the encoder index search.");
+        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
+        logger_->info("Initializing the full calibration.");
         return std::chrono::seconds { 20 };
-
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -190,6 +187,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->absolute_position_iu_ = getAbsolutePositionIU();
         state->absolute_position_ = getAbsolutePositionUnchecked();
         state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
+
     }
     if (hasIncrementalEncoder()) {
         state->incremental_position_iu_ = getIncrementalPositionIU();
@@ -198,22 +196,21 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
+    // TODO: create hasAIEAbsoluteEncoder() method
+    state->AIE_absolute_position_ = getAIEAbsolutePositionIU();
+
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
-    state->odrive_error_ = getOdriveError();
+    state->odrive_error_ = getODriveError();
     state->axis_error_ = getAxisError();
     state->motor_error_ = getMotorError();
-    state->dieboslave_error_ = getDieBOSlaveError();
     state->encoder_error_ = getEncoderError();
+    state->torquesensor_error_ = getTorqueSensorError();
     state->controller_error_ = getControllerError();
 
     return state;
 }
 
-// float ODrive::getTorque()
-//{
-//    return getMotorCurrent() * torque_constant_;
-//}
 
 float ODrive::getMotorTemperature()
 {
@@ -227,7 +224,6 @@ float ODrive::getOdriveTemperature()
 
 ODriveAxisState ODrive::getAxisState()
 {
-    // logger_->info("Reading axis state");
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
@@ -257,6 +253,12 @@ float ODrive::getIncrementalVelocityIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorVelocity, axis_)).f
         * (float)incremental_encoder_->getDirection();
+}
+
+uint32_t ODrive::getAIEAbsolutePositionIU()
+{
+    uint32_t aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
+    return aie_pos; 
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -297,34 +299,70 @@ float ODrive::getActualEffort()
     return getMotorCurrent();
 }
 
-uint32_t ODrive::getOdriveError()
+uint32_t ODrive::getODriveError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveError, ODriveAxis::None)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ODriveError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "ODrive error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getAxisError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Axis error: %u", error);
+    }
+#endif
+    return error;
 }
 
-uint32_t ODrive::getMotorError()
+uint64_t ODrive::getMotorError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
-}
-
-uint32_t ODrive::getDieBOSlaveError()
-{
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::DieBOSlaveError, axis_)).ui;
+    uint64_t error = this->read64(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Motor error: %llu", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getEncoderError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Encoder error: %u", error);
+    }
+#endif
+    return error;
+}
+
+uint32_t ODrive::getTorqueSensorError()
+{
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::TorqueSensorError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Torque sensor error: %u", error);
+    }
+#endif
+    return error;
 }
 
 uint32_t ODrive::getControllerError()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
+    uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
+#ifdef DEBUG_MODE
+    if (error != 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Controller error: %u", error);
+    }
+#endif
+    return error;
 }
 
 void ODrive::setAxisState(ODriveAxisState state)

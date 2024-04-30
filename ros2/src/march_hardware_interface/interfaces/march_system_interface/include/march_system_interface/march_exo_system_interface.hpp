@@ -111,7 +111,7 @@ public:
         }
 
         if (!jointFound) {
-            RCLCPP_WARN(get_logger(), "Joint '%s' not found!", joint_name.c_str());
+            RCLCPP_WARN_ONCE(get_logger(), "Joint '%s' not found!", joint_name.c_str());
         }
     }
 

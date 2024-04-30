@@ -36,13 +36,10 @@ alias gits='git status'
 
 # NEW M9 ALIASES
 alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
-alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py'
 alias convert_db3_to_mcap='cm && sros2 && ./utility_scripts/convert_db3_to_mcap.sh'
 
-alias angles_air='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="false"'
-alias angles_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
-alias cartesian_air='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0.xml" aie_force:="true"'
-alias cartesian_ground_aie='cm2 && sros2 && sfox && ros2 launch march_launch march.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" aie_force:="true"'
+alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march9.xml" aie_force:="true"'
+alias cartesian='cm2 && sros2 && sfox && ros2 launch march_launch izzy.launch.py model_to_load_mujoco:="march9.xml" aie_force:="true"'
 
 alias test_joints='cm2 && sros2 && sfox && ros2 launch march_launch test_joints.launch.py model_to_load_mujoco:="march9.xml"'
 
