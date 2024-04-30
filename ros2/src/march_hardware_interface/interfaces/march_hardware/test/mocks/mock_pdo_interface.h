@@ -19,6 +19,7 @@ public:
     MOCK_CONST_METHOD2(read8, march::bit8(uint16_t, uint8_t));
     MOCK_CONST_METHOD2(read16, march::bit16(uint16_t, uint8_t));
     MOCK_CONST_METHOD2(read32, march::bit32(uint16_t, uint8_t));
+    MOCK_CONST_METHOD2(read64, march::bit64(uint16_t, uint8_t));
 };
 
 using MockPdoInterfacePtr = std::shared_ptr<MockPdoInterface>;

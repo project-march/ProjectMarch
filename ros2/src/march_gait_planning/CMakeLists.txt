@@ -24,6 +24,7 @@ find_package(lifecycle_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(ament_cmake_gtest)
 find_package(rclcpp_lifecycle REQUIRED)
 
@@ -113,6 +114,7 @@ ament_target_dependencies(listener_gait_planning
   lifecycle_msgs
   std_msgs
   )
+
 
 
 # Install the executable

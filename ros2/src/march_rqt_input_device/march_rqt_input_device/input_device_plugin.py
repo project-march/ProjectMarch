@@ -21,7 +21,7 @@ def main(args=None):
     rclpy.init(args=args)
 
     try:
-        plugin = "rqt_input_device"
+        plugin = "ExoInputDevicePlugin"
         main_plugin = Main(filename=plugin)
         sys.exit(main_plugin.main(standalone=plugin))
 
@@ -41,6 +41,7 @@ class InputDevicePlugin(Plugin):
         layout_file = os.path.join(get_package_share_directory("march_mode_machine"), "generate","modes.json")
 
         self._node: Node = context.node
+        self._node.get_logger().info('InputDevicePlugin instantiated')
 
         self._controller = InputDeviceController(self._node)
         self._widget = InputDeviceView(ui_file, self._controller, layout_file)

@@ -1,5 +1,4 @@
-control_msgs/JointTrajectoryControllerState trajectory
-trajectory_msgs/JointTrajectoryPoint[] points
+std_msgs/Float64MultiArray points
 int8 reset
 
 # MODE 0 = NO RESET

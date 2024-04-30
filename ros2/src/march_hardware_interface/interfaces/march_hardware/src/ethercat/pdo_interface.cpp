@@ -65,4 +65,22 @@ bit32 PdoInterfaceImpl::read32(uint16_t slave_index, uint8_t module_index) const
 
     return return_value;
 }
+
+bit64 PdoInterfaceImpl::read64(uint16_t slave_index, uint8_t module_index) const
+{
+    const uint8_t* data_ptr = ec_slave[slave_index].inputs + module_index;
+
+    bit64 return_value {};
+    return_value.p.b0 = *(data_ptr++);
+    return_value.p.b1 = *(data_ptr++);
+    return_value.p.b2 = *(data_ptr++);
+    return_value.p.b3 = *(data_ptr++);
+    return_value.p.b4 = *(data_ptr++);
+    return_value.p.b5 = *(data_ptr++);
+    return_value.p.b6 = *(data_ptr++);
+    return_value.p.b7 = *data_ptr;
+
+    return return_value;
+}
+
 } // namespace march

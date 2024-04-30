@@ -114,7 +114,7 @@ class Gain:
         return self.gain
     
     def set_gain(self, gain) -> None:
-        self.gain = gain
+        self.gain = float(gain)
         self.update_slider_value()
         self.update_gain_value()
-        self.slider_spin_box.setValue(gain)
+        self.slider_spin_box.setValue(self.gain)

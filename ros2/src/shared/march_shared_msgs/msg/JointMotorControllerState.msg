@@ -11,3 +11,4 @@ float32 absolute_position
 float32 incremental_position
 float32 absolute_velocity
 float32 incremental_velocity
+float32 aie_absolute_position

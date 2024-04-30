@@ -50,7 +50,8 @@ RobotDescriptionNode::RobotDescriptionNode()
         std::bind(&RobotDescriptionNode::handleNodeJacobianRequest, this, std::placeholders::_1, std::placeholders::_2),
         rmw_qos_profile_services_default);
 
-    RCLCPP_INFO(this->get_logger(), "Robot Description Node initialized");
+    RCLCPP_INFO(this->get_logger(), "Robot Description Node initialized. Total number of joints: %d",
+        m_robot_description->getJointNodes().size());
 }
 
 RobotDescriptionNode::~RobotDescriptionNode()

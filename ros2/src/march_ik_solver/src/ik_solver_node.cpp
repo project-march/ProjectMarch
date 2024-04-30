@@ -30,6 +30,7 @@ IKSolverNode::IKSolverNode()
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
+    m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
     m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
 
@@ -65,7 +66,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
-    publishJointTrajectory();
+    // publishJointTrajectory();
+    publishDesiredJointPositions();
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -112,6 +114,20 @@ void IKSolverNode::publishJointTrajectory()
 
     // Update the previous joint trajectory point.
     updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
+}
+
+void IKSolverNode::publishDesiredJointPositions()
+{
+    std_msgs::msg::Float64MultiArray desired_joint_positions_msg;
+    std::vector<double> desired_joint_positions = std::vector<double>(
+        m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
+    // std::cout << "Desired joint positions: " << m_desired_joint_positions.transpose() << std::endl;
+    for (const auto& idx : m_alphabetical_joint_indices) {
+        // RCLCPP_INFO(this->get_logger(), "Joint index: %d", idx);
+        desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
+    }
+    // RCLCPP_INFO(this->get_logger(), "Desired joint positions published.");
+    m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
 }
 
 void IKSolverNode::publishErrorNorm(const double& error_norm)
@@ -184,6 +200,7 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("max_iterations", 10);
     declare_parameter("integral_dt", 0.01);
     declare_parameter("joint.names", std::vector<std::string>());
+    declare_parameter("joint.active", std::vector<bool>());
     declare_parameter("joint.limits.positions.upper", std::vector<double>());
     declare_parameter("joint.limits.positions.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
@@ -208,7 +225,17 @@ void IKSolverNode::configureIKSolverParameters()
         joint_position_limits_lower, joint_position_limits_upper,
         joint_velocity_limits_lower, joint_velocity_limits_upper);
 
-    // Store the joint indices in alphabetical order according to the joint names.
+    // Get an array of active joints and store the active joint names.
+    std::vector<bool> joint_active = get_parameter("joint.active").as_bool_array();
+    std::vector<std::string> active_joint_names;
+    for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
+        if (joint_active[i]) {
+            active_joint_names.push_back(m_joint_names[i]);
+            RCLCPP_INFO(this->get_logger(), "Active joint: %s", m_joint_names[i].c_str());
+        }
+    }
+
+    // Store the joint indices in alphabetical order according to the total joint names.
     m_alphabetical_joint_indices.clear();
     m_alphabetical_joint_indices.resize(m_joint_names.size());
     std::iota(m_alphabetical_joint_indices.begin(), m_alphabetical_joint_indices.end(), 0);
@@ -216,8 +243,17 @@ void IKSolverNode::configureIKSolverParameters()
         [&](const unsigned int& a, const unsigned int& b) {
             return m_joint_names[a] < m_joint_names[b];
         });
+
+    // Filter the joint indices according to the active joint names.
+    m_alphabetical_joint_indices.erase(
+        std::remove_if(m_alphabetical_joint_indices.begin(), m_alphabetical_joint_indices.end(),
+            [&](const unsigned int& idx) {
+                return std::find(active_joint_names.begin(), active_joint_names.end(), m_joint_names[idx]) == active_joint_names.end();
+            }),
+        m_alphabetical_joint_indices.end());
     
     // Create the alphabetical joint names, and print the joint indices and names.
+    m_joint_names_alphabetical.clear();
     RCLCPP_INFO(this->get_logger(), "Alphabetical joint indices:");
     for (const auto& joint_index : m_alphabetical_joint_indices) {
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);

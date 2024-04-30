@@ -97,12 +97,13 @@ private:
     int32_t getAbsolutePositionIU();
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
+    uint32_t getAIEAbsolutePositionIU(); 
 
-    uint32_t getOdriveError();
+    uint32_t getODriveError();
     uint32_t getAxisError();
-    uint32_t getMotorError();
-    uint32_t getDieBOSlaveError();
+    uint64_t getMotorError();
     uint32_t getEncoderError();
+    uint32_t getTorqueSensorError();
     uint32_t getControllerError();
 
     ODriveAxis axis_;
