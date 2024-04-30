@@ -24,10 +24,9 @@ GaitPlanningNode::GaitPlanningNode()
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
 
-    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::MPCCallback, this, _1)); 
-    m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::MPCCallback, this, _1)); 
-
     m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningNode::MPCCallback, this, _1));
+
+    m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::variableFootstepCallback, this, _1)); 
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
@@ -47,6 +46,16 @@ void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode
 
     publishFootPositions(); 
 }
+
+void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::FootStepOutput::SharedPtr msg){
+    RCLCPP_INFO(this->get_logger(), "Received variable step coordinate!"); 
+    float dist = msg->stepping_point.x - m_gait_planning.getCurrentRightFootPos()[0]; 
+    RCLCPP_INFO(this->get_logger(), "Calculated distance and interpolating! %f", dist); 
+    m_current_trajectory.clear(); 
+    m_current_trajectory = m_gait_planning.variableStepStoneTrajectory(dist); 
+    publishFootPositions(); 
+}
+
 
 void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current foot positions");
