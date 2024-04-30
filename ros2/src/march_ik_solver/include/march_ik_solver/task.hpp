@@ -6,6 +6,7 @@
 #ifndef IK_SOLVER__TASK_HPP
 #define IK_SOLVER__TASK_HPP
 
+#pragma once
 #define EIGEN_RUNTIME_NO_MALLOC
 
 #include <string>
@@ -57,6 +58,7 @@ public:
     inline void setDesiredTask(const Eigen::VectorXd& desired_task) { m_desired_task = desired_task; }
     inline void setJointNamesPtr(std::vector<std::string>* joint_names) { m_joint_names_ptr = joint_names; }
     inline void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr) { m_current_joint_positions_ptr = current_joint_positions_ptr; }
+    inline void setWorldToBaseOrientationPtr(std::shared_ptr<Eigen::Quaterniond> world_to_base_orientation) { m_world_to_base_orientation = world_to_base_orientation; }
 
     inline void setCurrentTask(const Eigen::VectorXd& current_task) { m_current_task = current_task; }
     inline void setJacobian(const Eigen::MatrixXd& jacobian) { m_jacobian = jacobian; }
@@ -76,7 +78,7 @@ protected:
 
     std::vector<std::string>* m_joint_names_ptr;
     Eigen::VectorXd* m_current_joint_positions_ptr;
-    Eigen::Quaterniond* m_world_to_base_orientation_ptr;
+    std::shared_ptr<Eigen::Quaterniond> m_world_to_base_orientation;
     Eigen::VectorXd m_desired_task;
     Eigen::MatrixXd m_gain_p;
     Eigen::MatrixXd m_gain_d;

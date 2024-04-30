@@ -21,18 +21,23 @@ class IKSolver {
 public:
     typedef std::array<double, 2> JointLimit;
 
-    IKSolver() = default;
+    IKSolver();
     ~IKSolver() = default;
 
     void createTask(const std::string& name, const std::string reference_frame,
         const std::vector<int>& joint_indices, const unsigned int& workspace_dim,
         const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
         const std::vector<double>& gain_i, const double& damping_coefficient);
+    Eigen::VectorXd solveInverseKinematics();
+    Eigen::VectorXd integrateJointVelocities();
+
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);
     void updateCurrentJointState(
         const std::vector<double>& current_joint_positions, const std::vector<double>& current_joint_velocities);
-    Eigen::VectorXd solveInverseKinematics();
-    Eigen::VectorXd integrateJointVelocities();
+    void updateWorldToBaseOrientation(const Eigen::Quaterniond& world_to_base_orientation);
+    inline void updateCurrentStanceLeg(const uint8_t& current_stance_leg) { m_current_stance_leg = current_stance_leg; };
+    inline void updateNextStanceLeg(const uint8_t& next_stance_leg) { m_next_stance_leg = next_stance_leg; };
+    inline void updateCurrentLinearAcceleration(const Eigen::Vector3d& current_linear_acceleration) { m_current_linear_acceleration = current_linear_acceleration; };
 
     inline std::vector<double> getCurrentJointPositions() const { return std::vector<double>(m_current_joint_positions.data(), m_current_joint_positions.data() + m_current_joint_positions.size()); };
     inline std::vector<double> getCurrentJointVelocities() const { return std::vector<double>(m_current_joint_velocities.data(), m_current_joint_velocities.data() + m_current_joint_velocities.size()); };
@@ -46,7 +51,6 @@ public:
     };
 
     inline void setDt(const double& dt) { m_dt = dt; };
-    inline void setCurrentStanceLeg(const uint8_t& current_stance_leg) { m_current_stance_leg = current_stance_leg; };
     inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
     void setJointConfigurations(const std::vector<std::string>& joint_names,
         const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
@@ -61,12 +65,16 @@ private:
     const unsigned int UPPER_JOINT_LIMIT = 1;
 
     double m_dt;
-    uint8_t m_current_stance_leg;
     std::vector<std::string> m_task_names;
     std::unordered_map<std::string, Task::UniquePtr> m_task_map;
+
+    uint8_t m_current_stance_leg;
+    uint8_t m_next_stance_leg;
     Eigen::VectorXd m_current_joint_positions;
     Eigen::VectorXd m_current_joint_velocities;
     Eigen::VectorXd m_desired_joint_velocities;
+    Eigen::Vector3d m_current_linear_acceleration;
+    std::shared_ptr<Eigen::Quaterniond> m_world_to_base_orientation;
 
     std::vector<std::string> m_joint_names;
     std::vector<JointLimit> m_joint_position_limits;

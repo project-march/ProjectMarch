@@ -141,7 +141,7 @@ void SensorFusionNode::timerCallback()
     m_tf_broadcaster->sendTransform(transform_stamped);
 
     // publishFeetHeight();
-    // publishMPCEstimation();
+    publishMPCEstimation();
     publishTorqueEstimation();
     publishStateEstimation();
 }

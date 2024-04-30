@@ -10,15 +10,30 @@
 #include <boost/algorithm/clamp.hpp>
 #include <math.h>
 
+IKSolver::IKSolver()
+{
+    m_dt = 1e-3; // s, 1 kHz control loop
+    m_current_joint_positions = Eigen::VectorXd::Zero(0);
+    m_current_joint_velocities = Eigen::VectorXd::Zero(0);
+    m_desired_joint_velocities = Eigen::VectorXd::Zero(0);
+    m_current_linear_acceleration = Eigen::Vector3d::Zero();
+}
+
 void IKSolver::createTask(const std::string& name, const std::string reference_frame,
     const std::vector<int>& joint_indices, const unsigned int& workspace_dim,
     const unsigned int& configuration_dim, const std::vector<double>& gain_p, const std::vector<double>& gain_d,
     const std::vector<double>& gain_i, const double& damping_coefficient)
 {
     if (name == "stability") {
-        m_task_map[name] = std::make_unique<TaskStability>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+        std::unique_ptr<TaskStability> stability_task
+            = std::make_unique<TaskStability>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+        stability_task->setCurrentLinearAccelerationPtr(&m_current_linear_acceleration);
+        stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
+        stability_task->setNextStanceLegPtr(&m_next_stance_leg);
+        m_task_map[name] = std::move(stability_task);
     } else {
-        m_task_map[name] = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+        m_task_map[name]
+            = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
     }
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);
@@ -26,6 +41,27 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
     m_task_map[name]->setDampingCoefficient(damping_coefficient);
     m_task_map[name]->setJointNamesPtr(&m_joint_names);
     m_task_map[name]->setCurrentJointPositionsPtr(&m_current_joint_positions);
+    m_task_map[name]->setWorldToBaseOrientationPtr(m_world_to_base_orientation);
+}
+
+Eigen::VectorXd IKSolver::solveInverseKinematics()
+{
+    m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    for (const auto& task_name : m_task_names) {
+        m_task_map.at(task_name)->computeCurrentTask();
+        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
+            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
+    }
+    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
+    return m_desired_joint_velocities;
+}
+
+Eigen::VectorXd IKSolver::integrateJointVelocities()
+{
+    Eigen::VectorXd desired_joint_positions;
+    desired_joint_positions.noalias() = m_current_joint_positions + m_desired_joint_velocities * m_dt;
+    m_current_joint_positions = clampJointLimits(desired_joint_positions);
+    return m_current_joint_positions;
 }
 
 void IKSolver::updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks)
@@ -44,35 +80,9 @@ void IKSolver::updateCurrentJointState(
         = Eigen::Map<const Eigen::VectorXd>(current_joint_velocities.data(), current_joint_velocities.size());
 }
 
-Eigen::VectorXd IKSolver::solveInverseKinematics()
+void IKSolver::updateWorldToBaseOrientation(const Eigen::Quaterniond& world_to_base_orientation)
 {
-    m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
-    for (const auto& task_name : m_task_names) {
-        m_task_map.at(task_name)->computeCurrentTask();
-        Eigen::VectorXd task_desired_joint_velocities = m_task_map.at(task_name)->solveTask();
-
-        if (task_name == "stability") {
-            if (!(m_current_stance_leg & 0b01)) {
-                task_desired_joint_velocities.segment(0, 5) = Eigen::VectorXd::Zero(5);
-            }
-            if (!((m_current_stance_leg & 0b10) >> 1)) {
-                task_desired_joint_velocities.segment(5, 5) = Eigen::VectorXd::Zero(5);
-            }
-        }
-
-        m_desired_joint_velocities.noalias() += task_desired_joint_velocities
-            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
-    }
-    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities);
-    return m_desired_joint_velocities;
-}
-
-Eigen::VectorXd IKSolver::integrateJointVelocities()
-{
-    Eigen::VectorXd desired_joint_positions;
-    desired_joint_positions.noalias() = m_current_joint_positions + m_desired_joint_velocities * m_dt;
-    m_current_joint_positions = clampJointLimits(desired_joint_positions);
-    return m_current_joint_positions;
+    m_world_to_base_orientation = std::make_shared<Eigen::Quaterniond>(world_to_base_orientation);
 }
 
 Eigen::VectorXd IKSolver::clampJointLimits(Eigen::VectorXd desired_joint_positions)

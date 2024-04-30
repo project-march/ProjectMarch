@@ -32,14 +32,15 @@ ik_solver:
         positions:
           upper: [10.0, 115.0, 125.0, 20.0, 8.0, 10.0, 115.0, 125.0, 20.0, 8.0]
           lower: [-20.0, -20.0, 0.0, -28.0, -8.0, -20.0, -20.0, 0.0, -28.0, -8.0]
-          soft: 1.5
+          soft: 2.0
         velocities:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
     task_names:
     - posture
-    - motion
     # - stability
+    - motion
+    - stability
     motion:
       reference_frame: "body"
       joint_indices: [4, 9]
@@ -52,11 +53,11 @@ ik_solver:
     stability:
       reference_frame: "body"
       joint_indices: [0]
-      m: 3
+      m: 2
       n: 10
-      kp: [5.0, 5.0, 0.0]
-      kd: [0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0]
+      kp: [18.0, 25.0]
+      kd: [2.0, 2.0]
+      ki: [1e-3, 1e-3]
       damp_coeff: 1e-6
     posture:
       reference_frame: "body"

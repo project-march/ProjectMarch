@@ -64,8 +64,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
     desired_tasks["motion"] = desired_motion;
 
-    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(3);
-    desired_stability << m_x_stance_leg, m_y_stance_leg, -0.3;
+    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
+    desired_stability << m_x_stance_leg, m_y_stance_leg;
     desired_tasks["stability"] = desired_stability;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
@@ -93,16 +93,21 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
             m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
         }
     }
-    // m_world_to_base_orientation = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x,
-    //     msg->imu.orientation.y, msg->imu.orientation.z);
+    m_ik_solver->updateWorldToBaseOrientation(
+        Eigen::Quaterniond(
+            msg->imu.orientation.w,
+            msg->imu.orientation.x,
+            msg->imu.orientation.y,
+            msg->imu.orientation.z)
+    );
 
-    m_ik_solver->setCurrentStanceLeg(msg->current_stance_leg);
-    if (msg->current_stance_leg == 0b10) {
-        m_x_stance_leg = msg->body_sole_pose[1].position.x;
-        m_y_stance_leg = msg->body_sole_pose[1].position.y;
-    } else if (msg->current_stance_leg == 0b01) {
+    m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
+    if ((msg->current_stance_leg >> 1) & 0b01) {
         m_x_stance_leg = msg->body_sole_pose[0].position.x;
         m_y_stance_leg = msg->body_sole_pose[0].position.y;
+    } else if (msg->current_stance_leg & 0b01) {
+        m_x_stance_leg = msg->body_sole_pose[1].position.x;
+        m_y_stance_leg = msg->body_sole_pose[1].position.y;
     } else {
         m_x_stance_leg = (msg->body_sole_pose[0].position.x + msg->body_sole_pose[1].position.x) / 2;
         m_y_stance_leg = (msg->body_sole_pose[0].position.y + msg->body_sole_pose[1].position.y) / 2;
@@ -246,6 +251,7 @@ void IKSolverNode::configureIKSolverParameters()
     std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
     // Apply soft limits to the joint position limits.
+    RCLCPP_INFO(this->get_logger(), "Aplying soft limits to the joint position limits.");
     double soft_limit = get_parameter("joint.limits.positions.soft").as_double();
     if (soft_limit < 0.0) {
         RCLCPP_WARN(this->get_logger(), "Soft limit must be greater than or equal to zero. Setting to zero.");
@@ -254,6 +260,8 @@ void IKSolverNode::configureIKSolverParameters()
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         joint_position_limits_upper[i] -= soft_limit;
         joint_position_limits_lower[i] += soft_limit;
+        RCLCPP_INFO(this->get_logger(), "Joint name: %s, Upper limit: %f, Lower limit: %f",
+            m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
     }
 
     // Set the joint positions and velocities limits in the IK solver.
