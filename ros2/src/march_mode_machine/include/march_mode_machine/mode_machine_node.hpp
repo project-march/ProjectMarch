@@ -11,6 +11,8 @@
 #include "march_shared_msgs/srv/request_gait.hpp"
 #include "march_shared_msgs/msg/exo_mode_array.hpp"
 #include "march_shared_msgs/srv/get_exo_mode_array.hpp"
+// #include "march_shared_msgs/msg/exo_mode.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "rclcpp/rclcpp.hpp"
 // #include "march_mode_machine/mode_machine_cartesian.hpp"
 #include "std_msgs/msg/int32.hpp"
@@ -18,6 +20,27 @@
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
+#include <unordered_map>
+
+//TODO: move to exomode generator python file 
+const std::unordered_map<exoMode, std::string> modeNodeTypeMap = {
+    {exoMode::Sit, "joint_angles"},
+    {exoMode::Stand, "joint_angles"},
+    {exoMode::Walk, "joint_angles"},
+    {exoMode::BootUp, "joint_angles"},
+    {exoMode::Error, "joint_angles"},
+    {exoMode::Sideways, "joint_angles"},
+    {exoMode::Hinge, "joint_angles"}, 
+    {exoMode::LargeWalk, "cartesian"},
+    {exoMode::SmallWalk, "cartesian"},
+    {exoMode::Ascending, "cartesian"},
+    {exoMode::Descending, "cartesian"},
+    {exoMode::VariableStep, "cartesian"},
+    {exoMode::VariableWalk, "cartesian"},
+    {exoMode::HighStep1, "cartesian"},
+    {exoMode::HighStep2, "cartesian"},
+    {exoMode::HighStep3, "cartesian"}
+};
 
 class ModeMachineNode : public rclcpp::Node 
 {

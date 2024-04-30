@@ -63,29 +63,14 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
         mode_msg.mode = m_mode_machine.getCurrentMode();
-        // To test the lifecycle nodes
-        switch (m_mode_machine.getCurrentMode()){
-            case 0 :
-            case 1 :
-            case 2 : 
-            case 3 : 
-            case 4 : 
-            case 5 : 
-                mode_msg.node_type = "joint_angles"; 
-                break; 
-            case 6 : 
-            case 7 : 
-            case 8 : 
-            case 9 : 
-            case 10 : 
-            case 11 :
-            case 12 : 
-            case 13 : 
-            case 14 : 
-                mode_msg.node_type = "cartesian"; 
-            default : 
-                break; 
+
+        auto it = modeNodeTypeMap.find((exoMode)mode_msg.mode); 
+        if (it != modeNodeTypeMap.end()){
+            mode_msg.node_type = it->second; 
+        } else {
+            mode_msg.node_type = "unknown"; 
         }
+
         RCLCPP_INFO(this->get_logger(), "Node_type set to %s", mode_msg.node_type.c_str()); 
         // end test lifecycle nodes 
         m_mode_publisher->publish(mode_msg);
