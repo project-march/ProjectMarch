@@ -89,8 +89,8 @@ SensorFusionNode::SensorFusionNode()
     m_mpc_com_pos_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("state_estimation/com_position", 10);
 
     std::vector<std::string> joint_names = { 
-        "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-        "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"
+        "left_ankle_dpf", "left_ankle_ie", "left_hip_aa", "left_hip_fe", "left_knee",
+        "right_ankle_dpf", "right_ankle_ie", "right_hip_aa", "right_hip_fe", "right_knee"
     };
     m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
     m_sensor_fusion->configureJointNames(joint_names);
@@ -98,7 +98,7 @@ SensorFusionNode::SensorFusionNode()
     m_dt = static_cast<double>(dt) / 1000.0;
     m_joint_state = nullptr;
     m_imu = nullptr;
-    m_node_feet_names = { "L_foot", "R_foot" };
+    m_node_feet_names = { "L_sole", "R_sole" };
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
@@ -129,7 +129,7 @@ void SensorFusionNode::timerCallback()
     geometry_msgs::msg::TransformStamped transform_stamped;
     transform_stamped.header.stamp = this->now();
     transform_stamped.header.frame_id = "world";
-    transform_stamped.child_frame_id = "backpack";
+    transform_stamped.child_frame_id = "base_link";
     // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
     transform_stamped.transform.translation.x = m_imu_position->point.x;
     transform_stamped.transform.translation.y = m_imu_position->point.y;
@@ -140,8 +140,8 @@ void SensorFusionNode::timerCallback()
     transform_stamped.transform.rotation.w = m_imu->orientation.w;
     m_tf_broadcaster->sendTransform(transform_stamped);
 
-    publishFeetHeight();
-    publishMPCEstimation();
+    // publishFeetHeight();
+    // publishMPCEstimation();
     publishTorqueEstimation();
     publishStateEstimation();
 }
@@ -178,7 +178,7 @@ void SensorFusionNode::publishStateEstimation()
         geometry_msgs::msg::TransformStamped transform_stamped;
 
         // Get left foot positions w.r.t. backpack frame
-        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_heel", tf2::TimePointZero);
         foot_pose.pose.position.x = transform_stamped.transform.translation.x;
         foot_pose.pose.position.y = transform_stamped.transform.translation.y;
         foot_pose.pose.position.z = transform_stamped.transform.translation.z;
@@ -189,7 +189,7 @@ void SensorFusionNode::publishStateEstimation()
         body_foot_poses.push_back(foot_pose.pose);
 
         // Get right foot positions in body frame w.r.t. backpack frame
-        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_heel", tf2::TimePointZero);
         foot_pose.pose.position.x = transform_stamped.transform.translation.x;
         foot_pose.pose.position.y = transform_stamped.transform.translation.y;
         foot_pose.pose.position.z = transform_stamped.transform.translation.z;
@@ -210,7 +210,7 @@ void SensorFusionNode::publishStateEstimation()
         geometry_msgs::msg::TransformStamped transform_stamped;
 
         // Get left foot position in world frame w.r.t. right ground frame.
-        transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("world", "L_heel", tf2::TimePointZero);
         foot_pose.position.x = transform_stamped.transform.translation.x;
         foot_pose.position.y = transform_stamped.transform.translation.y;
         foot_pose.position.z = transform_stamped.transform.translation.z;
@@ -221,7 +221,7 @@ void SensorFusionNode::publishStateEstimation()
         inertial_foot_positions.push_back(foot_pose);
 
         // Get right foot position in world frame w.r.t. right ground frame
-        transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("world", "R_heel", tf2::TimePointZero);
 
         foot_pose.orientation.y = transform_stamped.transform.rotation.y;
         foot_pose.orientation.z = transform_stamped.transform.rotation.z;
@@ -233,7 +233,7 @@ void SensorFusionNode::publishStateEstimation()
         return;
     }
 
-    std::vector<std::string> ankle_names = {"left_ankle", "right_ankle"};
+    std::vector<std::string> ankle_names = {"L_ankle", "R_ankle"};
     std::vector<RobotNode::SharedPtr> ankle_nodes = m_robot_description->findNodes(ankle_names);
     std::vector<geometry_msgs::msg::Pose> body_ankle_poses;
     for (const auto& ankle_node : ankle_nodes) {
@@ -283,8 +283,8 @@ void SensorFusionNode::publishFeetHeight()
 void SensorFusionNode::publishMPCEstimation()
 {
     // Wait for transform otherwise return
-    if (!m_tf_buffer->canTransform("R_ground", "world", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_ground", "L_ground", tf2::TimePointZero)) {
-        RCLCPP_WARN(this->get_logger(), "Cannot transform from world to R_ground");
+    if (!m_tf_buffer->canTransform("R_heel", "world", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_heel", "L_heel", tf2::TimePointZero)) {
+        RCLCPP_WARN(this->get_logger(), "Cannot transform from world to R_heel");
         return;
     }
 
@@ -301,7 +301,7 @@ void SensorFusionNode::publishMPCEstimation()
         
         // Get left foot position w.r.t. right ground frame.
         geometry_msgs::msg::TransformStamped transform_stamped;
-        transform_stamped = m_tf_buffer->lookupTransform("R_ground", "L_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "L_heel", tf2::TimePointZero);
         foot_pose.position.x = transform_stamped.transform.translation.x;
         foot_pose.position.y = transform_stamped.transform.translation.y;
         foot_pose.position.z = 0;
@@ -325,10 +325,10 @@ void SensorFusionNode::publishMPCEstimation()
         return;
     }
 
-    // Get transform stamped from world to R_ground
+    // Get transform stamped from world to R_heel
     geometry_msgs::msg::TransformStamped transform_stamped;
     try {
-        transform_stamped = m_tf_buffer->lookupTransform("R_ground", "world", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "world", tf2::TimePointZero);
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
         return;
@@ -344,54 +344,54 @@ void SensorFusionNode::publishMPCEstimation()
     double zmp_x = com_position.x() + (com_velocity.x() / sqrt(gravity / com_position.z())) * com_position.y();
     double zmp_y = com_position.y() + (com_velocity.y() / sqrt(gravity / com_position.z())) * com_position.z();
 
-    // Transform COM and ZMP to R_ground frame
+    // Transform COM and ZMP to R_heel frame
     Eigen::Vector3d com_position_world(com_position.x(), com_position.y(), com_position.z());
-    Eigen::Vector3d com_position_R_ground = q * com_position_world;
-    com_position_R_ground.x() += transform_stamped.transform.translation.x;
-    com_position_R_ground.y() += transform_stamped.transform.translation.y;
-    com_position_R_ground.z() += transform_stamped.transform.translation.z;
+    Eigen::Vector3d com_position_R_heel = q * com_position_world;
+    com_position_R_heel.x() += transform_stamped.transform.translation.x;
+    com_position_R_heel.y() += transform_stamped.transform.translation.y;
+    com_position_R_heel.z() += transform_stamped.transform.translation.z;
 
     Eigen::Vector3d com_velocity_world(com_velocity.x(), com_velocity.y(), com_velocity.z());
-    Eigen::Vector3d com_velocity_R_ground = q * com_velocity_world;
+    Eigen::Vector3d com_velocity_R_heel = q * com_velocity_world;
     
     Eigen::Vector3d zmp_world(zmp_x, zmp_y, 0);
-    Eigen::Vector3d zmp_R_ground = q * zmp_world;
-    zmp_R_ground.x() += transform_stamped.transform.translation.x;
-    zmp_R_ground.y() += transform_stamped.transform.translation.y;
-    zmp_R_ground.z() += transform_stamped.transform.translation.z;
+    Eigen::Vector3d zmp_R_heel = q * zmp_world;
+    zmp_R_heel.x() += transform_stamped.transform.translation.x;
+    zmp_R_heel.y() += transform_stamped.transform.translation.y;
+    zmp_R_heel.z() += transform_stamped.transform.translation.z;
 
     // Publish MPC estimation
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = current_time;
-    foot_positions_msg.header.frame_id = "R_ground";
+    foot_positions_msg.header.frame_id = "R_heel";
     foot_positions_msg.poses = inertial_foot_positions;
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = current_time;
-    com_msg.header.frame_id = "R_ground";
+    com_msg.header.frame_id = "R_heel";
     com_msg.position.header = com_msg.header;
-    com_msg.position.point.x = com_position_R_ground.x();
-    com_msg.position.point.y = com_position_R_ground.y();
-    com_msg.position.point.z = com_position_R_ground.z();
-    com_msg.velocity.x = com_velocity_R_ground.x();
-    com_msg.velocity.y = com_velocity_R_ground.y();
-    com_msg.velocity.z = com_velocity_R_ground.z();
+    com_msg.position.point.x = com_position_R_heel.x();
+    com_msg.position.point.y = com_position_R_heel.y();
+    com_msg.position.point.z = com_position_R_heel.z();
+    com_msg.velocity.x = com_velocity_R_heel.x();
+    com_msg.velocity.y = com_velocity_R_heel.y();
+    com_msg.velocity.z = com_velocity_R_heel.z();
     m_mpc_com_pub->publish(com_msg);
 
     geometry_msgs::msg::PointStamped com_pos_msg;
     com_pos_msg.header.stamp = current_time;
-    com_pos_msg.header.frame_id = "R_ground";
-    com_pos_msg.point.x = com_position_R_ground.x();
-    com_pos_msg.point.y = com_position_R_ground.y();
-    com_pos_msg.point.z = com_position_R_ground.z();
+    com_pos_msg.header.frame_id = "R_heel";
+    com_pos_msg.point.x = com_position_R_heel.x();
+    com_pos_msg.point.y = com_position_R_heel.y();
+    com_pos_msg.point.z = com_position_R_heel.z();
     m_mpc_com_pos_pub->publish(com_pos_msg);
 
     geometry_msgs::msg::PointStamped zmp_msg;
     zmp_msg.header.stamp = current_time;
-    zmp_msg.header.frame_id = "R_ground";
-    zmp_msg.point.x = zmp_R_ground.x();
-    zmp_msg.point.y = zmp_R_ground.y();
+    zmp_msg.header.frame_id = "R_heel";
+    zmp_msg.point.x = zmp_R_heel.x();
+    zmp_msg.point.y = zmp_R_heel.y();
     zmp_msg.point.z = 0.0;
     m_mpc_zmp_pub->publish(zmp_msg);
 
