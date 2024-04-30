@@ -22,7 +22,7 @@ def generate_launch_description():
         'march9',
         'march9.urdf'
     )
-    force_stance_threshold = 80.0
+    force_stance_threshold = 65.0
 
     return LaunchDescription([
         Node(

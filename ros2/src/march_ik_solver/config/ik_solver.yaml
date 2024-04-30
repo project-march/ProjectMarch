@@ -39,7 +39,7 @@ ik_solver:
     task_names:
     - posture
     - motion
-    - stability
+    # - stability
     motion:
       reference_frame: "body"
       joint_indices: [4, 9]

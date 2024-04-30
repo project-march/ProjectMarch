@@ -64,10 +64,10 @@ SensorFusionNode::SensorFusionNode()
 
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
-    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", rclcpp::SensorDataQoS(),
+    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1),
         m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
