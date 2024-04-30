@@ -13,7 +13,7 @@ class SensorDataExtraction:
     Also the sensors should receive incoming commands from the March gait follower
     """
 
-    def __init__(self, data, sensordata, sensor_type, sensor_adr):
+    def __init__(self, data, model, sensordata, sensor_type, sensor_adr):
         """A class that extracts and rewrites the sensor data from mujoco.
 
         Args:
@@ -27,6 +27,13 @@ class SensorDataExtraction:
         self.sensor_type = sensor_type
         self.sensor_adr = sensor_adr
 
+        self.joint_names = []
+        for i in range(model.njnt):
+            if "safety_catch" in model.joint(i).name:
+                continue
+            self.joint_names.append(model.joint(i).name)
+        self.joint_names.sort()
+
     def get_joint_pos(self):
         """This class extracts the data from the position sensors on the joints of the model.
 
@@ -39,9 +46,9 @@ class SensorDataExtraction:
         for i, sensor_type in enumerate(self.sensor_type):
             if sensor_type == mjtSensor.mjSENS_JOINTPOS:
                 joint_pos_sensor_adr.append(self.sensor_adr[i])
-        for adr in joint_pos_sensor_adr:
+        for i, adr in enumerate(joint_pos_sensor_adr):
             joint_pos.append(self.sensordata[adr])
-        return joint_pos
+        return joint_pos, self.joint_names
 
     def get_joint_vel(self):
         """This class extracts the data from the velocity sensors on the joints of the model.

@@ -4,6 +4,28 @@
 #include <cstdint>
 
 namespace march {
+
+
+// struct used to easily get specific bytes from a 64 bit variable
+struct packed_bit64 {
+    uint8_t b0;
+    uint8_t b1;
+    uint8_t b2;
+    uint8_t b3;
+    uint8_t b4;
+    uint8_t b5;
+    uint8_t b6;
+    uint8_t b7;
+};
+
+// union used for int64, uint64 and double
+union bit64 {
+    int64_t i;
+    uint64_t ui;
+    double d;
+    packed_bit64 p;
+};
+
 // struct used to easily get specific bytes from a 32 bit variable
 struct packed_bit32 {
     uint8_t b0;

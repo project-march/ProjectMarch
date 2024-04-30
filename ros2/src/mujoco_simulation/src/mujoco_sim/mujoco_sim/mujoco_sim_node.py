@@ -33,8 +33,30 @@ def get_actuator_names(model):
             name = name + chr(model.names[j])
             j = j + 1
         names.append(name)
+    # Sort the names in the alphabetical order
+    names.sort()
     return names
 
+def get_joint_names(model):
+    """This function returns an string array containing the joint names defined in the mujoco model.
+    
+    The names are stored in an array with all other model objet names, with lined addresses.
+    To retrieve the names, a loop from the starting address to the terminating char is used.
+    """
+    names = []
+    for i in range(model.nq):
+        name = ""
+        j = model.name_jntadr[i]
+        while model.names[j] != 0:
+            name = name + chr(model.names[j])
+            j = j + 1
+        # Skip the safety catch joints
+        if "safety_catch" in name:
+            continue
+        names.append(name)
+    # Sort the names in the alphabetical order
+    names.sort()
+    return names
 
 def get_controller_data(msg):
     """Get correct joint positions, linked to the joint name, form the incoming message."""
@@ -85,25 +107,27 @@ class MujocoSimNode(Node):
 
         self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
-        self.file_path = get_package_share_directory("march_description") + "/urdf/march8/" + str(self.model_name.value)
+        self.file_path = get_package_share_directory("march_description") + "/urdf/march9/" + str(self.model_name.value)
         
-        with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march8_control.yaml")) as file:
-            yaml_data = yaml.safe_load(file)
-            self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
+        # with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march9_control.yaml")) as file:
+        #     yaml_data = yaml.safe_load(file)
+        #     self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
 
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
 
         self.data = mujoco.MjData(self.model)
 
-        # self.actuator_names = get_actuator_names(self.model)
+        self.joint_names = get_joint_names(self.model)
+        self.actuator_names = get_actuator_names(self.model)
+        self.get_logger().info("Joint names: " + str(self.joint_names))
+        self.get_logger().info("Actuator names: " + str(self.actuator_names))
         self.use_aie_force = self.get_parameter("aie_force")
 
-        if self.use_aie_force.value:
-            self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
+        self.aie_passive_force = aie_passive_force.AIEPassiveForce(self.model)
 
         # Set timestep options
-        self.TIME_STEP_MJC = 0.005
+        self.TIME_STEP_MJC = 0.001
         self.model.opt.timestep = self.TIME_STEP_MJC
         # We need these options to compare mujoco and ros time, so they have the same reference starting point
         self.ros_first_updated = self.get_clock().now()
@@ -127,15 +151,16 @@ class MujocoSimNode(Node):
         )
 
         # Create an instance of that data extractor.
-        self.sensor_data_extraction = SensorDataExtraction(self.data, 
+        self.sensor_data_extraction = SensorDataExtraction(self.data,
+                                                           self.model,
                                                            self.data.sensordata, 
                                                            self.model.sensor_type,
                                                            self.model.sensor_adr)
 
-        self.set_initial_keyframe(0)
+        self.set_initial_keyframe(None)
 
         joint_val_dict = {}
-        joint_val = self.sensor_data_extraction.get_joint_pos()
+        joint_val, _ = self.sensor_data_extraction.get_joint_pos()
         for index, name in enumerate(self.actuator_names):
             joint_val_dict[name] = joint_val[index]
         self.get_logger().info(f"Keeping initial joint positions, "
@@ -163,8 +188,9 @@ class MujocoSimNode(Node):
 
         # Create an instance of that data extractor.
         self.sensor_data_extraction = SensorDataExtraction(
-            self.data, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
+            self.data, self.model, self.data.sensordata, self.model.sensor_type, self.model.sensor_adr
         )
+        self.get_logger().info("Sensor data extraction joints: " + str(self.sensor_data_extraction.joint_names))
 
         # Create a queue to store all incoming messages for a correctly timed simulation
         self.msg_queue = Queue()
@@ -182,9 +208,9 @@ class MujocoSimNode(Node):
         """Set initial xml keyframe taken from xml model"""
         if keyframe_id is None:
             return
-
+        # mujoco.mj_step(self.model, self.data)
         mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe_id)
-        mujoco.mj_step(self.model, self.data)
+        # mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.
@@ -264,15 +290,14 @@ class MujocoSimNode(Node):
 
         time_difference_withseconds = time_shifted.nanosec / 1e9 + time_shifted.sec
 
-        if self.use_aie_force.value == 'true':
+        if self.use_aie_force.value == True:
             while self.data.time <= time_difference_withseconds:
                 mujoco.set_mjcb_passive(self.aie_passive_force.callback)
                 mujoco.mj_step(self.model, self.data)
         else:
             while self.data.time <= time_difference_withseconds:
                 mujoco.mj_step(self.model, self.data)
-
-        self.time_last_updated = self.get_clock().now()
+            self.time_last_updated = self.get_clock().now()
 
     def sim_update_timer_callback(self):
         """Callback function to perform the simulation step.
@@ -303,8 +328,8 @@ class MujocoSimNode(Node):
         state_msg = JointState()
         state_msg.header.stamp = self.get_clock().now().to_msg()
         state_msg.header.frame_id = "joint_link"
-        state_msg.name = self.actuator_names
-        state_msg.position = self.sensor_data_extraction.get_joint_pos()
+        state_msg.name = self.joint_names
+        state_msg.position, _ = self.sensor_data_extraction.get_joint_pos()
         state_msg.velocity = self.sensor_data_extraction.get_joint_vel()
         state_msg.effort = self.sensor_data_extraction.get_joint_acc()
 
