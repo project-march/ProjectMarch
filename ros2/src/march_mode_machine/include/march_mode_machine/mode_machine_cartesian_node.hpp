@@ -1,6 +1,8 @@
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
 #include "march_shared_msgs/msg/foot_step_output.hpp"
+#include "march_shared_msgs/msg/all_planes.hpp"
+#include "march_shared_msgs/msg/plane.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
 #include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "march_shared_msgs/srv/request_gait.hpp"
@@ -39,6 +41,7 @@ class ModeMachineCartesianNode : public rclcpp::Node
     rclcpp::Publisher<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_publisher;
 
     rclcpp::Publisher<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_footsteps_dummy_publisher; 
+    rclcpp::Publisher<march_shared_msgs::msg::AllPlanes>::SharedPtr m_planes_dummy_publisher; 
 
     rclcpp::Service<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_service;
 
