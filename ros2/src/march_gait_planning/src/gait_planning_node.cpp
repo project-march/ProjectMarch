@@ -30,8 +30,9 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.19, 0.19, -0.85, 0.19, -0.19, -0.85}; 
-}
+    m_home_stand = {0.19, 0.19, -0.9, 0.19, -0.19, -0.9}; 
+    // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
+ }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 

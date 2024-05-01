@@ -37,7 +37,7 @@ ik_solver:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
     task_names:
-    - posture
+    # - posture
     - motion
     # - stability # Comment to disable stability task
     motion:

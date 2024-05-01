@@ -19,7 +19,7 @@ std::vector<std::string> joints_states_index = {"left_ankle_dpf", "left_ankle_ie
                                                 "right_ankle_dpf", "right_ankle_ie", "right_hip_aa", "right_hip_fe", "right_knee"};
 
 
-std::vector<int> generateMapping(const std::vector<std::string>& joints_actuated_index,
+std::vector<int> generateJointIndexMapping(const std::vector<std::string>& joints_actuated_index,
                                  const std::vector<std::string>& joints_states_index) {
     std::vector<int> mapping;
     for (const auto& joint : joints_actuated_index) {
@@ -53,7 +53,7 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 
     m_home_stand = {-0.016, -0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0}; // This is already in alphabetical order
 
-    m_mapping = generateMapping(joints_actuated_index, joints_states_index); 
+    m_joint_index_mapping = generateJointIndexMapping(joints_actuated_index, joints_states_index); 
 
 }
 
@@ -143,7 +143,7 @@ void TestJointsGaitPlanningNode::currentJointAnglesCallback(const march_shared_m
     // create logic to remap the joint names from the message to only the actuated ones
 
     std::vector<double> selected_positions;
-    for (int index : m_mapping) {
+    for (int index : m_joint_index_mapping) {
         selected_positions.push_back(msg->joint_state.position[index]);
     }
     
