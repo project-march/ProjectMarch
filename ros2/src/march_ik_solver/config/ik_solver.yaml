@@ -4,7 +4,7 @@ ik_solver:
     joint_trajectory_controller_period: 5e-3
     convergence_threshold: 1e-4
     max_iterations: 100000
-    integral_dt: 5e-5
+    integral_dt: 1e-4
     joint:
       names:
       - left_hip_aa
@@ -54,8 +54,8 @@ ik_solver:
       joint_indices: [0]
       m: 2
       n: 10
-      kp: [20.0, 20.0]
-      kd: [0.0, 0.0]
+      kp: [10.0, 6.5]
+      kd: [0.0, 1.0]
       ki: [1e-3, 1e-3]
       damp_coeff: 1e-6
     posture:

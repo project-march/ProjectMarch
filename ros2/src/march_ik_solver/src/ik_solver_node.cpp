@@ -102,16 +102,16 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     );
 
     m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
-    if ((msg->current_stance_leg >> 1) & 0b01) {
-        m_x_stance_leg = msg->body_sole_pose[0].position.x;
-        m_y_stance_leg = msg->body_sole_pose[0].position.y;
-    } else if (msg->current_stance_leg & 0b01) {
+    // if ((msg->current_stance_leg >> 1) & 0b01) {
+        // m_x_stance_leg = msg->body_sole_pose[0].position.x;
+        // m_y_stance_leg = msg->body_sole_pose[0].position.y;
+    // } else if (msg->current_stance_leg & 0b01) {
         m_x_stance_leg = msg->body_sole_pose[1].position.x;
         m_y_stance_leg = msg->body_sole_pose[1].position.y;
-    } else {
-        m_x_stance_leg = (msg->body_sole_pose[0].position.x + msg->body_sole_pose[1].position.x) / 2;
-        m_y_stance_leg = (msg->body_sole_pose[0].position.y + msg->body_sole_pose[1].position.y) / 2;
-    }
+    // } else {
+    //     m_x_stance_leg = (msg->body_sole_pose[0].position.x + msg->body_sole_pose[1].position.x) / 2;
+    //     m_y_stance_leg = (msg->body_sole_pose[0].position.y + msg->body_sole_pose[1].position.y) / 2;
+    // }
 }
 
 void IKSolverNode::publishJointTrajectory()
