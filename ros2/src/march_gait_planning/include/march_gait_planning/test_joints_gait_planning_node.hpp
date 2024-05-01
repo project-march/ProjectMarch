@@ -9,6 +9,8 @@
 #include "march_shared_msgs/msg/exo_mode_and_joint.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
 
 class TestJointsGaitPlanningNode : public rclcpp::Node
 {
@@ -27,7 +29,7 @@ private:
     int getActuatedJoint() const;
 
     void currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
-    void processHomeStandGait(int counter);
+    void processHomeStandGait();
 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_current_state_subscriber; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoModeAndJoint>::SharedPtr m_exo_mode_subscriber;
@@ -38,6 +40,8 @@ private:
     std_msgs::msg::Float64MultiArray m_joints_msg;
     int m_actuated_joint;
     bool m_first_stand;
+    int m_counter;
+    std::vector<int> m_joint_index_mapping;
 
     std::vector<double> m_home_stand;
 };

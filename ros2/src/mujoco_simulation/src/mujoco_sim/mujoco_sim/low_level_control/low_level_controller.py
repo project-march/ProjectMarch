@@ -20,7 +20,7 @@ class LowLvlController:
         # the generalized coordinates generated within Mujoco
         self.actuator_amount = model.nu
         self.joint_desired = {}
-        self.joint_names = self.node.actuator_names
+        self.actuator_names = self.node.actuator_names
         self.e_prev = []
         for _i in range(self.actuator_amount):
             self.e_prev.append(0)

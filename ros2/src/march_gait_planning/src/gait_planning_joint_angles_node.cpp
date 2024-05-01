@@ -201,7 +201,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                         processMovingGaits(count);
                         if (count >= (m_current_trajectory.size()-1)){
-                            m_gait_planning.setCounter(m_current_trajectory.size()-1);
+                            m_gait_planning.setCounter(0);
                             m_gait_planning.setPrevGaitType(exoMode::Stand); 
                         } else {
                             m_gait_planning.setCounter(count+1);

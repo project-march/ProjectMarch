@@ -107,7 +107,17 @@ Eigen::VectorXd Task::solveTask()
     Eigen::VectorXd error = calculateError();
     Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_task_n);
     joint_velocities.noalias() = m_jacobian_inverse * error;
-    return joint_velocities;
+    Eigen::VectorXd joint_velocities_extended = Eigen::VectorXd::Zero(10);
+    joint_velocities_extended(0) = joint_velocities(0);
+    joint_velocities_extended(1) = joint_velocities(1);
+    joint_velocities_extended(2) = joint_velocities(2);
+    joint_velocities_extended(3) = joint_velocities(3);
+    joint_velocities_extended(5) = joint_velocities(4);
+    joint_velocities_extended(6) = joint_velocities(5);
+    joint_velocities_extended(7) = joint_velocities(6);
+    joint_velocities_extended(8) = joint_velocities(7);
+
+    return joint_velocities_extended;
 }
 
 Eigen::VectorXd Task::calculateError()
