@@ -34,7 +34,7 @@ public:
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);
     void updateCurrentJointState(
         const std::vector<double>& current_joint_positions, const std::vector<double>& current_joint_velocities);
-    void updateWorldToBaseOrientation(const Eigen::Quaterniond& world_to_base_orientation);
+    void updateWorldToBaseOrientation(const double& w, const double& x, const double& y, const double& z);
     inline void updateCurrentStanceLeg(const uint8_t& current_stance_leg) { m_current_stance_leg = current_stance_leg; };
     inline void updateNextStanceLeg(const uint8_t& next_stance_leg) { m_next_stance_leg = next_stance_leg; };
     inline void updateCurrentLinearAcceleration(const Eigen::Vector3d& current_linear_acceleration) { m_current_linear_acceleration = current_linear_acceleration; };
@@ -74,7 +74,6 @@ private:
     Eigen::VectorXd m_current_joint_velocities;
     Eigen::VectorXd m_desired_joint_velocities;
     Eigen::Vector3d m_current_linear_acceleration;
-    std::shared_ptr<Eigen::Quaterniond> m_world_to_base_orientation;
 
     std::vector<std::string> m_joint_names;
     std::vector<JointLimit> m_joint_position_limits;

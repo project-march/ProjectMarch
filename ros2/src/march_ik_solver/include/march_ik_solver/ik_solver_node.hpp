@@ -53,6 +53,7 @@ private:
     unsigned int m_max_iterations;
     double m_x_stance_leg;
     double m_y_stance_leg;
+    bool m_first_step; // Temporary
 
     std::vector<std::string> m_joint_names;
     std::vector<std::string> m_joint_names_alphabetical;

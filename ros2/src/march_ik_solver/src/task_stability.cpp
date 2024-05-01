@@ -16,10 +16,14 @@ TaskStability::TaskStability(const std::string& task_name, const std::string& re
 
 void TaskStability::computeCurrentTaskCoordinates()
 {
-    m_current_task = pinocchio::centerOfMass(m_model, *m_data).segment(0, 2);
+    Eigen::VectorXd com_position;
+    com_position.noalias() = m_current_world_to_base_orientation.transpose() * pinocchio::centerOfMass(m_model, *m_data);
+    m_current_task = com_position.segment(0, 2);
 }
 
 void TaskStability::computeCurrentTaskJacobian()
 {
-   m_jacobian = pinocchio::jacobianCenterOfMass(m_model, *m_data).topRows(2);
+    Eigen::MatrixXd com_jacobian;
+    com_jacobian.noalias() = m_current_world_to_base_orientation.transpose() * pinocchio::jacobianCenterOfMass(m_model, *m_data);
+    m_jacobian = com_jacobian.topRows(2);
 }

@@ -41,7 +41,6 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
     m_task_map[name]->setDampingCoefficient(damping_coefficient);
     m_task_map[name]->setJointNamesPtr(&m_joint_names);
     m_task_map[name]->setCurrentJointPositionsPtr(&m_current_joint_positions);
-    m_task_map[name]->setWorldToBaseOrientationPtr(m_world_to_base_orientation);
 }
 
 Eigen::VectorXd IKSolver::solveInverseKinematics()
@@ -80,9 +79,12 @@ void IKSolver::updateCurrentJointState(
         = Eigen::Map<const Eigen::VectorXd>(current_joint_velocities.data(), current_joint_velocities.size());
 }
 
-void IKSolver::updateWorldToBaseOrientation(const Eigen::Quaterniond& world_to_base_orientation)
+void IKSolver::updateWorldToBaseOrientation(const double& w, const double& x, const double& y, const double& z)
 {
-    m_world_to_base_orientation = std::make_shared<Eigen::Quaterniond>(world_to_base_orientation);
+    Eigen::Matrix3d current_world_to_base_orientation = Eigen::Quaterniond(w, x, y, z).toRotationMatrix();
+    for (const auto& task_name : m_task_names) {
+        m_task_map.at(task_name)->setCurrentWorldToBaseOrientation(current_world_to_base_orientation);
+    }
 }
 
 Eigen::VectorXd IKSolver::clampJointLimits(Eigen::VectorXd desired_joint_positions)

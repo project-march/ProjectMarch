@@ -121,7 +121,7 @@ uint8_t SensorFusion::getCurrentStanceLeg() const
 
 uint8_t SensorFusion::getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const
 {
-    const double margin = 0.01;
+    const double margin = 0.05;
 
     if (left_foot_position + margin <= right_foot_position) {
         return 0b10;

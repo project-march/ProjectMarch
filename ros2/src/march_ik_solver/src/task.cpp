@@ -24,6 +24,7 @@ Task::Task(const std::string& task_name, const std::string& reference_frame, con
     setTaskM(workspace_dim);
     setTaskN(configuration_dim);
     m_dt = dt;
+    m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";

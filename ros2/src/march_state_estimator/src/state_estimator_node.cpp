@@ -283,11 +283,11 @@ void SensorFusionNode::publishStateEstimation()
     }
 
     state_estimation_msg.header.stamp = this->now();
-    state_estimation_msg.header.frame_id = "joint_link";
+    state_estimation_msg.header.frame_id = "backpack";
     state_estimation_msg.step_time = m_dt;
     state_estimation_msg.joint_state = *m_joint_state;
     state_estimation_msg.dynamical_joint_state.header.stamp = this->now();
-    state_estimation_msg.header.frame_id = "joint_link";
+    state_estimation_msg.dynamical_joint_state.header.frame_id = "joint_link";
     state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
     state_estimation_msg.dynamical_joint_state.joint_acceleration = m_sensor_fusion->getJointAcceleration(m_joint_state->name);
     state_estimation_msg.dynamical_joint_state.effort_dynamical = m_sensor_fusion->getJointDynamicalTorques(m_joint_state->name);

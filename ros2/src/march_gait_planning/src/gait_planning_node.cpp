@@ -30,7 +30,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(exoMode::BootUp); 
 
-    m_home_stand = {0.19, 0.17, -0.9, 0.19, -0.17, -0.9}; 
+    m_home_stand = {0.175, 0.14, -0.87, 0.175, -0.14, -0.87}; 
 }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){

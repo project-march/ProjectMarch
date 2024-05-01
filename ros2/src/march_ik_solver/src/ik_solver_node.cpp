@@ -40,6 +40,9 @@ IKSolverNode::IKSolverNode()
     m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
 
     RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
+
+    // Temporary
+    m_first_step = true;
 }
 
 IKSolverNode::~IKSolverNode()
@@ -94,24 +97,41 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
         }
     }
     m_ik_solver->updateWorldToBaseOrientation(
-        Eigen::Quaterniond(
-            msg->imu.orientation.w,
-            msg->imu.orientation.x,
-            msg->imu.orientation.y,
-            msg->imu.orientation.z)
+        msg->imu.orientation.w,
+        msg->imu.orientation.x,
+        msg->imu.orientation.y,
+        msg->imu.orientation.z
     );
 
-    m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
-    // if ((msg->current_stance_leg >> 1) & 0b01) {
-        // m_x_stance_leg = msg->body_sole_pose[0].position.x;
-        // m_y_stance_leg = msg->body_sole_pose[0].position.y;
-    // } else if (msg->current_stance_leg & 0b01) {
-        m_x_stance_leg = msg->body_sole_pose[1].position.x;
-        m_y_stance_leg = msg->body_sole_pose[1].position.y;
+    if (m_first_step && (msg->next_stance_leg != 0b11)) {
+        m_first_step = false;
+    }
+
+    Eigen::Vector3d stance_pos;
+    // if (m_first_step) {
+    // stance_pos.noalias()
+    //     = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+    //         * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
     // } else {
-    //     m_x_stance_leg = (msg->body_sole_pose[0].position.x + msg->body_sole_pose[1].position.x) / 2;
-    //     m_y_stance_leg = (msg->body_sole_pose[0].position.y + msg->body_sole_pose[1].position.y) / 2;
+        m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
+        if (msg->next_stance_leg == 0b01) {
+            stance_pos.noalias()
+                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+                    * Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z);
+
+        } else if (msg->next_stance_leg == 0b10) {
+            stance_pos.noalias()
+                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+                    * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
+        } else {
+            stance_pos.noalias() = (Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z) + Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z)) / 2;
+            stance_pos.noalias()
+                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+                    * stance_pos;
+        }
     // }
+    m_x_stance_leg = stance_pos.x();
+    m_y_stance_leg = stance_pos.y();
 }
 
 void IKSolverNode::publishJointTrajectory()

@@ -30,7 +30,7 @@ class AIEPassiveForce:
     def callback(self, model, data):
         angles = data.qpos
         velocity = data.qvel
-        b = 0.1
+        b = 0.3
 
         data.qfrc_passive[self.L_AIE_id] = 0.3 * self.aie_passive_force(angles[self.L_AIE_id]) - b * velocity[self.L_AIE_id]
         data.qfrc_passive[self.R_AIE_id] = 0.3 * self.aie_passive_force(angles[self.R_AIE_id]) - b * velocity[self.R_AIE_id]
