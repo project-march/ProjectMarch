@@ -36,7 +36,7 @@ public:
 
 
     //Interpolate between small and large bezier gait 
-    std::vector<XZFeetPositionsArray> variableStepStoneTrajectory(const float &step_distance); 
+    std::vector<XZFeetPositionsArray> variableStepStoneTrajectory(const float &step_distance, const exoMode &previous_mode); 
     std::vector<XZFeetPositionsArray> variableFullStepTrajectory(const float &step_distance); 
     std::vector<XZFeetPositionsArray> variableFirstStepTrajectory(const float &step_distance); 
     std::vector<XZFeetPositionsArray> variableCloseStepTrajectory(const float &step_distance); 

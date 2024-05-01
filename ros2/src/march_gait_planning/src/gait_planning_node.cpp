@@ -52,8 +52,11 @@ void GaitPlanningNode::variableFootstepCallback(const march_shared_msgs::msg::Fo
     float dist = msg->stepping_point.x - m_gait_planning.getCurrentRightFootPos()[0]; 
     RCLCPP_INFO(this->get_logger(), "Calculated distance and interpolating! %f", dist); 
     m_current_trajectory.clear(); 
-    m_current_trajectory = m_gait_planning.variableStepStoneTrajectory(dist); 
+    m_current_trajectory = m_gait_planning.variableStepStoneTrajectory(dist, m_gait_planning.getPreviousGaitType()); 
+    RCLCPP_INFO(this->get_logger(), "Current trajectory size: %d", m_current_trajectory.size()); 
+    m_single_execution_done = false;
     publishFootPositions(); 
+    RCLCPP_INFO(this->get_logger(), "First swing leg: %d", m_first_swing_leg);
 }
 
 
@@ -325,12 +328,55 @@ void GaitPlanningNode::publishFootPositions(){
             break;
 
         case exoMode::VariableStep : 
-            if (m_gait_planning.getPreviousGaitType() == exoMode::Stand){
-                // First stepping stone
+            if (m_gait_planning.getPreviousGaitType() == exoMode::VariableStep){
                 if (m_current_trajectory.empty()){
+                    // RCLCPP_INFO(this->get_logger(), "Trajectory empty");
                     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+
+                    // The step has finished, so switch stance leg here
+                    // NOTE: this is a bit iffy, so maybe there is a better way of doing this
+                    if (!m_single_execution_done) {
+                        m_single_execution_done = true;
+                        m_first_swing_leg = (m_first_swing_leg == 0) ? 1 : 0;
+                        RCLCPP_INFO(this->get_logger(), "Swapping first swing leg");
+                    }
                 }
                 else { 
+                    // RCLCPP_INFO(this->get_logger(), "Correct");
+                    GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
+                    m_current_trajectory.erase(m_current_trajectory.begin());
+                    if (m_first_swing_leg == 0){
+                        setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1] + m_home_stand[2], 
+                                                current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3] + m_home_stand[5]);
+                    }
+                    else{
+                        setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
+                                    current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
+                    }
+                    
+                    m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+                } 
+            }
+            else{
+                // First stepping stone
+                if (m_current_trajectory.empty()){
+                    // RCLCPP_INFO(this->get_logger(), "Trajectory empty");
+                    m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
+
+                    // The step has finished, so switch stance leg here
+                    if (m_single_execution_done){
+                        m_gait_planning.setPreviousGaitType(exoMode::VariableStep);
+                    }
+
+                    // NOTE: this is a bit iffy, so maybe there is a better way of doing this
+                    if (!m_single_execution_done) {
+                        m_single_execution_done = true;
+                        RCLCPP_INFO(this->get_logger(), "Swapping first swing leg");
+                        m_first_swing_leg = 0;
+                    }
+                }
+                else { 
+                    RCLCPP_INFO(this->get_logger(), "Correct");
                     GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
                     m_current_trajectory.erase(m_current_trajectory.begin());
                     setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
@@ -338,9 +384,7 @@ void GaitPlanningNode::publishFootPositions(){
                     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
                 } 
             }
-            if (m_gait_planning.getPreviousGaitType() == exoMode::VariableStep){
-                // Remaining stepping stones
-            }
+            
            
             break;
         

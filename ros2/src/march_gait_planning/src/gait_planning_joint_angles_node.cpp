@@ -86,7 +86,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Point values: %s", point_str.c_str());
             m_first_stand = false;
         } else {
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
+            RCLCPP_WARN(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
         }
     }
     publishJointTrajectoryPoints(); 

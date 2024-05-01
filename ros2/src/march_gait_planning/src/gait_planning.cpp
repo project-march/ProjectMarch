@@ -148,7 +148,7 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getVariableTraject
     return m_variable_step_trajectory; 
 }
 
-std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::variableStepStoneTrajectory(const float &step_distance) {
+std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::variableStepStoneTrajectory(const float &step_distance, const exoMode &previous_mode) {
 
     m_variable_step_trajectory.clear(); 
     std::vector<GaitPlanning::XZFeetPositionsArray> right_open = interpolateVariableTrajectory(step_distance, m_small_first_step_trajectory, m_large_first_step_trajectory, false); 
@@ -163,12 +163,21 @@ std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::variableStepStoneT
         std::swap(left_close[k][1], left_close[k][3]);
     }
 
+    //TODO: remove magic numbers
+
     // In essence, the first two columns are the coordinates for the leg that does the swing phase first, and the last two columns are the coordinates for the leg that does the stance phase first.
     // i.e., by clamping the last five values of the two last columns, we ensure that the swing leg during the step close hovers slightly above the ground, while the stance leg does go back to the homestand.
     m_variable_step_trajectory.insert(m_variable_step_trajectory.end(), left_close.begin(), left_close.end());
     for (int i = m_variable_step_trajectory.size() - 5; i < m_variable_step_trajectory.size(); ++i) {
         m_variable_step_trajectory[i][2] = m_variable_step_trajectory[m_variable_step_trajectory.size() - 5][2];
         m_variable_step_trajectory[i][3] = m_variable_step_trajectory[m_variable_step_trajectory.size() - 5][3];
+    }
+    if (previous_mode == exoMode::VariableStep){
+        // Clamp begin of the first swing leg if previous gait type was variable step
+        for (int i = 0; i < 5; ++i) {
+            m_variable_step_trajectory[i][0] = m_variable_step_trajectory[4][0];
+            m_variable_step_trajectory[i][1] = m_variable_step_trajectory[4][1];
+        }
     }
     return m_variable_step_trajectory; 
 

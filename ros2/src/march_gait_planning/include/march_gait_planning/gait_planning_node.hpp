@@ -81,5 +81,6 @@ class GaitPlanningNode:public rclcpp::Node {
     bool m_single_execution_done;
     bool m_variable_first_step_done; 
     int m_variable_walk_swing_leg; 
+    int m_first_swing_leg;
 
 };
