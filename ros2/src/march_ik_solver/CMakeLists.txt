@@ -50,6 +50,7 @@ ament_target_dependencies(${PROJECT_NAME}
   ament_index_cpp
 )
 
+# Add ik_solver_node executable
 add_executable(ik_solver_node src/ik_solver_node.cpp src/ik_solver.cpp src/task.cpp)
 
 target_include_directories(ik_solver_node PUBLIC
@@ -77,6 +78,23 @@ install(TARGETS
   ik_solver_node
   DESTINATION lib/${PROJECT_NAME})
 
+# Add ik_manager_node executable
+add_executable(ik_manager_node src/ik_manager_node.cpp)
+
+target_include_directories(ik_manager_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(ik_manager_node
+  rclcpp
+  march_shared_msgs
+)
+
+install(TARGETS
+  ik_manager_node
+  DESTINATION lib/${PROJECT_NAME})
+
+# Install header files.
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 

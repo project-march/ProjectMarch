@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef IK_SOLVER__TASK_HPP
 #define IK_SOLVER__TASK_HPP
 
@@ -5,6 +10,8 @@
 
 #include <string>
 #include <vector>
+
+#include "march_shared_msgs/msg/iks_task_status.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
@@ -33,8 +40,10 @@ public:
     inline unsigned int getTaskM() const { return m_task_m; }
     inline unsigned int getTaskN() const { return m_task_n; }
     double getErrorNorm() const;
-    inline Eigen::VectorXd getDesiredTask() const { return m_desired_task; }
+    std::vector<double> getError() const;
+    march_shared_msgs::msg::IksTaskStatus getTaskStatus() const;
     Eigen::MatrixXd getNullspaceProjection() const;
+    inline Eigen::VectorXd getDesiredTask() const { return m_desired_task; }
     inline Eigen::MatrixXd getJacobian() const { return m_jacobian; }
     inline Eigen::MatrixXd getJacobianInverse() const { return m_jacobian_inverse; }
     inline const std::vector<std::string>* getJointNamesPtr() const { return m_joint_names_ptr; }
@@ -64,6 +73,7 @@ private:
 
     std::string m_task_name;
     std::string m_reference_frame;
+    std::vector<std::string> m_node_names;
     unsigned int m_task_m;
     unsigned int m_task_n;
     std::vector<int> m_joint_indices;

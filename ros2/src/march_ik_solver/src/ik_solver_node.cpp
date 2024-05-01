@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
@@ -22,7 +27,10 @@ IKSolverNode::IKSolverNode()
     m_subscription_options.callback_group = m_callback_group;
 
     // Create the subscriptions and publishers.
-    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
+        "ik_solver/command", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
+    m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
     m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
@@ -30,9 +38,8 @@ IKSolverNode::IKSolverNode()
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "ik_solver/joint_trajectory", 10);
+    m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
-    m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
-    m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
 
     RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
 }
@@ -42,6 +49,12 @@ IKSolverNode::~IKSolverNode()
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
 }
 
+void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver command received.");
+    m_ik_solver->setTaskNames(msg->task_names);
+}
+
 void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
     /*
@@ -49,6 +62,10 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         - Separate Y-motion from "motion" task and create a new task for it.
             - This will allow the robot to stick to the desired Y-motion while the "motion" task is being solved.
     */
+    std::vector<std::string> task_names = m_ik_solver->getTaskNames();
+    if (task_names.empty()) {
+        return;
+    }
 
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
@@ -140,20 +157,6 @@ void IKSolverNode::publishDesiredJointPositions()
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
 }
 
-void IKSolverNode::publishErrorNorm(const double& error_norm)
-{
-    std_msgs::msg::Float64 error_norm_msg;
-    error_norm_msg.data = error_norm;
-    m_error_norm_pub->publish(error_norm_msg);
-}
-
-void IKSolverNode::publishIterations(const unsigned int& iterations)
-{
-    std_msgs::msg::UInt64 iterations_msg;
-    iterations_msg.data = iterations;
-    m_iterations_pub->publish(iterations_msg);
-}
-
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
@@ -170,12 +173,14 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_INFO_THROTTLE(
-        this->get_logger(), *get_clock(), 2000, "Iteration: %d, Error norm: %f", iteration, best_error);
+    RCLCPP_DEBUG_THROTTLE(
+        this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, best_error);
 
-    // Publish the error norm and iterations.
-    publishErrorNorm(best_error);
-    publishIterations(iteration);
+    // Publish the IK status.
+    march_shared_msgs::msg::IksStatus iks_status_msg = m_ik_solver->getIKStatus();
+    iks_status_msg.header.stamp = this->now();
+    iks_status_msg.iteration = iteration;
+    m_iks_status_pub->publish(iks_status_msg);
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
