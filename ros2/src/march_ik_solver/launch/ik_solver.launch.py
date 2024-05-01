@@ -9,19 +9,31 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
-    config = os.path.join(
+    ik_solver_config = os.path.join(
                 get_package_share_directory('march_ik_solver'),
                 'config',
                 'ik_solver.yaml'
+            )
+    
+    ik_manager_config = os.path.join(
+                get_package_share_directory('march_ik_solver'),
+                'config',
+                'ik_manager.yaml'
             )
 
     return LaunchDescription([
         Node(
             package='march_ik_solver',
-            # namespace='march_ik_solver',
             executable='ik_solver_node',
             name='ik_solver',
             output='screen',
-            parameters=[config],
+            parameters=[ik_solver_config],
+        ),
+        Node(
+            package='march_ik_solver',
+            executable='ik_manager_node',
+            name='ik_manager',
+            output='screen',
+            parameters=[ik_manager_config],
         ),
     ])

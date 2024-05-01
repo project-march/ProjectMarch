@@ -125,8 +125,7 @@ Eigen::VectorXd Task::calculateError()
     }
     m_error_norm = sqrt(m_error_norm);
 
-    pid_error.noalias()
-        = m_gain_p * error + calculateIntegralError(error) + calculateDerivativeError(error);
+    pid_error.noalias() = m_gain_p * error + calculateIntegralError(error) + calculateDerivativeError(error);
 
     m_previous_error = error;
     return pid_error;
@@ -169,6 +168,19 @@ void Task::computeJacobianInverse()
 double Task::getErrorNorm() const
 {
     return m_error_norm;
+}
+
+std::vector<double> Task::getError() const
+{
+    return std::vector<double>(m_previous_error.data(), m_previous_error.data() + m_previous_error.size());
+}
+
+march_shared_msgs::msg::IksTaskStatus Task::getTaskStatus() const
+{
+    march_shared_msgs::msg::IksTaskStatus task_status;
+    task_status.task_name = m_task_name;
+    task_status.error = std::vector<double>(m_previous_error.data(), m_previous_error.data() + m_previous_error.size());
+    return task_status;
 }
 
 Eigen::MatrixXd Task::getNullspaceProjection() const

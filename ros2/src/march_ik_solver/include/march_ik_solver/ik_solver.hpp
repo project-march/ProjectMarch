@@ -13,6 +13,7 @@
 
 #include "march_ik_solver/task.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "march_shared_msgs/msg/iks_status.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
@@ -39,6 +40,7 @@ public:
     inline void updateNextStanceLeg(const uint8_t& next_stance_leg) { m_next_stance_leg = next_stance_leg; };
     inline void updateCurrentLinearAcceleration(const Eigen::Vector3d& current_linear_acceleration) { m_current_linear_acceleration = current_linear_acceleration; };
 
+    inline std::vector<std::string> getTaskNames() const { return m_task_names; };
     inline std::vector<double> getCurrentJointPositions() const { return std::vector<double>(m_current_joint_positions.data(), m_current_joint_positions.data() + m_current_joint_positions.size()); };
     inline std::vector<double> getCurrentJointVelocities() const { return std::vector<double>(m_current_joint_velocities.data(), m_current_joint_velocities.data() + m_current_joint_velocities.size()); };
     inline std::vector<double> getDesiredJointVelocities() const { return std::vector<double>(m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size()); };
@@ -49,6 +51,13 @@ public:
         }
         return error;
     };
+    inline march_shared_msgs::msg::IksStatus getIKStatus() const {
+        march_shared_msgs::msg::IksStatus iks_status;
+        for (const auto& task_name : m_task_names) {
+            iks_status.tasks.push_back(m_task_map.at(task_name)->getTaskStatus());
+        }
+        return iks_status;
+    }
 
     inline void setDt(const double& dt) { m_dt = dt; };
     inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
