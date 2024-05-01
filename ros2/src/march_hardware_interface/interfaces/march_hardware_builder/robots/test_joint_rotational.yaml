@@ -1,5 +1,5 @@
 testsetup:
-  if_name: enp2s0
+  if_name: eno1
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
@@ -14,25 +14,25 @@ testsetup:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 276620
-            maxPositionIU: 515871
-            zeroPositionIU: 376154
+            minPositionIU: 311362
+            maxPositionIU: 585473
+            zeroPositionIU: 457988
             lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             resolution: 12
-            transmission: 121
+            transmission: 100
             direction: 1
           torqueSensor:
             maxTorque: 20
             averageTorque: 1.3
         pids:
           position:
-            p: 15.0
+            p: 24.0
             i: 0.0
-            d: 0.2
+            d: 0.4
           torque:
             p: 0.1
             i: 0.0

@@ -156,6 +156,7 @@ void IKSolverNode::publishDesiredJointPositions()
     std::vector<double> desired_joint_positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     for (const auto& idx : m_alphabetical_joint_indices) {
+        // RCLCPP_INFO(this->get_logger(), "Joint index: %d", idx);
         desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
     }
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);

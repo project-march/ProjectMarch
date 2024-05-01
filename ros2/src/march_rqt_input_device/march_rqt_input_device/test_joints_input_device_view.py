@@ -100,7 +100,7 @@ class TestJointsInputDeviceView(QWidget):
         qt_button.setMinimumSize(QSize(*size))
         qt_button.setMaximumSize(QSize(*size))
 
-        if name in ["left_ankle", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"]:
+        if name in ["left_ankle_dpf", "left_hip_aa", "left_hip_fe", "left_knee", "right_ankle_dpf", "right_hip_aa", "right_hip_fe", "right_knee"]:
             qt_button.clicked.connect(lambda: self._controller.set_actuated_joint(name))
             qt_button.setEnabled(True)
         else:
