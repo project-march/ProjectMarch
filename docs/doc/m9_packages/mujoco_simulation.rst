@@ -12,7 +12,26 @@ ROS API
 
 Nodes
 ^^^^^
-*ble_ipd_node* - Responsible for doing the thing.
+*mujoco_sim* - Responsible for doing the thing.
+
+.. figure:: images/mujoco_sim.png
+   :align: center
+   :scale: 100%
+   :alt: mujoco_sim
+
+*mujoco_reader* - Responsible for doing the thing.
+
+.. figure:: images/mujoco_reader.png
+   :align: center
+   :scale: 100%
+   :alt: mujoco_reader
+
+*mujoco_writer* - Responsible for doing the thing.
+
+.. figure:: images/mujoco_writer.png
+   :align: center
+   :scale: 100%
+   :alt: mujoco_writer
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
