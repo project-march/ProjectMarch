@@ -332,20 +332,26 @@ void IKSolverNode::configureTasksParameters()
     std::vector<std::string> task_names = get_parameter("task.names").as_string_array();
     m_ik_solver->setTaskNames(task_names);
 
+    std::unordered_map<std::string, std::vector<double>> task_gains_p, task_gains_d, task_gains_i;
+    std::unordered_map<std::string, double> task_damp_coeffs;
+    std::unordered_map<std::string, double> task_convergence_thresholds;
+
     for (const auto& task_name : task_names) {
         RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
         declare_parameter("task." + task_name + ".kp", std::vector<double>());
         declare_parameter("task." + task_name + ".kd", std::vector<double>());
         declare_parameter("task." + task_name + ".ki", std::vector<double>());
         declare_parameter("task." + task_name + ".damp_coeff", 0.0);
+        declare_parameter("task." + task_name + ".convergence_threshold", 0.0);
 
-        std::vector<double> kp = get_parameter("task." + task_name + ".kp").as_double_array();
-        std::vector<double> kd = get_parameter("task." + task_name + ".kd").as_double_array();
-        std::vector<double> ki = get_parameter("task." + task_name + ".ki").as_double_array();
-        double damp_coeff = get_parameter("task." + task_name + ".damp_coeff").as_double();
-
-        m_ik_solver->createTask(task_name, kp, kd, ki, damp_coeff);
+        task_gains_p[task_name] = get_parameter("task." + task_name + ".kp").as_double_array();
+        task_gains_d[task_name] = get_parameter("task." + task_name + ".kd").as_double_array();
+        task_gains_i[task_name] = get_parameter("task." + task_name + ".ki").as_double_array();
+        task_damp_coeffs[task_name] = get_parameter("task." + task_name + ".damp_coeff").as_double();
+        task_convergence_thresholds[task_name] = get_parameter("task." + task_name + ".convergence_threshold").as_double();
     }
+
+    m_ik_solver->createTask(task_gains_p, task_gains_d, task_gains_i, task_damp_coeffs, task_convergence_thresholds);
 }
 
 void IKSolverNode::configureIKSolutions()

@@ -57,8 +57,9 @@ public:
     void setGainP(const std::vector<double>& gain_p);
     void setGainD(const std::vector<double>& gain_d);
     void setGainI(const std::vector<double>& gain_i);
-    void setDampingCoefficient(const float& damping_coefficient);
-    inline void setDt(const float& dt) { m_dt = dt; }
+    void setDampingCoefficient(const double& damping_coefficient);
+    inline void setDt(const double& dt) { m_dt = dt; }
+    inline void setConvergenceThreshold(const double& convergence_threshold) { m_convergence_threshold = convergence_threshold; }
     inline void setDesiredTask(const Eigen::VectorXd& desired_task) { m_desired_task = desired_task; }
     inline void setJointNamesPtr(std::vector<std::string>* joint_names) { m_joint_names_ptr = joint_names; }
     inline void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr) { m_current_joint_positions_ptr = current_joint_positions_ptr; }
@@ -87,8 +88,9 @@ protected:
     Eigen::MatrixXd m_gain_p;
     Eigen::MatrixXd m_gain_d;
     Eigen::MatrixXd m_gain_i;
-    float m_dt;
-    float m_damping_coefficient;
+    double m_dt;
+    double m_damping_coefficient;
+    double m_convergence_threshold;
     Eigen::VectorXd m_integral_error;
     Eigen::VectorXd m_previous_error;
     double m_error_norm;

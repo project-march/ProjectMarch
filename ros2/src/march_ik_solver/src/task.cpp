@@ -79,7 +79,7 @@ void Task::setGainI(const std::vector<double>& gain_i)
     }
 }
 
-void Task::setDampingCoefficient(const float& damping_coefficient)
+void Task::setDampingCoefficient(const double& damping_coefficient)
 {
     m_damping_coefficient = damping_coefficient;
     m_damping_identity.noalias() = damping_coefficient * m_damping_identity;

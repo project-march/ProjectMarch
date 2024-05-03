@@ -21,32 +21,36 @@ IKSolver::IKSolver()
     m_current_linear_acceleration = Eigen::Vector3d::Zero();
 }
 
-void IKSolver::createTask(const std::string& name, const std::vector<double>& gain_p, 
-    const std::vector<double>& gain_d, const std::vector<double>& gain_i, 
-    const double& damping_coefficient)
+void IKSolver::createTask(
+    std::unordered_map<std::string, std::vector<double>> task_gains_p,
+    std::unordered_map<std::string, std::vector<double>> task_gains_d,
+    std::unordered_map<std::string, std::vector<double>> task_gains_i,
+    std::unordered_map<std::string, double> task_damp_coeffs,
+    std::unordered_map<std::string, double> task_convergence_thresholds)
 {
-    if (name == "stability") {
-        std::unique_ptr<StabilityTask> stability_task
-            = std::make_unique<StabilityTask>();
-        stability_task->setCurrentLinearAccelerationPtr(&m_current_linear_acceleration);
-        stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
-        stability_task->setNextStanceLegPtr(&m_next_stance_leg);
-        m_task_map[name] = std::move(stability_task);
-    } else if (name == "motion") {
-        m_task_map[name] = std::make_unique<MotionTask>();
-    } else if (name == "posture") {
-        m_task_map[name] = std::make_unique<PostureTask>();
-    } else {
-        m_task_map[name] = std::make_unique<Task>();
+    // Create tasks
+    m_task_map["motion"] = std::make_unique<MotionTask>();
+    m_task_map["posture"] = std::make_unique<PostureTask>();
+
+    // Create and set stability task
+    std::unique_ptr<StabilityTask> stability_task = std::make_unique<StabilityTask>();
+    stability_task->setCurrentLinearAccelerationPtr(&m_current_linear_acceleration);
+    stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
+    stability_task->setNextStanceLegPtr(&m_next_stance_leg);
+    m_task_map["stability"] = std::move(stability_task);
+
+    // Set task parameters
+    for (const auto& task_name : {"stability", "motion", "posture"}) {
+        m_task_map.at(task_name)->configureIkSolverVariables();
+        m_task_map.at(task_name)->setDt(m_dt);
+        m_task_map.at(task_name)->setGainP(task_gains_p.at(task_name));
+        m_task_map.at(task_name)->setGainD(task_gains_d.at(task_name));
+        m_task_map.at(task_name)->setGainI(task_gains_i.at(task_name));
+        m_task_map.at(task_name)->setDampingCoefficient(task_damp_coeffs.at(task_name));
+        m_task_map.at(task_name)->setJointNamesPtr(&m_joint_names);
+        m_task_map.at(task_name)->setCurrentJointPositionsPtr(&m_current_joint_positions);
+        m_task_map.at(task_name)->setConvergenceThreshold(task_convergence_thresholds.at(task_name));
     }
-    m_task_map[name]->configureIkSolverVariables();
-    m_task_map[name]->setDt(m_dt);
-    m_task_map[name]->setGainP(gain_p);
-    m_task_map[name]->setGainD(gain_d);
-    m_task_map[name]->setGainI(gain_i);
-    m_task_map[name]->setDampingCoefficient(damping_coefficient);
-    m_task_map[name]->setJointNamesPtr(&m_joint_names);
-    m_task_map[name]->setCurrentJointPositionsPtr(&m_current_joint_positions);
 }
 
 Eigen::VectorXd IKSolver::solveInverseKinematics()
