@@ -6,55 +6,49 @@ march_ble_ipd
 
 Overview
 --------
-The march_ble_ipd functions in connecting with the IPD over Bluetooth Low Energy (BLE). It is responsible for sending and receiving data from the IPD.
+This package is the implementation of the Bluetooth Input Device used to communicate with the smartwatch app, developed by MIX. This implementation **heavily** relies on the implementation from
+`Bluetooth Technology for Linux Developers <https://www.bluetooth.com/bluetooth-resources/bluetooth-for-linux//>`_
+
+This package implements a BLE Server which is basically copied one to one and altered for the use of receiving integers that correspond to exoModes. In addition to that it publishes alive messages to the safety node.
+
+Initialization
+---------------
+The first part of the constructor is quite similar to a normal ROS node, so this will mainly focus on the BLE part.
+
+Server
+^^^^^^^^^^^^^^^
+The :code:`BluetoothServer` class is a Python-based Bluetooth Low Energy (BLE) server that uses the D-Bus API to interact with the BlueZ Bluetooth stack on Linux. It advertises a BLE service and characteristic, and allows a BLE client to read and write to this characteristic.
+
+The script starts by setting up the D-Bus main loop and getting a reference to the system bus. It then sets up signal receivers to listen for property changes and interface additions on the bus.
+
+The :code:`Advertisement` class is used to create a BLE advertisement. This advertisement is broadcasted by the server to let nearby BLE clients know of its existence and the services it offers.
+
+The :code:`ExoModeCharacteristic` class represents a BLE characteristic that a client can read and write. It has a callback function that is called whenever a client writes to this characteristic.
+
+The :code:`ExoModeService` class represents a BLE service that contains the :code:`ExoModeCharacteristic`. This service is added to the :code:`Application` class, which represents the GATT application that is registered with BlueZ.
+
+The :code:`BluetoothServer` class is the main class of the script. It sets up the advertisement and the GATT application, and starts the main loop. It also handles the registration of the advertisement and the GATT application with BlueZ, and starts and stops the advertisement based on whether a client is connected. This class is a member variable of the ROS2 node.
+
+The server runs indefinitely, waiting for BLE clients to connect and interact with the :code:`ExoModeCharacteristic`. When a client writes to the characteristic, the server prints the new value and calls the callback function which sends the .
 
 ROS API
 -------
 
 Nodes
 ^^^^^
-*ble_ipd_node* - Responsible for doing the thing.
+*ble_ipd_node* - Handles inputs from the smartwatch, and passes these on to the rest of the architecture
 
-Subscribed Topics
-^^^^^^^^^^^^^^^^^
-
-*/march/template/command/other* (template_msgs/TemplateCommand)
-Does the other thing.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
-Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
+* | :code:`"/march/input_device/alive"` `Alive <https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/msg/Alive.msg/>`_
+  | Publishes alive messages every so often to the Safety node
 
-*/march/template/result* (template_msgs/Boolean)
-Tells you if it worked
-
-Services
-^^^^^^^^
-*/march/template/do* (template_msgs/Do)
-Does something
-
-Parameters
-^^^^^^^^^^
-*/march/template/counter* (*int*, required)
-How many to count
-*/march/template/countings* (*int[]*, default: [])
-List of countings
-
-Tutorials
----------
-
-How to do something
-^^^^^^^^^^^^^^^^^^^ 
-explain how to do something, for example:
-
-Create a new publisher
-^^^^^^^^^^^^^^^^^^^^^^
-Create a new publisher in the ``__init__`` of ``InputDeviceController``:
-
-.. code::
-
-from std_msgs.msg import Bool # Import the Bool msg if needed.
-
-self.this_tutorial_works_pub = rospy.Publisher('/march/this/tutorial/works', Bool, queue_size=10)
-
+Service Client
+^^^^^^^^^^^^^^
+* | :code:`"get_exo_mode_array"` `GetExoModeArray.srv <https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/srv/GetExoModeArray.srv>`_ 
+  | Sends requested mode to the :code:`ModeMachine` and receives possible new modes
+  
+Bluetooth Connections
+^^^^^^^^^^^^^^^^^^^^^
+* The node also advertises a BLE characteristic
