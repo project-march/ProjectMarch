@@ -344,9 +344,7 @@ void IKSolverNode::configureTasksParameters()
         declare_parameter("task." + task_name + ".damp_coeff", 0.0);
         declare_parameter("task." + task_name + ".convergence_threshold", 0.0);
 
-        task_gains_p[task_name] = get_parameter("task." + task_name + ".kp").as_double_array();
-        task_gains_d[task_name] = get_parameter("task." + task_name + ".kd").as_double_array();
-        task_gains_i[task_name] = get_parameter("task." + task_name + ".ki").as_double_array();
+        task_gains_p[task_name] = get_parameter("task." + task_name + ".kp").as_double_array();compute PID error
         task_damp_coeffs[task_name] = get_parameter("task." + task_name + ".damp_coeff").as_double();
         task_convergence_thresholds[task_name] = get_parameter("task." + task_name + ".convergence_threshold").as_double();
     }
