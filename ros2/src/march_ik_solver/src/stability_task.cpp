@@ -7,10 +7,10 @@
 
 #include "pinocchio/algorithm/center-of-mass.hpp"
 
-StabilityTask::StabilityTask(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
-    const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt)
-    : Task(task_name, reference_frame, joint_indices, workspace_dim, configuration_dim, dt)
+StabilityTask::StabilityTask() : Task()
 {
+    m_task_name = "stability";
+    m_reference_frame = "world";
     m_total_mass = pinocchio::computeTotalMass(m_model);
 }
 

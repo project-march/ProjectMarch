@@ -26,14 +26,14 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
 {
     if (name == "stability") {
         std::unique_ptr<StabilityTask> stability_task
-            = std::make_unique<StabilityTask>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+            = std::make_unique<StabilityTask>();
         stability_task->setCurrentLinearAccelerationPtr(&m_current_linear_acceleration);
         stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
         stability_task->setNextStanceLegPtr(&m_next_stance_leg);
         m_task_map[name] = std::move(stability_task);
     } else {
         m_task_map[name]
-            = std::make_unique<Task>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+            = std::make_unique<Task>();
     }
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);

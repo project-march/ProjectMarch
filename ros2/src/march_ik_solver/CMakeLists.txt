@@ -36,6 +36,8 @@ add_library(${PROJECT_NAME} STATIC
   src/ik_solver_node.cpp
   src/ik_solver.cpp
   src/task.cpp
+  src/motion_task.cpp
+  src/posture_task.cpp
   src/stability_task.cpp
 )
 
@@ -55,6 +57,8 @@ add_executable(ik_solver_node
   src/ik_solver_node.cpp 
   src/ik_solver.cpp 
   src/task.cpp
+  src/motion_task.cpp
+  src/posture_task.cpp
   src/stability_task.cpp
 )
 

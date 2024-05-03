@@ -15,28 +15,15 @@
 #include "pinocchio/algorithm/jacobian.hpp"
 #include "math.h"
 
-Task::Task(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
-    const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt)
+Task::Task()
 {
-    m_task_name = task_name;
-    m_reference_frame = reference_frame;
-    m_joint_indices = joint_indices;
-    setTaskM(workspace_dim);
-    setTaskN(configuration_dim);
-    m_dt = dt;
     m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_model);
     m_data = std::make_unique<pinocchio::Data>(m_model);
-
-    // Configure ik solver variables
-    const unsigned int TOTAL_SE3_SIZE = SE3_SIZE * joint_indices.size();
-    m_current_task = Eigen::VectorXd::Zero(TOTAL_SE3_SIZE);
-    m_jacobian = Eigen::MatrixXd::Zero(TOTAL_SE3_SIZE, m_model.nv);
-    m_previous_error = Eigen::VectorXd::Zero(workspace_dim);
-    m_integral_error = Eigen::VectorXd::Zero(workspace_dim);
+    m_task_n = m_model.nv;
 }
 
 void Task::setTaskName(const std::string& task_name)
@@ -65,11 +52,6 @@ void Task::setTaskN(const unsigned int& task_n)
 
     // Initialize damping identity matrix for singularity-robustness
     m_damping_identity = Eigen::MatrixXd::Identity(m_task_n, m_task_n);
-}
-
-void Task::setDt(const float& dt)
-{
-    m_dt = dt;
 }
 
 void Task::setGainP(const std::vector<double>& gain_p)
@@ -155,6 +137,15 @@ void Task::computeCurrentTask()
     computeCurrentTaskCoordinates();
     computeCurrentTaskJacobian();
     computeJacobianInverse();
+}
+
+void Task::configureIkSolverVariables()
+{
+    // Configure ik solver variables
+    m_current_task = Eigen::VectorXd::Zero(m_task_m);
+    m_jacobian = Eigen::MatrixXd::Zero(m_task_m, m_task_n);
+    m_previous_error = Eigen::VectorXd::Zero(m_task_m);
+    m_integral_error = Eigen::VectorXd::Zero(m_task_m);
 }
 
 void Task::computeJacobianInverse()

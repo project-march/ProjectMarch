@@ -26,8 +26,7 @@ public:
     typedef std::unique_ptr<Task> UniquePtr;
     typedef std::shared_ptr<Task> SharedPtr;
 
-    Task(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
-        const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt);
+    Task();
     ~Task() = default;
 
     Eigen::VectorXd solveTask();
@@ -35,6 +34,7 @@ public:
     Eigen::VectorXd calculateDerivativeError(const Eigen::VectorXd& error);
     Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd& error);
     void computeCurrentTask();
+    void configureIkSolverVariables();
 
     inline std::vector<int> getJointIndices() const { return m_joint_indices; }
     inline std::string getTaskName() const { return m_task_name; }
@@ -54,11 +54,11 @@ public:
     inline void setJointIndices(const std::vector<int>& joint_indices) { m_joint_indices = joint_indices; }
     void setTaskM(const unsigned int& task_m);
     void setTaskN(const unsigned int& task_n);
-    void setDt(const float& dt);
     void setGainP(const std::vector<double>& gain_p);
     void setGainD(const std::vector<double>& gain_d);
     void setGainI(const std::vector<double>& gain_i);
     void setDampingCoefficient(const float& damping_coefficient);
+    inline void setDt(const float& dt) { m_dt = dt; }
     inline void setDesiredTask(const Eigen::VectorXd& desired_task) { m_desired_task = desired_task; }
     inline void setJointNamesPtr(std::vector<std::string>* joint_names) { m_joint_names_ptr = joint_names; }
     inline void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr) { m_current_joint_positions_ptr = current_joint_positions_ptr; }
@@ -75,7 +75,6 @@ protected:
 
     std::string m_task_name;
     std::string m_reference_frame;
-    std::vector<std::string> m_node_names;
     unsigned int m_task_m;
     unsigned int m_task_n;
     std::vector<int> m_joint_indices;

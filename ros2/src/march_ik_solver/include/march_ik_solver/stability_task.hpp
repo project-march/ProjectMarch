@@ -11,8 +11,7 @@
 class StabilityTask : public Task
 {
 public:
-    StabilityTask(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
-    const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt);
+    StabilityTask();
 
     inline void setCurrentLinearAccelerationPtr(Eigen::Vector3d* current_linear_acceleration_ptr) { m_current_linear_acceleration_ptr = current_linear_acceleration_ptr; }
     inline void setCurrentStanceLegPtr(uint8_t* current_stance_leg_ptr) { m_current_stance_leg_ptr = current_stance_leg_ptr; }
