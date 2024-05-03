@@ -9,7 +9,6 @@
 #include <functional>
 #include <memory>
 
-#include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/jacobian.hpp"
 #include "math.h"
 
