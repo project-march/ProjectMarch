@@ -328,36 +328,23 @@ void IKSolverNode::configureIKSolverParameters()
 
 void IKSolverNode::configureTasksParameters()
 {
-    declare_parameter("task_names", std::vector<std::string>());
-    std::vector<std::string> task_names = get_parameter("task_names").as_string_array();
+    declare_parameter("task.names", std::vector<std::string>());
+    std::vector<std::string> task_names = get_parameter("task.names").as_string_array();
     m_ik_solver->setTaskNames(task_names);
 
     for (const auto& task_name : task_names) {
         RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
-        declare_parameter(task_name + ".reference_frame", "body");
-        declare_parameter(task_name + ".joint_indices", std::vector<long int>());
-        declare_parameter(task_name + ".m", 0);
-        declare_parameter(task_name + ".n", 0);
-        declare_parameter(task_name + ".kp", std::vector<double>());
-        declare_parameter(task_name + ".kd", std::vector<double>());
-        declare_parameter(task_name + ".ki", std::vector<double>());
-        declare_parameter(task_name + ".damp_coeff", 0.0);
+        declare_parameter("task." + task_name + ".kp", std::vector<double>());
+        declare_parameter("task." + task_name + ".kd", std::vector<double>());
+        declare_parameter("task." + task_name + ".ki", std::vector<double>());
+        declare_parameter("task." + task_name + ".damp_coeff", 0.0);
 
-        std::string reference_frame = get_parameter(task_name + ".reference_frame").as_string();
-        std::vector<long int> joint_indices = get_parameter(task_name + ".joint_indices").as_integer_array();
-        long unsigned int task_dim = get_parameter(task_name + ".m").as_int();
-        long unsigned int workspace_dim = get_parameter(task_name + ".n").as_int();
-        std::vector<double> kp = get_parameter(task_name + ".kp").as_double_array();
-        std::vector<double> kd = get_parameter(task_name + ".kd").as_double_array();
-        std::vector<double> ki = get_parameter(task_name + ".ki").as_double_array();
-        double damp_coeff = get_parameter(task_name + ".damp_coeff").as_double();
+        std::vector<double> kp = get_parameter("task." + task_name + ".kp").as_double_array();
+        std::vector<double> kd = get_parameter("task." + task_name + ".kd").as_double_array();
+        std::vector<double> ki = get_parameter("task." + task_name + ".ki").as_double_array();
+        double damp_coeff = get_parameter("task." + task_name + ".damp_coeff").as_double();
 
-        // Convert the joint indices to int.
-        std::vector<int> joint_indices_int(joint_indices.begin(), joint_indices.end());
-        for (const auto& joint_index : joint_indices_int) {
-            RCLCPP_INFO(this->get_logger(), "Joint index: %d", joint_index);
-        }
-        m_ik_solver->createTask(task_name, reference_frame, joint_indices_int, task_dim, workspace_dim, kp, kd, ki, damp_coeff);
+        m_ik_solver->createTask(task_name, kp, kd, ki, damp_coeff);
     }
 }
 

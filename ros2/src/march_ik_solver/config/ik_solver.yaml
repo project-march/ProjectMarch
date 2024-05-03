@@ -2,9 +2,9 @@ ik_solver:
   ros__parameters:
     state_estimator_time_offset: 20e-3
     joint_trajectory_controller_period: 5e-3
-    convergence_threshold: 1e-4
+    convergence_threshold: 1e-3
     max_iterations: 100000
-    integral_dt: 5e-4
+    integral_dt: 1e-4
     joint:
       names:
       - left_hip_aa
@@ -36,34 +36,26 @@ ik_solver:
         velocities:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
-    task_names:
-    - posture
-    - motion
-    - stability
-    motion:
-      reference_frame: "body"
-      joint_indices: [4, 9]
-      m: 6
-      n: 10
-      kp: [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
-      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
-    stability:
-      reference_frame: "body"
-      joint_indices: [0]
-      m: 2
-      n: 10
-      kp: [5.0, 15.0]
-      kd: [0.0, 0.0]
-      ki: [0.0, 0.0]
-      damp_coeff: 1e-12
-    posture:
-      reference_frame: "body"
-      joint_indices: [4, 9]
-      m: 2
-      n: 10
-      kp: [100.0, 100.0]
-      kd: [0.0, 0.0]
-      ki: [0.0, 0.0]
-      damp_coeff: 1e-12
+    task:
+      names:
+      - posture
+      - motion
+      - stability
+      motion:
+        kp: [25.0, 25.0, 25.0, 25.0, 25.0, 25.0]
+        kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        convergence_threshold: 1e-4
+        damp_coeff: 1e-12
+      stability:
+        kp: [5.0, 15.0]
+        kd: [0.0, 0.0]
+        ki: [0.0, 0.0]
+        convergence_threshold: 1e-2
+        damp_coeff: 1e-12
+      posture:
+        kp: [10.0, 10.0]
+        kd: [0.0, 0.0]
+        ki: [0.0, 0.0]
+        convergence_threshold: 1e-2
+        damp_coeff: 1e-12
