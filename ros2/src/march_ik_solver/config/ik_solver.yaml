@@ -4,7 +4,7 @@ ik_solver:
     joint_trajectory_controller_period: 5e-3
     convergence_threshold: 1e-4
     max_iterations: 100000
-    integral_dt: 1e-4
+    integral_dt: 2e-5
     joint:
       names:
       - left_hip_aa
