@@ -36,7 +36,7 @@ add_library(${PROJECT_NAME} STATIC
   src/ik_solver_node.cpp
   src/ik_solver.cpp
   src/task.cpp
-  src/task_stability.cpp
+  src/stability_task.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -55,7 +55,7 @@ add_executable(ik_solver_node
   src/ik_solver_node.cpp 
   src/ik_solver.cpp 
   src/task.cpp
-  src/task_stability.cpp
+  src/stability_task.cpp
 )
 
 target_include_directories(ik_solver_node PUBLIC

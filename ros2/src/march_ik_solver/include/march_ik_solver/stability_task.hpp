@@ -3,15 +3,15 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef IK_SOLVER__TASK_STABILITY_HPP
-#define IK_SOLVER__TASK_STABILITY_HPP
+#ifndef IK_SOLVER__STABILITY_TASK_HPP
+#define IK_SOLVER__STABILITY_TASK_HPP
 
 #include "march_ik_solver/task.hpp"
 
-class TaskStability : public Task
+class StabilityTask : public Task
 {
 public:
-    TaskStability(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
+    StabilityTask(const std::string& task_name, const std::string& reference_frame, const std::vector<int>& joint_indices,
     const unsigned int& workspace_dim, const unsigned int& configuration_dim, const float& dt);
 
     inline void setCurrentLinearAccelerationPtr(Eigen::Vector3d* current_linear_acceleration_ptr) { m_current_linear_acceleration_ptr = current_linear_acceleration_ptr; }
@@ -34,4 +34,4 @@ private:
     const double FOOT_WIDTH = 0.15; // m
 };
 
-#endif  // IK_SOLVER__TASK_STABILITY_HPP
+#endif  // IK_SOLVER__STABILITY_TASK_HPP

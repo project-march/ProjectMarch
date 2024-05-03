@@ -4,7 +4,7 @@
  */
 
 #include "march_ik_solver/ik_solver.hpp"
-#include "march_ik_solver/task_stability.hpp"
+#include "march_ik_solver/stability_task.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/clamp.hpp>
@@ -25,8 +25,8 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
     const std::vector<double>& gain_i, const double& damping_coefficient)
 {
     if (name == "stability") {
-        std::unique_ptr<TaskStability> stability_task
-            = std::make_unique<TaskStability>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
+        std::unique_ptr<StabilityTask> stability_task
+            = std::make_unique<StabilityTask>(name, reference_frame, joint_indices, workspace_dim, configuration_dim, m_dt);
         stability_task->setCurrentLinearAccelerationPtr(&m_current_linear_acceleration);
         stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
         stability_task->setNextStanceLegPtr(&m_next_stance_leg);
