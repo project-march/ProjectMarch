@@ -30,6 +30,7 @@ IKSolverNode::IKSolverNode()
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
+    m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
     m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
     m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
 
@@ -66,6 +67,7 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
     publishJointTrajectory();
+    publishDesiredJointPositions();
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -112,6 +114,19 @@ void IKSolverNode::publishJointTrajectory()
 
     // Update the previous joint trajectory point.
     updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
+}
+
+void IKSolverNode::publishDesiredJointPositions()
+{
+    std_msgs::msg::Float64MultiArray desired_joint_positions_msg;
+    std::vector<double> desired_joint_positions = std::vector<double>(
+        m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
+
+    for (const auto& idx : m_alphabetical_joint_indices) {
+        desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
+    }
+
+    m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
 }
 
 void IKSolverNode::publishErrorNorm(const double& error_norm)
