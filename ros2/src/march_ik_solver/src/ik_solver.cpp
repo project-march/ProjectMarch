@@ -5,6 +5,8 @@
 
 #include "march_ik_solver/ik_solver.hpp"
 #include "march_ik_solver/stability_task.hpp"
+#include "march_ik_solver/motion_task.hpp"
+#include "march_ik_solver/posture_task.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/clamp.hpp>
@@ -31,10 +33,15 @@ void IKSolver::createTask(const std::string& name, const std::string reference_f
         stability_task->setCurrentStanceLegPtr(&m_current_stance_leg);
         stability_task->setNextStanceLegPtr(&m_next_stance_leg);
         m_task_map[name] = std::move(stability_task);
+    } else if (name == "motion") {
+        m_task_map[name] = std::make_unique<MotionTask>();
+    } else if (name == "posture") {
+        m_task_map[name] = std::make_unique<PostureTask>();
     } else {
-        m_task_map[name]
-            = std::make_unique<Task>();
+        m_task_map[name] = std::make_unique<Task>();
     }
+    m_task_map[name]->configureIkSolverVariables();
+    m_task_map[name]->setDt(m_dt);
     m_task_map[name]->setGainP(gain_p);
     m_task_map[name]->setGainD(gain_d);
     m_task_map[name]->setGainI(gain_i);

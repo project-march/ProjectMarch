@@ -26,6 +26,7 @@ private:
     uint8_t* m_current_stance_leg_ptr;
     uint8_t* m_next_stance_leg_ptr;
 
+    const int STABILITY_COORDINATE_SIZE = 2;
     const int LEFT_FOOT_INDEX = 5;
     const int RIGHT_FOOT_INDEX = 10;
     const unsigned int TRANSLATION_SIZE = 3;

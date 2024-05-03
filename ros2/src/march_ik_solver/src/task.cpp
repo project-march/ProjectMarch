@@ -98,15 +98,16 @@ Eigen::VectorXd Task::solveTask()
 Eigen::VectorXd Task::calculateError()
 {
     Eigen::VectorXd error, pid_error;
-
     error.noalias() = m_desired_task - m_current_task;
     
+    // Calculate relevant error norms
     m_error_norm = 0.0;
     for (const auto& nonzero_gain_p_idx : m_nonzero_gain_p_indices) {
         m_error_norm += pow(error(nonzero_gain_p_idx), 2);
     }
     m_error_norm = sqrt(m_error_norm);
 
+    // Calculate PID error
     pid_error.noalias() = m_gain_p * error + calculateIntegralError(error) + calculateDerivativeError(error);
 
     m_previous_error = error;
@@ -144,13 +145,13 @@ void Task::configureIkSolverVariables()
     // Configure ik solver variables
     m_current_task = Eigen::VectorXd::Zero(m_task_m);
     m_jacobian = Eigen::MatrixXd::Zero(m_task_m, m_task_n);
+    m_jacobian_inverse = Eigen::MatrixXd::Zero(m_task_n, m_task_m);
     m_previous_error = Eigen::VectorXd::Zero(m_task_m);
     m_integral_error = Eigen::VectorXd::Zero(m_task_m);
 }
 
 void Task::computeJacobianInverse()
 {
-    m_jacobian_inverse = Eigen::MatrixXd::Zero(m_model.nv, m_task_m);
     Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
     jacobian_decomposition.setThreshold(m_damping_coefficient);
     m_jacobian_inverse.noalias() = jacobian_decomposition.pseudoInverse();
@@ -183,21 +184,10 @@ Eigen::MatrixXd Task::getNullspaceProjection() const
 
 void Task::computeCurrentTaskCoordinates()
 {
-    for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
-        // Fixed-size template cannot be used with aliases
-        m_current_task.segment<3>(SE3_SIZE * i) = m_data->oMi[m_joint_indices[i]].translation();
-        m_current_task.segment<3>(SE3_SIZE * i + EUCLIDEAN_SIZE) 
-            = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(ROTATION_YAW_INDEX, ROTATION_PITCH_INDEX, ROTATION_ROLL_INDEX);
-    }
+    // Implement in derived classes
 }
 
 void Task::computeCurrentTaskJacobian()
 {
-    for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
-        pinocchio::Data::Matrix6x jacobian_joint(SE3_SIZE, m_model.nv);
-        jacobian_joint.setZero();
-
-        pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, m_joint_indices[i], jacobian_joint);
-        m_jacobian.block(SE3_SIZE * i, 0, SE3_SIZE, m_model.nv) = jacobian_joint;
-    }
+    // Implement in derived classes
 }

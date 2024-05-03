@@ -19,6 +19,7 @@ PostureTask::PostureTask() : Task()
     m_reference_frame = "base_link";
     m_joint_indices = {LEFT_ANKLE_INDEX, RIGHT_ANKLE_INDEX};
     setTaskM(m_joint_indices.size());
+    m_task_m = m_joint_indices.size();
 }
 
 void PostureTask::computeCurrentTaskCoordinates()
@@ -34,7 +35,7 @@ void PostureTask::computeCurrentTaskJacobian()
 {
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
         // Fixed-size template cannot be used with aliases
-        pinocchio::Data::Matrix6x jacobian_joint(m_task_m, m_task_n);
+        pinocchio::Data::Matrix6x jacobian_joint(SE3_SIZE, m_model.nv);
         jacobian_joint.setZero();
 
         pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, m_joint_indices[i], jacobian_joint);

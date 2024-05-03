@@ -41,7 +41,7 @@ IKSolverNode::IKSolverNode()
     m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
 
-    RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
+    RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
 
     // Temporary
     m_first_step = true;
@@ -73,20 +73,17 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
-    Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(12);
+    Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(6);
     desired_motion << 
-        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0,
-        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
+        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z,
+        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
     desired_tasks["motion"] = desired_motion;
 
     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
     desired_stability << m_x_stance_leg, m_y_stance_leg;
     desired_tasks["stability"] = desired_stability;
 
-    Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
-    desired_posture << 
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0;
+    Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
     desired_tasks["posture"] = desired_posture;
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
@@ -198,6 +195,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
     double best_error = 1e9;
+    bool success = false;
     
     do {
         m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
@@ -206,6 +204,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 
         if (best_error <= m_convergence_threshold) {
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
+            success = true;
             break;
         }
         iteration++;
@@ -217,6 +216,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     march_shared_msgs::msg::IksStatus iks_status_msg = m_ik_solver->getIKStatus();
     iks_status_msg.header.stamp = this->now();
     iks_status_msg.iteration = iteration;
+    iks_status_msg.success = success;
     m_iks_status_pub->publish(iks_status_msg);
 }
 
