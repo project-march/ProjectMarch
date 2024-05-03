@@ -92,6 +92,7 @@ Eigen::VectorXd Task::solveTask()
     Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> jacobian_decomposition(m_jacobian);
     jacobian_decomposition.setThreshold(m_damping_coefficient);
     joint_velocities.noalias() = jacobian_decomposition.solve(error);
+    std::cout << "Task " << m_task_name.c_str() << ", joint velocities: " << joint_velocities.transpose() << std::endl;
     return joint_velocities;
 }
 

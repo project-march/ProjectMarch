@@ -19,7 +19,6 @@ PostureTask::PostureTask() : Task()
     m_reference_frame = "base_link";
     m_joint_indices = {LEFT_ANKLE_INDEX, RIGHT_ANKLE_INDEX};
     setTaskM(m_joint_indices.size());
-    m_task_m = m_joint_indices.size();
 }
 
 void PostureTask::computeCurrentTaskCoordinates()
