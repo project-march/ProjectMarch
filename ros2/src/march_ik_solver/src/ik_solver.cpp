@@ -40,7 +40,7 @@ void IKSolver::createTask(
     m_task_map["stability"] = std::move(stability_task);
 
     // Set task parameters
-    for (const auto& task_name : {"stability", "motion", "posture"}) {
+    for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->configureIkSolverVariables();
         m_task_map.at(task_name)->setDt(m_dt);
         m_task_map.at(task_name)->setGainP(task_gains_p.at(task_name));
