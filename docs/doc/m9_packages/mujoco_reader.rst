@@ -14,7 +14,7 @@ Nodes
 ^^^^^
 *mujoco_reader* - Responsible for doing the thing.
 
-.. figure:: images/mujoco_reader.png
+.. figure:: images/mujoco_reader.svg
    :align: center
    :scale: 100%
    :alt: mujoco_reader
@@ -22,21 +22,21 @@ Nodes
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
 
-*/march/template/command/other* (template_msgs/TemplateCommand)
-Does the other thing.
+*/mujoco_sensor_output* (mujoco_interfaces/MujocoDataSensing)
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
-Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
 
-*/march/template/result* (template_msgs/Boolean)
-Tells you if it worked
+*/joint_states* (sensor_msgs/JointState)
 
-Services
-^^^^^^^^
-*/march/template/do* (template_msgs/Do)
-Does something
+*/upper_imu* (sensor_msgs/Imu)
+
+*/lower_imu* (sensor_msgs/Imu)
+
+*/lower_imu/position* (geometry_msgs/PointStamped)
+
+*/lower_imu/velocity* (geometry_msgs/Vector3Stamped)
+
 
 Parameters
 ^^^^^^^^^^

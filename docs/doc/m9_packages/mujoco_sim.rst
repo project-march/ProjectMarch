@@ -1,11 +1,11 @@
-.. _mujoco_simulation-label:
+.. _mujoco_sim-label:
 
-mujoco_simulation
+mujoco_sim
 =================
 
 Overview
 --------
-what
+The main node 
 
 ROS API
 -------
@@ -14,50 +14,29 @@ Nodes
 ^^^^^
 *mujoco_sim* - Responsible for doing the thing.
 
-.. figure:: images/mujoco_sim.png
+.. figure:: images/mujoco_sim.svg
    :align: center
    :scale: 100%
    :alt: mujoco_sim
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
+*/mujoco_input* (template_msgs/TemplateCommand)
 
-*/march/template/command/other* (template_msgs/TemplateCommand)
-Does the other thing.
+*/mujoco_gains* (mujoco_interfaces/MujocoGains)
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/input_device/alive* (`std_msgs/Time <https://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
-Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
-
-*/march/template/result* (template_msgs/Boolean)
-Tells you if it worked
-
-Services
-^^^^^^^^
-*/march/template/do* (template_msgs/Do)
-Does something
+*/mujoco_sensor_output* (mujoco_interfaces/MujocoDataSensing)
 
 Parameters
 ^^^^^^^^^^
-*/march/template/counter* (*int*, required)
-How many to count
-*/march/template/countings* (*int[]*, default: [])
-List of countings
+*mujoco_sim.launch.py* Launches the *mujoco_sim*, *mujoco_writer*, and *mujoco_reader* nodes.
 
-Tutorials
----------
 
-How to do something
-^^^^^^^^^^^^^^^^^^^ 
-explain how to do something, for example:
 
-Create a new publisher
-^^^^^^^^^^^^^^^^^^^^^^
-Create a new publisher in the ``__init__`` of ``InputDeviceController``:
+*model_to_load* (*string*, default: "model_to_load.xml")
+What model to load into MuJoCo
 
-.. code::
-
-from std_msgs.msg import Bool # Import the Bool msg if needed.
-
-self.this_tutorial_works_pub = rospy.Publisher('/march/this/tutorial/works', Bool, queue_size=10)
+*aie_force* (*bool*, default: False)
+Toggles the passive AIE force, defined in *aie_passive_force.py*
