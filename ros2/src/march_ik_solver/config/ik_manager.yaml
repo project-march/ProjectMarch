@@ -37,7 +37,7 @@ ik_manager:
       - posture
       - motion
       SmallWalk:
-      - posture
+      # - posture
       - motion
       VariableStep:
       - posture

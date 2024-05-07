@@ -35,6 +35,7 @@ public:
     Eigen::VectorXd calculateIntegralError(const Eigen::VectorXd& error);
     void computeCurrentTask();
     void configureIkSolverVariables();
+    inline bool isConverged() { return m_error_norm < m_convergence_threshold; }
 
     inline std::vector<int> getJointIndices() const { return m_joint_indices; }
     inline std::string getTaskName() const { return m_task_name; }

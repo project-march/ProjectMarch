@@ -194,23 +194,20 @@ void IKSolverNode::publishDesiredJointPositions()
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
-    double best_error = 1e9;
     bool success = false;
     
     do {
         m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
         m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
-        best_error = m_ik_solver->getTasksError();
-
-        if (best_error <= m_convergence_threshold) {
-            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Convergence reached.");
+        if (m_ik_solver->areTasksConverged()) {
+            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Convergence reached.");
             success = true;
             break;
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_DEBUG_THROTTLE(
-        this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, best_error);
+    RCLCPP_INFO_THROTTLE(
+        this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, m_ik_solver->getTasksError());
 
     // Publish the IK status.
     march_shared_msgs::msg::IksStatus iks_status_msg = m_ik_solver->getIKStatus();
@@ -381,8 +378,7 @@ bool IKSolverNode::isWithinMaxIterations(const unsigned int& iterations)
 
 std::vector<double> IKSolverNode::createZeroVector()
 {
-    std::vector<double> zero_vector(m_joint_names.size(), 0.0);
-    return zero_vector;
+    return std::vector<double>(m_joint_names.size(), 0.0);
 }
 
 int main(int argc, char** argv)

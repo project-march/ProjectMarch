@@ -1,10 +1,9 @@
 ik_solver:
   ros__parameters:
-    state_estimator_time_offset: 20e-3
+    state_estimator_time_offset: 50e-3
     joint_trajectory_controller_period: 5e-3
-    convergence_threshold: 1e-4
     max_iterations: 100000
-    integral_dt: 1e-4
+    integral_dt: 1e-3
     joint:
       names:
       - left_hip_aa
@@ -42,20 +41,23 @@ ik_solver:
       - motion
       - stability
       motion:
-        kp: [25.0, 25.0, 25.0, 25.0, 25.0, 25.0]
+        kp: [125.0, 25.0, 125.0, 50.0, 25.0, 50.0]
         kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        convergence_threshold: 1e-4
+        convergence_threshold: 1e-2
         damp_coeff: 1e-3
+        weight: 1.0
       stability:
         kp: [5.0, 15.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
-        convergence_threshold: 1e-2
+        convergence_threshold: 0.0
         damp_coeff: 1e-12
+        weight: 1.0
       posture:
-        kp: [25.0, 25.0]
+        kp: [5.0, 5.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
-        convergence_threshold: 1e-2
+        convergence_threshold: 1e-1
         damp_coeff: 1e-3
+        weight: 0.1

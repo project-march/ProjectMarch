@@ -33,6 +33,7 @@ public:
         std::unordered_map<std::string, double> task_convergence_thresholds);
     Eigen::VectorXd solveInverseKinematics();
     Eigen::VectorXd integrateJointVelocities();
+    bool areTasksConverged();
 
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);
     void updateCurrentJointState(
@@ -51,7 +52,7 @@ public:
         for (const auto& task_name : m_task_names) {
             error += m_task_map.at(task_name)->getErrorNorm();
         }
-        return error;
+        return error / m_task_names.size();
     };
     inline march_shared_msgs::msg::IksStatus getIKStatus() const {
         march_shared_msgs::msg::IksStatus iks_status;

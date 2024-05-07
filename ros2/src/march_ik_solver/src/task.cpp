@@ -171,6 +171,7 @@ march_shared_msgs::msg::IksTaskStatus Task::getTaskStatus() const
 {
     march_shared_msgs::msg::IksTaskStatus task_status;
     task_status.task_name = m_task_name;
+    task_status.error_norm = m_error_norm;
     task_status.error = std::vector<double>(m_previous_error.data(), m_previous_error.data() + m_previous_error.size());
     return task_status;
 }

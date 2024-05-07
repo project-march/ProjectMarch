@@ -61,7 +61,7 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
         m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
             + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
     }
-    // m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities); // TODO: Do we need to clamp joint velocities in this manner?
+    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities); // TODO: Do we need to clamp joint velocities in this manner?
     return m_desired_joint_velocities;
 }
 
@@ -71,6 +71,16 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
     desired_joint_positions.noalias() = m_current_joint_positions + m_desired_joint_velocities * m_dt;
     m_current_joint_positions = clampJointLimits(desired_joint_positions);
     return m_current_joint_positions;
+}
+
+bool IKSolver::areTasksConverged()
+{
+    for (const auto& task_name : m_task_names) {
+        if (!m_task_map.at(task_name)->isConverged()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void IKSolver::updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks)
@@ -91,7 +101,7 @@ void IKSolver::updateCurrentJointState(
 
 void IKSolver::updateWorldToBaseOrientation(const double& w, const double& x, const double& y, const double& z)
 {
-    Eigen::Matrix3d current_world_to_base_orientation = Eigen::Quaterniond(w, x, y, z).toRotationMatrix();
+    Eigen::Matrix3d current_world_to_base_orientation = Eigen::Quaterniond(w, x, y, z).normalized().toRotationMatrix();
     for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->setCurrentWorldToBaseOrientation(current_world_to_base_orientation);
     }
