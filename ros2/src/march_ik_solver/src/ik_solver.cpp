@@ -26,7 +26,8 @@ void IKSolver::createTask(
     std::unordered_map<std::string, std::vector<double>> task_gains_d,
     std::unordered_map<std::string, std::vector<double>> task_gains_i,
     std::unordered_map<std::string, double> task_damp_coeffs,
-    std::unordered_map<std::string, double> task_convergence_thresholds)
+    std::unordered_map<std::string, double> task_convergence_thresholds,
+    std::unordered_map<std::string, double> task_weights)
 {
     // Create tasks
     m_task_map["motion"] = std::make_unique<MotionTask>();
@@ -50,18 +51,21 @@ void IKSolver::createTask(
         m_task_map.at(task_name)->setJointNamesPtr(&m_joint_names);
         m_task_map.at(task_name)->setCurrentJointPositionsPtr(&m_current_joint_positions);
         m_task_map.at(task_name)->setConvergenceThreshold(task_convergence_thresholds.at(task_name));
+        m_task_map.at(task_name)->setWeight(task_weights.at(task_name));
     }
 }
 
 Eigen::VectorXd IKSolver::solveInverseKinematics()
 {
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    double previous_task_weight = 0.0;
     for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->computeCurrentTask();
-        m_desired_joint_velocities.noalias() += m_task_map.at(task_name)->solveTask()
-            + m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities;
+        m_desired_joint_velocities.noalias() = m_task_map.at(task_name)->solveTask()
+            + previous_task_weight * (m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities);
+        previous_task_weight = m_task_map.at(task_name)->getWeight();
     }
-    m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities); // TODO: Do we need to clamp joint velocities in this manner?
+    // m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities); // TODO: Do we need to clamp joint velocities in this manner?
     return m_desired_joint_velocities;
 }
 

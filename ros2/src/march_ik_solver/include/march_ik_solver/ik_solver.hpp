@@ -30,7 +30,8 @@ public:
         std::unordered_map<std::string, std::vector<double>> task_gains_d,
         std::unordered_map<std::string, std::vector<double>> task_gains_i,
         std::unordered_map<std::string, double> task_damp_coeffs,
-        std::unordered_map<std::string, double> task_convergence_thresholds);
+        std::unordered_map<std::string, double> task_convergence_thresholds,
+        std::unordered_map<std::string, double> task_weights);
     Eigen::VectorXd solveInverseKinematics();
     Eigen::VectorXd integrateJointVelocities();
     bool areTasksConverged();

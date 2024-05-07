@@ -200,13 +200,13 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
         m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
         if (m_ik_solver->areTasksConverged()) {
-            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Convergence reached.");
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Convergence reached.");
             success = true;
             break;
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_INFO_THROTTLE(
+    RCLCPP_DEBUG_THROTTLE(
         this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, m_ik_solver->getTasksError());
 
     // Publish the IK status.
@@ -332,6 +332,7 @@ void IKSolverNode::configureTasksParameters()
     std::unordered_map<std::string, std::vector<double>> task_gains_p, task_gains_d, task_gains_i;
     std::unordered_map<std::string, double> task_damp_coeffs;
     std::unordered_map<std::string, double> task_convergence_thresholds;
+    std::unordered_map<std::string, double> task_weights;
 
     for (const auto& task_name : task_names) {
         RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
@@ -340,15 +341,17 @@ void IKSolverNode::configureTasksParameters()
         declare_parameter("task." + task_name + ".ki", std::vector<double>());
         declare_parameter("task." + task_name + ".damp_coeff", 0.0);
         declare_parameter("task." + task_name + ".convergence_threshold", 0.0);
+        declare_parameter("task." + task_name + ".weight", 1.0);
 
         task_gains_p[task_name] = get_parameter("task." + task_name + ".kp").as_double_array();
         task_gains_d[task_name] = get_parameter("task." + task_name + ".kd").as_double_array();
         task_gains_i[task_name] = get_parameter("task." + task_name + ".ki").as_double_array();
         task_damp_coeffs[task_name] = get_parameter("task." + task_name + ".damp_coeff").as_double();
         task_convergence_thresholds[task_name] = get_parameter("task." + task_name + ".convergence_threshold").as_double();
+        task_weights[task_name] = get_parameter("task." + task_name + ".weight").as_double();
     }
 
-    m_ik_solver->createTask(task_gains_p, task_gains_d, task_gains_i, task_damp_coeffs, task_convergence_thresholds);
+    m_ik_solver->createTask(task_gains_p, task_gains_d, task_gains_i, task_damp_coeffs, task_convergence_thresholds, task_weights);
     RCLCPP_INFO(this->get_logger(), "Tasks have been configured.");
 }
 

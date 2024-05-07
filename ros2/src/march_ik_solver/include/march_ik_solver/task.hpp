@@ -41,6 +41,7 @@ public:
     inline std::string getTaskName() const { return m_task_name; }
     inline unsigned int getTaskM() const { return m_task_m; }
     inline unsigned int getTaskN() const { return m_task_n; }
+    inline double getWeight() const { return m_weight; }
     double getErrorNorm() const;
     std::vector<double> getError() const;
     march_shared_msgs::msg::IksTaskStatus getTaskStatus() const;
@@ -61,6 +62,7 @@ public:
     void setDampingCoefficient(const double& damping_coefficient);
     inline void setDt(const double& dt) { m_dt = dt; }
     inline void setConvergenceThreshold(const double& convergence_threshold) { m_convergence_threshold = convergence_threshold; }
+    inline void setWeight(const double& weight) { m_weight = weight; }
     inline void setDesiredTask(const Eigen::VectorXd& desired_task) { m_desired_task = desired_task; }
     inline void setJointNamesPtr(std::vector<std::string>* joint_names) { m_joint_names_ptr = joint_names; }
     inline void setCurrentJointPositionsPtr(Eigen::VectorXd* current_joint_positions_ptr) { m_current_joint_positions_ptr = current_joint_positions_ptr; }
@@ -92,6 +94,7 @@ protected:
     double m_dt;
     double m_damping_coefficient;
     double m_convergence_threshold;
+    double m_weight;
     Eigen::VectorXd m_integral_error;
     Eigen::VectorXd m_previous_error;
     double m_error_norm;
