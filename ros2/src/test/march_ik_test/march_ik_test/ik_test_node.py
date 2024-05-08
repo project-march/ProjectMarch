@@ -16,6 +16,18 @@ class IkTestNode(Node):
     def __init__(self) -> None:
         super().__init__('ik_test_node')
 
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('interval', 5.0),
+                ('left_foot.x', 0.19),
+                ('left_foot.y', 0.16),
+                ('left_foot.z', -0.87),
+                ('right_foot.x', 0.19),
+                ('right_foot.y', -0.16),
+                ('right_foot.z', -0.87),
+        ])
+
         self.state_estimation_subscriber = self.create_subscription(
             StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
         self.iks_command_publisher = self.create_publisher(
@@ -24,29 +36,29 @@ class IkTestNode(Node):
             IksFootPositions, 'ik_solver/buffer/input', 10)
         
         self.left_foot = Point()
-        self.left_foot.x = 0.19
-        self.left_foot.y = 0.5
-        self.left_foot.z = -0.7
+        self.left_foot.x = self.get_parameter('left_foot.x').value
+        self.left_foot.y = self.get_parameter('left_foot.y').value
+        self.left_foot.z = self.get_parameter('left_foot.z').value
 
         self.right_foot = Point()
-        self.right_foot.x = 0.19
-        self.right_foot.y = -0.0
-        self.right_foot.z = -0.9
+        self.right_foot.x = self.get_parameter('right_foot.x').value
+        self.right_foot.y = self.get_parameter('right_foot.y').value
+        self.right_foot.z = self.get_parameter('right_foot.z').value
 
         self.current_feet_positions = None
-        self.interpolation_duration = 5.0
+        self.interpolation_duration = self.get_parameter('interval').value
         self.counter = 0.0
 
         iks_command_msg = IksCommand()
         iks_command_msg.header.stamp = self.get_clock().now().to_msg()
         iks_command_msg.exo_mode = "Stand"
         iks_command_msg.task_names = ["posture", "motion"]
+        self.iks_command_publisher.publish(iks_command_msg)
 
         self.get_logger().info('ik_test_node started, sending following information: ')
         self.get_logger().info(f"Exo mode: {iks_command_msg.exo_mode} with task names: {iks_command_msg.task_names}")
         for name, pos in [("Left ankle", self.left_foot), ("Right ankle", self.right_foot)]:
             self.get_logger().info(f"{name} foot at x={pos.x}, y={pos.y}, z={pos.z}")
-        self.iks_command_publisher.publish(iks_command_msg)
 
     def state_estimation_callback(self, msg):
         if self.current_feet_positions is None:
