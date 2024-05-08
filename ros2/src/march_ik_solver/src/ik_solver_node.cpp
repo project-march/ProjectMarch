@@ -220,6 +220,9 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     iks_status_msg.header.stamp = this->now();
     iks_status_msg.iteration = iteration;
     iks_status_msg.success = success;
+    iks_status_msg.start_time = start_time;
+    iks_status_msg.end_time = this->now();
+    iks_status_msg.duration = (iks_status_msg.end_time.nanosec - iks_status_msg.start_time.nanosec) * 1e-9;
     m_iks_status_pub->publish(iks_status_msg);
 }
 
