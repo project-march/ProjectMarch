@@ -71,6 +71,12 @@ def generate_launch_description():
         executable="spawner.py",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
+    
+    joint_position_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
+    )
     # endregion
 
     # region Start broadcasters
@@ -99,26 +105,13 @@ def generate_launch_description():
         ],
         condition=UnlessCondition(simulation),
     )
-
-    pressure_sole_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=[
-            "pressure_sole_broadcaster",
-            "-t",
-            "pressure_sole_broadcaster/PressureSoleBroadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-        condition=UnlessCondition(simulation),
-    )
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         pdb_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
-        pressure_sole_state_broadcaster_spawner,
+        joint_position_controller_spawner,
     ]
 
     robot_desc_xacro = Command(
