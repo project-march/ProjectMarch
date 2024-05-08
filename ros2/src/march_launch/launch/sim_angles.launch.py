@@ -150,7 +150,8 @@ def generate_launch_description() -> LaunchDescription:
     state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
 
     state_estimator = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator_izzy.launch.py']),
+        PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
+        launch_arguments=[("simulation", simulation)],
         condition=UnlessCondition(airgait),
         )
     # endregion
