@@ -9,12 +9,12 @@ import dbus.mainloop.glib
 import sys
 import random
 from gi.repository import GLib
+import threading
 sys.path.insert(0, '.')
 
 bus = None
 adapter_path = None
 adv_mgr_interface = None
-connected = 0
 
 # much of this code was copied or inspired by test\example-advertisement in the BlueZ source
 class Advertisement(dbus.service.Object):
@@ -179,7 +179,8 @@ class Application(dbus.service.Object):
 
 
 class BluetoothServer:
-    def __init__(self, callback=None):
+    def __init__(self, callback=None, node = None):
+        self._node = node
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SystemBus()
         # we're assuming the adapter supports advertising
@@ -216,7 +217,8 @@ class BluetoothServer:
                                             error_handler=self.register_app_error_cb)
 
         self.mainloop = GLib.MainLoop()
-        self.mainloop.run()
+        self.thread = threading.Thread(target=self.mainloop.run)
+        self.thread.start()
 
     def register_app_error_cb(self, error):
             print('Failed to register application: ' + str(error))
@@ -231,14 +233,13 @@ class BluetoothServer:
         self.mainloop.quit()
 
     def set_connected_status(self, status):
-        global connected
         if (status == 1):
             print("connected")
-            connected = 1
+            self._node._connected = True
             self.stop_advertising()
         else:
             print("disconnected")
-            connected = 0
+            self._node._connected = False
             self.start_advertising()
 
     def properties_changed(self, interface, changed, invalidated, path):

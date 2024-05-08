@@ -16,12 +16,13 @@ RESET = "\033[0m"
 
 class BLEInputDeviceNode(Node):
 
-    ID_FORMAT = "rqt@{machine}@{user}ros2"
+    ID_FORMAT = "ble@{machine}@{user}ros2"
 
     def __init__(self):
         super().__init__('bluetooth_input_device_node')
         self._requested_mode = GetExoModeArray.Request()
         self._available_modes_future = None
+        self._connected = False 
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         self._get_exo_mode_array_client = self.create_client(GetExoModeArray, 'get_exo_mode_array')
@@ -37,14 +38,16 @@ class BLEInputDeviceNode(Node):
                                                 clock=self.get_clock())
         
         self.get_logger().info(f"{COLOR}Ready to connect to bluetooth device{RESET}")
-        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode))    
+        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode), self)   
+
 
     def publish_mode(self, mode: int) -> None:
         self._requested_mode.desired_mode.mode = mode
         self._available_modes_future = self._get_exo_mode_array_client.call_async(self._requested_mode)
         self.get_logger().info("Requested mode: " + str(mode))
-        rclpy.spin_until_future_complete(self, self._available_modes_future)
-        self.store_available_modes(self._available_modes_future)
+        
+        # Don't wait for the service call to complete
+        self._available_modes_future.add_done_callback(self.store_available_modes)
 
     def store_available_modes(self, future) -> None:
         if future.result() is None:
@@ -57,8 +60,11 @@ class BLEInputDeviceNode(Node):
     
     def alive_callback(self) -> None:
         """Callback to send out an alive message."""
-        msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
-        self._alive_pub.publish(msg)
+        self.get_logger().info("_connected: " + str(self._connected))
+        if self._connected:
+            msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
+            self._alive_pub.publish(msg)
+        
 
 
 def main(args=None):
