@@ -62,6 +62,7 @@ public:
         }
         return iks_status;
     }
+    inline bool isPrioritizedTaskConverged() const { return m_task_map.at(m_task_names.back())->isConverged(); };
 
     inline void setDt(const double& dt) { m_dt = dt; };
     inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
