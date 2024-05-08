@@ -103,42 +103,43 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
             m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
         }
     }
-    m_ik_solver->updateWorldToBaseOrientation(
-        msg->imu.orientation.w,
-        msg->imu.orientation.x,
-        msg->imu.orientation.y,
-        msg->imu.orientation.z
-    );
+    // TODO: To be fixed.
+    // m_ik_solver->updateWorldToBaseOrientation(
+    //     msg->imu.orientation.w,
+    //     msg->imu.orientation.x,
+    //     msg->imu.orientation.y,
+    //     msg->imu.orientation.z
+    // );
 
-    if (m_first_step && (msg->next_stance_leg != 0b11)) {
-        m_first_step = false;
-    }
+    // if (m_first_step && (msg->next_stance_leg != 0b11)) {
+    //     m_first_step = false;
+    // }
 
-    Eigen::Vector3d stance_pos;
+    // Eigen::Vector3d stance_pos;
     // if (m_first_step) {
     // stance_pos.noalias()
     //     = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
     //         * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
     // } else {
-        m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
-        if (msg->next_stance_leg == 0b01) {
-            stance_pos.noalias()
-                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-                    * Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z);
+    //     m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
+    //     if (msg->next_stance_leg == 0b01) {
+    //         stance_pos.noalias()
+    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+    //                 * Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z);
 
-        } else if (msg->next_stance_leg == 0b10) {
-            stance_pos.noalias()
-                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-                    * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
-        } else {
-            stance_pos.noalias() = (Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z) + Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z)) / 2;
-            stance_pos.noalias()
-                = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-                    * stance_pos;
-        }
-    // }
-    m_x_stance_leg = stance_pos.x();
-    m_y_stance_leg = stance_pos.y();
+    //     } else if (msg->next_stance_leg == 0b10) {
+    //         stance_pos.noalias()
+    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+    //                 * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
+    //     } else {
+    //         stance_pos.noalias() = (Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z) + Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z)) / 2;
+    //         stance_pos.noalias()
+    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
+    //                 * stance_pos;
+    //     }
+    // // }
+    // m_x_stance_leg = stance_pos.x();
+    // m_y_stance_leg = stance_pos.y();
 
     // Publish the desired joint positions if there is a solution in the previous cycle.
     if (m_has_solution) {
