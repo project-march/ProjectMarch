@@ -11,6 +11,7 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include "march_gait_planning/gait_planning_joint_angles.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include <vector>
 #include <array> 
 #include <iostream> 
@@ -60,5 +61,6 @@ private:
     std::vector<double> m_incremental_steps_to_home_stand;
     bool m_first_stand;
     std::vector<double> m_initial_point;
+    uint8_t m_stance_leg; 
 
 };
