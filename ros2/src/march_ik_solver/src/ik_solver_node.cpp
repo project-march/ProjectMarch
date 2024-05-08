@@ -89,8 +89,6 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
-    publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
-    publishJointTrajectory();       // Publish the desired joint trajectory to the torque controller.
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -141,6 +139,13 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     // }
     m_x_stance_leg = stance_pos.x();
     m_y_stance_leg = stance_pos.y();
+
+    // Publish the desired joint positions if there is a solution in the previous cycle.
+    if (m_has_solution) {
+        publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
+        publishJointTrajectory();       // Publish the desired joint trajectory to the torque controller.
+        m_has_solution = false;
+    }
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -206,6 +211,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
+    m_has_solution = true;
     RCLCPP_DEBUG_THROTTLE(
         this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, m_ik_solver->getTasksError());
 
@@ -367,6 +373,7 @@ void IKSolverNode::configureIKSolutions()
 
     m_desired_joint_positions = Eigen::VectorXd::Zero(m_joint_names.size());
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    m_has_solution = false;
 }
 
 bool IKSolverNode::isWithinTimeWindow(const rclcpp::Time& time_stamp)
