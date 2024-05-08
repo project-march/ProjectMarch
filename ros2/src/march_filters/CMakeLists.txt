@@ -48,7 +48,6 @@ install(TARGETS filters_node
 
 install(DIRECTORY
   config
-  launch
   DESTINATION share/${PROJECT_NAME}
 )
 
