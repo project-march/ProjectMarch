@@ -246,7 +246,7 @@ void IKSolverNode::alphabetizeJointTrajectory(const trajectory_msgs::msg::JointT
 
 void IKSolverNode::configureIKSolverParameters()
 {
-    declare_parameter("state_estimator_time_offset", 0.05);
+    declare_parameter("state_estimator_timer_period", 0.05);
     declare_parameter("joint_trajectory_controller_period", 0.05);
     declare_parameter("convergence_threshold", 0.0005);
     declare_parameter("max_iterations", 10);
@@ -259,7 +259,7 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
     declare_parameter("joint.limits.positions.soft", 0.0);
 
-    m_state_estimator_time_offset = get_parameter("state_estimator_time_offset").as_double();
+    m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
     m_max_iterations = get_parameter("max_iterations").as_int();
     m_joint_names = get_parameter("joint.names").as_string_array();

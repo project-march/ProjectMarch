@@ -8,6 +8,7 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
+    state_estimator_clock_period = LaunchConfiguration('state_estimator_timer_period', default='0.05')
 
     ik_solver_config = os.path.join(
                 get_package_share_directory('march_ik_solver'),
@@ -27,7 +28,10 @@ def generate_launch_description():
             executable='ik_solver_node',
             name='ik_solver',
             output='screen',
-            parameters=[ik_solver_config],
+            parameters=[
+                ik_solver_config,
+                {'state_estimator_timer_period': state_estimator_clock_period},
+            ],
         ),
         Node(
             package='march_ik_solver',
