@@ -53,7 +53,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
             logger_->info("Initializing the encoder offset calibration.");           
         }
         
-        return std::chrono::seconds { 30 };
+        return std::chrono::seconds { 60 };
         logger_->info("Waiting 60 seconds");           
 
     } else {
@@ -236,6 +236,7 @@ ODriveAxisState ODrive::getAxisState()
 int32_t ODrive::getAbsolutePositionIU()
 {
     int32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
+    // logger_->info(logger_->fstring("iu value = %d", iu_value)); 
     if (iu_value == 0) {
         logger_->warn("sleeeeeeepppiiiiiiinnnggggggg to wait for absolute position readout"); 
         rclcpp::sleep_for(std::chrono::milliseconds(50)); 

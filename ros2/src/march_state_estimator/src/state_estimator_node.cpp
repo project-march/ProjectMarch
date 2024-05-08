@@ -100,7 +100,7 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
     m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_sensors_subscription_options.callback_group = m_sensors_callback_group;
 
-    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
+    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);

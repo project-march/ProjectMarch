@@ -267,9 +267,9 @@ march9:
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 592799 # Ros kills itself if it is in its hard limits (same as encode limits).
-            maxPositionIU: 954814 # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 611865
+            minPositionIU: 330877 # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 919222 # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 351266
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.

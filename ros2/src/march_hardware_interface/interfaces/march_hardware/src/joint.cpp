@@ -150,11 +150,11 @@ void Joint::readFirstEncoderValues(bool operational_check)
         logger_->warn(logger_->fstring("Initial torque: %f", initial_torque_));
         torque_ = initial_torque_;
         
-        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(initial_torque_)) {
-            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an initial torque of %f, while initial torque can at most be absolute ", name_.c_str(),
-                initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
-        }
+        // if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(initial_torque_)) {
+        //     throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+        //         "Joint %s has an initial torque of %f, while initial torque can at most be absolute ", name_.c_str(),
+        //         initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
+        // }
     }
     logger_->info(logger_->fstring("[%s] Read initial values", this->name_.c_str()));
 }
@@ -203,9 +203,9 @@ void Joint::readEncoders()
         if (motor_controller_->hasTorqueSensor()) {
             torque_ = motor_controller_->getTorque();
             if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-                throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                    "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
-                    motor_controller_->getTorqueSensor()->getMaxTorque());
+                // throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                //     "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
+                //     motor_controller_->getTorqueSensor()->getMaxTorque());
             }
         } else {
             logger_->info(logger_->fstring("No reading the torque sensors"));
