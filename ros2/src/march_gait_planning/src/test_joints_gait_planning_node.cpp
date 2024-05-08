@@ -36,7 +36,7 @@ std::vector<int> generateJointIndexMapping(const std::vector<std::string>& joint
 
 TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
  : Node("march_test_joints_gait_planning_node"), 
-   m_gait_planning(TestSetupGaitPlanning()),
+   m_gait_planning(TestJointsGaitPlanning()),
    m_current_trajectory(),
    m_joints_msg(),
    m_first_stand(true)
@@ -59,16 +59,18 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 
 void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
     RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
+    setActuatedJoint(msg->joint.data);
     m_gait_planning.setGaitType((exoMode)msg->mode);
-    if ((exoMode)msg->mode == exoMode::Walk){
-        m_current_trajectory= m_gait_planning.getTrajectory();
-    }
+    // if ((exoMode)msg->mode == exoMode::Walk){
+    //     RCLCPP_INFO(this->get_logger(), "Actuated joint from callback: %d", m_actuated_joint); 
+    //     // m_current_trajectory= m_gait_planning.getTrajectory(m_actuated_joint);
+    // }
 
     if ((exoMode)msg->mode == exoMode::Stand){
         m_counter = 0;
     }
 
-    setActuatedJoint(msg->joint.data);
+    
 }
 
 void TestJointsGaitPlanningNode::footPositionsPublish(){
@@ -81,6 +83,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
 
         case exoMode::Stand: {
             processHomeStandGait();
+            m_current_trajectory.clear();
             break;
         }
 
@@ -92,17 +95,16 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
             else {
                 if (m_current_trajectory.empty()) {
                     //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
-                    m_current_trajectory = m_gait_planning.getTrajectory();
+                    RCLCPP_INFO(this->get_logger(), "Actuated joint for filling trajectory: %d", m_actuated_joint); 
+                    m_current_trajectory = m_gait_planning.getTrajectory(m_actuated_joint);
                 }
                 else{
-                    double new_angle = ROTATION_RANGE* m_current_trajectory.front();
+                    double new_angle = m_current_trajectory.front();
                     
-                    if (m_actuated_joint == 1 || m_actuated_joint == 5) {
-                        new_angle = -new_angle;
-                    }
 
                     m_current_trajectory.erase(m_current_trajectory.begin());
                     m_joints_msg.data = {};
+                    //TODO: magic number
                     for (int i = 0; i < 8; i++) {
                         if (i == getActuatedJoint()) {
                             // This is the joint we want to actuate, set the new position
@@ -130,6 +132,7 @@ void TestJointsGaitPlanningNode::setActuatedJoint(const std::string &actuated_jo
     auto it = std::find(joints_actuated_index.begin(), joints_actuated_index.end(), actuated_joint);
     if (it != joints_actuated_index.end()) {
         m_actuated_joint = std::distance(joints_actuated_index.begin(), it);
+        RCLCPP_INFO(this->get_logger(), "m_actuated_joint set to: %d", m_actuated_joint);
     } else {
         // Handle case where actuated_joint is not a valid joint name
     }
