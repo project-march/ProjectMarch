@@ -45,7 +45,7 @@ class BLEInputDeviceNode(Node):
         self._requested_mode.desired_mode.mode = mode
         self._available_modes_future = self._get_exo_mode_array_client.call_async(self._requested_mode)
         self.get_logger().info("Requested mode: " + str(mode))
-        
+
         # Don't wait for the service call to complete
         self._available_modes_future.add_done_callback(self.store_available_modes)
 
@@ -60,7 +60,6 @@ class BLEInputDeviceNode(Node):
     
     def alive_callback(self) -> None:
         """Callback to send out an alive message."""
-        self.get_logger().info("_connected: " + str(self._connected))
         if self._connected:
             msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
             self._alive_pub.publish(msg)
