@@ -6,6 +6,11 @@ Author: Alexander James Becoy @alexanderjamesbecoy
 import rclpy
 from rclpy.node import Node
 
+import threading
+import sys
+from PyQt5.QtWidgets import QApplication
+from .window import Window
+
 from march_shared_msgs.msg import IksCommand
 from march_shared_msgs.msg import IksFootPositions
 from march_shared_msgs.msg import StateEstimation
@@ -13,7 +18,7 @@ from geometry_msgs.msg import Point
 
 class IkTestNode(Node):
 
-    def __init__(self) -> None:
+    def __init__(self, window) -> None:
         super().__init__('ik_test_node')
 
         self.declare_parameters(
@@ -55,12 +60,17 @@ class IkTestNode(Node):
         iks_command_msg.task_names = ["posture", "motion"]
         self.iks_command_publisher.publish(iks_command_msg)
 
+        self.window = window
+
         self.get_logger().info('ik_test_node started, sending following information: ')
         self.get_logger().info(f"Exo mode: {iks_command_msg.exo_mode} with task names: {iks_command_msg.task_names}")
         for name, pos in [("Left ankle", self.left_foot), ("Right ankle", self.right_foot)]:
             self.get_logger().info(f"{name} foot at x={pos.x}, y={pos.y}, z={pos.z}")
 
     def state_estimation_callback(self, msg):
+        if not self.window.is_publishing_:
+            return
+
         if self.current_feet_positions is None:
             self.current_feet_positions = IksFootPositions()
             self.current_feet_positions.left_foot_position.x = msg.body_ankle_pose[0].position.x
@@ -94,11 +104,23 @@ class IkTestNode(Node):
         interpolated_foot.z = self.interpolate(start.z, end.z, ratio)
         return interpolated_foot
 
-def main(args=None):
+def main(args=None):    
+    # Create the application
+    app = QApplication(sys.argv)
+
+    # Create the window and display
+    window = Window()
+    window.show()
+
+    # Initialize ROS2 and the node
     rclpy.init(args=args)
-    node = IkTestNode()
-    rclpy.spin(node)
-    rclpy.shutdown()
+    node = IkTestNode(window=window)
+
+    # Create the ROS2 spin thread
+    ros_thread = threading.Thread(target=lambda: rclpy.spin(node), daemon=True)
+    ros_thread.start()
+
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
