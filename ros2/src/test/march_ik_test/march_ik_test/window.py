@@ -155,6 +155,8 @@ class Window(QMainWindow):
         self.right_foot_x.setDisabled(True)
         self.right_foot_y.setDisabled(True)
         self.right_foot_z.setDisabled(True)
+        self.send_button.setDisabled(True)
+        self.stop_button.setDisabled(False)
 
     def stop_ik_command(self):
         self.is_publishing_ = False
@@ -164,3 +166,5 @@ class Window(QMainWindow):
         self.right_foot_x.setDisabled(False)
         self.right_foot_y.setDisabled(False)
         self.right_foot_z.setDisabled(False)
+        self.send_button.setDisabled(False)
+        self.stop_button.setDisabled(True)

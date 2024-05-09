@@ -111,6 +111,7 @@ ament_export_dependencies(Eigen3)
 install(DIRECTORY
   launch
   config
+  plotjuggler
 DESTINATION share/${PROJECT_NAME}/
 )
 

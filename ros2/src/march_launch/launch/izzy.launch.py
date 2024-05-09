@@ -20,6 +20,7 @@ def generate_launch_description() -> LaunchDescription:
     robot = LaunchConfiguration("robot")
     rviz = LaunchConfiguration("rviz", default="false")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+    ik_test = LaunchConfiguration("ik_test", default="false")
     
     # TODO: Configurable urdf
     state_estimator_clock_period = 0.05
@@ -161,6 +162,7 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+        condition=UnlessCondition(ik_test),
     )
     #endregion
 
@@ -182,8 +184,9 @@ def generate_launch_description() -> LaunchDescription:
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
         launch_arguments={
-            'robot_description': urdf_location, 
+            "robot_description": urdf_location, 
             "state_estimator_timer_period": str(state_estimator_clock_period),
+            "test": ik_test,
         }.items(),
     )
     # endregion

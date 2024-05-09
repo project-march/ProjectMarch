@@ -44,7 +44,7 @@ ik_solver:
         kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         convergence_threshold: 1e-6
-        damp_coeff: 1e-6
+        damp_coeff: 1e-1
         weight: 1.0
       stability:
         kp: [5.0, 15.0]
@@ -58,5 +58,5 @@ ik_solver:
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
         convergence_threshold: 1e-1
-        damp_coeff: 1e-6
+        damp_coeff: 1e-1
         weight: 1.0
