@@ -70,10 +70,6 @@ class IkTestNode(Node):
         self.iks_command_publisher.publish(self.iks_command_msg)
         if not self.window.is_publishing_:
             self.counter = 0.0
-            self.current_feet_positions = None
-            return
-
-        if self.current_feet_positions is None:
             self.current_feet_positions = IksFootPositions()
             self.current_feet_positions.left_foot_position.x = msg.body_ankle_pose[0].position.x
             self.current_feet_positions.left_foot_position.y = msg.body_ankle_pose[0].position.y
@@ -81,6 +77,7 @@ class IkTestNode(Node):
             self.current_feet_positions.right_foot_position.x = msg.body_ankle_pose[1].position.x
             self.current_feet_positions.right_foot_position.y = msg.body_ankle_pose[1].position.y
             self.current_feet_positions.right_foot_position.z = msg.body_ankle_pose[1].position.z
+            return
 
         self.left_foot.x = self.window.left_foot_x.value()
         self.left_foot.y = self.window.left_foot_y.value()
