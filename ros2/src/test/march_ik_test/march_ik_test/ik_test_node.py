@@ -54,21 +54,23 @@ class IkTestNode(Node):
         self.interpolation_duration = self.get_parameter('interval').value
         self.counter = 0.0
 
-        iks_command_msg = IksCommand()
-        iks_command_msg.header.stamp = self.get_clock().now().to_msg()
-        iks_command_msg.exo_mode = "Stand"
-        iks_command_msg.task_names = ["posture", "motion"]
-        self.iks_command_publisher.publish(iks_command_msg)
+        self.iks_command_msg = IksCommand()
+        self.iks_command_msg.header.stamp = self.get_clock().now().to_msg()
+        self.iks_command_msg.exo_mode = "Stand"
+        self.iks_command_msg.task_names = ["posture", "motion"]
 
         self.window = window
 
         self.get_logger().info('ik_test_node started, sending following information: ')
-        self.get_logger().info(f"Exo mode: {iks_command_msg.exo_mode} with task names: {iks_command_msg.task_names}")
+        self.get_logger().info(f"Exo mode: {self.iks_command_msg.exo_mode} with task names: {self.iks_command_msg.task_names}")
         for name, pos in [("Left ankle", self.left_foot), ("Right ankle", self.right_foot)]:
             self.get_logger().info(f"{name} foot at x={pos.x}, y={pos.y}, z={pos.z}")
 
     def state_estimation_callback(self, msg):
+        self.iks_command_publisher.publish(self.iks_command_msg)
         if not self.window.is_publishing_:
+            self.counter = 0.0
+            self.current_feet_positions = None
             return
 
         if self.current_feet_positions is None:
@@ -79,6 +81,14 @@ class IkTestNode(Node):
             self.current_feet_positions.right_foot_position.x = msg.body_ankle_pose[1].position.x
             self.current_feet_positions.right_foot_position.y = msg.body_ankle_pose[1].position.y
             self.current_feet_positions.right_foot_position.z = msg.body_ankle_pose[1].position.z
+
+        self.left_foot.x = self.window.left_foot_x.value()
+        self.left_foot.y = self.window.left_foot_y.value()
+        self.left_foot.z = self.window.left_foot_z.value()
+
+        self.right_foot.x = self.window.right_foot_x.value()
+        self.right_foot.y = self.window.right_foot_y.value()
+        self.right_foot.z = self.window.right_foot_z.value()
 
         interpolation_ratio = self.calculate_interpolate_ratio(msg.step_time)
         iks_foot_positions_msg = IksFootPositions()

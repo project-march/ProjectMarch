@@ -26,6 +26,7 @@ class Window(QMainWindow):
         # Set the layout for the left foot: number text fields for x, y, and z
         # Set labels next to the double spin box horizontally
         self.left_foot_label = QLabel("Left Foot")
+        self.left_foot_label.font().setBold(True)
 
         self.left_foot_x_layout = QHBoxLayout()
         self.left_foot_x_label = QLabel("X")
@@ -69,6 +70,7 @@ class Window(QMainWindow):
         # Set the layout for the right foot: number text fields for x, y, and z
         # Set labels next to the double spin box horizontally
         self.right_foot_label = QLabel("Right Foot")
+        self.right_foot_label.font().setBold(True)
 
         self.right_foot_x_layout = QHBoxLayout()
         self.right_foot_x_label = QLabel("X")
@@ -110,9 +112,11 @@ class Window(QMainWindow):
 
         # Set the layout for the menu: buttons to send the feet positions and stop the command
         self.send_button = QPushButton('Publish')
+        self.send_button.font().setBold(True)
         self.send_button.clicked.connect(self.publish_ik_command)
 
         self.stop_button = QPushButton('Stop')
+        self.stop_button.font().setBold(True)
         self.stop_button.clicked.connect(self.stop_ik_command)
 
         self.menu_layout.addWidget(self.send_button)
@@ -126,22 +130,22 @@ class Window(QMainWindow):
         self.layout.addLayout(self.menu_layout)
 
     def update_left_foot_x(self, value):
-        self.left_foot_x.value = value
+        self.left_foot_x.setValue(value)
 
     def update_left_foot_y(self, value):
-        self.left_foot_y.value = value
+        self.left_foot_y.setValue(value)
 
     def update_left_foot_z(self, value):
-        self.left_foot_z.value = value
+        self.left_foot_z.setValue(value)
 
     def update_right_foot_x(self, value):
-        self.right_foot_x.value = value
-
+        self.right_foot_x.setValue(value)
+        
     def update_right_foot_y(self, value):
-        self.right_foot_y.value = value
+        self.right_foot_y.setValue(value)
 
     def update_right_foot_z(self, value):
-        self.right_foot_z.value = value
+        self.right_foot_z.setValue(value)
 
     def publish_ik_command(self):
         self.is_publishing_ = True
