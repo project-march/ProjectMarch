@@ -3,7 +3,7 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#include "march_state_estimator/robot_node.hpp"
+#include "march_state_estimator/robot_description/robot_node.hpp"
 
 #include "math.h"
 #include "rclcpp/rclcpp.hpp"

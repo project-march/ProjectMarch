@@ -3,8 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
-#define MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_JOINT_HPP_
+#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_JOINT_HPP_
 
 #define JOINT_TYPE_REVOLUTE 1
 #define JOINT_TYPE_CONTINUOUS 2
@@ -13,7 +13,7 @@
 #define JOINT_TYPE_PLANAR 5
 #define JOINT_TYPE_FIXED 6
 
-#include "march_state_estimator/robot_node.hpp"
+#include "march_state_estimator/robot_description/robot_node.hpp"
 
 class RobotJoint : public RobotNode {
 public:
@@ -33,4 +33,4 @@ private:
     std::vector<double> m_joint_axis;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__ROBOT_JOINT_HPP_
+#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_JOINT_HPP_

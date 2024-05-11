@@ -14,7 +14,7 @@ from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-    simulation = LaunchConfiguration("simulation", default="true")
+    simulation = LaunchConfiguration("simulation", default="false")
     timestep_in_ms = LaunchConfiguration("timestep", default="50")
     
     robot_description = 'robot_definition-izzy.yaml'
@@ -39,7 +39,7 @@ def generate_launch_description():
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
                 {"simulation": simulation},
-            ]
+            ],
         ),
         Node(
             package='march_state_estimator',
@@ -49,7 +49,7 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-            ]
+            ],
         ),
         Node(
             package='march_state_estimator',
@@ -58,6 +58,15 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {"robot_definition": robot_description},
-            ]
+            ],
+        ),
+        Node(
+            package='march_state_estimator',
+            executable='filters_node',
+            name='filters',
+            output='screen',
+            parameters=[
+                {"urdf_file_path": urdf_file},
+            ],
         ),
     ])

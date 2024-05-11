@@ -3,10 +3,10 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__ROBOT_ZMP_HPP_
-#define MARCH_STATE_ESTIMATOR__ROBOT_ZMP_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_ZMP_HPP_
+#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_ZMP_HPP_
 
-#include "march_state_estimator/robot_node.hpp"
+#include "march_state_estimator/robot_description/robot_node.hpp"
 
 #define XY_DIM 2
 
@@ -48,4 +48,4 @@ private:
     Eigen::Quaterniond m_inertial_orientation;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__ROBOT_ZMP_HPP_
+#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_ZMP_HPP_

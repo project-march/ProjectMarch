@@ -149,6 +149,7 @@ def generate_launch_description() -> LaunchDescription:
                 "imu_launch.launch.py",
             )
         ),
+        condition=UnlessCondition(simulation),
     )
     # endregion
 
@@ -171,10 +172,10 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
-        launch_arguments={
-            "simulation": simulation,
-            "timestep_in_ms": str(state_estimator_clock_period * 1000),
-        }.items(),
+        launch_arguments=[
+            ("simulation", simulation),
+            ("timestep_in_ms", str(state_estimator_clock_period * 1000)),
+        ],
     )
     # endregion
 
@@ -183,11 +184,11 @@ def generate_launch_description() -> LaunchDescription:
 
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-        launch_arguments={
-            "robot_description": urdf_location, 
-            "state_estimator_timer_period": str(state_estimator_clock_period),
-            "test": ik_test,
-        }.items(),
+        launch_arguments=[
+            ("robot_description", urdf_location), 
+            ("state_estimator_timer_period", str(state_estimator_clock_period)),
+            ("test", ik_test),
+        ],
     )
     # endregion
 
@@ -253,12 +254,6 @@ def generate_launch_description() -> LaunchDescription:
             output='screen',
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
-        ),
-        Node(
-            package='march_filters',
-            executable='filters_node',
-            name='filters_node',
-            output='screen',
         ),
 
         mujoco_node,
