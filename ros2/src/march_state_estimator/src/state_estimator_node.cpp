@@ -139,6 +139,8 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     // Initialize timer
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
+    m_startup_time = this->now();
+    m_startup_timeout = 2.0;
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
@@ -150,6 +152,11 @@ StateEstimatorNode::~StateEstimatorNode()
 
 void StateEstimatorNode::timerCallback()
 {
+    if ((this->now() - m_startup_time) < rclcpp::Duration::from_seconds(m_startup_timeout)) {
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for proper initialization...");
+        return;
+    }
+
     // Check if joint state is initialized properly
     if (m_joint_state == nullptr) {
         return;

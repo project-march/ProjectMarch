@@ -107,6 +107,9 @@ private:
 
     rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
     rclcpp::SubscriptionOptions m_sensors_subscription_options;
+
+    double m_startup_timeout;
+    rclcpp::Time m_startup_time;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_

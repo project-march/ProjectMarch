@@ -13,7 +13,7 @@ SensorFusion::SensorFusion() {
     m_timestep = 0.05; // 20 Hz
 
     // Configure the initial state
-    m_state.imu_position = Eigen::Vector3d(0.0, 0.0, -1.0295092403533455);
+    m_state.imu_position = Eigen::Vector3d(0.0, 0.0, 1.0295092403533455);
     m_state.imu_velocity = Eigen::Vector3d::Zero();
     m_state.imu_orientation = Eigen::Quaterniond::Identity();
     m_state.left_foot_position = Eigen::Vector3d(0.24743795173789007, 0.10789731603419578, 0.0);
