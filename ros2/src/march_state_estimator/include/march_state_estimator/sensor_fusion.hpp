@@ -6,7 +6,6 @@
 #ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 #define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 
-#pragma once
 #include <vector>
 
 #include "eigen3/Eigen/Core"
@@ -80,7 +79,7 @@ public:
         updateState();
     }
     inline const EKFState& getState() const { return m_state; }
-    inline void setMeasurement(const EKFObservation& observation) { m_observation = observation; }
+    inline void setObservation(const EKFObservation& observation) { m_observation = observation; }
     inline void setTimestep(const double& timestep) { m_timestep = timestep; }
 
 private:

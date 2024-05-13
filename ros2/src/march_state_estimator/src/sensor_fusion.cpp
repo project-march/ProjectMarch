@@ -3,6 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
+// #define DEBUG
+
 #include "march_state_estimator/sensor_fusion.hpp"
 
 #include <iostream>
@@ -11,16 +13,16 @@ SensorFusion::SensorFusion() {
     m_timestep = 0.05; // 20 Hz
 
     // Configure the initial state
-    m_state.imu_position = Eigen::Vector3d::Zero();
+    m_state.imu_position = Eigen::Vector3d(0.0, 0.0, -1.0295092403533455);
     m_state.imu_velocity = Eigen::Vector3d::Zero();
     m_state.imu_orientation = Eigen::Quaterniond::Identity();
-    m_state.left_foot_position = Eigen::Vector3d::Zero();
-    m_state.right_foot_position = Eigen::Vector3d::Zero();
+    m_state.left_foot_position = Eigen::Vector3d(0.24743795173789007, 0.10789731603419578, 0.0);
+    m_state.right_foot_position = Eigen::Vector3d(0.24743795173789007, -0.10789731603419578, 0.0);
     m_state.accelerometer_bias = Eigen::Vector3d::Zero();
     m_state.gyroscope_bias = Eigen::Vector3d::Zero();
     m_state.left_foot_slippage = Eigen::Quaterniond::Identity();
     m_state.right_foot_slippage = Eigen::Quaterniond::Identity();
-    m_state.covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
+    m_state.covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-12;
 
     // Configure the initial observation
     m_observation.imu_acceleration = Eigen::Vector3d::Zero();
@@ -29,27 +31,59 @@ SensorFusion::SensorFusion() {
     m_observation.right_foot_position = Eigen::Vector3d::Zero();
     m_observation.left_foot_slippage = Eigen::Quaterniond::Identity();
     m_observation.right_foot_slippage = Eigen::Quaterniond::Identity();
+
+    // Configure the matrices
+    m_dynamics_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
+    m_observation_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
+    m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
 }
 
 void SensorFusion::predictState() {
+    #ifdef DEBUG
+    std::cout << "Computing prior state..." << std::endl;
+    #endif
     // Compute the expected linear velocity
     Eigen::Vector3d expected_linear_velocity;
     expected_linear_velocity.noalias() = m_state.imu_velocity
-        + m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration() + GRAVITY_VECTOR);
+        + m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration()); // + GRAVITY_VECTOR
     
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * expected_linear_velocity;
     m_state.imu_velocity = expected_linear_velocity;
     m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
     m_state.covariance_matrix = computePriorCovarianceMatrix();
+
+    #ifdef DEBUG
+    std::cout << "Prior state computed." << std::endl;
+    #endif
 }
 
 void SensorFusion::updateState() {
+    #ifdef DEBUG
+    std::cout << "Computing posterior state..." << std::endl;
+    #endif
+
     const Eigen::VectorXd innovation = computeInnovation();
+    #ifdef DEBUG
+    std::cout << "Innovation: " << innovation.transpose() << std::endl;
+    #endif
+
     computeInnovationCovarianceMatrix();
+    #ifdef DEBUG
+    std::cout << "Innovation covariance matrix computed." << std::endl;
+    #endif
+
     computeKalmanGain();
+    #ifdef DEBUG
+    std::cout << "Kalman gain computed." << std::endl;
+    #endif
+    
     Eigen::VectorXd correction_vector;
     correction_vector.noalias() = m_kalman_gain * innovation;
+    #ifdef DEBUG
+    std::cout << "Correction vector computed." << std::endl;
+    #endif
 
     // Update the state with the correction vector
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
@@ -62,6 +96,8 @@ void SensorFusion::updateState() {
     m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
     m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
     m_state.covariance_matrix.noalias() -= m_kalman_gain * m_observation_matrix * m_state.covariance_matrix;
+
+
 }
 
 const Eigen::VectorXd SensorFusion::computeInnovation() const {

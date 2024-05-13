@@ -32,6 +32,7 @@
 
 #include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/state_estimator.hpp"
+#include "march_state_estimator/sensor_fusion.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
 #define LEFT_FOOT_ID    0
@@ -72,6 +73,7 @@ private:
     std::vector<geometry_msgs::msg::Point> m_foot_positions;
 
     std::unique_ptr<StateEstimator> m_state_estimator;
+    std::unique_ptr<SensorFusion> m_sensor_fusion;
     std::shared_ptr<RobotDescription> m_robot_description; // TODO: TO be obtained from SensorFusion.
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;

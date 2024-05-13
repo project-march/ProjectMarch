@@ -3,6 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
+// #define DEBUG
+
 #include "march_state_estimator/state_estimator_node.hpp"
 
 #include "geometry_msgs/msg/point.hpp"
@@ -132,6 +134,8 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     m_state_estimator->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
     m_dt = static_cast<double>(dt) / 1000.0;
 
+    m_sensor_fusion = std::make_unique<SensorFusion>();
+
     // Initialize timer
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
@@ -165,7 +169,31 @@ void StateEstimatorNode::timerCallback()
     m_state_estimator->updateImuState(m_imu);
     if (m_is_simulation) {
         m_state_estimator->updateDynamicsState();
-        // m_state_estimator->updateKalmanFilter();
+
+        #ifdef DEBUG
+        RCLCPP_INFO(this->get_logger(), "Updating measurement data...");
+        #endif
+        
+        EKFObservation ekf_observation;
+        ekf_observation.imu_acceleration
+            = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, 0.0);
+        ekf_observation.imu_angular_velocity
+            = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
+        std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
+        ekf_observation.left_foot_position
+            = Eigen::Vector3d(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[LEFT_FOOT_ID].position.y, body_foot_poses[LEFT_FOOT_ID].position.z);
+        ekf_observation.right_foot_position
+            = Eigen::Vector3d(body_foot_poses[RIGHT_FOOT_ID].position.x, body_foot_poses[RIGHT_FOOT_ID].position.y, body_foot_poses[RIGHT_FOOT_ID].position.z);
+        ekf_observation.left_foot_slippage
+            = Eigen::Quaterniond(body_foot_poses[LEFT_FOOT_ID].orientation.w, body_foot_poses[LEFT_FOOT_ID].orientation.x, body_foot_poses[LEFT_FOOT_ID].orientation.y, body_foot_poses[LEFT_FOOT_ID].orientation.z);
+        ekf_observation.right_foot_slippage
+            = Eigen::Quaterniond(body_foot_poses[RIGHT_FOOT_ID].orientation.w, body_foot_poses[RIGHT_FOOT_ID].orientation.x, body_foot_poses[RIGHT_FOOT_ID].orientation.y, body_foot_poses[RIGHT_FOOT_ID].orientation.z);
+        m_sensor_fusion->setObservation(ekf_observation);
+
+        #ifdef DEBUG
+        RCLCPP_INFO(this->get_logger(), "Estimating state...");
+        #endif
+        m_sensor_fusion->estimateState();
     }
     broadcastTransformToTf2();
 
@@ -428,19 +456,28 @@ void StateEstimatorNode::broadcastTransformToTf2()
     transform_stamped.child_frame_id = "base_link";
     // transform_stamped.transform = m_state_estimator->getRobotTransform();
     
-    if (m_is_simulation) {
-        transform_stamped.transform.translation.x = m_imu_position->point.x;
-        transform_stamped.transform.translation.y = m_imu_position->point.y;
-        transform_stamped.transform.translation.z = m_imu_position->point.z;
-    } else {
-        transform_stamped.transform.translation.x = 0.0;
-        transform_stamped.transform.translation.y = 0.0;
-        transform_stamped.transform.translation.z = 0.0;
-    }
-    transform_stamped.transform.rotation.x = m_imu->orientation.x;
-    transform_stamped.transform.rotation.y = m_imu->orientation.y;
-    transform_stamped.transform.rotation.z = m_imu->orientation.z;
-    transform_stamped.transform.rotation.w = m_imu->orientation.w;
+    // if (m_is_simulation) {
+    //     transform_stamped.transform.translation.x = m_imu_position->point.x;
+    //     transform_stamped.transform.translation.y = m_imu_position->point.y;
+    //     transform_stamped.transform.translation.z = m_imu_position->point.z;
+    // } else {
+    //     transform_stamped.transform.translation.x = 0.0;
+    //     transform_stamped.transform.translation.y = 0.0;
+    //     transform_stamped.transform.translation.z = 0.0;
+    // }
+    // transform_stamped.transform.rotation.x = m_imu->orientation.x;
+    // transform_stamped.transform.rotation.y = m_imu->orientation.y;
+    // transform_stamped.transform.rotation.z = m_imu->orientation.z;
+    // transform_stamped.transform.rotation.w = m_imu->orientation.w;
+
+    EKFState state = m_sensor_fusion->getState();
+    transform_stamped.transform.translation.x = state.imu_position.x();
+    transform_stamped.transform.translation.y = state.imu_position.y();
+    transform_stamped.transform.translation.z = state.imu_position.z();
+    transform_stamped.transform.rotation.x = state.imu_orientation.x();
+    transform_stamped.transform.rotation.y = state.imu_orientation.y();
+    transform_stamped.transform.rotation.z = state.imu_orientation.z();
+    transform_stamped.transform.rotation.w = state.imu_orientation.w();
 
     m_tf_broadcaster->sendTransform(transform_stamped);
 }
