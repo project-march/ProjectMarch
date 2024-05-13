@@ -158,3 +158,7 @@ TEST_F(SensorFusionTest, test_should_compute_exponential_map_from_1_1_0_vector_a
     );
     testComputeExponentialMap(vector, expected_quaternion);
 }
+
+/***********************************************************************************
+ * SensorFusion::predictState() tests
+ ***********************************************************************************/
