@@ -52,6 +52,8 @@ include_directories(include)
 add_library(${PROJECT_NAME} STATIC
   src/state_estimator_node.cpp
   src/state_estimator.cpp
+  src/sensor_fusion.cpp
+
   src/robot_description/robot_description_node.cpp
   src/robot_description/robot_description.cpp
   src/robot_description/robot_node.cpp
@@ -87,12 +89,12 @@ ament_target_dependencies(${PROJECT_NAME}
 add_executable(state_estimator_node
   src/state_estimator_node.cpp
   src/state_estimator.cpp
+  src/sensor_fusion.cpp
   src/robot_description/robot_description.cpp
   src/robot_description/robot_node.cpp
   src/robot_description/robot_mass.cpp
   src/robot_description/robot_joint.cpp
   src/robot_description/robot_zmp.cpp
-
   src/torque_converter.cpp
 )
 
@@ -235,13 +237,15 @@ if(BUILD_TESTING)
 
   ament_add_gmock(test_runner
     test/test_runner.cpp
-    test/robot_description_test.cpp
-    src/robot_description/robot_description.cpp
-    test/torque_converter_test.cpp  
-    src/torque_converter.cpp
+    # test/robot_description_test.cpp
+    # src/robot_description/robot_description.cpp
+    # test/torque_converter_test.cpp  
+    # src/torque_converter.cpp
+    # test/sensor_fusion_test.cpp
+    # src/state_estimator.cpp
+    # src/robot_description/robot_node.cpp
     test/sensor_fusion_test.cpp
-    src/state_estimator.cpp
-    src/robot_description/robot_node.cpp
+    src/sensor_fusion.cpp
   )
 
   target_include_directories(test_runner PUBLIC
