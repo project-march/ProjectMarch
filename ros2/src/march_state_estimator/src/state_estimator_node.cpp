@@ -140,7 +140,7 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
     m_startup_time = this->now();
-    m_startup_timeout = 2.0;
+    m_startup_timeout = 3.0;
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
@@ -183,7 +183,7 @@ void StateEstimatorNode::timerCallback()
         
         EKFObservation ekf_observation;
         ekf_observation.imu_acceleration
-            = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, 0.0);
+            = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
         ekf_observation.imu_angular_velocity
             = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
         std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});

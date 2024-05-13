@@ -46,7 +46,7 @@ void SensorFusion::predictState() {
     // Compute the expected linear velocity
     Eigen::Vector3d expected_linear_velocity;
     expected_linear_velocity.noalias() = m_state.imu_velocity
-        + m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration()); // + GRAVITY_VECTOR
+        + m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration() + GRAVITY_VECTOR);
     
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * expected_linear_velocity;
