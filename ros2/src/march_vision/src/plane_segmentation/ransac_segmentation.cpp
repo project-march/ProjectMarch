@@ -2,12 +2,12 @@
 
 namespace march_vision {
 
-RansacSegmentation::RansacSegmentation(const RansacPlaneExtractorParameters& parameters) {
+RansacSegmentation::RansacSegmentation(const RansacSegmentationParameters& parameters) {
   setParameters(parameters);
   m_ransac.add_shape_factory<Plane>();
 }
 
-void RansacSegmentation::setParameters(const RansacPlaneExtractorParameters& parameters) {
+void RansacSegmentation::setParameters(const RansacSegmentationParameters& parameters) {
   m_cgal_ransac_parameters.probability = parameters.probability;
   m_cgal_ransac_parameters.min_points = parameters.min_points;
   m_cgal_ransac_parameters.epsilon = parameters.epsilon / 3.0;  // CGAL ransac puts the inlier tolerance at 3 times epsilon
@@ -23,7 +23,7 @@ void RansacSegmentation::detectPlanes(std::vector<PointWithNormal>& points_with_
 std::pair<Eigen::Vector3d, Eigen::Vector3d> RansacSegmentation::getPlaneParameters(Shape* shapePtr) {
   const auto* planePtr = static_cast<Plane*>(shapePtr);
 
-  // Get Normal, pointing upwards
+  // Get normal vector (pointing upwards)
   Eigen::Vector3d normalVector(planePtr->plane_normal().x(), planePtr->plane_normal().y(), planePtr->plane_normal().z());
   if (normalVector.z() < 0.0) {
     normalVector = -normalVector;

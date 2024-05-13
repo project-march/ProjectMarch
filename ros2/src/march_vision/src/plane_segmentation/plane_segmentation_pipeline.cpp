@@ -11,7 +11,7 @@ PlaneSegmentationPipeline::PlaneSegmentationPipeline(const Config& config)
 
 // TODO: Add timers?
 void PlaneSegmentationPipeline::update(grid_map::GridMap&& grid_map, const std::string& elevation_layer) {
-  // Clear / Overwrite old result
+  // Clear/overwrite old result
   m_planar_terrain.planar_regions.clear();
   m_planar_terrain.grid_map = std::move(grid_map);
 

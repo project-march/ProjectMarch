@@ -246,7 +246,7 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
     }
 }
 
-void SlidingWindowPlaneExtractor::refineLabelWithRansac(
+void PlanarImageSegmentation::refineLabelWithRansac(
     int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal)
 {
     // Fix the seed for each label to get deterministic behaviour
@@ -283,7 +283,7 @@ void SlidingWindowPlaneExtractor::refineLabelWithRansac(
     }
 }
 
-void SlidingWindowPlaneExtractor::addSurfaceNormalToMap(grid_map::GridMap& map, const std::string& layer_prefix) const
+void PlanarImageSegmentation::addSurfaceNormalToMap(grid_map::GridMap& map, const std::string& layer_prefix) const
 {
     map.add(layer_prefix + "_x");
     map.add(layer_prefix + "_y");

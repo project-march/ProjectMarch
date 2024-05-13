@@ -1,9 +1,9 @@
 /*
- * ElevationMap.cpp
+ * P.Fankhauser, M.Bloesch, and M.Hutter, 
+ * "Probabilistic Terrain Mapping for Mobile Robots with Uncertain Localization",
+ * in IEEE Robotics and Automation Letters (RA-L)
  *
- *  Created on: Feb 5, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, ANYbotics
+ * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
 #include <cmath>
