@@ -60,6 +60,7 @@ class BLEInputDeviceNode(Node):
     
     def alive_callback(self) -> None:
         """Callback to send out an alive message."""
+        # TODO: this is bullshit, handle this in the node itself instead of the safety node
         if self._connected:
             msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
             self._alive_pub.publish(msg)
