@@ -45,7 +45,23 @@ void SensorFusion::predictState() {
 }
 
 void SensorFusion::updateState() {
+    const Eigen::VectorXd innovation = computeInnovation();
+    computeInnovationCovarianceMatrix();
+    computeKalmanGain();
+    Eigen::VectorXd correction_vector;
+    correction_vector.noalias() = m_kalman_gain * innovation;
 
+    // Update the state with the correction vector
+    m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
+    m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
+    m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
+    m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
+    m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
+    m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
+    m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
+    m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
+    m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
+    m_state.covariance_matrix.noalias() -= m_kalman_gain * m_observation_matrix * m_state.covariance_matrix;
 }
 
 const Eigen::VectorXd SensorFusion::computeInnovation() const {
