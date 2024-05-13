@@ -3,10 +3,10 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#include "march_state_estimator/sensor_fusion.hpp"
+#include "march_state_estimator/state_estimator.hpp"
 #include <cmath>
 
-SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path)
+StateEstimator::StateEstimator(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path)
 {
     m_robot_description = robot_description;
     m_torque_converter = std::make_unique<TorqueConverter>(robot_description, urdf_file_path);
@@ -39,7 +39,7 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description, 
     );
 }
 
-void SensorFusion::configureJointNames(const std::vector<std::string>& joint_names)
+void StateEstimator::configureJointNames(const std::vector<std::string>& joint_names)
 {
     m_joint_names = joint_names;
 
@@ -59,13 +59,13 @@ void SensorFusion::configureJointNames(const std::vector<std::string>& joint_nam
     }
 }
 
-void SensorFusion::configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold)
+void StateEstimator::configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold)
 {
     m_left_foot_threshold = left_foot_threshold;
     m_right_foot_threshold = right_foot_threshold;
 }
 
-void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state)
+void StateEstimator::updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state)
 {
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
         m_joint_accelerations[joint_state->name[i]] = (joint_state->velocity[i] - m_joint_velocities[joint_state->name[i]]) / m_state_estimator_timestep;
@@ -75,7 +75,7 @@ void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPt
     }
 }
 
-void SensorFusion::updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu)
+void StateEstimator::updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu)
 {
     m_recent_imu_msg = imu;
     m_quaternion = Eigen::Quaterniond(imu->orientation.w, imu->orientation.x, imu->orientation.y, imu->orientation.z);
@@ -83,7 +83,7 @@ void SensorFusion::updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu)
     m_torque_converter->setInertialOrientation(m_quaternion);
 }
 
-void SensorFusion::updateDynamicsState()
+void StateEstimator::updateDynamicsState()
 {
     m_joint_dynamical_torques = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
     m_joint_external_torques = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
@@ -96,22 +96,22 @@ void SensorFusion::updateDynamicsState()
         m_robot_description->findNode("R_sole")->getGlobalPosition(m_joint_positions));
 }
 
-Eigen::Vector3d SensorFusion::getLeftFootForce() const
+Eigen::Vector3d StateEstimator::getLeftFootForce() const
 {
     return m_left_foot_force;
 }
 
-Eigen::Vector3d SensorFusion::getRightFootForce() const
+Eigen::Vector3d StateEstimator::getRightFootForce() const
 {
     return m_right_foot_force;
 }
 
-uint8_t SensorFusion::getCurrentStanceLeg() const
+uint8_t StateEstimator::getCurrentStanceLeg() const
 {
     return m_current_stance_leg;
 }
 
-uint8_t SensorFusion::getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const
+uint8_t StateEstimator::getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const
 {
     const double margin = 0.05;
 
@@ -124,7 +124,7 @@ uint8_t SensorFusion::getNextStanceLeg(const double& left_foot_position, const d
     }
 }
 
-void SensorFusion::updateCurrentStanceLeg(
+void StateEstimator::updateCurrentStanceLeg(
     const double& left_foot_torque, const double& right_foot_torque,
     const Eigen::Vector3d& left_foot_position, const Eigen::Vector3d& right_foot_position)
 {
@@ -134,20 +134,20 @@ void SensorFusion::updateCurrentStanceLeg(
         Eigen::Vector3d(right_foot_position.x(), right_foot_position.y(), right_foot_position.z()));
 }
 
-void SensorFusion::updateKalmanFilter()
+void StateEstimator::updateKalmanFilter()
 {
     updateProcessNoiseCovarianceMatrix(m_state_posterior);
     EKFState state_prior = calculatePriorState(m_state_posterior);
     m_state_posterior = calculatePosteriorState(state_prior);
 }
 
-Eigen::Quaterniond SensorFusion::getInertialOrientation() const
+Eigen::Quaterniond StateEstimator::getInertialOrientation() const
 {
     // return m_state_posterior.imu_orientation;
     return m_quaternion;
 }
 
-sensor_msgs::msg::JointState SensorFusion::getEstimatedJointState() const
+sensor_msgs::msg::JointState StateEstimator::getEstimatedJointState() const
 {
     sensor_msgs::msg::JointState estimated_joint_state;
     estimated_joint_state.name = m_joint_names;
@@ -162,12 +162,12 @@ sensor_msgs::msg::JointState SensorFusion::getEstimatedJointState() const
     return estimated_joint_state;
 }
 
-RobotNode::JointNameToValueMap SensorFusion::getJointPositions() const
+RobotNode::JointNameToValueMap StateEstimator::getJointPositions() const
 {
     return m_joint_positions;
 }
 
-Eigen::Vector3d SensorFusion::getCOM() const
+Eigen::Vector3d StateEstimator::getCOM() const
 {
     Eigen::Vector3d com_body_position = m_robot_description->findNode("com")->getGlobalPosition(m_joint_positions);
     Eigen::Vector3d com_inertial_position;
@@ -175,7 +175,7 @@ Eigen::Vector3d SensorFusion::getCOM() const
     return com_inertial_position;
 }
 
-Eigen::Vector3d SensorFusion::getCOMVelocity() const
+Eigen::Vector3d StateEstimator::getCOMVelocity() const
 {
     Eigen::Vector3d com_body_velocity = m_robot_description->findNode("com")->getGlobalVelocity(m_joint_positions, m_joint_velocities);
     Eigen::Vector3d com_inertial_velocity;
@@ -183,7 +183,7 @@ Eigen::Vector3d SensorFusion::getCOMVelocity() const
     return com_inertial_velocity;
 }
 
-geometry_msgs::msg::Point SensorFusion::getZMP() const
+geometry_msgs::msg::Point StateEstimator::getZMP() const
 {
     Eigen::Vector3d zmp_position = m_robot_description->findNode("zmp")->getGlobalPosition(m_joint_positions);
     geometry_msgs::msg::Point zmp;
@@ -193,7 +193,7 @@ geometry_msgs::msg::Point SensorFusion::getZMP() const
     return zmp;
 }
 
-geometry_msgs::msg::Transform SensorFusion::getRobotTransform() const
+geometry_msgs::msg::Transform StateEstimator::getRobotTransform() const
 {
     geometry_msgs::msg::Transform robot_transform;
 
@@ -208,7 +208,7 @@ geometry_msgs::msg::Transform SensorFusion::getRobotTransform() const
     return robot_transform;
 }
 
-std::vector<geometry_msgs::msg::Pose> SensorFusion::getFootPoses() const
+std::vector<geometry_msgs::msg::Pose> StateEstimator::getFootPoses() const
 {
     std::vector<geometry_msgs::msg::Pose> foot_poses;
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes({ "L_foot", "R_foot" });
@@ -230,7 +230,7 @@ std::vector<geometry_msgs::msg::Pose> SensorFusion::getFootPoses() const
     return foot_poses;
 }
 
-std::vector<double> SensorFusion::getFootContactHeight() const
+std::vector<double> StateEstimator::getFootContactHeight() const
 {
     std::vector<double> foot_contact_height;
     std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes({ "L_foot", "R_foot" });
@@ -245,7 +245,7 @@ std::vector<double> SensorFusion::getFootContactHeight() const
     return foot_contact_height;
 }
 
-std::vector<double> SensorFusion::getJointAcceleration(const std::vector<std::string>& joint_names) const
+std::vector<double> StateEstimator::getJointAcceleration(const std::vector<std::string>& joint_names) const
 {
     std::vector<double> joint_acceleration;
     for (const auto& joint_name : joint_names) {
@@ -254,7 +254,7 @@ std::vector<double> SensorFusion::getJointAcceleration(const std::vector<std::st
     return joint_acceleration;
 }
 
-std::vector<double> SensorFusion::getJointDynamicalTorques(const std::vector<std::string>& joint_names) const
+std::vector<double> StateEstimator::getJointDynamicalTorques(const std::vector<std::string>& joint_names) const
 {
     std::vector<double> joint_dynamical_torques;
     for (const auto& joint_name : joint_names) {
@@ -263,7 +263,7 @@ std::vector<double> SensorFusion::getJointDynamicalTorques(const std::vector<std
     return joint_dynamical_torques;
 }
 
-std::vector<double> SensorFusion::getJointExternalTorques(const std::vector<std::string>& joint_names) const
+std::vector<double> StateEstimator::getJointExternalTorques(const std::vector<std::string>& joint_names) const
 {
     std::vector<double> joint_total_torques;
     for (const auto& joint_name : joint_names) {
@@ -272,7 +272,7 @@ std::vector<double> SensorFusion::getJointExternalTorques(const std::vector<std:
     return joint_total_torques;
 }
 
-std::vector<Eigen::Vector3d> SensorFusion::getWorldTorqueInLegs() const
+std::vector<Eigen::Vector3d> StateEstimator::getWorldTorqueInLegs() const
 {
     std::vector<Eigen::Vector3d> world_torque_in_legs
         = m_torque_converter->getWorldTorqueInLegs(m_joint_positions, m_joint_total_torques);
@@ -285,7 +285,7 @@ std::vector<Eigen::Vector3d> SensorFusion::getWorldTorqueInLegs() const
     return world_torque_in_legs;
 }
 
-std::vector<Eigen::Vector3d> SensorFusion::getWorldForceInLegs() const
+std::vector<Eigen::Vector3d> StateEstimator::getWorldForceInLegs() const
 {
     std::vector<Eigen::Vector3d> world_torque_in_legs = getWorldTorqueInLegs();
     std::vector<Eigen::Vector3d> world_force_in_legs;
@@ -298,18 +298,18 @@ std::vector<Eigen::Vector3d> SensorFusion::getWorldForceInLegs() const
     return world_force_in_legs;
 }
 
-Eigen::VectorXd SensorFusion::getPosteriorStateVector() const
+Eigen::VectorXd StateEstimator::getPosteriorStateVector() const
 {
     Eigen::VectorXd state_vector = getEKFStateVector(m_state_posterior);
     return state_vector;
 }
 
-Eigen::Quaterniond SensorFusion::getFilteredOrientation() const
+Eigen::Quaterniond StateEstimator::getFilteredOrientation() const
 {
     return m_state_posterior.imu_orientation;
 }
 
-Eigen::Quaterniond SensorFusion::getExponentialMap(const Eigen::Vector3d& vector) const
+Eigen::Quaterniond StateEstimator::getExponentialMap(const Eigen::Vector3d& vector) const
 {
     Eigen::Quaterniond quaternion;
     Eigen::Vector3d vector_normalized = vector;
@@ -321,7 +321,7 @@ Eigen::Quaterniond SensorFusion::getExponentialMap(const Eigen::Vector3d& vector
     return quaternion;
 }
 
-Eigen::Matrix3d SensorFusion::getSkewSymmetricMatrix(const Eigen::Vector3d& vector) const
+Eigen::Matrix3d StateEstimator::getSkewSymmetricMatrix(const Eigen::Vector3d& vector) const
 {
     Eigen::Matrix3d skew_symmetric_matrix;
     skew_symmetric_matrix <<    0, -vector.z(), vector.y(), 
@@ -330,7 +330,7 @@ Eigen::Matrix3d SensorFusion::getSkewSymmetricMatrix(const Eigen::Vector3d& vect
     return skew_symmetric_matrix;
 }
 
-Eigen::MatrixXd SensorFusion::getStateTransitionMatrix(const EKFState& state) const
+Eigen::MatrixXd StateEstimator::getStateTransitionMatrix(const EKFState& state) const
 {
     Eigen::MatrixXd state_transition_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::Matrix3d ss_expected_measured_angular_velocity = getSkewSymmetricMatrix(calculateExpectedMeasuredAngularVelocity(state.gyroscope_bias));
@@ -346,7 +346,7 @@ Eigen::MatrixXd SensorFusion::getStateTransitionMatrix(const EKFState& state) co
     return state_transition_matrix;
 }
 
-Eigen::MatrixXd SensorFusion::getObservationModelMatrix(const EKFState& state) const
+Eigen::MatrixXd StateEstimator::getObservationModelMatrix(const EKFState& state) const
 {
     Eigen::MatrixXd measurement_model_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::Matrix3d rotation_matrix = state.imu_orientation.toRotationMatrix();
@@ -365,7 +365,7 @@ Eigen::MatrixXd SensorFusion::getObservationModelMatrix(const EKFState& state) c
     return measurement_model_matrix;
 }
 
-Eigen::MatrixXd SensorFusion::getNoiseJacobianMatrix(const EKFState& state) const
+Eigen::MatrixXd StateEstimator::getNoiseJacobianMatrix(const EKFState& state) const
 {
     Eigen::MatrixXd noise_jacobian_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::Matrix3d rotation_matrix = state.imu_orientation.toRotationMatrix().transpose();
@@ -379,22 +379,22 @@ Eigen::MatrixXd SensorFusion::getNoiseJacobianMatrix(const EKFState& state) cons
     return noise_jacobian_matrix;
 }
 
-void SensorFusion::setTimeStep(const double& timestep)
+void StateEstimator::setTimeStep(const double& timestep)
 {
     m_timestep = timestep;
 }
 
-void SensorFusion::setProcessNoiseAccelerationVector(const Eigen::Vector3d& process_noise_acceleration)
+void StateEstimator::setProcessNoiseAccelerationVector(const Eigen::Vector3d& process_noise_acceleration)
 {
     m_process_noise_acceleration = process_noise_acceleration;
 }
 
-void SensorFusion::setProcessNoiseAngularVelocityVector(const Eigen::Vector3d& process_noise_angular_velocity)
+void StateEstimator::setProcessNoiseAngularVelocityVector(const Eigen::Vector3d& process_noise_angular_velocity)
 {
     m_process_noise_angular_velocity = process_noise_angular_velocity;
 }
 
-void SensorFusion::setProcessNoiseCovarianceMatrix(const Eigen::Vector3d& process_noise_velocity,
+void StateEstimator::setProcessNoiseCovarianceMatrix(const Eigen::Vector3d& process_noise_velocity,
     const Eigen::Vector3d& process_noise_acceleration, const Eigen::Vector3d& process_noise_angular_velocity,
     const Eigen::Vector3d& process_noise_feet_position, const Eigen::Vector3d& process_noise_accelerometer_bias,
     const Eigen::Vector3d& process_noise_gyroscope_bias, const Eigen::Vector3d& process_noise_feet_slippage)
@@ -411,7 +411,7 @@ void SensorFusion::setProcessNoiseCovarianceMatrix(const Eigen::Vector3d& proces
     m_process_noise_covariance_matrix.block<3, 3>(24, 24) = process_noise_feet_slippage.asDiagonal();
 }
 
-void SensorFusion::setMeasurementNoiseCovarianceMatrix(
+void StateEstimator::setMeasurementNoiseCovarianceMatrix(
     const Eigen::Vector3d& measurement_noise_feet_position, const Eigen::Vector3d& measurement_noise_feet_slippage)
 {
     m_measurement_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
@@ -421,7 +421,7 @@ void SensorFusion::setMeasurementNoiseCovarianceMatrix(
     m_measurement_noise_covariance_matrix.block<3, 3>(9, 9) = measurement_noise_feet_slippage.asDiagonal();
     m_measurement_noise_covariance_matrix.noalias() = m_measurement_noise_covariance_matrix / m_timestep;
 }
-void SensorFusion::updateProcessNoiseCovarianceMatrix(const EKFState& state_posterior)
+void StateEstimator::updateProcessNoiseCovarianceMatrix(const EKFState& state_posterior)
 {
     Eigen::MatrixXd next_process_noise_covariance_matrix = Eigen::MatrixXd::Zero(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::MatrixXd state_transition_matrix, noise_jacobian_matrix;
@@ -438,7 +438,7 @@ void SensorFusion::updateProcessNoiseCovarianceMatrix(const EKFState& state_post
         ) * m_timestep;
 }
 
-Eigen::MatrixXd SensorFusion::calculatePriorCovarianceMatrix(const EKFState& state_posterior) const
+Eigen::MatrixXd StateEstimator::calculatePriorCovarianceMatrix(const EKFState& state_posterior) const
 {
     Eigen::MatrixXd priori_covariance_matrix;
     Eigen::MatrixXd state_transition_matrix = getStateTransitionMatrix(state_posterior);
@@ -447,21 +447,21 @@ Eigen::MatrixXd SensorFusion::calculatePriorCovarianceMatrix(const EKFState& sta
     return priori_covariance_matrix;
 }
 
-Eigen::Vector3d SensorFusion::calculateExpectedMeasuredAcceleration(const Eigen::Vector3d& accelerometer_bias) const
+Eigen::Vector3d StateEstimator::calculateExpectedMeasuredAcceleration(const Eigen::Vector3d& accelerometer_bias) const
 {
     Eigen::Vector3d expected_measured_acceleration;
     expected_measured_acceleration.noalias() = msgToEigenVector3d(m_recent_imu_msg->linear_acceleration) - accelerometer_bias;
     return expected_measured_acceleration;
 }
 
-Eigen::Vector3d SensorFusion::calculateExpectedMeasuredAngularVelocity(const Eigen::Vector3d& gyroscope_bias) const
+Eigen::Vector3d StateEstimator::calculateExpectedMeasuredAngularVelocity(const Eigen::Vector3d& gyroscope_bias) const
 {
     Eigen::Vector3d expected_measured_angular_velocity;
     expected_measured_angular_velocity.noalias() = msgToEigenVector3d(m_recent_imu_msg->angular_velocity) - gyroscope_bias;
     return expected_measured_angular_velocity;
 }
 
-Eigen::VectorXd SensorFusion::calculateInnovation(const EKFState& state_priori) const
+Eigen::VectorXd StateEstimator::calculateInnovation(const EKFState& state_priori) const
 {
     Eigen::VectorXd innovation(MEASUREMENT_DIMENSION_SIZE);
     Eigen::Matrix3d rotation_matrix = state_priori.imu_orientation.toRotationMatrix();
@@ -484,7 +484,7 @@ Eigen::VectorXd SensorFusion::calculateInnovation(const EKFState& state_priori) 
     return innovation;
 }
 
-Eigen::VectorXd SensorFusion::calculateStateCorrectionVector(const Eigen::MatrixXd& kalman_gain, 
+Eigen::VectorXd StateEstimator::calculateStateCorrectionVector(const Eigen::MatrixXd& kalman_gain, 
     const Eigen::VectorXd& innovation) const
 {
     Eigen::VectorXd state_correction_vector(STATE_DIMENSION_SIZE);
@@ -492,7 +492,7 @@ Eigen::VectorXd SensorFusion::calculateStateCorrectionVector(const Eigen::Matrix
     return state_correction_vector;
 }
 
-Eigen::MatrixXd SensorFusion::calculateInnovationCovarianceMatrix(const EKFState& state_priori) const
+Eigen::MatrixXd StateEstimator::calculateInnovationCovarianceMatrix(const EKFState& state_priori) const
 {
     Eigen::MatrixXd innovation_covariance_matrix(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     Eigen::MatrixXd measurement_model_matrix = getObservationModelMatrix(state_priori);
@@ -501,7 +501,7 @@ Eigen::MatrixXd SensorFusion::calculateInnovationCovarianceMatrix(const EKFState
     return innovation_covariance_matrix;
 }
 
-Eigen::MatrixXd SensorFusion::calculateKalmanGain(const EKFState& state_priori, const Eigen::MatrixXd& observation_model_matrix) const
+Eigen::MatrixXd StateEstimator::calculateKalmanGain(const EKFState& state_priori, const Eigen::MatrixXd& observation_model_matrix) const
 {
     Eigen::MatrixXd kalman_gain;
     Eigen::MatrixXd innovation_covariance_matrix = calculateInnovationCovarianceMatrix(state_priori);
@@ -510,7 +510,7 @@ Eigen::MatrixXd SensorFusion::calculateKalmanGain(const EKFState& state_priori, 
     return kalman_gain;
 }
 
-Eigen::MatrixXd SensorFusion::calculateEstimatedCovarianceMatrix(const EKFState& state_priori, 
+Eigen::MatrixXd StateEstimator::calculateEstimatedCovarianceMatrix(const EKFState& state_priori, 
     const Eigen::MatrixXd& kalman_gain, const Eigen::MatrixXd& observation_model) const
 {
     Eigen::MatrixXd estimated_covariance_matrix = Eigen::MatrixXd(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
@@ -518,7 +518,7 @@ Eigen::MatrixXd SensorFusion::calculateEstimatedCovarianceMatrix(const EKFState&
     return estimated_covariance_matrix;
 }
 
-EKFState SensorFusion::calculatePriorState(const EKFState& state_posterior) const
+EKFState StateEstimator::calculatePriorState(const EKFState& state_posterior) const
 {
     EKFState state_priori = state_posterior;
     Eigen::Matrix3d rotation_matrix = state_posterior.imu_orientation.toRotationMatrix().transpose();
@@ -533,7 +533,7 @@ EKFState SensorFusion::calculatePriorState(const EKFState& state_posterior) cons
     return state_priori;
 }
 
-EKFState SensorFusion::calculatePosteriorState(const EKFState& state_priori) const
+EKFState StateEstimator::calculatePosteriorState(const EKFState& state_priori) const
 {
     EKFState state_posterior;
     Eigen::VectorXd innovation = calculateInnovation(state_priori);
@@ -555,7 +555,7 @@ EKFState SensorFusion::calculatePosteriorState(const EKFState& state_priori) con
     return state_posterior;
 }
 
-Eigen::VectorXd SensorFusion::getEKFStateVector(const EKFState& state) const
+Eigen::VectorXd StateEstimator::getEKFStateVector(const EKFState& state) const
 {
     Eigen::VectorXd state_vector(STATE_DIMENSION_SIZE);
     state_vector << state.imu_position, state.imu_velocity, quaternionToEulerAngles(state.imu_orientation),
@@ -564,13 +564,13 @@ Eigen::VectorXd SensorFusion::getEKFStateVector(const EKFState& state) const
     return state_vector;
 }
 
-bool SensorFusion::hasConverged(const Eigen::Quaterniond& desired_orientation, const double& threshold) const
+bool StateEstimator::hasConverged(const Eigen::Quaterniond& desired_orientation, const double& threshold) const
 {
     Eigen::Quaterniond difference = desired_orientation * m_state_posterior.imu_orientation.inverse();
     return atan2(difference.vec().norm(), difference.w()) < threshold;
 }
 
-sensor_msgs::msg::Imu::SharedPtr SensorFusion::getFilteredImuMsg() const
+sensor_msgs::msg::Imu::SharedPtr StateEstimator::getFilteredImuMsg() const
 {
     sensor_msgs::msg::Imu::SharedPtr filtered_imu_msg = std::make_shared<sensor_msgs::msg::Imu>();
     filtered_imu_msg->header.stamp = m_recent_imu_msg->header.stamp;
@@ -588,7 +588,7 @@ sensor_msgs::msg::Imu::SharedPtr SensorFusion::getFilteredImuMsg() const
     return filtered_imu_msg;
 }
 
-geometry_msgs::msg::Vector3::SharedPtr SensorFusion::getFilteredOrientationMsg() const
+geometry_msgs::msg::Vector3::SharedPtr StateEstimator::getFilteredOrientationMsg() const
 {
     geometry_msgs::msg::Vector3::SharedPtr filtered_orientation = std::make_shared<geometry_msgs::msg::Vector3>();
     Eigen::Vector3d euler_angles = quaternionToEulerAngles(m_state_posterior.imu_orientation);
@@ -598,17 +598,17 @@ geometry_msgs::msg::Vector3::SharedPtr SensorFusion::getFilteredOrientationMsg()
     return filtered_orientation;
 }
 
-Eigen::Vector3d SensorFusion::msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const
+Eigen::Vector3d StateEstimator::msgToEigenVector3d(const geometry_msgs::msg::Vector3& vector) const
 {
     return Eigen::Vector3d(vector.x, vector.y, vector.z);
 }
 
-Eigen::Vector3d SensorFusion::quaternionToEulerAngles(const Eigen::Quaterniond& quaternion) const
+Eigen::Vector3d StateEstimator::quaternionToEulerAngles(const Eigen::Quaterniond& quaternion) const
 {
     return rotationMatrixToEulerAngles(quaternion.toRotationMatrix());    
 }
 
-Eigen::Vector3d SensorFusion::rotationMatrixToEulerAngles(const Eigen::Matrix3d& rotation_matrix) const
+Eigen::Vector3d StateEstimator::rotationMatrixToEulerAngles(const Eigen::Matrix3d& rotation_matrix) const
 {
     return rotation_matrix.eulerAngles(EULER_ROLL_AXIS, EULER_PITCH_AXIS, EULER_YAW_AXIS);
     // return rotation_matrix.eulerAngles(EULER_YAW_AXIS, EULER_PITCH_AXIS, EULER_ROLL_AXIS);

@@ -3,8 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
-#define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_HPP_
+#define MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_HPP_
 
 #define EULER_ROLL_AXIS     0
 #define EULER_PITCH_AXIS    1
@@ -50,10 +50,10 @@ struct EKFMeasurement {
     Eigen::Quaterniond right_foot_slippage = Eigen::Quaterniond::Identity();
 };
 
-class SensorFusion {
+class StateEstimator {
 public:
-    SensorFusion(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path);
-    ~SensorFusion() = default;
+    StateEstimator(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path);
+    ~StateEstimator() = default;
 
     void configureJointNames(const std::vector<std::string>& joint_names);
     void configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold);
@@ -166,4 +166,4 @@ private:
     Eigen::MatrixXd m_measurement_noise_covariance_matrix;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
+#endif // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_HPP_
