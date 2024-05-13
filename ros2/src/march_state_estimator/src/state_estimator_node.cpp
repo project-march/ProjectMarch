@@ -3,7 +3,7 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-// #define DEBUG
+#define DEBUG
 
 #include "march_state_estimator/state_estimator_node.hpp"
 
@@ -187,9 +187,9 @@ void StateEstimatorNode::timerCallback()
         
         EKFObservation ekf_observation;
         ekf_observation.imu_acceleration
-            = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
+            = Eigen::Vector3d(0.0, 0.0, 0.0);
         ekf_observation.imu_angular_velocity
-            = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
+            = Eigen::Vector3d(0.0, 0.0, 0.0);
         std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
         ekf_observation.left_foot_position
             = Eigen::Vector3d(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[LEFT_FOOT_ID].position.y, body_foot_poses[LEFT_FOOT_ID].position.z);

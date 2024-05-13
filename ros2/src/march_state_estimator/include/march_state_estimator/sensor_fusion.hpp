@@ -6,7 +6,10 @@
 #ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 #define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 
+#define DEBUG
+
 #include <vector>
+#include <iostream>
 
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"
@@ -93,17 +96,34 @@ private:
         return m_observation.imu_angular_velocity - m_state.gyroscope_bias;
     }
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
-        return m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose();
+        Eigen::MatrixXd prior_covariance_matrix;
+        prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose();
+        return prior_covariance_matrix;
     }
     inline void computeInnovationCovarianceMatrix() {
-        m_innovation_covariance_matrix = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose();
+        m_innovation_covariance_matrix.noalias() = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose()
+            + Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e-3;
+        #ifdef DEBUG
+        std::cout << "Innovation covariance matrix:\n" << m_innovation_covariance_matrix << std::endl;
+        #endif
     }
     inline void computeKalmanGain() {
-        Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXd> cod_innovation_covariance_matrix(m_innovation_covariance_matrix);
-        cod_innovation_covariance_matrix.setThreshold(1e-6); // TODO: Set a threshold for the SVD decomposition
-        m_kalman_gain = m_state.covariance_matrix * m_observation_matrix.transpose() * cod_innovation_covariance_matrix.pseudoInverse();
+        m_kalman_gain.noalias() = m_state.covariance_matrix * m_observation_matrix.transpose() * m_innovation_covariance_matrix.completeOrthogonalDecomposition().pseudoInverse();
+        #ifdef DEBUG
+        std::cout << "Kalman gain matrix:\n" << m_kalman_gain << std::endl;
+        #endif
+    }
+    inline void computeProcessNoiseCovarianceMatrix() {
+        Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
+        m_process_noise_covariance_matrix.noalias() 
+            = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
+                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
+        #ifdef DEBUG
+        std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
+        #endif
     }
     const Eigen::VectorXd computeInnovation() const;
+    const Eigen::MatrixXd computeNoiseJacobianMatrix() const;
     void computeDynamicsMatrix();
     void computeObservationMatrix();
 
@@ -121,6 +141,8 @@ private:
     Eigen::MatrixXd m_observation_matrix;
     Eigen::MatrixXd m_innovation_covariance_matrix;
     Eigen::MatrixXd m_kalman_gain;
+    Eigen::MatrixXd m_process_noise_covariance_matrix;
+    Eigen::MatrixXd m_observation_noise_covariance_matrix;
 
     friend class SensorFusionTest;
 };
