@@ -1,3 +1,5 @@
+#pragma once
+
 #include <rclcpp/rclcpp.hpp>
 #include "processing/camera_interface.h"
 #include <message_filters/sync_policies/approximate_time.h>

@@ -1,5 +1,4 @@
-#ifndef MARCH_CAMERA_INTERFACE_H
-#define MARCH_CAMERA_INTERFACE_H
+#pragma once
 
 #include <chrono>
 #include <cmath>
