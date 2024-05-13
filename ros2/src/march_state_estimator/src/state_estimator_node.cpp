@@ -152,6 +152,10 @@ StateEstimatorNode::~StateEstimatorNode()
 
 void StateEstimatorNode::timerCallback()
 {
+    // Broadcast transform from base_link to world frame to tf2
+    broadcastTransformToTf2();
+
+    // Avoid spikes in linear acceleration
     if ((this->now() - m_startup_time) < rclcpp::Duration::from_seconds(m_startup_timeout)) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for proper initialization...");
         return;
@@ -202,7 +206,6 @@ void StateEstimatorNode::timerCallback()
         #endif
         m_sensor_fusion->estimateState();
     }
-    broadcastTransformToTf2();
 
     // publishFeetHeight();
     // publishMPCEstimation();
