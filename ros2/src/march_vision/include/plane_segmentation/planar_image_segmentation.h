@@ -5,10 +5,10 @@
 #include <grid_map_core/GridMap.hpp>
 #include <opencv2/core/mat.hpp>
 
-#include "march_vision/segmented_planes_map.h"
-#include "march_vision/ransac_segmentation.h"
+#include "march_vision/plane_segmentation/segmented_planes_map.h"
+#include "march_vision/plane_segmentation/ransac_segmentation.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 struct PlanarImageSegmentationParameters {
   /// Size of the sliding window patch used for normal vector calculation and planarity detection
@@ -84,4 +84,4 @@ class PlanarImageSegmentation {
   cv::Mat m_binary_image_patch;
   SegmentedPlanesMap m_segmented_planes_map;
 };
-}  // namespace march_vision
+}  // namespace plane_segmentation

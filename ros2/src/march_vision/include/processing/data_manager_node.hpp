@@ -1,11 +1,13 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
-#include "processing/camera_interface.h"
+#include "march_vision/processing/camera_interface.h"
 #include <message_filters/sync_policies/approximate_time.h>
 
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
+namespace march_vision {
+    
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::PointCloud2, sensor_msgs::msg::PointCloud2> m_sync_policy;
 
 class InputSourceManagerNode : public rclcpp::Node
@@ -27,3 +29,4 @@ public:
     InputSourceManagerNode();
     ~InputSourceManagerNode() = default;
 };
+} // namespace march_vision

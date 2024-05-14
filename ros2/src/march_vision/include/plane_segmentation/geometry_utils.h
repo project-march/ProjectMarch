@@ -4,9 +4,9 @@
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_with_holes_2.h>
 
-#include "march_vision/planar_region.h"
+#include "march_vision/plane_segmentation/planar_region.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using CgalPoint2d = K::Point_2;
@@ -151,4 +151,4 @@ inline void transformInPlace(BoundaryWithInset& boundary_with_inset, const std::
   }
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

@@ -7,10 +7,10 @@
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/property_map.h>
 
-#include "march_vision/planar_region.h"
-#include "march_vision/segmented_planes_map.h"
+#include "march_vision/plane_segmentation/planar_region.h"
+#include "march_vision/plane_segmentation/segmented_planes_map.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Point3D = Kernel::Point_3;
@@ -49,7 +49,7 @@ class ContourSegmentation {
   cv::Mat m_binary_image;
 };
 
-/// Modifies the image in-place!
+/// Modifies the image in-place
 std::vector<BoundaryWithInset> extractBoundaryAndInset(cv::Mat& binary_image, const cv::Mat& erosion_kernel);
 std::vector<CgalPolygonWithHoles2d> extractPolygonsFromBinaryImage(const cv::Mat& binary_image);
 CgalPolygon2d cgalPolygonFromOpenCv(const std::vector<cv::Point>& openCV_polygon);
@@ -76,5 +76,5 @@ cv::Mat upSample(const cv::Mat& image);
  */
 SegmentedPlanesMap upSample(const SegmentedPlanesMap& map_in);
 
-}  // namespace march_vision
+}  // namespace plane_segmentation
 

@@ -6,8 +6,8 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "elevation_mapping/input_sources/InputSourceManager.hpp"
-#include "elevation_mapping/ElevationMapping.hpp"
+#include "march_vision/elevation_mapping/input_sources/input_source_manager.hpp"
+#include "march_vision/elevation_mapping/elevation_mapping.hpp"
 
 namespace elevation_mapping {
 

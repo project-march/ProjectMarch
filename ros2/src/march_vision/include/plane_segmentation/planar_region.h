@@ -9,7 +9,7 @@
 
 #include <grid_map_core/GridMap.hpp>
 
-namespace march_vision {
+namespace plane_segmentation {
 
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using CgalPoint2d = K::Point_2;
@@ -69,4 +69,4 @@ CgalPoint2d projectToPlaneAlongGravity(const CgalPoint2d& worldFrameXY, const Ei
  */
 Eigen::Vector3d positionInWorldFrameFromPosition2dInPlane(const CgalPoint2d& planeXY, const Eigen::Isometry3d& transform_plane_to_world);
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

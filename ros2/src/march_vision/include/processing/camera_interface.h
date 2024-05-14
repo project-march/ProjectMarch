@@ -18,15 +18,13 @@
 #include <thread>
 #include <vector>
 
-
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
 using MarkerPublisher = rclcpp::Publisher<visualization_msgs::msg::Marker>;
 
 
-// TODO: Add the filter params and the methods
-
+namespace march_vision{
 class CameraInterface {
 
 public:
@@ -77,9 +75,8 @@ protected:
     // TODO: Do I need this?
     Point m_ORIGIN;
 
-    PointCloud::Ptr pointsToPcl(const rs2::points& points);
-    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& leftOrRight);
+    PointCloud::Ptr pointsToPCL(const rs2::points& points);
+    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right);
 
 };
-
-#endif // MARCH_CAMERA_INTERFACE_H
+} // namespace march_vision

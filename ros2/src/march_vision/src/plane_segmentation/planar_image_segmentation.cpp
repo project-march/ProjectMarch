@@ -1,4 +1,4 @@
-#include "march_vision/planar_image_segmentation.h"
+#include "march_vision/plane_segmentation/planar_image_segmentation.h"
 
 #include <chrono>
 #include <cmath>
@@ -11,7 +11,7 @@
 
 #include <grid_map_core/grid_map_core.hpp>
 
-namespace march_vision {
+namespace plane_segmentation {
 
 namespace {
 
@@ -50,7 +50,6 @@ PlanarImageSegmentation::PlanarImageSegmentation(const PlanarImageSegmentationPa
 {
 }
 
-// S. Suzuki, K. Abe: "Topological Structural Analysis of Digitized Binary Images by Border Following"
 void PlanarImageSegmentation::runExtraction(const grid_map::GridMap& map, const std::string& layer_height)
 {
 
@@ -163,7 +162,6 @@ void PlanarImageSegmentation::runSlidingWindowDetector()
     }
 }
 
-// K. Wu, E. Otoo, K. Suzuki: "Optimizing Two-Pass Connected-Component Labeling Algorithms"
 void PlanarImageSegmentation::runSegmentation()
 {
     int number_of_label = cv::connectedComponents(

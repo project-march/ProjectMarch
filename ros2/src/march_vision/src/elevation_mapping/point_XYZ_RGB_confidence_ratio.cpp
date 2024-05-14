@@ -7,7 +7,7 @@
  */
 
 #define PCL_NO_PRECOMPILE
-#include "elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
+#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
 
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/filter.h>

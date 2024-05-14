@@ -6,7 +6,7 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "elevation_mapping/RobotMotionMapUpdater.hpp"
+#include "march_vision/elevation_mapping/robot_motion_map_updater.hpp"
 
 // Kindr
 #include <kindr/Core>

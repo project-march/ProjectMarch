@@ -3,9 +3,9 @@
 #include <Eigen/Core>
 #include <opencv2/core/mat.hpp>
 
-#include "march_vision/planar_region.h"
+#include "march_vision/plane_segmentation/planar_region.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 struct SegmentedPlanesMap {
   /// Unordered collection of all labels and corresponding plane parameters
@@ -25,4 +25,4 @@ struct SegmentedPlanesMap {
   int highest_label;
 };
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

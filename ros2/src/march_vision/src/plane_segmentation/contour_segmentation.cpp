@@ -1,10 +1,10 @@
 #include "march_vision/plane_segmentation/contour_segmentation.h"
 
 // TODO: Add geometry utils or add them in this
-#include <convex_plane_decomposition/GeometryUtils.h>
+#include <march_vision/plane_segmentation/geometry_utils.h>
 #include <opencv2/imgproc.hpp>
 
-namespace march_vision {
+namespace plane_segmentation {
 
 namespace {
 
@@ -60,11 +60,11 @@ cv::Mat upSample(const cv::Mat& image) {
 SegmentedPlanesMap upSample(const SegmentedPlanesMap& map_in) {
   
   SegmentedPlanesMap map_out;
-  mapOut.label_plane_parameters = map_in.label_plane_parameters;
-  mapOut.labeled_image = upSample(map_in.labeled_image);
-  mapOut.resolution = map_in.resolution / 3.0;
-  mapOut.map_origin = map_in.map_origin;
-  mapOut.highest_label = map_in.highest_label;
+  map_out.label_plane_parameters = map_in.label_plane_parameters;
+  map_out.labeled_image = upSample(map_in.labeled_image);
+  map_out.resolution = map_in.resolution / 3.0;
+  map_out.map_origin = map_in.map_origin;
+  map_out.highest_label = map_in.highest_label;
   return map_out;
 }
 
@@ -160,7 +160,6 @@ std::vector<BoundaryWithInset> extractBoundaryAndInset(cv::Mat& binary_image, co
   }
   return boundaries_with_insets;
 }
-
 std::vector<CgalPolygonWithHoles2d> extractPolygonsFromBinaryImage(const cv::Mat& binary_image) {
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;  // [Next, Previous, First_Child, Parent]
@@ -202,4 +201,4 @@ CgalPoint2d pixelToWorldFrame(const CgalPoint2d& pixelspace_cgal_point2d, double
   return {map_offset.x() - resolution * pixelspace_cgal_point2d.y(), map_offset.y() - resolution * pixelspace_cgal_point2d.x()};
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

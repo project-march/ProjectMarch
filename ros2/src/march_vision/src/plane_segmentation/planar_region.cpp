@@ -1,6 +1,6 @@
-#include "march_vision/planar_region.h"
+#include "march_vision/plane_segmentation/planar_region.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 // TODO: Remove if we are not going to use global frame
 Eigen::Isometry3d getTransformLocalToGlobal(const NormalAndPosition& normal_and_position) {
@@ -58,4 +58,4 @@ Eigen::Vector3d positionInWorldFrameFromPosition2dInPlane(const CgalPoint2d& pla
   return point_in_world;
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

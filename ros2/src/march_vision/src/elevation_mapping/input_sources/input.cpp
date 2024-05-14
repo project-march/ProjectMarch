@@ -6,12 +6,11 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "elevation_mapping/input_sources/Input.hpp"
+#include "march_vision/elevation_mapping/input_sources/input.hpp"
 
-#include "elevation_mapping/sensor_processors/LaserSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/PerfectSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/StereoSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/StructuredLightSensorProcessor.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/stereo_sensor_processor.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
 
 namespace elevation_mapping {
 
@@ -76,10 +75,6 @@ bool Input::configureSensorProcessor(std::string& inputSourceName, const std::st
   
   if (sensorType == "structured_light") {
     sensorProcessor_.reset(new StructuredLightSensorProcessor(nodeHandle_, generalSensorProcessorParameters));
-  } else if (sensorType == "stereo") {
-    sensorProcessor_.reset(new StereoSensorProcessor(nodeHandle_, generalSensorProcessorParameters));
-  } else if (sensorType == "laser") {
-    sensorProcessor_.reset(new LaserSensorProcessor(nodeHandle_, generalSensorProcessorParameters));
   } else if (sensorType == "perfect") {
     sensorProcessor_.reset(new PerfectSensorProcessor(nodeHandle_, generalSensorProcessorParameters));
   } else {

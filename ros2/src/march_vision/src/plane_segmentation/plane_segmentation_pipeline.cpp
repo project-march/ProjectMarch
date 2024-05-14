@@ -1,8 +1,8 @@
-#include "march_vision/plane_segmentation_pipeline.h"
+#include "march_vision/plane_segmentation/plane_segmentation_pipeline.h"
 
 #include <opencv2/core/eigen.hpp>
 
-namespace march_vision {
+namespace plane_segmentation {
 
 PlaneSegmentationPipeline::PlaneSegmentationPipeline(const Config& config)
     : m_planar_image_segmentation(config.PlanarImageSegmentationParameters, config.RansacSegmentationParameters),
@@ -35,4 +35,4 @@ void PlaneSegmentationPipeline::getSegmentation(grid_map::GridMap::Matrix& segme
   cv::cv2eigen(m_planar_image_segmentation.getSegmentedPlanesMap().labeled_image, segmentation);
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

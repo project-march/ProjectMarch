@@ -17,8 +17,8 @@
 
 #include <grid_map_core/GridMap.hpp>
 
-#include "elevation_mapping/postprocessing/postprocessing_pipeline_functor.hpp"
-#include "elevation_mapping/postprocessing/postprocessing_worker.hpp"
+#include "march_vision/elevation_mapping/postprocessing/postprocessing_pipeline_functor.hpp"
+#include "march_vision/elevation_mapping/postprocessing/postprocessing_worker.hpp"
 
 namespace elevation_mapping {
 

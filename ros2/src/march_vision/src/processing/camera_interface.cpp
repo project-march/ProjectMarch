@@ -1,4 +1,4 @@
-#include "processing/camera_interface.h"
+#include "march_vision/processing/camera_interface.h"
 // TODO: Change to new msg for current state
 //#include "march_shared_msgs/msg/current_state.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -8,10 +8,7 @@
 // TODO: Fix this message
 //#include <visualization_msgs/msg/marker_array.hpp>
 
-//TODO: Change ros to ros2
-
-CameraInterface::CameraInterface(rclcpp::Node* n,
-    const std::string& left_or_right)
+CameraInterface::CameraInterface(rclcpp::Node* n, const std::string& left_or_right)
     : m_node(n)
     , m_left_or_right(left_or_right)
 {
@@ -121,7 +118,7 @@ void CameraInterface::processRealSenseDepthFrames() {
 
     rs2::pointcloud pc;
     rs2::points points = pc.calculate(depth);
-    PointCloud::Ptr point_cloud = points_to_pcl(points);
+    PointCloud::Ptr point_cloud = pointsToPCL(points);
 
     // TODO: Change the topic?
     //point_cloud->header.frame_id = "camera_" + m_left_or_right + "_depth_optical_frame";
@@ -136,56 +133,7 @@ void CameraInterface::processPointCloud(const PointCloud::Ptr& pointcloud) {
     publishCloud(m_preprocessed_pointcloud_publisher, m_node, *pointcloud, m_left_or_right);
 }
 
-// TODO: Change to use the general time stamp.
-bool CameraInterface::updateTransformations(const rclcpp::Time& time_stamp) {
-
-  const Parameters parameters{parameters_.getData()};
-  try {
-
-    tf::StampedTransform transformTf;
-    m_tf_listener.lookupTransform(robotBaseFrameId_, sensorFrameId_, time_stamp,
-                                       transformTf);  // TODO: Why wrong direction?
-    Eigen::Affine3d transform;
-    poseTFToEigen(transformTf, transform);
-    rotationBaseToSensor_.setMatrix(transform.rotation().matrix());
-    translationBaseToSensorInBaseFrame_.toImplementation() = transform.translation();
-
-    return true;
-
-  } catch (tf::TransformException& ex) {
-    ROS_ERROR("%s", ex.what());
-    return false;
-  }
-}
-
-// TODO: Change to use the general time stamp.
-bool CameraInterface::transformPointCloud(PointCloudType::ConstPtr point_cloud, PointCloudType::Ptr point_cloud_transformed,
-                                          const std::string& target_frame) {
-  rclcpp::Time time_stamp;
-  time_stamp.fromNSec(1000 * pointCloud->header.stamp);
-  const std::string input_frame_id(pointCloud->header.frame_id);
-  tf2::StampedTransform transformTf;
-
-  try {
-    m_tf_listener.waitForTransform(target_frame, input_frame_id, time_stamp, ros2::Duration(1.0), ros2::Duration(0.001));
-    m_tf_listener.lookupTransform(target_frame, input_frame_id, time_stamp, transformTf);
-
-  } catch (tf2::TransformException& ex) {
-    ROS_ERROR("%s", ex.what());
-    return false;
-  }
-
-  Eigen::Affine3d transform;    
-  poseTFToEigen(transformTf, transform);
-  pcl::transformPointCloud(*point_cloud, *point_cloud_transformed, transform.cast<float>());
-  pointCloudTransformed->header.frame_id = target_frame;
-  ROS_DEBUG_THROTTLE(5, "Point cloud transformed to frame %s for time stamp %f.", target_frame.c_str(),
-                     point_cloud_transformed->header.stamp / 1000.0);
-
-  return true;
-}
-
-PointCloud::Ptr CameraInterface::points_to_pcl(const rs2::points& points) {
+PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) {
 
     PointCloud::Ptr cloud = boost::make_shared<PointCloud>();
 
@@ -207,48 +155,6 @@ PointCloud::Ptr CameraInterface::points_to_pcl(const rs2::points& points) {
     return cloud;
 }
 
-
-void CameraInterface::removePointsOutsideLimits(const PointCloud::Ptr& point_cloud) {
-
-    // TODO: Change this to lower being ground
-    if (!std::isfinite(m_ignore_points_lower_threshold) && !std::isfinite(m_ignore_points_upper_threshold)) {
-        return;
-    }
-    ROS_DEBUG("Limiting point cloud to the height interval of [%f, %f] relative to the robot base.", m_ignore_points_lower_threshold,
-            m_ignore_points_upper_threshold);
-
-    // Filter out points outside the specified range along the Z-axis
-    pcl::PassThrough<pcl::PointXYZRGBConfidenceRatio> pass_through_filter;
-    pass_through_filter.setInputCloud(point_cloud);
-    pass_through_filter.setFilterFieldName("z");
-    pass_through_filter.setFilterLimits(m_ignore_points_lower_threshold, m_ignore_points_upper_threshold);
-    pass_through_filter.filter(*point_cloud);
-
-    //ROS_DEBUG("removePointsOutsideLimits() reduced point cloud to %i points.", (int)point_cloud[0]->size());
-}
-
-bool CameraInterface::filterPointCloud(const PointCloudType::Ptr point_cloud) {
-    
-  PointCloudType temp_point_cloud;
-
-  std::vector<int> indices;
-  if (!point_cloud->is_dense) {
-    pcl::removeNaNFromPointCloud(*point_cloud, temp_point_cloud, indices);
-    temp_point_cloud.is_dense = true;
-    point_cloud->swap(temp_point_cloud);
-  }
-
-  if (m_apply_voxel_grid_filter) {
-    pcl::VoxelGrid<pcl::PointXYZRGBConfidenceRatio> voxel_grid_filter;
-    voxel_grid_filter.setInputCloud(point_cloud);
-    voxel_grid_filter.setLeafSize(m_voxel_filter_size, m_voxel_filter_size, m_voxel_filter_size);
-    voxel_grid_filter.filter(temp_point_cloud);
-    point_cloud->swap(temp_point_cloud);
-  }
-  ROS_DEBUG_THROTTLE(2, "filterPointCloud() reduced point cloud to %i points.", static_cast<int>(point_cloud->size()));
-  return true;
-}
-
 void CameraInterface::publishCloud(
     const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
 {
@@ -262,3 +168,21 @@ void CameraInterface::publishCloud(
     msg.header.stamp = n->now();
     publisher->publish(msg);
 }
+
+// void CameraInterface::shutdown() {
+
+//     m_pipeline.stop();
+
+//     m_tf_buffer.reset();
+//     m_tf_listener.reset();
+
+//     if (m_realsense_timer) {
+//         m_realsense_timer->cancel();
+//         m_realsense_timer.reset();
+//     }
+
+//     m_realsense_callback_group.reset();
+//     m_point_callback_group.reset();
+
+////     RCLCPP_INFO(m_node->get_logger(), "CameraInterface for %s camera has been shut down.", m_left_or_right.c_str());
+// }

@@ -9,9 +9,7 @@
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/property_map.h>
 
-
-// TODO: Change this?
-namespace march_vision {
+namespace plane_segmentation {
 
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Point3D = Kernel::Point_3;
@@ -62,4 +60,4 @@ class RansacSegmentation {
   EfficientRansac::Parameters m_cgal_ransac_parameters;
 };
 
-}  // namespace ransac_plane_extractor
+}  // namespace plane_segmentation

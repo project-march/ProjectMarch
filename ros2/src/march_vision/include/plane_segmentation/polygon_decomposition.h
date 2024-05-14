@@ -4,7 +4,7 @@
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_with_holes_2.h>
 
-namespace march_vision {
+namespace plane_segmentation {
 
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using CgalPoint2d = K::Point_2;
@@ -23,4 +23,4 @@ CgalPolygon2d growConvexPolygonInsideShape(const CgalPolygonWithHoles2d& parent_
 
 void updateMean(CgalPoint2d& mean, const CgalPoint2d& old_value, const CgalPoint2d& updated_value, int N);
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

@@ -1,12 +1,12 @@
 /*
- * SensorProcessorBase.cpp
+ * P.Fankhauser, M.Bloesch, and M.Hutter, 
+ * "Probabilistic Terrain Mapping for Mobile Robots with Uncertain Localization",
+ * in IEEE Robotics and Automation Letters (RA-L)
  *
- *  Created on: Jun 6, 2014
- *      Author: Péter Fankhauser, Hannes Keller
- *   Institute: ETH Zurich, ANYbotics
+ * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "elevation_mapping/sensor_processors/SensorProcessorBase.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 
 // ROS
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -28,7 +28,7 @@
 #include <limits>
 #include <vector>
 
-#include "elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
+#include "march_vision/elevation_mapping/[oint_XYZ_RGB_confidence_ratio.hpp"
 
 namespace elevation_mapping {
 
@@ -124,6 +124,7 @@ bool SensorProcessorBase::process(const PointCloudType::ConstPtr pointCloudInput
 }
 
 bool SensorProcessorBase::updateTransformations(const rclcpp::Time& timeStamp) {
+
   try {
 
     geometry_msgs::msg::TransformStamped transformGeom;
@@ -187,6 +188,7 @@ bool SensorProcessorBase::transformPointCloud(PointCloudType::ConstPtr pointClou
 }
 
 void SensorProcessorBase::removePointsOutsideLimits(PointCloudType::ConstPtr reference, std::vector<PointCloudType::Ptr>& pointClouds) {
+
   const Parameters parameters{parameters_.getData()};
   //TODO: Update condition to include ignore inside
   if (!std::isfinite(parameters.ignorePointsLowerThreshold_) && !std::isfinite(parameters.ignorePointsUpperThreshold_)) {

@@ -26,13 +26,11 @@
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include "elevation_mapping/ElevationMap.hpp"
-#include "elevation_mapping/ElevationMapping.hpp"
-#include "elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
-#include "elevation_mapping/sensor_processors/LaserSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/PerfectSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/StereoSensorProcessor.hpp"
-#include "elevation_mapping/sensor_processors/StructuredLightSensorProcessor.hpp"
+#include "march_vision/elevation_mapping/elevation_map.hpp"
+#include "march_vision/elevation_mapping/elevation_mapping.hpp"
+#include "march_vision/elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
 
 namespace elevation_mapping {
 
@@ -339,10 +337,6 @@ bool ElevationMapping::readParameters() {
   // SensorProcessorBase::GeneralParameters generalSensorProcessorConfig{nodeHandle_->get_parameter("robot_base_frame_id").as_string(), mapFrameId_};
   // if (sensorType == "structured_light") {
   //   sensorProcessor_.reset(new StructuredLightSensorProcessor(nodeHandle_, generalSensorProcessorConfig)); // ERROR
-  // } else if (sensorType == "stereo") {
-  //   sensorProcessor_.reset(new StereoSensorProcessor(nodeHandle_, generalSensorProcessorConfig));
-  // } else if (sensorType == "laser") {
-  //   sensorProcessor_.reset(new LaserSensorProcessor(nodeHandle_, generalSensorProcessorConfig));
   // } else if (sensorType == "perfect") {
   //   sensorProcessor_.reset(new PerfectSensorProcessor(nodeHandle_, generalSensorProcessorConfig));
   // } else {

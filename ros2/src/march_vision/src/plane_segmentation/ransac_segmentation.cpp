@@ -1,6 +1,6 @@
-#include "plane_segmentation/ransac_segmentation.h"
+#include "march_vision/plane_segmentation/ransac_segmentation.h"
 
-namespace march_vision {
+namespace plane_segmentation {
 
 RansacSegmentation::RansacSegmentation(const RansacSegmentationParameters& parameters) {
   setParameters(parameters);
@@ -36,4 +36,4 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> RansacSegmentation::getPlaneParamete
   return {normalVector, supportVector};
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

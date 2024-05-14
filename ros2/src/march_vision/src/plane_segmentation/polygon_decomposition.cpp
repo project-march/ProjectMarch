@@ -1,10 +1,9 @@
-#include "march_vision/polygon_decomposition.h"
+#include "march_vision/plane_segmentation/polygon_decomposition.h"
 
-// TODO: Remove this an add the functions where necessary
-#include "convex_plane_decomposition/GeometryUtils.h"
+#include "march_vision/plane_segmentation/geometry_utils.h"
 
 // TODO: Does this have to be march_vision or plane_segmentation?
-namespace march_vision {
+namespace plane_segmentation {
 
 namespace {
 
@@ -224,4 +223,4 @@ void updateMean(CgalPoint2d& mean, const CgalPoint2d& old_value, const CgalPoint
   mean += 1.0 / N * (updated_value - old_value);
 }
 
-}  // namespace march_vision
+}  // namespace plane_segmentation

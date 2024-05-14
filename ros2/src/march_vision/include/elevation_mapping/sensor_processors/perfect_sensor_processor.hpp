@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
-#include "elevation_mapping/sensor_processors/sensor_processor_base.hpp"
+#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "march_vision/elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 
 namespace elevation_mapping {
 

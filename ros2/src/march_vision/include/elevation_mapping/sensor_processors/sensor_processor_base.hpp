@@ -24,8 +24,8 @@
 #include <unordered_map>
 
 // PCL
-#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
-#include "elevation_mapping/thread_safe_data_wrapper.hpp"
+#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "march_vision/elevation_mapping/thread_safe_data_wrapper.hpp"
 
 namespace elevation_mapping {
 
