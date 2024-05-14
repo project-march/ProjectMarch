@@ -5,8 +5,8 @@
 
 #include "march_state_estimator/sensor_fusion.hpp"
 
-SensorFusion::SensorFusion() {
-    m_timestep = 0.05; // 20 Hz
+SensorFusion::SensorFusion(double timestep) {
+    m_timestep = timestep;
 
     // Configure the initial state
     m_state.imu_position = Eigen::Vector3d(0.0, 0.0, 1.0295092403533455);
@@ -18,7 +18,7 @@ SensorFusion::SensorFusion() {
     m_state.gyroscope_bias = Eigen::Vector3d::Zero();
     m_state.left_foot_slippage = Eigen::Quaterniond::Identity();
     m_state.right_foot_slippage = Eigen::Quaterniond::Identity();
-    m_state.covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-3;
+    m_state.covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
 
     // Configure the initial observation
     m_observation.imu_acceleration = Eigen::Vector3d::Zero();
@@ -33,8 +33,8 @@ SensorFusion::SensorFusion() {
     m_observation_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_process_noise_covariance_matrix = Eigen::MatrixXd::Zero(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
-    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-4;
+    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e-4;
 }
 
 void SensorFusion::predictState() {
@@ -43,7 +43,7 @@ void SensorFusion::predictState() {
     #endif
     // Compute the expected linear velocity
     Eigen::Vector3d expected_linear_velocity;
-    expected_linear_velocity.noalias() = m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration());
+    expected_linear_velocity.noalias() = m_timestep * (m_state.imu_orientation.toRotationMatrix().transpose() * computeMeasuredLinearAcceleration() + GRAVITY_VECTOR);
     
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
@@ -53,7 +53,7 @@ void SensorFusion::predictState() {
     // Update the covariance matrix with prior knowledge
     computeDynamicsMatrix();
     // computeProcessNoiseCovarianceMatrix();
-    m_state.covariance_matrix = computePriorCovarianceMatrix() + Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-3;
+    m_state.covariance_matrix = computePriorCovarianceMatrix() + m_process_noise_covariance_matrix;
 
     #ifdef DEBUG
     Eigen::VectorXd prior_state(STATE_DIMENSION_SIZE);
@@ -67,6 +67,7 @@ void SensorFusion::predictState() {
     prior_state.segment<3>(STATE_INDEX_LEFT_SLIPPAGE) = computeEulerAngles(m_state.left_foot_slippage);
     prior_state.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE) = computeEulerAngles(m_state.right_foot_slippage);
     std::cout << "Prior state: " << prior_state.transpose() << std::endl;
+    std::cout << "Prior covariance matrix:\n" << m_state.covariance_matrix << std::endl;
     #endif
 }
 
@@ -91,8 +92,8 @@ void SensorFusion::updateState() {
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
     m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
     m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
-    // m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
-    // m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
+    m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
+    m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
     m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
     // m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
@@ -116,6 +117,7 @@ void SensorFusion::updateState() {
     posterior_state.segment<3>(STATE_INDEX_LEFT_SLIPPAGE) = computeEulerAngles(m_state.left_foot_slippage);
     posterior_state.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE) = computeEulerAngles(m_state.right_foot_slippage);
     std::cout << "Posterior state: " << posterior_state.transpose() << std::endl;
+    std::cout << "Posterior covariance matrix:\n" << m_state.covariance_matrix << std::endl;
     #endif
 }
 
@@ -129,7 +131,7 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
     innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_POSITION)
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
-    // // Compute the innovation for the left and right foot slippage
+    // Compute the innovation for the left and right foot slippage
     // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE)
     //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.inverse());
     // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE)
@@ -149,6 +151,9 @@ const Eigen::MatrixXd SensorFusion::computeNoiseJacobianMatrix() const {
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
+    #ifdef DEBUG
+    std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
+    #endif
     return noise_jacobian_matrix;
 }
 

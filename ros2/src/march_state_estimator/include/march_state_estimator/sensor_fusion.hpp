@@ -74,7 +74,7 @@ class SensorFusionTest;
 
 class SensorFusion {
 public:
-    SensorFusion();
+    SensorFusion(double timestep);
     ~SensorFusion() = default;
 
     inline void estimateState() {
@@ -92,27 +92,31 @@ private:
     inline const Eigen::Vector3d computeMeasuredLinearAcceleration() const {
         return m_observation.imu_acceleration - m_state.accelerometer_bias;
     }
+
     inline const Eigen::Vector3d computeMeasuredAngularVelocity() const {
         return m_observation.imu_angular_velocity - m_state.gyroscope_bias;
     }
+
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
         Eigen::MatrixXd prior_covariance_matrix;
         prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose();
         return prior_covariance_matrix;
     }
+
     inline void computeInnovationCovarianceMatrix() {
-        m_innovation_covariance_matrix.noalias() = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose()
-            + Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e-3;
+        m_innovation_covariance_matrix.noalias() = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose() + m_observation_noise_covariance_matrix;
         #ifdef DEBUG
         std::cout << "Innovation covariance matrix:\n" << m_innovation_covariance_matrix << std::endl;
         #endif
     }
+
     inline void computeKalmanGain() {
         m_kalman_gain.noalias() = m_state.covariance_matrix * m_observation_matrix.transpose() * m_innovation_covariance_matrix.completeOrthogonalDecomposition().pseudoInverse();
         #ifdef DEBUG
         std::cout << "Kalman gain matrix:\n" << m_kalman_gain << std::endl;
         #endif
     }
+
     inline void computeProcessNoiseCovarianceMatrix() {
         Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
         m_process_noise_covariance_matrix.noalias() 
@@ -122,13 +126,16 @@ private:
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
         #endif
     }
+
     const Eigen::VectorXd computeInnovation() const;
     const Eigen::MatrixXd computeNoiseJacobianMatrix() const;
     void computeDynamicsMatrix();
     void computeObservationMatrix();
 
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
-        return orientation.toRotationMatrix().eulerAngles(ROTATION_ROLL, ROTATION_PITCH, ROTATION_YAW);
+        Eigen::Quaterniond q = orientation;
+        q.normalize();
+        return q.toRotationMatrix().eulerAngles(ROTATION_ROLL, ROTATION_PITCH, ROTATION_YAW);
     }
     const Eigen::Quaterniond computeExponentialMap(const Eigen::Vector3d& vector) const;
     const Eigen::Matrix3d computeSkewSymmetricMatrix(const Eigen::Vector3d& vector) const;

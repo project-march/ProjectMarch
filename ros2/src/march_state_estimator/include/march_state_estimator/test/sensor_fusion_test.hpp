@@ -17,7 +17,7 @@ public:
 
 protected:
     void SetUp() override {
-        m_sensor_fusion = std::make_unique<SensorFusion>();
+        m_sensor_fusion = std::make_unique<SensorFusion>(m_timestep);
     }
 
     void TearDown() override {
@@ -41,6 +41,8 @@ protected:
 
 private:
     std::unique_ptr<SensorFusion> m_sensor_fusion;
+
+    double m_timestep = 0.05;
 };
 
 #endif  // MARCH_STATE_ESTIMATOR__SENSOR_FUSION_TEST_HPP_

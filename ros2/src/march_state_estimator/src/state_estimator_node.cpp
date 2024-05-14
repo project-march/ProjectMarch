@@ -133,16 +133,24 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     m_state_estimator->configureJointNames(joint_names);
     m_state_estimator->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
     m_dt = static_cast<double>(dt) / 1000.0;
+    RCLCPP_INFO(this->get_logger(), "Timestep: %f", m_dt);
 
-    m_sensor_fusion = std::make_unique<SensorFusion>();
+    m_sensor_fusion = std::make_unique<SensorFusion>(m_dt);
 
     // Initialize timer
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
     m_startup_time = this->now();
-    m_startup_timeout = 3.0;
+    m_startup_timeout = 5.0;
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
+
+    // Avoid spikes in linear acceleration
+    while ((this->now() - m_startup_time) < rclcpp::Duration::from_seconds(m_startup_timeout)) {
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for proper initialization...");
+        broadcastTransformToTf2();
+    }
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is ready");
 }
 
 StateEstimatorNode::~StateEstimatorNode()
@@ -152,15 +160,6 @@ StateEstimatorNode::~StateEstimatorNode()
 
 void StateEstimatorNode::timerCallback()
 {
-    // Broadcast transform from base_link to world frame to tf2
-    broadcastTransformToTf2();
-
-    // Avoid spikes in linear acceleration
-    if ((this->now() - m_startup_time) < rclcpp::Duration::from_seconds(m_startup_timeout)) {
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for proper initialization...");
-        return;
-    }
-
     // Check if joint state is initialized properly
     if (m_joint_state == nullptr) {
         return;
@@ -187,9 +186,9 @@ void StateEstimatorNode::timerCallback()
         
         EKFObservation ekf_observation;
         ekf_observation.imu_acceleration
-            = Eigen::Vector3d(0.0, 0.0, 0.0);
+            = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
         ekf_observation.imu_angular_velocity
-            = Eigen::Vector3d(0.0, 0.0, 0.0);
+            = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
         std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
         ekf_observation.left_foot_position
             = Eigen::Vector3d(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[LEFT_FOOT_ID].position.y, body_foot_poses[LEFT_FOOT_ID].position.z);
@@ -206,6 +205,7 @@ void StateEstimatorNode::timerCallback()
         #endif
         m_sensor_fusion->estimateState();
     }
+    broadcastTransformToTf2();
 
     // publishFeetHeight();
     // publishMPCEstimation();
