@@ -27,6 +27,7 @@
   <depend>orocos_kdl</depend>
   <depend>trajectory_msgs</depend>
   <depend>filters</depend>
+  <depend>pinocchio</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

@@ -8,12 +8,17 @@
 
 #define DEBUG
 
+#include <string>
 #include <vector>
 #include <iostream>
 
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"
 #include "eigen3/Eigen/Dense"
+
+#include "pinocchio/algorithm/kinematics.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
+#include "pinocchio/algorithm/jacobian.hpp"
 
 #define STATE_DIMENSION_SIZE            27
 #define STATE_INDEX_POSITION            0
@@ -32,10 +37,6 @@
 #define MEASUREMENT_INDEX_LEFT_SLIPPAGE    6
 #define MEASUREMENT_INDEX_RIGHT_SLIPPAGE   9
 
-#define ROTATION_ROLL  0
-#define ROTATION_PITCH 1
-#define ROTATION_YAW   2
-
 #define QUATERNION_W 0
 #define QUATERNION_X 1
 #define QUATERNION_Y 2
@@ -44,6 +45,18 @@
 #define X_AXIS 0
 #define Y_AXIS 1
 #define Z_AXIS 2
+#define ROTATION_ROLL  0
+#define ROTATION_PITCH 1
+#define ROTATION_YAW   2
+#define CARTESIAN_DIMENSION_SIZE 3
+#define SE3_DIMENSION_SIZE 6
+
+#define LEFT_LEG_INDEX 0
+#define RIGHT_LEG_INDEX 1
+#define NUM_OF_LEGS 2
+
+#define JACOBIAN_POSITION_INDEX 0
+#define JACOBIAN_ORIENTATION_INDEX 3
 
 const Eigen::Vector3d GRAVITY_VECTOR = Eigen::Vector3d(0.0, 0.0, -9.81); // m/s^2
 
@@ -61,6 +74,7 @@ struct EKFState {
 };
 
 struct EKFObservation {
+    Eigen::VectorXd joint_position;
     Eigen::Vector3d imu_acceleration = Eigen::Vector3d::Zero();
     Eigen::Vector3d imu_angular_velocity = Eigen::Vector3d::Zero();
     Eigen::Vector3d left_foot_position = Eigen::Vector3d::Zero();
@@ -84,6 +98,13 @@ public:
     inline const EKFState& getState() const { return m_state; }
     inline void setObservation(const EKFObservation& observation) { m_observation = observation; }
     inline void setTimestep(const double& timestep) { m_timestep = timestep; }
+    inline void setJointPosition(const std::vector<std::string>& joint_names, const std::vector<double>& joint_positions) {
+        // Sort joint positions by joint names order in robot model
+        m_joint_position = Eigen::VectorXd::Zero(m_robot_model.nv);
+        for (unsigned int i = 0; i < joint_names.size(); i++) {
+            m_joint_position[m_robot_model.getJointId(joint_names[i])] = joint_positions[i];
+        }
+    }
 
 private:
     void predictState();
@@ -132,8 +153,8 @@ private:
     inline void computeProcessNoiseCovarianceMatrix() {
         Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
         m_process_noise_covariance_matrix.noalias() 
-            = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
-                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
+            = m_timestep * m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
+                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose();
         #ifdef DEBUG
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
         #endif
@@ -143,6 +164,7 @@ private:
     const Eigen::MatrixXd computeNoiseJacobianMatrix() const;
     void computeDynamicsMatrix();
     void computeObservationMatrix();
+    void computeObservationNoiseCovarianceMatrix();
 
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
         Eigen::Quaterniond q = orientation;
@@ -162,6 +184,15 @@ private:
     Eigen::MatrixXd m_kalman_gain;
     Eigen::MatrixXd m_process_noise_covariance_matrix;
     Eigen::MatrixXd m_observation_noise_covariance_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_position_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_slippage_matrix;
+    Eigen::MatrixXd m_observation_noise_covariance_joint_matrix;
+
+    pinocchio::Model m_robot_model;
+    std::unique_ptr<pinocchio::Data> m_robot_data;
+
+    Eigen::VectorXd m_joint_position;
+    int m_joint_idx[NUM_OF_LEGS];
 
     friend class SensorFusionTest;
 };

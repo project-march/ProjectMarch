@@ -5,8 +5,25 @@
 
 #include "march_state_estimator/sensor_fusion.hpp"
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
+#include "pinocchio/parsers/urdf.hpp"
+
+#include <cmath>
+
 SensorFusion::SensorFusion(double timestep) {
     m_timestep = timestep;
+
+    // Configure robot parameters
+    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
+    pinocchio::urdf::buildModel(urdf_file_path, m_robot_model);
+    m_robot_data = std::make_unique<pinocchio::Data>(m_robot_model);
+    m_joint_position = Eigen::VectorXd::Zero(m_robot_model.nv);
+
+    // Set joint index according to the URDF assuming there are 2 legs
+    int num_joints_per_leg = m_robot_model.nv >> 1;
+    for (int i = 0; i < NUM_OF_LEGS; i++) {
+        m_joint_idx[i] = num_joints_per_leg * (i + 1);
+    }
 
     // Configure the initial state
     m_state.imu_position = Eigen::Vector3d(0.0, 0.0, 1.0295092403533455);
@@ -21,6 +38,7 @@ SensorFusion::SensorFusion(double timestep) {
     m_state.covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
 
     // Configure the initial observation
+    m_observation.joint_position = Eigen::VectorXd::Zero(m_robot_model.nv);
     m_observation.imu_acceleration = Eigen::Vector3d::Zero();
     m_observation.imu_angular_velocity = Eigen::Vector3d::Zero();
     m_observation.left_foot_position = Eigen::Vector3d::Zero();
@@ -35,6 +53,9 @@ SensorFusion::SensorFusion(double timestep) {
     m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-2;
     m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e2;
+    m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e2;
+    m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e-1;
+    m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e-1;
 }
 
 void SensorFusion::predictState() {
@@ -77,6 +98,7 @@ void SensorFusion::updateState() {
 
     const Eigen::VectorXd innovation = computeInnovation();
     computeObservationMatrix();
+    computeObservationNoiseCovarianceMatrix();
     computeInnovationCovarianceMatrix();
     computeKalmanGain();
 
@@ -201,6 +223,35 @@ void SensorFusion::computeObservationMatrix() {
 
     #ifdef DEBUG
     std::cout << "Observation matrix:\n" << m_observation_matrix << std::endl;
+    #endif
+}
+
+void SensorFusion::computeObservationNoiseCovarianceMatrix() {
+    // Compute the Jacobians per leg
+    Eigen::MatrixXd jacobians[NUM_OF_LEGS];
+    for (int i = 0; i < NUM_OF_LEGS; i++) {
+        // Fixed-size template cannot be used with aliases
+        jacobians[i] = Eigen::MatrixXd::Zero(SE3_DIMENSION_SIZE, m_robot_model.nv);
+        pinocchio::computeJointJacobian(m_robot_model, *m_robot_data, m_joint_position, m_joint_idx[i], jacobians[i]);
+        #ifdef DEBUG
+        std::cout << "Jacobian " << i << ":\n" << jacobians[i] << std::endl;
+        #endif
+    }
+    m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, MEASUREMENT_INDEX_LEFT_POSITION).noalias()
+        = m_observation_noise_covariance_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+            * m_observation_noise_covariance_joint_matrix * jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
+    m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, MEASUREMENT_INDEX_RIGHT_POSITION).noalias()
+        = m_observation_noise_covariance_position_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+            * m_observation_noise_covariance_joint_matrix * jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
+    m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
+        = m_observation_noise_covariance_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+            * m_observation_noise_covariance_joint_matrix * jacobians[LEFT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
+    m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
+        = m_observation_noise_covariance_position_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+            * m_observation_noise_covariance_joint_matrix * jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
+    m_observation_noise_covariance_matrix.noalias() = m_observation_noise_covariance_matrix * (1.0 / m_timestep);
+    #ifdef DEBUG
+    std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
     #endif
 }
 

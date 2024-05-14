@@ -183,7 +183,11 @@ void StateEstimatorNode::timerCallback()
         #ifdef DEBUG
         RCLCPP_INFO(this->get_logger(), "Updating measurement data...");
         #endif
+
+        // Update joint position
+        m_sensor_fusion->setJointPosition(m_joint_state->name, m_joint_state->position);
         
+        // Update observation
         EKFObservation ekf_observation;
         ekf_observation.imu_acceleration
             = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);

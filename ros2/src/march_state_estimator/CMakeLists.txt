@@ -41,6 +41,7 @@ find_package(orocos_kdl REQUIRED)
 find_package(urdf REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(filters REQUIRED)
+find_package(pinocchio REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -116,6 +117,7 @@ ament_target_dependencies(state_estimator_node
   tf2_ros
   kdl_parser
   orocos_kdl
+  pinocchio
 )
 
 target_link_libraries(state_estimator_node
@@ -262,7 +264,7 @@ if(BUILD_TESTING)
     march_shared_msgs
     urdf
     Eigen3
-
+    pinocchio
   )
 
   target_link_libraries(test_runner
