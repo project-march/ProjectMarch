@@ -6,7 +6,7 @@
 #ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 #define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 
-#define DEBUG
+// #define DEBUG
 
 #include <string>
 #include <vector>
@@ -153,8 +153,8 @@ private:
     inline void computeProcessNoiseCovarianceMatrix() {
         Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
         m_process_noise_covariance_matrix.noalias() 
-            = m_timestep * m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
-                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose();
+            = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
+                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
         #ifdef DEBUG
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
         #endif

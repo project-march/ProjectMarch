@@ -52,10 +52,10 @@ SensorFusion::SensorFusion(double timestep) {
     m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-2;
-    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e2;
-    m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e2;
-    m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e-1;
-    m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e-1;
+    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e3;
+    m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
+    m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
 }
 
 void SensorFusion::predictState() {
@@ -69,11 +69,11 @@ void SensorFusion::predictState() {
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
     m_state.imu_velocity += expected_linear_velocity;
-    // m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
+    m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
 
     // Update the covariance matrix with prior knowledge
     computeDynamicsMatrix();
-    // computeProcessNoiseCovarianceMatrix();
+    computeProcessNoiseCovarianceMatrix();
     m_state.covariance_matrix = computePriorCovarianceMatrix() + m_process_noise_covariance_matrix;
 
     #ifdef DEBUG
@@ -112,7 +112,7 @@ void SensorFusion::updateState() {
     // Update the state with the correction vector
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
     m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
-    // m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
+    m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
     m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
     m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
@@ -165,7 +165,7 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
 }
 
 const Eigen::MatrixXd SensorFusion::computeNoiseJacobianMatrix() const {
-    Eigen::MatrixXd noise_jacobian_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    Eigen::MatrixXd noise_jacobian_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::Matrix3d orientation_matrix = m_state.imu_orientation.toRotationMatrix().transpose();
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_POSITION) = -orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;

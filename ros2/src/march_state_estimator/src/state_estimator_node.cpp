@@ -3,7 +3,7 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#define DEBUG
+// #define DEBUG
 
 #include "march_state_estimator/state_estimator_node.hpp"
 
