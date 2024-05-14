@@ -26,6 +26,12 @@ def generate_launch_description():
     )
     force_stance_threshold = 65.0
 
+    state_estimator_config = os.path.join(
+        get_package_share_directory('march_state_estimator'),
+        'config',
+        'state_estimator_config.yaml'
+    )
+
     return LaunchDescription([
         Node(
             package='march_state_estimator',
@@ -39,6 +45,7 @@ def generate_launch_description():
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
                 {"simulation": simulation},
+                state_estimator_config,
             ],
         ),
         Node(

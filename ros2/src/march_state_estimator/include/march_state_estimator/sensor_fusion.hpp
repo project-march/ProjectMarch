@@ -95,15 +95,77 @@ public:
         predictState();
         updateState();
     }
+
     inline const EKFState& getState() const { return m_state; }
+
     inline void setObservation(const EKFObservation& observation) { m_observation = observation; }
+
     inline void setTimestep(const double& timestep) { m_timestep = timestep; }
+
     inline void setJointPosition(const std::vector<std::string>& joint_names, const std::vector<double>& joint_positions) {
         // Sort joint positions by joint names order in robot model
         m_joint_position = Eigen::VectorXd::Zero(m_robot_model.nv);
         for (unsigned int i = 0; i < joint_names.size(); i++) {
             m_joint_position[m_robot_model.getJointId(joint_names[i])] = joint_positions[i];
         }
+    }
+
+    inline void setProcessNoiseCovarianceMatrix(
+        const std::vector<double>& linear_acceleration_covariance, const std::vector<double>& angular_velocity_covariance,
+        const std::vector<double>& foot_position_covariance, const std::vector<double>& accelerometer_bias_covariance,
+        const std::vector<double>& gyroscope_bias_covariance, const std::vector<double>& foot_slippage_covariance) 
+    {
+        #ifdef DEBUG
+        std::cout << "Linear acceleration covariance: " << Eigen::Map<const Eigen::VectorXd>(linear_acceleration_covariance.data(), linear_acceleration_covariance.size()).transpose() << std::endl;
+        std::cout << "Angular velocity covariance: " << Eigen::Map<const Eigen::VectorXd>(angular_velocity_covariance.data(), angular_velocity_covariance.size()).transpose() << std::endl;
+        std::cout << "Foot position covariance: " << Eigen::Map<const Eigen::VectorXd>(foot_position_covariance.data(), foot_position_covariance.size()).transpose() << std::endl;
+        std::cout << "Accelerometer bias covariance: " << Eigen::Map<const Eigen::VectorXd>(accelerometer_bias_covariance.data(), accelerometer_bias_covariance.size()).transpose() << std::endl;
+        std::cout << "Gyroscope bias covariance: " << Eigen::Map<const Eigen::VectorXd>(gyroscope_bias_covariance.data(), gyroscope_bias_covariance.size()).transpose() << std::endl;
+        std::cout << "Foot slippage covariance: " << Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).transpose() << std::endl;
+        #endif
+
+        m_process_noise_covariance_matrix = Eigen::MatrixXd::Zero(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY)
+            = m_timestep *Eigen::Map<const Eigen::VectorXd>(linear_acceleration_covariance.data(), linear_acceleration_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_POSITION)
+            = 0.5 * m_timestep * m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY);
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_ORIENTATION, STATE_INDEX_ORIENTATION)
+            = m_timestep * Eigen::Map<const Eigen::VectorXd>(angular_velocity_covariance.data(), angular_velocity_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION)
+            = Eigen::Map<const Eigen::VectorXd>(foot_position_covariance.data(), foot_position_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION)
+            = Eigen::Map<const Eigen::VectorXd>(foot_position_covariance.data(), foot_position_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_ACCELEROMETER_BIAS, STATE_INDEX_ACCELEROMETER_BIAS)
+            = Eigen::Map<const Eigen::VectorXd>(accelerometer_bias_covariance.data(), accelerometer_bias_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_GYROSCOPE_BIAS, STATE_INDEX_GYROSCOPE_BIAS)
+            = Eigen::Map<const Eigen::VectorXd>(gyroscope_bias_covariance.data(), gyroscope_bias_covariance.size()).asDiagonal();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
+            = Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).asDiagonal(); 
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
+            = Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).asDiagonal();
+
+        #ifdef DEBUG
+        std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
+        #endif
+    }
+
+    inline void setObservationNoiseCovarianceMatrix(const std::vector<double>& position_covariance,
+        const std::vector<double>& slippage_covariance, const std::vector<double>& joint_covariance)
+    {
+        #ifdef DEBUG
+        std::cout << "Position covariance: " << Eigen::Map<const Eigen::VectorXd>(position_covariance.data(), position_covariance.size()).transpose() << std::endl;
+        std::cout << "Slippage covariance: " << Eigen::Map<const Eigen::VectorXd>(slippage_covariance.data(), slippage_covariance.size()).transpose() << std::endl;
+        std::cout << "Joint covariance: " << Eigen::Map<const Eigen::VectorXd>(joint_covariance.data(), joint_covariance.size()).transpose() << std::endl;
+        #endif
+
+        m_observation_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+        m_observation_noise_covariance_position_matrix = Eigen::Map<const Eigen::VectorXd>(position_covariance.data(), position_covariance.size()).asDiagonal();
+        m_observation_noise_covariance_slippage_matrix = Eigen::Map<const Eigen::VectorXd>(slippage_covariance.data(), slippage_covariance.size()).asDiagonal();
+        m_observation_noise_covariance_joint_matrix = Eigen::Map<const Eigen::VectorXd>(joint_covariance.data(), joint_covariance.size()).asDiagonal();
+
+        #ifdef DEBUG
+        std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
+        #endif
     }
 
 private:

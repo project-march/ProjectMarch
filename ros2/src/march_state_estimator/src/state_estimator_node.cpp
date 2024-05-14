@@ -127,15 +127,47 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
 
     m_mpc_com_pos_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("state_estimation/com_position", 10);
     
-    // Initialize sensor fusion
+    // Calculate timestep in seconds
+    m_dt = static_cast<double>(dt) / 1000.0;
+
+    // Initialize state estimator
     m_node_feet_names = { "L_sole", "R_sole" };
     m_state_estimator = std::make_unique<StateEstimator>(m_robot_description, urdf_file_path);
     m_state_estimator->configureJointNames(joint_names);
     m_state_estimator->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
-    m_dt = static_cast<double>(dt) / 1000.0;
     RCLCPP_INFO(this->get_logger(), "Timestep: %f", m_dt);
 
+    // Initialize and configure noise parameters in sensor fusion
+    #ifdef DEBUG
+    RCLCPP_INFO(this->get_logger(), "Initializing sensor fusion...");
+    #endif
     m_sensor_fusion = std::make_unique<SensorFusion>(m_dt);
+
+    declare_parameter("noise_parameters.process_noise.linear_acceleration", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.angular_velocity", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.foot_position", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.accelerometer_bias", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.gyroscope_bias", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.foot_slippage", std::vector<double>());
+    m_sensor_fusion->setProcessNoiseCovarianceMatrix(
+        get_parameter("noise_parameters.process_noise.linear_acceleration").as_double_array(),
+        get_parameter("noise_parameters.process_noise.angular_velocity").as_double_array(),
+        get_parameter("noise_parameters.process_noise.foot_position").as_double_array(),
+        get_parameter("noise_parameters.process_noise.accelerometer_bias").as_double_array(),
+        get_parameter("noise_parameters.process_noise.gyroscope_bias").as_double_array(),
+        get_parameter("noise_parameters.process_noise.foot_slippage").as_double_array());
+
+    declare_parameter("noise_parameters.observation_noise.foot_position", std::vector<double>());
+    declare_parameter("noise_parameters.observation_noise.foot_slippage", std::vector<double>());
+    declare_parameter("noise_parameters.observation_noise.joint_position", std::vector<double>());
+    m_sensor_fusion->setObservationNoiseCovarianceMatrix(
+        get_parameter("noise_parameters.observation_noise.foot_position").as_double_array(),
+        get_parameter("noise_parameters.observation_noise.foot_slippage").as_double_array(),
+        get_parameter("noise_parameters.observation_noise.joint_position").as_double_array());
+
+    #ifdef DEBUG
+    RCLCPP_INFO(this->get_logger(), "Sensor fusion initialized");
+    #endif
 
     // Initialize timer
     m_timer = this->create_wall_timer(

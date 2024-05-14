@@ -1,7 +1,48 @@
-state_estimator_node:
+state_estimator:
   ros__parameters:
-    dt: 50    # The time between two state estimation steps in milliseconds.
-
-transform_broadcaster:
-  ros__parameters:
-    refresh_rate: 1000  # Hz
+    noise_parameters:
+      process_noise:
+        linear_acceleration:
+        - 1e-2  # x
+        - 1e-2  # y
+        - 1e-2  # z
+        angular_velocity:
+        - 1e-2  # roll
+        - 1e-2  # pitch
+        - 1e-2  # yaw
+        foot_position:
+        - 1e-2  # x
+        - 1e-2  # y
+        - 1e-2  # z
+        accelerometer_bias:
+        - 1e-2  # x
+        - 1e-2  # y
+        - 1e-2  # z
+        gyroscope_bias:
+        - 1e-2  # roll
+        - 1e-2  # pitch
+        - 1e-2  # yaw
+        foot_slippage:
+        - 1e-2  # roll
+        - 1e-2  # pitch
+        - 1e-2  # yaw
+      observation_noise:
+        foot_position:
+        - 1e3  # x
+        - 1e3  # y
+        - 1e3  # z
+        foot_slippage:
+        - 1e3  # roll
+        - 1e3  # pitch
+        - 1e3  # yaw
+        joint_position:
+        - 1e3  # left_hip_aa
+        - 1e3  # left_hip_fe
+        - 1e3  # left_knee
+        - 1e3  # left_ankle_dpf
+        - 1e3  # left_ankle_ie
+        - 1e3  # right_hip_aa
+        - 1e3  # right_hip_fe
+        - 1e3  # right_knee
+        - 1e3  # right_ankle_dpf
+        - 1e3  # right_ankle_ie
