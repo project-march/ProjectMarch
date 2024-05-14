@@ -100,7 +100,19 @@ private:
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
         Eigen::MatrixXd prior_covariance_matrix;
         prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose();
+        #ifdef DEBUG
+        std::cout << "Prior covariance matrix:\n" << prior_covariance_matrix << std::endl;
+        #endif
         return prior_covariance_matrix;
+    }
+
+    inline const Eigen::MatrixXd computePosteriorCovarianceMatrix() const {
+        Eigen::MatrixXd posterior_covariance_matrix;
+        posterior_covariance_matrix.noalias() = (Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) - m_kalman_gain * m_observation_matrix) * m_state.covariance_matrix;
+        #ifdef DEBUG
+        std::cout << "Posterior covariance matrix:\n" << posterior_covariance_matrix << std::endl;
+        #endif
+        return posterior_covariance_matrix;
     }
 
     inline void computeInnovationCovarianceMatrix() {
@@ -135,7 +147,7 @@ private:
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
         Eigen::Quaterniond q = orientation;
         q.normalize();
-        return q.toRotationMatrix().eulerAngles(ROTATION_ROLL, ROTATION_PITCH, ROTATION_YAW);
+        return q.toRotationMatrix().eulerAngles(ROTATION_YAW, ROTATION_PITCH, ROTATION_ROLL);
     }
     const Eigen::Quaterniond computeExponentialMap(const Eigen::Vector3d& vector) const;
     const Eigen::Matrix3d computeSkewSymmetricMatrix(const Eigen::Vector3d& vector) const;

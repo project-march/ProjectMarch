@@ -33,8 +33,8 @@ SensorFusion::SensorFusion(double timestep) {
     m_observation_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-4;
-    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e-4;
+    m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e-2;
+    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE) * 1e2;
 }
 
 void SensorFusion::predictState() {
@@ -48,7 +48,7 @@ void SensorFusion::predictState() {
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
     m_state.imu_velocity += expected_linear_velocity;
-    m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
+    // m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
 
     // Update the covariance matrix with prior knowledge
     computeDynamicsMatrix();
@@ -67,7 +67,6 @@ void SensorFusion::predictState() {
     prior_state.segment<3>(STATE_INDEX_LEFT_SLIPPAGE) = computeEulerAngles(m_state.left_foot_slippage);
     prior_state.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE) = computeEulerAngles(m_state.right_foot_slippage);
     std::cout << "Prior state: " << prior_state.transpose() << std::endl;
-    std::cout << "Prior covariance matrix:\n" << m_state.covariance_matrix << std::endl;
     #endif
 }
 
@@ -91,13 +90,13 @@ void SensorFusion::updateState() {
     // Update the state with the correction vector
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
     m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
-    m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
+    // m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
     m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
     m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
     m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
-    // m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
-    // m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
+    m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
+    m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
     m_state.covariance_matrix.noalias() -= m_kalman_gain * m_observation_matrix * m_state.covariance_matrix;
 
     // Normalize the orientations
@@ -117,7 +116,6 @@ void SensorFusion::updateState() {
     posterior_state.segment<3>(STATE_INDEX_LEFT_SLIPPAGE) = computeEulerAngles(m_state.left_foot_slippage);
     posterior_state.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE) = computeEulerAngles(m_state.right_foot_slippage);
     std::cout << "Posterior state: " << posterior_state.transpose() << std::endl;
-    std::cout << "Posterior covariance matrix:\n" << m_state.covariance_matrix << std::endl;
     #endif
 }
 
@@ -132,10 +130,10 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
     // Compute the innovation for the left and right foot slippage
-    // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE)
-    //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.inverse());
-    // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE)
-    //     = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.inverse());
+    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE)
+        = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
+    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE)
+        = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
 
     #ifdef DEBUG
     std::cout << "Innovation: " << innovation.transpose() << std::endl;
@@ -197,9 +195,9 @@ void SensorFusion::computeObservationMatrix() {
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_ORIENTATION)
         = Eigen::Matrix3d::Identity();
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
-        = -1.0 * (m_state.imu_orientation * m_state.left_foot_slippage.inverse()).toRotationMatrix();
+        = -1.0 * (m_state.imu_orientation * m_state.left_foot_slippage.conjugate()).toRotationMatrix();
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
-        = -1.0 * (m_state.imu_orientation * m_state.right_foot_slippage.inverse()).toRotationMatrix();
+        = -1.0 * (m_state.imu_orientation * m_state.right_foot_slippage.conjugate()).toRotationMatrix();
 
     #ifdef DEBUG
     std::cout << "Observation matrix:\n" << m_observation_matrix << std::endl;
