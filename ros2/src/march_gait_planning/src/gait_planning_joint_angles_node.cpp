@@ -30,7 +30,8 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
    m_current_trajectory(),
    m_incremental_steps_to_home_stand(),
    m_first_stand(true),
-   m_initial_point()
+   m_initial_point(), 
+   m_single_execution_done(false)
 {
     m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1)); 
     
@@ -59,8 +60,13 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
         RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!");
     }
 
+    if ((exoMode)msg->mode == exoMode::Sit){
+        m_single_execution_done = false; 
+    }
+
     if ((exoMode)msg->mode == exoMode::Stand && m_gait_planning.getPrevGaitType() == exoMode::Sit){
-        m_gait_planning.setCounter(0); 
+        // m_gait_planning.setCounter(0); 
+        m_single_execution_done = false; 
     }
 
 
@@ -158,7 +164,7 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
     if (count < m_current_trajectory.size()-1){ 
         processMovingGaits(count); 
         m_gait_planning.setCounter(count+1); 
-        RCLCPP_DEBUG(this->get_logger(), "Finishing gait, with count: %d", count);
+        RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_joints_msg.data = remapKinematicChaintoAlphabetical(m_gait_planning.getHomeStand()); 
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
@@ -218,19 +224,29 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
 
                     case exoMode::Sit :
 
-                        m_current_trajectory = m_gait_planning.getSitToStandGait(); 
-                        processMovingGaits(count);
-                        m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
-                        if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
-                            m_gait_planning.setPrevGaitType(exoMode::Stand); 
-                        } 
+                        // if counter= size trajectory refill with sit to stand, otherwise finish gait and reset to 0 afterwards 
+                        if (count < m_current_trajectory.size()-1 && !m_single_execution_done){
+                            processMovingGaits(count);
+                            m_gait_planning.setCounter(count+1); 
+                        } else if (count >= m_current_trajectory.size()-1 && !m_single_execution_done){
+                            m_gait_planning.setCounter(0); 
+                            m_single_execution_done = true; 
+                            m_current_trajectory = m_gait_planning.getSitToStandGait(); 
+                        } else {
+                            processMovingGaits(count);
+                            RCLCPP_INFO(this->get_logger(), "count: %d", count); 
+                            m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
+                            if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
+                                m_gait_planning.setPrevGaitType(exoMode::Stand); 
+                            }
+                        }
                         break; 
 
                     case exoMode::Hinge :
                         
                         m_current_trajectory = m_gait_planning.getHingeGait(); 
                         processMovingGaits(count); 
-                        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Count: %d", count);
+                        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Count: %d", count);
                         m_gait_planning.setCounter((count <= 0) ? 0 : (count - 1));
                         if (m_gait_planning.getCounter() <= 0){
                             m_current_trajectory.clear();

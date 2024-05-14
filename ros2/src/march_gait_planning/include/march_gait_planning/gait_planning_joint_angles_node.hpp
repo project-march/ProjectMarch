@@ -62,5 +62,6 @@ private:
     bool m_first_stand;
     std::vector<double> m_initial_point;
     uint8_t m_stance_leg; 
+    bool m_single_execution_done; 
 
 };
