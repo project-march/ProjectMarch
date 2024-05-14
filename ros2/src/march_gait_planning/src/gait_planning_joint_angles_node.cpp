@@ -74,7 +74,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         std::vector<double> point = msg->joint_state.position; 
         if (point.size() >= 8) {
             // TODO: overhaul remapping once an order is chosen!
-            m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
+            m_gait_planning.setPrevPoint({point[2], point[3], point[4], point[0], point[7], point[8], point[9], point[5]}); 
             RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
             std::string point_str;
             for (const auto &value : m_gait_planning.getPrevPoint()) {
