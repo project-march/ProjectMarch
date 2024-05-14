@@ -1,4 +1,4 @@
-std_msgs/Header Header
+std_msgs/Header header
 # Process noise covariances
 float64[] process_linear_acceleration
 float64[] process_angular_velocity
