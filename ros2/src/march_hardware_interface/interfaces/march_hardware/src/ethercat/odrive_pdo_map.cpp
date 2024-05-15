@@ -45,9 +45,6 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
     { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/108, /*length=*/32) },
     { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/112, /*length=*/32) },
     { ODriveObjectName::Torque, ODriveObject(/*offset=*/116, /*length=*/32) },
-};
-
-ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none = { 
     { ODriveObjectName::AIEAbsolutePosition, ODriveObject(/*offset=*/120, /*length=*/32) },
 };
 
@@ -77,21 +74,19 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
     { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/76, /*length=*/32) },
 };
 
-int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:
             return miso_objects_axis_0.at(object_name).offset;
         case ODriveAxis::One:
             return miso_objects_axis_1.at(object_name).offset;
-        case ODriveAxis::None:
-            return miso_objects_axis_none.at(object_name).offset; 
         default:
             throw error::HardwareException(error::ErrorType::ODRIVE_WRONG_AXIS_NUMBER, "Cannot get MISO Byte offset.");
     }
 }
 
-int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:

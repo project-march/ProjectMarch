@@ -71,8 +71,8 @@ public:
     static ObjectMap miso_objects_axis_none;
 
     // Get the byte offset for an ODriveObject of an axis
-    static int8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
-    static int8_t getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis);
+    static uint8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
+    static uint8_t getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis);
 };
 
 } // namespace march

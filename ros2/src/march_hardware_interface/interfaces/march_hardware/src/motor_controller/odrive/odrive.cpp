@@ -53,8 +53,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
             logger_->info("Initializing the encoder offset calibration.");           
         }
         
-        return std::chrono::seconds { 30 };
-        logger_->info("Waiting 60 seconds");           
+        return std::chrono::seconds { 60 };
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -233,9 +232,9 @@ ODriveAxisState ODrive::getAxisState()
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
-int32_t ODrive::getAbsolutePositionIU()
+uint32_t ODrive::getAbsolutePositionIU()
 {
-    int32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
+    uint32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
     if (iu_value == 0) {
         logger_->warn("sleeeeeeepppiiiiiiinnnggggggg to wait for absolute position readout"); 
         rclcpp::sleep_for(std::chrono::milliseconds(50)); 
@@ -243,7 +242,6 @@ int32_t ODrive::getAbsolutePositionIU()
         if (iu_value == 0){
             logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
         }
-        // logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
     }
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:

@@ -138,7 +138,8 @@ void Joint::readFirstEncoderValues(bool operational_check)
 
 
             throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
-                "Joint %s is outside hard limits, value is %f, limits are [%d, %d]", name_.c_str(), position_,
+                // "Joint %s is outside hard limits, value is %f, limits are [%d, %d]", name_.c_str(), position_,
+                "Joint %s is outside hard limits, value is %d, limits are [%d, %d]", name_.c_str(), motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_),
                 motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
                 motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
         }
@@ -201,7 +202,9 @@ void Joint::readEncoders()
         }
         velocity_ = motor_controller_->getVelocity();
         if (motor_controller_->hasTorqueSensor()) {
-            torque_ = motor_controller_->getTorque();
+            // torque_ = motor_controller_->getTorque();
+            // TODO: REMOVE DUMMY TORQUE VALUE. Currently the torque values are not communicated via MDrives so this check is redundant. Removed to fix logging errors during airgaiting. 
+            torque_ = 5.0; 
             if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
                 throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
                     "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,

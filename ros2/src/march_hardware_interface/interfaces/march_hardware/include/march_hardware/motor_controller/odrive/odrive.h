@@ -94,7 +94,7 @@ private:
     void waitForState(ODriveAxisState target_state);
     ODriveAxisState getAxisState();
 
-    int32_t getAbsolutePositionIU();
+    uint32_t getAbsolutePositionIU();
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
     uint32_t getAIEAbsolutePositionIU(); 
