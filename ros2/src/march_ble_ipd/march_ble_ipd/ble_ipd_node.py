@@ -7,11 +7,14 @@ from march_shared_msgs.msg import Alive
 
 import getpass
 import socket
+import os 
+import signal
 
 from march_ble_ipd.bluetooth_server import BluetoothServer
 
 COLOR = "\u001b[38;5;201m"
 RESET = "\033[0m"
+TIMEOUT = 30
 
 
 class BLEInputDeviceNode(Node):
@@ -23,6 +26,8 @@ class BLEInputDeviceNode(Node):
         self._requested_mode = GetExoModeArray.Request()
         self._available_modes_future = None
         self._connected = False 
+        self._connected_first_time = False
+        self._disconnect_timestamp = None
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         self._get_exo_mode_array_client = self.create_client(GetExoModeArray, 'get_exo_mode_array')
@@ -32,9 +37,8 @@ class BLEInputDeviceNode(Node):
 
         self.get_logger().info("Connected to service get_exo_mode_array")
 
-        self._alive_pub = self.create_publisher(Alive, "/march/input_device/alive", 10)
         self._alive_timer = self.create_timer(timer_period_sec=0.1,
-                                                callback=self.alive_callback,
+                                                callback=self.check_connectivity,
                                                 clock=self.get_clock())
         
         self.get_logger().info(f"{COLOR}Ready to connect to bluetooth device{RESET}")
@@ -58,12 +62,25 @@ class BLEInputDeviceNode(Node):
         mode_list = [exo_mode.mode for exo_mode in available_modes]
         print(mode_list)
     
-    def alive_callback(self) -> None:
-        """Callback to send out an alive message."""
-        # TODO: this is bullshit, handle this in the node itself instead of the safety node
-        if self._connected:
-            msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
-            self._alive_pub.publish(msg)
+    def check_connectivity(self) -> None:
+        """Check whether a bluetooth device is still connected"""
+        if (self._connected == False and self._connected_first_time):
+            # If the device was connected before, but is now disconnected
+            if self._disconnect_timestamp is None:
+                # The moment the device disconnects, store the time and send exoMode Stand
+                self._disconnect_timestamp = self.get_clock().now()
+                self.publish_mode(1)
+                self.get_logger().warn("Device disconnected, sending Stand mode")
+            elif ((self.get_clock().now() - self._disconnect_timestamp) > rclpy.time.Duration(seconds=TIMEOUT)):
+                # If the device has been disconnected for TIMEOUT seconds, kill the node
+                self.get_logger().error("Device has been disconnected for too long, shutting down all ROS nodes")
+                os.kill(os.getppid(), signal.SIGINT)  # Send SIGINT to parent process
+                rclpy.shutdown()
+        else:
+            # If the device is connected, reset the disconnect timestamp
+            if self._disconnect_timestamp is not None:
+                self.get_logger().info("Device is reconnected!")
+            self._disconnect_timestamp = None 
         
 
 

@@ -252,7 +252,6 @@ def generate_launch_description() -> LaunchDescription:
         march_control,
         mode_machine,
         record_rosbags_action,
-        safety_node,
         imu_nodes,
         ik_solver,
         state_estimator,

@@ -236,6 +236,7 @@ class BluetoothServer:
         if (status == 1):
             print("connected")
             self._node._connected = True
+            self._node._connected_first_time = True
             self.stop_advertising()
         else:
             print("disconnected")
