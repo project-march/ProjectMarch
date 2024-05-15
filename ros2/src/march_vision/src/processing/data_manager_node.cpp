@@ -1,6 +1,5 @@
 #include "march_vision/processing/input_source_manager_node.hpp"
 
-// TODO: Change to different name. Or do I need this at all, since I have the computer_vision_node?
 
 InputSourceManagerNode::InputSourceManagerNode() : Node("input_source_manager_node")
 {

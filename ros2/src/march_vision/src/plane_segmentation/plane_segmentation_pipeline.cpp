@@ -21,18 +21,20 @@ void PlaneSegmentationPipeline::update(grid_map::GridMap&& grid_map, const std::
 
   m_planar_terrain.planarRegions = m_contour_segmentation.extractPlanarRegions(m_planar_image_segmentation.getSegmentedPlanesMap());
 
-  // Add binary map
   // TODO: Don't know if we're going to use this
-  const std::string planeClassificationLayer{"plane_classification"};
-  m_planar_terrain.gridMap.add(planeClassificationLayer);
-  auto& traversabilityMask = m_planar_terrain.gridMap.get(planeClassificationLayer);
-  cv::cv2eigen(m_planar_image_segmentation.getBinaryLabeledImage(), traversabilityMask);
-
   m_postprocessing.postprocess(m_planar_terrain, elevation_layer, planeClassificationLayer);
 }
 
 void PlaneSegmentationPipeline::getSegmentation(grid_map::GridMap::Matrix& segmentation) const {
   cv::cv2eigen(m_planar_image_segmentation.getSegmentedPlanesMap().labeled_image, segmentation);
 }
+
+// TODO: Add a function to read parameters from a file and maybe refactor node and its ROS functionalities
+// bool PlaneSegmentationPipeline::readParameters(){
+
+//   Config config;
+// }
+
+
 
 }  // namespace plane_segmentation

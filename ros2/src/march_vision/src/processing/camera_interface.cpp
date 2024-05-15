@@ -34,7 +34,7 @@ CameraInterface::CameraInterface(rclcpp::Node* n, const std::string& left_or_rig
     point_callback_options_.callback_group = m_point_callback_group;
 
     // TODO: Decide on topic
-    m_topic_camera = "/cameras" + left_or_right + "/depth/color/points";
+    m_topic_camera = "/cameras/" + left_or_right + "/depth/color/points";
 
     m_sample_size = m_node->get_parameter("sample_size").as_int();
     m_outlier_distance = m_node->get_parameter("outlier_distance").as_double();

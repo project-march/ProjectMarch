@@ -1,0 +1,171 @@
+# NOTE: Right now we use one config for all nodes for simplicity, but might be nice to split them and specify the namespaces
+/**:
+  ros__parameters:
+
+###### COMPUTER VISION NODE PARAMETERS ######
+
+
+
+###### ELEVATION MAPPING NODE PARAMETERS ######
+
+    input_sources:
+      right_camera: 
+        type: pointcloud 
+        topic: /right_camera/points
+        queue_size: 1
+        publish_on_update: true # Whether to publish the elevation map after a callback from this source.
+        # Sensor processors parameters for Realsense 435i
+        sensor_processor:
+          type: structured_light
+          cutoff_min_depth: 0.2
+          cutoff_max_depth: 3.25
+          normal_factor_a: 0.000611
+          normal_factor_b:  0.003587
+          normal_factor_c: 0.3515
+          normal_factor_d: 0
+          normal_factor_e: 1
+          lateral_factor: 0.01576
+
+      # TODO: Check in input_source_manager if this is set up properly now
+      left_camera: 
+        type: pointcloud 
+        topic: /left_camera/points
+        queue_size: 1
+        publish_on_update: true # Whether to publish the elevation map after a callback from this source.
+        # Sensor processors parameters for Realsense 435i
+        sensor_processor:
+          type: structured_light
+          cutoff_min_depth: 0.2
+          cutoff_max_depth: 3.25
+          normal_factor_a: 0.000611
+          normal_factor_b:  0.003587
+          normal_factor_c: 0.3515
+          normal_factor_d: 0
+          normal_factor_e: 1
+          lateral_factor: 0.01576
+    
+    # Debugging parameters
+    # Noiseless ground truth measurements
+    # sensor_processor:
+    #   type: perfect
+
+    map_frame_id: "map"
+    robot_base_frame_id: "/base_link"
+    robot_pose_with_covariance_topic: "/robot_pose_with_covariance"
+
+    # TODO: Check if this works for the online visualization
+    track_point_frame_id: "map"
+    track_point_x: 0.0
+    track_point_y: 0.0
+    track_point_z: 0.0
+
+    # Elevation map parameters
+    length_in_x: 20.0  #20.0
+    length_in_y: 20.0  #20.0
+    position_x: 0.0
+    position_y: 0.0
+    resolution: 0.05 
+    min_variance: 0.0001
+    max_variance: 10000.0
+    mahalanobis_distance_threshold: 2.5 
+    multi_height_noise: 0.00002
+    #visibility_cleanup_rate: 1.0
+
+    
+    input_topic: elevation_map_raw
+    output_topic: elevation_map_filtered
+
+    filters:
+      filter1:
+        name: inpaint
+        type: gridMapCv/InpaintFilter
+        params:
+          input_layer: elevation_raw
+          output_layer: elevation_inpainted
+          radius: 0.05
+      
+      # filter2:  
+      #   name: surface_normals
+      #   type: gridMapFilters/NormalVectorsFilter
+      #   params:
+      #     input_layer: elevation_inpainted
+      #     output_layers_prefix: normal_vectors_
+      #     radius: 0.05
+      #     normal_vector_positive_axis: z
+
+      # filter3: # Compute traversability as normalized weighted sum of slope and roughness.
+      #   name: traversability
+      #   type: gridMapFilters/MathExpressionFilter
+      #   params:
+      #     output_layer: traversability
+      #     expression: 0.5 * (1.0 - (slope / 0.6)) + 0.5 * (1.0 - (roughness / 0.1))
+
+      # filter4:  # Edge detection by computing the standard deviation from slope.
+      #   name: edge_detection
+      #   type: gridMapFilters/SlidingWindowMathExpressionFilter
+      #   params:
+      #     input_layer: slope
+      #     output_layer: edges
+      #     expression: sqrt(sumOfFinites(square(slope - meanOfFinites(slope))) ./ numberOfFinites(slope)) # Standard deviation
+      #     compute_empty_cells: false
+      #     edge_handling: crop # options: inside, crop, empty, mean
+      #     window_length: 0.05
+
+      filter2:  # Reduce noise with a radial blurring filter.
+        name: mean_in_radius
+        type: gridMapFilters/MeanInRadiusFilter
+        params:
+          input_layer: elevation_inpainted
+          output_layer: elevation_smooth
+          radius: 0.05
+
+      # filter2:  # Boxblur as an alternative to the inpaint and radial blurring filter above.
+      #   name: boxblur
+      #   type: gridMapFilters/SlidingWindowMathExpressionFilter
+      #   params:
+      #     input_layer: elevation
+      #     output_layer: elevation_smooth
+      #     expression: meanOfFinites(elevation)
+      #     compute_empty_cells: true
+      #     edge_handling: crop # options: inside, crop, empty, mean
+      #     window_size: 3 # optional
+
+
+
+###### PLANE SEGMENTATION NODE PARAMETERS ######
+
+    frequency_plane_segmentation_pipeline: 15.0 
+
+    planar_image_segmentation:
+      kernel_size: 3                                        
+      planarity_opening_filter: 0                           
+      plane_inclination_threshold_degrees: 30.0             
+      local_plane_inclination_threshold_degrees: 35.0       
+      plane_patch_error_threshold: 0.02                     
+      min_number_points_per_label: 4                        
+      connectivity: 4                                       
+      include_ransac_refinement: true                       
+      global_plane_fit_distance_error_threshold: 0.025      
+      global_plane_fit_angle_error_threshold_degrees: 25.0  
+    
+    contour_segmentation:
+      margin_size: 1    
+
+    ransac_segmentation:
+      probability: 0.001      
+      min_points: 4           
+      epsilon: 0.025          
+      cluster_epsilon: 0.041  
+      normal_threshold: 25.0  
+
+    # TODO: Decide if we are going to postprocess plane_segmentation pipeline output
+    # postprocessing:
+
+      
+      
+
+
+
+
+
+
