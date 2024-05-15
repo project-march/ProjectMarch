@@ -31,7 +31,7 @@ Eigen::Isometry3d getTransformLocalToGlobal(const NormalAndPosition& normal_and_
 }
 
 CgalPoint2d projectToPlaneAlongGravity(const CgalPoint2d& worldFrameXY, const Eigen::Isometry3d& transform_plane_to_world) {
-  // Shorthands
+
   const auto& xAxis = transform_plane_to_world.linear().col(0);
   const auto& yAxis = transform_plane_to_world.linear().col(1);
   const auto& surface_normal_in_world = transform_plane_to_world.linear().col(2);

@@ -20,7 +20,6 @@ namespace {
     {
         const Eigen::Matrix3d covariance_matrix = sum_squared / num_point - mean * mean.transpose();
 
-        // Compute Eigenvectors.
         // Eigenvalues are ordered small to large.
         // Worst case bound for zero eigenvalue from :
         // https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html
@@ -29,11 +28,10 @@ namespace {
         if (solver.eigenvalues()(1) > 1e-8) {
             Eigen::Vector3d unitary_normal_vector = solver.eigenvectors().col(0);
 
-            // Check direction of the normal vector and flip the sign upwards
+            // Checks direction of the normal vector and flip the sign upwards
             if (unitary_normal_vector.z() < 0.0) {
                 unitary_normal_vector = -unitary_normal_vector;
             }
-            // The first eigenvalue might become slightly negative due to numerics.
             double square_error = (solver.eigenvalues()(0) > 0.0) ? solver.eigenvalues()(0) : 0.0;
             return { unitary_normal_vector, square_error };
         } else { // If second eigenvalue is zero, the normal is not defined.
@@ -64,7 +62,7 @@ void PlanarImageSegmentation::runExtraction(const grid_map::GridMap& map, const 
     const auto& map_size = m_map->getSize();
     m_binary_image_patch
         = cv::Mat(mapSize(0), mapSize(1), CV_8U, 0.0); // Zero initialize to set untouched pixels to not planar;
-    // Need a buffer of at least the linear size of the image. But no need to shrink if the buffer is already bigger.
+    // Need a buffer of at least the linear size of the image. But there's no need to shrink if the buffer is already bigger.
     const int linear_map_size = mapSize(0) * mapSize(1);
 
     if (m_surface_normals.size() < linear_map_size) {
@@ -84,7 +82,6 @@ void PlanarImageSegmentation::runExtraction(const grid_map::GridMap& map, const 
 std::pair<Eigen::Vector3d, double> PlanarImageSegmentation::computeNormalAndErrorForWindow(
     const Eigen::MatrixXf& window_data) const
 {
-
     // Get surrounding data.
     size_t n_points = 0;
     Eigen::Vector3d sum = Eigen::Vector3d::Zero();
@@ -114,19 +111,16 @@ std::pair<Eigen::Vector3d, double> PlanarImageSegmentation::computeNormalAndErro
     }
 }
 
-bool PlanarImageSegmentation::isLocallyPlanar(const Eigen::Vector3d& local_normal, double mean_squared_error) const
-{
+bool PlanarImageSegmentation::isLocallyPlanar(const Eigen::Vector3d& local_normal, double mean_squared_error) const {
 
     const double threshold_squared
         = m_parameters.plane_patch_error_threshold * m_parameters.plane_patch_error_threshold;
 
     const double normal_dot_product = local_normal.z();
-    return (
-        mean_squared_error < threshold_squared && normal_dot_product > m_parameters.local_plane_inclination_threshold);
+    return (mean_squared_error < threshold_squared && normal_dot_product > m_parameters.local_plane_inclination_threshold);
 }
 
-void PlanarImageSegmentation::runSlidingWindowDetector()
-{
+void PlanarImageSegmentation::runSlidingWindowDetector() {
 
     grid_map::SlidingWindowIterator window_iterator(
         *m_map, m_elevation_layer, grid_map::SlidingWindowIterator::EdgeHandling::EMPTY, m_parameters.kernel_size);
@@ -187,7 +181,7 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
                     int label, std::vector<ransac_segmentation::PointWithNormal>& points_with_normal)
 {
     const auto& elevationData = (*m_map)[m_elevation_layer];
-    points_with_normal.clear(); // clear the workvector
+    points_with_normal.clear(); 
 
     int num_points = 0;
     Eigen::Vector3d sum = Eigen::Vector3d::Zero();
@@ -245,9 +239,8 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
 }
 
 void PlanarImageSegmentation::refineLabelWithRansac(
-    int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal)
-{
-    // Fix the seed for each label to get deterministic behaviour
+    int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal) {
+
     CGAL::get_default_random() = CGAL::Random(0);
 
     ransac_segmentation::RansacSegmentation ransac_segmentation(m_ransac_parameters);
@@ -261,7 +254,7 @@ void PlanarImageSegmentation::refineLabelWithRansac(
         const auto& support_vector = plane_info.second;
 
         if (isWithinInclinationLimit(normal_vector)) {
-            // Bookkeeping of labels : reuse old label for the first plane
+            // reuse old label for the first plane
             const int new_label = (reuse_label) ? label : ++m_segmented_planes_map.highestLabel;
             reuse_label = false;
 

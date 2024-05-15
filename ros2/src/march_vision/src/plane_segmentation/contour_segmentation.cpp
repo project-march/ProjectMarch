@@ -106,7 +106,7 @@ std::vector<PlanarRegion> ContourSegmentation::extractPlanarRegions(const Segmen
     }
 
     
-    // TODO: Remove this since we use only local map frame
+    // TODO: Make sure it updates for robot frame correctly
     const auto plane_parameters = getTransformLocalToGlobal(label_plane.second);
     for (auto& boundary_and_inset : boundaries_and_insets) {
       // Transform points from pixel space to local terrain frame
@@ -126,10 +126,9 @@ std::vector<PlanarRegion> ContourSegmentation::extractPlanarRegions(const Segmen
 }
 
 std::vector<BoundaryWithInset> extractBoundaryAndInset(cv::Mat& binary_image, const cv::Mat& erosion_kernel) {
-  // Get boundary
+
   std::vector<CgalPolygonWithHoles2d> boundaries = extractPolygonsFromBinaryImage(binary_image);
 
-  // Erode
   cv::erode(binary_image, binary_image, erosion_kernel, cv::Point(-1,-1), 1, cv::BORDER_REPLICATE);
 
   // Erosion of the edge of the map
@@ -138,7 +137,6 @@ std::vector<BoundaryWithInset> extractBoundaryAndInset(cv::Mat& binary_image, co
   binary_image.col(0) = 0;
   binary_image.col(binary_image.cols - 1) = 0;
 
-  // Get insets
   std::vector<CgalPolygonWithHoles2d> insets = extractPolygonsFromBinaryImage(binary_image);
 
   // Associate boundaries with insets
@@ -161,6 +159,7 @@ std::vector<BoundaryWithInset> extractBoundaryAndInset(cv::Mat& binary_image, co
   return boundaries_with_insets;
 }
 std::vector<CgalPolygonWithHoles2d> extractPolygonsFromBinaryImage(const cv::Mat& binary_image) {
+
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;  // [Next, Previous, First_Child, Parent]
   auto isOuterContour = [](const cv::Vec4i& hierarchyVector) {
@@ -175,7 +174,6 @@ std::vector<CgalPolygonWithHoles2d> extractPolygonsFromBinaryImage(const cv::Mat
       CgalPolygonWithHoles2d polygon;
       polygon.outer_boundary() = cgalPolygonFromOpenCv(contours[i]);
 
-      // Add children as holes
       int child_index = hierarchy[i][2];  // First child
       while (child_index > 0) {
         polygon.add_hole(cgalPolygonFromOpenCv(contours[child_index]));
@@ -197,7 +195,7 @@ CgalPolygon2d cgalPolygonFromOpenCv(const std::vector<cv::Point>& openCV_polygon
 }
 
 CgalPoint2d pixelToWorldFrame(const CgalPoint2d& pixelspace_cgal_point2d, double resolution, const Eigen::Vector2d& map_offset) {
-  // Notice the transpose of x and y!
+  
   return {map_offset.x() - resolution * pixelspace_cgal_point2d.y(), map_offset.y() - resolution * pixelspace_cgal_point2d.x()};
 }
 

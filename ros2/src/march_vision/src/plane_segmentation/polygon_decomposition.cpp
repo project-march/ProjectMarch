@@ -2,7 +2,6 @@
 
 #include "march_vision/plane_segmentation/geometry_utils.h"
 
-// TODO: Does this have to be march_vision or plane_segmentation?
 namespace plane_segmentation {
 
 namespace {
