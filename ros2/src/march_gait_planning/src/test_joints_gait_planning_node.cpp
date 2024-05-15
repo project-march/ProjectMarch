@@ -51,7 +51,7 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
 
     m_counter = 0;
 
-    m_home_stand = {-0.016, -0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0}; // This is already in alphabetical order
+    m_home_stand = {-0.016, -0.03, 0.042, 0.06, -0.016, -0.03, 0.042, 0.06}; // This is already in alphabetical order
 
     m_joint_index_mapping = generateJointIndexMapping(joints_actuated_index, joints_states_index); 
 
@@ -97,6 +97,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                     //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
                     RCLCPP_INFO(this->get_logger(), "Actuated joint for filling trajectory: %d", m_actuated_joint); 
                     m_current_trajectory = m_gait_planning.getTrajectory(m_actuated_joint);
+                    RCLCPP_INFO(this->get_logger(), "Trajectory size: %d", m_current_trajectory.size());
                 }
                 else{
                     double new_angle = m_current_trajectory.front();
@@ -108,7 +109,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                     for (int i = 0; i < 8; i++) {
                         if (i == getActuatedJoint()) {
                             // This is the joint we want to actuate, set the new position
-                            m_joints_msg.data.push_back(new_angle + m_home_stand[i]);
+                            m_joints_msg.data.push_back(new_angle);
                         } else {
                             // This is not the joint we want to actuate, set the current position
                             m_joints_msg.data.push_back(m_home_stand[i]);

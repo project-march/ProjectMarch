@@ -54,10 +54,10 @@ march9:
             minPositionIU: 4792  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 5984  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 5570
-            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.02617994   # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.02617994  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.01308997  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.01308997  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 367.57
@@ -90,10 +90,10 @@ march9:
             minPositionIU: 322302 # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 706749 # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 373306
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.11798426  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.11798426  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.05899213  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.05899213  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -126,10 +126,10 @@ march9:
             minPositionIU: 540163  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 901249  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 561090
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.10908308  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.10908308  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.05454154  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.05454154  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -197,10 +197,10 @@ march9:
             minPositionIU: 6666  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 7962  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 7476
-            lowerSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.02617994   # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.02617994  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.01308997  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.01308997  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 367.57
@@ -233,10 +233,10 @@ march9:
             minPositionIU: 178693  # Ros kills itself if it is in its hard limits (same as encode limits).
             maxPositionIU: 573254  # Ros kills itself if it is in its hard limits (same as encode limits).
             zeroPositionIU: 233536
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            lowerSoftLimitMarginRad: 0.11798426  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.11798426  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.05899213  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.05899213  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -267,13 +267,13 @@ march9:
           absoluteEncoder:
             direction: -1
             resolution: 20
-            minPositionIU: 330877 # Ros kills itself if it is in its hard limits (same as encode limits).
-            maxPositionIU: 919222 # Ros kills itself if it is in its hard limits (same as encode limits).
-            zeroPositionIU: 351266
-            lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            upperSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
-            lowerErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
-            upperErrorSoftLimitMarginRad: 0.0174533  # Ros stops if it is x away from hard limit.
+            minPositionIU: 592799 # Ros kills itself if it is in its hard limits (same as encode limits).
+            maxPositionIU: 954814 # Ros kills itself if it is in its hard limits (same as encode limits).
+            zeroPositionIU: 611865
+            lowerSoftLimitMarginRad: 0.10908308  # Ros warns if it is x away from hard limit.
+            upperSoftLimitMarginRad: 0.10908308  # Ros warns if it is x away from hard limit.
+            lowerErrorSoftLimitMarginRad: 0.05454154  # Ros stops if it is x away from hard limit.
+            upperErrorSoftLimitMarginRad: 0.05454154  # Ros stops if it is x away from hard limit.
           incrementalEncoder:
             direction: 1
             resolution: 12
