@@ -3,29 +3,29 @@ state_estimator:
     noise_parameters:
       process_noise:
         linear_acceleration:
-        - 1e-2  # x
-        - 1e-2  # y
-        - 1e-2  # z
+        - 1e-12  # x
+        - 1e-12  # y
+        - 1e-12  # z
         angular_velocity:
-        - 1e-2  # roll
-        - 1e-2  # pitch
-        - 1e-2  # yaw
+        - 1e-12  # roll
+        - 1e-12  # pitch
+        - 1e-12  # yaw
         foot_position:
-        - 1e-2  # x
-        - 1e-2  # y
-        - 1e-2  # z
+        - 1e-12  # x
+        - 1e-12  # y
+        - 1e-12  # z
         accelerometer_bias:
-        - 1e-2  # x
-        - 1e-2  # y
-        - 1e-2  # z
+        - 1e-12  # x
+        - 1e-12  # y
+        - 1e-12  # z
         gyroscope_bias:
-        - 1e-2  # roll
-        - 1e-2  # pitch
-        - 1e-2  # yaw
+        - 1e-12  # roll
+        - 1e-12  # pitch
+        - 1e-12  # yaw
         foot_slippage:
-        - 1e-2  # roll
-        - 1e-2  # pitch
-        - 1e-2  # yaw
+        - 1e-12  # roll
+        - 1e-12  # pitch
+        - 1e-12  # yaw
       observation_noise:
         foot_position:
         - 1e3  # x

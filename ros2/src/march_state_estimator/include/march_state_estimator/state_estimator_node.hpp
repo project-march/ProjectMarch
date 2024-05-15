@@ -22,6 +22,7 @@
 #include "geometry_msgs/msg/vector3_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
+#include "march_shared_msgs/msg/sensor_fusion_noise_params.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/srv/get_current_joint_positions.hpp"
 #include "march_shared_msgs/srv/get_node_position.hpp"
@@ -91,6 +92,7 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
+
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 
@@ -101,7 +103,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_mpc_stance_foot_pub;
     rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_com_pos_pub;
 
-    // Temp
+    // Monitoring topics
     rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_left_pub;
     rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_right_pub;
 

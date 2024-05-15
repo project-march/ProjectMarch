@@ -50,7 +50,7 @@ SensorFusion::SensorFusion(double timestep) {
     m_dynamics_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_observation_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_kalman_gain = Eigen::MatrixXd::Ones(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e2;
     m_observation_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
     m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e3;
@@ -70,6 +70,9 @@ void SensorFusion::predictState() {
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
     m_state.imu_velocity += expected_linear_velocity;
     m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
+
+    // Normalize the orientations
+    m_state.imu_orientation.normalize();
 
     // Update the covariance matrix with prior knowledge
     computeDynamicsMatrix();
@@ -119,7 +122,7 @@ void SensorFusion::updateState() {
     m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
     m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
     m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
-    m_state.covariance_matrix.noalias() -= m_kalman_gain * m_observation_matrix * m_state.covariance_matrix;
+    m_state.covariance_matrix.noalias() = computePosteriorCovarianceMatrix();
 
     // Normalize the orientations
     m_state.imu_orientation.normalize();
@@ -146,15 +149,15 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
     Eigen::Matrix3d orientation_matrix = m_state.imu_orientation.toRotationMatrix();
 
     // Compute the innovation for the left and right foot positions
-    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_POSITION)
+    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_POSITION).noalias()
         = m_observation.left_foot_position - orientation_matrix * (m_state.left_foot_position - m_state.imu_position);
-    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_POSITION)
+    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_POSITION).noalias()
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
     // Compute the innovation for the left and right foot slippage
-    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE)
+    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
         = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
-    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE)
+    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
         = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
 
     #ifdef DEBUG
@@ -204,9 +207,9 @@ void SensorFusion::computeObservationMatrix() {
     // Compute the observation components for the left and right foot positions
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, STATE_INDEX_POSITION) = -orientation_matrix;
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, STATE_INDEX_POSITION)= -orientation_matrix;
-    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, STATE_INDEX_ORIENTATION)
+    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, STATE_INDEX_ORIENTATION).noalias()
         = computeSkewSymmetricMatrix(orientation_matrix * (m_state.left_foot_position - m_state.imu_position));
-    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, STATE_INDEX_ORIENTATION)
+    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, STATE_INDEX_ORIENTATION).noalias()
         = computeSkewSymmetricMatrix(orientation_matrix * (m_state.right_foot_position - m_state.imu_position));
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
@@ -216,9 +219,9 @@ void SensorFusion::computeObservationMatrix() {
         = Eigen::Matrix3d::Identity();
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_ORIENTATION)
         = Eigen::Matrix3d::Identity();
-    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
+    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE).noalias()
         = -1.0 * (m_state.imu_orientation * m_state.left_foot_slippage.conjugate()).toRotationMatrix();
-    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
+    m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE).noalias()
         = -1.0 * (m_state.imu_orientation * m_state.right_foot_slippage.conjugate()).toRotationMatrix();
 
     #ifdef DEBUG
