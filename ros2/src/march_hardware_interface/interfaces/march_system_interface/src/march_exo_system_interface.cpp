@@ -395,6 +395,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     // Stopping ethercat cycle in the hardware
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
+        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMISOAsString());
+        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMOSIAsString());
         // control on zero output torque when the exo shuts down.
 #ifndef DEBUG_MODE
         RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
