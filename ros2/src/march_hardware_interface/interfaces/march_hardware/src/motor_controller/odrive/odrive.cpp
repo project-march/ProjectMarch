@@ -451,24 +451,24 @@ std::string ODrive::getEthercatMISOAsString() const
 {
     march::EthercatMISO miso = this->getMISO();
     std::stringstream ss;
-    ss << "MISO, slave index: " << std::setw(4) << miso.slave_index << ", axis index: " << std::setw(4)
+    ss << "MISO, slave index: " << std::setw(2) << miso.slave_index << ", axis index: " << std::setw(2)
        << miso.axis_index << std::endl;
-    ss << "  Absolute position: "   << std::setw(66) << std::bitset<32>(miso.absolute_position).to_string()     << std::endl;
-    ss << "  Current: "             << std::setw(66) << std::bitset<32>(miso.current).to_string()               << std::endl;
-    ss << "  Motor velocity: "      << std::setw(66) << std::bitset<32>(miso.motor_velocity).to_string()        << std::endl;
-    ss << "  ODrive error: "        << std::setw(66) << std::bitset<32>(miso.odrive_error).to_string()          << std::endl;
-    ss << "  Axis error: "          << std::setw(66) << std::bitset<32>(miso.axis_error).to_string()            << std::endl;
-    ss << "  Motor error: "         << std::setw(66) << std::bitset<64>(miso.motor_error).to_string()           << std::endl;
-    ss << "  Encoder error: "       << std::setw(66) << std::bitset<32>(miso.encoder_error).to_string()         << std::endl;
-    ss << "  Torque sensor error: " << std::setw(66) << std::bitset<32>(miso.torque_sensor_error).to_string()   << std::endl;
-    ss << "  Controller error: "    << std::setw(66) << std::bitset<32>(miso.controller_error).to_string()      << std::endl;
-    ss << "  Axis state: "          << std::setw(66) << std::bitset<32>(miso.axis_state).to_string()            << std::endl;
-    ss << "  ODrive temperature: "  << std::setw(66) << std::bitset<32>(miso.odrive_temperature).to_string()    << std::endl;
-    ss << "  Motor temperature: "   << std::setw(66) << std::bitset<32>(miso.motor_temperature).to_string()     << std::endl;
-    ss << "  Shadow count: "        << std::setw(66) << std::bitset<32>(miso.shadow_count).to_string()          << std::endl;
-    ss << "  Torque: "              << std::setw(66) << std::bitset<32>(miso.torque).to_string()                << std::endl;
+    ss << "  Absolute position: "   << "\t" << std::bitset<32>(miso.absolute_position).to_string()     << std::endl;
+    ss << "  Current: "             << "\t\t" << std::bitset<32>(miso.current).to_string()               << std::endl;
+    ss << "  Motor velocity: "      << "\t" << std::bitset<32>(miso.motor_velocity).to_string()        << std::endl;
+    ss << "  ODrive error: "        << "\t\t" << std::bitset<32>(miso.odrive_error).to_string()          << std::endl;
+    ss << "  Axis error: "          << "\t\t" << std::bitset<32>(miso.axis_error).to_string()            << std::endl;
+    ss << "  Motor error: "         << "\t\t" << std::bitset<64>(miso.motor_error).to_string()           << std::endl;
+    ss << "  Encoder error: "       << "\t\t" << std::bitset<32>(miso.encoder_error).to_string()         << std::endl;
+    ss << "  Torque sensor error: " << "\t" << std::bitset<32>(miso.torque_sensor_error).to_string()   << std::endl;
+    ss << "  Controller error: "    << "\t" << std::bitset<32>(miso.controller_error).to_string()      << std::endl;
+    ss << "  Axis state: "          << "\t\t" << std::bitset<32>(miso.axis_state).to_string()            << std::endl;
+    ss << "  ODrive temperature: "  << "\t" << std::bitset<32>(miso.odrive_temperature).to_string()    << std::endl;
+    ss << "  Motor temperature: "   << "\t" << std::bitset<32>(miso.motor_temperature).to_string()     << std::endl;
+    ss << "  Shadow count: "        << "\t\t" << std::bitset<32>(miso.shadow_count).to_string()          << std::endl;
+    ss << "  Torque: "              << "\t\t" << std::bitset<32>(miso.torque).to_string()                << std::endl;
     if (axis_ == march::ODriveAxis::One) {
-        ss << "  AIE absolute position: " << std::setw(66) << std::bitset<32>(miso.aie_absolute_position).to_string() << std::endl;
+        ss << "  AIE absolute position: " << "\t" << std::bitset<32>(miso.aie_absolute_position).to_string() << std::endl;
     }
     return ss.str();
 }
@@ -477,18 +477,18 @@ std::string ODrive::getEthercatMOSIAsString() const
 {
     march::EthercatMOSI mosi = this->getMOSI();
     std::stringstream ss;
-    ss << "MOSI, slave index: " << std::setw(4) << mosi.slave_index << ", axis index: " << std::setw(4)
+    ss << "MOSI, slave index: " << std::setw(2) << mosi.slave_index << ", axis index: " << std::setw(2)
        << mosi.axis_index << std::endl;
-    ss << "  Target torque: "   << std::setw(66) << std::bitset<32>(mosi.target_torque).to_string()     << std::endl;
-    ss << "  Target position: " << std::setw(66) << std::bitset<32>(mosi.target_position).to_string()   << std::endl;
-    ss << "  Fuzzy torque: "    << std::setw(66) << std::bitset<32>(mosi.fuzzy_torque).to_string()      << std::endl;
-    ss << "  Fuzzy position: "  << std::setw(66) << std::bitset<32>(mosi.fuzzy_position).to_string()    << std::endl;
-    ss << "  Position P: "      << std::setw(66) << std::bitset<32>(mosi.position_p).to_string()        << std::endl;
-    ss << "  Position I: "      << std::setw(66) << std::bitset<32>(mosi.position_i).to_string()        << std::endl;
-    ss << "  Position D: "      << std::setw(66) << std::bitset<32>(mosi.position_d).to_string()        << std::endl;
-    ss << "  Torque P: "        << std::setw(66) << std::bitset<32>(mosi.torque_p).to_string()          << std::endl;
-    ss << "  Torque D: "        << std::setw(66) << std::bitset<32>(mosi.torque_d).to_string()          << std::endl;
-    ss << "  Requested state: " << std::setw(66) << std::bitset<32>(mosi.requested_state).to_string()   << std::endl;
+    ss << "  Target torque: "   << "\t\t" << std::bitset<32>(mosi.target_torque).to_string()     << std::endl;
+    ss << "  Target position: " << "\t" << std::bitset<32>(mosi.target_position).to_string()   << std::endl;
+    ss << "  Fuzzy torque: "    << "\t\t" << std::bitset<32>(mosi.fuzzy_torque).to_string()      << std::endl;
+    ss << "  Fuzzy position: "  << "\t" << std::bitset<32>(mosi.fuzzy_position).to_string()    << std::endl;
+    ss << "  Position P: "      << "\t\t" << std::bitset<32>(mosi.position_p).to_string()        << std::endl;
+    ss << "  Position I: "      << "\t\t" << std::bitset<32>(mosi.position_i).to_string()        << std::endl;
+    ss << "  Position D: "      << "\t\t" << std::bitset<32>(mosi.position_d).to_string()        << std::endl;
+    ss << "  Torque P: "        << "\t\t" << std::bitset<32>(mosi.torque_p).to_string()          << std::endl;
+    ss << "  Torque D: "        << "\t\t" << std::bitset<32>(mosi.torque_d).to_string()          << std::endl;
+    ss << "  Requested state: " << "\t" << std::bitset<32>(mosi.requested_state).to_string()   << std::endl;
     return ss.str();
 }
 
