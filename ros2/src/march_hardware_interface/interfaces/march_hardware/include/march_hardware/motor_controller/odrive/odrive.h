@@ -25,6 +25,43 @@
 #define KV_TO_TORQUE_CONSTANT 8.27
 
 namespace march {
+
+// Temporary
+struct EthercatMISO {
+    uint16_t slave_index;
+    uint8_t axis_index;
+    uint32_t absolute_position;
+    uint32_t current;
+    uint32_t motor_velocity;
+    uint32_t odrive_error;
+    uint32_t axis_error;
+    uint64_t motor_error;
+    uint32_t encoder_error;
+    uint32_t torque_sensor_error;
+    uint32_t controller_error;
+    uint32_t axis_state;
+    uint32_t odrive_temperature;
+    uint32_t motor_temperature;
+    uint32_t shadow_count;
+    uint32_t torque;
+    uint32_t aie_absolute_position = 0;
+};
+
+struct EthercatMOSI {
+    uint16_t slave_index;
+    uint8_t axis_index;
+    uint32_t target_torque;
+    uint32_t target_position;
+    uint32_t fuzzy_torque;
+    uint32_t fuzzy_position;
+    uint32_t position_p;
+    uint32_t position_i;
+    uint32_t position_d;
+    uint32_t torque_p;
+    uint32_t torque_d;
+    uint32_t requested_state;
+};
+
 class ODrive : public MotorController {
 public:
     /**
@@ -76,6 +113,10 @@ public:
     float getActualEffort() override;
     float getMotorTemperature();
     float getOdriveTemperature();
+
+    // Temporary
+    march::EthercatMISO getMISO();
+    march::EthercatMOSI getMOSI();
 
     double getTorqueLimit() const override;
     static constexpr double TORQUE_LIMIT = 100.0; // TODO: Determine a better value here

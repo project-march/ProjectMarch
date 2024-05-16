@@ -400,4 +400,48 @@ float ODrive::getMotorVoltage()
     throw error::NotImplemented("getMotorVoltage", "ODrive");
 }
 
+// Temporary
+march::EthercatMISO ODrive::getMISO()
+{
+    march::EthercatMISO miso {};
+    miso.slave_index = this->getSlaveIndex();
+    miso.axis_index = (uint8_t)(axis_);
+    miso.absolute_position = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
+    miso.current = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Current, axis_)).ui;
+    miso.motor_velocity = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorVelocity, axis_)).ui;
+    miso.odrive_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ODriveError, axis_)).ui;
+    miso.axis_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
+    miso.motor_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
+    miso.encoder_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+    miso.torque_sensor_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::TorqueSensorError, axis_)).ui;
+    miso.controller_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
+    miso.axis_state = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui;
+    miso.odrive_temperature = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveTemperature, axis_)).ui;
+    miso.motor_temperature = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).ui;
+    miso.shadow_count = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ShadowCount, axis_)).ui;
+    miso.torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).ui;
+    if (axis_ == march::ODriveAxis::One) {
+        miso.aie_absolute_position = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, axis_)).ui;
+    }
+    return miso;
+}
+
+march::EthercatMOSI ODrive::getMOSI()
+{
+    march::EthercatMOSI mosi {};
+    mosi.slave_index = this->getSlaveIndex();
+    mosi.axis_index = (uint8_t)(axis_);
+    mosi.target_torque = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_)).ui;
+    mosi.target_position = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_)).ui;
+    mosi.fuzzy_torque = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyTorque, axis_)).ui;
+    mosi.fuzzy_position = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_)).ui;
+    mosi.position_p = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_)).ui;
+    mosi.position_i = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionI, axis_)).ui;
+    mosi.position_d = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionD, axis_)).ui;
+    mosi.torque_p = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_)).ui;
+    mosi.torque_d = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueD, axis_)).ui;
+    mosi.requested_state = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_)).ui;
+    return mosi;
+}
+
 } // namespace march
