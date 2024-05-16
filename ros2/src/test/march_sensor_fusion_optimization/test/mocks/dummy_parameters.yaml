@@ -1,0 +1,48 @@
+state_estimator:
+  ros__parameters:
+    noise_parameters:
+      process_noise:
+        linear_acceleration:
+        - 1.0e-12  # x
+        - 1.0e-12  # y
+        - 1.0e-12  # z
+        angular_velocity:
+        - 1.0e-12  # roll
+        - 1.0e-12  # pitch
+        - 1.0e-12  # yaw
+        foot_position:
+        - 1.0e-12  # x
+        - 1.0e-12  # y
+        - 1.0e-12  # z
+        accelerometer_bias:
+        - 1.0e-12  # x
+        - 1.0e-12  # y
+        - 1.0e-12  # z
+        gyroscope_bias:
+        - 1.0e-12  # roll
+        - 1.0e-12  # pitch
+        - 1.0e-12  # yaw
+        foot_slippage:
+        - 1.0e-12  # roll
+        - 1.0e-12  # pitch
+        - 1.0e-12  # yaw
+      observation_noise:
+        foot_position:
+        - 1.0e+3  # x
+        - 1.0e+3  # y
+        - 1.0e+3  # z
+        foot_slippage:
+        - 1.0e+3  # roll
+        - 1.0e+3  # pitch
+        - 1.0e+3  # yaw
+        joint_position:
+        - 1.0e+3  # left_hip_aa
+        - 1.0e+3  # left_hip_fe
+        - 1.0e+3  # left_knee
+        - 1.0e+3  # left_ankle_dpf
+        - 1.0e+3  # left_ankle_ie
+        - 1.0e+3  # right_hip_aa
+        - 1.0e+3  # right_hip_fe
+        - 1.0e+3  # right_knee
+        - 1.0e+3  # right_ankle_dpf
+        - 1.0e+3  # right_ankle_ie

@@ -1,0 +1,48 @@
+state_estimator:
+  ros__parameters:
+    noise_parameters:
+      observation_noise:
+        foot_position:
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        foot_slippage:
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        joint_position:
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+        - 1000000.0
+      process_noise:
+        accelerometer_bias:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
+        angular_velocity:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
+        foot_position:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
+        foot_slippage:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
+        gyroscope_bias:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
+        linear_acceleration:
+        - 1.0e-06
+        - 1.0e-06
+        - 1.0e-06
