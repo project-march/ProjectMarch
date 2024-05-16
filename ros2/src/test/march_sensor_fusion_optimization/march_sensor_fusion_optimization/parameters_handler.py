@@ -4,9 +4,6 @@ Author: Alexander James Becoy @alexanderjamesbecoy
 """
 
 import yaml
-import os
-import sys
-import numpy as np
 
 class ParametersHandler:
 
