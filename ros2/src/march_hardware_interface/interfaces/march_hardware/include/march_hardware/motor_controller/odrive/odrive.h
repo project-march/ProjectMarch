@@ -29,9 +29,9 @@ namespace march {
 // Temporary
 struct EthercatMISO {
     uint16_t slave_index;
-    uint8_t axis_index;
-    uint32_t absolute_position;
-    uint32_t current;
+    int axis_index;
+    float absolute_position;
+    float current;
     uint32_t motor_velocity;
     uint32_t odrive_error;
     uint32_t axis_error;
@@ -40,25 +40,25 @@ struct EthercatMISO {
     uint32_t torque_sensor_error;
     uint32_t controller_error;
     uint32_t axis_state;
-    uint32_t odrive_temperature;
-    uint32_t motor_temperature;
-    uint32_t shadow_count;
-    uint32_t torque;
+    float odrive_temperature;
+    float motor_temperature;
+    int32_t shadow_count;
+    float torque;
     uint32_t aie_absolute_position = 0;
 };
 
 struct EthercatMOSI {
     uint16_t slave_index;
-    uint8_t axis_index;
-    uint32_t target_torque;
-    uint32_t target_position;
-    uint32_t fuzzy_torque;
-    uint32_t fuzzy_position;
-    uint32_t position_p;
-    uint32_t position_i;
-    uint32_t position_d;
-    uint32_t torque_p;
-    uint32_t torque_d;
+    int axis_index;
+    float target_torque;
+    float target_position;
+    float fuzzy_torque;
+    float fuzzy_position;
+    float position_p;
+    float position_i;
+    float position_d;
+    float torque_p;
+    float torque_d;
     uint32_t requested_state;
 };
 
