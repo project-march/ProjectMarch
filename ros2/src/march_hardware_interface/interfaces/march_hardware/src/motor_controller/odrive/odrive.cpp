@@ -411,7 +411,7 @@ march::EthercatMISO ODrive::getMISO()
     miso.motor_velocity = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorVelocity, axis_)).ui;
     miso.odrive_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ODriveError, axis_)).ui;
     miso.axis_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_)).ui;
-    miso.motor_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
+    miso.motor_error = this->read64(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_)).ui;
     miso.encoder_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
     miso.torque_sensor_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::TorqueSensorError, axis_)).ui;
     miso.controller_error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_)).ui;
