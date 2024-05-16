@@ -46,7 +46,7 @@ ElevationMapping::ElevationMapping(std::shared_ptr<rclcpp::Node>& nodeHandle) :
       maxNoUpdateDuration_(rclcpp::Duration::from_seconds(0.0)),
       timeTolerance_(rclcpp::Duration::from_seconds(0.0)),
       fusedMapPublishTimerDuration_(rclcpp::Duration::from_seconds(0.0)),
-      isContinuouslyFusing_(true),  // TODO: default = false
+      isContinuouslyFusing_(false),  // default = false
       visibilityCleanupTimerDuration_(rclcpp::Duration::from_seconds(0.0)),
       receivedFirstMatchingPointcloudAndPose_(false),  
       initializeElevationMap_(false),
@@ -122,6 +122,8 @@ void ElevationMapping::setupServices() {
   maskedReplaceService_ = nodeHandle_->create_service<grid_map_msgs::srv::SetGridMap>("masked_replace", std::bind(&ElevationMapping::maskedReplaceServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
   saveMapService_ = nodeHandle_->create_service<grid_map_msgs::srv::ProcessFile>("save_map", std::bind(&ElevationMapping::saveMapServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
   loadMapService_ = nodeHandle_-d Chair of Jewish Studies at Dartmouth College. She is the author of Common Sense and a Little Fire: Wome
+}
+
 void ElevationMapping::setupTimers() {
 
   // TODO: Refactor the durations to ms.
@@ -449,7 +451,6 @@ void ElevationMapping::pointCloudCallback(sensor_msgs::msg::PointCloud2::ConstSh
     robotPoseCovariance = Eigen::Map<const Eigen::MatrixXd>(poseMessage->pose.covariance.data(), 6, 6);
   }
 
-  // Process point cloud.
   PointCloudType::Ptr pointCloudProcessed(new PointCloudType);
   Eigen::VectorXf measurementVariances;
   if (!sensorProcessor_->process(pointCloud, robotPoseCovariance, pointCloudProcessed, measurementVariances,
@@ -541,8 +542,7 @@ void ElevationMapping::mapUpdateTimerCallback() {
 
 void ElevationMapping::publishFusedMapCallback() {
 
-  RCLCPP_INFO(nodeHandle_->get_logger(), "Entered publishFusedMapCallback() at time %f. ", nodeHandle_->get_clock()->now().seconds());
-
+//  RCLCPP_INFO(nodeHandle_->get_logger(), "Entered publishFusedMapCallback() at time %f. ", nodeHandle_->get_clock()->now().seconds());
   if (!map_.hasFusedMapSubscribers()) {
     return;
   }

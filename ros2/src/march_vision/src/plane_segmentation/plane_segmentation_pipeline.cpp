@@ -4,10 +4,28 @@
 
 namespace plane_segmentation {
 
-PlaneSegmentationPipeline::PlaneSegmentationPipeline(const Config& config)
-    : m_planar_image_segmentation(config.PlanarImageSegmentationParameters, config.RansacSegmentationParameters),
+PlaneSegmentationPipeline::PlaneSegmentationPipeline(std::shared_ptr<rclcpp::Node>& node_handle, const Config& config)
+    : m_node_handle(node_handle),
+      m_planar_image_segmentation(config.PlanarImageSegmentationParameters, config.RansacSegmentationParameters),
       m_contour_segmentation(config.ContourSegmentationParameters),
-      m_postprocessing(config.PostprocessingParameters) {}
+      m_postprocessing(config.PostprocessingParameters) 
+      {
+        RCLCPP_INFO(m_node_handle->get_logger(), "Plane segmentation node started.");
+        bool is_parameters_read = readParameters(m_node_handle);
+        if(is_parameters_read){
+          // TODO: Setup subscribers and publishers.7
+          // Input: filtered/postprocessed elevation map
+          // elevation_mapping_node_sub
+          // 
+          // RViz visualizations
+          // boundaries_pub
+          // insets_pub
+
+          // Output: planar terrain
+          // regions_pub
+        }
+        
+      }
 
 // TODO: Add timers?
 void PlaneSegmentationPipeline::update(grid_map::GridMap&& grid_map, const std::string& elevation_layer) {
@@ -34,6 +52,19 @@ void PlaneSegmentationPipeline::getSegmentation(grid_map::GridMap::Matrix& segme
 
 //   Config config;
 // }
+
+bool PlaneSegmentationPipeline::readParameters(){
+
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+  m_node_handle->declare_parameter("plane_segmentation_parameters");
+
+}
+
+
 
 
 

@@ -1,6 +1,5 @@
 #include "march_vision/plane_segmentation/contour_segmentation.h"
 
-// TODO: Add geometry utils or add them in this
 #include <march_vision/plane_segmentation/geometry_utils.h>
 #include <opencv2/imgproc.hpp>
 

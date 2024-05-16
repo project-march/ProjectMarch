@@ -1,0 +1,38 @@
+plane_segmentation:  
+  ros__parameters:
+
+    frequency_plane_segmentation_pipeline: 15.0 
+
+    planar_image_segmentation:
+      kernel_size: 3                                        
+      planarity_opening_filter: 0                           
+      plane_inclination_threshold_degrees: 30.0             
+      local_plane_inclination_threshold_degrees: 35.0       
+      plane_patch_error_threshold: 0.02                     
+      min_number_points_per_label: 4                        
+      connectivity: 4                                       
+      include_ransac_refinement: true                       
+      global_plane_fit_distance_error_threshold: 0.025      
+      global_plane_fit_angle_error_threshold_degrees: 25.0  
+    
+    contour_segmentation:
+      margin_size: 1    
+
+    ransac_segmentation:
+      probability: 0.001      
+      min_points: 4           
+      epsilon: 0.025          
+      cluster_epsilon: 0.041  
+      normal_threshold: 25.0  
+
+    # TODO: Decide if we are going to postprocess plane_segmentation pipeline output
+    # postprocessing:
+
+      
+      
+
+
+
+
+
+
