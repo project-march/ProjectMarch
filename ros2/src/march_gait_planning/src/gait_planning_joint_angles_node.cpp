@@ -43,7 +43,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
-    m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
+    m_gait_planning.setHomeStand(m_gait_planning.getStandToSitGait()[0]); 
 
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
 }
@@ -81,21 +81,21 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         if (point.size() >= 8) {
             // TODO: overhaul remapping once an order is chosen!
             m_gait_planning.setPrevPoint({point[2], point[3], point[4], point[0], point[7], point[8], point[9], point[5]}); 
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
+            RCLCPP_INFO(this->get_logger(), "Received current joint angles"); 
             std::string point_str;
             for (const auto &value : m_gait_planning.getPrevPoint()) {
                 point_str += std::to_string(value) + " ";
             }
 
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Point values: %s", point_str.c_str());
+            RCLCPP_INFO(this->get_logger(), "Point values: %s", point_str.c_str());
             m_first_stand = false;
         } else {
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
+            RCLCPP_INFO(this->get_logger(), "Not enough joint angles to set previous point correctly!");
         }
     }
     if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
     
-        RCLCPP_INFO(this->get_logger(), "New stance foot: %d", m_gait_planning.getStanceFoot());
+        RCLCPP_DEBUG(this->get_logger(), "New stance foot: %d", m_gait_planning.getStanceFoot());
         
         switch (m_gait_planning.getGaitType()){
             case exoMode::Walk:
