@@ -150,6 +150,10 @@ public:
     // 500 * 100us = 50 ms = watchdog timer
     static const uint16_t WATCHDOG_TIME = 500;
 
+    // Temporary debugging
+    virtual std::string getEthercatMISOAsString() const = 0;
+    virtual std::string getEthercatMOSIAsString() const = 0;
+
 protected:
     /// Get the direction of the most significant encoder.
     Encoder::Direction getMotorDirection() const;

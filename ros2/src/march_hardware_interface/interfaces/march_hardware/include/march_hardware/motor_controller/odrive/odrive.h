@@ -115,8 +115,10 @@ public:
     float getOdriveTemperature();
 
     // Temporary
-    march::EthercatMISO getMISO();
-    march::EthercatMOSI getMOSI();
+    march::EthercatMISO getMISO() const;
+    march::EthercatMOSI getMOSI() const;
+    std::string getEthercatMISOAsString() const override;
+    std::string getEthercatMOSIAsString() const override;
 
     double getTorqueLimit() const override;
     static constexpr double TORQUE_LIMIT = 100.0; // TODO: Determine a better value here

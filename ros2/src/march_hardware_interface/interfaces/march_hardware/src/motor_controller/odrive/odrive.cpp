@@ -18,6 +18,9 @@
 #include <unistd.h>
 #include <utility>
 
+#include <iomanip>
+#include <sstream>
+
 // Allows easy debugging of all incoming errors
 // #define DEBUG_MODE
 
@@ -401,7 +404,7 @@ float ODrive::getMotorVoltage()
 }
 
 // Temporary
-march::EthercatMISO ODrive::getMISO()
+march::EthercatMISO ODrive::getMISO() const
 {
     march::EthercatMISO miso {};
     miso.slave_index = this->getSlaveIndex();
@@ -426,7 +429,7 @@ march::EthercatMISO ODrive::getMISO()
     return miso;
 }
 
-march::EthercatMOSI ODrive::getMOSI()
+march::EthercatMOSI ODrive::getMOSI() const
 {
     march::EthercatMOSI mosi {};
     mosi.slave_index = this->getSlaveIndex();
@@ -442,6 +445,51 @@ march::EthercatMOSI ODrive::getMOSI()
     mosi.torque_d = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueD, axis_)).ui;
     mosi.requested_state = this->read32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_)).ui;
     return mosi;
+}
+
+std::string ODrive::getEthercatMISOAsString() const
+{
+    march::EthercatMISO miso = this->getMISO();
+    std::stringstream ss;
+    ss << "MISO, slave index: " << std::setw(2) << miso.slave_index << ", axis index: " << std::setw(2)
+       << miso.axis_index << std::endl;
+    ss << "  Absolute position: " << std::setw(66) << miso.absolute_position << std::endl;
+    ss << "  Current: " << std::setw(66) << miso.current << std::endl;
+    ss << "  Motor velocity: " << std::setw(66) << miso.motor_velocity << std::endl;
+    ss << "  ODrive error: " << std::setw(66) << miso.odrive_error << std::endl;
+    ss << "  Axis error: " << std::setw(66) << miso.axis_error << std::endl;
+    ss << "  Motor error: " << std::setw(66) << miso.motor_error << std::endl;
+    ss << "  Encoder error: " << std::setw(66) << miso.encoder_error << std::endl;
+    ss << "  Torque sensor error: " << std::setw(66) << miso.torque_sensor_error << std::endl;
+    ss << "  Controller error: " << std::setw(66) << miso.controller_error << std::endl;
+    ss << "  Axis state: " << std::setw(66) << miso.axis_state << std::endl;
+    ss << "  ODrive temperature: " << std::setw(66) << miso.odrive_temperature << std::endl;
+    ss << "  Motor temperature: " << std::setw(66) << miso.motor_temperature << std::endl;
+    ss << "  Shadow count: " << std::setw(66) << miso.shadow_count << std::endl;
+    ss << "  Torque: " << std::setw(66) << miso.torque << std::endl;
+    if (axis_ == march::ODriveAxis::One) {
+        ss << "  AIE absolute position: " << std::setw(66) << miso.aie_absolute_position << std::endl;
+    }
+    return ss.str();
+}
+
+std::string ODrive::getEthercatMOSIAsString() const
+{
+    march::EthercatMOSI mosi = this->getMOSI();
+    std::stringstream ss;
+    ss << "MOSI, slave index: " << std::setw(2) << mosi.slave_index << ", axis index: " << std::setw(2)
+       << mosi.axis_index << std::endl;
+    ss << "  Target torque: " << std::setw(66) << mosi.target_torque << std::endl;
+    ss << "  Target position: " << std::setw(66) << mosi.target_position << std::endl;
+    ss << "  Fuzzy torque: " << std::setw(66) << mosi.fuzzy_torque << std::endl;
+    ss << "  Fuzzy position: " << std::setw(66) << mosi.fuzzy_position << std::endl;
+    ss << "  Position P: " << std::setw(66) << mosi.position_p << std::endl;
+    ss << "  Position I: " << std::setw(66) << mosi.position_i << std::endl;
+    ss << "  Position D: " << std::setw(66) << mosi.position_d << std::endl;
+    ss << "  Torque P: " << std::setw(66) << mosi.torque_p << std::endl;
+    ss << "  Torque D: " << std::setw(66) << mosi.torque_d << std::endl;
+    ss << "  Requested state: " << std::setw(66) << mosi.requested_state << std::endl;
+    return ss.str();
 }
 
 } // namespace march
