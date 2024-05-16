@@ -79,8 +79,6 @@ float MotorController::getVelocity()
     return getAbsoluteVelocity();
 }
 
-
-
 float MotorController::getAbsolutePosition()
 {
     if (!hasAbsoluteEncoder()) {
