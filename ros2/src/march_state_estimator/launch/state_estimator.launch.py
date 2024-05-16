@@ -26,10 +26,10 @@ def generate_launch_description():
     )
     force_stance_threshold = 65.0
 
-    state_estimator_config = os.path.join(
+    sensor_fusion_noise_parameters_config = os.path.join(
         get_package_share_directory('march_state_estimator'),
         'config',
-        'state_estimator_config.yaml'
+        'sensor_fusion_noise_parameters.yaml'
     )
 
     return LaunchDescription([
@@ -45,7 +45,7 @@ def generate_launch_description():
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
                 {"simulation": simulation},
-                state_estimator_config,
+                sensor_fusion_noise_parameters_config,
             ],
         ),
         Node(
