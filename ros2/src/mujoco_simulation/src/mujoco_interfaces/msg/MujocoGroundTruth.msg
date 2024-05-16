@@ -1,0 +1,3 @@
+std_msgs/Header header
+mujoco_interfaces/MujocoGroundTruthState state
+mujoco_interfaces/MujocoGroundTruthObservation observation

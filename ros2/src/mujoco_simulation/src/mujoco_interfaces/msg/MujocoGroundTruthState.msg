@@ -1,0 +1,9 @@
+geometry_msgs/Point position
+geometry_msgs/Vector3 velocity
+geometry_msgs/Quaternion orientation
+geometry_msgs/Vector3 left_foot_position
+geometry_msgs/Vector3 right_foot_position
+geometry_msgs/Vector3 accelerometer_bias
+geometry_msgs/Vector3 gyroscope_bias
+geometry_msgs/Quaternion left_foot_slippage
+geometry_msgs/Quaternion right_foot_slippage
