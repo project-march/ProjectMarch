@@ -339,6 +339,9 @@ void StateEstimatorNode::publishStateEstimation()
     if (m_is_simulation) {
         state_estimation_msg.world_foot_pose = getCurrentPoseArray("world", {"L_sole", "R_sole"});
     }
+
+    // Variables for optimization of Kalman Filter tuning
+    state_estimation_msg.performance_cost = m_sensor_fusion->getPerformanceCost();
     
     m_state_estimation_pub->publish(state_estimation_msg);
 }

@@ -6,6 +6,7 @@
 #ifndef MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 #define MARCH_STATE_ESTIMATOR__SENSOR_FUSION_HPP_
 
+// Uncomment to enable debug mode
 // #define DEBUG
 
 #include <string>
@@ -97,6 +98,8 @@ public:
     }
 
     inline const EKFState& getState() const { return m_state; }
+
+    inline double getPerformanceCost() const { return m_performance_cost; }
 
     inline void setObservation(const EKFObservation& observation) { m_observation = observation; }
 
@@ -222,6 +225,13 @@ private:
         #endif
     }
 
+    inline void computePerformanceCost(const Eigen::VectorXd& innovation) {
+        m_performance_cost = innovation.transpose() * m_innovation_covariance_matrix.completeOrthogonalDecomposition().pseudoInverse() * innovation;
+        #ifdef DEBUG
+        std::cout << "Performance cost:\n" << m_performance_cost << std::endl;
+        #endif
+    }
+
     const Eigen::VectorXd computeInnovation() const;
     const Eigen::MatrixXd computeNoiseJacobianMatrix() const;
     void computeDynamicsMatrix();
@@ -237,6 +247,7 @@ private:
     const Eigen::Matrix3d computeSkewSymmetricMatrix(const Eigen::Vector3d& vector) const;
 
     double m_timestep;
+    double m_performance_cost;
 
     EKFState m_state;
     EKFObservation m_observation;

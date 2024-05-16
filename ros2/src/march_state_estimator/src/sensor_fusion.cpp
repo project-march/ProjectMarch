@@ -56,6 +56,9 @@ SensorFusion::SensorFusion(double timestep) {
     m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e3;
     m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
     m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
+
+    // Initialize the performance cost with a large value
+    m_performance_cost = 1e15;
 }
 
 void SensorFusion::predictState() {
@@ -128,6 +131,9 @@ void SensorFusion::updateState() {
     m_state.imu_orientation.normalize();
     m_state.left_foot_slippage.normalize();
     m_state.right_foot_slippage.normalize();
+
+    // Compute the performance cost to evaluate and optimize the sensor fusion algorithm
+    computePerformanceCost(innovation);
 
     #ifdef DEBUG
     Eigen::VectorXd posterior_state(STATE_DIMENSION_SIZE);
