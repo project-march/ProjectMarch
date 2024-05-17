@@ -14,7 +14,7 @@ from lifecycle_msgs.srv import GetState, ChangeState, GetAvailableTransitions
 from march_shared_msgs.msg import StateEstimation
 
 from march_sensor_fusion_optimization.bayesian_optimization import BayesianOptimizer
-from march_sensor_fusion_optimization.states_handler import BayesianOptimizationStates
+from ros2.src.utility.march_sensor_fusion_optimization.march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates, StateHandler
 
 class SensorFusionOptimizerNode(Node):
 
@@ -25,6 +25,7 @@ class SensorFusionOptimizerNode(Node):
         self.declare_parameter('min_observation_change', 1e-6)
         self.declare_parameter('parameters_filepath', get_package_share_directory('march_state_estimator') + '/config/sensor_fusion_noise_parameters.yaml')
 
+        # Initialize Bayesian Optimizer
         self.max_iterations = self.get_parameter('max_iterations').value
         self.min_observation_change = self.get_parameter('min_observation_change').value
         self.bayesian_optimizer = BayesianOptimizer(
@@ -34,8 +35,11 @@ class SensorFusionOptimizerNode(Node):
             param_file=self.get_parameter('parameters_filepath').value
         )
 
-        self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
+        # Initialize state machine
+        self.state_machine = BayesianOptimizationStates(BayesianOptimizationStates.STATE_CONFIGURATION)
 
+        # Initialize subscribers and clients
+        self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
         self.change_state_client = self.create_client(ChangeState, 'state_estimator/change_state', callback_group=None)
         self.get_state_client = self.create_client(GetState, 'state_estimator/get_state', callback_group=None)
         self.get_available_transitions_client = self.create_client(GetAvailableTransitions, 'state_estimator/get_available_transitions', callback_group=None)

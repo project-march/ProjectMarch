@@ -28,7 +28,7 @@ class ParametersHandler:
     def get_optimization_parameters(self, type: str) -> list:
         return self.parameters['state_estimator']['ros__parameters']['optimization_parameters'][type]
     
-    def get_no_optimization_parameters(self) -> int:
+    def get_num_optimization_parameters(self) -> int:
         size = 0
         for type in self.noise_type_names:
             size += len(self.get_optimization_parameters(type))

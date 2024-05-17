@@ -4,6 +4,7 @@ Author: Alexander James Becoy @alexanderjamesbecoy
 """
 
 from march_sensor_fusion_optimization.parameters_handler import ParametersHandler
+from march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates
 
 import numpy as np
 import tensorflow_probability as tfp
@@ -26,26 +27,26 @@ class BayesianOptimizer:
         # Initialize parameter handler
         self.param_file = param_file
         self.parameter_handler = ParametersHandler(self.param_file)
+        num_optimization_parameters = self.parameter_handler.get_num_optimization_parameters()
 
         # Initialize performance costs
         self.performance_costs = []
 
         # Initialize kernel hyperparameters
         self.amplitude  = tfp.util.TransformedVariable(
-            1.0, tfp.bijectors.Softplus(), dtype=np.float64, name='amplitude')
+            100.0, tfp.bijectors.Softplus(), dtype=np.float64, name='amplitude')
         self.length_scale = tfp.util.TransformedVariable(
-            1.0, tfp.bijectors.Softplus(), dtype=np.float64, name='length_scale')
+            1000.0, tfp.bijectors.Softplus(), dtype=np.float64, name='length_scale')
         self.kernel = tfm.psd_kernels.ExponentiatedQuadratic(
             amplitude=self.amplitude, length_scale=self.length_scale)
 
         # Initialize surrogate model
-        index_points = np.expand_dims(np.linspace(-1.0, 1.0, num_points), axis=-1)
+        index_points = np.expand_dims(np.linspace(-1.0, 1.0, num_optimization_parameters), axis=-1)
         self.surrogate_model = tfd.StudentTProcess(
             df=float(dof),
             kernel=self.kernel,
             index_points=index_points,
         )
-        self.fit(population_size=10)
 
 
     def fit(self, population_size: int) -> None:
