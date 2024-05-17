@@ -23,8 +23,25 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
+StateEstimatorNode::StateEstimatorNode(): LifecycleNode("state_estimator")
 {
+    RCLCPP_INFO(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been created.\nOn standby for configuration.");
+}
+
+StateEstimatorNode::~StateEstimatorNode()
+{
+    RCLCPP_WARN(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been destroyed.");
+}
+
+/*******************************************************************************
+ * Lifecycle Callbacks
+ *******************************************************************************/
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_configure(const rclcpp_lifecycle::State& state)
+{
+    (void) state;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is configuring...");
+
     // Determine if it is a simulation or real robot
     declare_parameter("simulation", true);
     m_is_simulation = get_parameter("simulation").as_bool();
@@ -73,7 +90,7 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     if (yaml_filename.empty())
     {
         RCLCPP_ERROR(this->get_logger(), "No robot description file has been provided.");
-        return;
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
 
     m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
@@ -84,7 +101,7 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     if (urdf_file_path.empty())
     {
         RCLCPP_ERROR(this->get_logger(), "No URDF file path has been provided.");
-        return;
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
 
     declare_parameter("timestep_in_ms", 50);
@@ -172,23 +189,92 @@ StateEstimatorNode::StateEstimatorNode(): Node("state_estimator")
     // Initialize timer
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
-    m_startup_time = this->now();
-    m_startup_timeout = 5.0;
+    m_timer->cancel();
 
-    RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
-
-    // Avoid spikes in linear acceleration
-    while ((this->now() - m_startup_time) < rclcpp::Duration::from_seconds(m_startup_timeout)) {
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for proper initialization...");
-        broadcastTransformToTf2();
-    }
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is ready");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-StateEstimatorNode::~StateEstimatorNode()
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_activate(const rclcpp_lifecycle::State& state)
 {
-    RCLCPP_WARN(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been stopped.");
+    (void) state;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is activating...");
+
+    m_state_estimation_pub->on_activate();
+    m_feet_height_pub->on_activate();
+    m_torque_left_pub->on_activate();
+    m_torque_right_pub->on_activate();
+    m_mpc_foot_positions_pub->on_activate();
+    m_mpc_com_pub->on_activate();
+    m_mpc_zmp_pub->on_activate();
+    m_mpc_stance_foot_pub->on_activate();
+    m_mpc_com_pos_pub->on_activate();
+
+    m_timer->reset();
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is active");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_deactivate(const rclcpp_lifecycle::State& state)
+{
+    (void) state;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is deactivating...");
+
+    m_state_estimation_pub->on_deactivate();
+    m_feet_height_pub->on_deactivate();
+    m_torque_left_pub->on_deactivate();
+    m_torque_right_pub->on_deactivate();
+    m_mpc_foot_positions_pub->on_deactivate();
+    m_mpc_com_pub->on_deactivate();
+    m_mpc_zmp_pub->on_deactivate();
+    m_mpc_stance_foot_pub->on_deactivate();
+    m_mpc_com_pos_pub->on_deactivate();
+
+    m_timer->cancel();
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is inactive");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_cleanup(const rclcpp_lifecycle::State& state)
+{
+    (void) state;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is cleaning up...");
+
+    m_state_estimation_pub.reset();
+    m_feet_height_pub.reset();
+    m_torque_left_pub.reset();
+    m_torque_right_pub.reset();
+    m_mpc_foot_positions_pub.reset();
+    m_mpc_com_pub.reset();
+    m_mpc_zmp_pub.reset();
+    m_mpc_stance_foot_pub.reset();
+    m_mpc_com_pos_pub.reset();
+
+    m_timer.reset();
+    m_joint_state_sub.reset();
+    m_imu_sub.reset();
+    m_imu_position_sub.reset();
+    m_imu_velocity_sub.reset();
+
+    m_robot_description.reset();
+    m_state_estimator.reset();
+    m_sensor_fusion.reset();
+
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node has been cleaned up");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_shutdown(const rclcpp_lifecycle::State& state)
+{
+    (void) state;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is shutting down...");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+
+/*******************************************************************************
+ * Callbacks
+ *******************************************************************************/
 
 void StateEstimatorNode::timerCallback()
 {
@@ -273,6 +359,11 @@ void StateEstimatorNode::imuVelocityCallback(const geometry_msgs::msg::Vector3St
 {
     m_imu_velocity = msg;
 }
+
+
+/*******************************************************************************
+ * Publish Functions
+ *******************************************************************************/
 
 void StateEstimatorNode::publishStateEstimation()
 {
@@ -531,6 +622,11 @@ void StateEstimatorNode::broadcastTransformToTf2()
     m_tf_broadcaster->sendTransform(transform_stamped);
 }
 
+
+/*******************************************************************************
+ * Helper Functions
+ *******************************************************************************/
+
 void StateEstimatorNode::checkJointStateTimeout()
 {
     if ((this->now() - m_joint_state_last_update) > rclcpp::Duration::from_seconds(m_joint_state_timeout)) {
@@ -583,12 +679,19 @@ std::vector<geometry_msgs::msg::Pose> StateEstimatorNode::getCurrentPoseArray(co
     return poses;
 }
 
+
+/*******************************************************************************
+ * Main Function
+ *******************************************************************************/
+
 int main(int argc, char** argv)
 {
     Eigen::initParallel();
     rclcpp::init(argc, argv);
-    rclcpp::Node::SharedPtr node_sensor_fusion = std::make_shared<StateEstimatorNode>();
-    rclcpp::spin(node_sensor_fusion);
+    rclcpp::executors::SingleThreadedExecutor executor;
+    auto state_estimator_node = std::make_shared<StateEstimatorNode>();
+    executor.add_node(state_estimator_node->get_node_base_interface());
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }

@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
   <depend>ament_index_cpp</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
@@ -28,6 +29,7 @@
   <depend>trajectory_msgs</depend>
   <depend>filters</depend>
   <depend>pinocchio</depend>
+  <depend>lifecycle_msgs</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

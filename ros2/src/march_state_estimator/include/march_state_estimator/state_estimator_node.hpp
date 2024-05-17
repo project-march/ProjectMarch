@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 #include "tf2/LinearMath/Quaternion.h"
@@ -20,6 +21,7 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/vector3_stamped.hpp"
+#include "lifecycle_msgs/msg/state.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/sensor_fusion_noise_params.hpp"
@@ -39,12 +41,18 @@
 #define LEFT_FOOT_ID    0
 #define RIGHT_FOOT_ID   1
 
-class StateEstimatorNode : public rclcpp::Node {
+class StateEstimatorNode : public rclcpp_lifecycle::LifecycleNode {
 public:
     StateEstimatorNode();
     ~StateEstimatorNode();
 
 private:
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State& state);
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State& state);
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State& state);
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State& state);
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State& state);
+
     void timerCallback();
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
@@ -87,31 +95,30 @@ private:
     rclcpp::Time m_joint_state_last_update;
     rclcpp::Time m_imu_last_update;
 
+    inline bool isInActiveState() { return get_current_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE; }
+
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
 
-    rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
-    rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
+    rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
+    rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 
     // M8's MPC
-    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_pub;
-    rclcpp::Publisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_mpc_com_pub;
-    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_zmp_pub;
-    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_mpc_stance_foot_pub;
-    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_com_pos_pub;
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseArray>::SharedPtr m_mpc_foot_positions_pub;
+    rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::CenterOfMass>::SharedPtr m_mpc_com_pub;
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_zmp_pub;
+    rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::Int32>::SharedPtr m_mpc_stance_foot_pub;
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PointStamped>::SharedPtr m_mpc_com_pos_pub;
 
     // Monitoring topics
-    rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_left_pub;
-    rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_right_pub;
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_left_pub;
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_torque_right_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_sensors_callback_group;
     rclcpp::SubscriptionOptions m_sensors_subscription_options;
-
-    double m_startup_timeout;
-    rclcpp::Time m_startup_time;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_NODE_HPP_

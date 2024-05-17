@@ -24,6 +24,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -42,6 +43,7 @@ find_package(urdf REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(filters REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -70,6 +72,7 @@ add_library(${PROJECT_NAME} STATIC
 
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp
+  rclcpp_lifecycle
   ament_index_cpp
   std_msgs
   sensor_msgs
@@ -84,6 +87,7 @@ ament_target_dependencies(${PROJECT_NAME}
   orocos_kdl
   urdf
   trajectory_msgs
+  lifecycle_msgs
 )
 
 # Create state_estimator_node executable
@@ -105,6 +109,7 @@ target_include_directories(state_estimator_node PUBLIC
 
 ament_target_dependencies(state_estimator_node
   rclcpp
+  rclcpp_lifecycle
   ament_index_cpp
   std_msgs
   sensor_msgs
@@ -118,6 +123,7 @@ ament_target_dependencies(state_estimator_node
   kdl_parser
   orocos_kdl
   pinocchio
+  lifecycle_msgs
 )
 
 target_link_libraries(state_estimator_node
