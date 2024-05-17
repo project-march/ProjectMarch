@@ -37,6 +37,15 @@ def test_parameters_handler_load_parameters():
                                                         'joint_position': [1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3],
                                                     }}}}}
 
+def test_parameters_handler_get_noise_type_names():
+    ph = ParametersHandler(filepath)
+    assert ph.noise_type_names == ['process_noise', 'observation_noise']
+
+def test_parameters_handler_get_noise_parameter_names():
+    ph = ParametersHandler(filepath)
+    assert ph.get_noise_parameter_names('process_noise') == ['linear_acceleration', 'angular_velocity', 'foot_position', 'accelerometer_bias', 'gyroscope_bias', 'foot_slippage']
+    assert ph.get_noise_parameter_names('observation_noise') == ['foot_position', 'foot_slippage', 'joint_position']
+
 def test_parameters_handler_get_parameter():
     ph = ParametersHandler(filepath)
     assert ph.get_parameter('process_noise', 'linear_acceleration') == [1e-12, 1e-12, 1e-12]
