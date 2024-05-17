@@ -46,3 +46,11 @@ state_estimator:
         - 1.0e-06
         - 1.0e-06
         - 1.0e-06
+    optimization_parameters:
+      observation_noise:
+      - foot_position
+      - foot_slippage
+      - joint_position
+      process_noise:
+      - foot_position
+      - foot_slippage

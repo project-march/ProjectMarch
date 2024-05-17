@@ -7,38 +7,45 @@ import rclpy
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
+from ament_index_python.packages import get_package_share_directory
 
 from lifecycle_msgs.msg import State, Transition, TransitionDescription
 from lifecycle_msgs.srv import GetState, ChangeState, GetAvailableTransitions
 from march_shared_msgs.msg import StateEstimation
 
-# from march_sensor_fusion_optimization.bayesian_optimizer import BayesianOptimizer
+from march_sensor_fusion_optimization.bayesian_optimization import BayesianOptimizer
+from march_sensor_fusion_optimization.states_handler import BayesianOptimizationStates
 
 class SensorFusionOptimizerNode(Node):
 
     def __init__(self) -> None:
         super().__init__('sensor_fusion_optimizer')
 
-        self.performance_cost = 1e15
-        # self.bayesian_optimizer = BayesianOptimizer()
+        self.declare_parameter('max_iterations', 1000)
+        self.declare_parameter('min_observation_change', 1e-6)
+        self.declare_parameter('parameters_filepath', get_package_share_directory('march_state_estimator') + '/config/sensor_fusion_noise_parameters.yaml')
+
+        self.max_iterations = self.get_parameter('max_iterations').value
+        self.min_observation_change = self.get_parameter('min_observation_change').value
+        self.bayesian_optimizer = BayesianOptimizer(
+            dof=3.0,
+            max_iter=self.max_iterations, 
+            min_obs=self.min_observation_change, 
+            param_file=self.get_parameter('parameters_filepath').value
+        )
 
         self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
 
-        client_callback_group = ReentrantCallbackGroup()
-
-        self.change_state_client = self.create_client(ChangeState, 'state_estimator/change_state', callback_group=client_callback_group)
-        self.get_state_client = self.create_client(GetState, 'state_estimator/get_state', callback_group=client_callback_group)
-        self.get_available_transitions_client = self.create_client(GetAvailableTransitions, 'state_estimator/get_available_transitions', callback_group=client_callback_group)
+        self.change_state_client = self.create_client(ChangeState, 'state_estimator/change_state', callback_group=None)
+        self.get_state_client = self.create_client(GetState, 'state_estimator/get_state', callback_group=None)
+        self.get_available_transitions_client = self.create_client(GetAvailableTransitions, 'state_estimator/get_available_transitions', callback_group=None)
 
         self.get_logger().info('Sensor Fusion Optimizer Node has been initialized.')
-        available_transitions = self.get_available_transitions()
-        self.get_logger().info('Available transitions:')
-        for transition in available_transitions:
-            self.get_logger().info(f'{transition.transition.label} ({transition.transition.id})\n\t state: {transition.start_state} -> {transition.goal_state}')
 
 
     def state_estimation_callback(self, msg: StateEstimation) -> None:
-        self.performance_cost = msg.performance_cost
+        self.bayesian_optimizer.performance_costs.append(msg.performance_cost)
+        # Actuate?
 
 
     def get_current_state(self) -> State:
@@ -53,6 +60,7 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Service has been called.')
         return get_state_future.result().current_state
+
 
     def get_available_transitions(self) -> list:
         self.get_logger().info('Getting available transitions...')

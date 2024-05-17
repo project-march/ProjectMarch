@@ -30,12 +30,19 @@ def test_parameters_handler_load_parameters():
                                                         'accelerometer_bias': [1e-12, 1e-12, 1e-12],
                                                         'gyroscope_bias': [1e-12, 1e-12, 1e-12],
                                                         'foot_slippage': [1e-12, 1e-12, 1e-12],
-                                                    },
+                                                },
                                                 'observation_noise': {
                                                         'foot_position': [1e3, 1e3, 1e3],
                                                         'foot_slippage': [1e3, 1e3, 1e3],
                                                         'joint_position': [1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3],
-                                                    }}}}}
+                                                },
+                                            },
+                                            'optimization_parameters': {
+                                                'process_noise': ['foot_position', 'foot_slippage'],
+                                                'observation_noise': ['foot_position', 'foot_slippage', 'joint_position'],
+                                            }
+                                        }
+                                    }}
 
 def test_parameters_handler_get_noise_type_names():
     ph = ParametersHandler(filepath)
@@ -86,9 +93,16 @@ def test_parameters_handler_save_parameters():
                                                         'accelerometer_bias': [1e-6, 1e-6, 1e-6],
                                                         'gyroscope_bias': [1e-6, 1e-6, 1e-6],
                                                         'foot_slippage': [1e-6, 1e-6, 1e-6],
-                                                    },
+                                                },
                                                 'observation_noise': {
                                                         'foot_position': [1e6, 1e6, 1e6],
                                                         'foot_slippage': [1e6, 1e6, 1e6],
                                                         'joint_position': [1e6, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6]
-                                                    }}}}}
+                                                },
+                                            },
+                                            'optimization_parameters': {
+                                                'process_noise': ['foot_position', 'foot_slippage'],
+                                                'observation_noise': ['foot_position', 'foot_slippage', 'joint_position'],
+                                            },
+                                        },
+                                    }}
