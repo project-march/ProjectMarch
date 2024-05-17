@@ -14,7 +14,7 @@ from lifecycle_msgs.srv import GetState, ChangeState, GetAvailableTransitions
 from march_shared_msgs.msg import StateEstimation
 
 from march_sensor_fusion_optimization.bayesian_optimization import BayesianOptimizer
-from ros2.src.utility.march_sensor_fusion_optimization.march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates, StateHandler
+from march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates, StateHandler
 
 class SensorFusionOptimizerNode(Node):
 
@@ -36,7 +36,8 @@ class SensorFusionOptimizerNode(Node):
         )
 
         # Initialize state machine
-        self.state_machine = BayesianOptimizationStates(BayesianOptimizationStates.STATE_CONFIGURATION)
+        self.state_machine = StateHandler(initial_state=BayesianOptimizationStates.STATE_CONFIGURATION)
+        self.timer = self.create_timer(self.state_machine.timer_period, self.timer_callback)
 
         # Initialize subscribers and clients
         self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
@@ -46,10 +47,13 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Sensor Fusion Optimizer Node has been initialized.')
 
+    def timer_callback(self) -> None:
+        current_state = self.state_machine.get_current_state()
+        available_transitions = self.state_machine
+
 
     def state_estimation_callback(self, msg: StateEstimation) -> None:
         self.bayesian_optimizer.performance_costs.append(msg.performance_cost)
-        # Actuate?
 
 
     def get_current_state(self) -> State:

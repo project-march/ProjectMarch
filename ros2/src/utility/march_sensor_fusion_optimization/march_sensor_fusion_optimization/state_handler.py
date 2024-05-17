@@ -20,6 +20,7 @@ class StateHandler:
 
     def __init__(self, initial_state: BayesianOptimizationStates) -> None:
         self.current_state = initial_state
+        self.timer_period = 1e-3
 
     def transition_state(self, transition: BayesianOptimizationTransitions) -> bool:
         if self.current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
@@ -36,6 +37,16 @@ class StateHandler:
                 return True
         else:
             return False
+        
+    def get_available_transitions(self) -> BayesianOptimizationTransitions:
+        if self.current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
+            return BayesianOptimizationTransitions.TRANSITION_CONFIGURATION_INITIALIZATION
+        elif self.current_state == BayesianOptimizationStates.STATE_INITALIZATION:
+            return BayesianOptimizationTransitions.TRANSITION_INITIALIZATION_OPTIMATION
+        elif self.current_state == BayesianOptimizationStates.STATE_OPTIMIZATION:
+            return BayesianOptimizationTransitions.TRANSITION_OPTIMIZATION_COMPLETION
+        else:
+            return None
     
     def get_current_state(self) -> BayesianOptimizationStates:
         return self.current_state
