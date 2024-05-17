@@ -106,3 +106,12 @@ def test_parameters_handler_save_parameters():
                                             },
                                         },
                                     }}
+    
+def test_parameters_handler_get_optimization_parameters():
+    ph = ParametersHandler(filepath)
+    assert ph.get_optimization_parameters('process_noise') == ['foot_position', 'foot_slippage']
+    assert ph.get_optimization_parameters('observation_noise') == ['foot_position', 'foot_slippage', 'joint_position']
+
+def test_parameters_handler_get_no_optimization_parameters():
+    ph = ParametersHandler(filepath)
+    assert ph.get_no_optimization_parameters() == 5
