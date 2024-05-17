@@ -30,9 +30,9 @@ namespace march {
 struct EthercatMISO {
     uint16_t slave_index;
     int axis_index;
-    float absolute_position;
+    uint32_t absolute_position;
     float current;
-    uint32_t motor_velocity;
+    float motor_velocity;
     uint32_t odrive_error;
     uint32_t axis_error;
     uint64_t motor_error;
@@ -119,6 +119,7 @@ public:
     march::EthercatMOSI getMOSI() const;
     std::string getEthercatMISOAsString() const override;
     std::string getEthercatMOSIAsString() const override;
+    bool isAxisOne() const override;
 
     double getTorqueLimit() const override;
     static constexpr double TORQUE_LIMIT = 100.0; // TODO: Determine a better value here

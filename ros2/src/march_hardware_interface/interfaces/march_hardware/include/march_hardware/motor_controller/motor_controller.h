@@ -153,6 +153,7 @@ public:
     // Temporary debugging
     virtual std::string getEthercatMISOAsString() const = 0;
     virtual std::string getEthercatMOSIAsString() const = 0;
+    virtual bool isAxisOne() const = 0;
 
 protected:
     /// Get the direction of the most significant encoder.

@@ -395,8 +395,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     // Stopping ethercat cycle in the hardware
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMISOAsString());
-        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMOSIAsString());
+        // RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMISOAsString());
+        // RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMOSIAsString());
         // control on zero output torque when the exo shuts down.
 #ifndef DEBUG_MODE
         RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
@@ -434,7 +434,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.torque = jointInfo.joint.getTorque();
         jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
-        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMISOAsString());
+        // RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMISOAsString());
     }  
 
     RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
@@ -477,7 +477,7 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     weight_node->publish_measured_torque();
 
     for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMOSIAsString());
+        // RCLCPP_INFO((*logger_), jointInfo.joint.getMotorController()->getEthercatMOSIAsString());
         if (!is_joint_in_valid_state(jointInfo)) {
             // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
             throw runtime_error("Joint not in valid state!");
