@@ -47,33 +47,54 @@ public:
     ~StateEstimatorNode();
 
 private:
+    // Lifecycle node callbacks
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State& state);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State& state);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State& state);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State& state);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State& state);
 
+    // Subscription callbacks
     void timerCallback();
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
     void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg);
 
+    // Publisher functions
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
     void publishGroundReactionForce();
-
     void broadcastTransformToTf2();
+
+    // Configuration functions
+    void declareParameters();
+    void configureSubscriptions();
+    void configurePublishers();
+    void configureStateEstimationTimer();
+    void configureTF2();
+    bool configureJointStateMsg();
+    bool configureImuMsg();
+    bool configureStateEstimator();
+    bool configureSensorFusion();
+
+    // Helper functions
+    inline bool isInActiveState() { return get_current_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE; }
+   
+    inline void updateJointStateTimeout() { m_joint_state_last_update = now(); }
+    inline void updateImuTimeout() { m_imu_last_update = now(); }
     void checkJointStateTimeout();
     void checkImuTimeout();
+   
     geometry_msgs::msg::TransformStamped getCurrentTransform(const std::string& parent_frame, const std::string& child_frame);
     geometry_msgs::msg::Pose getCurrentPose(const std::string& parent_frame, const std::string& child_frame);
     std::vector<geometry_msgs::msg::Pose> getCurrentPoseArray(const std::string& parent_frame, const std::vector<std::string>& child_frames);
 
+    // Member variables
+    double m_dt;
     bool m_is_simulation;
 
-    double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
     sensor_msgs::msg::Imu::SharedPtr m_imu;
     geometry_msgs::msg::PointStamped::SharedPtr m_imu_position;
@@ -94,8 +115,6 @@ private:
     double m_imu_timeout;
     rclcpp::Time m_joint_state_last_update;
     rclcpp::Time m_imu_last_update;
-
-    inline bool isInActiveState() { return get_current_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE; }
 
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;

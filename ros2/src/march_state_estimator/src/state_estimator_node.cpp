@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include "omp.h"
+#include "urdf/model.h"
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"
 #include "math.h"
@@ -33,165 +34,50 @@ StateEstimatorNode::~StateEstimatorNode()
     RCLCPP_WARN(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been destroyed.");
 }
 
+
 /*******************************************************************************
- * Lifecycle Callbacks
+ * Lifecycle node callbacks
  *******************************************************************************/
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateEstimatorNode::on_configure(const rclcpp_lifecycle::State& state)
 {
     (void) state;
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is configuring...");
+    declareParameters();
 
     // Determine if it is a simulation or real robot
-    declare_parameter("simulation", true);
     m_is_simulation = get_parameter("simulation").as_bool();
     RCLCPP_INFO(this->get_logger(), "Simulation: %s", m_is_simulation ? "true" : "false");
 
-    // First initialize sensor values to zero
-    // Initialize joint states to zero
-    std::vector<std::string> joint_names = { 
-        "left_ankle_dpf", "left_ankle_ie", "left_hip_aa", "left_hip_fe", "left_knee",
-        "right_ankle_dpf", "right_ankle_ie", "right_hip_aa", "right_hip_fe", "right_knee"
-    };
-    m_joint_state = nullptr;
-    // m_joint_state = std::make_shared<sensor_msgs::msg::JointState>();
-    // m_joint_state->header.frame_id = "joint_link";
-    // m_joint_state->header.stamp = this->now();
-    // m_joint_state->name = joint_names;
-    // m_joint_state->position = std::vector<double>(joint_names.size(), 0.0);
-    // m_joint_state->velocity = std::vector<double>(joint_names.size(), 0.0);
-    // m_joint_state->effort = std::vector<double>(joint_names.size(), 0.0);
-    m_joint_state_last_update = this->now();
-
-    // Initialize IMU to identity quaternion and gravity in z-axis
-    m_imu = std::make_shared<sensor_msgs::msg::Imu>();
-    m_imu->header.frame_id = "backpack";
-    m_imu->header.stamp = this->now();
-    m_imu->orientation.w = 1.0;
-    m_imu->orientation.x = 0.0;
-    m_imu->orientation.y = 0.0;
-    m_imu->orientation.z = 0.0;
-    m_imu->angular_velocity.x = 0.0;
-    m_imu->angular_velocity.y = 0.0;
-    m_imu->angular_velocity.z = 0.0;
-    m_imu->linear_acceleration.x = 0.0;
-    m_imu->linear_acceleration.y = 0.0;
-    m_imu->linear_acceleration.z = -9.81;
-    m_imu_last_update = this->now();
-
-    // Set timeout values in seconds
-    // TODO: Set these values in a parameter file
-    m_joint_state_timeout = 1.0;
-    m_imu_timeout = 5.0;
-
-    declare_parameter("robot_definition", std::string());
-    std::string yaml_filename = get_parameter("robot_definition").as_string();
-
-    if (yaml_filename.empty())
-    {
-        RCLCPP_ERROR(this->get_logger(), "No robot description file has been provided.");
+    // Initialize the sensor messages
+    if (!configureJointStateMsg()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize joint state message.");
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
 
-    m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-
-    declare_parameter("urdf_file_path", std::string());
-    std::string urdf_file_path = get_parameter("urdf_file_path").as_string();
-
-    if (urdf_file_path.empty())
-    {
-        RCLCPP_ERROR(this->get_logger(), "No URDF file path has been provided.");
+    if (!configureImuMsg()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize IMU message.");
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
 
-    declare_parameter("timestep_in_ms", 50);
-    int dt = get_parameter("timestep_in_ms").as_int();
+    // Initialize the ROS2 communication
+    configureSubscriptions();
+    configurePublishers();
+    configureStateEstimationTimer();
+    configureTF2();
 
-    declare_parameter("left_stance_threshold", 400.0);
-    declare_parameter("right_stance_threshold", 400.0);
-    double left_stance_threshold = get_parameter("left_stance_threshold").as_double();
-    double right_stance_threshold = get_parameter("right_stance_threshold").as_double();
+    // Initialize the state estimator and sensor fusion
+    if (!configureStateEstimator()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize state estimator.");
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+    }
 
-    m_tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
-    m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
-    m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+    if (!configureSensorFusion()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to initialize sensor fusion.");
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+    }
 
-    m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_sensors_subscription_options.callback_group = m_sensors_callback_group;
-
-    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
-        std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
-        std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_state_estimation_pub
-        = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
-    m_feet_height_pub 
-        = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
-    m_torque_left_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/left", 10);
-    m_torque_right_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/right", 10);
-
-    // Simulation ground truth information about position and velocity in world frame
-    m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
-        std::bind(&StateEstimatorNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
-        std::bind(&StateEstimatorNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-
-    // M8's MPC
-    m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
-    m_mpc_com_pub = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 10);
-    m_mpc_zmp_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 10);
-    m_mpc_stance_foot_pub = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 10);
-
-    m_mpc_com_pos_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("state_estimation/com_position", 10);
-    
-    // Calculate timestep in seconds
-    m_dt = static_cast<double>(dt) / 1000.0;
-
-    // Initialize state estimator
-    m_node_feet_names = { "L_sole", "R_sole" };
-    m_state_estimator = std::make_unique<StateEstimator>(m_robot_description, urdf_file_path);
-    m_state_estimator->configureJointNames(joint_names);
-    m_state_estimator->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
-    RCLCPP_INFO(this->get_logger(), "Timestep: %f", m_dt);
-
-    // Initialize and configure noise parameters in sensor fusion
-    #ifdef DEBUG
-    RCLCPP_INFO(this->get_logger(), "Initializing sensor fusion...");
-    #endif
-    m_sensor_fusion = std::make_unique<SensorFusion>(m_dt);
-
-    declare_parameter("noise_parameters.process_noise.linear_acceleration", std::vector<double>());
-    declare_parameter("noise_parameters.process_noise.angular_velocity", std::vector<double>());
-    declare_parameter("noise_parameters.process_noise.foot_position", std::vector<double>());
-    declare_parameter("noise_parameters.process_noise.accelerometer_bias", std::vector<double>());
-    declare_parameter("noise_parameters.process_noise.gyroscope_bias", std::vector<double>());
-    declare_parameter("noise_parameters.process_noise.foot_slippage", std::vector<double>());
-    m_sensor_fusion->setProcessNoiseCovarianceMatrix(
-        get_parameter("noise_parameters.process_noise.linear_acceleration").as_double_array(),
-        get_parameter("noise_parameters.process_noise.angular_velocity").as_double_array(),
-        get_parameter("noise_parameters.process_noise.foot_position").as_double_array(),
-        get_parameter("noise_parameters.process_noise.accelerometer_bias").as_double_array(),
-        get_parameter("noise_parameters.process_noise.gyroscope_bias").as_double_array(),
-        get_parameter("noise_parameters.process_noise.foot_slippage").as_double_array());
-
-    declare_parameter("noise_parameters.observation_noise.foot_position", std::vector<double>());
-    declare_parameter("noise_parameters.observation_noise.foot_slippage", std::vector<double>());
-    declare_parameter("noise_parameters.observation_noise.joint_position", std::vector<double>());
-    m_sensor_fusion->setObservationNoiseCovarianceMatrix(
-        get_parameter("noise_parameters.observation_noise.foot_position").as_double_array(),
-        get_parameter("noise_parameters.observation_noise.foot_slippage").as_double_array(),
-        get_parameter("noise_parameters.observation_noise.joint_position").as_double_array());
-
-    #ifdef DEBUG
-    RCLCPP_INFO(this->get_logger(), "Sensor fusion initialized");
-    #endif
-
-    // Initialize timer
-    m_timer = this->create_wall_timer(
-        std::chrono::milliseconds(dt), std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
-    m_timer->cancel();
-
-    RCLCPP_INFO(this->get_logger(), "State Estimator Node is ready");
+    RCLCPP_INFO(this->get_logger(), "State Estimator Node is fully configured.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -200,6 +86,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     (void) state;
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is activating...");
 
+    // Activate lifecycle publishers
     m_state_estimation_pub->on_activate();
     m_feet_height_pub->on_activate();
     m_torque_left_pub->on_activate();
@@ -210,7 +97,13 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     m_mpc_stance_foot_pub->on_activate();
     m_mpc_com_pos_pub->on_activate();
 
+    // Start the timer
     m_timer->reset();
+
+    // Initialize the last update time
+    updateJointStateTimeout();
+    updateImuTimeout();
+
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is active");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -273,7 +166,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
 
 
 /*******************************************************************************
- * Callbacks
+ * Subscription callbacks
  *******************************************************************************/
 
 void StateEstimatorNode::timerCallback()
@@ -362,7 +255,7 @@ void StateEstimatorNode::imuVelocityCallback(const geometry_msgs::msg::Vector3St
 
 
 /*******************************************************************************
- * Publish Functions
+ * Publisher functions
  *******************************************************************************/
 
 void StateEstimatorNode::publishStateEstimation()
@@ -624,7 +517,213 @@ void StateEstimatorNode::broadcastTransformToTf2()
 
 
 /*******************************************************************************
- * Helper Functions
+ * Configuration Functions
+ *******************************************************************************/
+
+void StateEstimatorNode::declareParameters()
+{
+    declare_parameter("simulation", true);
+    declare_parameter("urdf_file_path", std::string());
+    declare_parameter("robot_definition", std::string());
+    declare_parameter("timestep_in_ms", 50);
+
+    // Thresholds for stance detection
+    declare_parameter("left_stance_threshold", 400.0);
+    declare_parameter("right_stance_threshold", 400.0);
+
+    // Noise parameters for sensor fusion
+    declare_parameter("noise_parameters.process_noise.linear_acceleration", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.angular_velocity", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.foot_position", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.accelerometer_bias", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.gyroscope_bias", std::vector<double>());
+    declare_parameter("noise_parameters.process_noise.foot_slippage", std::vector<double>());
+    declare_parameter("noise_parameters.observation_noise.foot_position", std::vector<double>());
+    declare_parameter("noise_parameters.observation_noise.foot_slippage", std::vector<double>());
+    declare_parameter("noise_parameters.observation_noise.joint_position", std::vector<double>());
+
+    RCLCPP_INFO(this->get_logger(), "Parameters have been declared");
+}
+
+void StateEstimatorNode::configureSubscriptions()
+{
+    m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_sensors_subscription_options.callback_group = m_sensors_callback_group;
+
+    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
+        std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
+        std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+
+    // Simulation ground truth information about position and velocity in world frame
+    if (m_is_simulation) {
+        m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
+            std::bind(&StateEstimatorNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+        m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
+            std::bind(&StateEstimatorNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Subscriptions have been configured");
+}
+
+void StateEstimatorNode::configurePublishers()
+{
+    m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
+    m_feet_height_pub = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
+    m_torque_left_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/left", 10);
+    m_torque_right_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/right", 10);
+
+    // M8's MPC
+    m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
+    m_mpc_com_pub = this->create_publisher<march_shared_msgs::msg::CenterOfMass>("robot_com_position", 10);
+    m_mpc_zmp_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("robot_zmp_position", 10);
+    m_mpc_stance_foot_pub = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 10);
+    // Visualization of COM position
+    m_mpc_com_pos_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("state_estimation/com_position", 10);
+
+    RCLCPP_INFO(this->get_logger(), "Publishers have been configured");
+}
+
+void StateEstimatorNode::configureStateEstimationTimer()
+{
+    m_dt = static_cast<double>(get_parameter("timestep_in_ms").as_int()) / 1000.0;
+    m_timer = this->create_wall_timer(
+        std::chrono::milliseconds(get_parameter("timestep_in_ms").as_int()), 
+        std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
+    m_timer->cancel();
+
+    RCLCPP_INFO(this->get_logger(), "State Estimation Timer has been configured. Timestep: %f", m_dt);
+}
+
+void StateEstimatorNode::configureTF2()
+{
+    m_tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+    m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+    RCLCPP_INFO(this->get_logger(), "TF2 broadcaster and listener have been configured");
+}
+
+bool StateEstimatorNode::configureJointStateMsg()
+{
+    urdf::Model model;
+    if (!model.initFile(get_parameter("urdf_file_path").as_string())) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load URDF file");
+        return false;
+    }
+
+    // Retrieve joint names from URDF and sort them in alphabetical order.
+    std::vector<std::string> joint_names;
+    for (const auto& joint : model.joints_) {
+        if (joint.second->type != urdf::Joint::REVOLUTE)
+            continue;
+        joint_names.push_back(joint.first);
+    }
+    std::sort(joint_names.begin(), joint_names.end());
+ 
+    // Initialize joint state message.
+    m_joint_state = std::make_shared<sensor_msgs::msg::JointState>();
+    m_joint_state->header.frame_id = "joint_link";
+    m_joint_state->header.stamp = this->now();
+    m_joint_state->name = joint_names;
+    m_joint_state->position = std::vector<double>(joint_names.size(), 0.0);
+    m_joint_state->velocity = std::vector<double>(joint_names.size(), 0.0);
+    m_joint_state->effort = std::vector<double>(joint_names.size(), 0.0);
+
+    // Initialize last update timeout
+    m_joint_state_timeout = 1.0; // s
+
+    RCLCPP_INFO(this->get_logger(), "Joint State message has been configured");
+    return true;
+}
+
+bool StateEstimatorNode::configureImuMsg()
+{
+    const double GRAVITIY_ACCELERATION = 9.81;
+
+    // Initialize IMU message.
+    m_imu = std::make_shared<sensor_msgs::msg::Imu>();
+    m_imu->header.frame_id = "backpack";
+    m_imu->header.stamp = this->now();
+    
+    m_imu->orientation.w = 1.0;
+    m_imu->orientation.x = 0.0;
+    m_imu->orientation.y = 0.0;
+    m_imu->orientation.z = 0.0;
+    
+    m_imu->angular_velocity.x = 0.0;
+    m_imu->angular_velocity.y = 0.0;
+    m_imu->angular_velocity.z = 0.0;
+    
+    m_imu->linear_acceleration.x = 0.0;
+    m_imu->linear_acceleration.y = 0.0;
+    m_imu->linear_acceleration.z = -GRAVITIY_ACCELERATION;
+
+    // Initialize last update timeout
+    m_imu_timeout = 1.0; // s
+
+    RCLCPP_INFO(this->get_logger(), "IMU message has been configured");
+    return true;
+}
+
+bool StateEstimatorNode::configureStateEstimator()
+{
+    // Configure robot description
+    std::string yaml_filename = get_parameter("robot_definition").as_string();
+
+    if (yaml_filename.empty())
+    {
+        RCLCPP_ERROR(this->get_logger(), "No robot description file has been provided.");
+        return false;
+    }
+
+    m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
+
+    // Configure state estimator
+    std::string urdf_file_path = get_parameter("urdf_file_path").as_string();
+
+    if (urdf_file_path.empty())
+    {
+        RCLCPP_ERROR(this->get_logger(), "No URDF file path has been provided.");
+        return false;
+    }
+
+    // Initialize state estimator
+    m_node_feet_names = { "L_sole", "R_sole" };
+    m_state_estimator = std::make_unique<StateEstimator>(m_robot_description, urdf_file_path);
+    m_state_estimator->configureJointNames(m_joint_state->name);
+    m_state_estimator->configureStanceThresholds(
+        get_parameter("left_stance_threshold").as_double(),
+        get_parameter("right_stance_threshold").as_double());
+
+    RCLCPP_INFO(this->get_logger(), "State Estimator has been configured");
+    return true;
+}
+
+bool StateEstimatorNode::configureSensorFusion()
+{
+    // Initialize and configure noise parameters in sensor fusion
+    m_sensor_fusion = std::make_unique<SensorFusion>(m_dt);
+
+    m_sensor_fusion->setProcessNoiseCovarianceMatrix(
+        get_parameter("noise_parameters.process_noise.linear_acceleration").as_double_array(),
+        get_parameter("noise_parameters.process_noise.angular_velocity").as_double_array(),
+        get_parameter("noise_parameters.process_noise.foot_position").as_double_array(),
+        get_parameter("noise_parameters.process_noise.accelerometer_bias").as_double_array(),
+        get_parameter("noise_parameters.process_noise.gyroscope_bias").as_double_array(),
+        get_parameter("noise_parameters.process_noise.foot_slippage").as_double_array());
+
+    m_sensor_fusion->setObservationNoiseCovarianceMatrix(
+        get_parameter("noise_parameters.observation_noise.foot_position").as_double_array(),
+        get_parameter("noise_parameters.observation_noise.foot_slippage").as_double_array(),
+        get_parameter("noise_parameters.observation_noise.joint_position").as_double_array());
+
+    RCLCPP_INFO(this->get_logger(), "Sensor Fusion has been configured");
+    return true;
+}
+
+
+/*******************************************************************************
+ * Helper functions
  *******************************************************************************/
 
 void StateEstimatorNode::checkJointStateTimeout()
