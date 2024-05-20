@@ -6,6 +6,7 @@ Author: Alexander James Becoy @alexanderjamesbecoy
 from march_sensor_fusion_optimization.parameters_handler import ParametersHandler
 from march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates
 
+import random as rd
 import numpy as np
 import tensorflow_probability as tfp
 from tensorflow_probability import distributions as tfd
@@ -13,7 +14,7 @@ from tensorflow_probability import math as tfm
 
 class BayesianOptimizer:
 
-    def __init__(self, dof: int, max_iter: int, min_obs: float, param_file: str, amplitude=1.0, length_scale=1.0) -> None:
+    def __init__(self, dof: int, max_iter: int, min_obs: float, param_file: str, amplitude=1.0, length_scale=1.0, initial_population_size=10) -> None:
         """ Initialize the Bayesian Optimizer object.
         """
         assert dof > 2, "Degrees of freedom must be greater than 2."
@@ -27,9 +28,11 @@ class BayesianOptimizer:
         # Initialize parameter handler
         self.param_file = param_file
         self.parameter_handler = ParametersHandler(self.param_file)
-        num_optimization_parameters = self.parameter_handler.get_num_optimization_parameters()
+        self.num_optimization_parameters = self.parameter_handler.get_num_optimization_parameters()
 
         # Initialize kernel hyperparameters
+        assert amplitude > 0, "Amplitude must be greater than 0."
+        assert length_scale > 0, "Length scale must be greater than 0."
         self.amplitude  = tfp.util.TransformedVariable(
             amplitude, tfp.bijectors.Softplus(), dtype=np.float64, name='amplitude')
         self.length_scale = tfp.util.TransformedVariable(
@@ -37,51 +40,75 @@ class BayesianOptimizer:
         self.kernel = tfm.psd_kernels.ExponentiatedQuadratic(
             amplitude=self.amplitude, length_scale=self.length_scale)
 
-        # Initialize surrogate model
-        index_points = np.expand_dims(np.linspace(-1.0, 1.0, num_optimization_parameters), axis=-1)
-        self.surrogate_model = tfd.StudentTProcess(
-            df=float(dof),
-            kernel=self.kernel,
-            index_points=index_points,
-        )
+        # Create a random set of noise parameters.
+        self.dof = float(dof)
+        assert initial_population_size > 0, "Initial population size must be greater than 0."
+        # self.initial_population = self.surrogate_model.sample(initial_population_size).numpy().tolist()
+        self.initial_population = [np.random.uniform(0.0, 10.0, self.num_optimization_parameters).tolist() for _ in range(initial_population_size)]
+        self.population = []
+        self.index_points = np.array(self.initial_population).T
 
-
-    def configure(self, population_size: int, max_time: float) -> None:
-        """ Create random sets of observation noise.
+    def configure_noise_parameters(self, noise_parameters: list) -> None:
+        """ Configure the state estimator with the provided noise parameters.
         """
-        assert population_size > 0, "Population size must be greater than 0."
-        assert max_time > 0, "Maximum time must be greater than 0."
-        self.population = self.surrogate_model.sample(population_size)
-        self.population_performance = [None for _ in range(population_size)]
-        self.optimizer_idx = -1
-        self.max_time = max_time
-        self.time = 0.0
+        assert noise_parameters is not None, "Noise parameters must be provided."
+        assert len(noise_parameters) == self.num_optimization_parameters, \
+            "Number of noise parameters {} must match the number of optimization parameters which is {}" \
+            .format(len(noise_parameters),self.num_optimization_parameters)
+        self.parameter_handler.set_optimization_parameters(noise_parameters)
+        self.total_time = 0.0
+        self.costs = []
+        self.average_costs = []
 
-
-    def run(self, idx: int, performance: float, timestep: float) -> bool:
-        """ Store the performance cost of a set of observation noise.
-        Update the time and check if the run has reached the maximum time.
+    def select_random_noise_parameters(self) -> None:
+        """ Select a random set of noise parameters from the initial population,
+        and configure the state estimator with these parameters.
         """
-        assert idx >= 0, "Index must be greater than or equal to 0."
+        random_idx = rd.randint(0, len(self.initial_population) - 1)
+        self.populate(self.initial_population.pop(random_idx))            
+        self.configure_noise_parameters(self.population[-1]['parameters'])
+
+    def collect_performance(self, performance: float, dt: float) -> None:
+        """ Collect the performance of the state estimator to the last set of noise parameters.
+        """
         assert performance is not None, "Performance must be provided."
-        assert timestep > 0, "Timestep must be greater than 0."
+        assert dt > 0.0, "Time step must be greater than 0."
+        self.costs.append(performance)
+        self.total_time += dt
 
-        if self.population_performance[idx] is not None:
-            self.population_performance[idx].append(performance)
-        else:
-            self.population_performance[idx] = [performance]
-        
-        # Update time and check if the run has reached the maximum time
-        self.time += timestep
-        return self.time >= self.max_time
-
+    def compute_average_performance(self) -> None:
+        """ Compute the average performance of the state estimator with the last set of noise parameters
+        and reset the list of performance costs for the next Monte Carlo run.
+        """
+        assert len(self.population) > 0, "Population performance must not be empty."
+        assert len(self.population[-1]) > 0, "Population performance must not be empty."
+        self.average_costs.append(np.mean(self.costs))
+        self.costs = []
+    
+    def evaluate_performance(self) -> float:
+        """ Compute the JNIS performance cost of the state estimator with the current set of noise parameters.
+        """
+        assert len(self.population) > 0, "Population performance must not be empty."
+        assert len(self.average_costs) > 0, "Population performance must not be empty."
+        assert self.total_time > 0.0, "Total time must be greater than 0."
+        evaluation = np.log(np.sum(self.average_costs) / (self.total_time * self.dof))
+        self.population[-1]['JNIS'] = evaluation
 
     def fit(self) -> None:
-        """run EKF system multiple times using each set of observation noise, get the JNIS
-        performance cost of each set, and fit the surrogate model to the performance costs.
+        """ Fit the surrogate model to the current population of noise parameters and JNIS performance costs.
         """
-        pass
-        
+        assert len(self.population) > 0, "Population must not be empty."
+        assert len(self.population[-1]['parameters']) == self.num_optimization_parameters, \
+            "Number of noise parameters {} must match the number of optimization parameters which is {}" \
+            .format(len(self.population[-1]['parameters']),self.num_optimization_parameters)
+        assert self.population[-1]['JNIS'] is not None, "JNIS performance cost must be provided."
+        # optimizer_idx = np.min([self.population[p]['JNIS'] for p in range(len(self.population))])
+        self.surrogate_model = tfd.StudentTProcess(
+            df=self.dof,
+            kernel=self.kernel,
+            index_points=self.index_points,
+            mean_fn=self.mean_fn,
+        )
 
     def optimize(self) -> None:
         """ Maximize the acquisition function to find the optimal set of observation noise.
@@ -90,10 +117,24 @@ class BayesianOptimizer:
         termination criterion is met.
         """
         pass
-
     
     def acquisition_func(self, samples: np.ndarray, optimizer: np.ndarray) -> np.ndarray:
         """ Calculate the acquisition function in order to intelligently guide the search
         for the optimal set of observation noise via the surrogate model.
         """
         pass
+
+    def populate(self, noise_parameters: list) -> None:
+        """ Populate the surrogate model with a set of provided noise parameters
+        with the corresponding list of JNIS performance costs.
+        """
+        set_noise_parameters = {
+            'parameters': noise_parameters,
+            'JNIS': None,
+        }
+        self.population.append(set_noise_parameters)
+
+    def mean_fn(self, x: np.ndarray) -> np.ndarray:
+        """ Define the mean function of the surrogate model.
+        """
+        return np.zeros_like(x)
