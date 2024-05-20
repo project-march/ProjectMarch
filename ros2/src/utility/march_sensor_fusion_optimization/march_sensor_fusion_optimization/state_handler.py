@@ -13,10 +13,11 @@ class BayesianOptimizationStates(Enum):
     STATE_COLLECTION = 4
     STATE_DEACTIVATION = 5
     STATE_CLEANUP = 6
-    STATE_FIT = 7
-    STATE_ACQUISITION = 8
-    STATE_OPTIMIZATION = 9
-    STATE_DONE = 10
+    STATE_EVALUATION = 7
+    STATE_FIT = 8
+    STATE_ACQUISITION = 9
+    STATE_OPTIMIZATION = 10
+    STATE_DONE = 11
 
 class BayesianOptimizationModes(Enum):
     MODE_FIT = 0
@@ -24,16 +25,18 @@ class BayesianOptimizationModes(Enum):
 
 class StateHandler:
 
-    def __init__(self, max_collection_period: float, max_fit_iterations: int, max_optimization_iterations: int, min_observation_change: float) -> None:
+    def __init__(self, max_collection_period: float, max_mc_iterations: int, max_fit_iterations: int, max_optimization_iterations: int, min_observation_change: float) -> None:
         self.max_collection_period = max_collection_period
+        self.max_mc_iterations = max_mc_iterations
         self.max_fit_iterations = max_fit_iterations
         self.max_optimization_iterations = max_optimization_iterations
         self.min_observation_change = min_observation_change
 
         self.current_state = BayesianOptimizationStates.STATE_INITIALIZATION
         self.current_collection_time = 0.0
-        self.current_observation_change = float('inf')
+        self.current_mc_iterations = 0
         self.current_iterations = 0
+        self.current_observation_change = float('inf')
         self.current_mode = None
 
     def transition_state(self) -> BayesianOptimizationStates:
@@ -52,12 +55,12 @@ class StateHandler:
         
         # Configuration
         elif self.current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
+            self.current_collection_time = 0.0
             self.current_state = BayesianOptimizationStates.STATE_ACTIVATION
             return BayesianOptimizationStates.STATE_ACTIVATION
         
         # Activation
         elif self.current_state == BayesianOptimizationStates.STATE_ACTIVATION:
-            self.current_collection_time = 0.0
             self.current_state = BayesianOptimizationStates.STATE_COLLECTION
             return BayesianOptimizationStates.STATE_COLLECTION
         
@@ -71,12 +74,23 @@ class StateHandler:
             
         # Deactivation
         elif self.current_state == BayesianOptimizationStates.STATE_DEACTIVATION:
-            self.current_iterations += 1
+            self.current_mc_iterations += 1
             self.current_state = BayesianOptimizationStates.STATE_CLEANUP
             return BayesianOptimizationStates.STATE_CLEANUP
         
         # Cleanup
         elif self.current_state == BayesianOptimizationStates.STATE_CLEANUP:
+            if self.current_mc_iterations < self.max_mc_iterations:
+                self.current_state = BayesianOptimizationStates.STATE_CONFIGURATION
+                return BayesianOptimizationStates.STATE_CONFIGURATION
+            else:
+                self.current_mc_iterations = 0
+                self.current_iterations += 1
+                self.current_state = BayesianOptimizationStates.STATE_EVALUATION
+                return BayesianOptimizationStates.STATE_EVALUATION
+        
+        # Evaluation
+        elif self.current_state == BayesianOptimizationStates.STATE_EVALUATION:
             if self.current_mode == BayesianOptimizationModes.MODE_FIT:
                 if self.current_iterations < self.max_fit_iterations:
                     self.current_state = BayesianOptimizationStates.STATE_RANDOMIZATION
