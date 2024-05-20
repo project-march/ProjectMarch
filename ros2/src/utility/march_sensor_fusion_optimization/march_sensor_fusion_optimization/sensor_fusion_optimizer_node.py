@@ -14,7 +14,7 @@ from lifecycle_msgs.srv import GetState, ChangeState, GetAvailableTransitions
 from march_shared_msgs.msg import StateEstimation
 
 from march_sensor_fusion_optimization.bayesian_optimization import BayesianOptimizer
-from march_sensor_fusion_optimization.state_handler import BayesianOptimizationStates, StateHandler
+from march_sensor_fusion_optimization.state_handler import StateHandler, BayesianOptimizationStates, BayesianOptimizationTransitions
 
 class SensorFusionOptimizerNode(Node):
 
@@ -47,9 +47,13 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Sensor Fusion Optimizer Node has been initialized.')
 
+
     def timer_callback(self) -> None:
         current_state = self.state_machine.get_current_state()
-        available_transitions = self.state_machine
+
+        if current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
+            self.bayesian_optimizer.configure(population_size=10)
+            self.state_machine.transition_state(BayesianOptimizationTransitions.TRANSITION_CONFIGURATION_INITIALIZATION)
 
 
     def state_estimation_callback(self, msg: StateEstimation) -> None:

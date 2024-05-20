@@ -13,7 +13,7 @@ from tensorflow_probability import math as tfm
 
 class BayesianOptimizer:
 
-    def __init__(self, dof: int, max_iter: int, min_obs: float, param_file: str) -> None:
+    def __init__(self, dof: int, max_iter: int, min_obs: float, param_file: str, amplitude=1.0, length_scale=1.0) -> None:
         """ Initialize the Bayesian Optimizer object.
         """
         assert dof > 2, "Degrees of freedom must be greater than 2."
@@ -29,14 +29,11 @@ class BayesianOptimizer:
         self.parameter_handler = ParametersHandler(self.param_file)
         num_optimization_parameters = self.parameter_handler.get_num_optimization_parameters()
 
-        # Initialize performance costs
-        self.performance_costs = []
-
         # Initialize kernel hyperparameters
         self.amplitude  = tfp.util.TransformedVariable(
-            100.0, tfp.bijectors.Softplus(), dtype=np.float64, name='amplitude')
+            amplitude, tfp.bijectors.Softplus(), dtype=np.float64, name='amplitude')
         self.length_scale = tfp.util.TransformedVariable(
-            1000.0, tfp.bijectors.Softplus(), dtype=np.float64, name='length_scale')
+            length_scale, tfp.bijectors.Softplus(), dtype=np.float64, name='length_scale')
         self.kernel = tfm.psd_kernels.ExponentiatedQuadratic(
             amplitude=self.amplitude, length_scale=self.length_scale)
 
@@ -49,19 +46,41 @@ class BayesianOptimizer:
         )
 
 
-    def fit(self, population_size: int) -> None:
-        """ Create random sets of observation noise, run EKF system multiple times
-        using each set of observation noise, get the JNIS performance cost of each
-        set, and fit the surrogate model to the performance costs.
+    def configure(self, population_size: int, max_time: float) -> None:
+        """ Create random sets of observation noise.
         """
         assert population_size > 0, "Population size must be greater than 0."
-
+        assert max_time > 0, "Maximum time must be greater than 0."
         self.population = self.surrogate_model.sample(population_size)
-        for set in self.population:
-            print(set)
-            # Run EKF system
-            # Get JNIS performance cost
-            # self.performance_costs.append(cost)
+        self.population_performance = [None for _ in range(population_size)]
+        self.optimizer_idx = -1
+        self.max_time = max_time
+        self.time = 0.0
+
+
+    def run(self, idx: int, performance: float, timestep: float) -> bool:
+        """ Store the performance cost of a set of observation noise.
+        Update the time and check if the run has reached the maximum time.
+        """
+        assert idx >= 0, "Index must be greater than or equal to 0."
+        assert performance is not None, "Performance must be provided."
+        assert timestep > 0, "Timestep must be greater than 0."
+
+        if self.population_performance[idx] is not None:
+            self.population_performance[idx].append(performance)
+        else:
+            self.population_performance[idx] = [performance]
+        
+        # Update time and check if the run has reached the maximum time
+        self.time += timestep
+        return self.time >= self.max_time
+
+
+    def fit(self) -> None:
+        """run EKF system multiple times using each set of observation noise, get the JNIS
+        performance cost of each set, and fit the surrogate model to the performance costs.
+        """
+        pass
         
 
     def optimize(self) -> None:
