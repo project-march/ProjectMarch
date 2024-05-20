@@ -97,3 +97,98 @@ def test_state_handler_transition_state_cleanup_to_fit():
             assert sh.current_state == BayesianOptimizationStates.STATE_RANDOMIZATION
     assert sh.current_iterations == max_fit_iterations
     assert sh.current_state == BayesianOptimizationStates.STATE_FIT
+
+def test_state_handler_transition_state_fit_to_acquisition():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    sh.current_state = BayesianOptimizationStates.STATE_FIT
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_ACQUISITION
+
+def test_state_handler_transition_state_acquisition_to_configuration():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    sh.current_state = BayesianOptimizationStates.STATE_ACQUISITION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_CONFIGURATION
+
+def test_state_handler_transition_state_cleanup_to_optimization():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    sh.current_state = BayesianOptimizationStates.STATE_CLEANUP
+    sh.current_mode = BayesianOptimizationModes.MODE_OPTIMIZATION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_OPTIMIZATION
+
+def test_state_handler_transition_state_optimization_to_acquisition():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    sh.current_state = BayesianOptimizationStates.STATE_OPTIMIZATION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_ACQUISITION
+
+def test_state_handler_transition_state_optimization_to_done():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    sh.current_state = BayesianOptimizationStates.STATE_OPTIMIZATION
+    sh.current_iterations = max_optimization_iterations
+    sh.current_observation_change = min_observation_change
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_DONE
+
+def test_state_handler_complete_process_until_max_optimization_iterations_reached():
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    assert sh.current_state == BayesianOptimizationStates.STATE_INITIALIZATION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_RANDOMIZATION
+    for i in range(max_fit_iterations):
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CONFIGURATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_ACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_COLLECTION
+        while (sh.current_collection_time < max_collection_period):
+            sh.update_collection_time(collection_period)
+            _ = sh.transition_state()
+        assert sh.current_state == BayesianOptimizationStates.STATE_DEACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CLEANUP
+        if i < max_fit_iterations - 1:
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_RANDOMIZATION
+        else:
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_FIT
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_ACQUISITION
+    for i in range(max_optimization_iterations):
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CONFIGURATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_ACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_COLLECTION
+        while (sh.current_collection_time < max_collection_period):
+            sh.update_collection_time(collection_period)
+            _ = sh.transition_state()
+        assert sh.current_state == BayesianOptimizationStates.STATE_DEACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CLEANUP
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_OPTIMIZATION
+        if i < max_optimization_iterations - 1:
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_ACQUISITION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_DONE
+
+def test_state_handler_complete_process_until_max_optimization_iterations_reached():
+    observation_change = 1e5
+    sh = StateHandler(max_collection_period, max_fit_iterations, max_optimization_iterations, min_observation_change)
+    assert sh.current_state == BayesianOptimizationStates.STATE_INITIALIZATION
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_RANDOMIZATION
+    for i in range(max_fit_iterations):
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CONFIGURATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_ACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_COLLECTION
+        while (sh.current_collection_time < max_collection_period):
+            sh.update_collection_time(collection_period)
+            _ = sh.transition_state()
+        assert sh.current_state == BayesianOptimizationStates.STATE_DEACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CLEANUP
+        if i < max_fit_iterations - 1:
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_RANDOMIZATION
+        else:
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_FIT
+            assert sh.transition_state() == BayesianOptimizationStates.STATE_ACQUISITION
+    while (sh.current_state != BayesianOptimizationStates.STATE_DONE):
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CONFIGURATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_ACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_COLLECTION
+        while (sh.current_collection_time < max_collection_period):
+            sh.update_collection_time(collection_period)
+            _ = sh.transition_state()
+        assert sh.current_state == BayesianOptimizationStates.STATE_DEACTIVATION
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_CLEANUP
+        assert sh.transition_state() == BayesianOptimizationStates.STATE_OPTIMIZATION
+        _ = sh.transition_state()
+        # Update the observation change
+        sh.update_observation_change(observation_change)
+        observation_change /= 10
+    assert sh.transition_state() == BayesianOptimizationStates.STATE_DONE

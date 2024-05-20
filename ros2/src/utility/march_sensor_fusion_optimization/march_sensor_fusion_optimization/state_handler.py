@@ -91,6 +91,7 @@ class StateHandler:
             
         # Fit
         elif self.current_state == BayesianOptimizationStates.STATE_FIT:
+            self.current_iterations = 0
             self.current_state = BayesianOptimizationStates.STATE_ACQUISITION
             return BayesianOptimizationStates.STATE_ACQUISITION
         
@@ -101,7 +102,7 @@ class StateHandler:
         
         # Optimization
         elif self.current_state == BayesianOptimizationStates.STATE_OPTIMIZATION:
-            if self.current_iterations >= self.max_optimization_iterations or self.current_observation_change < self.min_observation_change:
+            if self.current_iterations >= self.max_optimization_iterations or self.current_observation_change <= self.min_observation_change:
                 self.current_state = BayesianOptimizationStates.STATE_DONE
                 return BayesianOptimizationStates.STATE_DONE
             else:
