@@ -32,7 +32,7 @@
 #include <csignal>
 
 // Uncomment this line to fully disable actuation, and have additional logging.
-#define DEBUG_MODE
+// #define DEBUG_MODE
 
 using namespace march_system_interface_util;
 

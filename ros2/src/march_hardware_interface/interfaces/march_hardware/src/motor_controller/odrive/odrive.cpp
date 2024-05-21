@@ -37,23 +37,18 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
 
 std::chrono::nanoseconds ODrive::reset()
 {
-    setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
+    // setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
     return std::chrono::seconds { 1 };
 }
 
 std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        if ((int)axis_ == 0) {
-        // For the MDrives and M9 joints
-            setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-            logger_->info("Initializing the encoder index search.");
-        } else {
-            setAxisState(ODriveAxisState::ENCODER_OFFSET_CALIBRATION);
-            logger_->info("Initializing the encoder offset calibration.");           
-        }
         
-        return std::chrono::seconds { 60 };
+        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+        logger_->info("Initializing the encoder index search.");
+        
+        return std::chrono::seconds { 20 };
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -234,11 +229,11 @@ ODriveAxisState ODrive::getAxisState()
 
 uint32_t ODrive::getAbsolutePositionIU()
 {
-    uint32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
+    uint32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
     if (iu_value == 0) {
         logger_->warn("sleeeeeeepppiiiiiiinnnggggggg to wait for absolute position readout"); 
         rclcpp::sleep_for(std::chrono::milliseconds(50)); 
-        iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
+        iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
         if (iu_value == 0){
             logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
         }
@@ -380,6 +375,7 @@ void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct {};
     write_struct.ui = state.value_;
+    RCLCPP_WARN(rclcpp::get_logger("ODrive"), "Setting axis state to: %u", write_struct.ui);
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
