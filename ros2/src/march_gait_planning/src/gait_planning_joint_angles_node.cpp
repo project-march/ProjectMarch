@@ -33,6 +33,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_gait_planning = GaitPlanningAngles(); 
     m_first_stand = true; 
     m_active = false; 
+    m_single_execution_done = false; 
 
     // m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
     //                     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
@@ -222,7 +223,10 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
     if (!m_first_stand){
         RCLCPP_DEBUG(this->get_logger(), "Entering timer function"); 
         unsigned count = m_gait_planning.getCounter(); 
-        switch (m_gait_planning.getGaitType()) {
+        exoMode current_gait = m_gait_planning.getGaitType(); 
+        exoMode previous_gait = m_gait_planning.getPrevGaitType(); 
+
+        switch (current_gait) {
             case exoMode::Walk : 
             
             switch(previous_gait){
@@ -366,6 +370,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             default :
                 break;
         }
+    }
 }
 
 int main(int argc, char *argv[]){
