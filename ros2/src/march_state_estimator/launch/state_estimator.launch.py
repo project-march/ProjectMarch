@@ -11,10 +11,12 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-
-    timestep = 0.020 # in seconds
+    simulation = LaunchConfiguration("simulation", default="true")
+    timestep_in_ms = LaunchConfiguration("timestep", default="50")
+    
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),
@@ -33,9 +35,10 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-                {"timestep_in_ms": int(timestep * 1000)},
+                {"timestep_in_ms": timestep_in_ms},
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
+                {"simulation": simulation},
             ]
         ),
         Node(

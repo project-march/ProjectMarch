@@ -97,11 +97,19 @@ def plot_joints(dataset):
 
 def stand_to_sit():
     time_points = 100
+    lhaa = np.linspace(-0.03, -0.03, time_points)
+    lhfe = np.linspace(0.136, 1.5, time_points)
+    lkfe = np.linspace(0.385, 1.2, time_points)
+    ladpf = np.linspace(0.162, -0.5, time_points)
     lhaa = np.linspace(-0.02, -0.06, time_points)
     lhfe = np.linspace(0.136, 1.5, time_points)
     lkfe = np.linspace(0.409, 1.2, time_points)
     ladpf = np.linspace(0.174, -0.5, time_points)
 
+    rhaa = np.linspace(-0.013, -0.013, time_points)
+    rhfe = np.linspace(0.176, 1.5, time_points)
+    rkfe = np.linspace(0.468, 1.2, time_points)
+    radpf = np.linspace(0.162, -0.5, time_points)
     rhaa = np.linspace(-0.003, -0.06, time_points)
     rhfe = np.linspace(0.138, 1.5, time_points)
     rkfe = np.linspace(0.413, 1.2, time_points)
@@ -116,15 +124,19 @@ def stand_to_sit():
 
 def sit_to_stand():
     time_points = 100
+    lhaa = np.linspace(-0.03, -0.03, time_points)
+    lhfe = np.linspace(1.5, 0.136, time_points)
+    lkfe = np.linspace(1.2, 0.385, time_points)
+    ladpf = np.linspace(-0.5, 0.162, time_points)
     lhaa = np.linspace(-0.06, -0.02, time_points)
     lhfe = np.linspace(1.5, 0.136, time_points)
     lkfe = np.linspace(1.2, 0.409, time_points)
     ladpf = np.linspace(-0.5, 0.174, time_points)
 
-    rhaa = np.linspace(-0.06, -0.003, time_points)
-    rhfe = np.linspace(1.5, 0.138, time_points)
-    rkfe = np.linspace(1.2, 0.413, time_points)
-    radpf = np.linspace(-0.5, 0.174, time_points)
+    rhaa = np.linspace(-0.013, -0.013, time_points)
+    rhfe = np.linspace(1.5, 0.176, time_points)
+    rkfe = np.linspace(1.2, 0.468, time_points)
+    radpf = np.linspace(-0.5, 0.162, time_points)
 
     sit_to_stand = np.column_stack([
         lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
@@ -135,15 +147,15 @@ def sit_to_stand():
     
 def hinge_gait():
     time_points = 100
-    lhaa = np.linspace(-0.06, -0.06, time_points)
-    lhfe = np.linspace(0.351166, 1.5, time_points)
-    lkfe = np.linspace(0.372236, 0.372236, time_points)
-    ladpf = np.linspace(0.119176, 0.119176, time_points)
+    lhaa = np.linspace(-0.03, -0.03, time_points)
+    lhfe = np.linspace(0.136, 1.5, time_points)
+    lkfe = np.linspace(0.385, 0.385, time_points)
+    ladpf = np.linspace(0.162, 0.162, time_points)
 
-    rhaa = np.linspace(-0.06, -0.06, time_points)
-    rhfe = np.linspace(0.274982, 1.5, time_points)
-    rkfe = np.linspace(0.286291, 0.286291, time_points)
-    radpf = np.linspace(0.077083, 0.077083, time_points)
+    rhaa = np.linspace(-0.013, -0.013, time_points)
+    rhfe = np.linspace(0.176, 1.5, time_points)
+    rkfe = np.linspace(0.468, 0.468, time_points)
+    radpf = np.linspace(0.162, 0.162, time_points)
 
 
     hinge_gait = np.column_stack([
@@ -155,26 +167,26 @@ def hinge_gait():
 
 def sideways(): 
     times = 100
-    ladpf1 = np.linspace(0.174, 0.174, times)
-    lhaa1 = np.linspace(-0.02, -0.1745, times)
+    ladpf1 = np.linspace(0.162, 0.162, times)
+    lhaa1 = np.linspace(-0.03, -0.1745, times)
     lhfe1 = np.linspace(0.136, 0.136, times)
-    lkfe1 = np.linspace(0.409, 0.5236, times)
-    radpf1 = np.linspace(0.174, 0.174, times)
-    rhaa1 = np.append(np.linspace(-0.003, -0.1, int(((2000000000-1500000000)/2000000000)*times)), np.linspace(-0.1, -0.1745, int(((1500000000)/2000000000)*times)))
-    rhfe1 = np.linspace(0.138, 0.138, times)
-    rkfe1 = np.linspace(0.413, 0.5236, times)
+    lkfe1 = np.linspace(0.385, 0.5236, times)
+    radpf1 = np.linspace(0.162, 0.162, times)
+    rhaa1 = np.append(np.linspace(-0.013, -0.1, int(((2000000000-1500000000)/2000000000)*times)), np.linspace(-0.1, -0.1745, int(((1500000000)/2000000000)*times)))
+    rhfe1 = np.linspace(0.176, 0.176, times)
+    rkfe1 = np.linspace(0.468, 0.5236, times)
     left_open = np.column_stack([
         lhaa1, lhfe1, lkfe1, ladpf1, rhaa1, rhfe1, rkfe1, radpf1
     ]) 
 
-    ladpf = np.linspace(0.174, 0.174, times)
-    lhaa = np.append(np.linspace(-0.1745, -0.1, int((1500000000/2000000000)*times)), np.linspace(-0.1, -0.02, int(((2000000000-1500000000)/2000000000)*times)))
+    ladpf = np.linspace(0.162, 0.162, times)
+    lhaa = np.append(np.linspace(-0.1745, -0.1, int((1500000000/2000000000)*times)), np.linspace(-0.1, -0.03, int(((2000000000-1500000000)/2000000000)*times)))
     lhfe = np.linspace(0.136, 0.136, times)
-    lkfe = np.linspace(0.5236, 0.409, times)
-    radpf = np.linspace(0.174, 0.174, times)
-    rhaa = np.linspace(-0.1745, -0.003, times)
-    rhfe = np.linspace(0.138, 0.138, times)
-    rkfe = np.linspace(0.5236, 0.413, times)
+    lkfe = np.linspace(0.5236, 0.385, times)
+    radpf = np.linspace(0.162, 0.162, times)
+    rhaa = np.linspace(-0.1745, -0.013, times)
+    rhfe = np.linspace(0.176, 0.176, times)
+    rkfe = np.linspace(0.5236, 0.468, times)
     right_close = np.column_stack([
         lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
     ])
@@ -215,8 +227,7 @@ def sideways():
 # step_close_updated.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/step_close_q.csv', sep=',', header=False, index=False)
 # full_gait.to_csv('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/full_gait_q.csv', sep=',', header=False, index=False)
 
-# sit_to_stand()
+# hinge_gait()
 # stand_to_sit()
-
+# sit_to_stand()
 sideways()
-hinge_gait()

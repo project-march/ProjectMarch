@@ -39,6 +39,7 @@ add_library(${PROJECT_NAME} STATIC
   src/gait_planning_node.cpp
   src/gait_planning.cpp
   src/test_joints_gait_planning_node.cpp
+  src/test_joints_gait_planning.cpp
   src/test_setup_gait_planning_node.cpp
   src/test_setup_gait_planning.cpp
 )
@@ -155,7 +156,7 @@ install(TARGETS test_setup_gait_planning_node
 # Create the test_gait_planning executable in the test_setup_gait_planning folder
 add_executable(test_joints_gait_planning_node
   src/test_joints_gait_planning_node.cpp
-  src/test_setup_gait_planning.cpp
+  src/test_joints_gait_planning.cpp
 )
 
 # Link against ROS 2 dependencies

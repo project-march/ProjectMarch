@@ -15,6 +15,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
@@ -51,7 +52,16 @@ private:
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
-    void publishTorqueEstimation();
+    void publishGroundReactionForce();
+
+    void broadcastTransformToTf2();
+    void checkJointStateTimeout();
+    void checkImuTimeout();
+    geometry_msgs::msg::TransformStamped getCurrentTransform(const std::string& parent_frame, const std::string& child_frame);
+    geometry_msgs::msg::Pose getCurrentPose(const std::string& parent_frame, const std::string& child_frame);
+    std::vector<geometry_msgs::msg::Pose> getCurrentPoseArray(const std::string& parent_frame, const std::vector<std::string>& child_frames);
+
+    bool m_is_simulation;
 
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
@@ -68,6 +78,11 @@ private:
     std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
 
     std::vector<Eigen::Vector3d> m_force_feet;
+
+    double m_joint_state_timeout;
+    double m_imu_timeout;
+    rclcpp::Time m_joint_state_last_update;
+    rclcpp::Time m_imu_last_update;
 
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;

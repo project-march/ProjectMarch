@@ -31,6 +31,9 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
+// Uncomment this line to fully disable actuation, and have additional logging.
+// #define DEBUG_MODE
+
 using namespace march_system_interface_util;
 
 namespace march_system_interface {
@@ -168,14 +171,18 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
         // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
-        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-        // state_interfaces.emplace_back(
-        //     hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
-        // For motor controller state broadcasting.
+
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
-            state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+            state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+
+            if (motor_controller_pointer.first == "AIE_absolute_position" && jointInfo.name == "left_ankle_dpf") {
+                state_interfaces.emplace_back(hardware_interface::StateInterface("left_ankle_ie", hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+            }
+
+            else if (motor_controller_pointer.first == "AIE_absolute_position" && jointInfo.name == "right_ankle_dpf") {
+                state_interfaces.emplace_back(hardware_interface::StateInterface("right_ankle_ie", hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+            }
         }
     }
 
@@ -361,12 +368,12 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
         /*function=*/
         [this](march::Joint& joint) {
             
-            // For debugging purposes.
-            // auto motor_controller_state = joint.getMotorController()->getState();
-            // RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
-            // joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
-            // motor_controller_state->getErrorStatus().c_str());
-
+// #ifdef DEBUG_MODE
+            auto motor_controller_state = joint.getMotorController()->getState();
+            RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
+            joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
+            motor_controller_state->getErrorStatus().c_str());
+// #endif
             return joint.getMotorController()->getState()->isOperational();
         },
         /*logger=*/(*logger_), /*joints=*/joints,
@@ -378,6 +385,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
                 joint.getName().c_str(),
                 march::ODriveAxisState::toString(march::ODriveAxisState::CLOSED_LOOP_CONTROL).c_str(),
                 joint.getMotorController()->getState()->getOperationalState().c_str());
+            
         });
 }
 
@@ -388,8 +396,10 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+#ifndef DEBUG_MODE
+        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
+#endif
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -467,9 +477,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-    // Actuate joint in state 8, comment for debugging
+    // Actuate joint in state 8
+#ifndef DEBUG_MODE
     jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
         (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+#endif
     }
 
     RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
