@@ -53,6 +53,9 @@ public:
     void set_m_current_shooting_node(int);
     std_msgs::msg::Int32 get_m_current_shooting_node();
     bool check_zmp_on_foot();
+    void set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions);
+    void set_current_stance_leg(uint8_t current_stance_leg);
+    void set_next_stance_leg(uint8_t next_stance_leg);
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
@@ -83,7 +86,7 @@ private:
     double m_timing_value;
 
     int m_current_count;
-    int m_current_stance_foot;
+    int m_current_stance_foot;:
     int m_previous_stance_foot;
     int m_step_counter;
 
@@ -96,6 +99,10 @@ private:
     double m_com_height;
     const double m_gravity_const;
     double m_first_admissible_region_y;
+
+    geometry_msgs::msg::PoseArray m_foot_positions;
+    uint8_t m_current_stance_leg;
+    uint8_t m_next_stance_leg;
 };
 
 #endif

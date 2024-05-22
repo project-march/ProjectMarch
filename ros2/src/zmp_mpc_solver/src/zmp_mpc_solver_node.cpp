@@ -37,7 +37,8 @@ SolverNode::SolverNode()
         "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "/current_mode", 10, std::bind(&SolverNode::currentModeCallback, this, _1)); 
-
+    m_state_estimation_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
+        "/state_estimation_topic", 10, std::bind(&SolverNode::state_estimation_callback, this, std::placeholders::_1));
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
     m_prev_foot_msg.header.frame_id = "R_ground";
@@ -128,7 +129,12 @@ void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_left_foot_on_gound(msg->data);
 }
-
+void SolverNode::state_estimation_callback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) 
+{
+    m_inertial_foot_positions = msg->inertial_foot_positions;
+    m_current_stance_leg = msg->current_stance_leg;
+    m_next_stance_leg = msg->next_stance_leg;
+}
 void SolverNode::timer_callback()
 {
     if (m_mode == exoMode::VariableWalk){ 

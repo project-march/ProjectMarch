@@ -91,6 +91,19 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
     return current_shooting_node;
 }
 
+
+void ZmpSolver::set_current_stance_leg(uint8_t current_stance_leg) {
+m_current_stance_leg = current_stance_leg;
+}
+
+void ZmpSolver::set_next_stance_leg(uint8_t next_stance_leg) {
+m_next_stance_leg = next_stance_leg;
+}
+
+void ZmpSolver::set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) {
+m_foot_positions = foot_positions;
+}
+
 void ZmpSolver::set_current_state()
 {
     // This is of course MPC dependent
@@ -271,6 +284,17 @@ void ZmpSolver::update_current_shooting_node()
 inline int ZmpSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
+    geometry_msgs::msg::Pose left_foot_pose = m_foot_positions.poses[0];
+    geometry_msgs::msg::Pose right_foot_pose = m_foot_positions.poses[1];
+
+    double left_foot_x = left_foot_pose.position.x;
+    double left_foot_y = left_foot_pose.position.y;
+    double right_foot_x = right_foot_pose.position.x;
+    double right_foot_y = right_foot_pose.position.y;
+
+    int current_stance_leg = m_current_stance_leg;
+    int next_stance_leg = m_next_stance_leg;
+    
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
@@ -397,6 +421,8 @@ inline int ZmpSolver::solve_zmp_mpc(
     p[2] = 0;
     p[3] = 0;
     p[4] = 0;
+    p[5] = 0;
+    p[6] = 0;   
 
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)

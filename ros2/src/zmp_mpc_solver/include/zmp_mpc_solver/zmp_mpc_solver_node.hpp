@@ -26,6 +26,7 @@
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "march_shared_msgs/msg/state_estimation.hpp"
 
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
@@ -51,9 +52,13 @@ private:
     double m_desired_previous_foot_x;
     double m_desired_previous_foot_y;
 
+    uint8_t m_current_stance_leg;
+    uint8_t m_next_stance_leg;
+
     geometry_msgs::msg::PoseArray::SharedPtr m_desired_footsteps;
     geometry_msgs::msg::PoseArray m_prev_des_footsteps;
     geometry_msgs::msg::PoseArray m_prev_foot_msg;
+    geometry_msgs::msg::PoseArray m_inertial_foot_positions;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
@@ -63,6 +68,7 @@ private:
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m__footstep_visualizer_publisher;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_current_shooting_node_publisher;
 
+    rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_subscriber;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_right_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr m_left_foot_on_ground_subscriber;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr m_stance_foot_subscriber;
