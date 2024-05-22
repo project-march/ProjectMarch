@@ -47,18 +47,14 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Sensor Fusion Optimizer Node has been initialized.')
 
-
     def timer_callback(self) -> None:
         current_state = self.state_machine.get_current_state()
 
         if current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
             self.bayesian_optimizer.configure(population_size=10)
-            self.state_machine.transition_state(BayesianOptimizationTransitions.TRANSITION_CONFIGURATION_INITIALIZATION)
-
 
     def state_estimation_callback(self, msg: StateEstimation) -> None:
         self.bayesian_optimizer.performance_costs.append(msg.performance_cost)
-
 
     def get_current_state(self) -> State:
         self.get_logger().info('Getting current state...')
@@ -73,7 +69,6 @@ class SensorFusionOptimizerNode(Node):
         self.get_logger().info('Service has been called.')
         return get_state_future.result().current_state
 
-
     def get_available_transitions(self) -> list:
         self.get_logger().info('Getting available transitions...')
         
@@ -86,7 +81,6 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Service has been called.')
         return get_available_transitions_future.result().available_transitions
-
 
     def change_state(self, transition: str) -> bool:
         self.get_logger().info('Transitioning via ' + transition + '...')
@@ -101,7 +95,6 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Service has been called.')
         return change_state_future.result().success
-            
 
 
 def main(args=None):

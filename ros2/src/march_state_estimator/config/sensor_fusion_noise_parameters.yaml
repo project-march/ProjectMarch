@@ -46,3 +46,11 @@ state_estimator:
         - 1e3  # right_knee
         - 1e3  # right_ankle_dpf
         - 1e3  # right_ankle_ie
+    optimization_parameters:
+      process_noise:
+      - foot_position
+      - foot_slippage
+      observation_noise:
+      - foot_position
+      - foot_slippage
+      - joint_position
