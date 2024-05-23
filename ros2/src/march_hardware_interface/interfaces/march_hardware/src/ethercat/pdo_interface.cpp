@@ -6,6 +6,8 @@
 
 #include <soem/ethercat.h>
 
+#include <rclcpp/rclcpp.hpp>
+
 namespace march {
 void PdoInterfaceImpl::write8(uint16_t slave_index, uint8_t module_index, bit8 value)
 {
@@ -30,6 +32,10 @@ void PdoInterfaceImpl::write32(uint16_t slave_index, uint8_t module_index, bit32
     *(data_ptr++) = value.p.b1;
     *(data_ptr++) = value.p.b2;
     *data_ptr = value.p.b3;
+
+    RCLCPP_WARN(rclcpp::get_logger("unsigned ints"),"Sending value %u ",value.ui);
+    RCLCPP_WARN(rclcpp::get_logger("floats"),"Sending value %f ",value.f);
+
 }
 
 bit8 PdoInterfaceImpl::read8(uint16_t slave_index, uint8_t module_index) const

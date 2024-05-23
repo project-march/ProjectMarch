@@ -44,10 +44,12 @@ std::chrono::nanoseconds ODrive::reset()
 std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        
-        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+
+        // auto initial_state = getAxisState();
+        // logger_->info(logger_->fstring("Currently in state %u", initial_state));
+
+        setAxisState(ODriveAxisState::FULL_CALIBRATION_SEQUENCE);
         logger_->info("Initializing the encoder index search.");
-        
         return std::chrono::seconds { 20 };
 
     } else {
@@ -139,13 +141,22 @@ void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 3> tor_pi
         offset += 4;
     }
 
-    offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_); // TODO:fix this with ODrivePDOMap.
-    for (double& i : tor_pid) {
-        bit32 write_value {};
-        write_value.f = static_cast<float>(i);
-        this->write32(offset, write_value);
-        offset += 4;
-    }
+    auto offset_p = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_); // TODO:fix this with ODrivePDOMap.
+    bit32 write_p {};
+    write_p.f = 0.420 + tor_pid[0]*0;
+    this->write32(offset_p, write_p);
+
+    auto offset_d = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueD, axis_); // TODO:fix this with ODrivePDOMap.
+    bit32 write_d {};
+    write_d.f = 0.69;
+    this->write32(offset_d, write_d);
+
+    // for (double& i : tor_pid) {
+    //     bit32 write_value {};
+    //     write_value.f = static_cast<float>(i);
+    //     this->write32(offset, write_value);
+    //     offset += 4;
+    // }
 }
 
 
@@ -224,7 +235,9 @@ float ODrive::getOdriveTemperature()
 
 ODriveAxisState ODrive::getAxisState()
 {
-    return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
+    uint32_t axis_state = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui;
+    RCLCPP_WARN(rclcpp::get_logger("getAxisState()"), "Current axis state: %u", axis_state);
+    return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);;
 }
 
 uint32_t ODrive::getAbsolutePositionIU()
