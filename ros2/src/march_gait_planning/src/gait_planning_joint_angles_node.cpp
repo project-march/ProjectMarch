@@ -38,20 +38,20 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1)); 
     // m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
     m_joint_angle_trajectory_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10); 
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
+    RCLCPP_INFO(this->get_logger(), "Joint trajectory publisher created"); 
 
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
     m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
 
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Gait planning node initialized");
+    RCLCPP_INFO(this->get_logger(), "Gait planning node initialized");
 }
 
 
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
+    RCLCPP_INFO(this->get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
     m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
     m_gait_planning.setGaitType((exoMode)msg->mode);
 
@@ -77,20 +77,19 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
     if (m_first_stand && m_gait_planning.getGaitType() == exoMode::Stand) {
-        std::vector<double> point = msg->joint_state.position; 
+        std::vector<double> point = msg->joint_state.position; // This point is including the AIE joints at indices 1 and 6, these are not needed in the GP since these are passive
         if (point.size() >= 8) {
-            // TODO: overhaul remapping once an order is chosen!
-            m_gait_planning.setPrevPoint({point[1], point[2], point[3], point[0], point[5], point[6], point[7], point[4]}); 
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Received current joint angles"); 
+            m_gait_planning.setPrevPoint({point[0], point[2], point[3], point[4], point[5], point[7], point[8], point[9]}); 
+            RCLCPP_INFO(this->get_logger(), "Received current joint angles"); 
             std::string point_str;
             for (const auto &value : m_gait_planning.getPrevPoint()) {
                 point_str += std::to_string(value) + " ";
             }
 
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Point values: %s", point_str.c_str());
+            RCLCPP_INFO(this->get_logger(), "Point values: %s", point_str.c_str());
             m_first_stand = false;
         } else {
-            RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Not enough joint angles to set previous point correctly!");
+            RCLCPP_INFO(this->get_logger(), "Not enough joint angles to set previous point correctly!");
         }
     }
     if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
@@ -115,9 +114,9 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
 void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
     // TODO: Whenever this function is called, we first need to check whether the trajectory is empty BEFORE IT IS FILLED WITH THE NEW GAIT, and empty it before filling it with the new gait.
     if (!m_current_trajectory.empty()){
-        m_joints_msg.data = remapKinematicChaintoAlphabetical(m_current_trajectory[counter]);
+        m_joints_msg.data = m_current_trajectory[counter];
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Gait message published!"); 
+        RCLCPP_DEBUG(this->get_logger(), "Gait message published!"); 
     }
 } 
 
@@ -133,12 +132,12 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
         }
         m_initial_point = m_gait_planning.getPrevPoint();
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Increments correctly calculated!");
+        RCLCPP_DEBUG(this->get_logger(), "Increments correctly calculated!");
     }
     std::vector<double> temp_moving_to_home_stand;
    
     if (m_gait_planning.getCounter() < INTERPOLATING_TIMESTEPS){
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Moving towards home stand!");
+        RCLCPP_DEBUG(this->get_logger(), "Moving towards home stand!");
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
@@ -146,12 +145,12 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
 
     }
     else{
-        RCLCPP_DEBUG(rclcpp::get_logger("march_gait_planning"), "Home stand position reached!");
+        RCLCPP_DEBUG(this->get_logger(), "Home stand position reached!");
         temp_moving_to_home_stand = m_gait_planning.getHomeStand();
         m_initial_point.clear();
     }
 
-    m_joints_msg.data = remapKinematicChaintoAlphabetical(temp_moving_to_home_stand);
+    m_joints_msg.data = temp_moving_to_home_stand;
     m_joint_angle_trajectory_publisher->publish(m_joints_msg);
     
     m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
@@ -166,7 +165,7 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
         m_gait_planning.setCounter(count+1); 
         RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
-        m_joints_msg.data = remapKinematicChaintoAlphabetical(m_gait_planning.getHomeStand()); 
+        m_joints_msg.data = m_gait_planning.getHomeStand(); 
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand());
         m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
@@ -246,7 +245,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         
                         m_current_trajectory = m_gait_planning.getHingeGait(); 
                         processMovingGaits(count); 
-                        RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Count: %d", count);
+                        RCLCPP_INFO(this->get_logger(), "Count: %d", count);
                         m_gait_planning.setCounter((count <= 0) ? 0 : (count - 1));
                         if (m_gait_planning.getCounter() <= 0){
                             m_current_trajectory.clear();
