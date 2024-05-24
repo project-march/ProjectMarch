@@ -71,8 +71,8 @@ void SensorFusion::predictState() {
     
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
-    m_state.imu_velocity += expected_linear_velocity;
-    m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
+    m_state.imu_velocity.noalias() += expected_linear_velocity;
+    // m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
 
     // Normalize the orientations
     m_state.imu_orientation.normalize();
@@ -80,7 +80,7 @@ void SensorFusion::predictState() {
     // Update the covariance matrix with prior knowledge
     computeDynamicsMatrix();
     computeProcessNoiseCovarianceMatrix();
-    m_state.covariance_matrix = computePriorCovarianceMatrix() + m_process_noise_covariance_matrix;
+    m_state.covariance_matrix = computePriorCovarianceMatrix();
 
     #ifdef DEBUG
     Eigen::VectorXd prior_state(STATE_DIMENSION_SIZE);
@@ -118,13 +118,13 @@ void SensorFusion::updateState() {
     // Update the state with the correction vector
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
     m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
-    m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
+    // m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
     m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
     m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
     m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
-    m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
-    m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
+    // m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
+    // m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
     m_state.covariance_matrix.noalias() = computePosteriorCovarianceMatrix();
 
     // Normalize the orientations
@@ -160,11 +160,11 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
     innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_POSITION).noalias()
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
-    // Compute the innovation for the left and right foot slippage
-    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
-    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
+    // // Compute the innovation for the left and right foot slippage
+    // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
+    // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
 
     #ifdef DEBUG
     std::cout << "Innovation: " << innovation.transpose() << std::endl;
@@ -247,16 +247,16 @@ void SensorFusion::computeObservationNoiseCovarianceMatrix() {
         #endif
     }
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, MEASUREMENT_INDEX_LEFT_POSITION).noalias()
-        = m_observation_noise_covariance_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+        = m_observation_noise_covariance_left_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
             * m_observation_noise_covariance_joint_matrix * jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, MEASUREMENT_INDEX_RIGHT_POSITION).noalias()
-        = m_observation_noise_covariance_position_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+        = m_observation_noise_covariance_right_position_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
             * m_observation_noise_covariance_joint_matrix * jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
-        = m_observation_noise_covariance_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+        = m_observation_noise_covariance_left_slippage_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
             * m_observation_noise_covariance_joint_matrix * jacobians[LEFT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
-        = m_observation_noise_covariance_position_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
+        = m_observation_noise_covariance_right_slippage_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
             * m_observation_noise_covariance_joint_matrix * jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
     m_observation_noise_covariance_matrix.noalias() = m_observation_noise_covariance_matrix * (1.0 / m_timestep);
     #ifdef DEBUG

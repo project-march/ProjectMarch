@@ -3,9 +3,9 @@ state_estimator:
     noise_parameters:
       process_noise:
         linear_acceleration:
-        - 1e-12  # x
-        - 1e-12  # y
-        - 1e-12  # z
+        - 1e-5  # x
+        - 1e-5  # y
+        - 1e-5  # z
         angular_velocity:
         - 1e-12  # roll
         - 1e-12  # pitch
@@ -15,9 +15,9 @@ state_estimator:
         - 1e-12  # y
         - 1e-12  # z
         accelerometer_bias:
-        - 1e-12  # x
-        - 1e-12  # y
-        - 1e-12  # z
+        - 1e-5  # x
+        - 1e-5  # y
+        - 1e-5  # z
         gyroscope_bias:
         - 1e-12  # roll
         - 1e-12  # pitch
@@ -28,24 +28,24 @@ state_estimator:
         - 1e-12  # yaw
       observation_noise:
         foot_position:
-        - 1e3  # x
-        - 1e3  # y
-        - 1e3  # z
+        - 1e2  # x
+        - 1e2  # y
+        - 1e2  # z
         foot_slippage:
         - 1e3  # roll
         - 1e3  # pitch
         - 1e3  # yaw
         joint_position:
-        - 1e3  # left_hip_aa
-        - 1e3  # left_hip_fe
-        - 1e3  # left_knee
-        - 1e3  # left_ankle_dpf
-        - 1e3  # left_ankle_ie
-        - 1e3  # right_hip_aa
-        - 1e3  # right_hip_fe
-        - 1e3  # right_knee
-        - 1e3  # right_ankle_dpf
-        - 1e3  # right_ankle_ie
+        - 1e2  # left_hip_aa
+        - 1e2  # left_hip_fe
+        - 1e2  # left_knee
+        - 1e2  # left_ankle_dpf
+        - 1e2  # left_ankle_ie
+        - 1e2  # right_hip_aa
+        - 1e2  # right_hip_fe
+        - 1e2  # right_knee
+        - 1e2  # right_ankle_dpf
+        - 1e2  # right_ankle_ie
     optimization_parameters:
       process_noise:
       - foot_position

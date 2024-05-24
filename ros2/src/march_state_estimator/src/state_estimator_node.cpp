@@ -195,24 +195,25 @@ void StateEstimatorNode::timerCallback()
         RCLCPP_INFO(this->get_logger(), "Updating measurement data...");
         #endif
 
-        // Update joint position
+        // Update joint position and stance leg
         m_sensor_fusion->setJointPosition(m_joint_state->name, m_joint_state->position);
+        m_sensor_fusion->updateStanceLeg(m_state_estimator->getCurrentStanceLeg());
         
         // Update observation
         EKFObservation ekf_observation;
         ekf_observation.imu_acceleration
             = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
-        ekf_observation.imu_angular_velocity
-            = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
+        ekf_observation.imu_angular_velocity.noalias()
+            = -1.0 * Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
         std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
         ekf_observation.left_foot_position
             = Eigen::Vector3d(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[LEFT_FOOT_ID].position.y, body_foot_poses[LEFT_FOOT_ID].position.z);
         ekf_observation.right_foot_position
             = Eigen::Vector3d(body_foot_poses[RIGHT_FOOT_ID].position.x, body_foot_poses[RIGHT_FOOT_ID].position.y, body_foot_poses[RIGHT_FOOT_ID].position.z);
         ekf_observation.left_foot_slippage
-            = Eigen::Quaterniond(body_foot_poses[LEFT_FOOT_ID].orientation.w, body_foot_poses[LEFT_FOOT_ID].orientation.x, body_foot_poses[LEFT_FOOT_ID].orientation.y, body_foot_poses[LEFT_FOOT_ID].orientation.z);
+            = Eigen::Quaterniond(body_foot_poses[LEFT_FOOT_ID].orientation.w, body_foot_poses[LEFT_FOOT_ID].orientation.x, body_foot_poses[LEFT_FOOT_ID].orientation.y, body_foot_poses[LEFT_FOOT_ID].orientation.z).inverse();
         ekf_observation.right_foot_slippage
-            = Eigen::Quaterniond(body_foot_poses[RIGHT_FOOT_ID].orientation.w, body_foot_poses[RIGHT_FOOT_ID].orientation.x, body_foot_poses[RIGHT_FOOT_ID].orientation.y, body_foot_poses[RIGHT_FOOT_ID].orientation.z);
+            = Eigen::Quaterniond(body_foot_poses[RIGHT_FOOT_ID].orientation.w, body_foot_poses[RIGHT_FOOT_ID].orientation.x, body_foot_poses[RIGHT_FOOT_ID].orientation.y, body_foot_poses[RIGHT_FOOT_ID].orientation.z).inverse();
         m_sensor_fusion->setObservation(ekf_observation);
 
         #ifdef DEBUG
@@ -504,13 +505,15 @@ void StateEstimatorNode::broadcastTransformToTf2()
     // transform_stamped.transform.rotation.w = m_imu->orientation.w;
 
     EKFState state = m_sensor_fusion->getState();
+    Eigen::Quaterniond body_to_world_orientation
+        = Eigen::Quaterniond(state.imu_orientation.w(), state.imu_orientation.x(), state.imu_orientation.y(), state.imu_orientation.z());
     transform_stamped.transform.translation.x = state.imu_position.x();
     transform_stamped.transform.translation.y = state.imu_position.y();
     transform_stamped.transform.translation.z = state.imu_position.z();
-    transform_stamped.transform.rotation.x = state.imu_orientation.x();
-    transform_stamped.transform.rotation.y = state.imu_orientation.y();
-    transform_stamped.transform.rotation.z = state.imu_orientation.z();
-    transform_stamped.transform.rotation.w = state.imu_orientation.w();
+    transform_stamped.transform.rotation.x = body_to_world_orientation.x();
+    transform_stamped.transform.rotation.y = body_to_world_orientation.y();
+    transform_stamped.transform.rotation.z = body_to_world_orientation.z();
+    transform_stamped.transform.rotation.w = body_to_world_orientation.w();
 
     m_tf_broadcaster->sendTransform(transform_stamped);
 }
@@ -552,7 +555,7 @@ void StateEstimatorNode::configureSubscriptions()
 
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
         std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
         std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
 
     // Simulation ground truth information about position and velocity in world frame

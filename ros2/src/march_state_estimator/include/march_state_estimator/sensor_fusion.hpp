@@ -146,6 +146,9 @@ public:
             = Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).asDiagonal(); 
         m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
             = Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).asDiagonal();
+        
+        m_process_noise_foot_position = Eigen::Map<const Eigen::VectorXd>(foot_position_covariance.data(), foot_position_covariance.size()).asDiagonal();
+        m_process_noise_foot_slippage = Eigen::Map<const Eigen::VectorXd>(foot_slippage_covariance.data(), foot_slippage_covariance.size()).asDiagonal();
 
         #ifdef DEBUG
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
@@ -165,10 +168,35 @@ public:
         m_observation_noise_covariance_position_matrix = Eigen::Map<const Eigen::VectorXd>(position_covariance.data(), position_covariance.size()).asDiagonal();
         m_observation_noise_covariance_slippage_matrix = Eigen::Map<const Eigen::VectorXd>(slippage_covariance.data(), slippage_covariance.size()).asDiagonal();
         m_observation_noise_covariance_joint_matrix = Eigen::Map<const Eigen::VectorXd>(joint_covariance.data(), joint_covariance.size()).asDiagonal();
+        
+        m_observation_noise_covariance_left_position_matrix = m_observation_noise_covariance_position_matrix;
+        m_observation_noise_covariance_right_position_matrix = m_observation_noise_covariance_position_matrix;
+        m_observation_noise_covariance_right_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
+        m_observation_noise_covariance_left_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
 
         #ifdef DEBUG
         std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
         #endif
+    }
+
+    inline void updateStanceLeg(uint8_t current_stance_leg) {
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION)
+            = (current_stance_leg & 0b01) * m_process_noise_foot_position + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION)
+            = ((current_stance_leg & 0b10) >> 1) * m_process_noise_foot_position + (~(current_stance_leg & 0b10) >> 1) *computeVeryLargeMatrix3d();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
+            = (current_stance_leg & 0b01) * m_process_noise_foot_slippage + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
+            = ((current_stance_leg & 0b10) >> 1) * m_process_noise_foot_slippage + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
+
+        m_observation_noise_covariance_left_position_matrix
+            = (current_stance_leg & 0b01) * m_observation_noise_covariance_position_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        m_observation_noise_covariance_right_position_matrix
+            = ((current_stance_leg & 0b10) >> 1) * m_observation_noise_covariance_position_matrix + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
+        m_observation_noise_covariance_left_slippage_matrix
+            = (current_stance_leg & 0b01) * m_observation_noise_covariance_slippage_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        m_observation_noise_covariance_right_slippage_matrix
+            = ((current_stance_leg & 0b10) >> 1) * m_observation_noise_covariance_slippage_matrix + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
     }
 
 private:
@@ -185,7 +213,7 @@ private:
 
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
         Eigen::MatrixXd prior_covariance_matrix;
-        prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose();
+        prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose() + m_process_noise_covariance_matrix;
         #ifdef DEBUG
         std::cout << "Prior covariance matrix:\n" << prior_covariance_matrix << std::endl;
         #endif
@@ -238,6 +266,7 @@ private:
     void computeObservationMatrix();
     void computeObservationNoiseCovarianceMatrix();
 
+    inline const Eigen::Matrix3d computeVeryLargeMatrix3d() const { return Eigen::Matrix3d::Identity() * 1e15; }
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
         Eigen::Quaterniond q = orientation;
         q.normalize();
@@ -256,10 +285,17 @@ private:
     Eigen::MatrixXd m_innovation_covariance_matrix;
     Eigen::MatrixXd m_kalman_gain;
     Eigen::MatrixXd m_process_noise_covariance_matrix;
+    Eigen::Matrix3d m_process_noise_foot_position;
+    Eigen::Matrix3d m_process_noise_foot_slippage;
     Eigen::MatrixXd m_observation_noise_covariance_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_left_position_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_right_position_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_left_slippage_matrix;
+    Eigen::Matrix3d m_observation_noise_covariance_right_slippage_matrix;
+    Eigen::MatrixXd m_observation_noise_covariance_joint_matrix;
+
     Eigen::Matrix3d m_observation_noise_covariance_position_matrix;
     Eigen::Matrix3d m_observation_noise_covariance_slippage_matrix;
-    Eigen::MatrixXd m_observation_noise_covariance_joint_matrix;
 
     pinocchio::Model m_robot_model;
     std::unique_ptr<pinocchio::Data> m_robot_data;
