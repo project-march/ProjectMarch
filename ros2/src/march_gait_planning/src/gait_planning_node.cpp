@@ -105,7 +105,7 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         m_desired_footpositions_msg->header = msg->header;
         if (m_current_trajectory.empty()){
             m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-            RCLCPP_INFO(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
+            // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
         }
         publishFootPositions();
     } else {
