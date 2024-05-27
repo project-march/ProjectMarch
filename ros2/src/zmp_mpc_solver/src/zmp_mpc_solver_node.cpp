@@ -5,8 +5,8 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-SolverNode::SolverNode()
-    : Node("mpc_solver_node")
+MpcSolverNode::MpcSolverNode()
+    : Node("mpc_solver")
     , m_zmp_solver()
     , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
@@ -22,23 +22,23 @@ SolverNode::SolverNode()
     m_current_shooting_node_publisher = this->create_publisher<std_msgs::msg::Int32>("current_shooting_node", 10);
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
-        "/robot_com_position", 10, std::bind(&SolverNode::com_callback, this, _1));
+        "/robot_com_position", 10, std::bind(&MpcSolverNode::com_callback, this, _1));
     m_desired_steps_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/desired_footsteps", 10, std::bind(&SolverNode::desired_pos_callback, this, _1));
+        "/desired_footsteps", 10, std::bind(&MpcSolverNode::desired_pos_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/est_foot_position", 10, std::bind(&SolverNode::feet_callback, this, _1));
+        "/est_foot_position", 10, std::bind(&MpcSolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
-        "/robot_zmp_position", 10, std::bind(&SolverNode::zmp_callback, this, _1));
+        "/robot_zmp_position", 10, std::bind(&MpcSolverNode::zmp_callback, this, _1));
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
-        "/current_stance_foot", 10, std::bind(&SolverNode::stance_foot_callback, this, _1));
+        "/current_stance_foot", 10, std::bind(&MpcSolverNode::stance_foot_callback, this, _1));
     m_right_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
-        "/right_foot_on_ground", 10, std::bind(&SolverNode::right_foot_ground_callback, this, _1));
+        "/right_foot_on_ground", 10, std::bind(&MpcSolverNode::right_foot_ground_callback, this, _1));
     m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
-        "/left_foot_on_ground", 10, std::bind(&SolverNode::left_foot_ground_callback, this, _1));
+        "/left_foot_on_ground", 10, std::bind(&MpcSolverNode::left_foot_ground_callback, this, _1));
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "/current_mode", 10, std::bind(&SolverNode::currentModeCallback, this, _1)); 
+        "/current_mode", 10, std::bind(&MpcSolverNode::currentModeCallback, this, _1)); 
     m_state_estimation_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "/state_estimation_topic", 10, std::bind(&SolverNode::state_estimation_callback, this, std::placeholders::_1));
+        "/state_estimation_topic", 10, std::bind(&MpcSolverNode::state_estimation_callback, this, std::placeholders::_1));
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
     m_prev_foot_msg.header.frame_id = "R_ground";
@@ -49,26 +49,26 @@ SolverNode::SolverNode()
 
     // timer_callback();
 
-    m_solving_timer = this->create_wall_timer(50ms, std::bind(&SolverNode::timer_callback, this));
+    m_solving_timer = this->create_wall_timer(50ms, std::bind(&MpcSolverNode::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "Booted up ZMP solver node");
 }
 
-void SolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     m_mode = (exoMode)msg->mode; 
 }
 
-void SolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
+void MpcSolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
     m_zmp_solver.set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
     m_zmp_solver.set_com_height(msg->position.point.z);
 }
 
-void SolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
+void MpcSolverNode::zmp_callback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
     m_zmp_solver.set_current_zmp(msg->point.x, msg->point.y);
 }
 
-void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
+void MpcSolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
     // OR SOMETHING FOR CURRENT FEET POSITIONS.
@@ -77,7 +77,7 @@ void SolverNode::desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr m
     m_zmp_solver.set_reference_stepsize(m_zmp_solver.get_candidate_footsteps());
 }
 
-void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
+void MpcSolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // m_zmp_solver.set_current_foot(msg->poses[1].position.x, msg->poses[1].position.y);
     // if ((m_zmp_solver.get_current_stance_foot() == -1)
@@ -115,27 +115,29 @@ void SolverNode::feet_callback(geometry_msgs::msg::PoseArray::SharedPtr msg)
     m_zmp_solver.set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
 }
 
-void SolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
+void MpcSolverNode::state_estimation_callback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) 
+{
+    m_inertial_foot_positions = msg->world_foot_pose;
+    m_current_stance_leg = msg->current_stance_leg;
+    m_next_stance_leg = msg->next_stance_leg;
+}
+
+void MpcSolverNode::stance_foot_callback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_zmp_solver.set_current_stance_foot(msg->data);
 }
 
-void SolverNode::right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
+void MpcSolverNode::right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_right_foot_on_gound(msg->data);
 }
 
-void SolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
+void MpcSolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg)
 {
     m_zmp_solver.set_left_foot_on_gound(msg->data);
 }
-void SolverNode::state_estimation_callback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) 
-{
-    m_inertial_foot_positions = msg->inertial_foot_positions;
-    m_current_stance_leg = msg->current_stance_leg;
-    m_next_stance_leg = msg->next_stance_leg;
-}
-void SolverNode::timer_callback()
+
+void MpcSolverNode::timer_callback()
 {
     if (m_mode == exoMode::VariableWalk){ 
 
@@ -286,7 +288,7 @@ void SolverNode::timer_callback()
     }
 }
 
-// void SolverNode::visualize_trajectory()
+// void MpcSolverNode::visualize_trajectory()
 // {
 //     visualization_msgs::msg::Marker com_marker;
 //     com_marker.type = 4;
@@ -325,7 +327,8 @@ void SolverNode::timer_callback()
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<SolverNode>());
+    auto node = std::make_shared<MpcSolverNode>();
+    rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
 }

@@ -31,9 +31,9 @@
 #ifndef ZMP_MPC_NODE
 #define ZMP_MPC_NODE
 
-class SolverNode : public rclcpp::Node {
+class MpcSolverNode : public rclcpp::Node {
 public:
-    SolverNode();
+    MpcSolverNode();
 
 private:
     ZmpSolver m_zmp_solver;
@@ -43,6 +43,7 @@ private:
     void feet_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void desired_pos_callback(geometry_msgs::msg::PoseArray::SharedPtr);
     void stance_foot_callback(std_msgs::msg::Int32::SharedPtr);
+    void state_estimation_callback(const march_shared_msgs::msg::StateEstimation::SharedPtr);
     void timer_callback();
     void visualize_trajectory();
     void right_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg);
@@ -58,7 +59,7 @@ private:
     geometry_msgs::msg::PoseArray::SharedPtr m_desired_footsteps;
     geometry_msgs::msg::PoseArray m_prev_des_footsteps;
     geometry_msgs::msg::PoseArray m_prev_foot_msg;
-    geometry_msgs::msg::PoseArray m_inertial_foot_positions;
+    std::vector<geometry_msgs::msg::Pose> m_inertial_foot_positions;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_trajectory_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;

@@ -86,7 +86,7 @@ private:
     double m_timing_value;
 
     int m_current_count;
-    int m_current_stance_foot;:
+    int m_current_stance_foot;
     int m_previous_stance_foot;
     int m_step_counter;
 
