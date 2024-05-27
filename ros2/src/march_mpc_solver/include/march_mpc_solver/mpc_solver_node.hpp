@@ -7,7 +7,7 @@
 #define MARCH_MPC_SOLVER__MPC_SOLVER_NODE_HPP_
 
 #include "rclcpp/rclcpp.hpp"
-#include "march_mpc_solver/zmp_mpc_solver.hpp"
+#include "march_mpc_solver/mpc_solver.hpp"
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
@@ -44,7 +44,7 @@ private:
 
     void visualizeTrajectory();
 
-    std::unique_ptr<ZmpSolver> m_zmp_solver;
+    std::unique_ptr<MpcSolver> m_mpc_solver;
 
     double m_desired_previous_foot_x;
     double m_desired_previous_foot_y;

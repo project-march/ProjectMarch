@@ -16,7 +16,7 @@ MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
     , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
 {
-    m_zmp_solver = std::make_unique<ZmpSolver>();
+    m_mpc_solver = std::make_unique<MpcSolver>();
 
     m_com_trajectory_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("com_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
@@ -55,8 +55,8 @@ MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
 
 void MpcSolverNode::currentComCallback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
-    m_zmp_solver->set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
-    m_zmp_solver->set_com_height(msg->position.point.z);
+    m_mpc_solver->set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
+    m_mpc_solver->set_com_height(msg->position.point.z);
 }
 
 void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
@@ -66,12 +66,12 @@ void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::S
 
 void MpcSolverNode::currentStanceFootCallback(std_msgs::msg::Int32::SharedPtr msg)
 {
-    m_zmp_solver->set_current_stance_foot(msg->data);
+    m_mpc_solver->set_current_stance_foot(msg->data);
 }
 
 void MpcSolverNode::currentZmpCallback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    m_zmp_solver->set_current_zmp(msg->point.x, msg->point.y);
+    m_mpc_solver->set_current_zmp(msg->point.x, msg->point.y);
 }
 
 void MpcSolverNode::desiredFeetPositionsCallback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -79,33 +79,33 @@ void MpcSolverNode::desiredFeetPositionsCallback(geometry_msgs::msg::PoseArray::
     // CHANGE THIS, NEED AN EXTRA TOPIC. THIS ONE IS CONNECTED TO THE FOOTSTEP PLANNER, NEED ONE FROM STATE ESTIMATION
     // OR SOMETHING FOR CURRENT FEET POSITIONS.
     m_desired_footsteps = msg;
-    m_zmp_solver->set_candidate_footsteps(m_desired_footsteps);
-    m_zmp_solver->set_reference_stepsize(m_zmp_solver->get_candidate_footsteps());
+    m_mpc_solver->set_candidate_footsteps(m_desired_footsteps);
+    m_mpc_solver->set_reference_stepsize(m_mpc_solver->get_candidate_footsteps());
 }
 
 void MpcSolverNode::estimatedFeetPositionsCallback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
     // msg->poses[0] is the left foot
     // msg->poses[1] is the right foot
-    if ((m_zmp_solver->get_current_stance_foot() == -1)
-        || (m_zmp_solver->get_current_stance_foot() == 1
-            && m_zmp_solver->get_m_current_shooting_node().data == 0)) { // if stance foot is the left foot
+    if ((m_mpc_solver->get_current_stance_foot() == -1)
+        || (m_mpc_solver->get_current_stance_foot() == 1
+            && m_mpc_solver->get_m_current_shooting_node().data == 0)) { // if stance foot is the left foot
         // only change the desired previous footsteps when current shooting node is 1 and the footstep changes
         if (abs(m_desired_previous_foot_y - msg->poses[LEFT_FOOT_ID].position.y) > 10e-2
-            && m_zmp_solver->get_m_current_shooting_node().data == 1) {
+            && m_mpc_solver->get_m_current_shooting_node().data == 1) {
             m_desired_previous_foot_x = msg->poses[LEFT_FOOT_ID].position.x;
             m_desired_previous_foot_y = msg->poses[LEFT_FOOT_ID].position.y;
         }
     }
-    if (m_zmp_solver->get_current_stance_foot() == 1
-        || (m_zmp_solver->get_current_stance_foot() == -1 && m_zmp_solver->get_m_current_shooting_node().data == 0)) {
+    if (m_mpc_solver->get_current_stance_foot() == 1
+        || (m_mpc_solver->get_current_stance_foot() == -1 && m_mpc_solver->get_m_current_shooting_node().data == 0)) {
         if (abs(m_desired_previous_foot_y - msg->poses[RIGHT_FOOT_ID].position.y) > 10e-2
-            && m_zmp_solver->get_m_current_shooting_node().data == 1) {
+            && m_mpc_solver->get_m_current_shooting_node().data == 1) {
             m_desired_previous_foot_x = msg->poses[RIGHT_FOOT_ID].position.x;
             m_desired_previous_foot_y = msg->poses[RIGHT_FOOT_ID].position.y;
         }
     }
-    m_zmp_solver->set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
+    m_mpc_solver->set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
 }
 
 void MpcSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) 
@@ -127,21 +127,21 @@ void MpcSolverNode::timerCallback()
     }
 
     if (*m_desired_footsteps != m_prev_des_footsteps) {
-        m_zmp_solver->reset_to_double_stance();
+        m_mpc_solver->reset_to_double_stance();
     }
 
     m_prev_des_footsteps = *m_desired_footsteps;
-    m_zmp_solver->update_current_foot();
-    m_zmp_solver->set_current_state();
-    int solver_status = m_zmp_solver->solve_step();
+    m_mpc_solver->update_current_foot();
+    m_mpc_solver->set_current_state();
+    int solver_status = m_mpc_solver->solve_step();
 
     if (solver_status != 0) {
         RCLCPP_WARN(this->get_logger(), "Could not find a solution. exited with status %i", solver_status);
         return;
     }
 
-    m_current_shooting_node_publisher->publish(m_zmp_solver->get_m_current_shooting_node());
-    m_zmp_solver->update_current_shooting_node();
+    m_current_shooting_node_publisher->publish(m_mpc_solver->get_m_current_shooting_node());
+    m_mpc_solver->update_current_shooting_node();
     visualizeTrajectory();
 }
 
@@ -181,12 +181,12 @@ void MpcSolverNode::visualizeTrajectory()
     geometry_msgs::msg::PoseStamped zmp_path_wrapper;
     zmp_path_wrapper.header.frame_id = "R_heel";
 
-    std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver->get_state_trajectory();
+    std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_mpc_solver->get_state_trajectory();
 
     for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 3)];
-        pose_container.position.z = m_zmp_solver->get_com_height();
+        pose_container.position.z = m_mpc_solver->get_com_height();
         com_msg.poses.push_back(pose_container);
         com_path_wrapper.pose = pose_container;
         com_path.poses.push_back(com_path_wrapper);
@@ -194,7 +194,7 @@ void MpcSolverNode::visualizeTrajectory()
         // Visualize the ZMP trajectory
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
-        pose_container.position.z = 0 ; // m_zmp_solver->get_com_height();
+        pose_container.position.z = 0 ; // m_mpc_solver->get_com_height();
         zmp_path_wrapper.pose = pose_container;
         zmp_path.poses.push_back(zmp_path_wrapper);
 
@@ -213,7 +213,7 @@ void MpcSolverNode::visualizeTrajectory()
 
         marker_container.x = (*trajectory_pointer)[(i * NX + 7)];
         marker_container.y = (*trajectory_pointer)[(i * NX + 9)];
-        marker_container.z = m_zmp_solver->get_com_height() / 2;
+        marker_container.z = m_mpc_solver->get_com_height() / 2;
         previous_footsteps_marker.points.push_back(marker_container);
     };
 

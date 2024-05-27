@@ -37,9 +37,9 @@ set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
 add_library(${PROJECT_NAME}_testlib
   STATIC
   src/mpc_solver_node.cpp
-  src/zmp_mpc_solver.cpp
-  include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+  src/mpc_solver.cpp
   include/${PROJECT_NAME}/mpc_solver_node.hpp
+  include/${PROJECT_NAME}/mpc_solver.hpp
 )
 
 ament_target_dependencies(
@@ -54,9 +54,9 @@ ament_target_dependencies(
 # 
 add_executable(mpc_solver_node
   src/mpc_solver_node.cpp
-  src/zmp_mpc_solver.cpp
-  include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+  src/mpc_solver.cpp
   include/${PROJECT_NAME}/mpc_solver_node.hpp
+  include/${PROJECT_NAME}/mpc_solver.hpp
 )
 ament_target_dependencies(mpc_solver_node rclcpp march_shared_msgs trajectory_msgs std_msgs)
 target_include_directories(mpc_solver_node PUBLIC
@@ -137,7 +137,7 @@ if(BUILD_TESTING)
   #find_package(ament_lint_auto REQUIRED)
   ament_add_gmock(${PROJECT_NAME}_test
     test/test_runner.cpp
-    test/zmp_mpc_test.cpp
+    test/mpc_solver_test.cpp
     # include
     )
   

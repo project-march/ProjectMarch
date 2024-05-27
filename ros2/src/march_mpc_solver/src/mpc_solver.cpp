@@ -1,8 +1,12 @@
-// standard
-#include "march_mpc_solver/zmp_mpc_solver.hpp"
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
+#include "march_mpc_solver/mpc_solver.hpp"
 #include <iostream>
 
-ZmpSolver::ZmpSolver()
+MpcSolver::MpcSolver()
     : m_time_horizon(2.0)
     , m_x_current()
     , m_u_current()
@@ -36,55 +40,55 @@ ZmpSolver::ZmpSolver()
     set_current_state();
 }
 
-double ZmpSolver::get_com_height()
+double MpcSolver::get_com_height()
 {
     return m_com_height;
 }
 
-void ZmpSolver::set_m_current_shooting_node(int current_shooting_node)
+void MpcSolver::set_m_current_shooting_node(int current_shooting_node)
 {
     m_current_shooting_node = current_shooting_node;
 }
 
-int ZmpSolver::solve_step()
+int MpcSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
     // return 1;
 }
 
-std::array<double, NX> ZmpSolver::get_state()
+std::array<double, NX> MpcSolver::get_state()
 {
     return m_x_current;
 }
 
-std::vector<double> ZmpSolver::get_real_time_com_trajectory_x()
+std::vector<double> MpcSolver::get_real_time_com_trajectory_x()
 {
     return m_real_time_com_trajectory_x;
 }
 
-std::vector<double> ZmpSolver::get_real_time_com_trajectory_y()
+std::vector<double> MpcSolver::get_real_time_com_trajectory_y()
 {
     return m_real_time_com_trajectory_y;
 }
 
-void ZmpSolver::reset_to_double_stance()
+void MpcSolver::reset_to_double_stance()
 {
     m_current_shooting_node = 100;
     m_step_counter = 0;
     m_current_count = -1;
 }
 
-std::array<double, NX * ZMP_PENDULUM_ODE_N>* ZmpSolver::get_state_trajectory()
+std::array<double, NX * ZMP_PENDULUM_ODE_N>* MpcSolver::get_state_trajectory()
 {
     return &m_x_trajectory;
 }
 
-std::array<double, NU * ZMP_PENDULUM_ODE_N> ZmpSolver::get_input_trajectory()
+std::array<double, NU * ZMP_PENDULUM_ODE_N> MpcSolver::get_input_trajectory()
 {
     return m_u_current;
 }
 
-std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
+std_msgs::msg::Int32 MpcSolver::get_m_current_shooting_node()
 {
     std_msgs::msg::Int32 current_shooting_node;
     current_shooting_node.data = m_current_shooting_node;
@@ -92,19 +96,19 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 }
 
 
-void ZmpSolver::set_current_stance_leg(uint8_t current_stance_leg) {
+void MpcSolver::set_current_stance_leg(uint8_t current_stance_leg) {
     m_current_stance_leg = current_stance_leg;
 }
 
-void ZmpSolver::set_next_stance_leg(uint8_t next_stance_leg) {
+void MpcSolver::set_next_stance_leg(uint8_t next_stance_leg) {
     m_next_stance_leg = next_stance_leg;
 }
 
-void ZmpSolver::set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) {
+void MpcSolver::set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) {
     m_foot_positions = foot_positions;
 }
 
-void ZmpSolver::set_current_state()
+void MpcSolver::set_current_state()
 {
     // This is of course MPC dependent
     m_x_current[0] = m_com_current[0]; // - 0.11; when using real state estimator
@@ -127,18 +131,18 @@ void ZmpSolver::set_current_state()
     m_x_current[11] = 0;
 }
 
-int ZmpSolver::get_current_stance_foot()
+int MpcSolver::get_current_stance_foot()
 {
     return m_current_stance_foot;
 }
 
-void ZmpSolver::set_current_foot(double x, double y)
+void MpcSolver::set_current_foot(double x, double y)
 {
     m_pos_foot_current[0] = x;
     m_pos_foot_current[1] = y;
 }
 
-void ZmpSolver::update_current_foot()
+void MpcSolver::update_current_foot()
 {
     if (m_step_counter == 0) {
         // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
@@ -151,27 +155,27 @@ void ZmpSolver::update_current_foot()
     }
 }
 
-void ZmpSolver::set_right_foot_on_gound(bool foot_on_ground)
+void MpcSolver::set_right_foot_on_gound(bool foot_on_ground)
 {
     if (foot_on_ground) {
         m_right_foot_on_ground = true;
     }
 }
 
-void ZmpSolver::set_left_foot_on_gound(bool foot_on_ground)
+void MpcSolver::set_left_foot_on_gound(bool foot_on_ground)
 {
     if (foot_on_ground) {
         m_left_foot_on_ground = true;
     }
 }
 
-void ZmpSolver::set_previous_foot(double x, double y)
+void MpcSolver::set_previous_foot(double x, double y)
 {
     m_pos_foot_prev[0] = x;
     m_pos_foot_prev[1] = y;
 }
 
-void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
+void MpcSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
 {
     m_candidate_footsteps.clear();
     for (auto pose : footsteps->poses) {
@@ -179,7 +183,7 @@ void ZmpSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr
     }
 }
 
-bool ZmpSolver::check_zmp_on_foot()
+bool MpcSolver::check_zmp_on_foot()
 {
     bool x_check;
     bool y_check;
@@ -219,7 +223,7 @@ bool ZmpSolver::check_zmp_on_foot()
     }
 }
 
-void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
+void MpcSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
 {
     m_reference_stepsize_y.clear();
     m_reference_stepsize_x.clear();
@@ -231,7 +235,7 @@ void ZmpSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
     }
 }
 
-void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
+void MpcSolver::set_current_com(double x, double y, double dx, double dy)
 {
     m_com_current[0] = x;
     m_com_current[1] = y;
@@ -240,18 +244,18 @@ void ZmpSolver::set_current_com(double x, double y, double dx, double dy)
     m_com_vel_current[1] = dy;
 }
 
-void ZmpSolver::set_com_height(double height)
+void MpcSolver::set_com_height(double height)
 {
     m_com_height = height;
 }
 
-void ZmpSolver::set_current_zmp(double x, double y)
+void MpcSolver::set_current_zmp(double x, double y)
 {
     m_zmp_current[0] = x;
     m_zmp_current[1] = y;
 }
 
-void ZmpSolver::initialize_mpc_params()
+void MpcSolver::initialize_mpc_params()
 {
     // Later, change this to read from a yaml
     m_admissible_region_x = 0.62;
@@ -271,17 +275,17 @@ void ZmpSolver::initialize_mpc_params()
     m_number_of_footsteps = 2;
 }
 
-void ZmpSolver::set_current_stance_foot(int stance_foot)
+void MpcSolver::set_current_stance_foot(int stance_foot)
 {
     m_current_stance_foot = stance_foot;
 }
 
-void ZmpSolver::update_current_shooting_node()
+void MpcSolver::update_current_shooting_node()
 {
     m_current_shooting_node += 1;
 }
 
-inline int ZmpSolver::solve_zmp_mpc(
+inline int MpcSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
     // geometry_msgs::msg::Pose left_foot_pose = m_foot_positions.poses[0];

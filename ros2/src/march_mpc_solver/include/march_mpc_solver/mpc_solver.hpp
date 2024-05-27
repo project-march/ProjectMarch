@@ -1,4 +1,11 @@
-// standard
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
+#ifndef MARCH_MPC_SOLVER__MPC_SOLVER_HPP_
+#define MARCH_MPC_SOLVER__MPC_SOLVER_HPP_
+
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
@@ -12,14 +19,13 @@
 #include <string>
 #include <vector>
 
-#ifndef ZMP_MPC
-#define ZMP_MPC
-
 enum Gait_type { startup, continuous, stopping };
 
-class ZmpSolver {
+class MpcSolver {
 public:
-    ZmpSolver();
+    MpcSolver();
+    ~MpcSolver() = default;
+
     double m_time_horizon;
     bool m_is_weight_shift_done;
     void set_current_state();
@@ -105,4 +111,4 @@ private:
     uint8_t m_next_stance_leg;
 };
 
-#endif
+#endif  // MARCH_MPC_SOLVER__MPC_SOLVER_HPP_
