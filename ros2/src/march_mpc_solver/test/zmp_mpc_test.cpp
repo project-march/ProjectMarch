@@ -2,7 +2,7 @@
 // NOLINTBEGIN
 
 //#include "state_machine.cpp"
-#include "zmp_mpc_solver/zmp_mpc_solver.hpp"
+#include "march_mpc_solver/zmp_mpc_solver.hpp"
 #include <array>
 #include <gtest/gtest.h>
 #include <memory>

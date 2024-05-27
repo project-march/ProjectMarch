@@ -28,7 +28,7 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
     for (auto& pose : msg->poses) {
         geometry_msgs::msg::TransformStamped transform;
         try {
-            transform = m_tf_buffer->lookupTransform("backpack", "R_ground", tf2::TimePointZero, tf2::durationFromSec(0.1));
+            transform = m_tf_buffer->lookupTransform("backpack", "R_heel", tf2::TimePointZero, tf2::durationFromSec(0.1));
         } catch (tf2::TransformException& ex) {
             RCLCPP_ERROR(this->get_logger(), "Transform error: %s", ex.what());
             return;

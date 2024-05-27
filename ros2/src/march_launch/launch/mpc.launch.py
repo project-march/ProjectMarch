@@ -285,5 +285,4 @@ def generate_launch_description() -> LaunchDescription:
         ipd_node,
         footstep_generator,
         bezier_visualization, 
-        # swing_leg_trajectory_generator,
     ])

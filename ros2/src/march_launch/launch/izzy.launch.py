@@ -217,6 +217,25 @@ def generate_launch_description() -> LaunchDescription:
     # step_length = 0.2
     # endregion
 
+    # region Launch Footstep Generator
+    footstep_generator_launch_dir = os.path.join(get_package_share_directory("footstep_generator"), "launch")
+    n_footsteps = 20
+    step_length = 0.2
+
+    footstep_generator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator.launch.py']),
+        # launch_arguments=[('n_footsteps', n_footsteps), ('step_length', step_length)],
+    )
+    # endregion
+
+    # region Launch Bezier Visualization
+    bezier_visualization_launch_dir = os.path.join(get_package_share_directory("march_visualization"), "launch")
+
+    bezier_visualization = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([bezier_visualization_launch_dir, '/bezier_visualization.launch.py']),
+    )
+    # endregion
+
     return LaunchDescription(declared_arguments + [
         Node(
             package='fuzzy_generator',
@@ -247,6 +266,19 @@ def generate_launch_description() -> LaunchDescription:
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
         ),
+        Node(
+            package='march_mpc_solver',
+            executable='zmp_mpc_solver',
+            name='zmp_mpc_solver',
+            output='screen',
+        ),
+        Node(
+            package='march_mpc_buffer',
+            executable='march_mpc_buffer_node',
+            name='march_mpc_buffer_node',
+            output='screen',
+        ),
+
 
         mujoco_node,
         march_control,
@@ -257,5 +289,6 @@ def generate_launch_description() -> LaunchDescription:
         ik_solver,
         state_estimator,
         ipd_node,
-        # footstep_generator, 
+        footstep_generator,
+        bezier_visualization, 
     ])

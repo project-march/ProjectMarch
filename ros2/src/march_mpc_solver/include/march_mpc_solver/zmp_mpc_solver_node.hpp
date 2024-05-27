@@ -7,7 +7,7 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "zmp_mpc_solver/zmp_mpc_solver.hpp"
+#include "march_mpc_solver/zmp_mpc_solver.hpp"
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"

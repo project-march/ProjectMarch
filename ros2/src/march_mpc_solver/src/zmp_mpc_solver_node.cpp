@@ -1,6 +1,4 @@
-// standard
-#include "zmp_mpc_solver/zmp_mpc_solver_node.hpp"
-//#include "march_shared_msgs/msg/point_stamped_list.hpp"
+#include "march_mpc_solver/zmp_mpc_solver_node.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -11,8 +9,6 @@ MpcSolverNode::MpcSolverNode()
     , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
 {
-    //    m_trajectory_publisher = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory",
-    //    10);
     m_com_trajectory_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("com_trajectory", 10);
     m_final_feet_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("final_feet_position", 10);
     m_com_visualizer_publisher = this->create_publisher<nav_msgs::msg::Path>("com_visualization_trajectory", 10);
@@ -22,26 +18,26 @@ MpcSolverNode::MpcSolverNode()
     m_current_shooting_node_publisher = this->create_publisher<std_msgs::msg::Int32>("current_shooting_node", 10);
 
     m_com_subscriber = this->create_subscription<march_shared_msgs::msg::CenterOfMass>(
-        "/robot_com_position", 10, std::bind(&MpcSolverNode::com_callback, this, _1));
+        "robot_com_position", 10, std::bind(&MpcSolverNode::com_callback, this, _1));
     m_desired_steps_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/desired_footsteps", 10, std::bind(&MpcSolverNode::desired_pos_callback, this, _1));
+        "desired_footsteps", 10, std::bind(&MpcSolverNode::desired_pos_callback, this, _1));
     m_feet_pos_subscriber = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/est_foot_position", 10, std::bind(&MpcSolverNode::feet_callback, this, _1));
+        "est_foot_position", 10, std::bind(&MpcSolverNode::feet_callback, this, _1));
     m_zmp_subscriber = this->create_subscription<geometry_msgs::msg::PointStamped>(
-        "/robot_zmp_position", 10, std::bind(&MpcSolverNode::zmp_callback, this, _1));
+        "robot_zmp_position", 10, std::bind(&MpcSolverNode::zmp_callback, this, _1));
     m_stance_foot_subscriber = this->create_subscription<std_msgs::msg::Int32>(
-        "/current_stance_foot", 10, std::bind(&MpcSolverNode::stance_foot_callback, this, _1));
+        "current_stance_foot", 10, std::bind(&MpcSolverNode::stance_foot_callback, this, _1));
     m_right_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
-        "/right_foot_on_ground", 10, std::bind(&MpcSolverNode::right_foot_ground_callback, this, _1));
+        "right_foot_on_ground", 10, std::bind(&MpcSolverNode::right_foot_ground_callback, this, _1));
     m_left_foot_on_ground_subscriber = this->create_subscription<std_msgs::msg::Bool>(
-        "/left_foot_on_ground", 10, std::bind(&MpcSolverNode::left_foot_ground_callback, this, _1));
+        "left_foot_on_ground", 10, std::bind(&MpcSolverNode::left_foot_ground_callback, this, _1));
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "/current_mode", 10, std::bind(&MpcSolverNode::currentModeCallback, this, _1)); 
+        "current_mode", 10, std::bind(&MpcSolverNode::currentModeCallback, this, _1)); 
     m_state_estimation_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "/state_estimation_topic", 10, std::bind(&MpcSolverNode::state_estimation_callback, this, std::placeholders::_1));
+        "state_estimation/state", 10, std::bind(&MpcSolverNode::state_estimation_callback, this, std::placeholders::_1));
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
-    m_prev_foot_msg.header.frame_id = "R_ground";
+    m_prev_foot_msg.header.frame_id = "R_heel";
     prev_foot_pose_container.position.x = 0.0;
     prev_foot_pose_container.position.y = 0.0;
     prev_foot_pose_container.position.z = 0.0;
@@ -159,38 +155,38 @@ void MpcSolverNode::timer_callback()
             } else {
                 auto com_msg = geometry_msgs::msg::PoseArray();
                 com_msg.header.stamp = this->get_clock()->now();
-                com_msg.header.frame_id = "R_ground";
+                com_msg.header.frame_id = "R_heel";
 
                 auto foot_msg = geometry_msgs::msg::PoseArray();
                 foot_msg.header.stamp = this->get_clock()->now();
-                foot_msg.header.frame_id = "R_ground";
+                foot_msg.header.frame_id = "R_heel";
 
                 geometry_msgs::msg::Pose pose_container;
 
                 // This is all for visualization
                 visualization_msgs::msg::Marker current_footsteps_marker;
                 current_footsteps_marker.type = 8;
-                current_footsteps_marker.header.frame_id = "R_ground";
+                current_footsteps_marker.header.frame_id = "R_heel";
                 current_footsteps_marker.id = 0;
 
                 visualization_msgs::msg::Marker previous_footsteps_marker;
                 previous_footsteps_marker.type = 8;
-                previous_footsteps_marker.header.frame_id = "R_ground";
+                previous_footsteps_marker.header.frame_id = "R_heel";
                 previous_footsteps_marker.id = 1;
 
                 geometry_msgs::msg::Point marker_container;
 
                 nav_msgs::msg::Path com_path;
-                com_path.header.frame_id = "R_ground";
+                com_path.header.frame_id = "R_heel";
 
                 nav_msgs::msg::Path zmp_path;
-                zmp_path.header.frame_id = "R_ground";
+                zmp_path.header.frame_id = "R_heel";
 
                 geometry_msgs::msg::PoseStamped com_path_wrapper;
-                com_path_wrapper.header.frame_id = "R_ground";
+                com_path_wrapper.header.frame_id = "R_heel";
 
                 geometry_msgs::msg::PoseStamped zmp_path_wrapper;
-                zmp_path_wrapper.header.frame_id = "R_ground";
+                zmp_path_wrapper.header.frame_id = "R_heel";
 
                 std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_zmp_solver.get_state_trajectory();
 
@@ -292,7 +288,7 @@ void MpcSolverNode::timer_callback()
 // {
 //     visualization_msgs::msg::Marker com_marker;
 //     com_marker.type = 4;
-//     com_marker.header.frame_id = "R_ground";
+//     com_marker.header.frame_id = "R_heel";
 //     com_marker.id = 0;
 //     geometry_msgs::msg::Point com_marker_point;
 //     std::vector<double> m_real_time_com_trajectory_x = m_zmp_solver.get_real_time_com_trajectory_x();

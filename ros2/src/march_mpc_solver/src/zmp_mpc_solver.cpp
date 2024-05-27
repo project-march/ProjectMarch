@@ -1,5 +1,5 @@
 // standard
-#include "zmp_mpc_solver/zmp_mpc_solver.hpp"
+#include "march_mpc_solver/zmp_mpc_solver.hpp"
 #include <iostream>
 
 ZmpSolver::ZmpSolver()
@@ -93,15 +93,15 @@ std_msgs::msg::Int32 ZmpSolver::get_m_current_shooting_node()
 
 
 void ZmpSolver::set_current_stance_leg(uint8_t current_stance_leg) {
-m_current_stance_leg = current_stance_leg;
+    m_current_stance_leg = current_stance_leg;
 }
 
 void ZmpSolver::set_next_stance_leg(uint8_t next_stance_leg) {
-m_next_stance_leg = next_stance_leg;
+    m_next_stance_leg = next_stance_leg;
 }
 
 void ZmpSolver::set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) {
-m_foot_positions = foot_positions;
+    m_foot_positions = foot_positions;
 }
 
 void ZmpSolver::set_current_state()
@@ -284,21 +284,20 @@ void ZmpSolver::update_current_shooting_node()
 inline int ZmpSolver::solve_zmp_mpc(
     std::array<double, NX>& x_init_input, std::array<double, NU * ZMP_PENDULUM_ODE_N>& u_current)
 {
-    geometry_msgs::msg::Pose left_foot_pose = m_foot_positions.poses[0];
-    geometry_msgs::msg::Pose right_foot_pose = m_foot_positions.poses[1];
+    // geometry_msgs::msg::Pose left_foot_pose = m_foot_positions.poses[0];
+    // geometry_msgs::msg::Pose right_foot_pose = m_foot_positions.poses[1];
 
-    double left_foot_x = left_foot_pose.position.x;
-    double left_foot_y = left_foot_pose.position.y;
-    double right_foot_x = right_foot_pose.position.x;
-    double right_foot_y = right_foot_pose.position.y;
+    // double left_foot_x = left_foot_pose.position.x;
+    // double left_foot_y = left_foot_pose.position.y;
+    // double right_foot_x = right_foot_pose.position.x;
+    // double right_foot_y = right_foot_pose.position.y;
 
-    int current_stance_leg = m_current_stance_leg;
-    int next_stance_leg = m_next_stance_leg;
-    
+    // int current_stance_leg = m_current_stance_leg;
+    // int next_stance_leg = m_next_stance_leg;
+
     ZMP_pendulum_ode_solver_capsule* acados_ocp_capsule = ZMP_pendulum_ode_acados_create_capsule();
     // there is an opportunity to change the number of shooting intervals in C without new code generation
     int N = ZMP_PENDULUM_ODE_N;
-    // RCLCPP_INFO(rclcpp::get_logger("Sahand stinkt"), "Current shooting node is %i\n", m_current_shooting_node);
 
     // allocate the array and fill it accordingly
     double* new_time_steps = NULL;

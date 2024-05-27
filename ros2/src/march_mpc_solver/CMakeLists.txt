@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(zmp_mpc_solver)
+project(march_mpc_solver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
