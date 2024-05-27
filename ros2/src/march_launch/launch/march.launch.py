@@ -168,6 +168,7 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
+        launch_arguments=[("simulation", simulation)],
         condition=UnlessCondition(airgait),
     )
     # endregion

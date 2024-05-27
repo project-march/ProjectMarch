@@ -11,28 +11,20 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-
-    # config = os.path.join(
-    #     get_package_share_directory('march_state_estimator'),
-    #     'config',
-    #     'state_estimator_config.yaml'
-    # )
-
-    # robot_description = os.path.join(
-    #     get_package_share_directory('march_state_estimator'),
-    #     'config',
-    #     'robot_definition-hennie_with_koen.yaml'
-    # )
-    timestep = 0.05 # in seconds
-    robot_description = 'robot_definition-hennie_with_koen.yaml'
+    simulation = LaunchConfiguration("simulation", default="true")
+    timestep_in_ms = LaunchConfiguration("timestep", default="50")
+    
+    robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),
         'urdf',
-        'march8',
-        'hennie_with_koen.urdf'
+        'march9',
+        'march9.urdf'
     )
+    force_stance_threshold = 100.0
 
     return LaunchDescription([
         Node(
@@ -43,7 +35,10 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-                {"timestep_in_ms": int(timestep * 1000)},
+                {"timestep_in_ms": timestep_in_ms},
+                {"left_stance_threshold": force_stance_threshold},
+                {"right_stance_threshold": force_stance_threshold},
+                {"simulation": simulation},
             ]
         ),
         Node(

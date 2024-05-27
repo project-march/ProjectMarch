@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march8_v0_aie_v0.xml")
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
@@ -23,7 +23,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # TODO: Configurable urdf
     urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf")
+        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
         robot_desc = infp.read()
 
@@ -75,7 +75,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_control"),
                 "launch",
-                "march8_controllers.launch.py",
+                "march9_controllers.launch.py",
             )
         ),
         launch_arguments=[("simulation", simulation)],
@@ -128,6 +128,7 @@ def generate_launch_description() -> LaunchDescription:
                 "imu_launch.launch.py",
             )
         ),
+        condition=UnlessCondition(simulation),
     )
     # endregion
 
@@ -150,6 +151,7 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
+        launch_arguments=[("simulation", simulation)],
         condition=UnlessCondition(airgait),
         )
     # endregion

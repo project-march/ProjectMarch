@@ -68,6 +68,7 @@ public:
     uint8_t getCurrentStanceLeg() const;
     uint8_t getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const;
 
+    sensor_msgs::msg::JointState getEstimatedJointState() const;
 
     RobotNode::JointNameToValueMap getJointPositions() const;
     Eigen::Quaterniond getInertialOrientation() const;
