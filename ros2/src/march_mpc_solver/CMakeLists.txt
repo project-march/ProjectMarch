@@ -36,10 +36,10 @@ set(acados_lib "${PROJECT_SOURCE_DIR}/../libraries/acados/lib")
 # Necessary for testing
 add_library(${PROJECT_NAME}_testlib
   STATIC
-  src/zmp_mpc_solver_node.cpp
+  src/mpc_solver_node.cpp
   src/zmp_mpc_solver.cpp
   include/${PROJECT_NAME}/zmp_mpc_solver.hpp
-  include/${PROJECT_NAME}/zmp_mpc_solver_node.hpp
+  include/${PROJECT_NAME}/mpc_solver_node.hpp
 )
 
 ament_target_dependencies(
@@ -52,18 +52,18 @@ ament_target_dependencies(
 )
 
 # 
-add_executable(zmp_mpc_solver
-src/zmp_mpc_solver_node.cpp
-src/zmp_mpc_solver.cpp
-include/${PROJECT_NAME}/zmp_mpc_solver.hpp
-include/${PROJECT_NAME}/zmp_mpc_solver_node.hpp
+add_executable(mpc_solver_node
+  src/mpc_solver_node.cpp
+  src/zmp_mpc_solver.cpp
+  include/${PROJECT_NAME}/zmp_mpc_solver.hpp
+  include/${PROJECT_NAME}/mpc_solver_node.hpp
 )
-ament_target_dependencies(zmp_mpc_solver rclcpp march_shared_msgs trajectory_msgs std_msgs)
-target_include_directories(zmp_mpc_solver PUBLIC
+ament_target_dependencies(mpc_solver_node rclcpp march_shared_msgs trajectory_msgs std_msgs)
+target_include_directories(mpc_solver_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(
-  zmp_mpc_solver
+  mpc_solver_node
   "pluginlib"
   "rclcpp"
   "geometry_msgs"
@@ -89,12 +89,12 @@ include_directories(
 )
 
 
-target_link_libraries(zmp_mpc_solver ${acados_lib}/libblasfeo.so)
-target_link_libraries(zmp_mpc_solver ${acados_lib}/libhpipm.so)
-target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so)
-target_link_libraries(zmp_mpc_solver ${acados_lib}/libqpOASES_e.so.3.1)
-target_link_libraries(zmp_mpc_solver ${acados_lib}/libacados.so)
-target_link_libraries(zmp_mpc_solver 
+target_link_libraries(mpc_solver_node ${acados_lib}/libblasfeo.so)
+target_link_libraries(mpc_solver_node ${acados_lib}/libhpipm.so)
+target_link_libraries(mpc_solver_node ${acados_lib}/libqpOASES_e.so)
+target_link_libraries(mpc_solver_node ${acados_lib}/libqpOASES_e.so.3.1)
+target_link_libraries(mpc_solver_node ${acados_lib}/libacados.so)
+target_link_libraries(mpc_solver_node 
 ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_ocp_solver_ZMP_pendulum_ode.so
 )
 
@@ -109,7 +109,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/c_generated_code/libacados_o
 )
 # 
 
-install(TARGETS zmp_mpc_solver
+install(TARGETS mpc_solver_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(FILES ${acados_lib}/libblasfeo.so

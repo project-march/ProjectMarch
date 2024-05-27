@@ -268,8 +268,8 @@ def generate_launch_description() -> LaunchDescription:
         ),
         Node(
             package='march_mpc_solver',
-            executable='zmp_mpc_solver',
-            name='zmp_mpc_solver',
+            executable='mpc_solver_node',
+            name='mpc_solver_node',
             output='screen',
         ),
         Node(
