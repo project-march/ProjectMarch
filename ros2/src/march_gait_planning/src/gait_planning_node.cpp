@@ -245,6 +245,14 @@ void GaitPlanningNode::processStand(){
 void GaitPlanningNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
+        for (auto element : m_current_trajectory){
+            m_pose->position.x = static_cast<float>(element[0]);
+            m_pose->position.z = static_cast<float>(element[1]);
+            m_pose->position.y = (m_gait_planning.getCurrentStanceFoot() & 0b1) ? m_home_stand[4] :  m_home_stand[1];       
+            m_visualization_msg->poses.push_back(*m_pose); 
+        }
+        m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+        m_visualization_msg->poses.clear(); 
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
