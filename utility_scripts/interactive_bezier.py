@@ -55,6 +55,10 @@ class DraggablePoint:
         self.point[1] = event.ydata
         self.artist.center = self.point[0], self.point[1]
         self.parent.update()
+    
+    def update_position(self):
+        """Update the position of the point."""
+        self.artist.center = self.point[0], self.point[1]
 
 class InteractiveBezier:
     """A class to represent an interactive Bezier curve in matplotlib."""
@@ -65,11 +69,45 @@ class InteractiveBezier:
         self.initial_points = points.copy()
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
+
+        # Create a separate window for the coordinates
+        self.root = tk.Tk()
+        self.root.title('Coordinates')
+
+        # Create labels for the columns
+        tk.Label(self.root, text='Point').grid(row=0, column=0)
+        tk.Label(self.root, text='X').grid(row=0, column=1)
+        tk.Label(self.root, text='Y').grid(row=0, column=2)
+
+        # Create entry fields for the coordinates
+        self.entries = []
+        for i, point in enumerate(self.points):
+            tk.Label(self.root, text=f'{i + 1}').grid(row=i + 1, column=0)
+            for j in range(2):
+                entry = tk.Entry(self.root)
+                entry.insert(0, str(point[j]))
+                entry.grid(row=i + 1, column=j + 1)
+                self.entries.append(entry)
+
+        # Create a button to update the points
+        tk.Button(self.root, text='Update points', command=self.update_points).grid(row=len(self.points) + 1, column=0, columnspan=3)
+        # Bind the closing of the plot window to a function
+        plt.get_current_fig_manager().canvas.figure.canvas.mpl_connect('close_event', self.on_close)
+
         self.update()
+
 
     def calculate_bezier_curve(self):
         """Calculate the Bezier curve for the current points."""
         return calculate_bezier_curve(self.points)
+    
+    def update_points(self):
+        """Update the points based on the entries."""
+        for i, entry in enumerate(self.entries):
+            self.points[i // 2][i % 2] = float(entry.get())
+            # Update the position of the draggable point
+            self.draggable_points[i // 2].update_position()
+        self.update()
 
     def update(self):
         """Update the plot."""
@@ -84,6 +122,11 @@ class InteractiveBezier:
         plt.ylim(y_min - 0.1 * (y_max - y_min), y_max + 0.1 * (y_max - y_min))
 
         plt.draw()
+        
+        # Update the entries
+        for i, entry in enumerate(self.entries):
+            entry.delete(0, tk.END)
+            entry.insert(0, str(self.points[i // 2][i % 2]))
 
     def connect(self):
         """Connect the draggable points to the plot."""
@@ -119,6 +162,8 @@ class InteractiveBezier:
             if not messagebox.askyesno('Change step size', 'You are changing the step size, are you sure?'):
                 # If the user clicks 'No', return without saving the points
                 root.destroy()
+                # Also destroy the coordinates window
+                self.root.destroy()
                 return
 
         # Ask whether to save the points
@@ -129,7 +174,9 @@ class InteractiveBezier:
             create_bezier_csv(self.points, 200)
 
         # Destroy the root window
-        root.destroy()      
+        root.destroy()
+        # Also destroy the coordinates window
+        self.root.destroy()      
 
 # Initialize the plot
 # plt.axis([0, 5, 0, 5])
