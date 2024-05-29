@@ -27,14 +27,12 @@ public:
     ~MpcSolver() = default;
 
     int solve_step();
-    bool check_zmp_on_foot();
-
-    void update_current_foot();
     void initialize_mpc_params();
-    void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
-    void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
     void reset_to_double_stance();
-
+    bool check_zmp_on_foot() const;
+    void set_candidate_footsteps(const geometry_msgs::msg::PoseArray::SharedPtr footsteps);
+    void set_reference_stepsize(const std::vector<geometry_msgs::msg::Point>& candidate_footsteps);
+    void update_current_foot();
     inline void update_current_shooting_node() { m_current_shooting_node++; }
 
     inline std::array<double, NX> get_state() const { return m_x_current; }

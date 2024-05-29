@@ -6,6 +6,8 @@
 #include "march_mpc_solver/mpc_solver.hpp"
 #include <iostream>
 
+#define DEBUG
+
 MpcSolver::MpcSolver()
     : m_time_horizon(2.0)
     , m_x_current()
@@ -43,87 +45,6 @@ MpcSolver::MpcSolver()
 int MpcSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
-    // return 1;
-}
-
-void MpcSolver::reset_to_double_stance()
-{
-    m_current_shooting_node = 100;
-    m_step_counter = 0;
-    m_current_count = -1;
-}
-
-void MpcSolver::update_current_foot()
-{
-    if (m_step_counter == 0) {
-        // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
-        m_pos_foot_current[0] = 0.0; // at the start, the CoM is about 0.11 meters in the positive direction, because
-                                     // the 0 is from the right ankle
-        m_pos_foot_current[1] = m_x_trajectory[8 + NX];
-    } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
-        m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
-        m_pos_foot_current[1] = m_x_trajectory[8 + NX];
-    }
-}
-
-void MpcSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
-{
-    m_candidate_footsteps.clear();
-    for (auto pose : footsteps->poses) {
-        m_candidate_footsteps.push_back(pose.position);
-    }
-}
-
-bool MpcSolver::check_zmp_on_foot()
-{
-    bool x_check;
-    bool y_check;
-    float zmp_check_margin_y = 1.3;
-    float zmp_check_margin_x = 1.3;
-
-    if (m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x
-        && m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x) {
-        x_check = true;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check true \n");
-    } else {
-        x_check = false;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "x zmp check false \n");
-    }
-
-    x_check = true;
-    RCLCPP_INFO(rclcpp::get_logger("zmp check"), "Difference for y is %f \nmargin is %f",
-        m_pos_foot_current[1] - m_zmp_current[1], m_foot_width_y * zmp_check_margin_y);
-
-    if (m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y
-        && m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y) {
-        y_check = true;
-        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check true \n");
-
-    } else {
-        y_check = false;
-        // RCLCPP_INFO(rclcpp::get_logger("zmp check"), "y zmp check false \n");
-    }
-
-    if (x_check == true && y_check == true) {
-        return true;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "both check true \n");
-
-    } else {
-        return false;
-        RCLCPP_INFO(rclcpp::get_logger("zmp check"), "both check false \n");
-    }
-}
-
-void MpcSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_candidate_footsteps)
-{
-    m_reference_stepsize_y.clear();
-    m_reference_stepsize_x.clear();
-    int n = m_candidate_footsteps.size();
-
-    for (int i = 0; i < n - 1; i++) {
-        m_reference_stepsize_x.push_back(m_candidate_footsteps[i + 1].x - m_candidate_footsteps[i].x);
-        m_reference_stepsize_y.push_back(m_candidate_footsteps[i + 1].y - m_candidate_footsteps[i].y);
-    }
 }
 
 void MpcSolver::initialize_mpc_params()
@@ -144,6 +65,66 @@ void MpcSolver::initialize_mpc_params()
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
+}
+
+void MpcSolver::reset_to_double_stance()
+{
+    m_current_shooting_node = 100;
+    m_step_counter = 0;
+    m_current_count = -1;
+}
+
+bool MpcSolver::check_zmp_on_foot() const
+{
+    float zmp_check_margin_y = 1.3;
+    float zmp_check_margin_x = 1.3;
+
+    bool x_check = ((m_zmp_current[0] < m_pos_foot_current[0] + m_foot_width_x * zmp_check_margin_x)
+        && (m_zmp_current[0] > m_pos_foot_current[0] - m_foot_width_x * zmp_check_margin_x));
+    bool y_check = ((m_zmp_current[1] < m_pos_foot_current[1] + m_foot_width_y * zmp_check_margin_y)
+        && (m_zmp_current[1] > m_pos_foot_current[1] - m_foot_width_y * zmp_check_margin_y));
+
+    #ifdef DEBUG
+    std::cout << "Difference for x is " << m_pos_foot_current[0] - m_zmp_current[0] 
+        << " with margin " << m_foot_width_x * zmp_check_margin_x << std::endl;
+    std::cout << "Difference for y is " << m_pos_foot_current[1] - m_zmp_current[1] 
+        << " with margin " << m_foot_width_y * zmp_check_margin_y << std::endl;
+    std::cout << "x_zmp check is " << x_check << std::endl;
+    std::cout << "y_zmp check is " << y_check << std::endl;
+    #endif
+    
+    return x_check && y_check;
+}
+
+void MpcSolver::set_candidate_footsteps(const geometry_msgs::msg::PoseArray::SharedPtr footsteps)
+{
+    m_candidate_footsteps.clear();
+    for (auto pose : footsteps->poses) {
+        m_candidate_footsteps.push_back(pose.position);
+    }
+}
+
+void MpcSolver::set_reference_stepsize(const std::vector<geometry_msgs::msg::Point>& candidate_footsteps)
+{
+    m_reference_stepsize_y.clear();
+    m_reference_stepsize_x.clear();
+    for (long unsigned int i = 0; i < candidate_footsteps.size() - 1; i++) {
+        m_reference_stepsize_x.push_back(candidate_footsteps[i + 1].x - candidate_footsteps[i].x);
+        m_reference_stepsize_y.push_back(candidate_footsteps[i + 1].y - candidate_footsteps[i].y);
+    }
+}
+
+void MpcSolver::update_current_foot()
+{
+    if (m_step_counter == 0) {
+        // m_pos_foot_current[0] = m_x_trajectory[6 + NX];
+        m_pos_foot_current[0] = 0.0; // at the start, the CoM is about 0.11 meters in the positive direction, because
+                                     // the 0 is from the right ankle
+        m_pos_foot_current[1] = m_x_trajectory[8 + NX];
+    } else if (m_step_counter != 0 && m_current_shooting_node == 1) {
+        m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
+        m_pos_foot_current[1] = m_x_trajectory[8 + NX];
+    }
 }
 
 inline int MpcSolver::solve_zmp_mpc(
