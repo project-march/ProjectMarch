@@ -62,6 +62,7 @@ class InteractiveBezier:
         self.points = points
         self.draggable_points = [DraggablePoint(self, point) for point in points]
         self.dragging = None
+        self.initial_points = points.copy()
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
         self.update()
@@ -112,16 +113,23 @@ class InteractiveBezier:
         root = tk.Tk()
         root.withdraw()
 
+        # Check if the last point has been altered
+        if not np.array_equal(self.points[-1], self.initial_points[-1]):
+            # Ask whether to change the step size
+            if not messagebox.askyesno('Change step size', 'You are changing the step size, are you sure?'):
+                # If the user clicks 'No', return without saving the points
+                root.destroy()
+                return
+
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
             # Save the points to a file
             with open('utility_scripts/points.yaml', 'w') as f:
                 yaml.dump(self.points.tolist(), f)
+            create_bezier_csv(self.points, 200)
 
         # Destroy the root window
-        root.destroy()
-
-        create_bezier_csv(self.points, 200)
+        root.destroy()      
 
 # Initialize the plot
 # plt.axis([0, 5, 0, 5])
@@ -133,7 +141,7 @@ if os.path.exists('utility_scripts/points.yaml'):
     with open('utility_scripts/points.yaml', 'r') as f:
         points = np.array(yaml.safe_load(f))
 else:
-    points = np.array([[1, 1], [2, 3], [3, 3], [4, 1]], dtype=float)
+    print("No points file found")
 
 interactive_bezier = InteractiveBezier(points)
 interactive_bezier.connect()
