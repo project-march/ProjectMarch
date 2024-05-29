@@ -9,15 +9,16 @@ GaitPlanningNode::GaitPlanningNode()
  : Node("march_gait_planning_node"), 
    m_gait_planning(GaitPlanning()),
    m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
-   m_pose(std::make_shared<geometry_msgs::msg::Pose>()), 
-   m_visualization_msg(std::make_shared<geometry_msgs::msg::PoseArray>()), 
+   m_pose1(std::make_shared<geometry_msgs::msg::Pose>()), 
+   m_pose2(std::make_shared<geometry_msgs::msg::Pose>()), 
+   m_visualization_msg(std::make_shared<march_shared_msgs::msg::VisualizationBeziers>()), 
    m_single_execution_done(false), 
    m_variable_first_step_done(false), 
    m_variable_walk_swing_leg()
  {
     m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
-    m_interpolated_bezier_visualization_publisher = create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
+    m_interpolated_bezier_visualization_publisher = create_publisher<march_shared_msgs::msg::VisualizationBeziers>("bezier_visualization", 10); 
 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GaitPlanningNode::currentModeCallback, this, _1)); 
@@ -126,12 +127,13 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
         }
 
         for (auto element : m_current_trajectory){
-            m_pose->position.x = static_cast<float>(element[0]);
-            m_pose->position.z = static_cast<float>(element[1]);
-            m_visualization_msg->poses.push_back(*m_pose); 
+            m_pose1->position.x = static_cast<float>(element[0]);
+            m_pose1->position.z = static_cast<float>(element[1]);
+            m_visualization_msg->foot1.poses.push_back(*m_pose1); 
         }
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-        m_visualization_msg->poses.clear(); 
+        m_visualization_msg->foot1.poses.clear(); 
+        m_visualization_msg->foot2.poses.clear(); 
         RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
 
         publishFootPositions(); 
@@ -169,9 +171,9 @@ void GaitPlanningNode::finishCurrentTrajectory(){
 }
 
 void GaitPlanningNode::publishIncrements(){
-    RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
+    // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
-    RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
+    // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
     m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
     setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
@@ -180,6 +182,43 @@ void GaitPlanningNode::publishIncrements(){
 void GaitPlanningNode::stepClose(){
     RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<exoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
+
+    // Hier trajectory publishen naar visualizer, depending on previous gait type 
+    switch (m_gait_planning.getPreviousGaitType()){
+        case exoMode::HighStep1: 
+        case exoMode::HighStep2:
+        case exoMode::HighStep3: 
+            for (auto element : m_current_trajectory){
+                m_pose1->position.x = static_cast<float>(element[0]);
+                m_pose1->position.z = static_cast<float>(element[1]);
+                m_pose1->position.y = m_home_stand[4];       
+                m_visualization_msg->foot1.poses.push_back(*m_pose1); 
+                m_pose2->position.x = static_cast<float>(element[2]); 
+                m_pose2->position.z = static_cast<float>(element[3]);
+                m_pose2->position.y = m_home_stand[1]; 
+                m_visualization_msg->foot2.poses.push_back(*m_pose2); 
+            }
+            m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+            m_visualization_msg->foot1.poses.clear();
+            m_visualization_msg->foot2.poses.clear();
+            break; 
+        case exoMode::LargeWalk:
+        case exoMode::SmallWalk: 
+        case exoMode::VariableWalk:
+            for (auto element : m_current_trajectory){
+                m_pose1->position.x = static_cast<float>(element[0]);
+                m_pose1->position.z = static_cast<float>(element[1]);
+                m_pose1->position.y = (m_gait_planning.getCurrentStanceFoot() & 0b1) ? m_home_stand[4] :  m_home_stand[1];       
+                m_visualization_msg->foot1.poses.push_back(*m_pose1); 
+            }
+            m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+            m_visualization_msg->foot1.poses.clear(); 
+            m_visualization_msg->foot2.poses.clear(); 
+            break; 
+        default: 
+            break; 
+    }
+
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(exoMode::Stand);
 }
@@ -246,13 +285,14 @@ void GaitPlanningNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         for (auto element : m_current_trajectory){
-            m_pose->position.x = static_cast<float>(element[0]);
-            m_pose->position.z = static_cast<float>(element[1]);
-            m_pose->position.y = (m_gait_planning.getCurrentStanceFoot() & 0b1) ? m_home_stand[4] :  m_home_stand[1];       
-            m_visualization_msg->poses.push_back(*m_pose); 
+            m_pose1->position.x = static_cast<float>(element[0]);
+            m_pose1->position.z = static_cast<float>(element[1]);
+            m_pose1->position.y = (m_gait_planning.getCurrentStanceFoot() & 0b1) ? m_home_stand[4] :  m_home_stand[1];       
+            m_visualization_msg->foot1.poses.push_back(*m_pose1); 
         }
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-        m_visualization_msg->poses.clear(); 
+        m_visualization_msg->foot1.poses.clear(); 
+        m_visualization_msg->foot2.poses.clear();
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -274,6 +314,23 @@ void GaitPlanningNode::publishHeightGaits(){
     if (m_current_trajectory.empty() && !m_single_execution_done){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
+
+        // The stairs/high_step trajectory is for all steps (with a shifting swing leg), find a way to publish both feet separately. csv are right, left foot 
+        for (auto element : m_current_trajectory){
+            m_pose1->position.x = static_cast<float>(element[0]);
+            m_pose1->position.z = static_cast<float>(element[1]);
+            m_pose1->position.y = m_home_stand[4];       
+            m_visualization_msg->foot1.poses.push_back(*m_pose1); 
+            m_pose2->position.x = static_cast<float>(element[2]); 
+            m_pose2->position.z = static_cast<float>(element[3]);
+            m_pose2->position.y = m_home_stand[1]; 
+            m_visualization_msg->foot2.poses.push_back(*m_pose2); 
+        }
+        m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
+        m_visualization_msg->foot1.poses.clear();
+        m_visualization_msg->foot2.poses.clear();
+        // 
+
         RCLCPP_INFO(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
     }
     else if (m_current_trajectory.empty() && m_single_execution_done){

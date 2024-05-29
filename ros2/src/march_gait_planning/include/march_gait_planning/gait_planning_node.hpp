@@ -12,6 +12,7 @@
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/foot_step_output.hpp"
+#include "march_shared_msgs/msg/visualization_beziers.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
@@ -39,7 +40,7 @@ class GaitPlanningNode:public rclcpp::Node {
     };
     
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
-    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_interpolated_bezier_visualization_publisher; 
+    rclcpp::Publisher<march_shared_msgs::msg::VisualizationBeziers>::SharedPtr m_interpolated_bezier_visualization_publisher; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; // exo_mode == gait_type 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
 
@@ -73,8 +74,9 @@ class GaitPlanningNode:public rclcpp::Node {
 
     std::vector<GaitPlanning::XZFeetPositionsArray> m_current_trajectory; 
     march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg;
-    geometry_msgs::msg::Pose::SharedPtr m_pose;  
-    geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg; 
+    geometry_msgs::msg::Pose::SharedPtr m_pose1;  
+    geometry_msgs::msg::Pose::SharedPtr m_pose2;  
+    march_shared_msgs::msg::VisualizationBeziers::SharedPtr m_visualization_msg; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
     bool m_single_execution_done;
