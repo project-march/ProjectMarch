@@ -13,10 +13,24 @@ def calculate_bezier_curve(points):
     curve_points = curve.evaluate_multi(t_values)
     return curve_points.T
 
-
 def create_bezier_csv(points, array_size):
     step_length = points.max(axis=0)[0]
+
+    first_step_points = points.copy()
+    first_step_points[:, 0] = first_step_points[:, 0]/2
+    curvexz_first_step = bezier.Curve(first_step_points.T, degree=3)
+    number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size/2))
+    points_first_step= curvexz_first_step.evaluate_multi(number_of_time_points_first_step)
+    x_swing_first_step = points_first_step[0,:]
+    z_swing_first_step = points_first_step[1,:]
+    x_stance_first_step = np.linspace(0, 0 - (step_length/2), int(array_size/2))
+    # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
+    z_stance_first_step = [0]*int(array_size/2)
+    # z_swing_first_step = z_swing_first_step + z_stance_first_step
+    final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
+
     curvexz_complete_step = bezier.Curve(points.T, degree=3)
+    print(points.T)
     number_of_time_points_complete_step = np.linspace(0, 1.0, array_size)
     points_complete_step= curvexz_complete_step.evaluate_multi(number_of_time_points_complete_step)
     x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
@@ -27,6 +41,7 @@ def create_bezier_csv(points, array_size):
     # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
     np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', final_points_complete_step, delimiter=',')
 
 
@@ -166,19 +181,19 @@ class InteractiveBezier:
                 # Also destroy the coordinates window
                 self.root.destroy()
                 return
-
+        # Destroy the root window
+        root.destroy()
+        # Also destroy the coordinates window
+        self.root.destroy() 
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
             # Save the points to a file
             self.data['large_gait'] = self.points.tolist()
             with open('utility_scripts/points.yaml', 'w') as f:
-                yaml.dump(self.data.tolist(), f)
+                yaml.dump(self.data, f)
             create_bezier_csv(self.points, 200)
 
-        # Destroy the root window
-        root.destroy()
-        # Also destroy the coordinates window
-        self.root.destroy()      
+             
 
 # Initialize the plot
 # plt.axis([0, 5, 0, 5])
