@@ -62,11 +62,12 @@ class DraggablePoint:
 
 class InteractiveBezier:
     """A class to represent an interactive Bezier curve in matplotlib."""
-    def __init__(self, points):
-        self.points = points
-        self.draggable_points = [DraggablePoint(self, point) for point in points]
+    def __init__(self, data):
+        self.data = data
+        self.points = np.array(data['large_gait'])
+        self.draggable_points = [DraggablePoint(self, point) for point in self.points]
         self.dragging = None
-        self.initial_points = points.copy()
+        self.initial_points = self.points.copy()
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
 
@@ -114,8 +115,8 @@ class InteractiveBezier:
         curve_points = self.calculate_bezier_curve()
         self.line.set_data(curve_points[:, 0], curve_points[:, 1])
             # Calculate the limits of the axes
-        x_min, y_min = points.min(axis=0)
-        x_max, y_max = points.max(axis=0)
+        x_min, y_min = self.points.min(axis=0)
+        x_max, y_max = self.points.max(axis=0)
         print(x_min, y_min, x_max, y_max)
         # Set the limits of the axes with a 10% margin
         plt.xlim(x_min - 0.1 * (x_max - x_min), x_max + 0.1 * (x_max - x_min))
@@ -169,8 +170,9 @@ class InteractiveBezier:
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
             # Save the points to a file
+            self.data['large_gait'] = self.points.tolist()
             with open('utility_scripts/points.yaml', 'w') as f:
-                yaml.dump(self.points.tolist(), f)
+                yaml.dump(self.data.tolist(), f)
             create_bezier_csv(self.points, 200)
 
         # Destroy the root window
@@ -186,11 +188,11 @@ class InteractiveBezier:
 # Load the points from the file if it exists, otherwise use default points
 if os.path.exists('utility_scripts/points.yaml'):
     with open('utility_scripts/points.yaml', 'r') as f:
-        points = np.array(yaml.safe_load(f))
+        data = yaml.safe_load(f)
 else:
     print("No points file found")
 
-interactive_bezier = InteractiveBezier(points)
+interactive_bezier = InteractiveBezier(data)
 interactive_bezier.connect()
 
 # Connect the on_close function to the close event
