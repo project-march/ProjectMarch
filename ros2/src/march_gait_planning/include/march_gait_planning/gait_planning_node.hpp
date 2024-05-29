@@ -63,6 +63,8 @@ class GaitPlanningNode:public rclcpp::Node {
     void publishWalk(); 
     void publishHeightGaits(); 
     void publishVariableWalk(); 
+    void visualizeOneFoot(); 
+    void visualizeBothFeet(); 
 
     GaitPlanning m_gait_planning; 
 
