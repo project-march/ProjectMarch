@@ -150,13 +150,15 @@ inline int MpcSolver::solve_zmp_mpc(
     //printf("Shooting nodes: %i\n", N);
     // First, we do some checks so the mpc works
     if ((N - 1) % m_number_of_footsteps != 0) {
-
-        return 5;
+        return ACADOS_READY;
     }
+
     int status = ZMP_pendulum_ode_acados_create_with_discretization(acados_ocp_capsule, N, new_time_steps);
 
     if (status) {
-        //printf("ZMP_pendulum_ode_acados_create() returned status %d. Exiting.\n", status);
+        #ifdef DEBUG
+        std::cout << "ZMP_pendulum_ode_acados_create() returned status " << status << ". Exiting." << std::endl;
+        #endif
         exit(1);
     }
 
@@ -168,56 +170,23 @@ inline int MpcSolver::solve_zmp_mpc(
     void* nlp_opts = ZMP_pendulum_ode_acados_get_nlp_opts(acados_ocp_capsule);
 
     // initial condition
-    int idxbx0[NBX0];
-    idxbx0[0] = 0;
-    idxbx0[1] = 1;
-    idxbx0[2] = 2;
-    idxbx0[3] = 3;
-    idxbx0[4] = 4;
-    idxbx0[5] = 5;
-    idxbx0[6] = 6;
-    idxbx0[7] = 7;
-    idxbx0[8] = 8;
-    idxbx0[9] = 9;
-    idxbx0[10] = 10;
-    idxbx0[11] = 11;
+    int idxbx0[NBX0];   // index of x for bounds
+    double lbx0[NBX0];  // lower bound for x
+    double ubx0[NBX0];  // upper bound for x
 
-    double lbx0[NBX0];
-    double ubx0[NBX0];
-    lbx0[0] = x_init_input[0];
-    ubx0[0] = x_init_input[0];
-    lbx0[1] = x_init_input[1];
-    ubx0[1] = x_init_input[1];
-    lbx0[2] = x_init_input[2];
-    ubx0[2] = x_init_input[2];
-    lbx0[3] = x_init_input[3];
-    ubx0[3] = x_init_input[3];
-    lbx0[4] = x_init_input[4];
-    ubx0[4] = x_init_input[4];
-    lbx0[5] = x_init_input[5];
-    ubx0[5] = x_init_input[5];
-    lbx0[6] = x_init_input[6];
-    ubx0[6] = x_init_input[6];
-    lbx0[7] = x_init_input[7];
-    ubx0[7] = x_init_input[7];
-    lbx0[8] = x_init_input[8];
-    ubx0[8] = x_init_input[8];
-    lbx0[9] = x_init_input[9];
-    ubx0[9] = x_init_input[9];
-    lbx0[10] = x_init_input[10];
-    ubx0[10] = x_init_input[10];
-    lbx0[11] = x_init_input[11];
-    ubx0[11] = x_init_input[11];
+    for (int ii = 0; ii < NBX0; ii++) {
+        idxbx0[ii] = ii;
+        lbx0[ii] = x_init_input[ii];
+        ubx0[ii] = x_init_input[ii];
+    }
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "idxbx", idxbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "ubx", ubx0);
 
     // We define our constraints here
-    // lh: Lower path constraints
-    double lh[4];
-    // rh: Upper path constraints
-    double uh[4];
+    double lh[4];   // lh: Lower path constraints
+    double uh[4];   // rh: Upper path constraints
 
     // // lhe: TERMINAL Lower path constraints
     // double lhe[2];
@@ -232,42 +201,26 @@ inline int MpcSolver::solve_zmp_mpc(
 
     // initialization for state values
     double x_init[NX];
-    x_init[0] = x_init_input[0];
-    x_init[1] = x_init_input[1];
-    x_init[2] = x_init_input[2];
-    x_init[3] = x_init_input[3];
-    x_init[4] = x_init_input[4];
-    x_init[5] = x_init_input[5];
-    x_init[6] = x_init_input[6];
-    x_init[7] = x_init_input[7];
-    x_init[8] = x_init_input[8];
-    x_init[9] = x_init_input[9];
-    x_init[10] = x_init_input[10];
-    x_init[11] = x_init_input[11];
+    for (int i = 0; i < NX; i++) {
+        x_init[i] = x_init_input[i];
+    }
 
     // initial value for control input
     double u0[NU];
-    u0[0] = 0.0;
-    u0[1] = 0.0;
-    u0[2] = 0.0;
-    u0[3] = 0.0;
+    for (int i = 0; i < NU; i++) {
+        u0[i] = 0.0;
+    }
+
     // set parameters
     // WE NEED TO SET OUR PARAMETERS HERE
     double p[NP];
-    // p[0] : Planned footstep width;
-    // p[1] : Planned footstep height;
-    // p[2] : Switch variable(0 at all times, 1 when we want to take a step);
-    // p[3] : moving foot constraint timing variable(0-1);
-    // p[4] : Periodic tail constraint;
-    // p[5] : RK4 constraint (always 0);
-    // p[6] : RK4 constraint (always 0);
-    p[0] = 0;
-    p[1] = 0;
-    p[2] = 0;
-    p[3] = 0;
-    p[4] = 0;
-    p[5] = 0;
-    p[6] = 0;   
+    p[0] = 0;   // p[0] : Planned footstep width;
+    p[1] = 0;   // p[1] : Planned footstep height;
+    p[2] = 0;   // p[2] : Switch variable(0 at all times, 1 when we want to take a step);
+    p[3] = 0;   // p[3] : moving foot constraint timing variable(0-1);
+    p[4] = 0;   // p[4] : Periodic tail constraint;
+    p[5] = 0;   // p[5] : RK4 constraint (always 0);
+    p[6] = 0;   // p[6] : RK4 constraint (always 0);
 
     double dt = 0.0 + (m_time_horizon) / (N - 1);
     // If the footstep is the left foot or the right foot(left is -1, right is 1)
@@ -279,15 +232,17 @@ inline int MpcSolver::solve_zmp_mpc(
     float step_duration = 0.6; // Set this to swing leg_duration, in percentage, so 60% of a step is single stance.
     float step_duration_factor = 1.0 / step_duration;
 
+    #ifdef DEBUG
     // check footstep planner references
-    //  std::cout << "Vector elements: ";
-    //  for (const auto& element : m_reference_stepsize_x) {
-    //      printf("element x is %f\n", element);
-    //  }
-    //  for (const auto& element : m_reference_stepsize_y) {
-    //      printf("element y is %f\n", element);
-    //  }
-    //  std::cout << std::endl;
+     std::cout << "Vector elements: ";
+     for (const auto& element : m_reference_stepsize_x) {
+         printf("element x is %f\n", element);
+     }
+     for (const auto& element : m_reference_stepsize_y) {
+         printf("element y is %f\n", element);
+     }
+     std::cout << std::endl;
+    #endif
 
     // When a new step is set, take the next reference step from the footstep planner generated trajectory
 
@@ -522,27 +477,35 @@ inline int MpcSolver::solve_zmp_mpc(
         min_time = MIN(elapsed_time, min_time);
     }
 
+    #ifdef DEBUG
     /* print solution and statistics */
     for (int ii = 0; ii <= nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
     for (int ii = 0; ii < nlp_dims->N; ii++)
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    // printf("\n--- xtraj ---\n");
-    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
-    // printf("\n--- utraj ---\n");
-    // d_print_exp_tran_mat(NU, N, utraj, NU);
-    // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
-    //printf("The current state is \n\n");
+    std::cout << "--- xtraj ---" << std::endl;
+    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
 
-    for (int i = 0; i < 12; i++) {
+    std::cout << "--- utraj ---" << std::endl;
+    d_print_exp_tran_mat(NU, N, utraj, NU);
+
+    ocp_nlp_out_print(nlp_solver->dims, nlp_out);
+
+    std::cout << "The current state is " << std::endl;
+    for (long unsigned int i = 0; i < NX; i++) {
         //printf(" %f", xtraj[i]);
+        std::cout << xtraj[i] << " ";
     }
 
-    //printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);
+    std::cout << "Solved ocp " << NTIMINGS << " times, solution printed above" << std::endl;
+    #endif
 
     if (status == ACADOS_SUCCESS) {
-        //printf("ZMP_pendulum_ode_acados_solve(): SUCCESS!\n");
+        #ifdef DEBUG
+        std::cout << "ZMP_pendulum_ode_acados_solve() SUCCESS!" << std::endl;
+        #endif
+
         for (int ii = 0; ii < nlp_dims->N; ii++) {
             u_current[ii] = utraj[ii];
         }
@@ -550,9 +513,12 @@ inline int MpcSolver::solve_zmp_mpc(
         for (int ii = 0; ii < NX; ii++) {
             x_init_input[ii] = xtraj[NX + ii];
         }
+
         std::copy(xtraj, xtraj + NX * ZMP_PENDULUM_ODE_N, m_x_trajectory.begin());
     } else {
-        //printf("ZMP_pendulum_ode_acados_solve() failed with status %d.\n", status);
+        #ifdef DEBUG
+        std::cout << "ZMP_pendulum_ode_acados_solve() failed with status " << status << "." << std::endl;
+        #endif
     }
 
     // here, we copy our array into the std::array
