@@ -26,42 +26,75 @@ public:
     MpcSolver();
     ~MpcSolver() = default;
 
-    double m_time_horizon;
-    bool m_is_weight_shift_done;
-    void set_current_state();
     int solve_step();
-    int get_current_stance_foot();
-    std::array<double, NX> get_state();
-    std::array<double, NX * ZMP_PENDULUM_ODE_N>* get_state_trajectory();
-    std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_trajectory();
+    bool check_zmp_on_foot();
 
-    void set_current_foot(double, double);
     void update_current_foot();
-    void set_previous_foot(double, double);
-    void set_current_com(double, double, double, double);
-    void set_com_height(double);
-    void set_current_zmp(double, double);
-    void set_current_stance_foot(int);
     void initialize_mpc_params();
-    void set_right_foot_on_gound(bool);
-    void set_left_foot_on_gound(bool);
     void set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr);
     void set_reference_stepsize(std::vector<geometry_msgs::msg::Point>);
     void reset_to_double_stance();
-    const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const
-    {
-        return m_candidate_footsteps;
+
+    inline void update_current_shooting_node() { m_current_shooting_node++; }
+
+    inline std::array<double, NX> get_state() const { return m_x_current; }
+    inline const std::array<double, NX * ZMP_PENDULUM_ODE_N>* get_state_trajectory() const { return &m_x_trajectory; }
+    inline std::array<double, NU * ZMP_PENDULUM_ODE_N> get_input_current() const { return m_u_current; }
+    inline double get_com_height() const { return m_com_height; }
+    inline int get_current_stance_foot() const { return m_current_stance_foot; }
+    inline const std::vector<geometry_msgs::msg::Point>& get_candidate_footsteps() const { return m_candidate_footsteps; }
+    inline std::vector<double> get_real_time_com_trajectory_x() const { return m_real_time_com_trajectory_x; }
+    inline std::vector<double> get_real_time_com_trajectory_y() const { return m_real_time_com_trajectory_y; }
+    inline std_msgs::msg::Int32 get_current_shooting_node() const {
+        std_msgs::msg::Int32 current_shooting_node;
+        current_shooting_node.data = m_current_shooting_node;
+        return current_shooting_node;
     }
-    double get_com_height();
-    void update_current_shooting_node();
-    std::vector<double> get_real_time_com_trajectory_x();
-    std::vector<double> get_real_time_com_trajectory_y();
-    void set_m_current_shooting_node(int);
-    std_msgs::msg::Int32 get_m_current_shooting_node();
-    bool check_zmp_on_foot();
-    void set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions);
-    void set_current_stance_leg(uint8_t current_stance_leg);
-    void set_next_stance_leg(uint8_t next_stance_leg);
+
+    inline void set_current_shooting_node(int current_shooting_node) { m_current_shooting_node = current_shooting_node; }
+    inline void set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) { m_foot_positions = foot_positions; }
+    inline void set_current_stance_leg(uint8_t current_stance_leg) { m_current_stance_leg = current_stance_leg; }
+    inline void set_next_stance_leg(uint8_t next_stance_leg) { m_next_stance_leg = next_stance_leg; }
+    inline void set_current_com(const double& x, const double& y, const double& x_dot, const double& y_dot) {
+        m_com_current[0] = x;
+        m_com_current[1] = y;
+        m_com_vel_current[0] = x_dot;
+        m_com_vel_current[1] = y_dot;
+    }
+    inline void set_com_height(const double& com_height) { m_com_height = com_height; }
+    inline void set_current_zmp(const double& x, const double& y) {
+        m_zmp_current[0] = x;
+        m_zmp_current[1] = y;
+    }
+    inline void set_current_stance_foot(int current_stance_foot) { m_current_stance_foot = current_stance_foot; }
+    inline void set_current_foot(const double& x, const double& y) {
+        m_pos_foot_current[0] = x;
+        m_pos_foot_current[1] = y;
+    }
+    inline void set_previous_foot(const double& x, const double& y) {
+        m_pos_foot_prev[0] = x;
+        m_pos_foot_prev[1] = y;
+    }
+    inline void set_current_state() {
+        m_x_current[0] = m_com_current[0]; // - 0.11; when using real state estimator
+        m_x_current[1] = m_com_vel_current[0];
+
+        m_x_current[2] = m_zmp_current[0];
+
+        m_x_current[3] = m_com_current[1];
+        m_x_current[4] = m_com_vel_current[1];
+
+        m_x_current[5] = m_zmp_current[1];
+
+        m_x_current[6] = m_pos_foot_current[0];
+        m_x_current[7] = m_pos_foot_prev[0];
+
+        m_x_current[8] = m_pos_foot_current[1];
+        m_x_current[9] = m_pos_foot_prev[1];
+
+        m_x_current[10] = 0;
+        m_x_current[11] = 0;
+    }
 
 private:
     int solve_zmp_mpc(std::array<double, NX>&, std::array<double, NU * ZMP_PENDULUM_ODE_N>&);
@@ -81,11 +114,10 @@ private:
     std::vector<double> m_real_time_com_trajectory_x;
     std::vector<double> m_real_time_com_trajectory_y;
 
+    double m_time_horizon;
+
     // Constraints for the ZMP MPC
     int m_number_of_footsteps;
-
-    bool m_right_foot_on_ground;
-    bool m_left_foot_on_ground;
 
     double m_switch;
     int m_current_shooting_node;

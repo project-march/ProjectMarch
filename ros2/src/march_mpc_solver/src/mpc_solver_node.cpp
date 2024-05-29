@@ -89,18 +89,18 @@ void MpcSolverNode::estimatedFeetPositionsCallback(geometry_msgs::msg::PoseArray
     // msg->poses[1] is the right foot
     if ((m_mpc_solver->get_current_stance_foot() == -1)
         || (m_mpc_solver->get_current_stance_foot() == 1
-            && m_mpc_solver->get_m_current_shooting_node().data == 0)) { // if stance foot is the left foot
+            && m_mpc_solver->get_current_shooting_node().data == 0)) { // if stance foot is the left foot
         // only change the desired previous footsteps when current shooting node is 1 and the footstep changes
         if (abs(m_desired_previous_foot_y - msg->poses[LEFT_FOOT_ID].position.y) > 10e-2
-            && m_mpc_solver->get_m_current_shooting_node().data == 1) {
+            && m_mpc_solver->get_current_shooting_node().data == 1) {
             m_desired_previous_foot_x = msg->poses[LEFT_FOOT_ID].position.x;
             m_desired_previous_foot_y = msg->poses[LEFT_FOOT_ID].position.y;
         }
     }
     if (m_mpc_solver->get_current_stance_foot() == 1
-        || (m_mpc_solver->get_current_stance_foot() == -1 && m_mpc_solver->get_m_current_shooting_node().data == 0)) {
+        || (m_mpc_solver->get_current_stance_foot() == -1 && m_mpc_solver->get_current_shooting_node().data == 0)) {
         if (abs(m_desired_previous_foot_y - msg->poses[RIGHT_FOOT_ID].position.y) > 10e-2
-            && m_mpc_solver->get_m_current_shooting_node().data == 1) {
+            && m_mpc_solver->get_current_shooting_node().data == 1) {
             m_desired_previous_foot_x = msg->poses[RIGHT_FOOT_ID].position.x;
             m_desired_previous_foot_y = msg->poses[RIGHT_FOOT_ID].position.y;
         }
@@ -140,7 +140,7 @@ void MpcSolverNode::timerCallback()
         return;
     }
 
-    m_current_shooting_node_publisher->publish(m_mpc_solver->get_m_current_shooting_node());
+    m_current_shooting_node_publisher->publish(m_mpc_solver->get_current_shooting_node());
     m_mpc_solver->update_current_shooting_node();
     visualizeTrajectory();
 }
@@ -181,7 +181,7 @@ void MpcSolverNode::visualizeTrajectory()
     geometry_msgs::msg::PoseStamped zmp_path_wrapper;
     zmp_path_wrapper.header.frame_id = "R_heel";
 
-    std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_mpc_solver->get_state_trajectory();
+    const std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_mpc_solver->get_state_trajectory();
 
     for (int i = 0; i < (ZMP_PENDULUM_ODE_N); i++) {
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 0)];

@@ -40,35 +40,10 @@ MpcSolver::MpcSolver()
     set_current_state();
 }
 
-double MpcSolver::get_com_height()
-{
-    return m_com_height;
-}
-
-void MpcSolver::set_m_current_shooting_node(int current_shooting_node)
-{
-    m_current_shooting_node = current_shooting_node;
-}
-
 int MpcSolver::solve_step()
 {
     return solve_zmp_mpc(m_x_current, m_u_current);
     // return 1;
-}
-
-std::array<double, NX> MpcSolver::get_state()
-{
-    return m_x_current;
-}
-
-std::vector<double> MpcSolver::get_real_time_com_trajectory_x()
-{
-    return m_real_time_com_trajectory_x;
-}
-
-std::vector<double> MpcSolver::get_real_time_com_trajectory_y()
-{
-    return m_real_time_com_trajectory_y;
 }
 
 void MpcSolver::reset_to_double_stance()
@@ -76,70 +51,6 @@ void MpcSolver::reset_to_double_stance()
     m_current_shooting_node = 100;
     m_step_counter = 0;
     m_current_count = -1;
-}
-
-std::array<double, NX * ZMP_PENDULUM_ODE_N>* MpcSolver::get_state_trajectory()
-{
-    return &m_x_trajectory;
-}
-
-std::array<double, NU * ZMP_PENDULUM_ODE_N> MpcSolver::get_input_trajectory()
-{
-    return m_u_current;
-}
-
-std_msgs::msg::Int32 MpcSolver::get_m_current_shooting_node()
-{
-    std_msgs::msg::Int32 current_shooting_node;
-    current_shooting_node.data = m_current_shooting_node;
-    return current_shooting_node;
-}
-
-
-void MpcSolver::set_current_stance_leg(uint8_t current_stance_leg) {
-    m_current_stance_leg = current_stance_leg;
-}
-
-void MpcSolver::set_next_stance_leg(uint8_t next_stance_leg) {
-    m_next_stance_leg = next_stance_leg;
-}
-
-void MpcSolver::set_foot_positions(const geometry_msgs::msg::PoseArray& foot_positions) {
-    m_foot_positions = foot_positions;
-}
-
-void MpcSolver::set_current_state()
-{
-    // This is of course MPC dependent
-    m_x_current[0] = m_com_current[0]; // - 0.11; when using real state estimator
-    m_x_current[1] = m_com_vel_current[0];
-
-    m_x_current[2] = m_zmp_current[0];
-
-    m_x_current[3] = m_com_current[1];
-    m_x_current[4] = m_com_vel_current[1];
-
-    m_x_current[5] = m_zmp_current[1];
-
-    m_x_current[6] = m_pos_foot_current[0];
-    m_x_current[7] = m_pos_foot_prev[0];
-
-    m_x_current[8] = m_pos_foot_current[1];
-    m_x_current[9] = m_pos_foot_prev[1];
-
-    m_x_current[10] = 0;
-    m_x_current[11] = 0;
-}
-
-int MpcSolver::get_current_stance_foot()
-{
-    return m_current_stance_foot;
-}
-
-void MpcSolver::set_current_foot(double x, double y)
-{
-    m_pos_foot_current[0] = x;
-    m_pos_foot_current[1] = y;
 }
 
 void MpcSolver::update_current_foot()
@@ -153,26 +64,6 @@ void MpcSolver::update_current_foot()
         m_pos_foot_current[0] = m_x_trajectory[6 + NX] - m_x_trajectory[6];
         m_pos_foot_current[1] = m_x_trajectory[8 + NX];
     }
-}
-
-void MpcSolver::set_right_foot_on_gound(bool foot_on_ground)
-{
-    if (foot_on_ground) {
-        m_right_foot_on_ground = true;
-    }
-}
-
-void MpcSolver::set_left_foot_on_gound(bool foot_on_ground)
-{
-    if (foot_on_ground) {
-        m_left_foot_on_ground = true;
-    }
-}
-
-void MpcSolver::set_previous_foot(double x, double y)
-{
-    m_pos_foot_prev[0] = x;
-    m_pos_foot_prev[1] = y;
 }
 
 void MpcSolver::set_candidate_footsteps(geometry_msgs::msg::PoseArray::SharedPtr footsteps)
@@ -235,26 +126,6 @@ void MpcSolver::set_reference_stepsize(std::vector<geometry_msgs::msg::Point> m_
     }
 }
 
-void MpcSolver::set_current_com(double x, double y, double dx, double dy)
-{
-    m_com_current[0] = x;
-    m_com_current[1] = y;
-
-    m_com_vel_current[0] = dx;
-    m_com_vel_current[1] = dy;
-}
-
-void MpcSolver::set_com_height(double height)
-{
-    m_com_height = height;
-}
-
-void MpcSolver::set_current_zmp(double x, double y)
-{
-    m_zmp_current[0] = x;
-    m_zmp_current[1] = y;
-}
-
 void MpcSolver::initialize_mpc_params()
 {
     // Later, change this to read from a yaml
@@ -273,16 +144,6 @@ void MpcSolver::initialize_mpc_params()
     m_timing_value = 0;
 
     m_number_of_footsteps = 2;
-}
-
-void MpcSolver::set_current_stance_foot(int stance_foot)
-{
-    m_current_stance_foot = stance_foot;
-}
-
-void MpcSolver::update_current_shooting_node()
-{
-    m_current_shooting_node += 1;
 }
 
 inline int MpcSolver::solve_zmp_mpc(
