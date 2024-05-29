@@ -13,7 +13,7 @@ def calculate_bezier_curve(points):
     curve_points = curve.evaluate_multi(t_values)
     return curve_points.T
 
-def create_bezier_csv(points, array_size):
+def create_bezier_csv(points, array_size, gait_type):
     step_length = points.max(axis=0)[0]
 
     first_step_points = points.copy()
@@ -41,8 +41,12 @@ def create_bezier_csv(points, array_size):
     # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
-    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
-    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', final_points_complete_step, delimiter=',')
+    if gait_type == "large_gait":
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', final_points_complete_step, delimiter=',')
+    elif gait_type == "small_gait":
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', final_points_first_step, delimiter=',')
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
 
 
 class DraggablePoint:
@@ -77,9 +81,10 @@ class DraggablePoint:
 
 class InteractiveBezier:
     """A class to represent an interactive Bezier curve in matplotlib."""
-    def __init__(self, data):
+    def __init__(self, data, gait_type):
+        self.gait_type = gait_type
         self.data = data
-        self.points = np.array(data['large_gait'])
+        self.points = np.array(data[self.gait_type])
         self.draggable_points = [DraggablePoint(self, point) for point in self.points]
         self.dragging = None
         self.initial_points = self.points.copy()
@@ -188,17 +193,11 @@ class InteractiveBezier:
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
             # Save the points to a file
-            self.data['large_gait'] = self.points.tolist()
+            self.data[self.gait_type] = self.points.tolist()
             with open('utility_scripts/points.yaml', 'w') as f:
                 yaml.dump(self.data, f)
-            create_bezier_csv(self.points, 200)
+            create_bezier_csv(self.points, 200, self.gait_type)
 
-             
-
-# Initialize the plot
-# plt.axis([0, 5, 0, 5])
-
-# Create the interactive Bezier curve and connect it to the plot
 
 # Load the points from the file if it exists, otherwise use default points
 if os.path.exists('utility_scripts/points.yaml'):
@@ -207,7 +206,7 @@ if os.path.exists('utility_scripts/points.yaml'):
 else:
     print("No points file found")
 
-interactive_bezier = InteractiveBezier(data)
+interactive_bezier = InteractiveBezier(data, "small_gait")
 interactive_bezier.connect()
 
 # Connect the on_close function to the close event
