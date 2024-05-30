@@ -28,8 +28,9 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
 {
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &state) {
 
+    (void) state; 
     m_gait_planning = GaitPlanningAngles(); 
     m_first_stand = true; 
     m_active = false; 
@@ -51,8 +52,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &state) {
 
+    (void) state;
     m_joint_angle_trajectory_publisher->on_activate(); 
 
     m_active = true;  
@@ -62,8 +64,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &state) {
 
+    (void) state; 
     m_joint_angle_trajectory_publisher->on_deactivate(); 
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
 
@@ -72,15 +75,18 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
     
+    (void) state; 
     m_joint_angle_trajectory_publisher.reset();  
     RCLCPP_DEBUG(this->get_logger(), "Joint angles node cleaned up!"); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &) {
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &state) {
+
+    (void) state; 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -95,18 +101,25 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
         m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
         m_gait_planning.setGaitType((exoMode)msg->mode);
         // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
-        if ((exoMode)msg->mode == exoMode::Stand){
-            RCLCPP_INFO(this->get_logger(), "got stand command "); 
-            if (m_gait_planning.getPrevGaitType() == exoMode::Walk || m_gait_planning.getPrevGaitType() == exoMode::Ascending || m_gait_planning.getPrevGaitType() == exoMode::Descending || m_gait_planning.getPrevGaitType() == exoMode::Sideways){
-            }   
-        } else {
+        if ((exoMode)msg->mode != exoMode::Stand){
             m_gait_planning.setCounter(0); 
-            // RCLCPP_INFO(this->get_logger(), "setting counter to 0 in this gait switch!"); 
+            RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!");
         }
+
+        if ((exoMode)msg->mode == exoMode::Sit){
+            m_single_execution_done = false; 
+        }
+
+        if ((exoMode)msg->mode == exoMode::Stand && m_gait_planning.getPrevGaitType() == exoMode::Sit){
+            // m_gait_planning.setCounter(0); 
+            m_single_execution_done = false; 
+        }
+
+
         if (!m_first_stand){
-            publishJointTrajectoryPoints();
-            RCLCPP_DEBUG(this->get_logger(), "\n Publish function called! \n "); 
+            publishJointTrajectoryPoints(); 
         }
+
     } else {
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
@@ -206,7 +219,7 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
     if (count < m_current_trajectory.size()-1){ 
         processMovingGaits(count); 
         m_gait_planning.setCounter(count+1); 
-        RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
+        // RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_joints_msg.data = m_gait_planning.getHomeStand(); 
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
@@ -274,7 +287,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                             m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                         } else {
                             processMovingGaits(count);
-                            RCLCPP_INFO(this->get_logger(), "count: %d", count); 
+                            // RCLCPP_INFO(this->get_logger(), "count: %d", count); 
                             m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
                             if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
                                 m_gait_planning.setPrevGaitType(exoMode::Stand); 
@@ -334,14 +347,14 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 m_current_trajectory = m_gait_planning.getStandToSitGait(); 
                 processMovingGaits(count);
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
-                RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
+                // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
                 break;
 
             case exoMode::Hinge:
                 m_current_trajectory = m_gait_planning.getHingeGait(); 
                 processMovingGaits(count); 
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size()-1)) ? (m_current_trajectory.size()-1): (count + 1)); 
-                RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
+                // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
                 break;
             
             case exoMode::Sideways :

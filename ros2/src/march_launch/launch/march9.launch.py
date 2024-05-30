@@ -75,7 +75,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_control"),
                 "launch",
-                "march8_controllers.launch.py",
+                "march9_controllers.launch.py",
             )
         ),
         launch_arguments=[("simulation", simulation)],
@@ -195,10 +195,16 @@ def generate_launch_description() -> LaunchDescription:
             executable='listener_gait_planning', 
             name='listener_gait_planning', 
         ),
+        # Node(
+        #     package='march_gait_planning', 
+        #     namespace='', 
+        #     executable='service_client_node', 
+        #     name='gait_planning_manager', 
+        # ),
         Node(
-            package='march_gait_planning', 
+            package='gait_planning_manager', 
             namespace='', 
-            executable='service_client_node', 
+            executable='gait_planning_manager_node', 
             name='gait_planning_manager', 
         ),
         Node(
@@ -235,7 +241,7 @@ def generate_launch_description() -> LaunchDescription:
         mode_machine,
         record_rosbags_action,
         safety_node,
-        imu_nodes,
+        # imu_nodes,
         ik_solver,
         state_estimator,
         ipd_node,
