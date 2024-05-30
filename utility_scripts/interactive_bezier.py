@@ -6,10 +6,10 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 
-def calculate_bezier_curve(points):
+def calculate_bezier_curve(points, array_size = 100):
     """Calculate the Bezier curve for the given points."""
     curve = bezier.Curve(points.T, degree=3)
-    t_values = np.linspace(0.0, 1.0, 100)
+    t_values = np.linspace(0.0, 1.0, array_size)
     curve_points = curve.evaluate_multi(t_values)
     return curve_points.T
 
@@ -64,7 +64,6 @@ def create_bezier_csv(points, array_size, gait_type):
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', final_points_step_close, delimiter=',')
 
-
 class DraggablePoint:
     """A class to represent a draggable point in matplotlib."""
     def __init__(self, parent, point):
@@ -97,15 +96,15 @@ class DraggablePoint:
 
 class InteractiveBezier:
     """A class to represent an interactive Bezier curve in matplotlib."""
-    def __init__(self, data, gait_type):
+    def __init__(self, points, gait_type):
         self.gait_type = gait_type
-        self.data = data
-        self.points = np.array(data[self.gait_type])
+        self.points = points
         self.draggable_points = [DraggablePoint(self, point) for point in self.points]
         self.dragging = None
         self.initial_points = self.points.copy()
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
+        self.updated_points = None
 
         # Create a separate window for the coordinates
         self.root = tk.Tk()
@@ -201,33 +200,76 @@ class InteractiveBezier:
                 root.destroy()
                 # Also destroy the coordinates window
                 self.root.destroy()
-                return
+                self.updated_points = self.initial_points.tolist()
         # Destroy the root window
         root.destroy()
         # Also destroy the coordinates window
         self.root.destroy() 
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
-            # Save the points to a file
-            self.data[self.gait_type] = self.points.tolist()
-            with open('utility_scripts/points.yaml', 'w') as f:
-                yaml.dump(self.data, f)
             create_bezier_csv(self.points, 200, self.gait_type)
+            self.updated_points = self.points.tolist()
+        else:
+            self.updated_points = self.initial_points.tolist()
+
+def interactive_bezier(gait_type: str): 
+    if gait_type == "small_gait" or gait_type == "large_gait":  
+        if os.path.exists('utility_scripts/points.yaml'):
+            with open('utility_scripts/points.yaml', 'r') as f:
+                data = yaml.safe_load(f)
+                points = np.array(data[gait_type])
+        else:
+            print("No points file found")
+
+        interactive_bezier = InteractiveBezier(points, gait_type)
+        interactive_bezier.connect()
+
+        # Connect the on_close function to the close event
+        plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
+        plt.grid()
+
+        # Start the matplotlib event loop
+        plt.show()
+
+        new_points = interactive_bezier.updated_points
+        data[gait_type] = new_points
 
 
-# Load the points from the file if it exists, otherwise use default points
-if os.path.exists('utility_scripts/points.yaml'):
-    with open('utility_scripts/points.yaml', 'r') as f:
-        data = yaml.safe_load(f)
-else:
-    print("No points file found")
+        
+    
+    elif gait_type == "ascending":
+        if os.path.exists('utility_scripts/points.yaml'):
+            with open('utility_scripts/points.yaml', 'r') as f:
+                data = yaml.safe_load(f)
+        else:
+            print("No points file found")
 
-interactive_bezier = InteractiveBezier(data, "small_gait")
-interactive_bezier.connect()
+        for i, step_type_dict in enumerate(data[gait_type]):
+            # Get the step type and the points
+            step_type = list(step_type_dict.keys())[0]
+            points = np.array(step_type_dict[step_type])
 
-# Connect the on_close function to the close event
-plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
-plt.grid()
+            # Pass the points to the InteractiveBezier class
+            interactive_bezier = InteractiveBezier(points, gait_type)
+            interactive_bezier.connect()
 
-# Start the matplotlib event loop
-plt.show()
+            # Connect the on_close function to the close event
+            plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
+            plt.grid()
+
+            # Start the matplotlib event loop
+            plt.show()
+
+            # Get the new points
+            new_points = interactive_bezier.updated_points
+
+            # Store the new points in the same spot in the data variable
+            data[gait_type][i][step_type] = new_points
+            
+
+    with open('utility_scripts/points.yaml', 'w') as f:
+            yaml.dump(data, f)
+
+
+
+interactive_bezier("large_gait")
