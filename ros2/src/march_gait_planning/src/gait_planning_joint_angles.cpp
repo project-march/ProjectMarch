@@ -34,8 +34,11 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_first_step_updated.csv", m_first_step_angle_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_first_step.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_full_step.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close.csv", m_step_close_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
+
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
@@ -44,9 +47,6 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close_updated.csv", m_step_close_trajectory); 
-
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
