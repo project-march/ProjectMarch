@@ -41,12 +41,28 @@ def create_bezier_csv(points, array_size, gait_type):
     # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
+    step_close_points = points.copy()
+    step_close_points[:, 0] = step_close_points[:, 0]/-2
+    curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
+    number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size/2))
+    points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
+    x_swing_step_close = points_step_close[0,:]
+    z_swing_step_close = points_step_close[1,:]
+    x_stance_step_close = np.linspace(0, 0 - (-step_length/2), int(array_size/2))
+    # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
+    z_stance_step_close = [0]*int(array_size/2)
+    # z_swing_first_step = z_swing_first_step + z_stance_first_step
+    final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
+    final_points_step_close = np.flip(final_points_step_close, axis=0)
+
     if gait_type == "large_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', final_points_complete_step, delimiter=',')
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/large_step_close.csv', final_points_step_close, delimiter=',')
     elif gait_type == "small_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', final_points_first_step, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', final_points_step_close, delimiter=',')
 
 
 class DraggablePoint:
