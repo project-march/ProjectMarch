@@ -19,6 +19,12 @@ install(DIRECTORY urdf
 install(DIRECTORY meshes
   DESTINATION share/${PROJECT_NAME})
 
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME})
+
+install(DIRECTORY rviz
+  DESTINATION share/${PROJECT_NAME})
+
 set(XACRO_FILES
         urdf/march8.xacro
 )

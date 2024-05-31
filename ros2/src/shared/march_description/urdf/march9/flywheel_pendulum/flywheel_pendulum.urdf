@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<robot name="Robot__31__">
+    <link name="Robot__31__">
+        <inertial>
+            <origin rpy="3.141592 3.141593 3.141592" xyz="0.000000 0.000000 0.000000" />
+            <inertia izz="0.04166666790843" ixx="0.24166665971279" iyz="0.0" iyy="0.21666666865349" ixy="0.0" ixz="0.0" />
+            <mass value="10.0" />
+        </inertial>
+        <collision>
+            <origin rpy="-3.141593 3.141593 -3.141593" xyz="0.000000 0.000000 0.000000" />
+            <geometry>
+                <sphere radius="0.025000000372529" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="pendulum__34__">
+        <inertial>
+            <origin rpy="3.124769 3.156842 -3.140807" xyz="-0.000928 -0.000758 0.004384" />
+            <inertia izz="3.0708521080669e-05" ixx="0.012900001369417" iyz="0.0" iyy="0.012900001369417" ixy="0.0" ixz="0.0" />
+            <mass value="0.30000001192093" />
+        </inertial>
+        <collision>
+            <origin rpy="-3.141593 3.141593 -3.141593" xyz="0.000000 0.000000 0.0800000" />
+            <geometry>
+                <mesh filename="package://march_description/meshes/march9/flywheel_pendulum/flywheel_pendulum__34__.dae" />
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="-0.019327 3.141506 3.141513" xyz="0.000006 -0.000886 0.0800009" />
+            <geometry>
+                <mesh filename="package://march_description/meshes/march9/flywheel_pendulum/flywheel_pendulum_visual__35__.dae" />
+            </geometry>
+            <material name="pendulum_visual__35___material">
+                <color rgba="0.500000 0.500000 0.500000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint type="continuous" name="unactuated_joint__33__">
+        <axis xyz="1 0 0" />
+        <parent link="Robot__31__" />
+        <child link="pendulum__34__" />
+        <origin rpy="-3.141592 3.141593 1.570796" xyz="0.00 -0.00 0.00" />
+    </joint>
+    <link name="flywheel__37__">
+        <inertial>
+            <origin rpy="2.956070 3.168183 -1.260866" xyz="0.000000 0.000000 -0.000001" />
+            <inertia izz="0.00028000000747852" ixx="0.00028000003658235" iyz="0.0" iyy="0.0013999999500811" ixy="0.0" ixz="0.0" />
+            <mass value="0.28000000119209" />
+        </inertial>
+        <collision>
+            <origin rpy="-3.141593 3.141593 -3.141593" xyz="0.000000 0.000000 0.080000" />
+            <geometry>
+                <mesh filename="package://march_description/meshes/march9/flywheel_pendulum/flywheel_flywheel__37__.dae" />
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="-1.989615 3.141560 3.141538" xyz="-0.000000 -0.000000 -0.00000" />
+            <geometry>
+                <mesh filename="package://march_description/meshes/march9/flywheel_pendulum/flywheel_flywheel_visual__38__.dae" />
+            </geometry>
+            <material name="flywheel_visual__38___material">
+                <color rgba="0.500000 0.500000 0.500000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint type="continuous" name="actuated_joint__36__">
+        <axis xyz="1 0 0" />
+        <parent link="pendulum__34__" />
+        <child link="flywheel__37__" />
+        <origin rpy="0 0 0" xyz="-0.022934 0.000362 0.1330381" />
+    </joint>
+</robot>
