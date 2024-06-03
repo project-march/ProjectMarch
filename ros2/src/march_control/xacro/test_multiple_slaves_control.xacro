@@ -49,11 +49,11 @@
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
       <plugin>march_system_interface/MarchExoSystemInterface</plugin>
-      <param name="robot">test_joint_rotational_primary</param>
+      <param name="robot">test_joint_multiple_slaves</param>
     </xacro:if>
   </hardware>
 
-  <!-- Uncomment one of the following two. -->
+  <xacro:march_joint name="linear_joint"/>
   <xacro:march_joint name="rotational_joint"/>
 
 </ros2_control>

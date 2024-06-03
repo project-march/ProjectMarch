@@ -1,6 +1,6 @@
 """Author: Marco Bak, MVIII."""
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument
 from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import (
     Command,
@@ -24,8 +24,9 @@ def generate_launch_description():
     # region Launch Controller manager, Extra configuration if simulation is `false`
 
     control_yaml = LaunchConfiguration("control_yaml")
-    control_xacro = "test_linear_control.xacro"
-    print("CHECK THIS ASSHOLE: {}".format(control_xacro))
+
+
+    control_xacro = "test_multiple_slaves_control.xacro"
 
     declared_arguments = [
         DeclareLaunchArgument(
@@ -71,10 +72,10 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    joint_position_controller_spawner = Node(
+    joint_trajectory_controller_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
-        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
+        arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
     )
     # endregion
 
@@ -95,7 +96,7 @@ def generate_launch_description():
 
     nodes = [
         joint_state_broadcaster_spawner,
-        joint_position_controller_spawner,
+        joint_trajectory_controller_spawner,
         motor_controller_state_broadcaster_spawner,
     ]
 
