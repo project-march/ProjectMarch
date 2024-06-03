@@ -94,7 +94,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
     }
     if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
     
-        RCLCPP_INFO(this->get_logger(), "New stance foot: %d", m_gait_planning.getStanceFoot());
+        // RCLCPP_INFO(this->get_logger(), "New stance foot: %d", m_gait_planning.getStanceFoot());
         
         switch (m_gait_planning.getGaitType()){
             case exoMode::Walk:

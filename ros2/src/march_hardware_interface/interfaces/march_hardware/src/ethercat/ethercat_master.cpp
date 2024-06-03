@@ -13,10 +13,10 @@
 #include <soem/ethercat.h>
 
 namespace march {
-EthercatMaster::EthercatMaster(std::string if_name, int max_slave_index, int cycle_time, int slave_timeout,
+EthercatMaster::EthercatMaster(std::string network_interface_name, int max_slave_index, int cycle_time, int slave_timeout,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : is_operational_(/*__i=*/false)
-    , if_name_(std::move(if_name))
+    , network_interface_name_(std::move(network_interface_name))
     , max_slave_index_(max_slave_index)
     , cycle_time_ms_(cycle_time)
     , logger_(std::move(logger))
@@ -63,13 +63,13 @@ bool EthercatMaster::start(std::vector<Joint>& joints)
 void EthercatMaster::ethercatMasterInitiation()
 {
     logger_->info("Trying to start EtherCAT");
-    if (!ec_init(this->if_name_.c_str())) {
+    if (!ec_init(this->network_interface_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
             "No socket connection on %s. Check if the socket is active by typing `ifconfig` in a terminal "
             ", or this node is not executed as root.",
-            this->if_name_.c_str());
+            this->network_interface_name_.c_str());
     }
-    logger_->info(logger_->fstring("ec_init on %s succeeded", this->if_name_.c_str()));
+    logger_->info(logger_->fstring("ec_init on %s succeeded", this->network_interface_name_.c_str()));
 
     const int slave_count = ec_config_init(FALSE);
     if (slave_count < this->max_slave_index_) {
