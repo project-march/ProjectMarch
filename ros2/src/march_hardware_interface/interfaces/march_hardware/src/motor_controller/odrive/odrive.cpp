@@ -382,7 +382,6 @@ void ODrive::setAxisState(ODriveAxisState state)
 {
     bit32 write_struct {};
     write_struct.ui = state.value_;
-    auto offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_);
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::RequestedState, axis_), write_struct);
 }
 
