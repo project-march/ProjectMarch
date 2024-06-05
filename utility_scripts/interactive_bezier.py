@@ -5,6 +5,7 @@ import yaml
 import os
 import tkinter as tk
 from tkinter import messagebox
+from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs
 
 def calculate_bezier_curve(points, array_size = 100):
     """Calculate the Bezier curve for the given points."""
@@ -269,6 +270,12 @@ def interactive_bezier(gait_type: str):
 
     with open('utility_scripts/points.yaml', 'w') as f:
             yaml.dump(data, f)
+    
+    if gait_type == "ascending":
+        ascend_csv = stair_gaits(data['ascending'], 200)
+        descend_csv = descend_stairs(ascend_csv)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
 
 
 
