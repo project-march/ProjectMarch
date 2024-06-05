@@ -47,11 +47,11 @@ void GaitPlanning::setFootPositions(const GaitPlanning::XYZFootPositionArray &ne
     m_current_right_foot_position = new_right_foot_position; 
 }
 
-void GaitPlanning::setGaitType(const exoMode &new_gait_type){
+void GaitPlanning::setGaitType(const ExoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanning::setPreviousGaitType(const exoMode &previous_gait_type){
+void GaitPlanning::setPreviousGaitType(const ExoMode &previous_gait_type){
     m_previous_gait_type = previous_gait_type; 
 }
 
@@ -80,38 +80,38 @@ void GaitPlanning::setVariableDistance(const float &distance){
 std::vector<GaitPlanning::XZFeetPositionsArray> GaitPlanning::getTrajectory() {
     // std::vector<GaitPlanning::XZFeetPositionsArray> result;  
     switch (m_gait_type){
-        case exoMode::LargeWalk : 
+        case ExoMode::LargeWalk : 
             return (m_current_stance_foot == 3) ? m_large_first_step_trajectory : m_large_bezier_trajectory; 
-        case exoMode::SmallWalk : 
+        case ExoMode::SmallWalk : 
             return  (m_current_stance_foot == 3) ? m_small_first_step_trajectory : m_small_bezier_trajectory; 
-        case exoMode::Stand :
+        case ExoMode::Stand :
             switch (m_previous_gait_type){
-                case exoMode::LargeWalk :
+                case ExoMode::LargeWalk :
                     return m_large_step_close_trajectory; 
-                case exoMode::SmallWalk :
+                case ExoMode::SmallWalk :
                     return m_small_step_close_trajectory; 
-                case exoMode::HighStep1 : 
+                case ExoMode::HighStep1 : 
                     return m_high_step_26cm_close_trajectory; 
-                case exoMode::HighStep2 : 
+                case ExoMode::HighStep2 : 
                     return m_high_step_22cm_close_trajectory; 
-                case exoMode::HighStep3 : 
+                case ExoMode::HighStep3 : 
                     return m_high_step_18cm_close_trajectory; 
-                case exoMode::VariableWalk : 
+                case ExoMode::VariableWalk : 
                     return variableFirstStepTrajectory(m_variable_distance); 
                 default :
                     return {}; 
             }
-            // return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
-        case exoMode::HighStep1 :
+            // return (m_previous_gait_type == ExoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
+        case ExoMode::HighStep1 :
             return m_high_step_26cm_trajectory;
-        case exoMode::HighStep2 :
+        case ExoMode::HighStep2 :
             return m_high_step_22cm_trajectory;
-        case exoMode::HighStep3 :
+        case ExoMode::HighStep3 :
             return m_high_step_18cm_trajectory;
-            return (m_previous_gait_type == exoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
-        case exoMode::Ascending :
+            return (m_previous_gait_type == ExoMode::LargeWalk) ? m_large_step_close_trajectory : m_small_step_close_trajectory;
+        case ExoMode::Ascending :
             return m_ascending_trajectory;
-        case exoMode::Descending :
+        case ExoMode::Descending :
             return m_descending_trajectory; 
         default : 
             return {}; 
@@ -130,11 +130,11 @@ GaitPlanning::XYZFootPositionArray GaitPlanning::getCurrentRightFootPos() const{
     return m_current_right_foot_position; 
 }
 
-exoMode GaitPlanning::getGaitType() const{
+ExoMode GaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
 
-exoMode GaitPlanning::getPreviousGaitType() const{
+ExoMode GaitPlanning::getPreviousGaitType() const{
     return m_previous_gait_type; 
 }
 

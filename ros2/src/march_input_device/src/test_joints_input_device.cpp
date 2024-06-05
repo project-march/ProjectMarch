@@ -10,17 +10,17 @@ This class is only used in the test_joints launch file.
 #include <iostream>
 
 TestJointsIPD::TestJointsIPD()
-    : m_current_mode (exoMode::BootUp)
+    : m_current_mode (ExoMode::BootUp)
 {
     std::cout << "IPD succesfully started" << std::endl;
 }
 
-exoMode TestJointsIPD::getCurrentMode() const
+ExoMode TestJointsIPD::getCurrentMode() const
 {
     return m_current_mode;
 }
 
-std::set<exoMode> TestJointsIPD::getAvailableModes() const
+std::set<ExoMode> TestJointsIPD::getAvailableModes() const
 {
     return m_available_modes;
 }
@@ -36,12 +36,12 @@ void TestJointsIPD::askNewMode() const
     std::cout << '\n';
 }
 
-void TestJointsIPD::setCurrentMode(const exoMode& current_mode)
+void TestJointsIPD::setCurrentMode(const ExoMode& current_mode)
 {
     m_current_mode = current_mode;
 }
 
-void TestJointsIPD::setAvailableModes(const std::set<exoMode>& available_modes)
+void TestJointsIPD::setAvailableModes(const std::set<ExoMode>& available_modes)
 {
     m_available_modes = available_modes;
 }

@@ -81,11 +81,11 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
+void GaitPlanningAngles::setGaitType(const ExoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
+void GaitPlanningAngles::setPrevGaitType(const ExoMode &prev_gait_type){
     m_prev_gait_type = prev_gait_type; 
 }
 
@@ -105,11 +105,11 @@ void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
     m_stance_foot = foot; 
 }
 
-exoMode GaitPlanningAngles::getGaitType() const {
+ExoMode GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
 
-exoMode GaitPlanningAngles::getPrevGaitType() const {
+ExoMode GaitPlanningAngles::getPrevGaitType() const {
     return m_prev_gait_type; 
 }
 
