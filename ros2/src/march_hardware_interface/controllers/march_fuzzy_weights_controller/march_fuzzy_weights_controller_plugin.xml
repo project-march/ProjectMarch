@@ -1,0 +1,9 @@
+<library path="march_fuzzy_weights_controller">
+    <class name="march_fuzzy_weights_controller/FuzzyWeightsController" 
+                    type="march_fuzzy_weights_controller::FuzzyWeightsController" 
+                    base_class_type="controller_interface::ControllerInterface">
+        <description>
+            The fuzzy weights controller commands a group of joints through the fuzzy weights interface.
+        </description>
+    </class>
+</library>
