@@ -21,8 +21,8 @@ for inner_list in data:
     for mode in inner_list:
         all_modes.append(mode)
 
-# Sort the list by the 'exoMode' value
-all_modes.sort(key=lambda mode: mode['exoMode'])
+# Sort the list by the 'ExoMode' value
+all_modes.sort(key=lambda mode: mode['ExoMode'])
 
 # Open the output file
 with open(os.path.join(output_dir, 'exo_mode.hpp'), 'w') as f:
@@ -31,29 +31,29 @@ with open(os.path.join(output_dir, 'exo_mode.hpp'), 'w') as f:
     f.write("// This is a generated file. Do not edit.\n\n")
 
     # Write the enum definition
-    f.write('enum class exoMode {\n')
+    f.write('enum class ExoMode {\n')
 
     # Write each enum member
     for mode in all_modes:
         name = mode['name']
-        value = mode['exoMode']
+        value = mode['ExoMode']
         f.write(f'    {name} = {value},\n')
 
     # Write the closing brace for the enum
     f.write('};\n\n')
 
     # Write the toString function
-    f.write("inline std::string toString(exoMode state) {\n")
+    f.write("inline std::string toString(ExoMode state) {\n")
     f.write("    switch (state) {\n")
     for mode in all_modes:
         name = mode['name']
-        f.write(f"        case exoMode::{name}: return \"{name}\";\n")
+        f.write(f"        case ExoMode::{name}: return \"{name}\";\n")
     f.write("        default: return \"Unknown\";\n")
     f.write("    }\n")
     f.write("}\n\n")
 
     # Write the operator overload for output stream
-    f.write("inline std::ostream& operator<<(std::ostream& os, exoMode state) {\n")
+    f.write("inline std::ostream& operator<<(std::ostream& os, ExoMode state) {\n")
     f.write("    os << toString(state);\n")
     f.write("    return os;\n")
     f.write("}\n")
