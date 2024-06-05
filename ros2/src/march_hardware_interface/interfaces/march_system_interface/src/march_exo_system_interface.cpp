@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "march_system_interface/march_exo_system_interface.hpp"
-//#include "march_system_interface/weight_node.h"
 
 #include <cassert>
 #include <chrono>
@@ -42,11 +41,8 @@ namespace march_system_interface {
 MarchExoSystemInterface::MarchExoSystemInterface()
     : logger_(std::make_shared<rclcpp::Logger>(rclcpp::get_logger("HardwareInterface")))
     , clock_(rclcpp::Clock())
-//    , m_weight_node_()
 {
     RCLCPP_INFO((*logger_), "creating Hardware Interface...");
-    //    m_weight_node_->m_hardware_interface = this;
-    //    RCLCPP_INFO((*logger_), "should've assigned the hwi to the weightnode now...");
     go_to_stop_state_on_crash(this); // Note this doesn't work if the ethercat connection is lost.
 }
 
@@ -76,7 +72,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_TORQUE_WEIGHT},
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
             /*logger=*/(*logger_))) {
@@ -214,6 +210,9 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
+        // Torque: Couples the command controller to the value jointInfo.target_torque through a pointer.
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(
+            jointInfo.name, hardware_interface::HW_IF_TORQUE_WEIGHT, &jointInfo.torque_weight));
     }
 
     return command_interfaces;
@@ -263,9 +262,6 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             }               
         }
 
-        weight_node = std::make_shared<WeightNode>();
-        weight_node->joints_info_ = getJointsInfo();
-        executor_.add_node(weight_node);
         gains_node = std::make_shared<GainsNode>();
         gains_node->joints_info_ = getJointsInfo();
         executor_.add_node(gains_node);
@@ -466,9 +462,6 @@ hardware_interface::return_type MarchExoSystemInterface::write()
     if (!joints_ready_for_actuation_) {
         return hardware_interface::return_type::OK;
     }
-        
-    // publish the measured torque each iteration
-    weight_node->publish_measured_torque();
 
     for (JointInfo& jointInfo : joints_info_) {
         if (!is_joint_in_valid_state(jointInfo)) {
