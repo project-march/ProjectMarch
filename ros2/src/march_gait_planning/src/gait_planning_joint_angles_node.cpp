@@ -43,7 +43,7 @@ GaitPlanningAnglesNode::GaitPlanningAnglesNode()
     m_gait_planning.setGaitType(exoMode::BootUp);
     m_gait_planning.setPrevGaitType(exoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
-    m_gait_planning.setHomeStand(m_gait_planning.getFirstStepAngleTrajectory()[0]); 
+    m_gait_planning.setHomeStand(m_gait_planning.getStandToSitGait()[0]); 
 
     RCLCPP_INFO(this->get_logger(), "Gait planning node initialized");
 }
