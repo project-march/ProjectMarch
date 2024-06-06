@@ -72,7 +72,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
-            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_TORQUE_WEIGHT},
+            /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
             /*required_state_interfaces=*/
             { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
             /*logger=*/(*logger_))) {

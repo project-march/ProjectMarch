@@ -36,8 +36,6 @@
 #include <std_msgs/msg/int32.hpp>
 #include "fuzzy_weights_controller/fuzzy_weights_controller.hpp"
 
-#define TORQUEDEBUG
-
 using std::placeholders::_1;
 using std::placeholders::_2;
 
