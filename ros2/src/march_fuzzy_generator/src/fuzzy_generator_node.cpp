@@ -5,7 +5,7 @@ using std::placeholders::_1;
 FuzzyGeneratorNode::FuzzyGeneratorNode()
     : Node("fuzzy_generator_node")
 {
-    declare_parameter("config_path", std::string("src/march_fuzzy_generator/config/default_weights.yaml"));
+    declare_parameter("config_path", std::string("~/src/march_fuzzy_generator/config/default_weights.yaml"));
     std::string config_path = this->get_parameter("config_path").as_string();
     m_fuzzy_generator = FuzzyGenerator(config_path);
 
@@ -72,10 +72,6 @@ void FuzzyGeneratorNode::publishFuzzyWeights(){
     if (m_fuzzy_generator.m_control_type == "position") {
         size_t num_joints = m_fuzzy_generator.m_joint_names.size();
         fuzzy_weights_msg.data.push_back(0.01);
-        // for (size_t i = 0; i < num_joints; ++i) {
-        //     fuzzy_weights_msg.data.push_back(0.01);
-        // }
-
     } else if (m_fuzzy_generator.m_control_type == "constant"){
         fuzzy_weights = m_fuzzy_generator.getConstantWeights();
     } else if (m_fuzzy_generator.m_control_type == "foot_height") {
