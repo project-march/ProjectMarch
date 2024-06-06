@@ -101,12 +101,6 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(rosbags),
     )
 
-    default_fuzzy_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
-    
     default_gainscheduler_config = os.path.join(
         get_package_share_directory('march_gain_scheduler'),
         'config',
@@ -114,7 +108,6 @@ def generate_launch_description() -> LaunchDescription:
     )    
 
     # parameters
-    fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
     gainscheduler_config_path = LaunchConfiguration("config_path", default=default_gainscheduler_config)
 
     return LaunchDescription([
@@ -132,12 +125,6 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[
                 {"test_rotational": test_rotational}
             ],
-        ),
-        Node(
-            package='fuzzy_generator',
-            executable='fuzzy_node',
-            name='fuzzy_node',
-            parameters=[{'config_path': fuzzy_config_path}]
         ),
         Node(
             package='march_gain_scheduler',
