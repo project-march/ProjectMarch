@@ -1,0 +1,19 @@
+height_bounds:
+  # all values represent height in meters
+  lower_bound: 0.0
+  upper_bound: 0.2 # interpolate up to 20 cm, dummy value
+torque_bounds:
+  # all values represent torque in Nm
+  lower_bound: 5.0 # maximum ankle torque for the stance leg, dummy value for now
+  upper_bound: 0.0 
+joints:
+  # all values represent ratios in percentage points
+  linear_joint:
+    minimum_torque: 0.0
+    maximum_torque: 0.3 
+    constant_weight: 0.5
+  rotational_joint:
+    minimum_torque: 0.0
+    maximum_torque: 0.2
+    constant_weight: 0.4
+  
