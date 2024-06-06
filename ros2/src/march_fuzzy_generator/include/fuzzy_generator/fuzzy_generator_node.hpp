@@ -1,7 +1,6 @@
 #ifndef MARCH_FUZZY_NODE_HPP
 #define MARCH_FUZZY_NODE_HPP
 #include "fuzzy_generator/fuzzy_generator.hpp"
-#include "march_shared_msgs/msg/fuzzy_weights.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
 #include "march_shared_msgs/msg/joint_motor_controller_state.hpp"

@@ -9,7 +9,6 @@ FuzzyGeneratorNode::FuzzyGeneratorNode()
     std::string config_path = this->get_parameter("config_path").as_string();
     m_fuzzy_generator = FuzzyGenerator(config_path);
 
-    // TODO: let the state estimator publish the foot heights
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
         "robot_foot_heights", 10, std::bind(&FuzzyGeneratorNode::footHeightsCallback, this, _1));
 
