@@ -3,7 +3,8 @@
 #pragma once
 
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
-#include <march_shared_msgs/msg/feet_height_stamped.hpp>
+#include "march_shared_msgs/msg/feet_height_stamped.hpp"
+#include "march_shared_msgs/msg/joint_motor_controller_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <yaml-cpp/yaml.h>
 
@@ -15,7 +16,8 @@ class FuzzyGenerator {
         void setConfigPath(const ExoMode &new_gait_type);
         std::vector<std::tuple<std::string, float, float>> getConstantWeights();
         std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FeetHeightStamped::SharedPtr& both_foot_heights);
-        std::vector<std::tuple<std::string, float, float>> calculateStanceSwingLegWeights(double left_ankle_torque, double right_ankle_torque);         // TODO: get torques from hwi
+        std::vector<std::tuple<std::string, float, float>> getAnkleTorques(double left_ankle_torque, double right_ankle_torque); 
+        std::vector<std::tuple<std::string, float, float>> returnPositionWeights();      
         std::vector<std::string> m_joint_names;
         std::string m_control_type = "position"; // default value
         std::string m_scheduling_variable;
@@ -26,7 +28,6 @@ class FuzzyGenerator {
         double m_upper_bound;
         ExoMode m_gait_type;
         std::vector<std::tuple<std::string, float, float, float>> m_torque_ranges;
-        void getJointNames();
         std::vector<std::tuple<std::string, float, float, float>> getTorqueRanges();
         std::vector<std::tuple<std::string, float, float>> calculateVariableWeights(double left_leg_parameter, double right_leg_parameter);
         

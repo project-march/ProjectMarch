@@ -4,7 +4,7 @@
 #include "march_shared_msgs/msg/fuzzy_weights.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/feet_height_stamped.hpp"
-#include <control_msgs/msg/joint_trajectory_controller_state.hpp>
+#include "march_shared_msgs/msg/joint_motor_controller_state.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
@@ -16,7 +16,7 @@ class FuzzyGeneratorNode : public rclcpp::Node {
     private:
         FuzzyGenerator m_fuzzy_generator;
         rclcpp::Subscription<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_foot_height_subscription;
-        rclcpp::Subscription<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr m_torque_subscription;        
+        rclcpp::Subscription<march_shared_msgs::msg::JointMotorControllerState>::SharedPtr m_torque_subscription;        
         rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_subscription;
         rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_weight_publisher;
         rclcpp::TimerBase::SharedPtr m_timer; 
@@ -29,10 +29,10 @@ class FuzzyGeneratorNode : public rclcpp::Node {
         static constexpr std::size_t m_position_weight_index = 1;
         static constexpr std::size_t m_torque_weight_index = 2;
 
-        double getActualJointTorque(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr& msg, const std::string& joint_name);
+        double getSpecificJointTorque(const march_shared_msgs::msg::JointMotorControllerState::SharedPtr msg, const std::string& joint_name);
         void footHeightsCallback(const march_shared_msgs::msg::FeetHeightStamped::SharedPtr msg);
         void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
-        void measuredTorquesCallback(const control_msgs::msg::JointTrajectoryControllerState::SharedPtr msg);
+        void measuredTorqueCallback(const march_shared_msgs::msg::JointMotorControllerState::SharedPtr msg);
         void publishFuzzyWeights();
 
 };
