@@ -3,15 +3,15 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_HPP_
-#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_HPP_
+#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_HPP_
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "march_state_estimator/robot_node.hpp"
-#include "march_state_estimator/robot_joint.hpp"
+#include "march_state_estimator/robot_description/robot_node.hpp"
+#include "march_state_estimator/robot_description/robot_joint.hpp"
 #include "yaml-cpp/yaml.h"
 
 struct RobotPartData {
@@ -63,4 +63,4 @@ private:
     Eigen::Quaterniond m_inertial_orientation;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_HPP_
+#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_HPP_

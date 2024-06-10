@@ -1,3 +1,8 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #include "march_ik_solver/ik_solver_node.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 
@@ -22,19 +27,21 @@ IKSolverNode::IKSolverNode()
     m_subscription_options.callback_group = m_callback_group;
 
     // Create the subscriptions and publishers.
-    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
+        "ik_solver/command", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
+    m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
     m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
-        "joint_trajectory_controller/joint_trajectory", 10);
+        "ik_solver/joint_trajectory", 10);
+    m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
-    m_error_norm_pub = this->create_publisher<std_msgs::msg::Float64>("ik_solver/error", 10);
-    m_iterations_pub = this->create_publisher<std_msgs::msg::UInt64>("ik_solver/iterations", 10);
 
-    RCLCPP_DEBUG(this->get_logger(), "IKSolverNode has been started.");
+    RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
 }
 
 IKSolverNode::~IKSolverNode()
@@ -42,32 +49,43 @@ IKSolverNode::~IKSolverNode()
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
 }
 
+void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver command received.");
+    m_ik_solver->setTaskNames(msg->task_names);
+}
+
 void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
+    /*
+        Big TODO: Expand the stack of tasks
+        - Separate Y-motion from "motion" task and create a new task for it.
+            - This will allow the robot to stick to the desired Y-motion while the "motion" task is being solved.
+    */
+    std::vector<std::string> task_names = m_ik_solver->getTaskNames();
+    if (task_names.empty()) {
+        return;
+    }
+
     // Vectorizing the desired tasks.
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
-    Eigen::VectorXd desired_pose = Eigen::VectorXd::Zero(12);
-    desired_pose << 
-        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z, 0, 0, 0,
-        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z, 0, 0, 0;
-    desired_tasks["motion"] = desired_pose;
+    Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(6);
+    desired_motion << 
+        msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z,
+        msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
+    desired_tasks["motion"] = desired_motion;
 
-    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(6);
-    desired_stability << 0.295, 0.0, 0.0, 0.0, 0.0, 0.0;
-    desired_tasks["stability"] = desired_stability;
+    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
+    desired_stability << 0.17, 0.0;
+    desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
 
-    Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(12);
-    desired_posture << 
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0;
+    Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
     desired_tasks["posture"] = desired_posture;
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
-    // publishJointTrajectory();
-    publishDesiredJointPositions();
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
@@ -82,6 +100,16 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
             m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
         }
     }
+
+    m_current_world_to_base_orientation = Eigen::Quaterniond(
+        msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
+
+    // Publish the desired joint positions if there is a solution in the previous cycle.
+    if (m_has_solution) {
+        publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
+        publishJointTrajectory();       // Publish the desired joint trajectory to the torque controller.
+        m_has_solution = false;
+    }
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -91,29 +119,33 @@ void IKSolverNode::publishJointTrajectory()
     joint_trajectory_msg->header.stamp = this->now();
 
     // Alphabetize the vector of joint names according to the alphabetical joint indices.
-    joint_trajectory_msg->joint_names = m_joint_names_alphabetical;
+    joint_trajectory_msg->joint_names = m_joint_names;
 
-    // Publish the previous joint trajectory point.
-    joint_trajectory_msg->points.push_back(m_joint_trajectory_point_prev);
+    // Calculate the desired joint velocities.
+    Eigen::VectorXd desired_joint_velocities;
+    desired_joint_velocities.noalias()
+        = (m_desired_joint_positions - Eigen::Map<const Eigen::VectorXd>(m_actual_joint_positions.data(), m_actual_joint_positions.size())) / m_state_estimator_time_offset;
+
+    // // Publish the previous joint trajectory point.
+    // joint_trajectory_msg->points.push_back(m_joint_trajectory_point_prev);
 
     // Create desired trajectory point.
     trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr joint_trajectory_point_desired = std::make_shared<trajectory_msgs::msg::JointTrajectoryPoint>();
     joint_trajectory_point_desired->positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     joint_trajectory_point_desired->velocities = std::vector<double>(
-        m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
+        desired_joint_velocities.data(), desired_joint_velocities.data() + desired_joint_velocities.size());
     joint_trajectory_point_desired->accelerations = createZeroVector();
     joint_trajectory_point_desired->effort = createZeroVector();
     joint_trajectory_point_desired->time_from_start.sec = 0;
     joint_trajectory_point_desired->time_from_start.nanosec = m_joint_trajectory_controller_period;
-    alphabetizeJointTrajectory(joint_trajectory_point_desired);
     joint_trajectory_msg->points.push_back(*joint_trajectory_point_desired);
 
     // Publish the message.
     m_joint_trajectory_pub->publish(*joint_trajectory_msg);
 
-    // Update the previous joint trajectory point.
-    updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
+    // // Update the previous joint trajectory point.
+    // updatePreviousJointTrajectoryPoint(*joint_trajectory_point_desired);
 }
 
 void IKSolverNode::publishDesiredJointPositions()
@@ -121,54 +153,41 @@ void IKSolverNode::publishDesiredJointPositions()
     std_msgs::msg::Float64MultiArray desired_joint_positions_msg;
     std::vector<double> desired_joint_positions = std::vector<double>(
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
-    // std::cout << "Desired joint positions: " << m_desired_joint_positions.transpose() << std::endl;
     for (const auto& idx : m_alphabetical_joint_indices) {
         // RCLCPP_INFO(this->get_logger(), "Joint index: %d", idx);
         desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
     }
-    // RCLCPP_INFO(this->get_logger(), "Desired joint positions published.");
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
-}
-
-void IKSolverNode::publishErrorNorm(const double& error_norm)
-{
-    std_msgs::msg::Float64 error_norm_msg;
-    error_norm_msg.data = error_norm;
-    m_error_norm_pub->publish(error_norm_msg);
-}
-
-void IKSolverNode::publishIterations(const unsigned int& iterations)
-{
-    std_msgs::msg::UInt64 iterations_msg;
-    iterations_msg.data = iterations;
-    m_iterations_pub->publish(iterations_msg);
 }
 
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
-    double best_error = 1e9;
+    bool success = false;
+    
     do {
-        Eigen::VectorXd desired_joint_velocities = m_ik_solver->solveInverseKinematics();
-        Eigen::VectorXd desired_joint_positions = m_ik_solver->integrateJointVelocities();
-        double error = m_ik_solver->getTasksError();
-        if (error < best_error) {
-            m_desired_joint_velocities = desired_joint_velocities;
-            m_desired_joint_positions = desired_joint_positions;
-            best_error = error;
-        }
-        if (best_error <= m_convergence_threshold) {
-            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 10000, "Convergence reached.");
+        m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
+        m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
+        if (m_ik_solver->isPrioritizedTaskConverged()) {
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Convergence reached.");
+            success = true;
             break;
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
-    RCLCPP_INFO_THROTTLE(
-        this->get_logger(), *get_clock(), 2000, "Iteration: %d, Error norm: %f", iteration, best_error);
+    m_has_solution = true;
+    RCLCPP_DEBUG_THROTTLE(
+        this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, m_ik_solver->getTasksError());
 
-    // Publish the error norm and iterations.
-    publishErrorNorm(best_error);
-    publishIterations(iteration);
+    // Publish the IK status.
+    march_shared_msgs::msg::IksStatus iks_status_msg = m_ik_solver->getIKStatus();
+    iks_status_msg.header.stamp = this->now();
+    iks_status_msg.iteration = iteration;
+    iks_status_msg.success = success;
+    iks_status_msg.start_time = start_time;
+    iks_status_msg.end_time = this->now();
+    iks_status_msg.duration = (iks_status_msg.end_time.nanosec - iks_status_msg.start_time.nanosec) * 1e-9;
+    m_iks_status_pub->publish(iks_status_msg);
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
@@ -194,7 +213,7 @@ void IKSolverNode::alphabetizeJointTrajectory(const trajectory_msgs::msg::JointT
 
 void IKSolverNode::configureIKSolverParameters()
 {
-    declare_parameter("state_estimator_time_offset", 0.05);
+    declare_parameter("state_estimator_timer_period", 0.05);
     declare_parameter("joint_trajectory_controller_period", 0.05);
     declare_parameter("convergence_threshold", 0.0005);
     declare_parameter("max_iterations", 10);
@@ -205,8 +224,9 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.limits.positions.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
+    declare_parameter("joint.limits.positions.soft", 0.0);
 
-    m_state_estimator_time_offset = get_parameter("state_estimator_time_offset").as_double();
+    m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
     m_max_iterations = get_parameter("max_iterations").as_int();
     m_joint_names = get_parameter("joint.names").as_string_array();
@@ -221,6 +241,21 @@ void IKSolverNode::configureIKSolverParameters()
     std::vector<double> joint_velocity_limits_upper = get_parameter("joint.limits.velocities.upper").as_double_array();
     std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
+    // Apply soft limits to the joint position limits.
+    RCLCPP_INFO(this->get_logger(), "Aplying soft limits to the joint position limits.");
+    double soft_limit = get_parameter("joint.limits.positions.soft").as_double();
+    if (soft_limit < 0.0) {
+        RCLCPP_WARN(this->get_logger(), "Soft limit must be greater than or equal to zero. Setting to zero.");
+        soft_limit = 0.0;
+    }
+    for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
+        joint_position_limits_upper[i] -= soft_limit;
+        joint_position_limits_lower[i] += soft_limit;
+        RCLCPP_INFO(this->get_logger(), "Joint name: %s, Upper limit: %f, Lower limit: %f",
+            m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
+    }
+
+    // Set the joint positions and velocities limits in the IK solver.
     m_ik_solver->setJointConfigurations(m_joint_names, 
         joint_position_limits_lower, joint_position_limits_upper,
         joint_velocity_limits_lower, joint_velocity_limits_upper);
@@ -259,36 +294,41 @@ void IKSolverNode::configureIKSolverParameters()
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
         RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
+
+    // Initialize world-to-base orientation.
+    m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 }
 
 void IKSolverNode::configureTasksParameters()
 {
-    declare_parameter("task_names", std::vector<std::string>());
-    std::vector<std::string> task_names = get_parameter("task_names").as_string_array();
+    declare_parameter("task.names", std::vector<std::string>());
+    std::vector<std::string> task_names = get_parameter("task.names").as_string_array();
     m_ik_solver->setTaskNames(task_names);
 
+    std::unordered_map<std::string, std::vector<double>> task_gains_p, task_gains_d, task_gains_i;
+    std::unordered_map<std::string, double> task_damp_coeffs;
+    std::unordered_map<std::string, double> task_convergence_thresholds;
+    std::unordered_map<std::string, double> task_weights;
+
     for (const auto& task_name : task_names) {
-        RCLCPP_DEBUG(this->get_logger(), "Task name: %s", task_name.c_str());
-        declare_parameter(task_name + ".reference_frame", "body");
-        declare_parameter(task_name + ".nodes", std::vector<std::string>());
-        declare_parameter(task_name + ".m", 0);
-        declare_parameter(task_name + ".n", 0);
-        declare_parameter(task_name + ".kp", std::vector<double>());
-        declare_parameter(task_name + ".kd", std::vector<double>());
-        declare_parameter(task_name + ".ki", std::vector<double>());
-        declare_parameter(task_name + ".damp_coeff", 0.0);
+        RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
+        declare_parameter("task." + task_name + ".kp", std::vector<double>());
+        declare_parameter("task." + task_name + ".kd", std::vector<double>());
+        declare_parameter("task." + task_name + ".ki", std::vector<double>());
+        declare_parameter("task." + task_name + ".damp_coeff", 0.0);
+        declare_parameter("task." + task_name + ".convergence_threshold", 0.0);
+        declare_parameter("task." + task_name + ".weight", 1.0);
 
-        std::string reference_frame = get_parameter(task_name + ".reference_frame").as_string();
-        std::vector<std::string> nodes = get_parameter(task_name + ".nodes").as_string_array();
-        long unsigned int task_dim = get_parameter(task_name + ".m").as_int();
-        long unsigned int workspace_dim = get_parameter(task_name + ".n").as_int();
-        std::vector<double> kp = get_parameter(task_name + ".kp").as_double_array();
-        std::vector<double> kd = get_parameter(task_name + ".kd").as_double_array();
-        std::vector<double> ki = get_parameter(task_name + ".ki").as_double_array();
-        double damp_coeff = get_parameter(task_name + ".damp_coeff").as_double();
-
-        m_ik_solver->createTask(task_name, reference_frame, nodes, task_dim, workspace_dim, kp, kd, ki, damp_coeff);
+        task_gains_p[task_name] = get_parameter("task." + task_name + ".kp").as_double_array();
+        task_gains_d[task_name] = get_parameter("task." + task_name + ".kd").as_double_array();
+        task_gains_i[task_name] = get_parameter("task." + task_name + ".ki").as_double_array();
+        task_damp_coeffs[task_name] = get_parameter("task." + task_name + ".damp_coeff").as_double();
+        task_convergence_thresholds[task_name] = get_parameter("task." + task_name + ".convergence_threshold").as_double();
+        task_weights[task_name] = get_parameter("task." + task_name + ".weight").as_double();
     }
+
+    m_ik_solver->createTask(task_gains_p, task_gains_d, task_gains_i, task_damp_coeffs, task_convergence_thresholds, task_weights);
+    RCLCPP_INFO(this->get_logger(), "Tasks have been configured.");
 }
 
 void IKSolverNode::configureIKSolutions()
@@ -303,6 +343,7 @@ void IKSolverNode::configureIKSolutions()
 
     m_desired_joint_positions = Eigen::VectorXd::Zero(m_joint_names.size());
     m_desired_joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    m_has_solution = false;
 }
 
 bool IKSolverNode::isWithinTimeWindow(const rclcpp::Time& time_stamp)
@@ -317,8 +358,7 @@ bool IKSolverNode::isWithinMaxIterations(const unsigned int& iterations)
 
 std::vector<double> IKSolverNode::createZeroVector()
 {
-    std::vector<double> zero_vector(m_joint_names.size(), 0.0);
-    return zero_vector;
+    return std::vector<double>(m_joint_names.size(), 0.0);
 }
 
 int main(int argc, char** argv)

@@ -3,8 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__ROBOT_NODE_HPP_
-#define MARCH_STATE_ESTIMATOR__ROBOT_NODE_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_NODE_HPP_
+#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_NODE_HPP_
 
 #include <string>
 #include <unordered_map>
@@ -116,4 +116,4 @@ protected:
     std::vector<GiNaC::ex> m_dynamical_torque_expressions;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__ROBOT_NODE_HPP_
+#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_NODE_HPP_
