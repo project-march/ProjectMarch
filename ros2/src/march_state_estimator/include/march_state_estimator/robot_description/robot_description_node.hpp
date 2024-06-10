@@ -3,8 +3,8 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_NODE_HPP_
-#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_NODE_HPP_
+#ifndef MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_NODE_HPP_
+#define MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_NODE_HPP_
 
 #include <memory>
 #include <string>
@@ -20,7 +20,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 
 class RobotDescriptionNode : public rclcpp::Node {
 public:
@@ -44,4 +44,4 @@ private:
     rclcpp::Service<march_shared_msgs::srv::GetNodeJacobian>::SharedPtr m_service_node_jacobian;
 };
 
-#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION_NODE_HPP_
+#endif // MARCH_STATE_ESTIMATOR__ROBOT_DESCRIPTION__ROBOT_DESCRIPTION_NODE_HPP_

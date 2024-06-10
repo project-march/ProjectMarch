@@ -20,8 +20,10 @@ def generate_launch_description() -> LaunchDescription:
     robot = LaunchConfiguration("robot")
     rviz = LaunchConfiguration("rviz", default="false")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+    ik_test = LaunchConfiguration("ik_test", default="false")
     
     # TODO: Configurable urdf
+    state_estimator_clock_period = 0.05
     urdf_location = os.path.join(
         get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
@@ -147,6 +149,7 @@ def generate_launch_description() -> LaunchDescription:
                 "imu_launch.launch.py",
             )
         ),
+        condition=UnlessCondition(simulation),
     )
     # endregion
 
@@ -160,6 +163,7 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+        condition=UnlessCondition(ik_test),
     )
     #endregion
 
@@ -168,19 +172,23 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
-        launch_arguments=[("simulation", simulation)],
+        launch_arguments=[
+            ("simulation", simulation),
+            ("timestep_in_ms", str(state_estimator_clock_period * 1000)),
+        ],
     )
     # endregion
 
     # region Launch IK Solver
     ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
-    # declare parameters
-    # in ms
-    trajectory_dt = 50
 
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-        launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
+        launch_arguments=[
+            ("robot_description", urdf_location), 
+            ("state_estimator_timer_period", str(state_estimator_clock_period)),
+            ("test", ik_test),
+        ],
     )
     # endregion
 
