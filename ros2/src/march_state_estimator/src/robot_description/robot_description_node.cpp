@@ -3,7 +3,7 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#include "march_state_estimator/robot_description_node.hpp"
+#include "march_state_estimator/robot_description/robot_description_node.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "geometry_msgs/msg/pose.hpp"

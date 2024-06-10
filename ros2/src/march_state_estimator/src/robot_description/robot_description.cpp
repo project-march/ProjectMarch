@@ -3,10 +3,10 @@
  * Author: Alexander James Becoy @alexanderjamesbecoy
  */
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 
-#include "march_state_estimator/robot_mass.hpp"
-#include "march_state_estimator/robot_zmp.hpp"
+#include "march_state_estimator/robot_description/robot_mass.hpp"
+#include "march_state_estimator/robot_description/robot_zmp.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include "boost/range/combine.hpp"
