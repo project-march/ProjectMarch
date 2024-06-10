@@ -74,7 +74,7 @@ private:
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
 
-    exoMode m_mode; 
+    ExoMode m_mode; 
 };
 
 #endif // MARCH_MPC_SOLVER__MPC_SOLVER_NODE_HPP_

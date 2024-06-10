@@ -107,7 +107,7 @@ public:
     }
 
     /**
-     * @brief Updates the member variables based on the input array.E
+     * @brief Updates the member variables based on the input array.
      * @param other The other motor controller state of which all values need to be copied over from.
      */
     inline void update_values(MotorControllerState* other)

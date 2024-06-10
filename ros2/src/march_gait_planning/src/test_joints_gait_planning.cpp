@@ -46,11 +46,11 @@ std::vector<double> TestJointsGaitPlanning::getTrajectory(int& actuated_joint) c
     }
 }
 
-void TestJointsGaitPlanning::setGaitType(const exoMode &new_gait_type){
+void TestJointsGaitPlanning::setGaitType(const ExoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-exoMode TestJointsGaitPlanning::getGaitType() const{
+ExoMode TestJointsGaitPlanning::getGaitType() const{
     return m_gait_type; 
 }
 

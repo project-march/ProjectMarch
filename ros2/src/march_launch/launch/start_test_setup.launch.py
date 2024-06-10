@@ -13,7 +13,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
     test_rotational = LaunchConfiguration("test_rotational", default="true")
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
+    # IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
     
     # region Launch march control
     rotational_launch_file = IncludeLaunchDescription(
@@ -59,18 +59,18 @@ def generate_launch_description() -> LaunchDescription:
     
 
     # region Launch input device
-    input_device = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("IPD_new_terminal", IPD_new_terminal)
-        ],
-    )
+    # input_device = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("march_input_device"),
+    #             "launch",
+    #             "input_device.launch.py",
+    #         )
+    #     ),
+    #     launch_arguments=[
+    #         ("IPD_new_terminal", IPD_new_terminal)
+    #     ],
+    # )
     # endregion
 
     rosbags = LaunchConfiguration("rosbags", default='true')
@@ -145,8 +145,13 @@ def generate_launch_description() -> LaunchDescription:
             name='gain_scheduler',
             parameters=[{'config_path': gainscheduler_config_path}]
         ),
+        Node(
+            package='march_test_joints_gui',
+            executable='test_joints_gui_node',
+            name='test_joints_gui_node',
+        ),
 
-        input_device,
+        # input_device,
         rotational_launch_file,
         linear_launch_file,
         record_rosbags_action,

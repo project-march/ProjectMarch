@@ -28,19 +28,19 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningNode::MPCCallback, this, _1));
 
-    m_gait_planning.setGaitType(exoMode::BootUp); 
+    m_gait_planning.setGaitType(ExoMode::BootUp); 
 
     m_home_stand = {0.19, 0.19, -0.9, 0.19, -0.19, -0.9}; 
     // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
  }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str());
+    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getGaitType())).c_str());
     m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
-    m_gait_planning.setGaitType((exoMode)msg->mode);
+    m_gait_planning.setGaitType((ExoMode)msg->mode);
 
-    if ((exoMode)msg->mode == exoMode::Descending){
+    if ((ExoMode)msg->mode == ExoMode::Descending){
         m_single_execution_done = false; 
     }
 
@@ -178,10 +178,10 @@ void GaitPlanningNode::publishIncrements(){
 }
 
 void GaitPlanningNode::stepClose(){
-    RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<exoMode>(m_gait_planning.getPreviousGaitType())).c_str());
+    RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
-    m_gait_planning.setPreviousGaitType(exoMode::Stand);
+    m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
 
 void GaitPlanningNode::calculateIncrements(){
@@ -203,7 +203,7 @@ void GaitPlanningNode::calculateIncrements(){
         m_home_stand_trajectory.push_back(m_initial_position); 
     }
     RCLCPP_INFO(this->get_logger(), "Calculated incremental steps, length of trajectory: %d", m_home_stand_trajectory.size()); 
-    m_gait_planning.setPreviousGaitType(exoMode::Stand); 
+    m_gait_planning.setPreviousGaitType(ExoMode::Stand); 
 }
 
 void GaitPlanningNode::publishHomeStand(){
@@ -222,16 +222,16 @@ void GaitPlanningNode::processStand(){
         publishIncrements(); 
     } else {
         switch (m_gait_planning.getPreviousGaitType()){
-            case exoMode::LargeWalk :
-            case exoMode::SmallWalk :
-            case exoMode::HighStep1 :
-            case exoMode::HighStep2 :
-            case exoMode::HighStep3 :
-            case exoMode::VariableWalk :
+            case ExoMode::LargeWalk :
+            case ExoMode::SmallWalk :
+            case ExoMode::HighStep1 :
+            case ExoMode::HighStep2 :
+            case ExoMode::HighStep3 :
+            case ExoMode::VariableWalk :
                 stepClose(); 
                 break; 
 
-            case exoMode::BootUp :
+            case ExoMode::BootUp :
                 calculateIncrements(); 
                 break; 
 
@@ -301,20 +301,20 @@ void GaitPlanningNode::publishVariableWalk(){
  
 void GaitPlanningNode::publishFootPositions(){
     switch (m_gait_planning.getGaitType()){
-        case exoMode::Stand :
+        case ExoMode::Stand :
             processStand(); 
             break;
 
-        case exoMode::BootUp :
+        case ExoMode::BootUp :
             RCLCPP_DEBUG(this->get_logger(), "BootUp mode entered, waiting for new mode."); 
             break;
         
-        case exoMode::LargeWalk :
-        case exoMode::SmallWalk :
+        case ExoMode::LargeWalk :
+        case ExoMode::SmallWalk :
             publishWalk(); 
             break;
 
-        case exoMode::VariableStep : 
+        case ExoMode::VariableStep : 
             if (m_current_trajectory.empty()){
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
@@ -328,15 +328,15 @@ void GaitPlanningNode::publishFootPositions(){
             } 
             break;
         
-        case exoMode::HighStep1 :
-        case exoMode::HighStep2 :
-        case exoMode::HighStep3 :
-        case exoMode::Ascending :
-        case exoMode::Descending :
+        case ExoMode::HighStep1 :
+        case ExoMode::HighStep2 :
+        case ExoMode::HighStep3 :
+        case ExoMode::Ascending :
+        case ExoMode::Descending :
             publishHeightGaits(); 
             break;
         
-        case exoMode::VariableWalk :
+        case ExoMode::VariableWalk :
             publishVariableWalk(); 
             break; 
 

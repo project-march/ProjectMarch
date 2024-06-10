@@ -1,39 +1,34 @@
 testsetup:
-  if_name: eno1
+  network_interface_name: enp2s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
     - linear_joint:
         motor_controller:
-          type: odrive
-          actuationMode: torque
           slaveIndex: 1
           axis: 1
-          motorKV: 210
-          useIncrementalEncoder: true
+          useIncrementalEncoderForPosition: false
           absoluteEncoder:
             resolution: 14
-            minPositionIU: 2576
-            maxPositionIU: 4016
-            zeroPositionIU: 3296
+            minPositionIU: 13248
+            maxPositionIU: 14999
+            zeroPositionIU: 14123
             lowerSoftLimitMarginRad: 0.0349066  # Ros warns if it is x away from hard limit.
             upperSoftLimitMarginRad: 0.00349066  # Ros warns if it is x away from hard limit.
             lowerErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
             upperErrorSoftLimitMarginRad: 0.00174533  # Ros stops if it is x away from hard limit.
-            direction: 1
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 183.78 
+            transmission: 183.78
             direction: 1
           torqueSensor:
             maxTorque: 1
             averageTorque: 1
-        pids:
+        gains:
           position:
-            p: 20.0
-            i: 0.0
+            p: 20
+            i: 0
             d: 0.2
           torque:
             p: 0.1
-            i: 0.0
-            d: 0.001
+            d: 0
