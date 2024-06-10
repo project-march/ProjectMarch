@@ -54,7 +54,7 @@ MpcSolverNode::MpcSolverNode()
 }
 
 void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    m_mode = (exoMode)msg->mode; 
+    m_mode = (ExoMode)msg->mode; 
 }
 
 void MpcSolverNode::com_callback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
@@ -139,7 +139,7 @@ void MpcSolverNode::left_foot_ground_callback(std_msgs::msg::Bool::SharedPtr msg
 
 void MpcSolverNode::timer_callback()
 {
-    if (m_mode == exoMode::VariableWalk){ 
+    if (m_mode == ExoMode::VariableWalk){ 
 
         if (!(m_desired_footsteps)) {
             RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input from footstep planner");

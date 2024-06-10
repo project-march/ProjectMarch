@@ -13,8 +13,6 @@
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 
-//#include "march_shared_msgs/msg/robot_state.hpp"
-//#include "march_shared_msgs/msg/point_stamped_list.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "march_shared_msgs/msg/center_of_mass.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
@@ -81,7 +79,7 @@ private:
 
     rclcpp::TimerBase::SharedPtr m_solving_timer;
 
-    exoMode m_mode; 
+    ExoMode m_mode; 
 };
 
 #endif
