@@ -255,8 +255,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             RCLCPP_WARN((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
             // If no weight has been assigned, we start in position control.
-            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight
-                || isnan(jointInfo.position_weight)) {
+            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
             }               

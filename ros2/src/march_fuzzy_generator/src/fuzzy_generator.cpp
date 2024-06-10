@@ -14,7 +14,7 @@ FuzzyGenerator::FuzzyGenerator(std::string system_type)
     } else if (m_system_type == "exo") {
         m_config = YAML::LoadFile(m_package_path + "/config/default_weights.yaml");
     } else {
-        throw std::runtime_error("Invalid system type");
+        RCLCPP_ERROR(rclcpp::get_logger("FuzzyGenerator"), "System type not found."); 
     }
 
     m_torque_ranges = getTorqueRanges();
@@ -44,13 +44,13 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateFoot
     m_upper_bound = m_config["height_bounds"]["upper_bound"].as<double>();
 
     if (both_foot_heights == nullptr) {
-        throw std::runtime_error("No foot height received.");
+        RCLCPP_ERROR(rclcpp::get_logger("FuzzyGenerator"), "Received nullptr foot heights");
     }  
     double left_foot_height = both_foot_heights->heights[m_left_foot_index];
     double right_foot_height = both_foot_heights->heights[m_right_foot_index];
 
     if (left_foot_height < 0 || right_foot_height < 0) {
-        throw std::runtime_error("Negative foot heights received for both feet.");
+        RCLCPP_ERROR(rclcpp::get_logger("FuzzyGenerator"), "Received negative foot height.");
     }
 
     // Set the lowest foot to 0
@@ -70,7 +70,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::getAnkleTorqu
     m_upper_bound = m_config["torque_bounds"]["upper_bound"].as<double>();
 
     if (left_ankle_torque == 0 && right_ankle_torque == 0) {
-        throw std::runtime_error("No ankle torques received.");
+        RCLCPP_ERROR(rclcpp::get_logger("FuzzyGenerator"), "No ankle torques received");
     }
     return calculateVariableWeights(left_ankle_torque, right_ankle_torque);
 }
@@ -95,7 +95,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateVari
         } else if (joint_name.find("right") != std::string::npos) {
             fuzzy_parameter = right_leg_parameter;
         } else {
-            throw std::runtime_error("Joint not found");
+            RCLCPP_WARN(rclcpp::get_logger("FuzzyGenerator"), "Joint name not found.");
         }
 
         // calculate how far the parameter is in the 'fuzzy shifting range'
@@ -154,8 +154,8 @@ void FuzzyGenerator::setConfigPath(const ExoMode &new_gait_type)
         m_config = YAML::LoadFile(m_package_path + "/config/sideways_walk_weights_tsu.yaml");
         m_control_type = "stance_swing_leg";    
     } else {
-        m_config = YAML::LoadFile(m_package_path + "/config/default_weights_tsu.yaml");
-        m_control_type = "constant";
+        RCLCPP_WARN(rclcpp::get_logger("FuzzyGenerator"), "No config found for this gait, using position control");
+        m_control_type = "position";
     }
 
     m_torque_ranges = getTorqueRanges();

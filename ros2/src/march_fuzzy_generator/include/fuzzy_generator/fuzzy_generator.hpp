@@ -18,7 +18,7 @@ class FuzzyGenerator {
         std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FeetHeightStamped::SharedPtr& both_foot_heights);
         std::vector<std::tuple<std::string, float, float>> getAnkleTorques(double left_ankle_torque, double right_ankle_torque); 
         std::vector<std::tuple<std::string, float, float>> returnPositionWeights();      
-        std::string m_control_type = "constant"; // default value
+        std::string m_control_type = "position"; // default value
 
     private:
         std::string m_system_type;
