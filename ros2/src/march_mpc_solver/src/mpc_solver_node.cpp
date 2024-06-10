@@ -61,7 +61,7 @@ void MpcSolverNode::currentComCallback(march_shared_msgs::msg::CenterOfMass::Sha
 
 void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
 {
-    m_mode = (exoMode) msg->mode; 
+    m_mode = (ExoMode) msg->mode; 
 }
 
 void MpcSolverNode::currentStanceFootCallback(std_msgs::msg::Int32::SharedPtr msg)
@@ -117,7 +117,7 @@ void MpcSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateE
 
 void MpcSolverNode::timerCallback()
 {
-    if (m_mode != exoMode::VariableWalk){ 
+    if (m_mode != ExoMode::VariableWalk){ 
         return;
     }
 
