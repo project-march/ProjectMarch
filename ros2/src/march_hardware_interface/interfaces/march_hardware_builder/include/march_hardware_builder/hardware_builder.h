@@ -22,7 +22,6 @@
 #include <march_hardware/motor_controller/motor_controller_type.h>
 #include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/power_distribution_board/power_distribution_board.h>
-#include <march_hardware/temperature/temperature_ges.h>
 #include <march_hardware/torque_sensor/torque_sensor.h>
 #include <march_logger_cpp/base_logger.hpp>
 #include <march_hardware/error/error_type.h>
@@ -60,30 +59,25 @@ public:
      * @param joints_config YAML node that contains a sequence of joint objects
      * @return list of created joints
      */
-    std::vector<march::Joint> createJoints(
-        const YAML::Node& joints_config, const std::vector<std::string>& active_joint_names) const;
+    std::vector<march::Joint> createJoints(const YAML::Node& joints_config, const std::vector<std::string>& active_joint_names) const;
 
-    std::map<std::string, YAML::Node> getMapOfActiveJointConfigs(
-        const YAML::Node& joints_config, std::vector<std::string> active_joint_names) const;
+    std::map<std::string, YAML::Node> getMapOfActiveJointConfigs(const YAML::Node& joints_config, std::vector<std::string> active_joint_names) const;
 
     march::Joint createJoint(const std::string& joint_name, const YAML::Node& joint_config) const;
-    std::unique_ptr<march::MotorController> createMotorController(
-        const march_logger::BaseLogger& parent_joint_name, const YAML::Node& config) const;
-    std::unique_ptr<march::ODrive> createODrive(
-        const march_logger::BaseLogger& logger, const YAML::Node& odrive_config, march::ActuationMode mode) const;
 
-    static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(
-        const YAML::Node& absolute_encoder_config, const march::MotorControllerType motor_controller_type);
-    static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
-        const YAML::Node& incremental_encoder_config, const march::MotorControllerType motor_controller_type);
+    std::unique_ptr<march::MotorController> createMotorController(const march_logger::BaseLogger& parent_joint_name, const YAML::Node& config) const;
+
+    std::unique_ptr<march::ODrive> createODrive(const march_logger::BaseLogger& logger, const YAML::Node& odrive_config, march::ActuationMode mode) const;
+
+    static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config, const march::MotorControllerType motor_controller_type);
+
+    static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(const YAML::Node& incremental_encoder_config, const march::MotorControllerType motor_controller_type);
+    
     static march::Encoder::Direction getEncoderDirection(const YAML::Node& encoder_config);
 
-    static std::unique_ptr<march::TorqueSensor> createTorqueSensor(
-        const YAML::Node& torque_sensor_config, const march::MotorControllerType motor_controller_type);
+    static std::unique_ptr<march::TorqueSensor> createTorqueSensor(const YAML::Node& torque_sensor_config, const march::MotorControllerType motor_controller_type);
 
-    std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config) const;
-    std::optional<march::PowerDistributionBoard> createPowerDistributionBoard(
-        const YAML::Node& power_distribution_config) const;
+    std::optional<march::PowerDistributionBoard> createPowerDistributionBoard(const YAML::Node& power_distribution_config) const;
 
     /**
      * @brief Loops over all keys in the keyList and check if they exist in the
@@ -106,23 +100,16 @@ public:
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> TORQUE_SENSOR_REQUIRED_KEYS;
     static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
-    static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
     static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
     static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
 
 private:
     YAML::Node robot_config_;
-    std::string if_name_;
+    std::string network_interface_name_;
     std::shared_ptr<march_logger::BaseLogger> logger_;
     const march::PdoInterfacePtr pdo_interface_;
     const march::SdoInterfacePtr sdo_interface_;
 };
-
-/**
- * Converts the input filestream object to a stringstream object so that is
- * easier to test for in IMotionCUbe.cpp
- */
-std::string convertSWFileToString(std::ifstream& sw_file);
 
 #endif // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

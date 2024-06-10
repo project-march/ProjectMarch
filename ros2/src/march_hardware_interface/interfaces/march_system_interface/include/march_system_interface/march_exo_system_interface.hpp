@@ -46,7 +46,7 @@ struct JointLimit {
     std::chrono::time_point<std::chrono::steady_clock> last_time_not_in_soft_error_limit;
     std::chrono::milliseconds msec_until_error_when_in_error_soft_limits;
     int soft_error_limit_warning_throttle_msec;
-    double max_effort_differance;
+    double max_effort_differance; // Outdated?
     bool stop_when_outside_hard_limits;
 };
 /// Contains all the needed information for the Hardware Interface for a Joint.
@@ -95,14 +95,14 @@ public:
     /**
      * Sets the PID values for a joint.
      * @param joint_name The name of the joint.
-     * @param new_position_pid The new PID values.
+     * @param new_position_gains The new PID values.
      */
-    void setPidValues(std::string joint_name, const std::array<double, 3>& new_position_pid)
+    void setPidValues(std::string joint_name, const std::array<double, 3>& new_position_gains)
     {
         bool jointFound = false;
         for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
             if (jointInfo.name == joint_name) {
-                jointInfo.joint.setPositionPIDValues(new_position_pid);
+                jointInfo.joint.setPositionPIDValues(new_position_gains);
                 jointFound = true;
 
                 // Call sendPID() after new PID values are set
@@ -306,7 +306,7 @@ private:
     rclcpp::executors::SingleThreadedExecutor executor_; // Executor needed to subscriber
     void pdb_read();
     bool is_joint_in_valid_state(JointInfo& jointInfo);
-    bool is_joint_in_limit(JointInfo& jointInfo);
+    bool is_joint_outside_limits(JointInfo& jointInfo);
     JointInfo build_joint_info(const hardware_interface::ComponentInfo& joint);
 
     std::unique_ptr<march::MarchRobot> load_march_hardware(const hardware_interface::HardwareInfo& info) const;

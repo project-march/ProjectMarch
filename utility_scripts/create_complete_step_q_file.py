@@ -24,12 +24,12 @@ def stand_to_sit():
     lhaa = np.linspace(-0.03, -0.03, time_points)
     lhfe = np.linspace(0.136, 1.5, time_points)
     lkfe = np.linspace(0.385, 1.2, time_points)
-    ladpf = np.linspace(0.162, -0.5, time_points)
+    ladpf = np.linspace(0.162, 0.162, time_points)
 
     rhaa = np.linspace(-0.013, -0.013, time_points)
     rhfe = np.linspace(0.176, 1.5, time_points)
     rkfe = np.linspace(0.468, 1.2, time_points)
-    radpf = np.linspace(0.162, -0.5, time_points)
+    radpf = np.linspace(0.162, 0.162, time_points)
 
     # joint_angles_dataset = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
@@ -47,12 +47,12 @@ def sit_to_stand():
     lhaa = np.linspace(-0.03, -0.03, time_points)
     lhfe = np.linspace(1.5, 0.136, time_points)
     lkfe = np.linspace(1.2, 0.385, time_points)
-    ladpf = np.linspace(-0.5, 0.162, time_points)
+    ladpf = np.linspace(0.162, 0.162, time_points)
 
     rhaa = np.linspace(-0.013, -0.013, time_points)
     rhfe = np.linspace(1.5, 0.176, time_points)
     rkfe = np.linspace(1.2, 0.468, time_points)
-    radpf = np.linspace(-0.5, 0.162, time_points)
+    radpf = np.linspace(0.162, 0.162, time_points)
 
     # sit_to_stand = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
@@ -144,8 +144,8 @@ def remap_iks_translated_joint_angle_gaits(old_name, new_name):
 
     
 # hinge_gait()
-# stand_to_sit()
-# sit_to_stand()
+stand_to_sit()
+sit_to_stand()
 # sideways()
 # remap_iks_translated_joint_angle_gaits('cartesian_in_joint_angle_first_step_updated', 'cartesian_in_joint_angle_first_step')
 # remap_iks_translated_joint_angle_gaits('cartesian_in_joint_angle_step_close_updated', 'cartesian_in_joint_angle_step_close')

@@ -24,8 +24,8 @@ for inner_list in data:
     for mode in inner_list:
         all_modes.append(mode)
 
-# Sort the list by the 'exoMode' value
-all_modes.sort(key=lambda mode: mode['exoMode'])
+# Sort the list by the 'ExoMode' value
+all_modes.sort(key=lambda mode: mode['ExoMode'])
 
 output_dir = os.path.join(script_dir, '../msg')
 print(output_dir)
@@ -37,5 +37,5 @@ with open(os.path.join(output_dir, 'ExoMode.msg'), 'w') as f:
     f.write("# Constant types of modes\n")
     for mode in all_modes:
         name = mode['name']
-        value = mode['exoMode']
+        value = mode['ExoMode']
         f.write(f'int8 {name.upper()} = {value}\n')
