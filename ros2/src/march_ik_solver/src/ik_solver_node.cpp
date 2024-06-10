@@ -78,7 +78,7 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
     desired_stability << 0.17, 0.0;
-    desired_tasks["stability"] = m_current_world_to_base_orientation.toRotationMatrix().transpose() * desired_stability;
+    desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
     desired_tasks["posture"] = desired_posture;
@@ -102,7 +102,7 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
     }
 
     m_current_world_to_base_orientation = Eigen::Quaterniond(
-        msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z);
+        msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
 
     // Publish the desired joint positions if there is a solution in the previous cycle.
     if (m_has_solution) {
@@ -296,7 +296,7 @@ void IKSolverNode::configureIKSolverParameters()
     }
 
     // Initialize world-to-base orientation.
-    m_current_world_to_base_orientation = Eigen::Quaterniond(1.0, 0.0, 0.0, 0.0);
+    m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 }
 
 void IKSolverNode::configureTasksParameters()

@@ -58,7 +58,7 @@ private:
     std::vector<double> m_actual_joint_velocities;
     Eigen::VectorXd m_desired_joint_positions;
     Eigen::VectorXd m_desired_joint_velocities;
-    Eigen::Quaterniond m_current_world_to_base_orientation;
+    Eigen::Matrix3d m_current_world_to_base_orientation;
     trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
 
     // ROS2 communication
