@@ -26,6 +26,14 @@ IKSolverNode::IKSolverNode()
     m_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_subscription_options.callback_group = m_callback_group;
 
+    rclcpp::QoS qos(100);
+    auto rmw_qos_profile = qos.get_rmw_qos_profile();
+
+    m_desired_foot_positions_sub.subscribe(this, "ik_solver/buffer/input", rmw_qos_profile);
+    m_desired_com_pose_sub.subscribe(this, "mpc_solver/buffer/output", rmw_qos_profile);
+    m_ik_sync_sub.reset(new message_filters::Synchronizer<IKSynchronizer>(IKSynchronizer(10), m_desired_foot_positions_sub, m_desired_com_pose_sub));
+    m_ik_sync_sub->registerCallback(&IKSolverNode::iksSyncCallback, this);
+
     // Create the subscriptions and publishers.
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
         "ik_solver/command", rclcpp::SensorDataQoS(),
@@ -47,6 +55,14 @@ IKSolverNode::IKSolverNode()
 IKSolverNode::~IKSolverNode()
 {
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
+}
+
+void IKSolverNode::iksSyncCallback(
+    const march_shared_msgs::msg::IksFootPositions::SharedPtr foot_positions_msg,
+    const geometry_msgs::msg::PoseStamped::SharedPtr com_pose_msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "IKSolver sync callback received.");
+    // iksFootPositionsCallback(foot_positions_msg);
 }
 
 void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
