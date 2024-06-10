@@ -6,7 +6,7 @@
 #include "march_mpc_solver/mpc_solver.hpp"
 #include <iostream>
 
-#define DEBUG
+// #define DEBUG
 
 MpcSolver::MpcSolver()
     : m_time_horizon(2.0)
@@ -476,6 +476,12 @@ inline int MpcSolver::solve_zmp_mpc(
         ocp_nlp_get(nlp_config, nlp_solver, "time_tot", &elapsed_time);
         min_time = MIN(elapsed_time, min_time);
     }
+
+    /* print solution and statistics */
+    for (int ii = 0; ii <= nlp_dims->N; ii++)
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
+    for (int ii = 0; ii < nlp_dims->N; ii++)
+        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
     // #ifdef DEBUG
     // /* print solution and statistics */
