@@ -477,29 +477,29 @@ inline int MpcSolver::solve_zmp_mpc(
         min_time = MIN(elapsed_time, min_time);
     }
 
-    #ifdef DEBUG
-    /* print solution and statistics */
-    for (int ii = 0; ii <= nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
-    for (int ii = 0; ii < nlp_dims->N; ii++)
-        ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
+    // #ifdef DEBUG
+    // /* print solution and statistics */
+    // for (int ii = 0; ii <= nlp_dims->N; ii++)
+    //     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "x", &xtraj[ii * NX]);
+    // for (int ii = 0; ii < nlp_dims->N; ii++)
+    //     ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii * NU]);
 
-    std::cout << "--- xtraj ---" << std::endl;
-    d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
+    // std::cout << "--- xtraj ---" << std::endl;
+    // d_print_exp_tran_mat(NX, N + 1, xtraj, NX);
 
-    std::cout << "--- utraj ---" << std::endl;
-    d_print_exp_tran_mat(NU, N, utraj, NU);
+    // std::cout << "--- utraj ---" << std::endl;
+    // d_print_exp_tran_mat(NU, N, utraj, NU);
 
-    ocp_nlp_out_print(nlp_solver->dims, nlp_out);
+    // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
 
-    std::cout << "The current state is " << std::endl;
-    for (long unsigned int i = 0; i < NX; i++) {
-        //printf(" %f", xtraj[i]);
-        std::cout << xtraj[i] << " ";
-    }
+    // std::cout << "The current state is " << std::endl;
+    // for (long unsigned int i = 0; i < NX; i++) {
+    //     //printf(" %f", xtraj[i]);
+    //     std::cout << xtraj[i] << " ";
+    // }
 
-    std::cout << "Solved ocp " << NTIMINGS << " times, solution printed above" << std::endl;
-    #endif
+    // std::cout << "Solved ocp " << NTIMINGS << " times, solution printed above" << std::endl;
+    // #endif
 
     if (status == ACADOS_SUCCESS) {
         #ifdef DEBUG
