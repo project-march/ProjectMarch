@@ -14,13 +14,11 @@ def generate_launch_description():
     arg = SetEnvironmentVariable("RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED", "1")
     ld.add_action(arg)
 
-    default_config = os.path.join(get_package_share_directory("march_fuzzy_generator"), "config", "default_weights.yaml")
-
     # parameters
-    config_path = LaunchConfiguration("config_path", default=default_config)
+    system_type = LaunchConfiguration("system_type", default="tsu")
 
     fuzzy_generator_node = Node(
-        package="march_fuzzy_generator", executable="fuzzy_generator_node", name="fuzzy_generator", parameters=[{"config_path": config_path}]
+        package="march_fuzzy_generator", executable="fuzzy_generator_node", name="fuzzy_generator", parameters=[{"system_type": system_type}],
     )
     ld.add_action(fuzzy_generator_node)
 

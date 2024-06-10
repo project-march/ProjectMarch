@@ -1,10 +1,22 @@
 #include "fuzzy_generator/fuzzy_generator.hpp"
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 
 FuzzyGenerator::FuzzyGenerator(){}
 
-FuzzyGenerator::FuzzyGenerator(std::string config_path)
+FuzzyGenerator::FuzzyGenerator(std::string system_type)
 {
-    m_config = YAML::LoadFile(config_path);
+    m_package_path = ament_index_cpp::get_package_share_directory("march_fuzzy_generator");
+    m_system_type = system_type;
+
+    if (m_system_type == "tsu") {
+        m_config = YAML::LoadFile(m_package_path + "/config/default_weights_tsu.yaml");
+    } else if (m_system_type == "exo") {
+        m_config = YAML::LoadFile(m_package_path + "/config/default_weights.yaml");
+    } else {
+        throw std::runtime_error("Invalid system type");
+    }
+
     m_torque_ranges = getTorqueRanges();
 }
 
@@ -136,13 +148,13 @@ void FuzzyGenerator::setConfigPath(const ExoMode &new_gait_type)
     m_gait_type = new_gait_type;
 
     if (new_gait_type == static_cast<ExoMode>(m_walk_index)) {
-        m_config = YAML::LoadFile("~/src/march_fuzzy_generator/config/walk_weights_tsu.yaml");  
+        m_config = YAML::LoadFile(m_package_path + "/config/walk_weights_tsu.yaml");  
         m_control_type = "position";
     } else if (new_gait_type == static_cast<ExoMode>(m_sideways_walk_index)) {
-        m_config = YAML::LoadFile("~/src/march_fuzzy_generator/config/sideways_walk_weights_tsu.yaml");
+        m_config = YAML::LoadFile(m_package_path + "/config/sideways_walk_weights_tsu.yaml");
         m_control_type = "stance_swing_leg";    
     } else {
-        m_config = YAML::LoadFile("~/src/march_fuzzy_generator/config/default_weights_tsu.yaml");
+        m_config = YAML::LoadFile(m_package_path + "/config/default_weights_tsu.yaml");
         m_control_type = "constant";
     }
 

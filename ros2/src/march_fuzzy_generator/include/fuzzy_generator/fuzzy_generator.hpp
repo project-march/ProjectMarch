@@ -12,15 +12,17 @@
 class FuzzyGenerator {
     public:
         FuzzyGenerator();
-        FuzzyGenerator(std::string config_path);
+        FuzzyGenerator(std::string system_type);
         void setConfigPath(const ExoMode &new_gait_type);
         std::vector<std::tuple<std::string, float, float>> getConstantWeights();
         std::vector<std::tuple<std::string, float, float>> calculateFootHeightWeights(const march_shared_msgs::msg::FeetHeightStamped::SharedPtr& both_foot_heights);
         std::vector<std::tuple<std::string, float, float>> getAnkleTorques(double left_ankle_torque, double right_ankle_torque); 
         std::vector<std::tuple<std::string, float, float>> returnPositionWeights();      
-        std::string m_control_type = "position"; // default value
+        std::string m_control_type = "constant"; // default value
 
     private:
+        std::string m_system_type;
+        std::string m_package_path;
         YAML::Node m_config;
         double m_lower_bound;
         double m_upper_bound;

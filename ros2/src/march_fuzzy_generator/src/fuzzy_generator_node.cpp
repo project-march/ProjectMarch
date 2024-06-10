@@ -5,9 +5,10 @@ using std::placeholders::_1;
 FuzzyGeneratorNode::FuzzyGeneratorNode()
     : Node("fuzzy_generator_node")
 {
-    declare_parameter("config_path", std::string("~/src/march_fuzzy_generator/config/default_weights.yaml"));
-    std::string config_path = this->get_parameter("config_path").as_string();
-    m_fuzzy_generator = FuzzyGenerator(config_path);
+    declare_parameter("system_type", std::string("tsu"));
+    std::string system_type = this->get_parameter("system_type").as_string();
+
+    m_fuzzy_generator = FuzzyGenerator(system_type);
 
     m_foot_height_subscription = this->create_subscription<march_shared_msgs::msg::FeetHeightStamped>(
         "robot_foot_heights", 10, std::bind(&FuzzyGeneratorNode::footHeightsCallback, this, _1));

@@ -8,6 +8,7 @@
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
 
+
 class FuzzyGeneratorNode : public rclcpp::Node {
     public:
         FuzzyGeneratorNode();
@@ -33,6 +34,5 @@ class FuzzyGeneratorNode : public rclcpp::Node {
         void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
         void measuredTorqueCallback(const march_shared_msgs::msg::JointMotorControllerState::SharedPtr msg);
         void publishFuzzyWeights();
-
 };
 #endif // MARCH_FUZZY_NODE_HPP
