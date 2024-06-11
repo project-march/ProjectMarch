@@ -13,7 +13,11 @@
 MarchMpcBufferNode::MarchMpcBufferNode() : Node("march_mpc_buffer_node") {
     m_footsteps_sub = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "final_feet_position", 10, std::bind(&MarchMpcBufferNode::footstepsCallback, this, std::placeholders::_1));
+    m_com_trajectory_sub = this->create_subscription<geometry_msgs::msg::PoseArray>(
+        "com_trajectory", 10, std::bind(&MarchMpcBufferNode::comTrajectoryCallback, this, std::placeholders::_1));
+
     m_footsteps_buffer_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10);
+    m_com_buffer_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("mpc_solver/buffer/com_output", 10);
 
     m_tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
     m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
@@ -28,7 +32,7 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
     for (auto& pose : msg->poses) {
         geometry_msgs::msg::TransformStamped transform;
         try {
-            transform = m_tf_buffer->lookupTransform("backpack", "R_heel", tf2::TimePointZero, tf2::durationFromSec(0.1));
+            transform = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero, tf2::durationFromSec(0.1));
         } catch (tf2::TransformException& ex) {
             RCLCPP_ERROR(this->get_logger(), "Transform error: %s", ex.what());
             return;
@@ -52,6 +56,38 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
     }
 
     m_footsteps_buffer_pub->publish(transformed_footsteps);
+}
+
+void MarchMpcBufferNode::comTrajectoryCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
+    // Transform the first COM pose from the right foot frame to the backpack frame.
+    geometry_msgs::msg::Pose transformed_com_pose;
+
+    geometry_msgs::msg::TransformStamped transform;
+    try {
+        transform = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero, tf2::durationFromSec(0.1));
+    } catch (tf2::TransformException& ex) {
+        RCLCPP_ERROR(this->get_logger(), "Transform error: %s", ex.what());
+        return;
+    }
+
+    tf2::Transform tf_right_foot_to_backpack;
+    tf2::fromMsg(transform.transform, tf_right_foot_to_backpack);
+
+    tf2::Transform tf_right_foot;
+    tf2::fromMsg(msg->poses[0], tf_right_foot);
+
+    tf2::Transform tf_backpack = tf_right_foot_to_backpack * tf_right_foot;
+
+    tf2::toMsg(tf_backpack, transformed_com_pose);
+
+    // Remove the orientation of the backpack frame.
+    transformed_com_pose.orientation = tf2::toMsg(tf2::Quaternion(0, 0, 0, 1));
+
+    geometry_msgs::msg::PoseStamped transformed_com_pose_stamped;
+    transformed_com_pose_stamped.header = msg->header;
+    transformed_com_pose_stamped.pose = transformed_com_pose;
+
+    m_com_buffer_pub->publish(transformed_com_pose_stamped);
 }
 
 int main(int argc, char** argv) {

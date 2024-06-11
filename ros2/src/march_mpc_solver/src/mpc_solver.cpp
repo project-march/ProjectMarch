@@ -1,6 +1,8 @@
 /*
  * Project MARCH IX, 2023-2024
- * Author: Alexander James Becoy @alexanderjamesbecoy
+ * Author: 
+ *  - Alexander James Becoy @alexanderjamesbecoy
+ *  - Pleuntje Brons @pleuntjebrons
  */
 
 #include "march_mpc_solver/mpc_solver.hpp"

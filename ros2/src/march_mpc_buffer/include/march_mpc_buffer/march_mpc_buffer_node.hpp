@@ -8,6 +8,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "tf2_ros/transform_listener.h"
 
 class MarchMpcBufferNode : public rclcpp::Node {
@@ -17,9 +18,13 @@ public:
 
 private:
     void footstepsCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg);
+    void comTrajectoryCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg);
 
     rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_footsteps_sub;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_sub;
+
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_footsteps_buffer_pub;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr m_com_buffer_pub;
 
     std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;

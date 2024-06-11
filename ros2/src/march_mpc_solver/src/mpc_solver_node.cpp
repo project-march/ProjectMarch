@@ -1,6 +1,8 @@
 /*
  * Project MARCH IX, 2023-2024
- * Author: Alexander James Becoy @alexanderjamesbecoy
+ * Author: 
+ *  - Alexander James Becoy @alexanderjamesbecoy
+ *  - Pleuntje Brons @pleuntjebrons
  */
 
 #include "march_mpc_solver/mpc_solver_node.hpp"
@@ -42,7 +44,7 @@ MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
         "state_estimation/state", 10, std::bind(&MpcSolverNode::stateEstimationCallback, this, std::placeholders::_1));
     geometry_msgs::msg::Pose prev_foot_pose_container;
 
-    m_prev_foot_msg.header.frame_id = "R_heel";
+    m_prev_foot_msg.header.frame_id = "R_sole";
     prev_foot_pose_container.position.x = 0.0;
     prev_foot_pose_container.position.y = 0.0;
     prev_foot_pose_container.position.z = 0.0;
@@ -149,37 +151,37 @@ void MpcSolverNode::visualizeTrajectory()
 {
     auto com_msg = geometry_msgs::msg::PoseArray();
     com_msg.header.stamp = this->get_clock()->now();
-    com_msg.header.frame_id = "R_heel";
+    com_msg.header.frame_id = "R_sole";
 
     auto foot_msg = geometry_msgs::msg::PoseArray();
     foot_msg.header.stamp = this->get_clock()->now();
-    foot_msg.header.frame_id = "R_heel";
+    foot_msg.header.frame_id = "R_sole";
 
     geometry_msgs::msg::Pose pose_container;
 
     visualization_msgs::msg::Marker current_footsteps_marker;
     current_footsteps_marker.type = 8;
-    current_footsteps_marker.header.frame_id = "R_heel";
+    current_footsteps_marker.header.frame_id = "R_sole";
     current_footsteps_marker.id = 0;
 
     visualization_msgs::msg::Marker previous_footsteps_marker;
     previous_footsteps_marker.type = 8;
-    previous_footsteps_marker.header.frame_id = "R_heel";
+    previous_footsteps_marker.header.frame_id = "R_sole";
     previous_footsteps_marker.id = 1;
 
     geometry_msgs::msg::Point marker_container;
 
     nav_msgs::msg::Path com_path;
-    com_path.header.frame_id = "R_heel";
+    com_path.header.frame_id = "R_sole";
 
     nav_msgs::msg::Path zmp_path;
-    zmp_path.header.frame_id = "R_heel";
+    zmp_path.header.frame_id = "R_sole";
 
     geometry_msgs::msg::PoseStamped com_path_wrapper;
-    com_path_wrapper.header.frame_id = "R_heel";
+    com_path_wrapper.header.frame_id = "R_sole";
 
     geometry_msgs::msg::PoseStamped zmp_path_wrapper;
-    zmp_path_wrapper.header.frame_id = "R_heel";
+    zmp_path_wrapper.header.frame_id = "R_sole";
 
     const std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_mpc_solver->get_state_trajectory();
 
