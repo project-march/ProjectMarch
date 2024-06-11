@@ -38,6 +38,7 @@ private:
 
     // Process various types of gaits 
     void processHomeStandGait();
+    void processBootUpToStandGait();
     void finishGaitBeforeStand(); 
     void processMovingGaits(const int &counter);     
     
