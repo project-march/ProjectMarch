@@ -136,6 +136,7 @@ class Joint:
 
     def update_actual_pos(self, pos: float) -> None:
         self.actual_position_widget.setValue(pos)
+        self.actual_position = pos
 
     def update_desired_pos(self, pos: float) -> None:
         self.desired_position_widget.setValue(pos)
@@ -215,6 +216,7 @@ class Window(QMainWindow):
         for joint in self.joints:
             joint.set_disable_run_button_callback(self.disable_run_button)
             self.joint_layout.addLayout(joint.create_layout())
+        self.joint_layout.addStretch()
 
         # Create layout for menu
         menu_layout = QHBoxLayout()

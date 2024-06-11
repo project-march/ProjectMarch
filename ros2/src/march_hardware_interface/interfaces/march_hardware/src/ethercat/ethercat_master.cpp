@@ -207,6 +207,23 @@ void EthercatMaster::ethercatLoop()
     }
 }
 
+bool EthercatMaster::isCheckSumValid(uint16_t slave)
+{
+    uint32_t checkSumValue = 0;
+    // NOTE: If the PDO mapping is changed, the "124" must be changed to the new length of the PDO MISO
+    for (int byte_offset = 0; byte_offset < 124; byte_offset++) {
+        checkSumValue += pdo_interface_.read8(slave, byte_offset).ui;
+    }
+    checkSumValue = checkSumValue % 4294967296;
+
+    uint32_t receivedCheckSum = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    if (receivedCheckSum != checkSumValue) {
+        logger_->warn(logger_->fstring("Slave %d: Checksum value is not correct. Received checksum: %d, calculated checksum: %d", slave, receivedCheckSum, checkSumValue));
+        return false;
+    }
+    return true;
+}
+
 bool EthercatMaster::sendReceivePdo()
 {
     if (this->latest_lost_slave_ == -1) {
@@ -217,6 +234,12 @@ bool EthercatMaster::sendReceivePdo()
             logger_->warn(logger_->fstring(
                 "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_));
             return false;
+        }
+        // loop over max_slave_index_ to check for each slave if checksum is correct
+        for (int slave = 1; slave <= max_slave_index_; slave++) {
+            if (!this->isCheckSumValid(slave)) {
+                return false;
+            }
         }
         return true;
     }

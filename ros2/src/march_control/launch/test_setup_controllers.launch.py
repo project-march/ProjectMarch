@@ -19,19 +19,37 @@ from march_utility.utilities.build_tool_functions import get_control_file_loc
 
 def generate_launch_description():
     """Launch file to start up the controllers, controller_manager, hardware_interface and simulation."""
-    control_type = LaunchConfiguration("control_type")
-    test_rotational = LaunchConfiguration("test_rotational")
-    # region Launch Controller manager, Extra configuration if simulation is `false`
-
-    control_yaml = LaunchConfiguration("control_yaml")
-
-    print("CHECK THIS ASSHOLE: {}".format(test_rotational))
-
-    control_xacro = "test_rotational_control.xacro" if (test_rotational == "true") else "test_linear_control.xacro"
     
-    print("CHECK THIS ASSSHOLE PART 2 {}".format(control_xacro))
+    control_type = LaunchConfiguration("control_type")
+    control_yaml = LaunchConfiguration("control_yaml")
+    test_rotational = LaunchConfiguration("test_rotational", default="false")
+    test_linear = LaunchConfiguration("test_linear", default="false")
+    control_xacro = LaunchConfiguration("control_xacro")
+  
 
     declared_arguments = [
+        DeclareLaunchArgument(
+            name="control_xacro",
+            default_value="ros2_control_test_setup.xacro",
+            description="The xacro file that is used to load the control.",
+            condition=IfCondition(PythonExpression(["'", test_rotational, "' == 'true' and ", "'", test_linear, "' == 'true'"])),
+        ),
+        
+        DeclareLaunchArgument(
+            name="control_xacro",
+            default_value="ros2_control_test_linear.xacro",
+            description="The xacro file that is used to load the control.",
+            condition=IfCondition(PythonExpression(["'", test_rotational, "' == 'false' and ", "'", test_linear, "' == 'true'"])),
+        ),
+        
+        DeclareLaunchArgument(
+            name="control_xacro",
+            default_value="ros2_control_test_rotational.xacro",
+            description="The xacro file that is used to load the control.",
+            condition=IfCondition(PythonExpression(["'", test_rotational, "' == 'true' and ", "'", test_linear, "' == 'false'"])),
+        ),
+        
+        
         DeclareLaunchArgument(
             name="simulation",
             default_value="false",
@@ -53,18 +71,11 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name="control_yaml",
-            default_value="effort_control/test_joint_rotational_control.yaml",
+            default_value="effort_control/march9_test_setup_control.yaml",
             description="The controller yaml file to use loaded in through the controller manager "
             "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-            condition=IfCondition(test_rotational),
         ),
-        DeclareLaunchArgument(
-            name="control_yaml",
-            default_value="effort_control/test_joint_linear_control.yaml",
-            description="The controller yaml file to use loaded in through the controller manager "
-            "(not used if gazebo control is used). Must be in: `march_control/config/`.",
-            condition=UnlessCondition(test_rotational),
-        ),
+        
         # endregion
     ]
 
@@ -74,13 +85,6 @@ def generate_launch_description():
         executable="spawner.py",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
-
-    joint_trajectory_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
-    )
-    # endregion
 
     # region Start broadcasters
     motor_controller_state_broadcaster_spawner = Node(
@@ -94,16 +98,23 @@ def generate_launch_description():
             "/controller_manager",
         ],
     )
+        
+    joint_position_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
+    
+    )
 
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
-        joint_trajectory_controller_spawner,
         motor_controller_state_broadcaster_spawner,
+        joint_position_controller_spawner,
     ]
 
-    robot_desc_xacro = Command(
+    robot_desc_dict = {"robot_description": Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
@@ -111,8 +122,7 @@ def generate_launch_description():
             " type:=",
             control_type,
         ]
-    )
-    robot_desc_dict = {"robot_description": robot_desc_xacro}
+    )}
 
     # This node couples the HW interface with control.
     control_node_exo = Node(

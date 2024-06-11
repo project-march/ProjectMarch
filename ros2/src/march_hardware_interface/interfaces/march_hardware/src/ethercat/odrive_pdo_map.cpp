@@ -49,6 +49,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none = { 
     { ODriveObjectName::AIEAbsolutePosition, ODriveObject(/*offset=*/120, /*length=*/32) },
+    { ODriveObjectName::CheckSum, ODriveObject(/*offset=*/124, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
