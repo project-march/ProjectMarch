@@ -47,7 +47,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
         logger_->info("Initializing the encoder index search.");    
 
-        return std::chrono::seconds {20};
+        return std::chrono::seconds {10};
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -200,8 +200,8 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
-    // TODO: create hasAIEAbsoluteEncoder() method
     state->AIE_absolute_position_ = getAIEAbsolutePositionRad();
+    state->check_sum_ = getCheckSum();
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
@@ -218,14 +218,21 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
 float ODrive::getMotorTemperature()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).f;
+    float motor_temp = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).f;
+    float motor_temp_check = 100;
+    if (motor_temp > motor_temp_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getMotorTemperature"), "Motor temperature is %f, the MotorTemperature object's bits are probably scrambled like some tasty eggs.", motor_temp);
+    }
+    return motor_temp;
 }
 
+// TODO: get rid of this object.
 float ODrive::getOdriveTemperature()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveTemperature, axis_)).f;
 }
 
+// TODO: create check for faulty states
 ODriveAxisState ODrive::getAxisState()
 {
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
@@ -233,20 +240,25 @@ ODriveAxisState ODrive::getAxisState()
 
 uint32_t ODrive::getAbsolutePositionIU()
 {
-    uint32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
-    if (iu_value == 0) {
-        // Sleep for 50ms to give the MDrive time to update the encoder value
-        rclcpp::sleep_for(std::chrono::milliseconds(50)); 
-        iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
-        if (iu_value == 0){
+    uint32_t abs_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
+    if (abs_pos_iu == 0) {
+        rclcpp::sleep_for(std::chrono::milliseconds(50)); // Sleep for 50ms to give the MDrive time to update the encoder value
+        abs_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
+        if (abs_pos_iu == 0){
             logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
         }
     }
+
+    uint32_t abs_pos_check = 1048576; // Better would be to differentiate between the different joints but this is a good start
+    if (abs_pos_iu > abs_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getAbsolutePositionIU"), "Absolute encoder value is %u, the AbsolutePosition object's bits are probably scrambled like some tasty eggs.", abs_pos_iu);
+    }
+
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:
-            return iu_value;
+            return abs_pos_iu;
         case Encoder::Direction::Negative:
-            return this->absolute_encoder_->getTotalPositions() - iu_value;
+            return this->absolute_encoder_->getTotalPositions() - abs_pos_iu;
         default:
             throw error::HardwareException(error::ErrorType::INVALID_ENCODER_DIRECTION);
     }
@@ -254,8 +266,12 @@ uint32_t ODrive::getAbsolutePositionIU()
 
 int32_t ODrive::getIncrementalPositionIU()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ShadowCount, axis_)).i
-        * incremental_encoder_->getDirection();
+    int32_t inc_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ShadowCount, axis_)).i;
+    int32_t inc_pos_check = 1e6;
+    if (abs(inc_pos_iu) > inc_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getIncrementalPositionIU"), "Incremental encoder value is %d, the ShadowCount object's bits are probably scrambled like some tasty eggs.", inc_pos_iu);
+    }
+    return inc_pos_iu*incremental_encoder_->getDirection();
 }
 
 float ODrive::getIncrementalVelocityIU()
@@ -267,11 +283,21 @@ float ODrive::getIncrementalVelocityIU()
 float ODrive::getAIEAbsolutePositionRad()
 {
     uint32_t aie_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
-#ifdef DEBUG_MODE
-    int8_t offset = ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None);
-    RCLCPP_WARN(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition: %u, at offset %d", aie_pos_iu,offset);
-#endif
+    uint32_t aie_pos_check = 16384;
+    if (aie_pos_iu > aie_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %u, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos_iu);
+    }
     return (float)this->getAbsoluteEncoder()->positionIUToRadians(aie_pos_iu); 
+}
+
+uint32_t ODrive::getCheckSum()
+{
+    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    // uint32_t checksum_check = 987654321;
+    // if (checksum != checksum_check) {
+    //     RCLCPP_ERROR(rclcpp::get_logger("getCheckSum"), "Checksum value is %u, the CheckSum object's bits are probably scrambled like some tasty eggs.", checksum);
+    // }
+    return checksum;
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -303,8 +329,12 @@ float ODrive::getTorqueUnchecked()
 
 float ODrive::getMotorCurrent()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Current, axis_)).f
-        * (float)getMotorDirection();
+    float motor_current = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Current, axis_)).f;
+    float motor_current_check = 50;
+    if (motor_current > motor_current_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getMotorCurrent"), "Motor current is %f, the Current object's bits are probably scrambled like some tasty eggs.", motor_current);
+    }
+    return motor_current * (float)getMotorDirection();
 }
 
 float ODrive::getActualEffort()

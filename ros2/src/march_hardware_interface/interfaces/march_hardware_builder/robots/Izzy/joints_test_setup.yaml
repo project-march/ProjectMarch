@@ -1,5 +1,5 @@
 testsetup:
-  network_interface_name: enp1s0
+  network_interface_name: enp2s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
@@ -11,9 +11,9 @@ testsetup:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 13739
-            maxPositionIU: 15857
-            zeroPositionIU: 15013
+            minPositionIU: 13248
+            maxPositionIU: 14999
+            zeroPositionIU: 14141
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -35,15 +35,15 @@ testsetup:
             d: 0.0002
     - rotational_joint:
         motor_controller:
-          slaveIndex: 4
+          slaveIndex: 1
           axis: 0
           useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 453989
-            maxPositionIU: 818338
-            zeroPositionIU: 555555
+            minPositionIU: 488647
+            maxPositionIU: 759751
+            zeroPositionIU: 624199
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
