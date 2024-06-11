@@ -11,17 +11,15 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description() -> LaunchDescription:
-    """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default='false')
-    test_linear = LaunchConfiguration("test_linear", default='false')
+    """Generates the launch file for the march9 node structure."""
     
     # region Launch march control
-    test_setup_controllers_launch = IncludeLaunchDescription(
+    march_9_controllers_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 FindPackageShare("march_control").find("march_control"),
                 "launch",
-                "test_setup_controllers.launch.py",
+                "march9_controllers.launch.py",
             )
         )
     )
@@ -68,6 +66,6 @@ def generate_launch_description() -> LaunchDescription:
             executable='test_joints_gui_node',
             name='test_joints_gui_node',
         ),
-        test_setup_controllers_launch,
+        march_9_controllers_launch,
         record_rosbags_action,
     ])

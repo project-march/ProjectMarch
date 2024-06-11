@@ -37,6 +37,7 @@ enum class ODriveObjectName {
     ShadowCount,
     Torque,
     AIEAbsolutePosition,
+    CheckSum,
 
     // Write objects
     TargetTorque,

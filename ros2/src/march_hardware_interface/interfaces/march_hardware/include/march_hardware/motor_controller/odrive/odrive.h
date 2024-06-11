@@ -89,6 +89,7 @@ private:
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
     float getAIEAbsolutePositionRad(); 
+    uint32_t getCheckSum();
 
     uint32_t getODriveError();
     uint32_t getAxisError();
