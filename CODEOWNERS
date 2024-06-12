@@ -17,10 +17,10 @@ Dockerfile @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 .flake8 @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 
 ^[C/C++]
-*.cpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.hpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.c @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.h @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+*.cpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks @mhabers
+*.hpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks @mhabers
+*.c @AlexanderJamesBecoy @alexandar.andonov @femkebuiks @mhabers
+*.h @AlexanderJamesBecoy @alexandar.andonov @femkebuiks @mhabers
 
 [Movement]
 /ros2/src/gaits/march_gait_files @floorheijs @wnederpel
