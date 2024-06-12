@@ -22,13 +22,13 @@ def plot_joints(dataset):
 def stand_to_sit():
     time_points = 100
     lhaa = np.linspace(-0.03, -0.03, time_points)
-    lhfe = np.linspace(0.136, 1.5, time_points)
-    lkfe = np.linspace(0.385, 1.2, time_points)
+    lhfe = np.linspace(0.136, 1.57, time_points)
+    lkfe = np.linspace(0.385, 1.57, time_points)
     ladpf = np.linspace(0.162, 0.162, time_points)
 
-    rhaa = np.linspace(-0.013, -0.013, time_points)
-    rhfe = np.linspace(0.176, 1.5, time_points)
-    rkfe = np.linspace(0.468, 1.2, time_points)
+    rhaa = np.linspace(-0.03, -0.03, time_points)
+    rhfe = np.linspace(0.176, 1.57, time_points)
+    rkfe = np.linspace(0.468, 1.57, time_points)
     radpf = np.linspace(0.162, 0.162, time_points)
 
     # joint_angles_dataset = np.column_stack([
@@ -45,13 +45,13 @@ def stand_to_sit():
 def sit_to_stand():
     time_points = 100
     lhaa = np.linspace(-0.03, -0.03, time_points)
-    lhfe = np.linspace(1.5, 0.136, time_points)
-    lkfe = np.linspace(1.2, 0.385, time_points)
+    lhfe = np.linspace(1.57, 0.136, time_points)
+    lkfe = np.linspace(1.57, 0.385, time_points)
     ladpf = np.linspace(0.162, 0.162, time_points)
 
-    rhaa = np.linspace(-0.013, -0.013, time_points)
-    rhfe = np.linspace(1.5, 0.176, time_points)
-    rkfe = np.linspace(1.2, 0.468, time_points)
+    rhaa = np.linspace(-0.03, -0.03, time_points)
+    rhfe = np.linspace(1.57, 0.176, time_points)
+    rkfe = np.linspace(1.57, 0.468, time_points)
     radpf = np.linspace(0.162, 0.162, time_points)
 
     # sit_to_stand = np.column_stack([
