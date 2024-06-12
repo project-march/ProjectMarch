@@ -325,7 +325,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     m_current_trajectory = m_gait_planning.getStandToSitGait(); 
                     processMovingGaits(count);
                     m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
-                    RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
+                    RCLCPP_DEBUG(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
                     break;
                 }
                 
