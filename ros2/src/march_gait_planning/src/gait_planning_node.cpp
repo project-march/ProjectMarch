@@ -125,9 +125,9 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
         }
 
         for (auto element : m_current_trajectory){
-            m_pose->position.x = static_cast<float>(element[0]);
+            m_pose->position.x = static_cast<float>(element[0]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 3 : 0];
             m_pose->position.y = m_home_stand[m_variable_walk_swing_leg == 1 ? 4 : 1];
-            m_pose->position.z = static_cast<float>(element[1]);
+            m_pose->position.z = static_cast<float>(element[1]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 5 : 2];
             m_visualization_msg->poses.push_back(*m_pose); 
         }
         m_visualization_msg->header.frame_id = "backpack"; 
