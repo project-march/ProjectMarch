@@ -12,7 +12,7 @@
 
 #include "march_shared_msgs/msg/joint_efforts.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
-#include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 class TorqueConverterNode : public rclcpp::Node
 {
@@ -22,21 +22,24 @@ public:
 
 private:
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
-    void desiredJointTrajectoryCallback(const trajectory_msgs::msg::JointTrajectory::SharedPtr msg);
+    void desiredJointPositionsCallback(const std_msgs::msg::Float64MultiArray::SharedPtr msg);
     void publishDesiredJointEfforts();
 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
-    rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_desired_joint_trajectory_sub;
+    rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_sub;
     rclcpp::Publisher<march_shared_msgs::msg::JointEfforts>::SharedPtr m_joint_efforts_pub;
 
     std::vector<std::string> m_joint_names;
-    RobotNode::JointNameToValueMap m_joint_positions;
+    std::vector<std::string> m_actuator_names;
+    RobotNode::JointNameToValueMap m_joint_positions_desired;
+    RobotNode::JointNameToValueMap m_joint_positions_actual;
     RobotNode::JointNameToValueMap m_joint_velocities;
     RobotNode::JointNameToValueMap m_joint_accelerations;
     RobotNode::JointNameToValueMap m_joint_external_torques;
 
     RobotDescription::SharedPtr m_robot_description;
     TorqueConverter::UniquePtr m_torque_converter;
+    double m_dt;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__TORQUE_CONVERTER_NODE_HPP_

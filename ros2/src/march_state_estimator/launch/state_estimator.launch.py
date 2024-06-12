@@ -45,11 +45,12 @@ def generate_launch_description():
             package='march_state_estimator',
             executable='torque_converter_node',
             name='torque_converter',
-            output='screen',
+            output={"both": {"screen", "log", "own_log"}},
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
             ],
+            arguments=["--ros-args", "--log-level", "info"],
         ),
         Node(
             package='march_state_estimator',
