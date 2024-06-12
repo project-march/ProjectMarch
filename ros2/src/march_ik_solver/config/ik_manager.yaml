@@ -45,7 +45,7 @@ ik_manager:
       VariableWalk:
       - posture
       - motion
-      - stability
+      # - stability
       HighStep1:
       - posture
       - motion

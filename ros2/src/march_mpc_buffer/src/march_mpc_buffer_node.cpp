@@ -10,6 +10,9 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
+#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
+
 MarchMpcBufferNode::MarchMpcBufferNode() : Node("march_mpc_buffer_node") {
     m_footsteps_sub = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "final_feet_position", 10, std::bind(&MarchMpcBufferNode::footstepsCallback, this, std::placeholders::_1));
@@ -29,7 +32,8 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
     transformed_footsteps.header.frame_id = "backpack"; 
     transformed_footsteps.header.stamp = msg->header.stamp; 
 
-    for (auto& pose : msg->poses) {
+    for (long unsigned int i = 0; i < msg->poses.size(); i++) {
+        auto pose = msg->poses[i];
         geometry_msgs::msg::TransformStamped transform;
         try {
             transform = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero, tf2::durationFromSec(0.1));
@@ -60,8 +64,6 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
 
 void MarchMpcBufferNode::comTrajectoryCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
     // Transform the first COM pose from the right foot frame to the backpack frame.
-    geometry_msgs::msg::Pose transformed_com_pose;
-
     geometry_msgs::msg::TransformStamped transform;
     try {
         transform = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero, tf2::durationFromSec(0.1));
@@ -78,13 +80,15 @@ void MarchMpcBufferNode::comTrajectoryCallback(const geometry_msgs::msg::PoseArr
 
     tf2::Transform tf_backpack = tf_right_foot_to_backpack * tf_right_foot;
 
+    geometry_msgs::msg::Pose transformed_com_pose;
     tf2::toMsg(tf_backpack, transformed_com_pose);
 
     // Remove the orientation of the backpack frame.
     transformed_com_pose.orientation = tf2::toMsg(tf2::Quaternion(0, 0, 0, 1));
 
     geometry_msgs::msg::PoseStamped transformed_com_pose_stamped;
-    transformed_com_pose_stamped.header = msg->header;
+    transformed_com_pose_stamped.header.frame_id = "backpack";
+    transformed_com_pose_stamped.header.stamp = msg->header.stamp;
     transformed_com_pose_stamped.pose = transformed_com_pose;
 
     m_com_buffer_pub->publish(transformed_com_pose_stamped);

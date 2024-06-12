@@ -22,6 +22,8 @@ IKSolverNode::IKSolverNode()
     configureTasksParameters();
     configureIKSolutions();
 
+    m_desired_com_position = Eigen::Vector2d::Zero();
+
     // Create the callback group and subscription options.
     m_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_subscription_options.callback_group = m_callback_group;
@@ -29,21 +31,25 @@ IKSolverNode::IKSolverNode()
     rclcpp::QoS qos(100);
     auto rmw_qos_profile = qos.get_rmw_qos_profile();
 
-    m_desired_foot_positions_sub.subscribe(this, "ik_solver/buffer/input", rmw_qos_profile);
-    m_desired_com_pose_sub.subscribe(this, "mpc_solver/buffer/output", rmw_qos_profile);
-    m_ik_sync_sub.reset(new message_filters::Synchronizer<IKSynchronizer>(IKSynchronizer(10), m_desired_foot_positions_sub, m_desired_com_pose_sub));
-    m_ik_sync_sub->registerCallback(&IKSolverNode::iksSyncCallback, this);
+    // m_desired_foot_positions_sub.subscribe(this, "ik_solver/buffer/input", rmw_qos_profile);
+    // m_desired_com_pose_sub.subscribe(this, "mpc_solver/buffer/output", rmw_qos_profile);
+    // m_ik_sync_sub.reset(new message_filters::Synchronizer<IKSynchronizer>(IKSynchronizer(10), m_desired_foot_positions_sub, m_desired_com_pose_sub));
+    // m_ik_sync_sub->registerCallback(&IKSolverNode::iksSyncCallback, this);
 
     // Create the subscriptions and publishers.
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
         "ik_solver/command", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
-    m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
-        std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
+        std::bind(&IKSolverNode::desiredFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
+    m_desired_com_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+        "mpc_solver/buffer/com_output", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::desiredComPoseCallback, this, std::placeholders::_1), m_subscription_options);
     m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation/state", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
+        
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "ik_solver/joint_trajectory", 10);
     m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
@@ -57,13 +63,37 @@ IKSolverNode::~IKSolverNode()
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
 }
 
-void IKSolverNode::iksSyncCallback(
-    const march_shared_msgs::msg::IksFootPositions::SharedPtr foot_positions_msg,
-    const geometry_msgs::msg::PoseStamped::SharedPtr com_pose_msg)
-{
-    RCLCPP_DEBUG(this->get_logger(), "IKSolver sync callback received.");
-    // iksFootPositionsCallback(foot_positions_msg);
-}
+// void IKSolverNode::iksSyncCallback(
+//     const march_shared_msgs::msg::IksFootPositions::SharedPtr foot_positions_msg,
+//     const geometry_msgs::msg::PoseStamped::SharedPtr com_pose_msg)
+// {
+//     RCLCPP_DEBUG(this->get_logger(), "IKSolver sync callback received.");
+
+//     std::vector<std::string> task_names = m_ik_solver->getTaskNames();
+//     if (task_names.empty()) {
+//         return;
+//     }
+
+//     // Vectorizing the desired tasks.
+//     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
+//     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
+//     Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(6);
+//     desired_motion << 
+//         msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z,
+//         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
+//     desired_tasks["motion"] = desired_motion;
+
+//     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
+//     desired_stability << 0.17, 0.0;
+//     desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
+
+//     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
+//     desired_tasks["posture"] = desired_posture;
+
+//     m_ik_solver->updateDesiredTasks(desired_tasks);
+//     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
+//     solveInverseKinematics(msg->header.stamp);
+// }
 
 void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
 {
@@ -71,7 +101,7 @@ void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::
     m_ik_solver->setTaskNames(msg->task_names);
 }
 
-void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
+void IKSolverNode::desiredFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg)
 {
     /*
         Big TODO: Expand the stack of tasks
@@ -92,9 +122,10 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
     desired_tasks["motion"] = desired_motion;
 
-    Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
-    desired_stability << 0.17, 0.0;
-    desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
+    // Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
+    // desired_stability << m_desired_com_position.x(), m_desired_com_position.y();
+    // desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
+    desired_tasks["stability"] = m_desired_com_position;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
     desired_tasks["posture"] = desired_posture;
@@ -102,6 +133,12 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
     solveInverseKinematics(msg->header.stamp);
+}
+
+void IKSolverNode::desiredComPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "Desired CoM pose received.");
+    m_desired_com_position << msg->pose.position.x, msg->pose.position.y;
 }
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)

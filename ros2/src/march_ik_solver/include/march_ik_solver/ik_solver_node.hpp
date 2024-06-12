@@ -37,7 +37,8 @@ private:
     void iksSyncCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr foot_positions_msg,
         const geometry_msgs::msg::PoseStamped::SharedPtr com_pose_msg);
     void iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg);
-    void iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
+    void desiredFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
+    void desiredComPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void publishJointTrajectory();
     void publishDesiredJointPositions();
@@ -66,17 +67,19 @@ private:
     std::vector<double> m_actual_joint_velocities;
     Eigen::VectorXd m_desired_joint_positions;
     Eigen::VectorXd m_desired_joint_velocities;
+    Eigen::Vector2d m_desired_com_position;
     Eigen::Matrix3d m_current_world_to_base_orientation;
     trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
 
     // ROS2 communication
-    message_filters::Subscriber<march_shared_msgs::msg::IksFootPositions> m_desired_foot_positions_sub;
-    message_filters::Subscriber<geometry_msgs::msg::PoseStamped> m_desired_com_pose_sub;
-    std::shared_ptr<message_filters::Synchronizer<IKSynchronizer>> m_ik_sync_sub;
+    // message_filters::Subscriber<march_shared_msgs::msg::IksFootPositions> m_desired_foot_positions_sub;
+    // message_filters::Subscriber<geometry_msgs::msg::PoseStamped> m_desired_com_pose_sub;
+    // std::shared_ptr<message_filters::Synchronizer<IKSynchronizer>> m_ik_sync_sub;
 
     rclcpp::Subscription<march_shared_msgs::msg::IksCommand>::SharedPtr m_ik_solver_command_sub;
-    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_foot_positions_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_desired_foot_positions_sub;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr m_desired_com_pose_sub;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
     rclcpp::Publisher<march_shared_msgs::msg::IksStatus>::SharedPtr m_iks_status_pub;

@@ -40,7 +40,7 @@ ik_solver:
       - motion
       - stability
       motion:
-        kp: [10.0, 10.0, 25.0, 10.0, 10.0, 25.0]
+        kp: [[10.0, 10.0, 25.0, 10.0, 10.0, 25.0]]
         kd: [0.1, 0.1, 0.25, 0.1, 0.1, 0.25]
         ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         convergence_threshold: 1e-5
@@ -51,10 +51,10 @@ ik_solver:
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
         convergence_threshold: 1e-2
-        damp_coeff: 1e-4
+        damp_coeff: 1e-3
         weight: 1.0
       posture:
-        kp: [2.5, 2.5]
+        kp: [4.0, 4.0]
         kd: [0.05, 0.05]
         ki: [0.0, 0.0]
         convergence_threshold: 1e-3

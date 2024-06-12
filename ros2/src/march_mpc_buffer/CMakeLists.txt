@@ -21,6 +21,8 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -33,6 +35,7 @@ ament_target_dependencies(${PROJECT_NAME}
   tf2
   tf2_ros
   tf2_geometry_msgs
+  Eigen3
 )
 
 # Create march_mpc_buffer_node executable
@@ -50,6 +53,7 @@ ament_target_dependencies(march_mpc_buffer_node
   geometry_msgs
   tf2_ros
   tf2_geometry_msgs
+  Eigen3
 )
 
 install(TARGETS
@@ -57,6 +61,9 @@ install(TARGETS
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )
+
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

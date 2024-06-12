@@ -88,12 +88,12 @@ void SensorFusion::updateDynamicsState()
     m_joint_dynamical_torques = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
     m_joint_external_torques = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
 
-    m_left_foot_force = m_torque_converter->getExternalForceByNode("L_sole", m_joint_positions, m_joint_external_torques);
-    m_right_foot_force = m_torque_converter->getExternalForceByNode("R_sole", m_joint_positions, m_joint_external_torques);
+    m_left_foot_force = m_torque_converter->getExternalForceByNode("L_heel", m_joint_positions, m_joint_external_torques);
+    m_right_foot_force = m_torque_converter->getExternalForceByNode("R_heel", m_joint_positions, m_joint_external_torques);
 
     updateCurrentStanceLeg(m_left_foot_force.z(), m_right_foot_force.z(),
-        m_robot_description->findNode("L_sole")->getGlobalPosition(m_joint_positions),
-        m_robot_description->findNode("R_sole")->getGlobalPosition(m_joint_positions));
+        m_robot_description->findNode("L_heel")->getGlobalPosition(m_joint_positions),
+        m_robot_description->findNode("R_heel")->getGlobalPosition(m_joint_positions));
 }
 
 Eigen::Vector3d SensorFusion::getLeftFootForce() const

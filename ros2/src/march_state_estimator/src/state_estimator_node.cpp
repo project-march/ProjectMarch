@@ -131,6 +131,7 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
     m_sensor_fusion->configureJointNames(joint_names);
     m_sensor_fusion->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
     m_dt = static_cast<double>(dt) / 1000.0;
+    RCLCPP_INFO(this->get_logger(), "State Estimator Clock Period: %f s", m_dt);
 
     // Initialize timer
     m_timer = this->create_wall_timer(
@@ -289,7 +290,9 @@ void SensorFusionNode::publishMPCEstimation()
     // Get current time
     rclcpp::Time current_time = this->now();
 
-    uint8_t stance_leg = m_sensor_fusion->getCurrentStanceLeg();
+    // uint8_t stance_leg = m_sensor_fusion->getCurrentStanceLeg();
+    std::vector<geometry_msgs::msg::Pose> foot_positions = getCurrentPoseArray("backpack", {"L_heel", "R_heel"});
+    uint8_t stance_leg = m_sensor_fusion->getNextStanceLeg(foot_positions[0].position.x, foot_positions[1].position.x);
 
     // Get transform stamped from world to R_sole
     geometry_msgs::msg::TransformStamped transform_stamped;
