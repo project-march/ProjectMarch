@@ -126,9 +126,12 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
 
         for (auto element : m_current_trajectory){
             m_pose->position.x = static_cast<float>(element[0]);
+            m_pose->position.y = m_home_stand[m_variable_walk_swing_leg == 1 ? 4 : 1];
             m_pose->position.z = static_cast<float>(element[1]);
             m_visualization_msg->poses.push_back(*m_pose); 
         }
+        m_visualization_msg->header.frame_id = "backpack"; 
+        m_visualization_msg->header.stamp = this->now(); 
         m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
         m_visualization_msg->poses.clear(); 
         RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
