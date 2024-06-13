@@ -10,11 +10,13 @@
 #include <vector>
 
 #include <march_hardware/joint.h>
+#include "march_hardware/ethercat/pdo_interface.h"
+#include "march_hardware/ethercat/odrive_pdo_map.h"
 
 namespace march {
 /**
  * Base class of the ethercat master supported with the SOEM library
- * @param if_name Network interface name, check ifconfig.
+ * @param network_interface_name Network interface name, check ifconfig.
  * @param io_map Holds the mapping of the SOEM message.
  * @param expected_working_counter The expected working counter of the ethercat
  * train.
@@ -23,7 +25,7 @@ namespace march {
  */
 class EthercatMaster {
 public:
-    EthercatMaster(std::string if_name, int max_slave_index, int cycle_time, int slave_timeout,
+    EthercatMaster(std::string network_interface_name, int max_slave_index, int cycle_time, int slave_timeout,
         std::shared_ptr<march_logger::BaseLogger> logger);
     ~EthercatMaster();
 
@@ -62,7 +64,7 @@ public:
 
 private:
     /**
-     * Opens the ethernet port with the given if_name and checks the amount of
+     * Opens the ethernet port with the given network_interface_name and checks the amount of
      * slaves.
      */
     void ethercatMasterInitiation();
@@ -86,6 +88,8 @@ private:
      * received, otherwise false.
      */
     bool sendReceivePdo();
+
+    bool isCheckSumValid(uint16_t slave);
 
     /**
      * Checks if all the slaves are connected and in operational state.
@@ -116,7 +120,7 @@ private:
 
     std::atomic<bool> is_operational_;
 
-    const std::string if_name_;
+    const std::string network_interface_name_;
     const int max_slave_index_;
     const int cycle_time_ms_;
 
@@ -131,6 +135,7 @@ private:
 
     int latest_lost_slave_ = -1;
     const int slave_watchdog_timeout_;
+    PdoInterfaceImpl pdo_interface_;
     std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 
     std::thread ethercat_thread_;

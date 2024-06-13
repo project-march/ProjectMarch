@@ -42,9 +42,6 @@ IKSolverNode::IKSolverNode()
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
 
     RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
-
-    // Temporary
-    m_first_step = true;
 }
 
 IKSolverNode::~IKSolverNode()
@@ -80,8 +77,8 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     desired_tasks["motion"] = desired_motion;
 
     Eigen::VectorXd desired_stability = Eigen::VectorXd::Zero(2);
-    desired_stability << m_x_stance_leg, m_y_stance_leg;
-    desired_tasks["stability"] = desired_stability;
+    desired_stability << 0.17, 0.0;
+    desired_tasks["stability"] = m_current_world_to_base_orientation.transpose() * desired_stability;
 
     Eigen::VectorXd desired_posture = Eigen::VectorXd::Zero(2);
     desired_tasks["posture"] = desired_posture;
@@ -103,43 +100,9 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
             m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
         }
     }
-    // TODO: To be fixed.
-    // m_ik_solver->updateWorldToBaseOrientation(
-    //     msg->imu.orientation.w,
-    //     msg->imu.orientation.x,
-    //     msg->imu.orientation.y,
-    //     msg->imu.orientation.z
-    // );
 
-    // if (m_first_step && (msg->next_stance_leg != 0b11)) {
-    //     m_first_step = false;
-    // }
-
-    // Eigen::Vector3d stance_pos;
-    // if (m_first_step) {
-    // stance_pos.noalias()
-    //     = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-    //         * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
-    // } else {
-    //     m_ik_solver->updateCurrentStanceLeg(msg->current_stance_leg);
-    //     if (msg->next_stance_leg == 0b01) {
-    //         stance_pos.noalias()
-    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-    //                 * Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z);
-
-    //     } else if (msg->next_stance_leg == 0b10) {
-    //         stance_pos.noalias()
-    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-    //                 * Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z);
-    //     } else {
-    //         stance_pos.noalias() = (Eigen::Vector3d(msg->body_sole_pose[0].position.x, msg->body_sole_pose[0].position.y, msg->body_sole_pose[0].position.z) + Eigen::Vector3d(msg->body_sole_pose[1].position.x, msg->body_sole_pose[1].position.y, msg->body_sole_pose[1].position.z)) / 2;
-    //         stance_pos.noalias()
-    //             = Eigen::Quaterniond(msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).normalized().toRotationMatrix().transpose()
-    //                 * stance_pos;
-    //     }
-    // // }
-    // m_x_stance_leg = stance_pos.x();
-    // m_y_stance_leg = stance_pos.y();
+    m_current_world_to_base_orientation = Eigen::Quaterniond(
+        msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
 
     // Publish the desired joint positions if there is a solution in the previous cycle.
     if (m_has_solution) {
@@ -331,6 +294,9 @@ void IKSolverNode::configureIKSolverParameters()
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
         RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
+
+    // Initialize world-to-base orientation.
+    m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 }
 
 void IKSolverNode::configureTasksParameters()

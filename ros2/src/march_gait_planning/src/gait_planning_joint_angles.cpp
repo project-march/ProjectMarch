@@ -34,8 +34,11 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_first_step_updated.csv", m_first_step_angle_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_first_step.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_full_step.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close.csv", m_step_close_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
+
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
 
@@ -44,9 +47,6 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close_updated.csv", m_step_close_trajectory); 
-
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
@@ -81,11 +81,11 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
+void GaitPlanningAngles::setGaitType(const ExoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
+void GaitPlanningAngles::setPrevGaitType(const ExoMode &prev_gait_type){
     m_prev_gait_type = prev_gait_type; 
 }
 
@@ -105,11 +105,11 @@ void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
     m_stance_foot = foot; 
 }
 
-exoMode GaitPlanningAngles::getGaitType() const {
+ExoMode GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
 
-exoMode GaitPlanningAngles::getPrevGaitType() const {
+ExoMode GaitPlanningAngles::getPrevGaitType() const {
     return m_prev_gait_type; 
 }
 

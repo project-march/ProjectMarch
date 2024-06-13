@@ -98,12 +98,8 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
-        if (!has_correct_actuation_mode(jointInfo.joint)) {
-            return hardware_interface::return_type::ERROR;
-        }
         joints_info_.push_back(jointInfo);
-        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max effort difference.", joint.name.c_str(),
-            jointInfo.limit.max_effort_differance);
+        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max effort difference.", joint.name.c_str(), jointInfo.limit.max_effort_differance);
     }
 
     status_ = hardware_interface::status::CONFIGURED;
@@ -116,6 +112,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint)
 {
 
+    // TODO: reduce the amount of if statements. parameter should only be able to be set to true or false.
     string stop_hardl_param = get_parameter(joint, "stop_when_outside_hard_limits", "true");
     bool stop_when_outside_hard_limits
         = !(stop_hardl_param == "false" or stop_hardl_param == "0" or stop_hardl_param == "False");
@@ -164,10 +161,10 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 {
     RCLCPP_INFO((*logger_), "Creating export state interface.");
     std::vector<hardware_interface::StateInterface> state_interfaces;
+    
     for (JointInfo& jointInfo : joints_info_) {
         // Position: Couples the state controller to the value jointInfo.position through a pointer.
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position));
         // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
         state_interfaces.emplace_back(hardware_interface::StateInterface(
             jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
@@ -176,17 +173,22 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
             jointInfo.motor_controller_data.get_pointers()) {
             state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
 
-            if (motor_controller_pointer.first == "AIE_absolute_position" && jointInfo.name == "left_ankle_dpf") {
-                state_interfaces.emplace_back(hardware_interface::StateInterface("left_ankle_ie", hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
-            }
+            std::map<std::string, std::string> joint_to_interface = {
+                {"left_ankle_dpf", "left_ankle_ie"},
+                {"right_ankle_dpf", "right_ankle_ie"},
+                {"linear_joint", "test_linear_ie"}
+            };
 
-            else if (motor_controller_pointer.first == "AIE_absolute_position" && jointInfo.name == "right_ankle_dpf") {
-                state_interfaces.emplace_back(hardware_interface::StateInterface("right_ankle_ie", hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+            if (motor_controller_pointer.first == "AIE_absolute_position") {
+                auto it = joint_to_interface.find(jointInfo.name);
+                if (it != joint_to_interface.end()) {
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+                }
             }
         }
     }
 
-    // // For the PDB broadcaster.
+    // For the PDB broadcaster.
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
@@ -207,11 +209,8 @@ std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::expor
 {
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
-    for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
-        // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
-        // command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
+
+    for (JointInfo& jointInfo : joints_info_) {      
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
@@ -397,7 +396,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
 #ifndef DEBUG_MODE
-        RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        RCLCPP_WARN_ONCE(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
 #endif
     }
@@ -493,10 +492,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 // TODO: (re)move to hwi_util. Possibly add additional checks. 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
+    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_outside_limits(jointInfo);
 }
 
-bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
+bool MarchExoSystemInterface::is_joint_outside_limits(JointInfo& jointInfo)
 {
     // SOFT Limit check.
     if (jointInfo.joint.isWithinSoftLimits()) {
@@ -556,7 +555,7 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
                                     "'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
     }
     string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
-        + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
+        + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + "Izzy" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
@@ -571,6 +570,7 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
     return hw_builder.createMarchRobot(/*active_joint_names=*/joint_names);
 }
 
+// TODO: remove or move to hwi_util
 bool MarchExoSystemInterface::has_correct_actuation_mode(march::Joint& joint) const
 {
     const auto& actuation_mode = joint.getMotorController()->getActuationMode();

@@ -37,6 +37,7 @@ alias gits='git status'
 # NEW M9 ALIASES
 alias plt='ros2 run plotjuggler plotjuggler -l src/march_launch/launch/joint_angles_plotjuggler.xml'
 alias convert_db3_to_mcap='cm && sros2 && ./utility_scripts/convert_db3_to_mcap.sh'
+alias tshark_record='cm2 && ../utility_scripts/tshark_recorder.sh'
 
 alias angles='cm2 && sros2 && sfox && ros2 launch march_launch sim_angles.launch.py model_to_load_mujoco:="march9.xml" aie_force:="true"'
 alias cartesian='cm2 && sros2 && sfox && ros2 launch march_launch izzy.launch.py model_to_load_mujoco:="march9.xml" aie_force:="true"'

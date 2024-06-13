@@ -25,36 +25,29 @@
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, bool index_found, unsigned int motor_kv, bool is_incremental_encoder_more_precise,
-    std::shared_ptr<march_logger::BaseLogger> logger)
+    ActuationMode actuation_mode, bool use_inc_enc_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
     : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor),
-        actuation_mode, is_incremental_encoder_more_precise, std::move(logger))
+        actuation_mode, std::move(use_inc_enc_for_position) , std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
-    , torque_constant_(KV_TO_TORQUE_CONSTANT / (float)motor_kv)
 {
 }
 
+// TODO: reintegrate this state on the mdrives
 std::chrono::nanoseconds ODrive::reset()
 {
-    setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
+    // setAxisState(ODriveAxisState::CLEAR_ALL_ERRORS);
     return std::chrono::seconds { 1 };
 }
 
 std::chrono::nanoseconds ODrive::prepareActuation()
 {
     if (!index_found_ && getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL) {
-        if ((int)axis_ == 0) {
-        // For the MDrives and M9 joints
-            setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
-            logger_->info("Initializing the encoder index search.");
-        } else {
-            setAxisState(ODriveAxisState::ENCODER_OFFSET_CALIBRATION);
-            logger_->info("Initializing the encoder offset calibration.");           
-        }
-        
-        return std::chrono::seconds { 60 };
-        logger_->info("Waiting 60 seconds");           
+
+        setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
+        logger_->info("Initializing the encoder index search.");    
+
+        return std::chrono::seconds {10};
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -64,10 +57,13 @@ std::chrono::nanoseconds ODrive::prepareActuation()
 // Before enabling actuation, a joint should have gone through its entire callibration sequence, after which it goes back to idle.
 void ODrive::enableActuation()
 {
+    auto current_state = getAxisState();
+    auto target_state = ODriveAxisState::CLOSED_LOOP_CONTROL;
     if (getAxisState() != ODriveAxisState::CLOSED_LOOP_CONTROL && getAxisState() == ODriveAxisState::IDLE) {
         setAxisState(ODriveAxisState::CLOSED_LOOP_CONTROL);
+        RCLCPP_WARN(rclcpp::get_logger("enableActuation"),"MDrive currently in state: %s, and setting state to %s",current_state.toString().c_str(),ODriveAxisState::toString(target_state).c_str());
     } else {
-        logger_->info("ODrive state already in closed loop control");
+        RCLCPP_WARN(rclcpp::get_logger("enableActuation"),"MDrive currently in state: %s, should be in state 8.",current_state.toString().c_str());
     }
 
 }
@@ -125,36 +121,38 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 
     bit32 write_position {};
     write_position.f = target_position;
-    // logger_->info(logger_->fstring(
-    // "Sending position %f to the exo.", target_position));
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
 }
 
-void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 3> tor_pid)
+void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid)
 {
-    auto offset
-        = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_); // TODO: fix this with ODrivePDOMap.
-    for (double& i : pos_pid) {
-        bit32 write_value {};
-        logger_->info(logger_->fstring("Sending PID value %f, with offset %d, to the exo.", i, offset));
-        write_value.f = static_cast<float>(i);
-        this->write32(offset, write_value);
-        offset += 4;
-    }
+    bit32 write_position_p {};
+    bit32 write_position_i {};
+    bit32 write_position_d {};
 
-    offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_); // TODO:fix this with ODrivePDOMap.
-    for (double& i : tor_pid) {
-        bit32 write_value {};
-        write_value.f = static_cast<float>(i);
-        this->write32(offset, write_value);
-        offset += 4;
-    }
+    write_position_p.f = static_cast<float>(pos_pid[0]);
+    write_position_i.f = static_cast<float>(pos_pid[1]);
+    write_position_d.f = static_cast<float>(pos_pid[2]);
+
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_), write_position_p);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionI, axis_), write_position_i);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionD, axis_), write_position_d);
+
+    bit32 write_torque_p {};
+    bit32 write_torque_d {};
+
+    write_torque_p.f = static_cast<float>(tor_pid[0]);
+    write_torque_d.f = static_cast<float>(tor_pid[1]);
+
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_), write_torque_p);
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueD, axis_), write_torque_d);
 }
 
 
+// Not used currently
 int ODrive::getActuationModeNumber() const
 {
     /* These values are used to set the control mode of the ODrive.
@@ -202,8 +200,8 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
-    // TODO: create hasAIEAbsoluteEncoder() method
-    state->AIE_absolute_position_ = getAIEAbsolutePositionIU();
+    state->AIE_absolute_position_ = getAIEAbsolutePositionRad();
+    state->check_sum_ = getCheckSum();
 
     // Set ODrive specific attributes
     state->axis_state_ = getAxisState();
@@ -220,37 +218,47 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
 
 float ODrive::getMotorTemperature()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).f;
+    float motor_temp = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorTemperature, axis_)).f;
+    float motor_temp_check = 100;
+    if (motor_temp > motor_temp_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getMotorTemperature"), "Motor temperature is %f, the MotorTemperature object's bits are probably scrambled like some tasty eggs.", motor_temp);
+    }
+    return motor_temp;
 }
 
+// TODO: get rid of this object.
 float ODrive::getOdriveTemperature()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::OdriveTemperature, axis_)).f;
 }
 
+// TODO: create check for faulty states
 ODriveAxisState ODrive::getAxisState()
 {
     return ODriveAxisState(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisState, axis_)).ui);
 }
 
-int32_t ODrive::getAbsolutePositionIU()
+uint32_t ODrive::getAbsolutePositionIU()
 {
-    int32_t iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
-    // logger_->info(logger_->fstring("iu value = %d", iu_value)); 
-    if (iu_value == 0) {
-        logger_->warn("sleeeeeeepppiiiiiiinnnggggggg to wait for absolute position readout"); 
-        rclcpp::sleep_for(std::chrono::milliseconds(50)); 
-        iu_value = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).i;
-        if (iu_value == 0){
+    uint32_t abs_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
+    if (abs_pos_iu == 0) {
+        rclcpp::sleep_for(std::chrono::milliseconds(50)); // Sleep for 50ms to give the MDrive time to update the encoder value
+        abs_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AbsolutePosition, axis_)).ui;
+        if (abs_pos_iu == 0){
             logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
         }
-        // logger_->fatal("Absolute encoder value is 0 (Check the encoder cable, or flash the odrive).");
     }
+
+    uint32_t abs_pos_check = 1048576; // Better would be to differentiate between the different joints but this is a good start
+    if (abs_pos_iu > abs_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getAbsolutePositionIU"), "Absolute encoder value is %u, the AbsolutePosition object's bits are probably scrambled like some tasty eggs.", abs_pos_iu);
+    }
+
     switch (absolute_encoder_->getDirection()) {
         case Encoder::Direction::Positive:
-            return iu_value;
+            return abs_pos_iu;
         case Encoder::Direction::Negative:
-            return this->absolute_encoder_->getTotalPositions() - iu_value;
+            return this->absolute_encoder_->getTotalPositions() - abs_pos_iu;
         default:
             throw error::HardwareException(error::ErrorType::INVALID_ENCODER_DIRECTION);
     }
@@ -258,8 +266,12 @@ int32_t ODrive::getAbsolutePositionIU()
 
 int32_t ODrive::getIncrementalPositionIU()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ShadowCount, axis_)).i
-        * incremental_encoder_->getDirection();
+    int32_t inc_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ShadowCount, axis_)).i;
+    int32_t inc_pos_check = 1e6;
+    if (abs(inc_pos_iu) > inc_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getIncrementalPositionIU"), "Incremental encoder value is %d, the ShadowCount object's bits are probably scrambled like some tasty eggs.", inc_pos_iu);
+    }
+    return inc_pos_iu*incremental_encoder_->getDirection();
 }
 
 float ODrive::getIncrementalVelocityIU()
@@ -268,11 +280,24 @@ float ODrive::getIncrementalVelocityIU()
         * (float)incremental_encoder_->getDirection();
 }
 
-uint32_t ODrive::getAIEAbsolutePositionIU()
+float ODrive::getAIEAbsolutePositionRad()
 {
-    // uint32_t aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
-    uint32_t aie_pos = 0; // Placeholder
-    return aie_pos; 
+    uint32_t aie_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
+    uint32_t aie_pos_check = 16384;
+    if (aie_pos_iu > aie_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %u, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos_iu);
+    }
+    return (float)this->getAbsoluteEncoder()->positionIUToRadians(aie_pos_iu); 
+}
+
+uint32_t ODrive::getCheckSum()
+{
+    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    // uint32_t checksum_check = 987654321;
+    // if (checksum != checksum_check) {
+    //     RCLCPP_ERROR(rclcpp::get_logger("getCheckSum"), "Checksum value is %u, the CheckSum object's bits are probably scrambled like some tasty eggs.", checksum);
+    // }
+    return checksum;
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -304,8 +329,12 @@ float ODrive::getTorqueUnchecked()
 
 float ODrive::getMotorCurrent()
 {
-    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Current, axis_)).f
-        * (float)getMotorDirection();
+    float motor_current = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Current, axis_)).f;
+    float motor_current_check = 50;
+    if (motor_current > motor_current_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getMotorCurrent"), "Motor current is %f, the Current object's bits are probably scrambled like some tasty eggs.", motor_current);
+    }
+    return motor_current * (float)getMotorDirection();
 }
 
 float ODrive::getActualEffort()

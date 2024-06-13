@@ -2,7 +2,7 @@ ik_solver:
   ros__parameters:
     joint_trajectory_controller_period: 5e-3
     max_iterations: 100000
-    integral_dt: 1e-3
+    integral_dt: 1e-2
     joint:
       names:
       - left_hip_aa
@@ -30,7 +30,7 @@ ik_solver:
         positions:
           upper: [10.0, 115.0, 125.0, 20.0, 8.0, 10.0, 115.0, 125.0, 20.0, 8.0]
           lower: [-20.0, -20.0, 0.0, -28.0, -8.0, -20.0, -20.0, 0.0, -28.0, -8.0]
-          soft: 1.0
+          soft: 2.0
         velocities:
           lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
           upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
@@ -40,23 +40,23 @@ ik_solver:
       - motion
       - stability
       motion:
-        kp: [25.0, 25.0, 25.0, 25.0, 25.0, 25.0]
-        kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        kp: [10.0, 10.0, 25.0, 10.0, 10.0, 25.0]
+        kd: [0.1, 0.1, 0.25, 0.1, 0.1, 0.25]
         ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        convergence_threshold: 1e-6
-        damp_coeff: 1e-4
+        convergence_threshold: 1e-5
+        damp_coeff: 1e-3
         weight: 1.0
       stability:
-        kp: [5.0, 15.0]
+        kp: [2.5, 2.5]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
-        convergence_threshold: 0.0
-        damp_coeff: 1e-12
+        convergence_threshold: 1e-2
+        damp_coeff: 1e-4
         weight: 1.0
       posture:
-        kp: [10.0, 10.0]
-        kd: [0.0, 0.0]
+        kp: [2.5, 2.5]
+        kd: [0.05, 0.05]
         ki: [0.0, 0.0]
-        convergence_threshold: 1e-1
-        damp_coeff: 1e-4
+        convergence_threshold: 1e-3
+        damp_coeff: 1e-3
         weight: 1.0

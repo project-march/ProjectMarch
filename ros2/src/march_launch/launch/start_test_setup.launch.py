@@ -12,65 +12,20 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    test_rotational = LaunchConfiguration("test_rotational", default="true")
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal", default="true")
+    test_rotational = LaunchConfiguration("test_rotational", default='false')
+    test_linear = LaunchConfiguration("test_linear", default='false')
     
     # region Launch march control
-    rotational_launch_file = IncludeLaunchDescription(
+    test_setup_controllers_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 FindPackageShare("march_control").find("march_control"),
                 "launch",
-                "rotational_control.launch.py",
+                "test_setup_controllers.launch.py",
             )
-        ),
-        launch_arguments=[
-            ("test_rotational", test_rotational)
-        ],
-        condition=IfCondition(test_rotational),
+        )
     )
 
-    linear_launch_file = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                FindPackageShare("march_control").find("march_control"),
-                "launch",
-                "linear_control.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("test_rotational", test_rotational)
-        ],
-        condition=UnlessCondition(test_rotational),
-    )
-    # endregion
-    # march_control = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_control"),
-    #             "launch",
-    #             "control_test_setup.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[
-    #         ("test_rotational", test_rotational)
-    #     ],
-    # )
-    
-
-    # region Launch input device
-    input_device = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("IPD_new_terminal", IPD_new_terminal)
-        ],
-    )
     # endregion
 
     rosbags = LaunchConfiguration("rosbags", default='true')
@@ -101,22 +56,6 @@ def generate_launch_description() -> LaunchDescription:
         condition=IfCondition(rosbags),
     )
 
-    default_fuzzy_config = os.path.join(
-        get_package_share_directory('fuzzy_generator'),
-        'config',
-        'joints.yaml'
-    )
-    
-    default_gainscheduler_config = os.path.join(
-        get_package_share_directory('march_gain_scheduler'),
-        'config',
-        'stand_gains.yaml'
-    )    
-
-    # parameters
-    fuzzy_config_path = LaunchConfiguration("config_path", default=default_fuzzy_config)
-    gainscheduler_config_path = LaunchConfiguration("config_path", default=default_gainscheduler_config)
-
     return LaunchDescription([
         Node(
             package='march_mode_machine',
@@ -125,29 +64,10 @@ def generate_launch_description() -> LaunchDescription:
             name='mode_machine',
         ),
         Node(
-            package='march_gait_planning',
-            namespace='',
-            executable='test_setup_gait_planning_node',
-            name='test_setup_gait_planning',
-            parameters=[
-                {"test_rotational": test_rotational}
-            ],
+            package='march_test_joints_gui',
+            executable='test_joints_gui_node',
+            name='test_joints_gui_node',
         ),
-        Node(
-            package='fuzzy_generator',
-            executable='fuzzy_node',
-            name='fuzzy_node',
-            parameters=[{'config_path': fuzzy_config_path}]
-        ),
-        Node(
-            package='march_gain_scheduler',
-            executable='gain_scheduler_node',
-            name='gain_scheduler',
-            parameters=[{'config_path': gainscheduler_config_path}]
-        ),
-
-        input_device,
-        rotational_launch_file,
-        linear_launch_file,
+        test_setup_controllers_launch,
         record_rosbags_action,
     ])

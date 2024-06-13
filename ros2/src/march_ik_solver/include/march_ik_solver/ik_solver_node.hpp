@@ -49,9 +49,6 @@ private:
     double m_state_estimator_time_offset;
     double m_convergence_threshold;
     unsigned int m_max_iterations;
-    double m_x_stance_leg;
-    double m_y_stance_leg;
-    bool m_first_step; // Temporary
     bool m_has_solution;
 
     std::vector<std::string> m_joint_names;
@@ -61,6 +58,7 @@ private:
     std::vector<double> m_actual_joint_velocities;
     Eigen::VectorXd m_desired_joint_positions;
     Eigen::VectorXd m_desired_joint_velocities;
+    Eigen::Matrix3d m_current_world_to_base_orientation;
     trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
 
     // ROS2 communication

@@ -13,10 +13,10 @@
 #include <soem/ethercat.h>
 
 namespace march {
-EthercatMaster::EthercatMaster(std::string if_name, int max_slave_index, int cycle_time, int slave_timeout,
+EthercatMaster::EthercatMaster(std::string network_interface_name, int max_slave_index, int cycle_time, int slave_timeout,
     std::shared_ptr<march_logger::BaseLogger> logger)
     : is_operational_(/*__i=*/false)
-    , if_name_(std::move(if_name))
+    , network_interface_name_(std::move(network_interface_name))
     , max_slave_index_(max_slave_index)
     , cycle_time_ms_(cycle_time)
     , logger_(std::move(logger))
@@ -63,13 +63,13 @@ bool EthercatMaster::start(std::vector<Joint>& joints)
 void EthercatMaster::ethercatMasterInitiation()
 {
     logger_->info("Trying to start EtherCAT");
-    if (!ec_init(this->if_name_.c_str())) {
+    if (!ec_init(this->network_interface_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
             "No socket connection on %s. Check if the socket is active by typing `ifconfig` in a terminal "
             ", or this node is not executed as root.",
-            this->if_name_.c_str());
+            this->network_interface_name_.c_str());
     }
-    logger_->info(logger_->fstring("ec_init on %s succeeded", this->if_name_.c_str()));
+    logger_->info(logger_->fstring("ec_init on %s succeeded", this->network_interface_name_.c_str()));
 
     const int slave_count = ec_config_init(FALSE);
     if (slave_count < this->max_slave_index_) {
@@ -207,6 +207,23 @@ void EthercatMaster::ethercatLoop()
     }
 }
 
+bool EthercatMaster::isCheckSumValid(uint16_t slave)
+{
+    uint32_t checkSumValue = 0;
+    // NOTE: If the PDO mapping is changed, the "124" must be changed to the new length of the PDO MISO
+    for (int byte_offset = 0; byte_offset < 124; byte_offset++) {
+        checkSumValue += pdo_interface_.read8(slave, byte_offset).ui;
+    }
+    checkSumValue = checkSumValue % 4294967296;
+
+    uint32_t receivedCheckSum = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    if (receivedCheckSum != checkSumValue) {
+        logger_->warn(logger_->fstring("Slave %d: Checksum value is not correct. Received checksum: %d, calculated checksum: %d", slave, receivedCheckSum, checkSumValue));
+        return false;
+    }
+    return true;
+}
+
 bool EthercatMaster::sendReceivePdo()
 {
     if (this->latest_lost_slave_ == -1) {
@@ -217,6 +234,12 @@ bool EthercatMaster::sendReceivePdo()
             logger_->warn(logger_->fstring(
                 "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_));
             return false;
+        }
+        // loop over max_slave_index_ to check for each slave if checksum is correct
+        for (int slave = 1; slave <= max_slave_index_; slave++) {
+            if (!this->isCheckSumValid(slave)) {
+                return false;
+            }
         }
         return true;
     }

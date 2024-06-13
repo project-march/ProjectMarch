@@ -26,7 +26,7 @@ ModeMachineCartesianNode::~ModeMachineCartesianNode()
 
 void ModeMachineCartesianNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_Response::SharedPtr response) const
 {
-    std::set<exoMode> available_modes = m_mode_machine.getAvailableModes((exoMode)m_mode_machine.getCurrentMode());
+    std::set<ExoMode> available_modes = m_mode_machine.getAvailableModes((ExoMode)m_mode_machine.getCurrentMode());
 
     // Clear the existing modes in the msg
     response->mode_array.modes.clear();
@@ -45,7 +45,7 @@ void ModeMachineCartesianNode::handleGetExoModeArray(const std::shared_ptr<march
         std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Response> response)
 {
     RCLCPP_INFO(this->get_logger(), "Request received!");
-    exoMode new_mode = (exoMode)request->desired_mode.mode;
+    ExoMode new_mode = (ExoMode)request->desired_mode.mode;
     if (m_mode_machine.isValidTransition(new_mode))
     {
         m_mode_machine.performTransition(new_mode);

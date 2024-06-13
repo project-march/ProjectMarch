@@ -56,7 +56,6 @@ add_library(${PROJECT_NAME} STATIC
   src/state_estimator_node.cpp
   src/state_estimator.cpp
   src/sensor_fusion.cpp
-
   src/robot_description/robot_description_node.cpp
   src/robot_description/robot_description.cpp
   src/robot_description/robot_node.cpp

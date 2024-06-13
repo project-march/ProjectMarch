@@ -19,12 +19,12 @@ void StabilityTask::computeCurrentTaskCoordinates()
 {
     Eigen::VectorXd com_position;
     com_position.noalias() = m_current_world_to_base_orientation.transpose() * pinocchio::centerOfMass(m_model, *m_data);
-    m_current_task = com_position.segment(0, 2);
+    m_current_task = com_position.segment(0, STABILITY_COORDINATE_SIZE);
 }
 
 void StabilityTask::computeCurrentTaskJacobian()
 {
     Eigen::MatrixXd com_jacobian;
     com_jacobian.noalias() = m_current_world_to_base_orientation.transpose() * pinocchio::jacobianCenterOfMass(m_model, *m_data);
-    m_jacobian = com_jacobian.topRows(2);
+    m_jacobian = com_jacobian.topRows(STABILITY_COORDINATE_SIZE);
 }
