@@ -19,7 +19,7 @@ See <https://www.gnu.org/licenses/>.
   <compiler meshdir="obj-files" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.01' iterations='50' solver='PGS' gravity='0 0 -9.81'>
-    <!-- <flag energy="enable"/> -->
+    <!-- <0flag energy="enable"/> -->
   </option>
 
   <asset>
@@ -96,12 +96,17 @@ See <https://www.gnu.org/licenses/>.
     <light name="spotlight" mode="targetbodycom" target="backpack"
            diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10"/>
 
+    <!-- box to sit at startup -->
+    <!-- <body name="box" pos="-0.1 0 0.25">
+      <geom type="box" size="0.25 0.25 0.25" rgba="0.8 0.6 0.4 1" conaffinity="15" condim="3"/>
+    </body> -->
+
     <body name="safety_catcher" pos="-0.2 0 1.2">
       <inertial pos="0 0 0" mass="0.1" diaginertia="10 10 10"/>
       <!-- <joint name="safety_catch_slider_x" type="slide" axis="1 0 0" range="-10 10" pos="0 0 0"/> -->
-      <!-- <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-0.5 0.5" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_slider_y" type="slide" axis="0 1 0" range="-10 10" pos="0 0 0"/> -->
       <!-- <joint name="safety_catch_slider_z" type="slide" axis="0 0 1" range="-10 10" pos="0 0 0"/> -->
-      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-10 10" pos="0 0 0"/> -->
+      <!-- <joint name="safety_catch_hinge_x"  type="hinge" axis="1 0 0" range="-180 180" pos="0 0 0"/> -->
       <!-- <joint name="safety_catch_hinge_y"  type="hinge" axis="0 1 0" range="-180 180" pos="0 0 0"/> -->
       <!-- <joint name="safety_catch_hinge_z"  type="hinge" axis="0 0 1" range="-180 180" pos="0 0 0"/> -->
       
@@ -313,10 +318,12 @@ See <https://www.gnu.org/licenses/>.
 
   </sensor>
 
-  <!-- <keyframe>
-    <key name="test" qpos='-0.3491 0 0 0 0 -0.3491 0 0 0 0'/>
-    <key name="right" qpos='0.1745 0 0 0 0 -0.3491 0 0 0 0'/>
-    <key name="left" qpos='-0.3491 0 0 0 0 0.1745 0 0 0 0'/>
-  </keyframe> -->
+  <!-- <keyframe> -->
+    <!-- <key name="sit_free" qpos="0 0 -0.696 0 0 0 0 1.57 1.57 0 0 0 1.57 1.57 0 0"/> -->
+    <!-- <key name="sit_xz" qpos="0 -0.696 0 1.57 1.57 0 0 0 1.57 1.57 0 0"/> -->
+    <!-- <key name="test" qpos='-0.3491 0 0 0 0 -0.3491 0 0 0 0'/> -->
+    <!-- <key name="right" qpos='0.1745 0 0 0 0 -0.3491 0 0 0 0'/> -->
+    <!-- <key name="left" qpos='-0.3491 0 0 0 0 0.1745 0 0 0 0'/> -->
+  <!-- </keyframe> -->
 
 </mujoco>
