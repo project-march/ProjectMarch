@@ -44,21 +44,25 @@ def stand_to_sit():
 
 def sit_to_stand():
     time_points = 70
-    t_1 = np.linspace(0, 0.5, int(time_points/3))
+    t_1 = np.linspace(0, 1/9, int(time_points/9))
 
-    hfe_first_piecewise = 0.115*np.sin(2*np.pi*t_1-np.pi/2) + 1.685
+    hfe_first_piecewise = 0.115*np.sin(9*np.pi*t_1-np.pi/2) + 1.685
 
-    t_2 = np.linspace(0.5, 1.5, time_points-int(time_points/3))
+    t_2 = np.linspace(1/9, 1/2, int((2/5-1/9)*time_points))
 
-    hfe_second_piecewise = 0.832*np.sin(np.pi*(t_2-0.5) + np.pi/2) + 0.968
+    hfe_second_piecewise = 1.8*np.ones(int((2/5-1/9)*time_points))
+
+    t_3 = np.linspace(1/2, 1, time_points-len(t_1) - len(t_2))
+
+    hfe_third_piecewise = 0.88255*np.sin(2*np.pi*t_3 - np.pi/2) + 0.91756
 
     # HFE moet langer stil staan in die tilt stand
     
-    kfe_first_piecewise = 1.57*np.ones(int(time_points/4))
-    kfe_second_piecewise = np.linspace(1.57, 0.385, time_points-int(time_points/4))
+    kfe_first_piecewise = 1.57*np.ones(int(time_points/9))
+    kfe_second_piecewise = np.linspace(1.57, 0.185, time_points-int(time_points/9))
 
     haa = np.linspace(-0.055, -0.055, time_points)
-    hfe = np.concatenate((hfe_first_piecewise, hfe_second_piecewise))
+    hfe = np.concatenate((hfe_first_piecewise, hfe_second_piecewise, hfe_third_piecewise))
     kfe = np.concatenate((kfe_first_piecewise, kfe_second_piecewise))
     adpf = np.linspace(0.162, 0.162, time_points)
 
@@ -74,6 +78,8 @@ def sit_to_stand():
     sit_to_stand = np.column_stack([
         adpf, haa, hfe, kfe, adpf, haa, hfe, kfe
     ])
+    plt.plot(hfe)
+    plt.show()
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
                sit_to_stand, delimiter=',')
