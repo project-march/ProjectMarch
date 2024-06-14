@@ -303,7 +303,7 @@ private:
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
         Eigen::Quaterniond q = orientation;
         q.normalize();
-        return q.toRotationMatrix().eulerAngles(ROTATION_ROLL, ROTATION_PITCH, ROTATION_YAW);
+        return q.toRotationMatrix().eulerAngles(ROTATION_YAW, ROTATION_PITCH, ROTATION_ROLL);
     }
     const Eigen::Quaterniond computeExponentialMap(const Eigen::Vector3d& vector) const;
     const Eigen::Matrix3d computeSkewSymmetricMatrix(const Eigen::Vector3d& vector) const;

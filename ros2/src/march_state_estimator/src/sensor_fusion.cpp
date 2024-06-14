@@ -160,11 +160,11 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
     innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_POSITION).noalias()
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
-    // // Compute the innovation for the left and right foot slippage
-    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
-    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
+    // Compute the innovation for the left and right foot slippage
+    // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.inverse());
+    // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.inverse());
 
     #ifdef DEBUG
     std::cout << "Innovation: " << innovation.transpose() << std::endl;
@@ -226,9 +226,9 @@ void SensorFusion::computeObservationMatrix() {
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_ORIENTATION)
         = Eigen::Matrix3d::Identity();
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE).noalias()
-        = -1.0 * (m_state.imu_orientation * m_state.left_foot_slippage.conjugate()).toRotationMatrix();
+        = -1.0 * (m_state.imu_orientation * m_state.left_foot_slippage.inverse()).toRotationMatrix();
     m_observation_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE).noalias()
-        = -1.0 * (m_state.imu_orientation * m_state.right_foot_slippage.conjugate()).toRotationMatrix();
+        = -1.0 * (m_state.imu_orientation * m_state.right_foot_slippage.inverse()).toRotationMatrix();
 
     #ifdef DEBUG
     std::cout << "Observation matrix:\n" << m_observation_matrix << std::endl;
