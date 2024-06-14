@@ -72,7 +72,7 @@ void SensorFusion::predictState() {
     // Update the state with prior knowledge
     m_state.imu_position.noalias() += m_timestep * m_state.imu_velocity + 0.5 * m_timestep * expected_linear_velocity;
     m_state.imu_velocity.noalias() += expected_linear_velocity;
-    // m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
+    m_state.imu_orientation = computeExponentialMap(m_timestep * computeMeasuredAngularVelocity()) * m_state.imu_orientation;
 
     // Normalize the orientations
     m_state.imu_orientation.normalize();
@@ -118,7 +118,7 @@ void SensorFusion::updateState() {
     // Update the state with the correction vector
     m_state.imu_position.noalias() += correction_vector.segment<3>(STATE_INDEX_POSITION);
     m_state.imu_velocity.noalias() += correction_vector.segment<3>(STATE_INDEX_VELOCITY);
-    // m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
+    m_state.imu_orientation = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_ORIENTATION)) * m_state.imu_orientation;
     m_state.accelerometer_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_ACCELEROMETER_BIAS);
     m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
@@ -161,10 +161,10 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
     // // Compute the innovation for the left and right foot slippage
-    // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
-    //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
-    // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
-    //     = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
+    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
+        = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.conjugate());
+    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
+        = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.conjugate());
 
     #ifdef DEBUG
     std::cout << "Innovation: " << innovation.transpose() << std::endl;
@@ -180,9 +180,9 @@ const Eigen::MatrixXd SensorFusion::computeNoiseJacobianMatrix() const {
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
-    // #ifdef DEBUG
-    // std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
-    // #endif
+    #ifdef DEBUG
+    std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
+    #endif
     return noise_jacobian_matrix;
 }
 

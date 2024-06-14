@@ -232,16 +232,9 @@ private:
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
         Eigen::MatrixXd prior_covariance_matrix;
         prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose() + m_process_noise_covariance_matrix;
-        try {
-            Eigen::LLT<Eigen::MatrixXd> llt(prior_covariance_matrix);
-            if (llt.info() == Eigen::NumericalIssue) {
-                throw std::runtime_error("Prior covariance matrix is not positive semi-definite.");
-            }
-        } catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-        }
         #ifdef DEBUG
         std::cout << "Prior covariance matrix:\n" << prior_covariance_matrix << std::endl;
+        matrixIsPositiveSemiDefinite(prior_covariance_matrix, "prior covariance");
         #endif
         return prior_covariance_matrix;
     }
@@ -249,32 +242,18 @@ private:
     inline const Eigen::MatrixXd computePosteriorCovarianceMatrix() const {
         Eigen::MatrixXd posterior_covariance_matrix;
         posterior_covariance_matrix.noalias() = (Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) - m_kalman_gain * m_observation_matrix) * m_state.covariance_matrix;
-        try {
-            Eigen::LLT<Eigen::MatrixXd> llt(posterior_covariance_matrix);
-            if (llt.info() == Eigen::NumericalIssue) {
-                throw std::runtime_error("Posterior covariance matrix is not positive semi-definite.");
-            }
-        } catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-        }
         #ifdef DEBUG
         std::cout << "Posterior covariance matrix:\n" << posterior_covariance_matrix << std::endl;
+        matrixIsPositiveSemiDefinite(posterior_covariance_matrix, "posterior covariance");
         #endif
         return posterior_covariance_matrix;
     }
 
     inline void computeInnovationCovarianceMatrix() {
         m_innovation_covariance_matrix.noalias() = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose() + m_observation_noise_covariance_matrix;
-        try {
-            Eigen::LLT<Eigen::MatrixXd> llt(m_innovation_covariance_matrix);
-            if (llt.info() == Eigen::NumericalIssue) {
-                throw std::runtime_error("Innovation covariance matrix is not positive semi-definite.");
-            }
-        } catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-        }
         #ifdef DEBUG
         std::cout << "Innovation covariance matrix:\n" << m_innovation_covariance_matrix << std::endl;
+        matrixIsPositiveSemiDefinite(m_innovation_covariance_matrix, "innovation covariance");
         #endif
     }
 
@@ -286,10 +265,10 @@ private:
     }
 
     inline void computeProcessNoiseCovarianceMatrix() {
-        // Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
-        // m_process_noise_covariance_matrix.noalias() 
-        //     = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
-        //         * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
+        Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
+        m_process_noise_covariance_matrix.noalias() 
+            = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
+                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
         #ifdef DEBUG
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
         #endif
@@ -300,6 +279,18 @@ private:
         #ifdef DEBUG
         std::cout << "Performance cost:\n" << m_performance_cost << std::endl;
         #endif
+    }
+
+    inline void matrixIsPositiveSemiDefinite(const Eigen::MatrixXd& matrix, const std::string& matrix_name) const {
+        try {
+            Eigen::LLT<Eigen::MatrixXd> llt(matrix);
+            if (llt.info() == Eigen::NumericalIssue) {
+                std::string error_message = matrix_name + " matrix is not positive semi-definite.";
+                throw std::runtime_error(error_message);
+            }
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     const Eigen::VectorXd computeInnovation() const;

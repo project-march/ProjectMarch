@@ -204,16 +204,16 @@ void StateEstimatorNode::timerCallback()
         ekf_observation.imu_acceleration
             = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
         ekf_observation.imu_angular_velocity.noalias()
-            = -1.0 * Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
+            = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
         std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
         ekf_observation.left_foot_position
             = Eigen::Vector3d(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[LEFT_FOOT_ID].position.y, body_foot_poses[LEFT_FOOT_ID].position.z);
         ekf_observation.right_foot_position
             = Eigen::Vector3d(body_foot_poses[RIGHT_FOOT_ID].position.x, body_foot_poses[RIGHT_FOOT_ID].position.y, body_foot_poses[RIGHT_FOOT_ID].position.z);
         ekf_observation.left_foot_slippage
-            = Eigen::Quaterniond(body_foot_poses[LEFT_FOOT_ID].orientation.w, body_foot_poses[LEFT_FOOT_ID].orientation.x, body_foot_poses[LEFT_FOOT_ID].orientation.y, body_foot_poses[LEFT_FOOT_ID].orientation.z).inverse();
+            = Eigen::Quaterniond(body_foot_poses[LEFT_FOOT_ID].orientation.w, body_foot_poses[LEFT_FOOT_ID].orientation.x, body_foot_poses[LEFT_FOOT_ID].orientation.y, body_foot_poses[LEFT_FOOT_ID].orientation.z);
         ekf_observation.right_foot_slippage
-            = Eigen::Quaterniond(body_foot_poses[RIGHT_FOOT_ID].orientation.w, body_foot_poses[RIGHT_FOOT_ID].orientation.x, body_foot_poses[RIGHT_FOOT_ID].orientation.y, body_foot_poses[RIGHT_FOOT_ID].orientation.z).inverse();
+            = Eigen::Quaterniond(body_foot_poses[RIGHT_FOOT_ID].orientation.w, body_foot_poses[RIGHT_FOOT_ID].orientation.x, body_foot_poses[RIGHT_FOOT_ID].orientation.y, body_foot_poses[RIGHT_FOOT_ID].orientation.z);
         m_sensor_fusion->setObservation(ekf_observation);
 
         #ifdef DEBUG
