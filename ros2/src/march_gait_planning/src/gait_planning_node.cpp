@@ -30,6 +30,7 @@ GaitPlanningNode::GaitPlanningNode()
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
 
+    //TODO: NOT UP TO DATE WITH THE ANGLES IMPLEMENTATION
     m_home_stand = {0.19, 0.22, -0.9, 0.19, -0.22, -0.9};
 }
 
