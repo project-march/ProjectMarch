@@ -36,6 +36,7 @@ enum class ODriveObjectName {
     MotorTemperature,
     ShadowCount,
     Torque,
+    PosAbsRad,
     AIEAbsolutePosition,
     CheckSumMISO,
     CheckSumMOSIStatus,
