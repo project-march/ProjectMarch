@@ -88,6 +88,7 @@ private:
     uint32_t getAbsolutePositionIU();
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
+    float getPosAbsRad();
     float getAIEAbsolutePositionRad(); 
     uint32_t getCheckSum();
 

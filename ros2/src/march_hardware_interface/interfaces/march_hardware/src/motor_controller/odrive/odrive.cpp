@@ -200,6 +200,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
+    state->pos_abs_rad_ = getPosAbsRad();
     state->AIE_absolute_position_ = getAIEAbsolutePositionRad();
     state->check_sum_ = getCheckSum();
 
@@ -278,6 +279,16 @@ float ODrive::getIncrementalVelocityIU()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorVelocity, axis_)).f
         * (float)incremental_encoder_->getDirection();
+}
+
+float ODrive::getPosAbsRad()
+{
+    float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
+    float pos_abs_rad_check = 5;
+    if (abs(pos_abs_rad) > pos_abs_rad_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
+    }
+    return pos_abs_rad;
 }
 
 float ODrive::getAIEAbsolutePositionRad()
