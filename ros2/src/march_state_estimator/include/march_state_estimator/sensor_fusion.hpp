@@ -174,20 +174,34 @@ public:
         m_observation_noise_covariance_right_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
         m_observation_noise_covariance_left_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
 
+        m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, MEASUREMENT_INDEX_LEFT_POSITION)
+            = m_observation_noise_covariance_left_position_matrix;
+        m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_POSITION, MEASUREMENT_INDEX_RIGHT_POSITION)
+            = m_observation_noise_covariance_right_position_matrix;
+        m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE, MEASUREMENT_INDEX_LEFT_SLIPPAGE)
+            = m_observation_noise_covariance_left_slippage_matrix;
+        m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, MEASUREMENT_INDEX_RIGHT_SLIPPAGE)
+            = m_observation_noise_covariance_right_slippage_matrix;
+
         #ifdef DEBUG
         std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
         #endif
     }
 
     inline void updateStanceLeg(uint8_t current_stance_leg) {
-        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION)
-            = (current_stance_leg & 0b01) * m_process_noise_foot_position + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION)
-            = ((current_stance_leg & 0b10) >> 1) * m_process_noise_foot_position + (~(current_stance_leg & 0b10) >> 1) *computeVeryLargeMatrix3d();
-        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
-            = (current_stance_leg & 0b01) * m_process_noise_foot_slippage + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
-            = ((current_stance_leg & 0b10) >> 1) * m_process_noise_foot_slippage + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
+        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION)
+        //     = (current_stance_leg & 0b01) * m_process_noise_foot_position + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION)
+        //     = ((current_stance_leg >> 1) & 0b01) * m_process_noise_foot_position + ((~current_stance_leg >> 1) & 0b01) *computeVeryLargeMatrix3d();
+        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
+        //     = (current_stance_leg & 0b01) * m_process_noise_foot_slippage + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
+        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
+        //     = ((current_stance_leg >> 1) & 0b01) * m_process_noise_foot_slippage + ((~current_stance_leg >> 1) & 0b01) * computeVeryLargeMatrix3d();
+
+        #ifdef DEBUG
+        std::cout << "Current stance leg: " << (int)current_stance_leg << std::endl;
+        std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
+        #endif
 
         m_observation_noise_covariance_left_position_matrix
             = (current_stance_leg & 0b01) * m_observation_noise_covariance_position_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
@@ -197,6 +211,10 @@ public:
             = (current_stance_leg & 0b01) * m_observation_noise_covariance_slippage_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
         m_observation_noise_covariance_right_slippage_matrix
             = ((current_stance_leg & 0b10) >> 1) * m_observation_noise_covariance_slippage_matrix + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
+
+        #ifdef DEBUG
+        std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
+        #endif
     }
 
 private:
@@ -214,6 +232,14 @@ private:
     inline const Eigen::MatrixXd computePriorCovarianceMatrix() const {
         Eigen::MatrixXd prior_covariance_matrix;
         prior_covariance_matrix.noalias() = m_dynamics_matrix * m_state.covariance_matrix * m_dynamics_matrix.transpose() + m_process_noise_covariance_matrix;
+        try {
+            Eigen::LLT<Eigen::MatrixXd> llt(prior_covariance_matrix);
+            if (llt.info() == Eigen::NumericalIssue) {
+                throw std::runtime_error("Prior covariance matrix is not positive semi-definite.");
+            }
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
         #ifdef DEBUG
         std::cout << "Prior covariance matrix:\n" << prior_covariance_matrix << std::endl;
         #endif
@@ -223,6 +249,14 @@ private:
     inline const Eigen::MatrixXd computePosteriorCovarianceMatrix() const {
         Eigen::MatrixXd posterior_covariance_matrix;
         posterior_covariance_matrix.noalias() = (Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) - m_kalman_gain * m_observation_matrix) * m_state.covariance_matrix;
+        try {
+            Eigen::LLT<Eigen::MatrixXd> llt(posterior_covariance_matrix);
+            if (llt.info() == Eigen::NumericalIssue) {
+                throw std::runtime_error("Posterior covariance matrix is not positive semi-definite.");
+            }
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
         #ifdef DEBUG
         std::cout << "Posterior covariance matrix:\n" << posterior_covariance_matrix << std::endl;
         #endif
@@ -231,30 +265,38 @@ private:
 
     inline void computeInnovationCovarianceMatrix() {
         m_innovation_covariance_matrix.noalias() = m_observation_matrix * m_state.covariance_matrix * m_observation_matrix.transpose() + m_observation_noise_covariance_matrix;
+        try {
+            Eigen::LLT<Eigen::MatrixXd> llt(m_innovation_covariance_matrix);
+            if (llt.info() == Eigen::NumericalIssue) {
+                throw std::runtime_error("Innovation covariance matrix is not positive semi-definite.");
+            }
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
         #ifdef DEBUG
         std::cout << "Innovation covariance matrix:\n" << m_innovation_covariance_matrix << std::endl;
         #endif
     }
 
     inline void computeKalmanGain() {
-        m_kalman_gain.noalias() = m_state.covariance_matrix * m_observation_matrix.transpose() * m_innovation_covariance_matrix.completeOrthogonalDecomposition().pseudoInverse();
+        m_kalman_gain.noalias() = m_state.covariance_matrix * m_observation_matrix.transpose() * m_innovation_covariance_matrix.inverse();
         #ifdef DEBUG
         std::cout << "Kalman gain matrix:\n" << m_kalman_gain << std::endl;
         #endif
     }
 
     inline void computeProcessNoiseCovarianceMatrix() {
-        Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
-        m_process_noise_covariance_matrix.noalias() 
-            = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
-                * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
+        // Eigen::MatrixXd noise_jacobian_matrix = computeNoiseJacobianMatrix();
+        // m_process_noise_covariance_matrix.noalias() 
+        //     = m_dynamics_matrix * noise_jacobian_matrix * m_process_noise_covariance_matrix 
+        //         * noise_jacobian_matrix.transpose() * m_dynamics_matrix.transpose() * m_timestep;
         #ifdef DEBUG
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
         #endif
     }
 
     inline void computePerformanceCost(const Eigen::VectorXd& innovation) {
-        m_performance_cost = innovation.transpose() * m_innovation_covariance_matrix.completeOrthogonalDecomposition().pseudoInverse() * innovation;
+        m_performance_cost = innovation.transpose() * m_innovation_covariance_matrix.inverse() * innovation;
         #ifdef DEBUG
         std::cout << "Performance cost:\n" << m_performance_cost << std::endl;
         #endif
@@ -266,7 +308,7 @@ private:
     void computeObservationMatrix();
     void computeObservationNoiseCovarianceMatrix();
 
-    inline const Eigen::Matrix3d computeVeryLargeMatrix3d() const { return Eigen::Matrix3d::Identity() * 1e15; }
+    inline const Eigen::Matrix3d computeVeryLargeMatrix3d() const { return Eigen::Matrix3d::Identity() * 1e23; }
     inline const Eigen::Vector3d computeEulerAngles(const Eigen::Quaterniond& orientation) const {
         Eigen::Quaterniond q = orientation;
         q.normalize();

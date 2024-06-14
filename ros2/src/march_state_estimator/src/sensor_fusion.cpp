@@ -58,7 +58,7 @@ SensorFusion::SensorFusion(double timestep) {
     m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
 
     // Initialize the performance cost with a large value
-    m_performance_cost = 1e15;
+    m_performance_cost = 1e23;
 }
 
 void SensorFusion::predictState() {
@@ -123,8 +123,8 @@ void SensorFusion::updateState() {
     m_state.gyroscope_bias.noalias() += correction_vector.segment<3>(STATE_INDEX_GYROSCOPE_BIAS);
     m_state.left_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_LEFT_FOOT_POSITION);
     m_state.right_foot_position.noalias() += correction_vector.segment<3>(STATE_INDEX_RIGHT_FOOT_POSITION);
-    // m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
-    // m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
+    m_state.left_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_LEFT_SLIPPAGE)) * m_state.left_foot_slippage;
+    m_state.right_foot_slippage = computeExponentialMap(correction_vector.segment<3>(STATE_INDEX_RIGHT_SLIPPAGE)) * m_state.right_foot_slippage;
     m_state.covariance_matrix.noalias() = computePosteriorCovarianceMatrix();
 
     // Normalize the orientations
@@ -180,9 +180,9 @@ const Eigen::MatrixXd SensorFusion::computeNoiseJacobianMatrix() const {
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
     noise_jacobian_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
-    #ifdef DEBUG
-    std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
-    #endif
+    // #ifdef DEBUG
+    // std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
+    // #endif
     return noise_jacobian_matrix;
 }
 
@@ -242,9 +242,9 @@ void SensorFusion::computeObservationNoiseCovarianceMatrix() {
         // Fixed-size template cannot be used with aliases
         jacobians[i] = Eigen::MatrixXd::Zero(SE3_DIMENSION_SIZE, m_robot_model.nv);
         pinocchio::computeJointJacobian(m_robot_model, *m_robot_data, m_joint_position, m_joint_idx[i], jacobians[i]);
-        #ifdef DEBUG
-        std::cout << "Jacobian " << i << ":\n" << jacobians[i] << std::endl;
-        #endif
+        // #ifdef DEBUG
+        // std::cout << "Jacobian " << i << ":\n" << jacobians[i] << std::endl;
+        // #endif
     }
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_LEFT_POSITION, MEASUREMENT_INDEX_LEFT_POSITION).noalias()
         = m_observation_noise_covariance_left_position_matrix + jacobians[LEFT_LEG_INDEX].block(JACOBIAN_POSITION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
@@ -280,9 +280,9 @@ const Eigen::Matrix3d SensorFusion::computeSkewSymmetricMatrix(const Eigen::Vect
                              vector[Z_AXIS], 0.0, -vector[X_AXIS],
                              -vector[Y_AXIS], vector[X_AXIS], 0.0;
 
-    #ifdef DEBUG
-    std::cout << "Skew-symmetric matrix:\n" << skew_symmetric_matrix << std::endl;
-    #endif
+    // #ifdef DEBUG
+    // std::cout << "Skew-symmetric matrix:\n" << skew_symmetric_matrix << std::endl;
+    // #endif
 
     return skew_symmetric_matrix;
 }
