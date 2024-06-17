@@ -144,37 +144,7 @@ void Joint::readEncoders()
 
     if (this->receivedDataUpdate()) {
         last_read_time_ = std::chrono::steady_clock::now();
-        /* Calculate position by using the base absolute position and adding
-         * the difference between the initial incremental position and the new
-         * incremental position
-         *
-         * Calculation example:
-         * Say the first time the encoders are read they have the following
-         * values:
-         *  - absolute:     0.5
-         *  - incremental:  0.7
-         *
-         *  Then the joint has an initial absolute position of 0.5 and an
-         * initial incremental position of 0.7 Since the joint uses the absolute
-         * encoder at startup, the initial position of the joint is 0.5
-         *
-         *  Say the second time the encoders are read they have the following
-         * values:
-         *  - absolute:     0.25
-         *  - incremental:  0.4
-         *
-         *  If the incremental encoder of the joint is more precise, then we
-         * should use that value.
-         * The difference in incremental position is 0.4 - 0.7 = -0.3.
-         * Hence the new joint position is 0.5 - 0.3 = 0.2.
-         *
-         *  If the absolute encoder of the joint is more precise, then we should
-         * use that value This would give us a new joint position of 0.25
-         */
-
-
-        // TODO: check if really redundant
-        if (motor_controller_-> useIncrementalEncoderForPosition()) {
+        if (motor_controller_-> useLowLevelForPosition()) {
             double new_incremental_position = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
         } else {

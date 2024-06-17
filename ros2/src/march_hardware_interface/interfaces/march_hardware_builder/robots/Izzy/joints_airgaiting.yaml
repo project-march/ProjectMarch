@@ -8,7 +8,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -39,7 +39,7 @@ march9:
         motor_controller:
           slaveIndex: 3
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -70,7 +70,7 @@ march9:
         motor_controller:
           slaveIndex: 3
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1
@@ -101,7 +101,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -132,7 +132,7 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -163,7 +163,7 @@ march9:
         motor_controller:
           slaveIndex: 2
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -194,7 +194,7 @@ march9:
         motor_controller:
           slaveIndex: 2
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -225,7 +225,7 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1

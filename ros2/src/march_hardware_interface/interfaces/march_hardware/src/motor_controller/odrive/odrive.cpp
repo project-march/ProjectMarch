@@ -25,9 +25,9 @@
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, bool use_inc_enc_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
+    ActuationMode actuation_mode, bool use_low_level_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
     : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor),
-        actuation_mode, std::move(use_inc_enc_for_position) , std::move(logger))
+        actuation_mode, std::move(use_low_level_for_position) , std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
 {
@@ -284,7 +284,7 @@ float ODrive::getIncrementalVelocityIU()
 float ODrive::getPosAbsRad()
 {
     float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
-    float pos_abs_rad_check = 5;
+    float pos_abs_rad_check = 2;
     if (abs(pos_abs_rad) > pos_abs_rad_check) {
         RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
     }
@@ -303,12 +303,7 @@ float ODrive::getAIEAbsolutePositionRad()
 
 uint32_t ODrive::getCheckSum()
 {
-    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
-    // uint32_t checksum_check = 987654321;
-    // if (checksum != checksum_check) {
-    //     RCLCPP_ERROR(rclcpp::get_logger("getCheckSum"), "Checksum value is %u, the CheckSum object's bits are probably scrambled like some tasty eggs.", checksum);
-    // }
-    return checksum;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
 }
 
 float ODrive::getAbsolutePositionUnchecked()

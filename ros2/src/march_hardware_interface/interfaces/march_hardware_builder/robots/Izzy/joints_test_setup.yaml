@@ -7,7 +7,7 @@ testsetup:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -31,13 +31,13 @@ testsetup:
             i: 0.0
             d: 0.2
           torque:
-            p: 50.0
-            d: 0.0002
+            p: 0.0
+            d: 0.0
     - rotational_joint:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -61,5 +61,5 @@ testsetup:
             i: 0.0
             d: 1.5
           torque:
-            p: 0.1
+            p: 0.0
             d: 0.0

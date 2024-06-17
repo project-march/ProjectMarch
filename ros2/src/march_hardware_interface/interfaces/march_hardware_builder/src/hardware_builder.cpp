@@ -132,7 +132,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const march_logger:
     const auto slave_index = odrive_config["slaveIndex"].as<int>();
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
     const auto& absolute_encoder_config = odrive_config["absoluteEncoder"];
-    const auto& use_inc_enc_for_position_config = odrive_config["useIncrementalEncoderForPosition"];
+    const auto& use_low_level_for_position_config = odrive_config["useLowLevelForPosition"];
     const auto& incremental_encoder_config = odrive_config["incrementalEncoder"];
     const auto& torque_sensor_config = odrive_config["torqueSensor"];
   
@@ -146,7 +146,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const march_logger:
         /*incremental_encoder=*/HardwareBuilder::createIncrementalEncoder(incremental_encoder_config, march::MotorControllerType::ODrive),
         /*torque_sensor=*/HardwareBuilder::createTorqueSensor(torque_sensor_config, march::MotorControllerType::ODrive),
         /*actuation_mode=*/mode,
-        /*use_inc_enc_for_position=*/use_inc_enc_for_position_config,
+        /*use_low_level_for_position=*/use_low_level_for_position_config,
         /*index_found=*/index_found,
         /*logger=*/loggerPtr);
 }
