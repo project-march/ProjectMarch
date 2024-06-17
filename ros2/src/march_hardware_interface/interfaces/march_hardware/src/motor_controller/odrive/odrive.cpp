@@ -281,16 +281,6 @@ float ODrive::getIncrementalVelocityIU()
         * (float)incremental_encoder_->getDirection();
 }
 
-float ODrive::getPosAbsRad()
-{
-    float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
-    float pos_abs_rad_check = 2;
-    if (abs(pos_abs_rad) > pos_abs_rad_check) {
-        RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
-    }
-    return pos_abs_rad;
-}
-
 float ODrive::getAIEAbsolutePositionRad()
 {
     uint32_t aie_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
@@ -329,8 +319,17 @@ float ODrive::getIncrementalVelocityUnchecked()
 
 float ODrive::getTorqueUnchecked()
 {
-    float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
-    return measured_torque;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
+}
+
+float ODrive::getPosAbsRad()
+{
+    float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
+    float pos_abs_rad_check = 2;
+    if (abs(pos_abs_rad) > pos_abs_rad_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
+    }
+    return pos_abs_rad;
 }
 
 float ODrive::getMotorCurrent()

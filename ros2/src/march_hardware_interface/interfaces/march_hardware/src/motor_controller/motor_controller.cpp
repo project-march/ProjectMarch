@@ -45,7 +45,7 @@ bool MotorController::useLowLevelForPosition() const
 float MotorController::getPosition()
 {
     if (useLowLevelForPosition()) {
-        return getIncrementalPosition();
+        return getLowLevelPosition();
     }
     return getAbsolutePosition();
 }
@@ -103,6 +103,11 @@ float MotorController::getTorque()
     } else {
         return getTorqueUnchecked();
     }
+}
+
+float MotorController::getLowLevelPosition()
+{
+    return getPosAbsRad();
 }
 
 double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const

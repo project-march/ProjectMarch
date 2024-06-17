@@ -78,6 +78,7 @@ protected:
     float getAbsoluteVelocityUnchecked() override;
     float getIncrementalVelocityUnchecked() override;
     float getTorqueUnchecked() override;
+    float getPosAbsRad() override;
 
 private:
     // Getter and setter for the axis state
@@ -88,7 +89,6 @@ private:
     uint32_t getAbsolutePositionIU();
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
-    float getPosAbsRad();
     float getAIEAbsolutePositionRad(); 
     uint32_t getCheckSum();
 

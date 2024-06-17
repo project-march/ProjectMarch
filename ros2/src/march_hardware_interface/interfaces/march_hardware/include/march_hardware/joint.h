@@ -89,6 +89,10 @@ public:
      */
     bool isWithinHardLimits() const;
 
+    bool hasMotorControllerError();
+
+    void logHardLimits();
+
     /** @brief Override comparison operator */
     friend bool operator==(const Joint& lhs, const Joint& rhs)
     {

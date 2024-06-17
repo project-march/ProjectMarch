@@ -31,6 +31,7 @@ public:
     float getIncrementalPosition();
     float getIncrementalVelocity();
     float getTorque();
+    float getLowLevelPosition();
 
     /**
      * \brief Applies an clamp, an motor-direction and Effort to IU Effort conversion transformation.
@@ -147,6 +148,7 @@ protected:
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
     virtual float getTorqueUnchecked() = 0;
+    virtual float getPosAbsRad() = 0;
 
     std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
     std::unique_ptr<IncrementalEncoder> incremental_encoder_;

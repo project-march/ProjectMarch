@@ -53,14 +53,6 @@ void Joint::enableActuation()
     motor_controller_->enableActuation();
 }
 
-/***
- * This functions checks if the fuzzy control values are equal to one, when added together.
- * When this is the case, the joints van be actuated, and the target torque and position can be send to the ethercat.
- * @param target_position
- * @param target_torque
- * @param position_weight
- * @param torque_weight
- */
 void Joint::actuate(float target_position, float target_torque, float position_weight, float torque_weight)
 {
     float total_fuzzy = torque_weight + position_weight;
@@ -75,66 +67,56 @@ void Joint::actuate(float target_position, float target_torque, float position_w
 
 void Joint::readFirstEncoderValues(bool operational_check)
 {
-    logger_->info(logger_->fstring("[%s] Reading first values", this->name_.c_str()));
+    logger_->info(logger_->fstring("[%s] Reading first encoder values", this->name_.c_str()));
 
-    // Preconditions check
-    if (operational_check) {
-        auto motor_controller_state = motor_controller_->getState();
+    if (operational_check && hasMotorControllerError()) {
+        throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
+    }
+    
+    initial_incremental_position_ = motor_controller_->getIncrementalPosition();
+    logger_->warn(logger_->fstring("Initial incremental position: %f", initial_incremental_position_));
+
+    initial_absolute_position_ = motor_controller_->getAbsolutePosition();
+    logger_->warn(logger_->fstring("Initial absolute position: %f", initial_absolute_position_));
+    
+    position_ = motor_controller_-> useLowLevelForPosition() ? motor_controller_->getLowLevelPosition() : motor_controller_->getAbsolutePosition();
+
+    if (operational_check && !isWithinHardLimits()) {
+        logHardLimits();
+
+        throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
+            "Joint %s is outside hard limits, value is %f, limits are [%d, %d]", name_.c_str(), position_,
+            motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
+            motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
+    }
+    
+    initial_torque_ = motor_controller_->getTorque();
+    logger_->warn(logger_->fstring("Initial torque: %f", initial_torque_));
+    torque_ = initial_torque_;
         
-        if (motor_controller_state->hasError()) {     
-            logger_->fatal(logger_->fstring("[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().c_str()));
-            
-            throw error::HardwareException(error::ErrorType::PREPARE_ACTUATION_ERROR);
-        }
+    if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(initial_torque_)) {
+        throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+            "Joint %s has an initial torque of %f, while initial torque can at most be absolute ", name_.c_str(),
+            initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
+    }     
+
+    logger_->info(logger_->fstring("[%s] Read initial encoder values, and joint is within its hard limits.", this->name_.c_str()));
+}
+
+bool Joint::hasMotorControllerError() {
+    auto motor_controller_state = motor_controller_->getState();
+    if (motor_controller_state->hasError()) {     
+        logger_->fatal(logger_->fstring("[%s]: %s", this->name_.c_str(), motor_controller_state->getErrorStatus().c_str()));
+        return true;
     }
+    return false;
+}
 
-    // TODO: outdated check since all joints have an incremental encoder > remove in the cleanup.
-    if (motor_controller_->hasIncrementalEncoder()) {
-        initial_incremental_position_ = motor_controller_->getIncrementalPosition();
-        logger_->warn(logger_->fstring("Initial incremental position: %f", initial_incremental_position_));
-    }
-
-    // TODO: outdated check since all joints have an absolute encoder > remove in the cleanup.
-    if (motor_controller_->hasAbsoluteEncoder()) {
-        initial_absolute_position_ = motor_controller_->getAbsolutePosition();
-        logger_->warn(logger_->fstring("Initial absolute position: %f", initial_absolute_position_));
-
-        // TODO: this check should be removed once the motor controllers are properly communicating this information.
-        if (initial_absolute_position_ == 0) {
-            throw error::HardwareException(error::ErrorType::ABSOLUTE_ENCODER_ZERO,
-                "Joint %s has an initial absolute position of 0, which is not allowed", name_.c_str());
-        }
-
-        position_ = initial_absolute_position_;
-        logger_->warn(logger_->fstring("Current pos (iu ) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
-
-        if (operational_check && !isWithinHardLimits()) {
-            logger_->warn(logger_->fstring("Lower limit is: %d", motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU()));
-            logger_->warn(logger_->fstring("Upper limit is: %d", motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU()));
-            logger_->warn(logger_->fstring("Current pos (rad) is: %f", position_));
-            logger_->warn(logger_->fstring("Current pos (iu ) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
-
-
-            throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
-                "Joint %s is outside hard limits, value is %f, limits are [%d, %d]", name_.c_str(), position_,
-                motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
-                motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
-        }
-    }
-
-    // Soon to be outdated check since all joints will have a torque sensor
-    if (motor_controller_->hasTorqueSensor()) {
-        initial_torque_ = motor_controller_->getTorque();
-        logger_->warn(logger_->fstring("Initial torque: %f", initial_torque_));
-        torque_ = initial_torque_;
-        
-        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(initial_torque_)) {
-            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                "Joint %s has an initial torque of %f, while initial torque can at most be absolute ", name_.c_str(),
-                initial_torque_, motor_controller_->getTorqueSensor()->getMaxTorque());
-        }
-    }
-    logger_->info(logger_->fstring("[%s] Read initial values", this->name_.c_str()));
+void Joint::logHardLimits() {
+    logger_->warn(logger_->fstring("Lower limit is: %d", motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU()));
+    logger_->warn(logger_->fstring("Upper limit is: %d", motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU()));
+    logger_->warn(logger_->fstring("Current pos (rad) is: %f", position_));
+    logger_->warn(logger_->fstring("Current pos (iu ) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
 }
 
 void Joint::readEncoders()
@@ -143,32 +125,28 @@ void Joint::readEncoders()
     std::chrono::duration<double> time_between_last_update = current_time - last_read_time_;
 
     if (this->receivedDataUpdate()) {
-        last_read_time_ = std::chrono::steady_clock::now();
-        if (motor_controller_-> useLowLevelForPosition()) {
-            double new_incremental_position = motor_controller_->getIncrementalPosition();
-            position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
-        } else {
-            position_ = motor_controller_->getAbsolutePosition();
-        }
-
-        velocity_ = motor_controller_->getVelocity();
-        if (motor_controller_->hasTorqueSensor()) {
-            torque_ = motor_controller_->getTorque();
-            if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
-                throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
-                    "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
-                    motor_controller_->getTorqueSensor()->getMaxTorque());
-            }
-        } else {
-            logger_->info(logger_->fstring("No reading the torque sensors"));
-        }
-    } else {
         if (time_between_last_update
             >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
             logger_->warn(
                 logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
                     this->name_.c_str(), time_between_last_update.count()));
         }
+        return;
+    }
+    
+    last_read_time_ = std::chrono::steady_clock::now();
+    position_ = motor_controller_-> useLowLevelForPosition() ? motor_controller_->getLowLevelPosition() : motor_controller_->getAbsolutePosition();
+    velocity_ = motor_controller_->getVelocity();
+
+    if (motor_controller_->hasTorqueSensor()) {
+        torque_ = motor_controller_->getTorque();
+        if (motor_controller_->getTorqueSensor()->exceedsMaxTorque(torque_)) {
+            throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
+                "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
+                motor_controller_->getTorqueSensor()->getMaxTorque());
+        }
+    } else {
+        logger_->info(logger_->fstring("No reading the torque sensors"));
     }
 }
 
