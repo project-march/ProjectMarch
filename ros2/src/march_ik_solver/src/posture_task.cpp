@@ -26,9 +26,6 @@ void PostureTask::computeCurrentTaskCoordinates()
         // Fixed-size template cannot be used with aliases
         m_current_task(i) = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(
             ROTATION_YAW_INDEX, ROTATION_PITCH_INDEX, ROTATION_ROLL_INDEX).y();
-        if (m_current_task(i) > M_PI) {
-            m_current_task(i) -= 2 * M_PI;
-        }
     }
 }
 
