@@ -65,7 +65,6 @@ Eigen::VectorXd IKSolver::solveInverseKinematics()
             + previous_task_weight * (m_task_map.at(task_name)->getNullspaceProjection() * m_desired_joint_velocities);
         previous_task_weight = m_task_map.at(task_name)->getWeight();
     }
-    // m_desired_joint_velocities = clampJointVelocities(m_desired_joint_velocities); // TODO: Do we need to clamp joint velocities in this manner?
     return m_desired_joint_velocities;
 }
 
@@ -75,6 +74,21 @@ Eigen::VectorXd IKSolver::integrateJointVelocities()
     desired_joint_positions.noalias() = m_current_joint_positions + m_desired_joint_velocities * m_dt;
     m_current_joint_positions = clampJointLimits(desired_joint_positions);
     return m_current_joint_positions;
+}
+
+Eigen::VectorXd IKSolver::applyJointVelocityLimits(const double& dt,
+    const Eigen::VectorXd& desired_joint_positions, 
+    const Eigen::VectorXd& current_joint_positions) const
+{
+    Eigen::VectorXd joint_velocities = Eigen::VectorXd::Zero(m_joint_names.size());
+    joint_velocities.noalias() = (desired_joint_positions - current_joint_positions) / dt;
+    for (long unsigned int i = 0; i < m_joint_names.size(); i++) {
+        joint_velocities(i) = boost::algorithm::clamp(
+            joint_velocities(i), 
+            m_joint_velocity_limits[i][LOWER_JOINT_LIMIT], 
+            m_joint_velocity_limits[i][UPPER_JOINT_LIMIT]);
+    }
+    return joint_velocities * dt + current_joint_positions;
 }
 
 bool IKSolver::areTasksConverged()
@@ -137,7 +151,8 @@ Eigen::VectorXd IKSolver::clampJointVelocities(Eigen::VectorXd desired_joint_vel
 
 void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_names,
     const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
-    const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits)
+    const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits,
+    const double& joint_velocity_multiplier)
 {
     m_joint_names = joint_names;
 
@@ -147,9 +162,12 @@ void IKSolver::setJointConfigurations(const std::vector<std::string>& joint_name
         return;
     }
 
-    double multiplier = 1.0;
     for (long unsigned int i = 0; i < joint_names.size(); i++) {
-        m_joint_position_limits.push_back({ deg2rad(joint_position_lower_limits[i]), deg2rad(joint_position_upper_limits[i]) });
-        m_joint_velocity_limits.push_back({ multiplier * deg2rad(joint_velocity_lower_limits[i]), multiplier * deg2rad(joint_velocity_upper_limits[i]) });
+        m_joint_position_limits.push_back({ 
+            deg2rad(joint_position_lower_limits[i]), 
+            deg2rad(joint_position_upper_limits[i]) });
+        m_joint_velocity_limits.push_back({ 
+            joint_velocity_multiplier * deg2rad(joint_velocity_lower_limits[i]), 
+            joint_velocity_multiplier * deg2rad(joint_velocity_upper_limits[i]) });
     }
 }
