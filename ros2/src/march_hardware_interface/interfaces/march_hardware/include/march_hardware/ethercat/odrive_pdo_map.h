@@ -37,7 +37,8 @@ enum class ODriveObjectName {
     ShadowCount,
     Torque,
     AIEAbsolutePosition,
-    CheckSum,
+    CheckSumMISO,
+    CheckSumMOSIStatus,
 
     // Write objects
     TargetTorque,
@@ -49,7 +50,8 @@ enum class ODriveObjectName {
     PositionD,
     TorqueP,
     TorqueD,
-    RequestedState
+    RequestedState,
+    CheckSumMOSI
 
 };
 

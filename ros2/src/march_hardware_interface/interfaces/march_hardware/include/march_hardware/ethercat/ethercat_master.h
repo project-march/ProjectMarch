@@ -89,6 +89,8 @@ private:
      */
     bool sendReceivePdo();
 
+    void writeChecksumMOSI();
+
     bool isCheckSumValid(uint16_t slave);
 
     /**

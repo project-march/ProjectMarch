@@ -175,6 +175,9 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         }
         iteration++;
     } while (isWithinTimeWindow(start_time) && isWithinMaxIterations(iteration));
+    m_desired_joint_positions = m_ik_solver->applyJointVelocityLimits(
+        m_state_estimator_time_offset, m_desired_joint_positions, 
+        Eigen::Map<const Eigen::VectorXd>(m_actual_joint_positions.data(), m_actual_joint_positions.size()));
     m_has_solution = true;
     RCLCPP_DEBUG_THROTTLE(
         this->get_logger(), *get_clock(), 1000, "Iteration: %d, Error norm: %f", iteration, m_ik_solver->getTasksError());
@@ -224,7 +227,8 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.limits.positions.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
-    declare_parameter("joint.limits.positions.soft", 0.0);
+    declare_parameter("joint.limits.velocities.multiplier", 1.0);
+    declare_parameter("joint.limits.positions.soft", std::vector<double>());
 
     m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -243,14 +247,14 @@ void IKSolverNode::configureIKSolverParameters()
 
     // Apply soft limits to the joint position limits.
     RCLCPP_INFO(this->get_logger(), "Aplying soft limits to the joint position limits.");
-    double soft_limit = get_parameter("joint.limits.positions.soft").as_double();
-    if (soft_limit < 0.0) {
-        RCLCPP_WARN(this->get_logger(), "Soft limit must be greater than or equal to zero. Setting to zero.");
-        soft_limit = 0.0;
+    std::vector<double> soft_limits = get_parameter("joint.limits.positions.soft").as_double_array();
+    if (soft_limits.size() != std::max(joint_position_limits_upper.size(), joint_position_limits_lower.size())) {
+        RCLCPP_WARN(this->get_logger(), "Soft limit size does not match the joint position limits size.");
+        exit(1);
     }
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
-        joint_position_limits_upper[i] -= soft_limit;
-        joint_position_limits_lower[i] += soft_limit;
+        joint_position_limits_upper[i] -= soft_limits[i];
+        joint_position_limits_lower[i] += soft_limits[i];
         RCLCPP_INFO(this->get_logger(), "Joint name: %s, Upper limit: %f, Lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
     }
@@ -258,7 +262,8 @@ void IKSolverNode::configureIKSolverParameters()
     // Set the joint positions and velocities limits in the IK solver.
     m_ik_solver->setJointConfigurations(m_joint_names, 
         joint_position_limits_lower, joint_position_limits_upper,
-        joint_velocity_limits_lower, joint_velocity_limits_upper);
+        joint_velocity_limits_lower, joint_velocity_limits_upper,
+        get_parameter("joint.limits.velocities.multiplier").as_double());
 
     // Get an array of active joints and store the active joint names.
     std::vector<bool> joint_active = get_parameter("joint.active").as_bool_array();

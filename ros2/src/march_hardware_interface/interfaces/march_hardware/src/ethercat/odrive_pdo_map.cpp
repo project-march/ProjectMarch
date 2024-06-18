@@ -49,7 +49,8 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none = { 
     { ODriveObjectName::AIEAbsolutePosition, ODriveObject(/*offset=*/120, /*length=*/32) },
-    { ODriveObjectName::CheckSum, ODriveObject(/*offset=*/124, /*length=*/32) },
+    { ODriveObjectName::CheckSumMISO, ODriveObject(/*offset=*/124, /*length=*/32) },
+    { ODriveObjectName::CheckSumMOSIStatus, ODriveObject(/*offset=*/128, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
@@ -76,6 +77,8 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
     { ODriveObjectName::TorqueP, ODriveObject(/*offset=*/68, /*length=*/32) },
     { ODriveObjectName::TorqueD, ODriveObject(/*offset=*/72, /*length=*/32) },
     { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/76, /*length=*/32) },
+    { ODriveObjectName::CheckSumMOSI, ODriveObject(/*offset=*/80, /*length=*/32) },
+
 };
 
 int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)

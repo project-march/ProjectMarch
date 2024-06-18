@@ -69,7 +69,7 @@ class Joint:
         zero_position_layout.addWidget(QLabel("Target position (rad)"))
         self.zero_position_widget = QDoubleSpinBox()
         self.zero_position_widget.setDecimals(3)
-        self.zero_position_widget.setSingleStep(5e-2)
+        self.zero_position_widget.setSingleStep(5e-3)
         self.zero_position_widget.setRange(-np.pi, np.pi)
         self.zero_position_widget.setDisabled(True)
         self.zero_position_widget.valueChanged.connect(self.update_zero_pos)
