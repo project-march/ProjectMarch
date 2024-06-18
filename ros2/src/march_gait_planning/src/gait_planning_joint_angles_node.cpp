@@ -10,7 +10,7 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 
 using std::placeholders::_1; 
 
-int INTERPOLATING_TIMESTEPS = 40;
+int INTERPOLATING_TIMESTEPS = 100;
 
 struct CSVRow {
     std::string left_hip_aa;
