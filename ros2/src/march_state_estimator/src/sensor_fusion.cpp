@@ -67,24 +67,11 @@ void SensorFusion::configureStanceThresholds(const double& left_foot_threshold, 
 
 void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state)
 {
-    if (joint_state->name.size() != m_joint_names.size()) {
-        return;
-    }
-
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
         m_joint_accelerations[joint_state->name[i]] = (joint_state->velocity[i] - m_joint_velocities[joint_state->name[i]]) / m_state_estimator_timestep;
-        
-        if (!std::isnan(joint_state->position[i])) {
-            m_joint_positions[joint_state->name[i]] = joint_state->position[i];
-        }
-
-        if (!std::isnan(joint_state->velocity[i])) {
-            m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
-        }
-
-        if (!std::isnan(joint_state->effort[i])) {
-            m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
-        }
+        m_joint_positions[joint_state->name[i]] = joint_state->position[i];
+        m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
+        m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
     }
 }
 

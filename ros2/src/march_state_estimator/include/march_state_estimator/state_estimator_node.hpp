@@ -30,7 +30,7 @@
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float64.hpp"
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/sensor_fusion.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 

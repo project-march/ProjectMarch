@@ -1,6 +1,6 @@
 # The software department will always be marked as a CODEOWNER.
 [Software department]
-* @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+* @AlexanderJamesBecoy @alexandar.andonov @AndrewHutani @mhabers
 
 [Software license]
 LICENSE @ThijsRay @wnederpel @AlexanderJamesBecoy
@@ -17,10 +17,10 @@ Dockerfile @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 .flake8 @MarcoBak @George_Vegelien @AlexanderJamesBecoy
 
 ^[C/C++]
-*.cpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.hpp @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.c @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
-*.h @AlexanderJamesBecoy @alexandar.andonov @femkebuiks
+*.cpp @AlexanderJamesBecoy @alexandar.andonov @AndrewHutani @mhabers
+*.hpp @AlexanderJamesBecoy @alexandar.andonov @AndrewHutani @mhabers
+*.c @AlexanderJamesBecoy @alexandar.andonov @AndrewHutani @mhabers
+*.h @AlexanderJamesBecoy @alexandar.andonov @AndrewHutani @mhabers
 
 [Movement]
 /ros2/src/gaits/march_gait_files @floorheijs @wnederpel

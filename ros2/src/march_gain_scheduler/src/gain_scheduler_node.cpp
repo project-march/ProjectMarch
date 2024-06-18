@@ -29,8 +29,8 @@ void GainSchedulerNode::setTimer(int publish_time) {
 
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str());
-    m_scheduler.setConfigPath((exoMode)msg->mode);
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str());
+    m_scheduler.setConfigPath((ExoMode)msg->mode);
 }
 
 std::string GainSchedulerNode::vectorToString(const std::vector<double>& vec) {

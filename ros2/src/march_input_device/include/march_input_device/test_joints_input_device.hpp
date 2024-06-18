@@ -12,18 +12,18 @@
 class TestJointsIPD {
 public:
     explicit TestJointsIPD();
-    exoMode getCurrentMode() const;
-    std::set<exoMode> getAvailableModes() const;
+    ExoMode getCurrentMode() const;
+    std::set<ExoMode> getAvailableModes() const;
     void askNewMode() const;
-    void setCurrentMode(const exoMode& current_mode);
-    void setAvailableModes(const std::set<exoMode>& available_modes);
+    void setCurrentMode(const ExoMode& current_mode);
+    void setAvailableModes(const std::set<ExoMode>& available_modes);
     void setActuatedJoint(const std::string &actuated_joint);
     std::string getActuatedJoint() const;
     void askNewJoint() const;
 
 private:
-    exoMode m_current_mode;
-    std::set<exoMode> m_available_modes;
+    ExoMode m_current_mode;
+    std::set<ExoMode> m_available_modes;
     std::string m_actuated_joint;
     std::vector<std::string> m_available_joints;
 

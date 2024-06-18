@@ -16,8 +16,8 @@ public:
 private:
     rclcpp::Client<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_client;
     
-    void sendNewMode(const exoMode& desired_mode);
-    exoMode askMode() const;
+    void sendNewMode(const ExoMode& desired_mode);
+    ExoMode askMode() const;
 
     IPD m_ipd;
 

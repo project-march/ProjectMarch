@@ -24,9 +24,9 @@ using std::placeholders::_2;
 SensorFusionNode::SensorFusionNode(): Node("state_estimator")
 {
     // Determine if it is a simulation or real robot
-    // declare_parameter("simulation", true);
-    // m_is_simulation = get_parameter("simulation").as_bool();
-    m_is_simulation = false;
+    declare_parameter("simulation", true);
+    m_is_simulation = get_parameter("simulation").as_bool();
+    RCLCPP_INFO(this->get_logger(), "Simulation: %s", m_is_simulation ? "true" : "false");
 
     // First initialize sensor values to zero
     // Initialize joint states to zero
@@ -100,10 +100,9 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
     m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_sensors_subscription_options.callback_group = m_sensors_callback_group;
 
-    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", rclcpp::SensorDataQoS(),
-        std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1),
-        m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
+    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
@@ -205,6 +204,38 @@ void SensorFusionNode::publishStateEstimation()
 {
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
     rclcpp::Time current_time = current_time;
+
+    std::vector<geometry_msgs::msg::Pose> body_sole_poses;
+    try {
+        geometry_msgs::msg::PoseStamped sole_pose;
+        geometry_msgs::msg::TransformStamped transform_stamped;
+
+        // Get left foot positions w.r.t. backpack frame
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
+
+        // Get right foot positions in body frame w.r.t. backpack frame
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
+    }
+    catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in body frame: %s", e.what());
+        return;
+    }
 
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "base_link";

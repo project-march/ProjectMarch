@@ -23,7 +23,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
 const unsigned int STATE_DIMENSION_SIZE = 27;

@@ -34,7 +34,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningCartesianNode::MPCCallback, this, _1));
 
-    m_gait_planning.setGaitType(exoMode::BootUp); 
+    m_gait_planning.setGaitType(ExoMode::BootUp); 
 
     m_home_stand = {0.19, 0.19, -0.9, 0.19, -0.19, -0.9}; 
     // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
@@ -90,9 +90,9 @@ void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg
         m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
         m_gait_planning.setGaitType((exoMode)msg->mode);
 
-        if ((exoMode)msg->mode == exoMode::Descending){
-            m_single_execution_done = false; 
-        }
+    if ((ExoMode)msg->mode == ExoMode::Descending){
+        m_single_execution_done = false; 
+    }
 
         publishFootPositions(); 
     } else {
@@ -226,10 +226,10 @@ void GaitPlanningCartesianNode::finishCurrentTrajectory(){
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
-void GaitPlanningCartesianNode::publishIncrements(){
-    RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
+void GaitPlanningNode::publishIncrements(){
+    // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
-    RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
+    // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
     m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
     setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
@@ -239,7 +239,7 @@ void GaitPlanningCartesianNode::stepClose(){
     RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<exoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
-    m_gait_planning.setPreviousGaitType(exoMode::Stand);
+    m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
 
 void GaitPlanningCartesianNode::calculateIncrements(){
@@ -261,7 +261,7 @@ void GaitPlanningCartesianNode::calculateIncrements(){
         m_home_stand_trajectory.push_back(m_initial_position); 
     }
     RCLCPP_INFO(this->get_logger(), "Calculated incremental steps, length of trajectory: %d", m_home_stand_trajectory.size()); 
-    m_gait_planning.setPreviousGaitType(exoMode::Stand); 
+    m_gait_planning.setPreviousGaitType(ExoMode::Stand); 
 }
 
 void GaitPlanningCartesianNode::publishHomeStand(){
@@ -280,16 +280,16 @@ void GaitPlanningCartesianNode::processStand(){
         publishIncrements(); 
     } else {
         switch (m_gait_planning.getPreviousGaitType()){
-            case exoMode::LargeWalk :
-            case exoMode::SmallWalk :
-            case exoMode::HighStep1 :
-            case exoMode::HighStep2 :
-            case exoMode::HighStep3 :
-            case exoMode::VariableWalk :
+            case ExoMode::LargeWalk :
+            case ExoMode::SmallWalk :
+            case ExoMode::HighStep1 :
+            case ExoMode::HighStep2 :
+            case ExoMode::HighStep3 :
+            case ExoMode::VariableWalk :
                 stepClose(); 
                 break; 
 
-            case exoMode::BootUp :
+            case ExoMode::BootUp :
                 calculateIncrements(); 
                 break; 
 
@@ -359,20 +359,20 @@ void GaitPlanningCartesianNode::publishVariableWalk(){
  
 void GaitPlanningCartesianNode::publishFootPositions(){
     switch (m_gait_planning.getGaitType()){
-        case exoMode::Stand :
+        case ExoMode::Stand :
             processStand(); 
             break;
 
-        case exoMode::BootUp :
+        case ExoMode::BootUp :
             RCLCPP_DEBUG(this->get_logger(), "BootUp mode entered, waiting for new mode."); 
             break;
         
-        case exoMode::LargeWalk :
-        case exoMode::SmallWalk :
+        case ExoMode::LargeWalk :
+        case ExoMode::SmallWalk :
             publishWalk(); 
             break;
 
-        case exoMode::VariableStep : 
+        case ExoMode::VariableStep : 
             if (m_current_trajectory.empty()){
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
@@ -386,15 +386,15 @@ void GaitPlanningCartesianNode::publishFootPositions(){
             } 
             break;
         
-        case exoMode::HighStep1 :
-        case exoMode::HighStep2 :
-        case exoMode::HighStep3 :
-        case exoMode::Ascending :
-        case exoMode::Descending :
+        case ExoMode::HighStep1 :
+        case ExoMode::HighStep2 :
+        case ExoMode::HighStep3 :
+        case ExoMode::Ascending :
+        case ExoMode::Descending :
             publishHeightGaits(); 
             break;
         
-        case exoMode::VariableWalk :
+        case ExoMode::VariableWalk :
             publishVariableWalk(); 
             break; 
 

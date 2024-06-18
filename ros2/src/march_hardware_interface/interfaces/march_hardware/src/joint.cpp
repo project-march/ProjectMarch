@@ -15,16 +15,15 @@
 namespace march {
 Joint::Joint(
     std::string name,
-    int net_number, std::unique_ptr<MotorController> motor_controller,
-    std::array<double, 3> position_pid,
-    std::array<double, 3> torque_pid,
+    std::unique_ptr<MotorController> motor_controller,
+    std::array<double, 3> position_gains,
+    std::array<double, 2> torque_gains,
     std::shared_ptr<march_logger::BaseLogger> logger)
     :name_(std::move(name)),
-    net_number_(net_number),
     last_read_time_(std::chrono::steady_clock::now()),
     motor_controller_(std::move(motor_controller)),
-    position_pid(std::move(position_pid)),
-    torque_pid(std::move(torque_pid)),
+    position_gains(std::move(position_gains)),
+    torque_gains(std::move(torque_gains)),
     logger_(std::move(logger))
 
 {
@@ -34,31 +33,10 @@ Joint::Joint(
     }
 }
 
-Joint::Joint(
-    std::string name, int net_number,
-    std::unique_ptr<MotorController> motor_controller,
-    std::array<double, 3> position_pid,
-    std::array<double, 3> torque_pid,
-    std::unique_ptr<TemperatureGES> temperature_ges,
-    std::shared_ptr<march_logger::BaseLogger> logger)
-    : name_(std::move(name)),
-    net_number_(net_number),
-    last_read_time_(std::chrono::steady_clock::now()),
-    motor_controller_(std::move(motor_controller)),
-    position_pid(std::move(position_pid)),
-    torque_pid(std::move(torque_pid)),
-    temperature_ges_(std::move(temperature_ges)),
-    logger_(std::move(logger))
-{
-}
-
 bool Joint::initSdo(int cycle_time)
 {
     bool reset = false;
     reset |= motor_controller_->Slave::initSdo(cycle_time);
-    if (hasTemperatureGES()) {
-        reset |= getTemperatureGES()->initSdo(cycle_time);
-    }
     return reset;
 }
 
@@ -193,12 +171,16 @@ void Joint::readEncoders()
          *  If the absolute encoder of the joint is more precise, then we should
          * use that value This would give us a new joint position of 0.25
          */
-        if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+
+
+        // TODO: check if really redundant
+        if (motor_controller_-> useIncrementalEncoderForPosition()) {
             double new_incremental_position = motor_controller_->getIncrementalPosition();
             position_ = initial_absolute_position_ + (new_incremental_position - initial_incremental_position_);
         } else {
             position_ = motor_controller_->getAbsolutePosition();
         }
+
         velocity_ = motor_controller_->getVelocity();
         if (motor_controller_->hasTorqueSensor()) {
             torque_ = motor_controller_->getTorque();
@@ -222,12 +204,12 @@ void Joint::readEncoders()
 
 void Joint::sendPID()
 {
-    this->motor_controller_->sendPID(std::move(this->position_pid), std::move(this->torque_pid));
+    this->motor_controller_->sendPID(std::move(this->position_gains), std::move(this->torque_gains));
 }
 
-void Joint::setPositionPIDValues(const std::array<double, 3>& new_position_pid)
+void Joint::setPositionPIDValues(const std::array<double, 3>& new_position_gains)
 {
-    position_pid = std::array<double, 3>(new_position_pid);
+    position_gains = std::array<double, 3>(new_position_gains);
 } 
 
 double Joint::getPosition() const
@@ -245,19 +227,9 @@ double Joint::getTorque() const
     return torque_;
 }
 
-int Joint::getNetNumber() const
-{
-    return net_number_;
-}
-
 std::string Joint::getName() const
 {
     return name_;
-}
-
-bool Joint::hasTemperatureGES() const
-{
-    return temperature_ges_ != nullptr;
 }
 
 bool Joint::receivedDataUpdate()
@@ -277,17 +249,6 @@ bool Joint::receivedDataUpdate()
 std::unique_ptr<MotorController>& Joint::getMotorController()
 {
     return motor_controller_;
-}
-
-std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
-{
-    if (hasTemperatureGES()) {
-        return temperature_ges_;
-    } else {
-        logger_->error("Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-        throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
-            "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
-    }
 }
 
 bool Joint::isWithinSoftLimits() const

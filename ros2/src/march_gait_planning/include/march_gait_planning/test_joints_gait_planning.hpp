@@ -12,14 +12,14 @@ public:
     TestJointsGaitPlanning();
     void loadTrajectoryFromCSV(const std::string &path, std::vector<double> &member_variable);
     std::vector<double> getTrajectory(int& actuated_joint) const;
-    void setGaitType(const exoMode &new_gait_type);
-    exoMode getGaitType() const;
+    void setGaitType(const ExoMode &new_gait_type);
+    ExoMode getGaitType() const;
 
     std::vector<double> getPrevPoint() const; 
     void setPrevPoint(const std::vector<double> &point);
 
 private:
-    exoMode m_gait_type;
+    ExoMode m_gait_type;
     std::vector<double> m_trajectory_adpf;
     std::vector<double> m_trajectory_haa;
     std::vector<double> m_trajectory_hfe;

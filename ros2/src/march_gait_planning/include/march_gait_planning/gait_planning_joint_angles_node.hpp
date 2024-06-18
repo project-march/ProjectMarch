@@ -49,7 +49,7 @@ public:
 private: 
     // std::vector<double> getCurrentJointAngles();
 
-    // Callback for the current exoMode
+    // Callback for the current ExoMode
     void currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg);
 
     // Callback for current joint angles
@@ -57,6 +57,7 @@ private:
 
     // Process various types of gaits 
     void processHomeStandGait();
+    void processBootUpToStandGait();
     void finishGaitBeforeStand(); 
     void processMovingGaits(const int &counter);     
     

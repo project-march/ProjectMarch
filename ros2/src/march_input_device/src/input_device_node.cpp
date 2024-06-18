@@ -6,7 +6,7 @@
 using std::placeholders::_1;
 
 
-std::vector<exoMode> all_possible_modes = {exoMode::Stand, exoMode::Walk, exoMode::BootUp};;
+std::vector<ExoMode> all_possible_modes = {ExoMode::Stand, ExoMode::Walk, ExoMode::BootUp};;
 
 inputDeviceNode::inputDeviceNode()
   : Node("march_input_device_node"),
@@ -20,13 +20,13 @@ inputDeviceNode::inputDeviceNode()
 
   RCLCPP_INFO(this->get_logger(), "Connected to service get_exo_mode_array");
 
-  m_ipd.setCurrentMode(exoMode::BootUp);
+  m_ipd.setCurrentMode(ExoMode::BootUp);
   sendNewMode(m_ipd.getCurrentMode());
   
 
 }
 
-void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
+void inputDeviceNode::sendNewMode(const ExoMode& desired_mode)
 {
     auto request = std::make_shared<march_shared_msgs::srv::GetExoModeArray::Request>();
     request->desired_mode.mode = static_cast<int32_t>(desired_mode);
@@ -41,12 +41,12 @@ void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
     {
         auto result = result_future.get();
         // Do something with the result
-        std::set<exoMode> exo_modes_set;
+        std::set<ExoMode> exo_modes_set;
         for (const auto& exo_mode_msg : result->mode_array.modes) {
-            exo_modes_set.insert(static_cast<exoMode>(exo_mode_msg.mode));
+            exo_modes_set.insert(static_cast<ExoMode>(exo_mode_msg.mode));
         }
         m_ipd.setAvailableModes(exo_modes_set);
-        exoMode desired_mode = askMode();
+        ExoMode desired_mode = askMode();
         sendNewMode(desired_mode);
     }
     else {
@@ -54,11 +54,11 @@ void inputDeviceNode::sendNewMode(const exoMode& desired_mode)
     }
 }
 
-exoMode inputDeviceNode::askMode() const
+ExoMode inputDeviceNode::askMode() const
 {
-  std::set<exoMode> available_modes = m_ipd.getAvailableModes();
+  std::set<ExoMode> available_modes = m_ipd.getAvailableModes();
 
-  std::map<std::string, exoMode> mode_map;
+  std::map<std::string, ExoMode> mode_map;
   for (const auto& mode : all_possible_modes) {
     mode_map[toString(mode)] = mode;
   }
@@ -82,7 +82,7 @@ exoMode inputDeviceNode::askMode() const
     }
   }
   rclcpp::shutdown();
-  return exoMode::BootUp;
+  return ExoMode::BootUp;
 }
 
 int main(int argc, char *argv[]) 

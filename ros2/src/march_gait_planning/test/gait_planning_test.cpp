@@ -41,13 +41,13 @@ TEST_F(GaitPlanningTest, AssertErrorWrongInputSetFootPositions){
 }
 
 TEST_F(GaitPlanningTest, SetGaitTypeCorrect){
-    exoMode mode = exoMode::Walk;
+    ExoMode mode = ExoMode::Walk;
     test_gait_planning.setGaitType(mode);
     ASSERT_EQ(test_gait_planning.getGaitType(), mode) << "Current stance foot is not initialized correctly";
 }
 
 TEST_F(GaitPlanningTest, AssertErrorWrongInputSetGaitType){
-    // assert error is caught when input is not an exoMode
+    // assert error is caught when input is not an ExoMode
 }
 
 TEST_F(GaitPlanningTest, FirstStepTrajectoryGetterTest){

@@ -47,6 +47,7 @@ class InputDevicePlugin(Plugin):
         self._widget = InputDeviceView(ui_file, self._controller, layout_file)
 
         self._controller.set_view(self._widget)
+        self._controller.publish_mode(3)
         
         context.add_widget(self._widget)
 

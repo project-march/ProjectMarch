@@ -26,6 +26,7 @@
   <depend>kdl_parser</depend>
   <depend>orocos_kdl</depend>
   <depend>trajectory_msgs</depend>
+  <depend>filters</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

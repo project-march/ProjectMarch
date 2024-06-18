@@ -9,14 +9,14 @@ class ExoModeTransitions {
 public:
     ExoModeTransitions() {
         transitions = {
-            { exoMode::Sit, { exoMode::Stand, exoMode::BootUp, exoMode::Error } },
-            { exoMode::Stand, { exoMode::Sit, exoMode::Walk, exoMode::BootUp, exoMode::Error, exoMode::Sideways, exoMode::Ascending, exoMode::Descending} },
-            { exoMode::Walk, { exoMode::Stand, exoMode::Error} },
-            { exoMode::BootUp, { exoMode::Stand } },
-            { exoMode::Error, {}},
-            { exoMode::Sideways, { exoMode::Stand}},
-            { exoMode::Ascending, { exoMode::Stand}},
-            { exoMode::Descending, { exoMode::Stand}}
+            { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
+            { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Ascending, ExoMode::Descending} },
+            { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
+            { ExoMode::BootUp, { ExoMode::Stand } },
+            { ExoMode::Error, {}},
+            { ExoMode::Sideways, { ExoMode::Stand}},
+            { ExoMode::Ascending, { ExoMode::Stand}},
+            { ExoMode::Descending, { ExoMode::Stand}}
         };
     }  
 
@@ -63,11 +63,11 @@ public:
 
     }
 
-    std::set<exoMode> getPossibleTransitions(exoMode currentMode) const {
-        std::vector<exoMode> vec = transitions.at(currentMode);
-        return std::set<exoMode>(vec.begin(), vec.end());
+    std::set<ExoMode> getPossibleTransitions(ExoMode currentMode) const {
+        std::vector<ExoMode> vec = transitions.at(currentMode);
+        return std::set<ExoMode>(vec.begin(), vec.end());
     }
 
 private:
-    std::map<exoMode, std::vector<exoMode>> transitions;
+    std::map<ExoMode, std::vector<ExoMode>> transitions;
 };

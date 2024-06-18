@@ -8,7 +8,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "march_state_estimator/torque_converter.hpp"
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 
 #include "march_shared_msgs/msg/joint_efforts.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
