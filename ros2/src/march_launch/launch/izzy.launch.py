@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
     ik_test = LaunchConfiguration("ik_test", default="false")
     
     # TODO: Configurable urdf
-    state_estimator_clock_period = 0.025
+    state_estimator_clock_period = 0.02
     urdf_location = os.path.join(
         get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
@@ -281,7 +281,11 @@ def generate_launch_description() -> LaunchDescription:
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
         ),
-
+        Node(
+            package='bezier_visualization',
+            executable='bezier_visualization_node',
+            name='bezier_visualization',
+        ),
         mujoco_node,
         state_estimator,
         march_control,

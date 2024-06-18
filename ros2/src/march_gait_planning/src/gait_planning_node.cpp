@@ -234,9 +234,14 @@ void GaitPlanningCartesianNode::publishIncrements(){
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
+
+
+
 void GaitPlanningCartesianNode::stepClose(){
+    // ?????? Merge was confusing
     RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
+
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
@@ -250,10 +255,10 @@ void GaitPlanningCartesianNode::calculateIncrements(){
     m_initial_position = {m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2], m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]}; 
     RCLCPP_INFO(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
     for (unsigned i = 0; i < m_home_stand.size(); i++){
-        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/40); 
+        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/100); 
     }
     RCLCPP_INFO(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
-    for (unsigned i = 0; i < 40; i++){
+    for (unsigned i = 0; i < 100; i++){
         for (unsigned i = 0; i < m_initial_position.size(); i++){
         m_initial_position[i] += m_increments[i]; 
         }
@@ -323,6 +328,9 @@ void GaitPlanningCartesianNode::publishHeightGaits(){
     if (m_current_trajectory.empty() && !m_single_execution_done){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
+
+        // The stairs/high_step trajectory is for all steps (with a shifting swing leg), find a way to publish both feet separately. csv are right, left foot 
+
         RCLCPP_INFO(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
     }
     else if (m_current_trajectory.empty() && m_single_execution_done){
