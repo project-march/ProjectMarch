@@ -6,6 +6,25 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs
+from scipy.interpolate import interp1d
+
+def make_evenly_spaced_points(x, z, array_size):
+    # Create an array of cumulative distances between points
+    distances = np.sqrt(np.diff(x)**2 + np.diff(z)**2)
+    cumulative_distances = np.insert(np.cumsum(distances), 0, 0)
+
+    # Generate new evenly spaced distances
+    even_distances = np.linspace(cumulative_distances[0], cumulative_distances[-1], num=array_size)
+
+    # Interpolate the x and z values over the new distances
+    interp_x = interp1d(cumulative_distances, x, kind='cubic')
+    interp_z = interp1d(cumulative_distances, z, kind='cubic')
+
+    x_new = interp_x(even_distances)
+    z_new = interp_z(even_distances)
+
+    return x_new, z_new
+
 
 def calculate_bezier_curve(points, array_size = 100):
     """Calculate the Bezier curve for the given points."""
@@ -20,14 +39,17 @@ def create_bezier_csv(points, array_size, gait_type):
     first_step_points = points.copy()
     first_step_points[:, 0] = first_step_points[:, 0]/2
     curvexz_first_step = bezier.Curve(first_step_points.T, degree=3)
-    number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size/2))
+    number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size))
     points_first_step= curvexz_first_step.evaluate_multi(number_of_time_points_first_step)
     x_swing_first_step = points_first_step[0,:]
     z_swing_first_step = points_first_step[1,:]
-    x_stance_first_step = np.linspace(0, 0 - (step_length/2), int(array_size/2))
+    x_stance_first_step = np.linspace(0, 0 - (step_length/2), int(array_size))
     # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
-    z_stance_first_step = [0]*int(array_size/2)
+    z_stance_first_step = [0]*int(array_size)
     # z_swing_first_step = z_swing_first_step + z_stance_first_step
+
+    x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size))
+
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
 
     curvexz_complete_step = bezier.Curve(points.T, degree=3)
@@ -40,19 +62,25 @@ def create_bezier_csv(points, array_size, gait_type):
     # z_stance_complete_step = compensation_for_circle(array_size, step_length)
     z_stance_complete_step = [0]*array_size
     # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
+    
+    x_swing_complete_step, z_swing_complete_step = make_evenly_spaced_points(x_swing_complete_step, z_swing_complete_step, array_size)
+    
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
     curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
-    number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size/2))
+    number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size))
     points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
     x_swing_step_close = points_step_close[0,:]
     z_swing_step_close = points_step_close[1,:]
-    x_stance_step_close = np.linspace(0, 0 - (-step_length/2), int(array_size/2))
+    x_stance_step_close = np.linspace(0, 0 - (-step_length/2), int(array_size))
     # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
-    z_stance_step_close = [0]*int(array_size/2)
+    z_stance_step_close = [0]*int(array_size)
     # z_swing_first_step = z_swing_first_step + z_stance_first_step
+
+    x_swing_step_close, z_swing_step_close = make_evenly_spaced_points(x_swing_step_close, z_swing_step_close, array_size)
+
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
 
@@ -97,7 +125,7 @@ class DraggablePoint:
 
 class InteractiveBezier:
     """A class to represent an interactive Bezier curve in matplotlib."""
-    def __init__(self, points, gait_type):
+    def __init__(self, points, gait_type, array_size):
         self.gait_type = gait_type
         self.points = points
         self.draggable_points = [DraggablePoint(self, point) for point in self.points]
@@ -106,6 +134,7 @@ class InteractiveBezier:
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
         self.updated_points = None
+        self.array_size = array_size    
 
         # Create a separate window for the coordinates
         self.root = tk.Tk()
@@ -208,12 +237,12 @@ class InteractiveBezier:
         self.root.destroy() 
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
-            create_bezier_csv(self.points, 200, self.gait_type)
+            create_bezier_csv(self.points, self.array_size, self.gait_type)
             self.updated_points = self.points.tolist()
         else:
             self.updated_points = self.initial_points.tolist()
 
-def interactive_bezier(gait_type: str): 
+def interactive_bezier(gait_type: str, array_size: int): 
     if gait_type == "small_gait" or gait_type == "large_gait":  
         if os.path.exists('utility_scripts/points.yaml'):
             with open('utility_scripts/points.yaml', 'r') as f:
@@ -222,7 +251,7 @@ def interactive_bezier(gait_type: str):
         else:
             print("No points file found")
 
-        interactive_bezier = InteractiveBezier(points, gait_type)
+        interactive_bezier = InteractiveBezier(points, gait_type, array_size)
         interactive_bezier.connect()
 
         # Connect the on_close function to the close event
@@ -272,11 +301,11 @@ def interactive_bezier(gait_type: str):
             yaml.dump(data, f)
     
     if gait_type == "ascending":
-        ascend_csv = stair_gaits(data['ascending'], 200)
+        ascend_csv = stair_gaits(data['ascending'], array_size)
         descend_csv = descend_stairs(ascend_csv)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
 
 
 
-interactive_bezier("large_gait")
+interactive_bezier("small_gait", 80)
