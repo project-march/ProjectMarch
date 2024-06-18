@@ -1,5 +1,5 @@
 <launch>
-    <arg name="if_name"/>
+    <arg name="network_interface_name"/>
     <node launch-prefix="ethercat_grant" name="slave_count_check" pkg="march_hardware" type="slave_count_check"
-          output="screen" required="true" args="$(arg if_name)"/>
+          output="screen" required="true" args="$(arg network_interface_name)"/>
 </launch>

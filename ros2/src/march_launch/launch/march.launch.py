@@ -22,8 +22,9 @@ def generate_launch_description() -> LaunchDescription:
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
     
     # TODO: Configurable urdf
+    state_estimator_clock_period = 0.025
     urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf")
+        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
         robot_desc = infp.read()
 
@@ -168,8 +169,10 @@ def generate_launch_description() -> LaunchDescription:
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
-        launch_arguments=[("simulation", simulation)],
-        condition=UnlessCondition(airgait),
+        launch_arguments=[
+            ("simulation", simulation),
+            ("clock_period", str(state_estimator_clock_period)),
+        ],
     )
     # endregion
 
@@ -250,13 +253,13 @@ def generate_launch_description() -> LaunchDescription:
         ),
 
         mujoco_node,
+        state_estimator,
         march_control,
         mode_machine,
         record_rosbags_action,
         safety_node,
         imu_nodes,
         ik_solver,
-        state_estimator,
         ipd_node,
         # footstep_generator, 
     ])

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
 class TorqueConverterTest : public ::testing::Test {

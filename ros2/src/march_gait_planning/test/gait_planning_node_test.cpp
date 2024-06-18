@@ -33,7 +33,7 @@ TEST_F(GaitPlanningNodeTest, SendRequestTest){
 // }
 
 // TEST_F(GaitPlanningNodeTest, FootPositionsPublishStandTest){
-//     test_gait_planning.m_gait_planning.setGaitType(exoMode::Stand);
+//     test_gait_planning.m_gait_planning.setGaitType(ExoMode::Stand);
 //     test_gait_planning.footPositionsPublish(); 
 //     ASSERT_EQ(test_gait_planning.m_desired_footpositions_msg->left_foot_position, ({0.0, 0.16, -0.802})); 
 //     ASSERT_EQ(test_gait_planning.m_desired_footpositions_msg->right_foot_position, ({0.0, -0.16, -0.802})); 
@@ -41,14 +41,14 @@ TEST_F(GaitPlanningNodeTest, SendRequestTest){
 // }
 
 // TEST_F(GaitPlanningNodeTest, FootPositionsPublishBootUpTest){
-//     test_gait_planning.m_gait_planning.setGaitType(exoMode::BootUp); 
+//     test_gait_planning.m_gait_planning.setGaitType(ExoMode::BootUp); 
 //     test_gait_planning.footPositionsPublish(); 
 //     ASSERT_TRUE(test_gait_planning.m_desired_footpositions_msg.empty()); 
 // }
 
 // TEST_F(GaitPlanningNodeTest, FootPositionsPublishFirstStepTest){
 //     test_gait_planning.m_gait_planning.setStanceFoot(0); 
-//     test_gait_planning.m_gait_planning.setGaitType(exoMode::Walk); 
+//     test_gait_planning.m_gait_planning.setGaitType(ExoMode::Walk); 
 //     test_gait_planning.footPositionsPublish(); 
 //     ASSERT_EQ(test_gait_planning.m_desired_footpositions_msg->left_foot_position, ({}))
 // }

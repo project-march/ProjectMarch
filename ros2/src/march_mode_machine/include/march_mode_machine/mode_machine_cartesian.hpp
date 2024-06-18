@@ -10,15 +10,15 @@
 class ModeMachineCartesian {
     public:
     explicit ModeMachineCartesian(); 
-    bool performTransition(const exoMode& desired_mode); 
-    bool isValidTransition(const exoMode& desired_mode) const; 
+    bool performTransition(const ExoMode& desired_mode); 
+    bool isValidTransition(const ExoMode& desired_mode) const; 
     int getCurrentMode() const; 
-    std::set<exoMode> getAvailableModes(exoMode current_mode) const; 
-    void setCurrentMode(const exoMode& mode); 
+    std::set<ExoMode> getAvailableModes(ExoMode current_mode) const; 
+    void setCurrentMode(const ExoMode& mode); 
 
     protected:
     ExoModeTransitions m_exo_transitions; 
 
     private:
-    exoMode m_current_mode; 
+    ExoMode m_current_mode; 
 };

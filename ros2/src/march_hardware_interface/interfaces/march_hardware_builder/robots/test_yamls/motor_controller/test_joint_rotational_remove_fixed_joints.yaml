@@ -1,5 +1,5 @@
 testsetup:
-  if_name: enp2s0
+  network_interface_name: enp2s0
   ecatCycleTime: 4
   ecatSlaveTimeout: 50
   joints:

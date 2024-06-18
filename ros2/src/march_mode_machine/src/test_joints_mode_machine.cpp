@@ -14,7 +14,7 @@ TestJointsModeMachine::TestJointsModeMachine()
 {
         m_exo_transitions = ExoModeTransitions("Test Joints");
 
-        setCurrentMode(exoMode::BootUp);
+        setCurrentMode(ExoMode::BootUp);
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Test joints Mode Machine created");
 }
 

@@ -14,8 +14,8 @@ from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-    simulation = LaunchConfiguration("simulation", default="true")
-    timestep_in_ms = LaunchConfiguration("timestep", default="50")
+    simulation = LaunchConfiguration("simulation", default="false")
+    clock_period = LaunchConfiguration("clock_period", default="0.05")
     
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
@@ -24,7 +24,7 @@ def generate_launch_description():
         'march9',
         'march9.urdf'
     )
-    force_stance_threshold = 100.0
+    force_stance_threshold = 65.0
 
     return LaunchDescription([
         Node(
@@ -35,11 +35,11 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-                {"timestep_in_ms": timestep_in_ms},
+                {"clock_period": clock_period},
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
                 {"simulation": simulation},
-            ]
+            ],
         ),
         Node(
             package='march_state_estimator',
@@ -49,7 +49,7 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-            ]
+            ],
         ),
         Node(
             package='march_state_estimator',
@@ -58,6 +58,15 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {"robot_definition": robot_description},
-            ]
+            ],
+        ),
+        Node(
+            package='march_state_estimator',
+            executable='filters_node',
+            name='filters',
+            output='screen',
+            parameters=[
+                {"urdf_file_path": urdf_file},
+            ],
         ),
     ])

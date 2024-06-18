@@ -23,7 +23,7 @@ public:
     ~TestJointsModeMachineNode();
 
 private:
-    void sendRequest(const exoMode& desired_mode);
+    void sendRequest(const ExoMode& desired_mode);
     void responseFootstepCallback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);

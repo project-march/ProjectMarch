@@ -14,7 +14,7 @@ This node is only called in the test_joints launch file.
 #include <algorithm>
 using std::placeholders::_1;
 
-std::array<exoMode, 3> all_possible_modes = { exoMode::Stand, exoMode::Walk, exoMode::BootUp};
+std::array<ExoMode, 3> all_possible_modes = { ExoMode::Stand, ExoMode::Walk, ExoMode::BootUp};
 //TODO: Re-enable these joints once the issue with hip_aa's is fixed.
 // std::vector<std::string> all_possible_joints = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
 //                                             "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
@@ -36,11 +36,11 @@ TestJointsInputDeviceNode::TestJointsInputDeviceNode()
     m_request = std::make_shared<march_shared_msgs::srv::GetExoModeArray::Request>();
 
     m_request->actuated_joint.data = askJoint();    
-    m_ipd.setCurrentMode(exoMode::BootUp);
+    m_ipd.setCurrentMode(ExoMode::BootUp);
     sendNewModeAndJoint(m_ipd.getCurrentMode());
 }
 
-void TestJointsInputDeviceNode::sendNewModeAndJoint(const exoMode& desired_mode)
+void TestJointsInputDeviceNode::sendNewModeAndJoint(const ExoMode& desired_mode)
 {
     m_request->desired_mode.mode = static_cast<int32_t>(desired_mode);
 
@@ -52,15 +52,15 @@ void TestJointsInputDeviceNode::sendNewModeAndJoint(const exoMode& desired_mode)
     {
         auto result = result_future.get();
         // Do something with the result
-        std::set<exoMode> exo_modes_set;
+        std::set<ExoMode> exo_modes_set;
         for (const auto& exo_mode_msg : result->mode_array.modes) {
-            exo_modes_set.insert(static_cast<exoMode>(exo_mode_msg.mode));
+            exo_modes_set.insert(static_cast<ExoMode>(exo_mode_msg.mode));
         }
         m_ipd.setAvailableModes(exo_modes_set);
-        m_ipd.setCurrentMode((exoMode)m_request->desired_mode.mode); 
+        m_ipd.setCurrentMode((ExoMode)m_request->desired_mode.mode); 
 
-        exoMode desired_mode = askMode();
-        if (desired_mode == exoMode::BootUp){
+        ExoMode desired_mode = askMode();
+        if (desired_mode == ExoMode::BootUp){
             m_ipd.setActuatedJoint(askJoint());
             m_request->actuated_joint.data = m_ipd.getActuatedJoint();
         }
@@ -71,11 +71,11 @@ void TestJointsInputDeviceNode::sendNewModeAndJoint(const exoMode& desired_mode)
     }
 }
 
-exoMode TestJointsInputDeviceNode::askMode() const
+ExoMode TestJointsInputDeviceNode::askMode() const
 {
-    std::set<exoMode> available_modes = m_ipd.getAvailableModes();
+    std::set<ExoMode> available_modes = m_ipd.getAvailableModes();
 
-    std::map<std::string, exoMode> mode_map;
+    std::map<std::string, ExoMode> mode_map;
     for (const auto& mode : all_possible_modes) {
         mode_map[toString(mode)] = mode;
     }
@@ -99,7 +99,7 @@ exoMode TestJointsInputDeviceNode::askMode() const
         }
     }
     rclcpp::shutdown();
-    return exoMode::BootUp;
+    return ExoMode::BootUp;
 }
 
 std::string TestJointsInputDeviceNode::askJoint() const

@@ -1,10 +1,8 @@
 ik_solver:
   ros__parameters:
-    state_estimator_time_offset: 20e-3
     joint_trajectory_controller_period: 5e-3
-    convergence_threshold: 1e-3
-    max_iterations: 100
-    integral_dt: 5e-3
+    max_iterations: 100000
+    integral_dt: 1e-2
     joint:
       names:
       - left_hip_aa
@@ -30,45 +28,36 @@ ik_solver:
       - false # right_ankle_ie
       limits:
         positions:
-          # upper: [10.0, 112.5, 125.0, 10.0, 10.0, 112.5, 125.0, 10.0]
-          # lower: [-15.0, -10.0, 0.0, -25.0, -15.0, -10.0, 0.0, -25.0]
-          # upper: [8.75, 106.25, 118.75, 8.25, 8.75, 106.25, 118.75, 8.25]
-          # lower: [-13.75, -3.875, 6.25, -23.25, -13.75, -3.875, 6.25, -23.25]
-          # upper: [7.5, 110.0, 112.5, 4.0, 10.0, 7.5, 110.0, 112.5, 4.0, 10.0]
-          # lower: [-12.5, 2.25, 12.5, -18.0, -10.0, -12.5, 2.25, 12.5, -18.0, -10.0]
-          upper: [7.0, 112.0, 122.0, 17.0, 5.0, 7.0, 112.0, 122.0, 17.0, 5.0]
-          lower: [-17.0, -17.0, 3.0, -25.0, -5.0, -17.0, -17.0, 3.0, -25.0, -5.0]
+          upper: [10.0, 115.0, 125.0, 19.0, 8.0, 10.0, 115.0, 125.0, 19.0, 8.0]   # deg
+          lower: [-20.0, -20.0, 0.0, -23.0, -8.0, -20.0, -20.0, 0.0, -23.0, -8.0] # deg
+          soft: [1.5, 6.76, 6.25, 2.0, 0.0, 1.5, 6.76, 6.25, 2.0, 0.0]  # deg
         velocities:
-          lower: [-100.0, -115.6, -243.6, -130.1, -100.0, -100.0, -115.6, -243.6, -130.1, -100.0]
-          upper: [ 100.0,  67.16,  208.9,  100.3, 100.0,  100.0,  67.16,  208.9,  100.3, 100.0]
-    task_names:
-    # - posture
-    - motion
-    # - stability # Comment to disable stability task
-    motion:
-      reference_frame: "body"
-      nodes: ["L_ankle", "R_ankle"]
-      m: 12
-      n: 8
-      kp: [100.0, 300.0, 200.0, 10.0, 0.0, 0.0, 100.0, 300.0, 200.0, 10.0, 0.0, 0.0]
-      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
-    stability:
-      reference_frame: "inertial"
-      nodes: ["zmp"]
-      m: 6
-      n: 8
-      kp: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
-    posture:
-      reference_frame: "body"
-      nodes: ["L_ankle", "R_ankle"]
-      m: 12
-      n: 8
-      kp: [0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0]
-      kd: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      damp_coeff: 1e-12
+          upper: [ 20.0,  219.82,  336.16,  50.04, 10.0,  20.0,  219.82,  336.16,  50.04, 10.0]     # deg/s
+          lower: [-20.0, -154.10, -384.05, -50.16, -10.0, -20.0, -154.10, -384.05, -50.16, -10.0]   # deg/s
+          multiplier: 1.0
+    task:
+      names:
+      - posture
+      - motion
+      - stability
+      motion:
+        kp: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        kd: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+        ki: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        convergence_threshold: 1e-5   # m
+        damp_coeff: 1e-3
+        weight: 1.0
+      stability:
+        kp: [2.5, 2.5]
+        kd: [0.0, 0.0]
+        ki: [0.0, 0.0]
+        convergence_threshold: 1e-2   # m
+        damp_coeff: 1e-4
+        weight: 1.0
+      posture:
+        kp: [0.5, 0.5]
+        kd: [0.0, 0.0]
+        ki: [0.0, 0.0]
+        convergence_threshold: 1e-3   # rad
+        damp_coeff: 1e-3
+        weight: 1.0
