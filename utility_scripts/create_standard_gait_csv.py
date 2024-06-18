@@ -2,15 +2,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import bezier 
+from scipy.interpolate import interp1d
 
 TIMESTEPS = 40 # Number of time steps for each step, note that first and last step are half the size
 
-def package_bezier(step_length, array_size):
+def make_evenly_spaced_points(x, z, array_size):
+    # Create an array of cumulative distances between points
+    distances = np.sqrt(np.diff(x)**2 + np.diff(z)**2)
+    cumulative_distances = np.insert(np.cumsum(distances), 0, 0)
 
-    def compensation_for_circle(array_size, step_length): 
-        x = np.linspace(-step_length, step_length, array_size, endpoint=True)
-        y = 0.5*x**2 
-        return y 
+    # Generate new evenly spaced distances
+    even_distances = np.linspace(cumulative_distances[0], cumulative_distances[-1], num=array_size)
+
+    # Interpolate the x and z values over the new distances
+    interp_x = interp1d(cumulative_distances, x, kind='cubic')
+    interp_z = interp1d(cumulative_distances, z, kind='cubic')
+
+    x_new = interp_x(even_distances)
+    z_new = interp_z(even_distances)
+
+    return x_new, z_new
+
+def package_bezier(step_length, array_size):
 
     xzpositions_first_step = np.asfortranarray([[0.0, (0.02/0.1)*(step_length/2), (0.0533/0.1)*(step_length/2), (step_length/2)], [0.0, 0.4, 0.2, 0.0]])
     curvexz_first_step = bezier.Curve(xzpositions_first_step, degree=3)
@@ -22,8 +35,11 @@ def package_bezier(step_length, array_size):
     # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
     z_stance_first_step = [0]*int(array_size/2)
     # z_swing_first_step = z_swing_first_step + z_stance_first_step
+
+    x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size/2))
+
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
-    plt.plot(x_swing_first_step, z_swing_first_step)
+    plt.scatter(x_swing_first_step, z_swing_first_step)
     plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
     plt.show()
     # print(final_points.shape)
@@ -38,8 +54,11 @@ def package_bezier(step_length, array_size):
     # z_stance_complete_step = compensation_for_circle(array_size, step_length)
     z_stance_complete_step = [0]*array_size
     # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
+
+    x_swing_complete_step, z_swing_complete_step = make_evenly_spaced_points(x_swing_complete_step, z_swing_complete_step, array_size)
+
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
-    plt.plot(x_swing_complete_step, z_swing_complete_step)
+    plt.scatter(x_swing_complete_step, z_swing_complete_step)
     plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
     plt.show()
 
@@ -82,7 +101,7 @@ def interpolate(step_size, small_gait_complete_step, large_gait_complete_step, a
     plt.show()
     return result 
 
-res = interpolate(0.3, small_gait_first_step, large_gait_first_step, 100)
+# res = interpolate(0.3, small_gait_first_step, large_gait_first_step, 100)
 
 # plt.plot(large_gait_complete_step[:,0], large_gait_complete_step[:,1])
 # plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
