@@ -41,17 +41,17 @@ class IkTestNode(Node):
             IksFootPositions, 'ik_solver/buffer/input', 10)
         
         self.left_foot = Point()
-        self.left_foot.x = self.get_parameter('left_foot.x').value
-        self.left_foot.y = self.get_parameter('left_foot.y').value
-        self.left_foot.z = self.get_parameter('left_foot.z').value
+        self.left_foot.x = self.get_parameter('left_foot.x').get_parameter_value().double_value
+        self.left_foot.y = self.get_parameter('left_foot.y').get_parameter_value().double_value
+        self.left_foot.z = self.get_parameter('left_foot.z').get_parameter_value().double_value
 
         self.right_foot = Point()
-        self.right_foot.x = self.get_parameter('right_foot.x').value
-        self.right_foot.y = self.get_parameter('right_foot.y').value
-        self.right_foot.z = self.get_parameter('right_foot.z').value
+        self.right_foot.x = self.get_parameter('right_foot.x').get_parameter_value().double_value
+        self.right_foot.y = self.get_parameter('right_foot.y').get_parameter_value().double_value
+        self.right_foot.z = self.get_parameter('right_foot.z').get_parameter_value().double_value
 
         self.current_feet_positions = None
-        self.interpolation_duration = self.get_parameter('interval').value
+        self.interpolation_duration = self.get_parameter('interval').get_parameter_value().double_value
         self.counter = 0.0
 
         self.iks_command_msg = IksCommand()
