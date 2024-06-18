@@ -43,6 +43,9 @@ public:
     // Check whether the state of the MotorController has changed
     bool receivedDataUpdate();
 
+    // Handle the case where no data has been received from the MotorController
+    void handleNoDataUpdate(std::chrono::duration<double> time_between_last_update);
+
     // Prepare the joint for actuation
     // Returns an optional wait duration
     std::chrono::nanoseconds prepareActuation();

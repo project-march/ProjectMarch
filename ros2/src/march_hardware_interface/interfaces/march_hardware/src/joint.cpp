@@ -65,6 +65,7 @@ void Joint::actuate(float target_position, float target_torque, float position_w
     motor_controller_->actuateRadians(target_position, position_weight);
 }
 
+// TODO: look if we want to use the operational check or get rid of it
 void Joint::readFirstEncoderValues(bool operational_check)
 {
     logger_->info(logger_->fstring("[%s] Reading first encoder values", this->name_.c_str()));
@@ -116,7 +117,7 @@ void Joint::logHardLimits() {
     logger_->warn(logger_->fstring("Lower limit is: %d", motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU()));
     logger_->warn(logger_->fstring("Upper limit is: %d", motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU()));
     logger_->warn(logger_->fstring("Current pos (rad) is: %f", position_));
-    logger_->warn(logger_->fstring("Current pos (iu ) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
+    logger_->warn(logger_->fstring("Current pos (iu) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
 }
 
 void Joint::readEncoders()
@@ -124,13 +125,8 @@ void Joint::readEncoders()
     auto current_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> time_between_last_update = current_time - last_read_time_;
 
-    if (this->receivedDataUpdate()) {
-        if (time_between_last_update
-            >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-            logger_->warn(
-                logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
-                    this->name_.c_str(), time_between_last_update.count()));
-        }
+    if (!this->receivedDataUpdate()) {
+        handleNoDataUpdate(time_between_last_update);
         return;
     }
     
@@ -192,6 +188,15 @@ bool Joint::receivedDataUpdate()
     }
     previous_state_ = std::move(new_state);
     return data_updated;
+}
+
+void Joint::handleNoDataUpdate(std::chrono::duration<double> time_between_last_update) {
+    const std::chrono::milliseconds MAX_UPDATE_INTERVAL { 10 }; // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
+    if (time_between_last_update >= MAX_UPDATE_INTERVAL) {
+        logger_->warn(
+            logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
+                this->name_.c_str(), time_between_last_update.count()));
+    }
 }
 
 std::unique_ptr<MotorController>& Joint::getMotorController()
