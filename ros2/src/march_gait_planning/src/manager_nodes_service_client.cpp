@@ -28,8 +28,8 @@ void ServiceClient::publishModeToGaitPlanning(const march_shared_msgs::msg::ExoM
 }
 
 void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    if ((exoMode)msg->mode == exoMode::Stand){
+    RCLCPP_INFO(this->get_logger(), "Received new mode! %s \n", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    if ((ExoMode)msg->mode == ExoMode::Stand){
         if (m_angles_active == true && m_cartesian_active == true){
             changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
             // changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
@@ -45,13 +45,13 @@ void ServiceClient::modeCallback(const march_shared_msgs::msg::ExoMode::SharedPt
         } else {
             RCLCPP_ERROR(this->get_logger(), "Both gait planning nodes inactive!"); 
         }
-    } else if (msg->node_type == "joint_angles" && (exoMode)msg->mode != exoMode::Stand){
+    } else if (msg->node_type == "joint_angles" && (ExoMode)msg->mode != ExoMode::Stand){
         if (!m_angles_active) changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
         if (m_cartesian_active) changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE);   
         m_angles_active = true; 
         m_cartesian_active = false; 
         publishModeToGaitPlanning(msg); 
-    } else if (msg->node_type == "cartesian" && (exoMode)msg->mode != exoMode::Stand){
+    } else if (msg->node_type == "cartesian" && (ExoMode)msg->mode != ExoMode::Stand){
         if (!m_cartesian_active) changeCartesianState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);  
         if (m_angles_active) changeAnglesState(lifecycle_msgs::msg::Transition::TRANSITION_DEACTIVATE); 
         m_angles_active = false;

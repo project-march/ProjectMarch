@@ -36,8 +36,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
 
-    m_home_stand = {0.19, 0.19, -0.9, 0.19, -0.19, -0.9}; 
-    // m_home_stand = {0.12, 0.15, -0.90, 0.12, -0.15, -0.90}; 
+    m_home_stand = {0.19, 0.22, -0.9, 0.19, -0.22, -0.9};
 
     RCLCPP_INFO(this->get_logger(), "Cartesian node configured! "); 
 
@@ -84,11 +83,11 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 
 void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<exoMode>(m_gait_planning.getGaitType())).c_str());
+    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getGaitType())).c_str());
     if (m_active){
         m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
-        m_gait_planning.setGaitType((exoMode)msg->mode);
+        m_gait_planning.setGaitType((ExoMode)msg->mode);
 
     if ((ExoMode)msg->mode == ExoMode::Descending){
         m_single_execution_done = false; 
@@ -226,7 +225,7 @@ void GaitPlanningCartesianNode::finishCurrentTrajectory(){
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
-void GaitPlanningNode::publishIncrements(){
+void GaitPlanningCartesianNode::publishIncrements(){
     // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
     // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
@@ -236,7 +235,7 @@ void GaitPlanningNode::publishIncrements(){
 }
 
 void GaitPlanningCartesianNode::stepClose(){
-    RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<exoMode>(m_gait_planning.getPreviousGaitType())).c_str());
+    RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);

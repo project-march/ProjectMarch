@@ -23,23 +23,23 @@
 #include <unordered_map>
 
 //TODO: move to exomode generator python file 
-const std::unordered_map<exoMode, std::string> modeNodeTypeMap = {
-    {exoMode::Sit, "joint_angles"},
-    {exoMode::Stand, "joint_angles"},
-    {exoMode::Walk, "joint_angles"},
-    {exoMode::BootUp, "joint_angles"},
-    {exoMode::Error, "joint_angles"},
-    {exoMode::Sideways, "joint_angles"},
-    {exoMode::Hinge, "joint_angles"}, 
-    {exoMode::LargeWalk, "cartesian"},
-    {exoMode::SmallWalk, "cartesian"},
-    {exoMode::Ascending, "cartesian"},
-    {exoMode::Descending, "cartesian"},
-    {exoMode::VariableStep, "cartesian"},
-    {exoMode::VariableWalk, "cartesian"},
-    {exoMode::HighStep1, "cartesian"},
-    {exoMode::HighStep2, "cartesian"},
-    {exoMode::HighStep3, "cartesian"}
+const std::unordered_map<ExoMode, std::string> modeNodeTypeMap = {
+    {ExoMode::Sit, "joint_angles"},
+    {ExoMode::Stand, "joint_angles"},
+    {ExoMode::Walk, "joint_angles"},
+    {ExoMode::BootUp, "joint_angles"},
+    {ExoMode::Error, "joint_angles"},
+    {ExoMode::Sideways, "joint_angles"},
+    {ExoMode::Hinge, "joint_angles"}, 
+    {ExoMode::LargeWalk, "cartesian"},
+    {ExoMode::SmallWalk, "cartesian"},
+    {ExoMode::Ascending, "cartesian"},
+    {ExoMode::Descending, "cartesian"},
+    {ExoMode::VariableStep, "cartesian"},
+    {ExoMode::VariableWalk, "cartesian"},
+    {ExoMode::HighStep1, "cartesian"},
+    {ExoMode::HighStep2, "cartesian"},
+    {ExoMode::HighStep3, "cartesian"}
 };
 
 class ModeMachineNode : public rclcpp::Node 
