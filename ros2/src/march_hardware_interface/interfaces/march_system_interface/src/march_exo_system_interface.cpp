@@ -396,7 +396,7 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
 #ifndef DEBUG_MODE
-        RCLCPP_WARN_ONCE(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+        RCLCPP_WARN(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
 #endif
     }
