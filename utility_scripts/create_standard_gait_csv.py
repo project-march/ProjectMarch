@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import bezier 
 
+TIMESTEPS = 40 # Number of time steps for each step, note that first and last step are half the size
+
 def package_bezier(step_length, array_size):
 
     def compensation_for_circle(array_size, step_length): 
@@ -43,10 +45,10 @@ def package_bezier(step_length, array_size):
 
     return final_points_first_step, final_points_complete_step
 
-large_gait_first_step, large_gait_complete_step = package_bezier(0.6, 200)
+large_gait_first_step, large_gait_complete_step = package_bezier(0.6, TIMESTEPS)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', large_gait_first_step, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', large_gait_complete_step, delimiter=',')
-small_gait_first_step, small_gait_complete_step = package_bezier(0.2, 200)
+small_gait_first_step, small_gait_complete_step = package_bezier(0.2, TIMESTEPS)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', small_gait_first_step, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', small_gait_complete_step, delimiter=',')
 
@@ -86,10 +88,10 @@ res = interpolate(0.3, small_gait_first_step, large_gait_first_step, 100)
 # plt.plot(small_gait_complete_step[:,0], small_gait_complete_step[:,1])
 # plt.show()
 
-large_step_close, _ = package_bezier(-0.6, 200)
+large_step_close, _ = package_bezier(-0.6, TIMESTEPS)
 large_step_close = np.flip(large_step_close, axis=0)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/large_step_close.csv', large_step_close, delimiter=',')
 
-small_step_close, _ = package_bezier(-0.2, 200)
+small_step_close, _ = package_bezier(-0.2, TIMESTEPS)
 small_step_close = np.flip(small_step_close, axis=0)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', small_step_close, delimiter=',')
