@@ -168,7 +168,7 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     do {
         m_desired_joint_velocities = m_ik_solver->solveInverseKinematics();
         m_desired_joint_positions = m_ik_solver->integrateJointVelocities();
-        if (m_ik_solver->isPrioritizedTaskConverged()) {
+        if (m_ik_solver->areTasksConverged()) {
             RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Convergence reached.");
             success = true;
             break;

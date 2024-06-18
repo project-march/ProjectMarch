@@ -32,7 +32,7 @@ GaitPlanningNode::GaitPlanningNode()
     m_gait_planning.setGaitType(ExoMode::BootUp); 
 
     //TODO: NOT UP TO DATE WITH THE ANGLES IMPLEMENTATION
-    m_home_stand = {0.139, 0.22, -0.913, 0.139, -0.22, -0.913};
+    m_home_stand = {0.139, 0.22, -0.89, 0.139, -0.22, -0.89};
 }
 
 void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -215,14 +215,14 @@ void GaitPlanningNode::stepClose(){
 
     // Hier trajectory publishen naar visualizer, depending on previous gait type 
     switch (m_gait_planning.getPreviousGaitType()){
-        case exoMode::HighStep1: 
-        case exoMode::HighStep2:
-        case exoMode::HighStep3: 
+        case ExoMode::HighStep1: 
+        case ExoMode::HighStep2:
+        case ExoMode::HighStep3: 
             visualizeBothFeet(); 
             break; 
-        case exoMode::LargeWalk:
-        case exoMode::SmallWalk: 
-        case exoMode::VariableWalk:
+        case ExoMode::LargeWalk:
+        case ExoMode::SmallWalk: 
+        case ExoMode::VariableWalk:
             visualizeOneFoot(); 
             break; 
         default: 
@@ -242,10 +242,10 @@ void GaitPlanningNode::calculateIncrements(){
     m_initial_position = {m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2], m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]}; 
     RCLCPP_INFO(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
     for (unsigned i = 0; i < m_home_stand.size(); i++){
-        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/40); 
+        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/100); 
     }
     RCLCPP_INFO(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
-    for (unsigned i = 0; i < 40; i++){
+    for (unsigned i = 0; i < 100; i++){
         for (unsigned i = 0; i < m_initial_position.size(); i++){
         m_initial_position[i] += m_increments[i]; 
         }
