@@ -15,7 +15,7 @@ from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
     simulation = LaunchConfiguration("simulation", default="false")
-    timestep_in_ms = LaunchConfiguration("timestep", default="50")
+    clock_period = LaunchConfiguration("clock_period", default="0.05")
     
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
@@ -35,7 +35,7 @@ def generate_launch_description():
             parameters=[
                 {"robot_definition": robot_description},
                 {"urdf_file_path": urdf_file},
-                {"timestep_in_ms": timestep_in_ms},
+                {"clock_period": clock_period},
                 {"left_stance_threshold": force_stance_threshold},
                 {"right_stance_threshold": force_stance_threshold},
                 {"simulation": simulation},
