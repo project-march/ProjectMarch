@@ -83,7 +83,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
 
 };
 
-int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:
@@ -97,7 +97,7 @@ int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis 
     }
 }
 
-int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:
