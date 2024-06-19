@@ -7,6 +7,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+import yaml
 
 def generate_launch_description():
     state_estimator_clock_period = LaunchConfiguration('state_estimator_timer_period', default='0.05')
@@ -34,6 +35,16 @@ def generate_launch_description():
         ),
         condition=IfCondition(test),
     )
+
+    # Load the soft joint limits from the robot config
+    joints_airgaiting_config_filepath = os.path.join(
+                get_package_share_directory('march_hardware_builder'),
+                'robots', 'Izzy',
+                'joints_airgaiting.yaml'
+            )
+    joints_airgaiting_config = yaml.safe_load(open(joints_airgaiting_config_filepath, 'r'))
+    actuator_names = [list(actuator.keys())[0] for actuator in joints_airgaiting_config['march9']['joints']]
+    print(actuator_names)
 
     return LaunchDescription([
         Node(
