@@ -528,7 +528,7 @@ void StateEstimatorNode::declareParameters()
     declare_parameter("simulation", true);
     declare_parameter("urdf_file_path", std::string());
     declare_parameter("robot_definition", std::string());
-    declare_parameter("timestep_in_ms", 50);
+    declare_parameter("clock_period", 0.05);
 
     // Thresholds for stance detection
     declare_parameter("left_stance_threshold", 400.0);
@@ -589,9 +589,9 @@ void StateEstimatorNode::configurePublishers()
 
 void StateEstimatorNode::configureStateEstimationTimer()
 {
-    m_dt = static_cast<double>(get_parameter("timestep_in_ms").as_int()) / 1000.0;
+    m_dt = get_parameter("clock_period").as_double();
     m_timer = this->create_wall_timer(
-        std::chrono::milliseconds(get_parameter("timestep_in_ms").as_int()), 
+        std::chrono::milliseconds(static_cast<int>(m_dt * 1000)), 
         std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
     m_timer->cancel();
 

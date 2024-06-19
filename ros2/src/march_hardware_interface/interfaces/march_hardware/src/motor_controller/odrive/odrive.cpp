@@ -47,7 +47,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
         logger_->info("Initializing the encoder index search.");    
 
-        return std::chrono::seconds {10};
+        return std::chrono::seconds {20};
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -292,7 +292,7 @@ float ODrive::getAIEAbsolutePositionRad()
 
 uint32_t ODrive::getCheckSum()
 {
-    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
     // uint32_t checksum_check = 987654321;
     // if (checksum != checksum_check) {
     //     RCLCPP_ERROR(rclcpp::get_logger("getCheckSum"), "Checksum value is %u, the CheckSum object's bits are probably scrambled like some tasty eggs.", checksum);

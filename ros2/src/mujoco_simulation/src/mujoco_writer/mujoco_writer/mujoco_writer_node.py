@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from control_msgs.msg import JointTrajectoryControllerState
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Empty
 from std_msgs.msg import Float64MultiArray
 
 from mujoco_interfaces.msg import MujocoInput
@@ -30,7 +30,8 @@ class MujocoWriterNode(Node):
         )
 
         # A subscriber that notifies if the queue with trajectory points has to  be reset.
-        self.reset_subscription = self.create_subscription(Bool, "/mujoco_reset_trajectory", self.reset_callback, 10)
+        self.reset_subscription = self.create_subscription(Bool, "/mujoco/writer/reset", self.reset_callback, 10)
+        self.reset_publisher = self.create_publisher(Empty, "/mujoco/reset", 10)
         self.reset = False
         # self.subscription  # prevent unused variable warning
 
@@ -68,6 +69,9 @@ class MujocoWriterNode(Node):
     def reset_callback(self, msg):
         """Set the reset flag when a message is received with data True."""
         self.reset = msg.data
+        if msg.data:
+            msg_to_send = Empty()
+            self.reset_publisher.publish(msg_to_send)
 
 
 def main(args=None):

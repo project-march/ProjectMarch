@@ -42,6 +42,15 @@ bit8 PdoInterfaceImpl::read8(uint16_t slave_index, uint8_t module_index) const
     return return_value;
 }
 
+bit8 PdoInterfaceImpl::read8mosi(uint16_t slave_index, uint8_t module_index) const{
+    const uint8_t* data_ptr = ec_slave[slave_index].outputs + module_index;
+
+    bit8 return_value {};
+    return_value.b0 = *data_ptr;
+
+    return return_value;
+}
+
 bit16 PdoInterfaceImpl::read16(uint16_t slave_index, uint8_t module_index) const
 {
     const uint8_t* data_ptr = ec_slave[slave_index].inputs + module_index;
