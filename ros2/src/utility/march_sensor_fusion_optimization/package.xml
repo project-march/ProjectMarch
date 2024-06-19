@@ -3,10 +3,24 @@
 <package format="3">
   <name>march_sensor_fusion_optimization</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="gungnir@todo.todo">gungnir</maintainer>
+  <description>Optimization of sensor fusion parameters for the MARCH exoskeleton project.</description>
+  <maintainer email="alexanderjamesbecoy@example.com">Alexander James Becoy</maintainer>
   <license>TODO: License declaration</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>lifecycle_msgs</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>ament_index_python</depend>
+
+  <exec_depend>numpy</exec_depend>
+  <exec_depend>tensorflow_probability</exec_depend>
+  <exec_depend>bayesian-optimization</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>

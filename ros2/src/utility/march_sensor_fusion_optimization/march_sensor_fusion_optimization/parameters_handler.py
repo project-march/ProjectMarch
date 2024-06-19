@@ -35,12 +35,13 @@ class ParametersHandler:
         return size
     
     def set_optimization_parameters(self, values: list) -> None:
-        new_process_params = values[0:len(self.get_optimization_parameter_names('process_noise'))]
-        for i, param in enumerate(self.get_optimization_parameter_names('process_noise')):
-            self.parameters['state_estimator']['ros__parameters']['noise_parameters']['process_noise'][param] = new_process_params[i]
-        new_observation_params = values[len(new_process_params):]
+        # new_process_params = values[0:len(self.get_optimization_parameter_names('process_noise'))]
+        # for i, param in enumerate(self.get_optimization_parameter_names('process_noise')):
+        #     self.parameters['state_estimator']['ros__parameters']['noise_parameters']['process_noise'][param] = new_process_params[i]
+        # new_observation_params = values[len(new_process_params):]
         for i, param in enumerate(self.get_optimization_parameter_names('observation_noise')):
-            self.parameters['state_estimator']['ros__parameters']['noise_parameters']['observation_noise'][param] = new_observation_params[i]
+            # self.parameters['state_estimator']['ros__parameters']['noise_parameters']['observation_noise'][param] = new_observation_params[i]
+            self.parameters['state_estimator']['ros__parameters']['noise_parameters']['observation_noise'][param] = values[i]
 
     def save_parameters(self, path: str = None) -> None:
         if path is None:
