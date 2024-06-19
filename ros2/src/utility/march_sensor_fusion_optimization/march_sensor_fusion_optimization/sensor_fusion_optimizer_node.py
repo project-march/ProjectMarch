@@ -1,6 +1,7 @@
 """
 Project MARCH IX, 2023-2024
-Author: Alexander James Becoy @alexanderjamesbecoy
+Authors: Alexander James Becoy @alexanderjamesbecoy
+         Alexander Andonov 
 """
 
 import rclpy
@@ -11,50 +12,79 @@ from ament_index_python.packages import get_package_share_directory
 
 from lifecycle_msgs.msg import State, Transition, TransitionDescription
 from lifecycle_msgs.srv import GetState, ChangeState, GetAvailableTransitions
-from march_shared_msgs.msg import StateEstimation
+from march_shared_msgs.msg import StateEstimation, ExoMode
+from std_msgs.msg import Bool, Empty
+from march_sensor_fusion_optimization.parameters_handler import ParametersHandler
 
-from march_sensor_fusion_optimization.bayesian_optimization import BayesianOptimizer
-from march_sensor_fusion_optimization.state_handler import StateHandler, BayesianOptimizationStates, BayesianOptimizationTransitions
+import time
+import random as rd
+import numpy as np
+import tensorflow_probability as tfp
+from tensorflow_probability import distributions as tfd
+from tensorflow_probability import math as tfm
+from bayes_opt import BayesianOptimization, UtilityFunction
+
 
 class SensorFusionOptimizerNode(Node):
 
     def __init__(self) -> None:
         super().__init__('sensor_fusion_optimizer')
 
-        self.declare_parameter('max_iterations', 1000)
-        self.declare_parameter('min_observation_change', 1e-6)
+        self.declare_parameter('max_iterations', 100)
         self.declare_parameter('parameters_filepath', get_package_share_directory('march_state_estimator') + '/config/sensor_fusion_noise_parameters.yaml')
 
-        # Initialize Bayesian Optimizer
+        # Bayesian Optimization parameters Optimizer
         self.max_iterations = self.get_parameter('max_iterations').value
-        self.min_observation_change = self.get_parameter('min_observation_change').value
-        self.bayesian_optimizer = BayesianOptimizer(
-            dof=3.0,
-            max_iter=self.max_iterations, 
-            min_obs=self.min_observation_change, 
-            param_file=self.get_parameter('parameters_filepath').value
-        )
+        self.max_iterations = 100
+        self.dof = 3
+        self.param_file = self.get_parameter('parameters_filepath').value
+        self.parameter_handler = ParametersHandler(self.param_file)
+        self.num_optimization_parameters = 3
+        self.initial_population_size = 30
+        self.performance_costs = []
+        self.dt = []
+        self.average_costs = []
+        self.total_time = 0.0
+        self.num_monte_carlo_runs = 200
+        self.num_run_time_steps = 1000
+        self.xi = 0.0 # exploration parameter in EI function
+        self.kernel_alpha = 1e-8
+        self.num_optimization_parameters = 3
+        self.simulation_time = 5
+        # NOTE: We simplify the noise observation parameters of foot position, foot slippage,
+               # and joint position to reduce dimensions of the optimization problem.
+        self.bounds = np.array([
+            (1e-3, 1.0),  # foot position noise (assumption: x=y=z)
+            (1e-3, 1.0),  # foot slippage noise (assumption: roll=pitch=yaw)
+            (1e-3, 1.0)]) # joint position noise (assumption: all joints have same position noise)
 
-        # Initialize state machine
-        self.state_machine = StateHandler(initial_state=BayesianOptimizationStates.STATE_CONFIGURATION)
-        self.timer = self.create_timer(self.state_machine.timer_period, self.timer_callback)
+        self.utility_function = UtilityFunction(kind="ei", kappa=2.5, xi=self.xi)
+        self.optimizer = BayesianOptimization(
+            f=self.black_box_filter_function,  
+            pbounds={"foot_position": self.bounds[0], "foot_slippage": self.bounds[1], "joint_position": self.bounds[2]},
+            verbose=2,
+            random_state=1
+        )
+        # TODO: Implement Student-t process for surrogate model
+        # Kernel parameters
+        self.optimizer.set_gp_params(
+            alpha=self.kernel_alpha,
+            normalize_y=True,
+            n_restarts_optimizer=5
+        )
 
         # Initialize subscribers and clients
         self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
         self.change_state_client = self.create_client(ChangeState, 'state_estimator/change_state', callback_group=None)
         self.get_state_client = self.create_client(GetState, 'state_estimator/get_state', callback_group=None)
         self.get_available_transitions_client = self.create_client(GetAvailableTransitions, 'state_estimator/get_available_transitions', callback_group=None)
-
+        self.exo_mode_publisher = self.create_publisher(ExoMode, 'current_mode', 10)
+        self.simulation_command_publisher = self.create_publisher(Bool, 'mujoco_writer/reset', 10)
         self.get_logger().info('Sensor Fusion Optimizer Node has been initialized.')
 
-    def timer_callback(self) -> None:
-        current_state = self.state_machine.get_current_state()
-
-        if current_state == BayesianOptimizationStates.STATE_CONFIGURATION:
-            self.bayesian_optimizer.configure(population_size=10)
-
     def state_estimation_callback(self, msg: StateEstimation) -> None:
-        self.bayesian_optimizer.performance_costs.append(msg.performance_cost)
+        self.performance_costs.append(msg.performance_cost)
+        self.dt.append(msg.step_time)
 
     def get_current_state(self) -> State:
         self.get_logger().info('Getting current state...')
@@ -95,7 +125,57 @@ class SensorFusionOptimizerNode(Node):
 
         self.get_logger().info('Service has been called.')
         return change_state_future.result().success
+    
+    def run_filter_with_noise_parameters(self, noise_parameters: np.ndarray) -> None:
+        """ Run the EKF with the provided noise parameters and collect performance costs
+        through Monte Carlo simulations. """
+        self.costs = np.zeros((self.num_monte_carlo_runs, self.num_run_time_steps))
+        self.total_time = []
 
+        for i in range(self.num_monte_carlo_runs):  # Simulate N many runs
+            self.total_time.append(0.0)
+            self.paremeter_handler.set_optimization_parameters(noise_parameters)
+            self.change_state("TRANSITION_CONFIGURE")
+            self.simulation_command_publisher(Bool(data=True))
+            self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND))
+            # NOTE: Wait to be stable
+            time.sleep(5)     
+            self.change_state("TRANSITION_ACTIVATE")
+            self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.WALK))
+            for j in range(self.num_run_time_steps):
+                # TODO: Make sure that the callback data runs in parallel with this 
+                # TODO: Does this get the current NIS at all points?
+                performance = self.performance_costs[-1]
+                self.costs[i,j] = performance
+                # TODO: Make sure this gets correct dt
+                self.total_time[-1] += self.dt[-1]
+            self.change_state("TRANSITION_DEACTIVATE")
+
+    def evaluate_performance_cost(self) -> float:
+        """Compute the JNIS performance cost of the state estimator with the current set of noise parameters."""
+        average_costs_per_run = np.mean(self.costs, axis=1)
+        total_time = np.sum(self.total_time)
+        average_costs_per_time = average_costs_per_run / total_time
+        JNIS = np.abs(np.log(np.sum(average_costs_per_time) / self.num_optimization_parameters))
+        return JNIS
+    
+    def black_box_filter_function(self, foot_position: float, foot_slippage: float, joint_position: float) -> float:
+        """ Black box function to estimate the costs of the state estimation filter. """
+        # TODO: Configure parameters of State Estimation filter
+        self.parameter_handler.set_optimization_parameters([foot_position, foot_slippage, joint_position])
+        self.run_filter_with_noise_parameters([foot_position, foot_slippage, joint_position])
+        # Negative JNIS to maximize the performance
+        return -self.evaluate_performance_cost()
+
+    def optimize(self) -> np.ndarray:
+        """ Optimize the EKF parameters using Bayesian Optimization with Gaussian Processes."""
+        self.optimizer.maximize(
+            acquisition_function=self.utility_function,
+            init_points=self.initial_population_size,
+            n_iter=self.max_iterataions
+        )
+        print("Minimum found JNIS: ", -(self.optimizer.max["target"]))
+        return self.optimizer.max["params"]
 
 def main(args=None):
     rclpy.init(args=args)

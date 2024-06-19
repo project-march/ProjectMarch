@@ -47,9 +47,9 @@ state_estimator:
         - 1e-12  # right_ankle_dpf
         - 1e-12  # right_ankle_ie
     optimization_parameters:
-      process_noise:
-      - foot_position
-      - foot_slippage
+      # process_noise:
+      # - foot_position
+      # - foot_slippage
       observation_noise:
       - foot_position
       - foot_slippage
