@@ -592,7 +592,7 @@ void StateEstimatorNode::configureStateEstimationTimer()
     m_dt = get_parameter("clock_period").as_double();
     m_timer = this->create_wall_timer(
         std::chrono::milliseconds(static_cast<int>(m_dt * 1000)), 
-        std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
+        std::bind(&StateEstimatorNode::timerCallback, this), m_sensors_callback_group);
     m_timer->cancel();
 
     RCLCPP_INFO(this->get_logger(), "State Estimation Timer has been configured. Timestep: %f", m_dt);

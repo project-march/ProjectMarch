@@ -12,7 +12,7 @@ from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from mujoco_interfaces.msg import MujocoGains
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Empty as EmptyMsg
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -136,6 +136,8 @@ class MujocoSimNode(Node):
         self.writer_subscriber = self.create_subscription(MujocoInput, "mujoco_input", self.writer_callback, 100)
         # Create a subscriber for updating the gains
         self.gains_subscriber = self.create_subscription(MujocoGains, "mujoco_gains", self.gains_callback, 100)
+        # Create a subscriber to reset the simulation
+        self.reset_subscriber = self.create_subscription(EmptyMsg, "mujoco/reset", self.reset_callback, 10)
         # Create a publisher for the reading-from-mujoco action
         self.reader_publisher = self.create_publisher(MujocoDataSensing, "mujoco_sensor_output", 10)
 
@@ -342,6 +344,17 @@ class MujocoSimNode(Node):
         sensor_msg.backpack_vel = backpack_velocity
 
         self.reader_publisher.publish(sensor_msg)
+
+    def reset_callback(self, msg):
+        """Callback function for the reset service.
+
+        This function resets the simulation to the initial state.
+        """
+        self.data.time = 0
+        self.set_initial_keyframe(0)
+        self.ros_first_updated = self.get_clock().now()
+        self.trajectory_last_updated = self.get_clock().now()
+        self.get_logger().warn("Simulation reset")
 
 
 def main(args=None):
