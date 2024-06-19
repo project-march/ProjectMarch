@@ -281,11 +281,11 @@ def generate_launch_description() -> LaunchDescription:
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
         ),
-        Node(
-            package='bezier_visualization',
-            executable='bezier_visualization_node',
-            name='bezier_visualization',
-        ),
+        # Node(
+        #     package='bezier_visualization',
+        #     executable='bezier_visualization_node',
+        #     name='bezier_visualization',
+        # ),
         mujoco_node,
         state_estimator,
         march_control,
