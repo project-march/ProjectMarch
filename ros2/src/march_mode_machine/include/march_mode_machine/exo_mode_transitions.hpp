@@ -24,9 +24,9 @@ public:
         if (type == "Joint Angles"){
             transitions = {
                 { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
-                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Ascending, ExoMode::Descending, ExoMode::Hinge} },
+                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Hinge} },
                 { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
-                { ExoMode::BootUp, { ExoMode::Stand } },
+                { ExoMode::BootUp, { ExoMode::Stand, ExoMode::Sit } },
                 { ExoMode::Error, {}},
                 { ExoMode::Sideways, { ExoMode::Stand}},
                 { ExoMode::Ascending, { ExoMode::Stand}},

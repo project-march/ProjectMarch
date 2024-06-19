@@ -18,9 +18,9 @@
 
 // #include "rclcpp/rclcpp.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "march_state_estimator/robot_description.hpp"
-#include "march_state_estimator/robot_node.hpp"
-#include "march_state_estimator/robot_zmp.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_node.hpp"
+#include "march_state_estimator/robot_description/robot_zmp.hpp"
 
 class RobotDescriptionTest : public ::testing::Test {
 public:

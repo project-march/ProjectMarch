@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+ <tabbed_widget parent="main_window" name="Main Window">
+  <Tab tab_name="Cartesian Space" containers="1">
+   <Container>
+    <DockSplitter count="2" sizes="0.5;0.5" orientation="-">
+     <DockSplitter count="3" sizes="0.333625;0.33275;0.333625" orientation="|">
+      <DockArea name="Left foot x">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="0.118199" left="1718611230.353473" top="0.691528" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/left_foot_position/x" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.0/position/x" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Left foot y">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="0.169969" left="1718611230.353473" top="0.221220" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/left_foot_position/y" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.0/position/y" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Left foot z">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.917302" left="1718611230.353473" top="-0.418142" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/left_foot_position/z" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.0/position/z" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="3" sizes="0.334501;0.330998;0.334501" orientation="|">
+      <DockArea name="Right foot x">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="0.117740" left="1718611230.353473" top="0.691473" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/right_foot_position/x" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.1/position/x" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Right foot y">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.221220" left="1718611230.353473" top="-0.169969" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/right_foot_position/y" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.1/position/y" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Right foot z">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.917160" left="1718611230.353473" top="-0.418089" right="1718611236.655784"/>
+        <limitY/>
+        <curve name="/ik_solver/buffer/input/right_foot_position/z" color="#ff7f0e"/>
+        <curve name="/state_estimation/state/body_ankle_pose.1/position/z" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="Configuration Space" containers="1">
+   <Container>
+    <DockSplitter count="2" sizes="0.5;0.5" orientation="-">
+     <DockSplitter count="5" sizes="0.200263;0.198948;0.201578;0.198948;0.200263" orientation="|">
+      <DockArea name="L_ADPF">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-28.000000" left="1718611230.333517" top="20.000000" right="1718611236.655996"/>
+        <limitY min="-28" max="20"/>
+        <curve name="/joint_states/left_ankle_dpf/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/left_ankle_dpf/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.0" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.0[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_AIE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-10.000000" left="1718611230.333517" top="10.000000" right="1718611236.655996"/>
+        <limitY min="-10" max="10"/>
+        <curve name="/joint_states/left_ankle_ie/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/left_ankle_ie/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_HAA">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-20.000000" left="1718611230.333517" top="10.000000" right="1718611236.655996"/>
+        <limitY min="-20" max="10"/>
+        <curve name="/joint_states/left_hip_aa/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/left_hip_aa/position[Outlier Removal]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.1" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.1[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_HFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-20.000000" left="1718611230.333517" top="115.000000" right="1718611236.655996"/>
+        <limitY min="-20" max="115"/>
+        <curve name="/joint_states/left_hip_fe/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/left_hip_fe/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.2" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.2[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_KFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="0.000000" left="1718611230.333517" top="125.000000" right="1718611236.655996"/>
+        <limitY min="0" max="125"/>
+        <curve name="/joint_states/left_knee/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/left_knee/position[Outlier Removal]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.3" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.3[Outlier Removal]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="5" sizes="0.200701;0.198948;0.200701;0.198948;0.200701" orientation="|">
+      <DockArea name="R_ADPF">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-28.000000" left="1718611230.333517" top="20.000000" right="1718611236.655996"/>
+        <limitY min="-28" max="20"/>
+        <curve name="/joint_states/right_ankle_dpf/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/right_ankle_dpf/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.4" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.4[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_AIE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-10.000000" left="1718611230.333517" top="10.000000" right="1718611236.655996"/>
+        <limitY min="-10" max="10"/>
+        <curve name="/joint_states/right_ankle_ie/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/right_ankle_ie/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_HAA">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-20.000000" left="1718611230.333517" top="10.000000" right="1718611236.655996"/>
+        <limitY min="-20" max="10"/>
+        <curve name="/joint_states/right_hip_aa/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/right_hip_aa/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.5" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.5[Outlier Removal]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_HFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-20.000000" left="1718611230.333517" top="115.000000" right="1718611236.655996"/>
+        <limitY min="-20" max="115"/>
+        <curve name="/joint_states/right_hip_fe/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/right_hip_fe/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.6" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.6[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_KFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="0.000000" left="1718611230.333517" top="125.000000" right="1718611236.655996"/>
+        <limitY min="0" max="125"/>
+        <curve name="/joint_states/right_knee/position" color="#0ec5ff">
+         <transform name="Scale/Offset" alias="/joint_states/right_knee/position[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+        <curve name="/march_joint_position_controller/commands/data.7" color="#ff7f0e">
+         <transform name="Scale/Offset" alias="/march_joint_position_controller/commands/data.7[Scale/Offset]">
+          <options value_scale="57.296" value_offset="0" time_offset="0"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="Velocity Space" containers="1">
+   <Container>
+    <DockSplitter count="2" sizes="0.5;0.5" orientation="-">
+     <DockSplitter count="5" sizes="0.199825;0.200263;0.199825;0.200263;0.199825" orientation="|">
+      <DockArea name="L_ADPF">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.868082" left="1718611230.333517" top="0.500247" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/left_ankle_dpf/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.0" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.0[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_AIE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.047930" left="1718611230.333517" top="0.013715" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/left_ankle_ie/position" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="L_HAA">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.083026" left="1718611230.333517" top="0.078446" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/left_hip_aa/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.1" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.1[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_HFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-1.420612" left="1718611230.333517" top="0.447970" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/left_hip_fe/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.2" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.2[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioActual"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="L_KFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-2.248398" left="1718611230.333517" top="0.391810" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/left_knee/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.3" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.3[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="5" sizes="0.199825;0.200263;0.199825;0.200263;0.199825" orientation="|">
+      <DockArea name="R_ADPF">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.642801" left="1718611230.333517" top="0.537193" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/right_ankle_dpf/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.4" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.4[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_AIE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-1.324963" left="1718611230.333517" top="0.687962" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/right_ankle_ie/velocity" color="#0ec5ff"/>
+       </plot>
+      </DockArea>
+      <DockArea name="R_HAA">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-0.094496" left="1718611230.333517" top="0.083000" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/right_hip_aa/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.5" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.5[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_HFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-1.396567" left="1718611230.333517" top="0.449072" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/right_hip_fe/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.6" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.6[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioCustom"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+      <DockArea name="R_KFE">
+       <plot mode="TimeSeries" flip_x="false" flip_y="false" style="Lines">
+        <range bottom="-2.287737" left="1718611230.333517" top="0.392199" right="1718611236.655996"/>
+        <limitY/>
+        <curve name="/joint_states/right_knee/velocity" color="#0ec5ff"/>
+        <curve name="/march_joint_position_controller/commands/data.7" color="#ff7f0e">
+         <transform name="Derivative" alias="/march_joint_position_controller/commands/data.7[Derivative]">
+          <options lineEdit="0.05001" radioChecked="radioActual"/>
+         </transform>
+        </curve>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="2"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="0"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <default time_axis="" delimiter="0"/>
+  </plugin>
+  <plugin ID="DataLoad MCAP"/>
+  <plugin ID="DataLoad ROS2 bags">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="ROS2 Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+  </plugin>
+  <plugin ID="UDP Server"/>
+  <plugin ID="WebSocket Server"/>
+  <plugin ID="ZMQ Subscriber"/>
+  <plugin ID="Fast Fourier Transform"/>
+  <plugin ID="Quaternion to RPY"/>
+  <plugin ID="Reactive Script Editor">
+   <library code="--[[ Helper function to create a series from arrays&#xa;&#xa; new_series: a series previously created with ScatterXY.new(name)&#xa; prefix:     prefix of the timeseries, before the index of the array&#xa; suffix_X:   suffix to complete the name of the series containing the X value. If [nil], use the index of the array.&#xa; suffix_Y:   suffix to complete the name of the series containing the Y value&#xa; timestamp:   usually the tracker_time variable&#xa;              &#xa; Example:&#xa; &#xa; Assuming we have multiple series in the form:&#xa; &#xa;   /trajectory/node.{X}/position/x&#xa;   /trajectory/node.{X}/position/y&#xa;   &#xa; where {N} is the index of the array (integer). We can create a reactive series from the array with:&#xa; &#xa;   new_series = ScatterXY.new(&quot;my_trajectory&quot;) &#xa;   CreateSeriesFromArray( new_series, &quot;/trajectory/node&quot;, &quot;position/x&quot;, &quot;position/y&quot;, tracker_time );&#xa;--]]&#xa;&#xa;function CreateSeriesFromArray( new_series, prefix, suffix_X, suffix_Y, timestamp )&#xa;  &#xa;  --- clear previous values&#xa;  new_series:clear()&#xa;  &#xa;  --- Append points to new_series&#xa;  index = 0&#xa;  while(true) do&#xa;&#xa;    x = index;&#xa;    -- if not nil, get the X coordinate from a series&#xa;    if suffix_X ~= nil then &#xa;      series_x = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_X) )&#xa;      if series_x == nil then break end&#xa;      x = series_x:atTime(timestamp)&#x9; &#xa;    end&#xa;    &#xa;    series_y = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_Y) )&#xa;    if series_y == nil then break end &#xa;    y = series_y:atTime(timestamp)&#xa;    &#xa;    new_series:push_back(x,y)&#xa;    index = index+1&#xa;  end&#xa;end&#xa;&#xa;--[[ Similar to the built-in function GetSeriesNames(), but select only the names with a give prefix. --]]&#xa;&#xa;function GetSeriesNamesByPrefix(prefix)&#xa;  -- GetSeriesNames(9 is a built-in function&#xa;  all_names = GetSeriesNames()&#xa;  filtered_names = {}&#xa;  for i, name in ipairs(all_names)  do&#xa;    -- check the prefix&#xa;    if name:find(prefix, 1, #prefix) then&#xa;      table.insert(filtered_names, name);&#xa;    end&#xa;  end&#xa;  return filtered_names&#xa;end&#xa;&#xa;--[[ Modify an existing series, applying offsets to all their X and Y values&#xa;&#xa; series: an existing timeseries, obtained with TimeseriesView.find(name)&#xa; delta_x: offset to apply to each x value&#xa; delta_y: offset to apply to each y value &#xa;  &#xa;--]]&#xa;&#xa;function ApplyOffsetInPlace(series, delta_x, delta_y)&#xa;  -- use C++ indeces, not Lua indeces&#xa;  for index=0, series:size()-1 do&#xa;    x,y = series:at(index)&#xa;    series:set(index, x + delta_x, y + delta_y)&#xa;  end&#xa;end&#xa;"/>
+   <scripts/>
+  </plugin>
+  <plugin ID="CSV Exporter"/>
+  <plugin ID="ROS2 Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <previouslyLoaded_Datafiles/>
+ <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <customMathEquations/>
+ <snippets/>
+ <!-- - - - - - - - - - - - - - - -->
+</root>
+

@@ -69,7 +69,7 @@ class Joint:
         zero_position_layout.addWidget(QLabel("Target position (rad)"))
         self.zero_position_widget = QDoubleSpinBox()
         self.zero_position_widget.setDecimals(3)
-        self.zero_position_widget.setSingleStep(5e-2)
+        self.zero_position_widget.setSingleStep(5e-3)
         self.zero_position_widget.setRange(-np.pi, np.pi)
         self.zero_position_widget.setDisabled(True)
         self.zero_position_widget.valueChanged.connect(self.update_zero_pos)
@@ -136,6 +136,7 @@ class Joint:
 
     def update_actual_pos(self, pos: float) -> None:
         self.actual_position_widget.setValue(pos)
+        self.actual_position = pos
 
     def update_desired_pos(self, pos: float) -> None:
         self.desired_position_widget.setValue(pos)
@@ -215,6 +216,7 @@ class Window(QMainWindow):
         for joint in self.joints:
             joint.set_disable_run_button_callback(self.disable_run_button)
             self.joint_layout.addLayout(joint.create_layout())
+        self.joint_layout.addStretch()
 
         # Create layout for menu
         menu_layout = QHBoxLayout()

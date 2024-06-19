@@ -26,6 +26,7 @@ public:
     double incremental_velocity_ = 0;
     double AIE_absolute_position_ = 0;
     double torque_ = 0;
+    double check_sum_ = 0;
 
     friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
     {
@@ -43,6 +44,7 @@ public:
             && lhs.incremental_velocity_ == rhs.incremental_velocity_ 
             && lhs.AIE_absolute_position_ == rhs.AIE_absolute_position_
             && lhs.torque_ == rhs.torque_
+            && lhs.check_sum_ == rhs.check_sum_
             && lhs.isOperational() == rhs.isOperational()
             && lhs.hasError() == rhs.hasError();
     }
@@ -90,6 +92,7 @@ public:
      * @return A pair of interface_names and pointers to the member variables.
      */
     inline std::array<std::pair<std::string, double*>, 14> get_pointers()
+    inline std::array<std::pair<std::string, double*>, 14> get_pointers()
     {
         return {
             std::make_pair(/*__x=*/"motor_current", &motor_current_),
@@ -106,6 +109,7 @@ public:
             std::make_pair(/*__x=*/"incremental_velocity", &incremental_velocity_),
             std::make_pair(/*__x=*/"AIE_absolute_position", &AIE_absolute_position_),
             std::make_pair(/*__x=*/"torque", &torque_),
+            std::make_pair(/*__x=*/"check_sum", &check_sum_),
         };
     }
 
@@ -129,6 +133,7 @@ public:
         incremental_velocity_ = other->incremental_velocity_;
         AIE_absolute_position_ = other->AIE_absolute_position_;
         torque_ = other->torque_;
+        check_sum_ = other->check_sum_;
     }
 };
 

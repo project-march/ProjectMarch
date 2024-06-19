@@ -10,7 +10,7 @@
 #include "kdl/chainidsolver_recursive_newton_euler.hpp"
 #include "urdf/model.h"
 
-#include "march_state_estimator/robot_joint.hpp"
+#include "march_state_estimator/robot_description/robot_joint.hpp"
 #include <math.h>
 
 TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_description, const std::string& urdf_file_path)

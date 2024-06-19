@@ -10,6 +10,8 @@
 #include <vector>
 
 #include <march_hardware/joint.h>
+#include "march_hardware/ethercat/pdo_interface.h"
+#include "march_hardware/ethercat/odrive_pdo_map.h"
 
 namespace march {
 /**
@@ -87,6 +89,10 @@ private:
      */
     bool sendReceivePdo();
 
+    void writeChecksumMOSI();
+
+    bool isCheckSumValid(uint16_t slave);
+
     /**
      * Checks if all the slaves are connected and in operational state.
      */
@@ -131,6 +137,7 @@ private:
 
     int latest_lost_slave_ = -1;
     const int slave_watchdog_timeout_;
+    PdoInterfaceImpl pdo_interface_;
     std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 
     std::thread ethercat_thread_;

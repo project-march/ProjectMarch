@@ -8,7 +8,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -21,45 +21,45 @@ march9:
             upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 183.78
+            transmission: 215.797
             direction: 1
           torqueSensor:
             maxTorque: 150.0
             averageTorque: 10
         gains:
           position:
-            p: 15.0
+            p: 20.0
             i: 0.0
-            d: 0.2
+            d: 0.4
           torque:
-            p: 50.0
-            d: 0.0002
+            p: 0.0
+            d: 0.0
 
     - left_hip_aa:
         motor_controller:
           slaveIndex: 3
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
             minPositionIU: 4792
-            maxPositionIU: 5984
-            zeroPositionIU: 5570
+            maxPositionIU: 6057
+            zeroPositionIU: 5702
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
             upperErrorSoftLimitMarginRad: 0.01308997
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 367.57
+            transmission: 411.1
             direction: 1
           torqueSensor:
             maxTorque: 150.0
             averageTorque: 10
         gains:
           position:
-            p: 35.0
+            p: 45.0
             i: 0.0
             d: 0.6
           torque:
@@ -105,9 +105,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 453989
+            minPositionIU: 453980
             maxPositionIU: 818338
-            zeroPositionIU: 474378
+            zeroPositionIU: 453980
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
@@ -132,58 +132,58 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 13739
-            maxPositionIU: 15857
-            zeroPositionIU: 15013
+            minPositionIU: 13725
+            maxPositionIU: 15863
+            zeroPositionIU: 14999
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
             upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 183.78
+            transmission: 215.797
             direction: 1
           torqueSensor:
             maxTorque: 150.0
             averageTorque: 10
         gains:
           position:
-            p: 15.0
+            p: 20
             i: 0.0
-            d: 0.2
+            d: 0.4
           torque:
-            p: 50.0
-            d: 0.0002
+            p: 0.0
+            d: 0.0
 
     - right_hip_aa:
         motor_controller:
           slaveIndex: 2
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
             minPositionIU: 6523
             maxPositionIU: 7811
-            zeroPositionIU: 7291
+            zeroPositionIU: 7433
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
             upperErrorSoftLimitMarginRad: 0.01308997
           incrementalEncoder:
             countsPerRotation: 6400
-            transmission: 367.57
+            transmission: 411.1
             direction: 1
           torqueSensor:
             maxTorque: 150.0
             averageTorque: 10
         gains:
           position:
-            p: 35.0
+            p: 45.0
             i: 0.0
             d: 0.6
           torque:
@@ -198,9 +198,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 264864
-            maxPositionIU: 657603
-            zeroPositionIU: 323118
+            minPositionIU: 176992
+            maxPositionIU: 571303
+            zeroPositionIU: 235246
             lowerSoftLimitMarginRad: 0.11798426
             upperSoftLimitMarginRad: 0.11798426
             lowerErrorSoftLimitMarginRad: 0.05899213
@@ -231,7 +231,7 @@ march9:
             direction: -1
             minPositionIU: 330877
             maxPositionIU: 919222
-            zeroPositionIU: 351266
+            zeroPositionIU: 330877
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
