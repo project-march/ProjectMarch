@@ -308,4 +308,4 @@ def interactive_bezier(gait_type: str, array_size: int):
 
 
 
-interactive_bezier("small_gait", 150)
+interactive_bezier("small_gait", 100)
