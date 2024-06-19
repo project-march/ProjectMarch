@@ -91,8 +91,7 @@ public:
      * `march_motor_controller_state_broadcaster/.../motor_controller_semantic_component.hpp`
      * @return A pair of interface_names and pointers to the member variables.
      */
-    inline std::array<std::pair<std::string, double*>, 14> get_pointers()
-    inline std::array<std::pair<std::string, double*>, 14> get_pointers()
+    inline std::array<std::pair<std::string, double*>, 15> get_pointers()
     {
         return {
             std::make_pair(/*__x=*/"motor_current", &motor_current_),

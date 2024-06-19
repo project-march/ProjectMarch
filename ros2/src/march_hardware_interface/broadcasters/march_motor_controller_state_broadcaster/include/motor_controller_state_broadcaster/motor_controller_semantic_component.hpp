@@ -25,8 +25,7 @@ using JointMCMsg = march_shared_msgs::msg::JointMotorControllerState;
 class MotorControllerSemanticComponent : public semantic_components::SemanticComponentInterface<JointMCMsg> {
 public:
     explicit MotorControllerSemanticComponent(const std::string& joint_name)
-        : SemanticComponentInterface(joint_name, /*size=*/14)
-        : SemanticComponentInterface(joint_name, /*size=*/14)
+        : SemanticComponentInterface(joint_name, /*size=*/15)
         , joint_name_(joint_name)
     {
         interface_names_.emplace_back(joint_name + "/" + "motor_current");
