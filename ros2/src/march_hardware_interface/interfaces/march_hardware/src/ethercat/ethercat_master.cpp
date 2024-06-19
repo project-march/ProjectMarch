@@ -210,8 +210,8 @@ void EthercatMaster::ethercatLoop()
 bool EthercatMaster::isCheckSumValid(uint16_t slave)
 {
     uint32_t checkSumValue = 0;
-    // NOTE: If the PDO mapping is changed, the "124" must be changed to the new length of the PDO MISO
-    for (int byte_offset = 0; byte_offset < 124; byte_offset++) {
+    uint8_t checksum_offset = ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None);
+    for (int byte_offset = 0; byte_offset < checksum_offset; byte_offset++) {
         checkSumValue += pdo_interface_.read8(slave, byte_offset).ui;
     }
     checkSumValue = checkSumValue % 4294967296;
@@ -229,8 +229,8 @@ void EthercatMaster::writeChecksumMOSI()
 {
     for (int slave = 1; slave <= max_slave_index_; slave++) {
         uint32_t checkSumValue = 0;
-        // NOTE: If the PDO mapping is changed, the "80" must be changed to the new length of the PDO MOSI
-        for (int byte_offset = 0; byte_offset < 80; byte_offset++) {
+        uint8_t checksum_offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::CheckSumMOSI, ODriveAxis::One);
+        for (int byte_offset = 0; byte_offset < checksum_offset; byte_offset++) {
             checkSumValue += pdo_interface_.read8mosi(slave, byte_offset).ui;
         }
         checkSumValue = checkSumValue % 4294967296;
