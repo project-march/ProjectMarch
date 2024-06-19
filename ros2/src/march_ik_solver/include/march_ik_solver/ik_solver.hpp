@@ -34,6 +34,10 @@ public:
         std::unordered_map<std::string, double> task_weights);
     Eigen::VectorXd solveInverseKinematics();
     Eigen::VectorXd integrateJointVelocities();
+    Eigen::VectorXd applyJointVelocityLimits(
+        const double& dt,
+        const Eigen::VectorXd& desired_joint_positions, 
+        const Eigen::VectorXd& current_joint_positions) const;
     bool areTasksConverged();
 
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);
@@ -65,10 +69,12 @@ public:
     inline bool isPrioritizedTaskConverged() const { return m_task_map.at(m_task_names.back())->isConverged(); };
 
     inline void setDt(const double& dt) { m_dt = dt; };
+    inline void setVelocityLimitMultiplier(const double& velocity_limit_multiplier) { m_velocity_limit_multiplier = velocity_limit_multiplier; };
     inline void setTaskNames(const std::vector<std::string>& task_names) { m_task_names = task_names; };
     void setJointConfigurations(const std::vector<std::string>& joint_names,
         const std::vector<double>& joint_position_lower_limits, const std::vector<double>& joint_position_upper_limits,
-        const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits);
+        const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits,
+        const double& velocity_limit_multiplier);
 
 private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
@@ -79,6 +85,7 @@ private:
     const unsigned int UPPER_JOINT_LIMIT = 1;
 
     double m_dt;
+    double m_velocity_limit_multiplier;
     std::vector<std::string> m_task_names;
     std::unordered_map<std::string, Task::UniquePtr> m_task_map;
 
