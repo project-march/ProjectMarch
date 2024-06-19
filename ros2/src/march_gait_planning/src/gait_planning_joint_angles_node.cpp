@@ -260,7 +260,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                             m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                         } else {
                             processMovingGaits(count);
-                            RCLCPP_INFO(this->get_logger(), "count: %d", count); 
+                            // RCLCPP_INFO(this->get_logger(), "count: %d", count); 
                             m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
                             if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
                                 m_gait_planning.setPrevGaitType(ExoMode::Stand); 
@@ -272,7 +272,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                         
                         m_current_trajectory = m_gait_planning.getHingeGait(); 
                         processMovingGaits(count); 
-                        RCLCPP_INFO(this->get_logger(), "Count: %d", count);
+                        // RCLCPP_INFO(this->get_logger(), "Count: %d", count);
                         m_gait_planning.setCounter((count <= 0) ? 0 : (count - 1));
                         if (m_gait_planning.getCounter() <= 0){
                             m_current_trajectory.clear();
@@ -325,7 +325,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     m_current_trajectory = m_gait_planning.getStandToSitGait(); 
                     processMovingGaits(count);
                     m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
-                    RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
+                    // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
                     break;
                 }
                 
@@ -334,7 +334,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 m_current_trajectory = m_gait_planning.getHingeGait(); 
                 processMovingGaits(count); 
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size()-1)) ? (m_current_trajectory.size()-1): (count + 1)); 
-                RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
+                // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
                 break;
             
             case ExoMode::Sideways :

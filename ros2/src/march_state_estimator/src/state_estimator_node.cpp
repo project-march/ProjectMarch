@@ -85,8 +85,8 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
         return;
     }
 
-    declare_parameter("timestep_in_ms", 50);
-    int dt = get_parameter("timestep_in_ms").as_int();
+    declare_parameter("clock_period", 0.05);
+    m_dt = get_parameter("clock_period").as_double();
 
     declare_parameter("left_stance_threshold", 400.0);
     declare_parameter("right_stance_threshold", 400.0);
@@ -130,12 +130,11 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
     m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
     m_sensor_fusion->configureJointNames(joint_names);
     m_sensor_fusion->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
-    m_dt = static_cast<double>(dt) / 1000.0;
-    RCLCPP_INFO(this->get_logger(), "State Estimator Clock Period: %f s", m_dt);
+    RCLCPP_INFO(this->get_logger(), "State estimator clock period: %f s", m_dt);
 
     // Initialize timer
     m_timer = this->create_wall_timer(
-        std::chrono::milliseconds(dt), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
+        std::chrono::milliseconds(static_cast<int>(m_dt * 1000)), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }

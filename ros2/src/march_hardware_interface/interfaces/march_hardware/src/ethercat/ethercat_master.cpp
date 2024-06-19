@@ -216,7 +216,8 @@ bool EthercatMaster::isCheckSumValid(uint16_t slave)
     }
     checkSumValue = checkSumValue % 4294967296;
 
-    uint32_t receivedCheckSum = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSum, ODriveAxis::None)).ui;
+    uint32_t receivedCheckSum = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
+
     if (receivedCheckSum != checkSumValue) {
         logger_->warn(logger_->fstring("Slave %d: Checksum value is not correct. Received checksum: %d, calculated checksum: %d", slave, receivedCheckSum, checkSumValue));
         return false;
@@ -224,9 +225,34 @@ bool EthercatMaster::isCheckSumValid(uint16_t slave)
     return true;
 }
 
+void EthercatMaster::writeChecksumMOSI()
+{
+    for (int slave = 1; slave <= max_slave_index_; slave++) {
+        uint32_t checkSumValue = 0;
+        // NOTE: If the PDO mapping is changed, the "80" must be changed to the new length of the PDO MOSI
+        for (int byte_offset = 0; byte_offset < 80; byte_offset++) {
+            checkSumValue += pdo_interface_.read8mosi(slave, byte_offset).ui;
+        }
+        checkSumValue = checkSumValue % 4294967296;
+
+        uint32_t receivedCheckSumMOSIStatus = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMOSIStatus, ODriveAxis::None)).ui;
+    
+        if (receivedCheckSumMOSIStatus != 0) {
+            logger_->warn(logger_->fstring("Slave %d: Checksum MOSI status is not zero. Received checksum: %d", slave, receivedCheckSumMOSIStatus));
+        }
+
+        bit32 write_checksum = {};
+        write_checksum.ui = checkSumValue;
+
+        pdo_interface_.write32(slave, ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::CheckSumMOSI, ODriveAxis::One), write_checksum);
+
+    }
+}
+
 bool EthercatMaster::sendReceivePdo()
 {
     if (this->latest_lost_slave_ == -1) {
+        writeChecksumMOSI();
         ec_send_processdata();
         const int wkc = ec_receive_processdata(EC_TIMEOUTRET);
         if (!has_warned_about_worker_counter and wkc < this->expected_working_counter_) {
