@@ -5,62 +5,117 @@
 
 using std::placeholders::_1; 
 
-GaitPlanningNode::GaitPlanningNode()
- : Node("march_gait_planning_node"), 
-   m_gait_planning(GaitPlanning()),
-   m_desired_footpositions_msg(std::make_shared<march_shared_msgs::msg::IksFootPositions>()),
-   m_pose(std::make_shared<geometry_msgs::msg::Pose>()), 
-   m_visualization_msg(std::make_shared<geometry_msgs::msg::PoseArray>()), 
-   m_single_execution_done(false), 
-   m_variable_first_step_done(false), 
-   m_variable_walk_swing_leg()
+GaitPlanningCartesianNode::GaitPlanningCartesianNode()
+    : rclcpp_lifecycle::LifecycleNode("gait_planning_cartesian_node", rclcpp::NodeOptions().use_intra_process_comms(false))
  {
-    m_iks_foot_positions_publisher = create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
+ }
 
-    m_interpolated_bezier_visualization_publisher = create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_configure(const rclcpp_lifecycle::State &state){
+
+    (void) state; 
+    m_gait_planning = GaitPlanning(); 
+    m_desired_footpositions_msg = std::make_shared<march_shared_msgs::msg::IksFootPositions>();
+    m_pose = std::make_shared<geometry_msgs::msg::Pose>(); 
+    m_visualization_msg_rviz = std::make_shared<geometry_msgs::msg::PoseArray>(); 
+    m_single_execution_done = false; 
+    m_variable_first_step_done = false; 
+    m_active = false; 
+
+    m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
+
+    m_interpolated_bezier_visualization_publisher_rviz = this->create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
-        "current_mode", 10, std::bind(&GaitPlanningNode::currentModeCallback, this, _1)); 
+        "gait_planning_mode", 10, std::bind(&GaitPlanningCartesianNode::currentModeCallback, this, _1)); 
     m_exo_joint_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "state_estimation/state", 100, std::bind(&GaitPlanningNode::currentExoJointStateCallback, this, _1)); 
+        "state_estimation/state", 100, std::bind(&GaitPlanningCartesianNode::currentExoJointStateCallback, this, _1)); 
 
-    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningNode::MPCCallback, this, _1)); 
+    // m_variable_foot_step_subscriber = create_subscription<march_shared_msgs::msg::FootStepOutput>("footsteps", 100, std::bind(&GaitPlanningCartesianNode::MPCCallback, this, _1)); 
 
-    m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningNode::MPCCallback, this, _1));
+    m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningCartesianNode::MPCCallback, this, _1));
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
 
-    //TODO: NOT UP TO DATE WITH THE ANGLES IMPLEMENTATION
-    m_home_stand = {0.19, 0.22, -0.9, 0.19, -0.22, -0.9};
+    m_home_stand = {0.139, 0.25, -0.89, 0.139, -0.25, -0.89};
+
+    RCLCPP_INFO(this->get_logger(), "Cartesian node configured! "); 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-void GaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &state) {
+    
+    (void) state; 
+    m_active = true;  
+    m_iks_foot_positions_publisher->on_activate(); 
+    m_interpolated_bezier_visualization_publisher_rviz->on_activate();
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node activated!"); 
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_deactivate(const rclcpp_lifecycle::State &state) {
+    
+    (void) state; 
+    m_active = false; 
+    m_iks_foot_positions_publisher->on_deactivate(); 
+    m_interpolated_bezier_visualization_publisher_rviz->on_deactivate(); 
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node deactivated!"); 
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_cleanup(const rclcpp_lifecycle::State &state) {
+    
+    (void) state; 
+    m_iks_foot_positions_publisher.reset();
+    m_interpolated_bezier_visualization_publisher_rviz.reset();   
+    RCLCPP_DEBUG(this->get_logger(), "Cartesian node cleaned up!"); 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_shutdown(const rclcpp_lifecycle::State &state) {
+    (void) state; 
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+
+void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
     // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getGaitType())).c_str());
-    m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
-    m_gait_planning.setGaitType((ExoMode)msg->mode);
+    if (m_active){
+        m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
+        m_gait_planning.setGaitType((ExoMode)msg->mode);
 
     if ((ExoMode)msg->mode == ExoMode::Descending){
         m_single_execution_done = false; 
     }
 
-    publishFootPositions(); 
-}
-
-void GaitPlanningNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current foot positions");
-    GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
-    GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
-    m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
-    m_desired_footpositions_msg->header = msg->header;
-    if (m_current_trajectory.empty()){
-        m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-        // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %d", m_gait_planning.getCurrentStanceFoot());
+        publishFootPositions(); 
+    } else {
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
-    publishFootPositions(); 
 }
 
-void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
+void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
+    // RCLCPP_INFO(get_logger(), "Received current foot positions");
+
+    if (m_active){
+        GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
+        GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
+        m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
+        m_desired_footpositions_msg->header = msg->header;
+        if (m_current_trajectory.empty()){
+            m_gait_planning.setStanceFoot(msg->next_stance_leg); 
+            // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
+        }
+        publishFootPositions();
+    } else {
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+    }
+}
+
+void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg){
     RCLCPP_INFO(this->get_logger(), "Received footsteps from MPC"); 
 
     m_left_foot_offset = m_gait_planning.getCurrentLeftFootPos(); 
@@ -74,7 +129,7 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
 
         //Remove duplicates from PoseArray message to identify the two desired footsteps
 
-        std::set<geometry_msgs::msg::Pose, GaitPlanningNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
+        std::set<geometry_msgs::msg::Pose, GaitPlanningCartesianNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
         auto second_foot = next(final_feet.begin(), 1); 
@@ -125,14 +180,21 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
             m_current_trajectory = m_gait_planning.variableFullStepTrajectory(m_gait_planning.getVariableDistance()); 
         }
 
+        /**
+         * Below is code to visualize a posearray in RViz for MPC visualization.
+         **/ 
         for (auto element : m_current_trajectory){
-            m_pose->position.x = static_cast<float>(element[0]);
-            m_pose->position.z = static_cast<float>(element[1]);
-            m_visualization_msg->poses.push_back(*m_pose); 
+            m_pose->position.x = static_cast<float>(element[0]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 3 : 0];
+            m_pose->position.y = m_home_stand[m_variable_walk_swing_leg == 1 ? 4 : 1];
+            m_pose->position.z = static_cast<float>(element[1]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 5 : 2];
+            m_visualization_msg_rviz->poses.push_back(*m_pose); 
         }
-        m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-        m_visualization_msg->poses.clear(); 
+        m_visualization_msg_rviz->header.frame_id = "backpack"; 
+        m_visualization_msg_rviz->header.stamp = this->now(); 
+        m_interpolated_bezier_visualization_publisher_rviz->publish(*m_visualization_msg_rviz); 
+        m_visualization_msg_rviz->poses.clear(); 
         RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
+
 
         publishFootPositions(); 
 
@@ -140,7 +202,7 @@ void GaitPlanningNode::MPCCallback(const geometry_msgs::msg::PoseArray::SharedPt
 
 }
 
-void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
+void GaitPlanningCartesianNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
 {
     m_desired_footpositions_msg->left_foot_position.x = left_x;
@@ -151,7 +213,7 @@ void GaitPlanningNode::setFootPositionsMessage(double left_x, double left_y, dou
     m_desired_footpositions_msg->right_foot_position.z = right_z;
 }
 
-void GaitPlanningNode::finishCurrentTrajectory(){
+void GaitPlanningCartesianNode::finishCurrentTrajectory(){
     RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
     // RCLCPP_INFO(this->get_logger(), "current trajectory size: %d \n", m_current_trajectory.size()); 
     GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -168,7 +230,7 @@ void GaitPlanningNode::finishCurrentTrajectory(){
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
-void GaitPlanningNode::publishIncrements(){
+void GaitPlanningCartesianNode::publishIncrements(){
     // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
     // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
@@ -177,14 +239,33 @@ void GaitPlanningNode::publishIncrements(){
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
-void GaitPlanningNode::stepClose(){
+
+
+
+void GaitPlanningCartesianNode::stepClose(){
     RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
+
+    // Hier trajectory publishen naar visualizer, depending on previous gait type 
+    switch (m_gait_planning.getPreviousGaitType()){
+        case ExoMode::HighStep1: 
+        case ExoMode::HighStep2:
+        case ExoMode::HighStep3: 
+            break; 
+        case ExoMode::LargeWalk:
+        case ExoMode::SmallWalk: 
+        case ExoMode::VariableWalk:
+            break; 
+        default: 
+            break; 
+    }
+
     RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
 
-void GaitPlanningNode::calculateIncrements(){
+
+void GaitPlanningCartesianNode::calculateIncrements(){
     m_current_trajectory.clear(); 
     m_home_stand_trajectory.clear();  
     RCLCPP_INFO(this->get_logger(), "Incrementing to homestand"); 
@@ -193,10 +274,10 @@ void GaitPlanningNode::calculateIncrements(){
     m_initial_position = {m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2], m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]}; 
     RCLCPP_INFO(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
     for (unsigned i = 0; i < m_home_stand.size(); i++){
-        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/40); 
+        m_increments.push_back((m_home_stand[i] - m_initial_position[i])/100); 
     }
     RCLCPP_INFO(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
-    for (unsigned i = 0; i < 40; i++){
+    for (unsigned i = 0; i < 100; i++){
         for (unsigned i = 0; i < m_initial_position.size(); i++){
         m_initial_position[i] += m_increments[i]; 
         }
@@ -206,7 +287,7 @@ void GaitPlanningNode::calculateIncrements(){
     m_gait_planning.setPreviousGaitType(ExoMode::Stand); 
 }
 
-void GaitPlanningNode::publishHomeStand(){
+void GaitPlanningCartesianNode::publishHomeStand(){
     m_current_trajectory.clear();
     setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
@@ -214,7 +295,7 @@ void GaitPlanningNode::publishHomeStand(){
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
 }
 
-void GaitPlanningNode::processStand(){
+void GaitPlanningCartesianNode::processStand(){
     m_single_execution_done = false;
     if (!m_current_trajectory.empty()){
         finishCurrentTrajectory(); 
@@ -242,7 +323,7 @@ void GaitPlanningNode::processStand(){
     }
 }
 
-void GaitPlanningNode::publishWalk(){
+void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
@@ -262,10 +343,11 @@ void GaitPlanningNode::publishWalk(){
     }
 }
 
-void GaitPlanningNode::publishHeightGaits(){
+void GaitPlanningCartesianNode::publishHeightGaits(){
     if (m_current_trajectory.empty() && !m_single_execution_done){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
+
         RCLCPP_INFO(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
     }
     else if (m_current_trajectory.empty() && m_single_execution_done){
@@ -281,7 +363,7 @@ void GaitPlanningNode::publishHeightGaits(){
     }
 }
 
-void GaitPlanningNode::publishVariableWalk(){
+void GaitPlanningCartesianNode::publishVariableWalk(){
     // TODO: figure out if offset is still needed. 
     if (!m_current_trajectory.empty()){
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -299,7 +381,7 @@ void GaitPlanningNode::publishVariableWalk(){
     }
 }
  
-void GaitPlanningNode::publishFootPositions(){
+void GaitPlanningCartesianNode::publishFootPositions(){
     switch (m_gait_planning.getGaitType()){
         case ExoMode::Stand :
             processStand(); 
@@ -349,7 +431,10 @@ int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
 
-    rclcpp::spin(std::make_shared<GaitPlanningNode>()); 
+    rclcpp::executors::SingleThreadedExecutor executor; 
+    std::shared_ptr<GaitPlanningCartesianNode> gait_planning_cartesian_node = std::make_shared<GaitPlanningCartesianNode>();
+    executor.add_node(gait_planning_cartesian_node->get_node_base_interface()); 
+    executor.spin(); 
     rclcpp::shutdown(); 
 
     return 0; 

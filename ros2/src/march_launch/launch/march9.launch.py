@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     """Generates the launch file for the march8 node structure."""
-    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
@@ -76,42 +76,11 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_control"),
                 "launch",
-                "march8_controllers.launch.py",
+                "march9_controllers.launch.py",
             )
         ),
         launch_arguments=[("simulation", simulation)],
     )
-    # endregion
-
-    # region Launch Footstep Generator
-    # footstep_generator_launch_dir = os.path.join(get_package_share_directory("footstep_generator"), "launch")
-    # n_footsteps = 20
-    # step_length = 0.2
-
-    # footstep_generator = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator.launch.py']),
-    #     # launch_arguments=[('n_footsteps', n_footsteps), ('step_length', step_length)],
-    # )
-    # endregion
-
-    #TODO: implement own input device M9 
-
-    # region rqt input device
-    # rqt_input_device = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_rqt_input_device"),
-    #             "launch",
-    #             "input_device.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[
-    #         ("ping_safety_node", "true"),
-    #         ("use_sim_time", "false"),
-    #         ("layout", "training"),
-    #         ("testing", "false"),
-    #     ],
-    # )
     # endregion
 
     # region Launch Safety
@@ -133,7 +102,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
-                "mode_machine_cartesian.launch.py",
+                "mode_machine.launch.py",
             )
         ),
     )
@@ -215,12 +184,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-
-    # region footstep_generation parameters
-    # n_footsteps = 20
-    # step_length = 0.2
-    # endregion
-
     return LaunchDescription(declared_arguments + [
         Node(
             package='fuzzy_generator',
@@ -232,9 +195,33 @@ def generate_launch_description() -> LaunchDescription:
         Node(
             package='march_gait_planning', 
             namespace='', 
-            executable='gait_planning_node', 
-            name='march_gait_planning', 
+            executable='listener_gait_planning', 
+            name='listener_gait_planning', 
         ),
+        # Node(
+        #     package='march_gait_planning', 
+        #     namespace='', 
+        #     executable='service_client_node', 
+        #     name='gait_planning_manager', 
+        # ),
+        Node(
+            package='gait_planning_manager', 
+            namespace='', 
+            executable='gait_planning_manager_node', 
+            name='gait_planning_manager', 
+        ),
+        Node(
+            package='march_gait_planning', 
+            namespace='', 
+            executable='gait_planning_angles_node',
+            name='gait_planning_angles_node', 
+        ), 
+        Node(
+            package='march_gait_planning', 
+            namespace='', 
+            executable='gait_planning_cartesian_node', 
+            name='gait_planning_cartesian_node', 
+        ), 
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -258,7 +245,7 @@ def generate_launch_description() -> LaunchDescription:
         mode_machine,
         record_rosbags_action,
         safety_node,
-        imu_nodes,
+        # imu_nodes,
         ik_solver,
         ipd_node,
         # footstep_generator, 
