@@ -11,9 +11,9 @@ controller_manager:
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
-#
-#    joint_state_broadcaster:
-#      type: joint_state_broadcaster/JointStateBroadcaster
+
+  #  joint_state_broadcaster:
+  #    type: joint_state_broadcaster/JointStateBroadcaster
 
 #    march_pressure_sole_broadcaster:
 #      type: march_pressure_sole_broadcaster::PressureSoleBroadcaster

@@ -10,7 +10,7 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 
 using std::placeholders::_1; 
 
-int INTERPOLATING_TIMESTEPS = 40;
+int INTERPOLATING_TIMESTEPS = 100;
 
 struct CSVRow {
     std::string left_hip_aa;
@@ -24,41 +24,87 @@ struct CSVRow {
 };
 
 GaitPlanningAnglesNode::GaitPlanningAnglesNode()
- : Node("gait_planning_angles_node"), 
-   m_gait_planning(GaitPlanningAngles()),
-   m_joints_msg(),
-   m_current_trajectory(),
-   m_incremental_steps_to_home_stand(),
-   m_first_stand(true),
-   m_initial_point(), 
-   m_single_execution_done(false)
+ : rclcpp_lifecycle::LifecycleNode("gait_planning_angles_node", rclcpp::NodeOptions().use_intra_process_comms(false))
 {
-    m_current_state_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1)); 
-    
-    m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>("current_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1)); 
-    // m_joint_angle_trajectory_publisher = create_publisher<trajectory_msgs::msg::JointTrajectory>("joint_trajectory_controller/joint_trajectory", 10); 
-    m_joint_angle_trajectory_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10); 
-    RCLCPP_INFO(this->get_logger(), "Joint trajectory publisher created"); 
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_configure(const rclcpp_lifecycle::State &state) {
+
+    (void) state; 
+    m_gait_planning = GaitPlanningAngles(); 
+    m_first_stand = true; 
+    m_active = false; 
+    m_single_execution_done = false; 
+
+    // m_joints_msg.joint_names = {"left_hip_aa", "left_hip_fe", "left_knee", "left_ankle", 
+    //                     "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle"};
+
+    m_current_state_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1));
+    m_exo_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));
+    m_joint_angle_trajectory_publisher = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
 
     m_gait_planning.setGaitType(ExoMode::BootUp);
     m_gait_planning.setPrevGaitType(ExoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
     m_gait_planning.setHomeStand(m_gait_planning.getStandToSitGait()[0]); 
+    RCLCPP_INFO(this->get_logger(), "Joint angles node configured!");
 
-    RCLCPP_INFO(this->get_logger(), "Gait planning node initialized");
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_activate(const rclcpp_lifecycle::State &state) {
 
+    (void) state;
+    m_joint_angle_trajectory_publisher->on_activate(); 
+
+    m_active = true;  
+
+    RCLCPP_DEBUG(this->get_logger(), "Joint angles node activated!"); 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_deactivate(const rclcpp_lifecycle::State &state) {
+
+    (void) state; 
+    m_joint_angle_trajectory_publisher->on_deactivate(); 
+    RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
+
+    m_active = false; 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_cleanup(const rclcpp_lifecycle::State &state) {
+    
+    (void) state; 
+    m_joint_angle_trajectory_publisher.reset();  
+    RCLCPP_DEBUG(this->get_logger(), "Joint angles node cleaned up!"); 
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningAnglesNode::on_shutdown(const rclcpp_lifecycle::State &state) {
+
+    (void) state; 
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+void GaitPlanningAnglesNode::setFirstCallbackMsg(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
+    m_first_callback_msg = msg; 
+}
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
     RCLCPP_INFO(this->get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
-    m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
-    m_gait_planning.setGaitType((ExoMode)msg->mode);
-
-    if ((ExoMode)msg->mode != ExoMode::Stand){
-        m_gait_planning.setCounter(0); 
-        RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!");
-    }
+    if (m_active){
+        // RCLCPP_INFO(this->get_logger(), "m_active = true"); 
+        m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
+        m_gait_planning.setGaitType((ExoMode)msg->mode);
+        // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
+        if ((ExoMode)msg->mode != ExoMode::Stand){
+            m_gait_planning.setCounter(0); 
+            RCLCPP_DEBUG(this->get_logger(), "setting counter to 0 in this gait switch!");
+        }
 
     if ((ExoMode)msg->mode == ExoMode::Sit){
         m_single_execution_done = false; 
@@ -69,14 +115,21 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
         m_single_execution_done = false; 
     }
 
-    if (!m_first_stand){
-        publishJointTrajectoryPoints(); 
+        if (!m_first_stand){
+            publishJointTrajectoryPoints(); 
+        }
+
+    } else {
+            RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
     }
+
 }
 
 void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
-    if (m_first_stand && (m_gait_planning.getGaitType() == ExoMode::Stand || m_gait_planning.getGaitType() == ExoMode::Sit)) {
-        std::vector<double> point = msg->joint_state.position; // This point is including the AIE joints at indices 1 and 6, these are not needed in the GP since these are passive
+    // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "\n entered joint angles callback \n"); 
+    if (m_active){
+        if (m_first_stand && (m_gait_planning.getGaitType() == ExoMode::Stand || m_gait_planning.getGaitType() == ExoMode::Sit)) {
+        std::vector<double> point = msg->joint_state.position; 
         if (point.size() >= 8) {
             m_gait_planning.setPrevPoint({point[0], point[2], point[3], point[4], point[5], point[7], point[8], point[9]}); 
             RCLCPP_INFO(this->get_logger(), "Received current joint angles"); 
@@ -107,6 +160,9 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         }
     }
     publishJointTrajectoryPoints(); 
+    } else {
+        RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
+    }
     
 }
 
@@ -168,7 +224,7 @@ void GaitPlanningAnglesNode::processBootUpToStandGait(){
     std::vector<double> temp_moving_to_home_stand;
    
     if (m_gait_planning.getCounter() < INTERPOLATING_TIMESTEPS){
-        RCLCPP_DEBUG(this->get_logger(), "Moving towards sit position!");
+        RCLCPP_INFO(this->get_logger(), "Moving towards sit position!");
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
@@ -191,7 +247,7 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
     if (count < m_current_trajectory.size()-1){ 
         processMovingGaits(count); 
         m_gait_planning.setCounter(count+1); 
-        RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
+        // RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_joints_msg.data = m_gait_planning.getHomeStand(); 
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
@@ -260,7 +316,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                             m_current_trajectory = m_gait_planning.getSitToStandGait(); 
                         } else {
                             processMovingGaits(count);
-                            // RCLCPP_INFO(this->get_logger(), "count: %d", count); 
+                            // // RCLCPP_INFO(this->get_logger(), "count: %d", count); 
                             m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
                             if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
                                 m_gait_planning.setPrevGaitType(ExoMode::Stand); 
@@ -335,6 +391,7 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 processMovingGaits(count); 
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size()-1)) ? (m_current_trajectory.size()-1): (count + 1)); 
                 // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
+                // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
                 break;
             
             case ExoMode::Sideways :
@@ -362,13 +419,17 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
             default :
                 break;
         }
-}
+    }
 
 int main(int argc, char *argv[]){
     
     rclcpp::init(argc, argv); 
 
-    rclcpp::spin(std::make_shared<GaitPlanningAnglesNode>()); 
+    rclcpp::executors::SingleThreadedExecutor executor; 
+    std::shared_ptr<GaitPlanningAnglesNode> gait_planning_node = std::make_shared<GaitPlanningAnglesNode>();
+    executor.add_node(gait_planning_node->get_node_base_interface()); 
+    executor.spin(); 
+
     rclcpp::shutdown(); 
 
     return 0; 
