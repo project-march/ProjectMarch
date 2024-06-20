@@ -22,7 +22,7 @@ def plot_joints(dataset):
 def stand_to_sit():
     time_points = 125
     adpf = np.linspace(0.162, 0, time_points)
-    haa = np.linspace(-0.065, -0.065, time_points)
+    haa = np.linspace(-0.06, -0.065, time_points)
     hfe = np.linspace(0.0349, 1.57, time_points)
     kfe = np.linspace(0.185, 1.57, time_points)
 
@@ -41,7 +41,7 @@ def stand_to_sit():
 def sit_to_stand():
     time_points = 125
     adpf = np.linspace(0, 0.162, time_points)
-    haa = np.linspace(-0.065, -0.065, time_points)
+    haa = np.linspace(-0.06, -0.065, time_points)
     hfe = np.linspace(1.57, 0.0349, time_points)
     kfe = np.linspace(1.57, 0.185, time_points)
 
