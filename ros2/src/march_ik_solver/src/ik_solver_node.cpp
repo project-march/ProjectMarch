@@ -156,6 +156,7 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
 
     m_current_world_to_base_orientation = Eigen::Quaterniond(
         msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
+    m_ik_solver->updateCurrentWorldToBaseOrientation(m_current_world_to_base_orientation);
 
     // Publish the desired joint positions if there is a solution in the previous cycle.
     if (m_has_solution) {

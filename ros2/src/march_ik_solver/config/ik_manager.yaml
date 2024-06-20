@@ -21,6 +21,7 @@ ik_manager:
       Stand:
       - posture
       - motion
+      - stability
       Sit:
       - posture
       - motion
