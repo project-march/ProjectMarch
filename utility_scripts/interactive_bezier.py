@@ -69,7 +69,7 @@ def create_bezier_csv(points, array_size, gait_type):
     plt.show()
 
     # ------------------------------------------------- FULL STEP ----------------------------------------------------------------------------------
-    phi_full_step = np.linspace(ending_angle, -ending_angle, int(array_size))
+    phi_full_step = np.linspace(-ending_angle, ending_angle, int(array_size))
 
     x_stance_complete_step = -LEG_LENGTH*np.sin(phi_full_step)
     z_stance_complete_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_full_step)
@@ -95,7 +95,7 @@ def create_bezier_csv(points, array_size, gait_type):
     plt.show()
 
     # ------------------------------------------------- STEP CLOSE ----------------------------------------------------------------------------------
-    phi_step_close = np.linspace(-ending_angle, 0, int(array_size))
+    phi_step_close = np.linspace(0, -ending_angle, int(array_size))
 
     x_stance_step_close = -LEG_LENGTH*np.sin(phi_step_close)
     z_stance_step_close = LEG_LENGTH - LEG_LENGTH*np.cos(phi_step_close)
