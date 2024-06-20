@@ -37,7 +37,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
 
-    m_home_stand = {0.139, 0.25, -0.89, 0.139, -0.25, -0.89};
+    m_home_stand = {0.1386, 0.228, -0.912, 0.1386, -0.228, -0.912};
 
     RCLCPP_INFO(this->get_logger(), "Cartesian node configured! "); 
 
