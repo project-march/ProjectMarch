@@ -25,7 +25,7 @@ using JointMCMsg = march_shared_msgs::msg::JointMotorControllerState;
 class MotorControllerSemanticComponent : public semantic_components::SemanticComponentInterface<JointMCMsg> {
 public:
     explicit MotorControllerSemanticComponent(const std::string& joint_name)
-        : SemanticComponentInterface(joint_name, /*size=*/12)
+        : SemanticComponentInterface(joint_name, /*size=*/14)
         , joint_name_(joint_name)
     {
         interface_names_.emplace_back(joint_name + "/" + "motor_current");
@@ -40,6 +40,8 @@ public:
         interface_names_.emplace_back(joint_name + "/" + "incremental_position");
         interface_names_.emplace_back(joint_name + "/" + "absolute_velocity");
         interface_names_.emplace_back(joint_name + "/" + "incremental_velocity");
+        interface_names_.emplace_back(joint_name + "/" + "AIE_absolute_position");
+        interface_names_.emplace_back(joint_name + "/" + "check_sum");
     }
 
     virtual ~MotorControllerSemanticComponent() = default;
@@ -69,6 +71,8 @@ public:
         incremental_position_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         absolute_velocity_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         incremental_velocity_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        AIE_absolute_position_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        check_sum_ = static_cast<float>(state_interface::get(index, state_interfaces_));
     }
 
     /**
@@ -94,6 +98,8 @@ public:
         msg.incremental_position = incremental_position_;
         msg.absolute_velocity = absolute_velocity_;
         msg.incremental_velocity = incremental_velocity_;
+        msg.aie_absolute_position = AIE_absolute_position_;
+        msg.check_sum = check_sum_;
         return true;
     }
 
@@ -114,6 +120,9 @@ private:
     float incremental_position_ = 0.F;
     float absolute_velocity_ = 0.F;
     float incremental_velocity_ = 0.F;
+
+    float AIE_absolute_position_ = 0.F;
+    float check_sum_ = 0.F;
 };
 
 } // namespace march_motor_controller_state_broadcaster

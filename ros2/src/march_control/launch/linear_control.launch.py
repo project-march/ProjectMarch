@@ -71,10 +71,10 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    joint_trajectory_controller_spawner = Node(
+    joint_position_controller_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
-        arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
+        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
     )
     # endregion
 
@@ -95,7 +95,7 @@ def generate_launch_description():
 
     nodes = [
         joint_state_broadcaster_spawner,
-        joint_trajectory_controller_spawner,
+        joint_position_controller_spawner,
         motor_controller_state_broadcaster_spawner,
     ]
 

@@ -17,8 +17,8 @@ public:
     // Setters
     void setStanceFoot(const uint8_t &new_stance_foot);
     void setFootPositions(const XYZFootPositionArray &new_left_foot_position, const XYZFootPositionArray &new_right_foot_position);
-    void setGaitType(const exoMode &new_gait_type);
-    void setPreviousGaitType(const exoMode &previous_gait_type);  
+    void setGaitType(const ExoMode &new_gait_type);
+    void setPreviousGaitType(const ExoMode &previous_gait_type);  
     void setBezierGait();
     void setVariableDistance(const float &distance); 
 
@@ -27,8 +27,8 @@ public:
     int getCurrentStanceFoot() const; 
     XYZFootPositionArray getCurrentLeftFootPos() const; 
     XYZFootPositionArray getCurrentRightFootPos() const; 
-    exoMode getGaitType() const; 
-    exoMode getPreviousGaitType() const;
+    ExoMode getGaitType() const; 
+    ExoMode getPreviousGaitType() const;
     float getVariableDistance() const; 
 
     //Getter for variable step size 
@@ -45,8 +45,8 @@ public:
 
 
 private: 
-    exoMode m_gait_type; 
-    exoMode m_previous_gait_type;
+    ExoMode m_gait_type; 
+    ExoMode m_previous_gait_type;
     int m_current_stance_foot; 
     double m_step_size; 
     

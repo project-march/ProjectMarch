@@ -59,7 +59,7 @@ class InputDeviceView(QWidget):
         self,
         name: str,
         callback: Optional[Union[str, Callable]] = None,
-        exoMode: Optional[int] = None,
+        ExoMode: Optional[int] = None,
         control_type: Optional[str] = None,
         image_path: Optional[str] = None,
         size: Tuple[int, int] = (125, 140),
@@ -94,9 +94,9 @@ class InputDeviceView(QWidget):
         qt_button.setMinimumSize(QSize(*size))
         qt_button.setMaximumSize(QSize(*size))
 
-        if exoMode is not None:
+        if ExoMode is not None:
             # Check if a method with the name specified by `callback`` exists in the controller class and if it is callable/a function.
-            qt_button.clicked.connect(lambda: self._controller.publish_mode(exoMode))
+            qt_button.clicked.connect(lambda: self._controller.publish_mode(ExoMode))
         else:
             # If no exomode is defined, print a warning.
             print(f"Exomode is not defined.")

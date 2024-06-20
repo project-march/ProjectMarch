@@ -5,7 +5,7 @@ GainScheduler::GainScheduler()
 }
 
 GainScheduler::GainScheduler(std::string config_path)
-    : m_gait_type(static_cast<exoMode>(0)), m_config(YAML::LoadFile(config_path))
+    : m_gait_type(static_cast<ExoMode>(0)), m_config(YAML::LoadFile(config_path))
 {
 }
 
@@ -62,7 +62,7 @@ std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getA
 }
 
 // Method to set the config path
-void GainScheduler::setConfigPath(const exoMode &new_gait_type) {
+void GainScheduler::setConfigPath(const ExoMode &new_gait_type) {
     if (m_last_joint_state != nullptr) {
         m_old_pid_values = getAllJointStatePidValues(m_last_joint_state);
     } else {
@@ -73,11 +73,11 @@ void GainScheduler::setConfigPath(const exoMode &new_gait_type) {
     // startInterpolation();
     std::cout << "Gait type set to: " << m_gait_type << '\n';
 
-    if (new_gait_type == static_cast<exoMode>(0)) {
+    if (new_gait_type == static_cast<ExoMode>(0)) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains.yaml");
-    } else if (new_gait_type == static_cast<exoMode>(1)) {
+    } else if (new_gait_type == static_cast<ExoMode>(1)) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/stand_gains.yaml");
-    } else if (new_gait_type == static_cast<exoMode>(2)) {
+    } else if (new_gait_type == static_cast<ExoMode>(2)) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/walk_gains.yaml");
     } else {
         throw std::runtime_error("Gait type not found");

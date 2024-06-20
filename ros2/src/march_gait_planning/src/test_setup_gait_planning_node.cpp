@@ -30,7 +30,7 @@ TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
     m_test_joint_trajectory_controller_mode_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "joint_trajectory_controller/joint_trajectory", 10);
 
-    m_gait_planning.setGaitType(exoMode::BootUp); 
+    m_gait_planning.setGaitType(ExoMode::BootUp); 
 
     // If everything goes correctly, there is nothing to publish so immediately a request will be sent. 
     auto timer_callback = std::bind(&TestSetupGaitPlanningNode::timerCallback, this);
@@ -45,8 +45,8 @@ TestSetupGaitPlanningNode::TestSetupGaitPlanningNode()
 }
 
 void TestSetupGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
-    m_gait_planning.setGaitType((exoMode)msg->mode);
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    m_gait_planning.setGaitType((ExoMode)msg->mode);
 }
 
 void TestSetupGaitPlanningNode::footPositionsPublish(){
@@ -64,11 +64,11 @@ void TestSetupGaitPlanningNode::executeRotationalJointGait(){
 
     switch (m_gait_planning.getGaitType()){
 
-        case exoMode::BootUp: {
+        case ExoMode::BootUp: {
             break;
         }
 
-        case exoMode::Stand: {
+        case ExoMode::Stand: {
 
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);
@@ -77,7 +77,7 @@ void TestSetupGaitPlanningNode::executeRotationalJointGait(){
             RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
             break;
         }
-        case exoMode::Walk: {
+        case ExoMode::Walk: {
 
             if (m_current_trajectory.empty()) {
                 //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
@@ -107,11 +107,11 @@ void TestSetupGaitPlanningNode::executeLinearJointGait(){
 
     switch (m_gait_planning.getGaitType()){
 
-        case exoMode::BootUp: {
+        case ExoMode::BootUp: {
         break;
         }
 
-        case exoMode::Stand: {
+        case ExoMode::Stand: {
 
             m_current_trajectory.clear();
             m_current_joint_angles_msg->points[1].positions.push_back(0.0);
@@ -119,7 +119,7 @@ void TestSetupGaitPlanningNode::executeLinearJointGait(){
             RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
             break;
         }
-        case exoMode::Walk: {
+        case ExoMode::Walk: {
 
             if (m_current_trajectory.empty()) {
                 m_current_trajectory = m_gait_planning.getTrajectory();

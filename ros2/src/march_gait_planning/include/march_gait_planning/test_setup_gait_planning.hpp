@@ -12,12 +12,16 @@ public:
     TestSetupGaitPlanning();
     void loadTrajectoryFromCSV();
     std::vector<double> getTrajectory() const;
-    void setGaitType(const exoMode &new_gait_type);
-    exoMode getGaitType() const;
+    void setGaitType(const ExoMode &new_gait_type);
+    ExoMode getGaitType() const;
+
+    std::vector<double> getPrevPoint() const; 
+    void setPrevPoint(const std::vector<double> &point);
 
 private:
-    exoMode m_gait_type;
+    ExoMode m_gait_type;
     std::vector<double> m_trajectory;
+    std::vector<double> m_prev_point; 
 };
 
 #endif // TEST_GAIT_PLANNING_HPP

@@ -17,16 +17,7 @@ class MotorController : public Slave {
 public:
     MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-        ActuationMode actuation_mode, bool is_incremental_encoder_more_precise,
-        std::shared_ptr<march_logger::BaseLogger> logger);
-
-    MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-        std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode,
-        std::shared_ptr<march_logger::BaseLogger> logger);
-
-    MotorController(const Slave& slave, std::unique_ptr<IncrementalEncoder> incremental_encoder,
-        std::unique_ptr<TorqueSensor> torque_sensor, ActuationMode actuation_mode,
-        std::shared_ptr<march_logger::BaseLogger> logger);
+        ActuationMode actuation_mode, bool use_inc_enc_for_position, std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -53,16 +44,11 @@ public:
     virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
     virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
 
-    virtual void sendPID(std::array<double, 3> pos_pid, std::array<double, 3> tor_pid)
-        = 0;
+    virtual void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) = 0;
 
     // Getter and setter for the ActuationMode
     ActuationMode getActuationMode() const;
     void setActuationMode(ActuationMode actuation_mode);
-
-    // TODO: Check if this method is really redundant.
-    // Actuate based on the actuation mode of the motor controller
-    //    void actuate(float target);
 
     /* Reset the MotorController
      * Can be overridden by child classes
@@ -82,12 +68,11 @@ public:
     // MotorController
     virtual int getActuationModeNumber() const = 0;
 
-    // Get whether the incremental encoder is more precise than the absolute
-    // encoder
-    bool isIncrementalEncoderMorePrecise() const;
-
-    // Are the slaves of this MotorController unique
+     // Are the slaves of this MotorController unique
     virtual bool requiresUniqueSlaves() const = 0;
+
+    // Check if we want to use the incremental encoder to update the position
+    bool useIncrementalEncoderForPosition() const;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -167,8 +152,7 @@ protected:
     std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     std::unique_ptr<TorqueSensor> torque_sensor_;
     ActuationMode actuation_mode_;
-
-    bool is_incremental_encoder_more_precise_;
+    bool use_inc_enc_for_position_;
 
     std::shared_ptr<march_logger::BaseLogger> logger_;
 

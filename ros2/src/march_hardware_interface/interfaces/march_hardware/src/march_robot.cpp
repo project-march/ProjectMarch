@@ -2,7 +2,6 @@
 #include "march_hardware/march_robot.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
-#include "march_hardware/temperature/temperature_sensor.h"
 
 #include <algorithm>
 #include <memory>
@@ -14,11 +13,11 @@ namespace march {
 MarchRobot::MarchRobot(
     ::std::vector<Joint> jointList,
     std::shared_ptr<march_logger::BaseLogger> logger,
-    ::std::string if_name,
+    ::std::string network_interface_name,
     int ecatCycleTime,
     int ecatSlaveTimeout)
     : joint_list_(std::move(jointList)),
-    ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
+    ethercat_master_(std::move(network_interface_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
     logger_(std::move(logger))
 
 {
@@ -27,12 +26,12 @@ MarchRobot::MarchRobot(
 MarchRobot::MarchRobot(
     ::std::vector<Joint> jointList,
     std::shared_ptr<march_logger::BaseLogger> logger,
-    ::std::string if_name,
+    ::std::string network_interface_name,
     int ecatCycleTime,
     int ecatSlaveTimeout,
     std::optional<PowerDistributionBoard> power_distribution_board)
     : joint_list_(std::move(jointList)),
-    ethercat_master_(std::move(if_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
+    ethercat_master_(std::move(network_interface_name), this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout, logger),
     power_distribution_board_(std::move(power_distribution_board)),
     logger_(std::move(logger))
 
@@ -91,9 +90,6 @@ int MarchRobot::getMaxSlaveIndex()
     int maxSlaveIndex = -1;
 
     for (Joint& joint : joint_list_) {
-        if (joint.hasTemperatureGES()) {
-            maxSlaveIndex = std::max((int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
-        }
         maxSlaveIndex = std::max((int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
     }
     return maxSlaveIndex;
@@ -102,15 +98,9 @@ int MarchRobot::getMaxSlaveIndex()
 bool MarchRobot::hasValidSlaves()
 {
     ::std::vector<int> motorControllerIndices;
-    ::std::vector<int> temperatureSlaveIndices;
     ::std::vector<int> pdbSlaveIndices;
 
     for (auto& joint : joint_list_) {
-        if (joint.hasTemperatureGES()) {
-            int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
-            temperatureSlaveIndices.push_back(temperatureSlaveIndex);
-        }
-
         int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
         motorControllerIndices.push_back(motorControllerSlaveIndex);
     }
@@ -120,19 +110,11 @@ bool MarchRobot::hasValidSlaves()
         pdbSlaveIndices.push_back(index);
     }
 
-    // Multiple temperature sensors may be connected to the same slave.
-    // Remove duplicate temperatureSlaveIndices so they don't trigger as
-    // duplicates later.
-    sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
-    temperatureSlaveIndices.erase(
-        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()), temperatureSlaveIndices.end());
-
     // Merge the slave indices
     ::std::vector<int> slaveIndices;
 
-    slaveIndices.reserve(motorControllerIndices.size() + temperatureSlaveIndices.size());
+    slaveIndices.reserve(motorControllerIndices.size());
     slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
-    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
     slaveIndices.insert(slaveIndices.end(), pdbSlaveIndices.begin(), pdbSlaveIndices.end());
 
     logger_->info(logger_->fstring("Found configuration for %lu slaves.", slaveIndices.size()));

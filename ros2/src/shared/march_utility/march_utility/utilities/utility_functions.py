@@ -181,7 +181,7 @@ def get_limits_robot_from_urdf_for_inverse_kinematics(joint_name: str):
         float. The limit of the given joint.
     """
     # get limits from march7 yaml
-    robot_path = get_package_share_directory("march_hardware_builder") + "/robots/march8.yaml"
+    robot_path = get_package_share_directory("march_hardware_builder") + "/robots/Hennie/march8.yaml"
     with open(robot_path) as file:
         document = yaml.full_load(file)
 
@@ -240,7 +240,7 @@ def get_joint_names_from_urdf(return_fixed_joints: bool = False):
 
     Retrieves it from the `MARCH_URDF`.
     """
-    robot_path = get_package_share_directory("march_hardware_builder") + "/robots/march8.yaml"
+    robot_path = get_package_share_directory("march_hardware_builder") + "/robots/Hennie/march8.yaml"
     with open(robot_path) as file:
         document = yaml.full_load(file)
 

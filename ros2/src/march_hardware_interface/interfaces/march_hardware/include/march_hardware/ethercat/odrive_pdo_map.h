@@ -25,26 +25,20 @@ enum class ODriveObjectName {
     AbsolutePosition,
     Current,
     MotorVelocity,
-    OdriveError,
+    ODriveError,
     AxisError,
     MotorError,
-    DieBOSlaveError,
     EncoderError,
+    TorqueSensorError,
     ControllerError,
     AxisState,
     OdriveTemperature,
     MotorTemperature,
     ShadowCount,
     Torque,
-    Heel_right,
-    Heel_left,
-    Met1,
-    Hallux,
-    Met3,
-    Toes,
-    Met5,
-    Arch,
-    Rfix,
+    AIEAbsolutePosition,
+    CheckSumMISO,
+    CheckSumMOSIStatus,
 
     // Write objects
     TargetTorque,
@@ -55,9 +49,9 @@ enum class ODriveObjectName {
     PositionI,
     PositionD,
     TorqueP,
-    TorqueI,
     TorqueD,
-    RequestedState
+    RequestedState,
+    CheckSumMOSI
 
 };
 

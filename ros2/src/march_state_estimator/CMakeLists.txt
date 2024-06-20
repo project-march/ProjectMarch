@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -fno-math-errno -ffast-math -O3 -fopenmp -DNDEBUG)
+  add_compile_options(-Wall -Wextra -Wpedantic -O3 -fopenmp -DNDEBUG)
 endif()
 
 # Set external library directories
@@ -36,6 +36,11 @@ find_package(urdf REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(kdl_parser REQUIRED)
+find_package(orocos_kdl REQUIRED)
+find_package(urdf REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(filters REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -45,16 +50,19 @@ include_directories(include)
 # include_directories(${GINAC_BUILD_DIR})
 
 add_library(${PROJECT_NAME} STATIC
-  src/robot_description_node.cpp
-  src/robot_description.cpp
-  src/robot_node.cpp
-  src/robot_mass.cpp
-  src/robot_joint.cpp
-  src/robot_zmp.cpp
-  src/sensor_fusion_node.cpp
-  src/sensor_fusion.cpp
-  src/torque_converter.cpp
   src/state_estimator_node.cpp
+  src/sensor_fusion.cpp
+  src/robot_description/robot_description_node.cpp
+  src/robot_description/robot_description.cpp
+  src/robot_description/robot_node.cpp
+  src/robot_description/robot_mass.cpp
+  src/robot_description/robot_joint.cpp
+  src/robot_description/robot_zmp.cpp
+
+  src/torque_converter_node.cpp
+  src/torque_converter.cpp
+
+  src/filters/filters_node.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -67,25 +75,31 @@ ament_target_dependencies(${PROJECT_NAME}
   march_shared_msgs
   urdf
   Eigen3
+  tf2
+  tf2_ros
+  kdl_parser
+  orocos_kdl
+  urdf
+  trajectory_msgs
 )
 
 # Create state_estimator_node executable
 add_executable(state_estimator_node
-  src/robot_description_node.cpp
-  src/robot_description.cpp
-  src/robot_node.cpp
-  src/robot_mass.cpp
-  src/robot_joint.cpp
-  src/robot_zmp.cpp
-  src/sensor_fusion_node.cpp
-  src/sensor_fusion.cpp
-  src/torque_converter.cpp
   src/state_estimator_node.cpp
+  src/sensor_fusion.cpp
+  src/robot_description/robot_description.cpp
+  src/robot_description/robot_node.cpp
+  src/robot_description/robot_mass.cpp
+  src/robot_description/robot_joint.cpp
+  src/robot_description/robot_zmp.cpp
+
+  src/torque_converter.cpp
 )
+
 target_include_directories(state_estimator_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-  
+
 ament_target_dependencies(state_estimator_node
   rclcpp
   ament_index_cpp
@@ -98,6 +112,8 @@ ament_target_dependencies(state_estimator_node
   Eigen3
   tf2
   tf2_ros
+  kdl_parser
+  orocos_kdl
 )
 
 target_link_libraries(state_estimator_node
@@ -107,9 +123,98 @@ target_link_libraries(state_estimator_node
   ${OpenMP_CXX_LIBRARIES}
 )
 
+# Create torque_converter_node executable
+add_executable(torque_converter_node
+  src/torque_converter_node.cpp
+  src/robot_description/robot_description.cpp
+  src/robot_description/robot_node.cpp
+  src/robot_description/robot_mass.cpp
+  src/robot_description/robot_joint.cpp
+  src/robot_description/robot_zmp.cpp
+  src/torque_converter.cpp
+)
+
+target_include_directories(torque_converter_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+  
+ament_target_dependencies(torque_converter_node
+  rclcpp
+  ament_index_cpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  march_description
+  march_shared_msgs
+  urdf
+  Eigen3
+  tf2
+  tf2_ros
+  kdl_parser
+  orocos_kdl
+  trajectory_msgs
+)
+
+target_link_libraries(torque_converter_node
+  ${PROJECT_NAME}
+  ${GINAC_LIB}
+  ${YAMLCPP_LIBRARIES}
+  ${OpenMP_CXX_LIBRARIES}
+)
+
+# Create robot_description_node executable
+add_executable(robot_description_node
+  src/robot_description/robot_description_node.cpp
+  src/robot_description/robot_description.cpp
+  src/robot_description/robot_node.cpp
+  src/robot_description/robot_mass.cpp
+  src/robot_description/robot_joint.cpp
+  src/robot_description/robot_zmp.cpp
+)
+
+target_include_directories(robot_description_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(robot_description_node
+  rclcpp
+  ament_index_cpp
+  march_shared_msgs
+  Eigen3
+  kdl_parser
+  orocos_kdl
+)
+
+target_link_libraries(robot_description_node
+  ${PROJECT_NAME}
+  ${GINAC_LIB}
+  ${YAMLCPP_LIBRARIES}
+  ${OpenMP_CXX_LIBRARIES}
+)
+
+# Create filters_node executable
+add_executable(filters_node
+  src/filters/filters_node.cpp
+)
+
+target_include_directories(filters_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(filters_node
+  rclcpp
+  filters
+  urdf
+  sensor_msgs
+  ament_index_cpp
+)
+
 # Install targets and executables
 install(TARGETS
   state_estimator_node
+  torque_converter_node
+  robot_description_node
+  filters_node
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
@@ -131,12 +236,12 @@ if(BUILD_TESTING)
   ament_add_gmock(test_runner
     test/test_runner.cpp
     test/robot_description_test.cpp
-    src/robot_description.cpp
+    src/robot_description/robot_description.cpp
     test/torque_converter_test.cpp  
     src/torque_converter.cpp
     test/sensor_fusion_test.cpp
     src/sensor_fusion.cpp
-    src/robot_node.cpp
+    src/robot_description/robot_node.cpp
   )
 
   target_include_directories(test_runner PUBLIC
