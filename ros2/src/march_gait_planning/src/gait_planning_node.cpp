@@ -15,16 +15,15 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     (void) state; 
     m_gait_planning = GaitPlanning(); 
     m_desired_footpositions_msg = std::make_shared<march_shared_msgs::msg::IksFootPositions>();
-    m_pose1 = std::make_shared<geometry_msgs::msg::Pose>(); 
-    m_pose2 = std::make_shared<geometry_msgs::msg::Pose>(); 
-    m_visualization_msg = std::make_shared<march_shared_msgs::msg::VisualizationBeziers>(); 
+    m_pose = std::make_shared<geometry_msgs::msg::Pose>(); 
+    m_visualization_msg_rviz = std::make_shared<geometry_msgs::msg::PoseArray>(); 
     m_single_execution_done = false; 
     m_variable_first_step_done = false; 
     m_active = false; 
 
     m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
-    m_interpolated_bezier_visualization_publisher = this->create_publisher<march_shared_msgs::msg::VisualizationBeziers>("bezier_visualization", 10); 
+    m_interpolated_bezier_visualization_publisher_rviz = this->create_publisher<geometry_msgs::msg::PoseArray>("bezier_visualization", 10); 
 
     m_exo_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "gait_planning_mode", 10, std::bind(&GaitPlanningCartesianNode::currentModeCallback, this, _1)); 
@@ -49,8 +48,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     (void) state; 
     m_active = true;  
     m_iks_foot_positions_publisher->on_activate(); 
-    m_interpolated_bezier_visualization_publisher->on_activate();
-    // m_active = true;  
+    m_interpolated_bezier_visualization_publisher_rviz->on_activate();
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node activated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -60,8 +58,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     (void) state; 
     m_active = false; 
     m_iks_foot_positions_publisher->on_deactivate(); 
-    m_interpolated_bezier_visualization_publisher->on_deactivate(); 
-    // m_active = false; 
+    m_interpolated_bezier_visualization_publisher_rviz->on_deactivate(); 
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node deactivated!"); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -71,7 +68,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     
     (void) state; 
     m_iks_foot_positions_publisher.reset();
-    m_interpolated_bezier_visualization_publisher.reset();  
+    m_interpolated_bezier_visualization_publisher_rviz.reset();   
     RCLCPP_DEBUG(this->get_logger(), "Cartesian node cleaned up!"); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -183,52 +180,27 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
             m_current_trajectory = m_gait_planning.variableFullStepTrajectory(m_gait_planning.getVariableDistance()); 
         }
 
+        /**
+         * Below is code to visualize a posearray in RViz for MPC visualization.
+         **/ 
         for (auto element : m_current_trajectory){
-            m_pose1->position.x = static_cast<float>(element[0]);
-            m_pose1->position.z = static_cast<float>(element[1]);
-            m_pose1->position.y = (m_variable_walk_swing_leg == 1) ? m_home_stand[4] :  m_home_stand[1];       
-            m_visualization_msg->foot1.poses.push_back(*m_pose1); 
+            m_pose->position.x = static_cast<float>(element[0]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 3 : 0];
+            m_pose->position.y = m_home_stand[m_variable_walk_swing_leg == 1 ? 4 : 1];
+            m_pose->position.z = static_cast<float>(element[1]) + m_home_stand[m_variable_walk_swing_leg == 1 ? 5 : 2];
+            m_visualization_msg_rviz->poses.push_back(*m_pose); 
         }
-        m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-        m_visualization_msg->foot1.poses.clear(); 
-        m_visualization_msg->foot2.poses.clear(); 
-
+        m_visualization_msg_rviz->header.frame_id = "backpack"; 
+        m_visualization_msg_rviz->header.stamp = this->now(); 
+        m_interpolated_bezier_visualization_publisher_rviz->publish(*m_visualization_msg_rviz); 
+        m_visualization_msg_rviz->poses.clear(); 
         RCLCPP_DEBUG(this->get_logger(), "Visualization msg filled and sent "); 
+
 
         publishFootPositions(); 
 
     }
 
 }
-
-void GaitPlanningCartesianNode::visualizeBothFeet(){
-    for (auto element : m_current_trajectory){
-        m_pose1->position.x = static_cast<float>(element[0]);
-        m_pose1->position.z = static_cast<float>(element[1]);
-        m_pose1->position.y = m_home_stand[4];       
-        m_visualization_msg->foot1.poses.push_back(*m_pose1); 
-        m_pose2->position.x = static_cast<float>(element[2]); 
-        m_pose2->position.z = static_cast<float>(element[3]);
-        m_pose2->position.y = m_home_stand[1]; 
-        m_visualization_msg->foot2.poses.push_back(*m_pose2); 
-    }
-    m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-    m_visualization_msg->foot1.poses.clear();
-    m_visualization_msg->foot2.poses.clear();
-}
-
-void GaitPlanningCartesianNode::visualizeOneFoot(){
-    for (auto element : m_current_trajectory){
-        m_pose1->position.x = static_cast<float>(element[0]);
-        m_pose1->position.z = static_cast<float>(element[1]);
-        m_pose1->position.y = (m_gait_planning.getCurrentStanceFoot() & 0b1) ? m_home_stand[4] :  m_home_stand[1];       
-        m_visualization_msg->foot1.poses.push_back(*m_pose1); 
-    }
-    m_interpolated_bezier_visualization_publisher->publish(*m_visualization_msg); 
-    m_visualization_msg->foot1.poses.clear(); 
-    m_visualization_msg->foot2.poses.clear(); 
-}
-
 
 void GaitPlanningCartesianNode::setFootPositionsMessage(double left_x, double left_y, double left_z, 
                                         double right_x, double right_y, double right_z) 
@@ -279,12 +251,10 @@ void GaitPlanningCartesianNode::stepClose(){
         case ExoMode::HighStep1: 
         case ExoMode::HighStep2:
         case ExoMode::HighStep3: 
-            visualizeBothFeet(); 
             break; 
         case ExoMode::LargeWalk:
         case ExoMode::SmallWalk: 
         case ExoMode::VariableWalk:
-            visualizeOneFoot(); 
             break; 
         default: 
             break; 
@@ -378,10 +348,6 @@ void GaitPlanningCartesianNode::publishHeightGaits(){
     if (m_current_trajectory.empty() && !m_single_execution_done){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
-
-        // The stairs/high_step trajectory is for all steps (with a shifting swing leg), find a way to publish both feet separately. csv are right, left foot 
-
-        visualizeBothFeet(); 
 
         RCLCPP_INFO(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
     }
