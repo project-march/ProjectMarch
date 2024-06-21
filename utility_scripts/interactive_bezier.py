@@ -36,16 +36,19 @@ def calculate_bezier_curve(points, array_size = 100):
     return curve_points.T
 
 def create_bezier_csv(points, array_size, gait_type):
+    pause_time = int(array_size/6)
     step_length = points.max(axis=0)[0]
-
-    # ------------------------------------------------- FIRST STEP ----------------------------------------------------------------------------------
     ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
 
+    # ------------------------------------------------- FIRST STEP ----------------------------------------------------------------------------------
     phi_first_step = np.linspace(0, ending_angle, int(array_size))
 
     # The stance leg follows a circle with radius LEG_LENGTH with center at (0, LEG_LENGTH). Sine and cosine are swapped from a usual circle, since we want the circle to start at the bottom and go backwards
     x_stance_first_step = -LEG_LENGTH*np.sin(phi_first_step)
     z_stance_first_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_first_step)
+
+    x_stance_first_step = np.append(x_stance_first_step, x_stance_first_step[-1]*np.ones(pause_time))
+    z_stance_first_step = np.append(z_stance_first_step, z_stance_first_step[-1]*np.ones(pause_time))
 
     vertical_offset = z_stance_first_step[-1]
 
@@ -61,9 +64,12 @@ def create_bezier_csv(points, array_size, gait_type):
 
     x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size))
 
+    x_swing_first_step = np.append(x_swing_first_step, x_swing_first_step[-1]*np.ones(pause_time))
+    z_swing_first_step = np.append(z_swing_first_step, z_swing_first_step[-1]*np.ones(pause_time))
+
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
 
-    plt.plot(x_swing_first_step, z_swing_first_step)
+    plt.scatter(x_swing_first_step, z_swing_first_step)
     plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
     plt.title("First Step")
     plt.show()
@@ -73,8 +79,9 @@ def create_bezier_csv(points, array_size, gait_type):
 
     x_stance_complete_step = -LEG_LENGTH*np.sin(phi_full_step)
     z_stance_complete_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_full_step)
-    # x_stance_complete_step = np.linspace(0+(step_length/2), 0 - (step_length/2), array_size)
-    # z_stance_complete_step = [0]*array_size
+
+    x_stance_complete_step = np.append(x_stance_complete_step, x_stance_complete_step[-1]*np.ones(pause_time))
+    z_stance_complete_step = np.append(z_stance_complete_step, z_stance_complete_step[-1]*np.ones(pause_time))
 
     full_step_points = points.copy()
     full_step_points[:, 1] = full_step_points[:, 1] + vertical_offset
@@ -87,6 +94,9 @@ def create_bezier_csv(points, array_size, gait_type):
     
     x_swing_complete_step, z_swing_complete_step = make_evenly_spaced_points(x_swing_complete_step, z_swing_complete_step, array_size)
     
+    x_swing_complete_step = np.append(x_swing_complete_step, x_swing_complete_step[-1]*np.ones(pause_time))
+    z_swing_complete_step = np.append(z_swing_complete_step, z_swing_complete_step[-1]*np.ones(pause_time))
+
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
     plt.plot(x_swing_complete_step, z_swing_complete_step)
@@ -99,8 +109,9 @@ def create_bezier_csv(points, array_size, gait_type):
 
     x_stance_step_close = -LEG_LENGTH*np.sin(phi_step_close)
     z_stance_step_close = LEG_LENGTH - LEG_LENGTH*np.cos(phi_step_close)
-    # x_stance_step_close = np.linspace(0, 0 - (-step_length/2), int(array_size))
-    # z_stance_step_close = [0]*int(array_size)
+
+    x_stance_step_close = np.append(x_stance_step_close, x_stance_step_close[-1]*np.ones(pause_time))
+    z_stance_step_close = np.append(z_stance_step_close, z_stance_step_close[-1]*np.ones(pause_time))
 
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
@@ -111,9 +122,10 @@ def create_bezier_csv(points, array_size, gait_type):
     x_swing_step_close = points_step_close[0,:]
     z_swing_step_close = points_step_close[1,:]
 
-
-
     x_swing_step_close, z_swing_step_close = make_evenly_spaced_points(x_swing_step_close, z_swing_step_close, array_size)
+
+    x_swing_step_close = np.append(x_swing_step_close, x_swing_step_close[-1]*np.ones(pause_time))
+    z_swing_step_close = np.append(z_swing_step_close, z_swing_step_close[-1]*np.ones(pause_time))
 
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
