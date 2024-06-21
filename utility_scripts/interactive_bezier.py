@@ -110,8 +110,8 @@ def create_bezier_csv(points, array_size, gait_type):
     x_stance_step_close = -LEG_LENGTH*np.sin(phi_step_close)
     z_stance_step_close = LEG_LENGTH - LEG_LENGTH*np.cos(phi_step_close)
 
-    x_stance_step_close = np.append(x_stance_step_close, x_stance_step_close[-1]*np.ones(pause_time))
-    z_stance_step_close = np.append(z_stance_step_close, z_stance_step_close[-1]*np.ones(pause_time))
+    # x_stance_step_close = np.append(x_stance_step_close, x_stance_step_close[-1]*np.ones(pause_time))
+    # z_stance_step_close = np.append(z_stance_step_close, z_stance_step_close[-1]*np.ones(pause_time))
 
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
@@ -124,8 +124,8 @@ def create_bezier_csv(points, array_size, gait_type):
 
     x_swing_step_close, z_swing_step_close = make_evenly_spaced_points(x_swing_step_close, z_swing_step_close, array_size)
 
-    x_swing_step_close = np.append(x_swing_step_close, x_swing_step_close[-1]*np.ones(pause_time))
-    z_swing_step_close = np.append(z_swing_step_close, z_swing_step_close[-1]*np.ones(pause_time))
+    # x_swing_step_close = np.append(x_swing_step_close, x_swing_step_close[-1]*np.ones(pause_time))
+    # z_swing_step_close = np.append(z_swing_step_close, z_swing_step_close[-1]*np.ones(pause_time))
 
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
