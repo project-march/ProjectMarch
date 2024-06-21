@@ -268,11 +268,14 @@ void StateEstimatorNode::noiseParametersCallback(const std_msgs::msg::Float64Mul
 
     std::vector<double> foot_position_noise = { msg->data[0], msg->data[0], msg->data[0] };
     std::vector<double> foot_slippage_noise = { msg->data[1], msg->data[1], msg->data[1] };
-    std::vector<double> joint_position_noise = { msg->data[2], msg->data[2], msg->data[2] };
+    std::vector<double> joint_position_noise = { 
+        msg->data[2], msg->data[2], msg->data[2], msg->data[2], msg->data[2],
+        msg->data[2], msg->data[2], msg->data[2], msg->data[2], msg->data[2]
+    };
 
     m_sensor_fusion->setObservationNoiseCovarianceMatrix(foot_position_noise, foot_slippage_noise, joint_position_noise);
 
-    RCLCPP_INFO(this->get_logger(), "Observation noise parameters have been updated. Foot position: %f, Foot slippage: %f, Joint position: %f",
+    RCLCPP_WARN(this->get_logger(), "Observation noise parameters have been updated. Foot position: %f, Foot slippage: %f, Joint position: %f",
         foot_position_noise[0], foot_slippage_noise[0], joint_position_noise[0]);
 }
 

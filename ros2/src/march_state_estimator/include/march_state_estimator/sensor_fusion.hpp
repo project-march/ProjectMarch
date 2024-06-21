@@ -189,30 +189,35 @@ public:
     }
 
     inline void updateStanceLeg(uint8_t current_stance_leg) {
-        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION)
-        //     = (current_stance_leg & 0b01) * m_process_noise_foot_position + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION)
-        //     = ((current_stance_leg >> 1) & 0b01) * m_process_noise_foot_position + ((~current_stance_leg >> 1) & 0b01) *computeVeryLargeMatrix3d();
-        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE)
-        //     = (current_stance_leg & 0b01) * m_process_noise_foot_slippage + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        // m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE)
-        //     = ((current_stance_leg >> 1) & 0b01) * m_process_noise_foot_slippage + ((~current_stance_leg >> 1) & 0b01) * computeVeryLargeMatrix3d();
+        // If left leg a is stance leg
+        if (current_stance_leg & 0b01) {
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = m_process_noise_foot_position;
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE) = m_process_noise_foot_slippage;
+            m_observation_noise_covariance_left_position_matrix = m_observation_noise_covariance_position_matrix;
+            m_observation_noise_covariance_left_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
+        } else {
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = computeVeryLargeMatrix3d();
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE) = computeVeryLargeMatrix3d();
+            m_observation_noise_covariance_left_position_matrix = computeVeryLargeMatrix3d();
+            m_observation_noise_covariance_left_slippage_matrix = computeVeryLargeMatrix3d();
+        }
+
+        // If right leg b is stance leg
+        if ((current_stance_leg & 0b10) >> 1) {
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = m_process_noise_foot_position;
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE) = m_process_noise_foot_slippage;
+            m_observation_noise_covariance_right_position_matrix = m_observation_noise_covariance_position_matrix;
+            m_observation_noise_covariance_right_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
+        } else {
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = computeVeryLargeMatrix3d();
+            m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE) = computeVeryLargeMatrix3d();
+            m_observation_noise_covariance_right_position_matrix = computeVeryLargeMatrix3d();
+            m_observation_noise_covariance_right_slippage_matrix = computeVeryLargeMatrix3d();
+        }
 
         #ifdef DEBUG
         std::cout << "Current stance leg: " << (int)current_stance_leg << std::endl;
         std::cout << "Process noise covariance matrix:\n" << m_process_noise_covariance_matrix << std::endl;
-        #endif
-
-        m_observation_noise_covariance_left_position_matrix
-            = (current_stance_leg & 0b01) * m_observation_noise_covariance_position_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        m_observation_noise_covariance_right_position_matrix
-            = ((current_stance_leg & 0b10) >> 1) * m_observation_noise_covariance_position_matrix + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
-        m_observation_noise_covariance_left_slippage_matrix
-            = (current_stance_leg & 0b01) * m_observation_noise_covariance_slippage_matrix + (~current_stance_leg & 0b01) * computeVeryLargeMatrix3d();
-        m_observation_noise_covariance_right_slippage_matrix
-            = ((current_stance_leg & 0b10) >> 1) * m_observation_noise_covariance_slippage_matrix + (~(current_stance_leg & 0b10) >> 1) * computeVeryLargeMatrix3d();
-
-        #ifdef DEBUG
         std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
         #endif
     }
