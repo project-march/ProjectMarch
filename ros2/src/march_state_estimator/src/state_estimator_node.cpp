@@ -254,6 +254,23 @@ void StateEstimatorNode::imuVelocityCallback(const geometry_msgs::msg::Vector3St
     m_imu_velocity = msg;
 }
 
+void StateEstimatorNode::noiseParametersCallback(const std_msgs::msg::Float64MultiArray::SharedPtr msg)
+{
+    if (msg->data.size() != 3) {
+        RCLCPP_ERROR(this->get_logger(), "Invalid noise parameters size: %d", msg->data.size());
+        return;
+    }
+
+    std::vector<double> foot_position_noise = { msg->data[0], msg->data[0], msg->data[0] };
+    std::vector<double> foot_slippage_noise = { msg->data[1], msg->data[1], msg->data[1] };
+    std::vector<double> joint_position_noise = { msg->data[2], msg->data[2], msg->data[2] };
+
+    m_sensor_fusion->setObservationNoiseCovarianceMatrix(foot_position_noise, foot_slippage_noise, joint_position_noise);
+
+    RCLCPP_INFO(this->get_logger(), "Observation noise parameters have been updated. Foot position: %f, Foot slippage: %f, Joint position: %f",
+        foot_position_noise[0], foot_slippage_noise[0], joint_position_noise[0]);
+}
+
 
 /*******************************************************************************
  * Publisher functions
@@ -565,6 +582,9 @@ void StateEstimatorNode::configureSubscriptions()
         m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
             std::bind(&StateEstimatorNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     }
+
+    m_noise_params_sub = this->create_subscription<std_msgs::msg::Float64MultiArray>("state_estimation/noise_parameters", 10,
+        std::bind(&StateEstimatorNode::noiseParametersCallback, this, std::placeholders::_1));
 
     RCLCPP_INFO(this->get_logger(), "Subscriptions have been configured");
 }

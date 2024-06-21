@@ -32,6 +32,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float64.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 #include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/state_estimator.hpp"
@@ -60,6 +61,7 @@ private:
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
     void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg);
+    void noiseParametersCallback(const std_msgs::msg::Float64MultiArray::SharedPtr msg);
 
     // Publisher functions
     void publishStateEstimation();
@@ -121,6 +123,7 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
+    rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr m_noise_params_sub;
 
     rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
