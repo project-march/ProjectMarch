@@ -26,6 +26,8 @@ using std::placeholders::_2;
 
 StateEstimatorNode::StateEstimatorNode(): LifecycleNode("state_estimator")
 {
+    RCLCPP_INFO(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode is initializing...");
+    declareParameters();
     RCLCPP_INFO(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been created.\nOn standby for configuration.");
 }
 
@@ -43,7 +45,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
 {
     (void) state;
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is configuring...");
-    declareParameters();
 
     // Determine if it is a simulation or real robot
     m_is_simulation = get_parameter("simulation").as_bool();
@@ -152,6 +153,10 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     m_robot_description.reset();
     m_state_estimator.reset();
     m_sensor_fusion.reset();
+
+    m_tf_buffer.reset();
+    m_tf_broadcaster.reset();
+    m_tf_listener.reset();
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node has been cleaned up");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
