@@ -16,6 +16,8 @@ Panels:
         - /Pose1
         - /Path1
         - /Path2
+        - /PointStamped2
+        - /Path3
       Splitter Ratio: 0.5
     Tree Height: 754
   - Class: rviz_common/Selection
@@ -311,7 +313,7 @@ Visualization Manager:
       Axes Radius: 0.10000000149011612
       Class: rviz_default_plugins/Pose
       Color: 255; 25; 0
-      Enabled: true
+      Enabled: false
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
       Name: Pose
@@ -324,7 +326,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /mpc_solver/buffer/com_output
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
@@ -379,6 +381,47 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /zmp_visualization_trajectory
       Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz_default_plugins/PointStamped
+      Color: 252; 233; 79
+      Enabled: false
+      History Length: 1
+      Name: PointStamped
+      Radius: 0.02500000037252903
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /state_estimation/com_position
+      Value: false
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 237; 212; 0
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /mpc_solver/swing_trajectory
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -422,25 +465,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 6.691323280334473
+      Distance: 2.2199997901916504
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.218160629272461
-        Y: -0.0693257600069046
-        Z: 0.3604339063167572
+        X: 0.10328000783920288
+        Y: -0.24509043991565704
+        Z: 0.5025506615638733
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.720397412776947
+      Pitch: 0.2903977334499359
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.711774826049805
+      Yaw: 3.9217700958251953
     Saved: ~
 Window Geometry:
   Displays:
@@ -456,5 +499,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1848
-  X: 1299
+  X: 593
   Y: 0

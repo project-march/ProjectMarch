@@ -30,7 +30,7 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
     // Transform the footsteps from the right foot frame to the backpack frame.
     geometry_msgs::msg::PoseArray transformed_footsteps;
     transformed_footsteps.header.frame_id = "backpack"; 
-    transformed_footsteps.header.stamp = msg->header.stamp; 
+    transformed_footsteps.header.stamp = msg->header.stamp;
 
     for (long unsigned int i = 0; i < msg->poses.size(); i++) {
         auto pose = msg->poses[i];
@@ -55,6 +55,8 @@ void MarchMpcBufferNode::footstepsCallback(const geometry_msgs::msg::PoseArray::
 
         // Remove the orientation of the backpack frame.
         pose_backpack.orientation = tf2::toMsg(tf2::Quaternion(0, 0, 0, 1));
+        pose_backpack.position.x -= 0.04320972829531439; // Offset in x direction from the sole to the ankle.
+        
 
         transformed_footsteps.poses.push_back(pose_backpack);
     }
@@ -87,7 +89,7 @@ void MarchMpcBufferNode::comTrajectoryCallback(const geometry_msgs::msg::PoseArr
     transformed_com_pose.orientation = tf2::toMsg(tf2::Quaternion(0, 0, 0, 1));
 
     geometry_msgs::msg::PoseStamped transformed_com_pose_stamped;
-    transformed_com_pose_stamped.header.frame_id = "backpack";
+    transformed_com_pose_stamped.header.frame_id = "world";
     transformed_com_pose_stamped.header.stamp = msg->header.stamp;
     transformed_com_pose_stamped.pose = transformed_com_pose;
 

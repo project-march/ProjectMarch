@@ -260,11 +260,17 @@ def generate_launch_description() -> LaunchDescription:
             name='fuzzy_generator',
             parameters=[{'config_path': fuzzy_config_path}]
         ),
+        # Node(
+        #     package='march_gait_planning', 
+        #     namespace='', 
+        #     executable='gait_planning_node', 
+        #     name='march_gait_planning', 
+        # ),
         Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_node', 
-            name='march_gait_planning', 
+            package='march_mpc_planning',
+            namespace='',
+            executable='mpc_planning_node',
+            name='mpc_planning_node',
         ),
         Node(
             package='robot_state_publisher',

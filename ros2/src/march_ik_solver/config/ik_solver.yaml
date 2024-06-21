@@ -2,7 +2,7 @@ ik_solver:
   ros__parameters:
     joint_trajectory_controller_period: 5e-3
     max_iterations: 100000
-    integral_dt: 1e-2
+    integral_dt: 1e-4
     joint:
       names:
       - left_hip_aa
@@ -48,10 +48,10 @@ ik_solver:
         damp_coeff: 1e-3
         weight: 1.0
       stability:
-        kp: [2.5, 2.5]
+        kp: [5.0, 5.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
-        convergence_threshold: 1e-2
+        convergence_threshold: 1e-4
         damp_coeff: 1e-3
         weight: 1.0
       posture:
