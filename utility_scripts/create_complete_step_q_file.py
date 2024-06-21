@@ -20,16 +20,16 @@ def plot_joints(dataset):
     plt.show()
 
 def stand_to_sit():
-    time_points = 70
-    lhaa = np.linspace(-0.055, -0.055, time_points)
-    lhfe = np.linspace(0.03490, 1.57, time_points)
-    lkfe = np.linspace(0.185, 1.57, time_points)
-    ladpf = np.linspace(0.162, 0.162, time_points)
+    time_points = 125
+    lhaa = np.linspace(-0.084, -0.084, time_points)
+    lhfe = np.linspace(0.1622, 1.57, time_points)
+    lkfe = np.linspace(0.436, 1.57, time_points)
+    ladpf = np.linspace(0.2731, 0, time_points)
 
-    rhaa = np.linspace(-0.055, -0.055, time_points)
-    rhfe = np.linspace(0.03490, 1.57, time_points)
-    rkfe = np.linspace(0.185, 1.57, time_points)
-    radpf = np.linspace(0.162, 0.162, time_points)
+    rhaa = np.linspace(-0.084, -0.084, time_points)
+    rhfe = np.linspace(0.1622, 1.57, time_points)
+    rkfe = np.linspace(0.436, 1.57, time_points)
+    radpf = np.linspace(0.2731, 0, time_points)
 
     # joint_angles_dataset = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
@@ -43,16 +43,16 @@ def stand_to_sit():
                joint_angles_dataset, delimiter=',')
 
 def sit_to_stand():
-    time_points = 70
-    lhaa = np.linspace(-0.055, -0.055, time_points)
-    lhfe = np.linspace(1.57, 0.03490, time_points)
-    lkfe = np.linspace(1.57, 0.185, time_points)
-    ladpf = np.linspace(0.162, 0.162, time_points)
+    time_points = 125
+    lhaa = np.linspace(-0.084, -0.084, time_points)
+    lhfe = np.linspace(1.57, 0.1622, time_points)
+    lkfe = np.linspace(1.57, 0.436, time_points)
+    ladpf = np.linspace(0, 0.2731, time_points)
 
-    rhaa = np.linspace(-0.055, -0.055, time_points)
-    rhfe = np.linspace(1.57, 0.03490, time_points)
-    rkfe = np.linspace(1.57, 0.185, time_points)
-    radpf = np.linspace(0.162, 0.162, time_points)
+    rhaa = np.linspace(-0.057, -0.057, time_points)
+    rhfe = np.linspace(1.57, 0.1622, time_points)
+    rkfe = np.linspace(1.57, 0.436, time_points)
+    radpf = np.linspace(0, 0.2731, time_points)
 
     # sit_to_stand = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf

@@ -78,6 +78,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/StateEstimation.msg"
   "msg/StateEstimatorVisualization.msg"
   "msg/TorqueStamped.msg"
+  "msg/VisualizationBeziers.msg"
   "msg/WeightStamped.msg"
   "srv/GetCurrentStanceLeg.srv"
   "srv/GetExoModeArray.srv"
