@@ -310,6 +310,7 @@ void StateEstimatorNode::publishStateEstimation()
     }
     catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in body frame: %s", e.what());
+        m_sensor_fusion_valid = false;
         return;
     }
 
@@ -344,8 +345,12 @@ void StateEstimatorNode::publishStateEstimation()
 
     // Variables for optimization of Kalman Filter tuning
     state_estimation_msg.performance_cost = m_sensor_fusion->getPerformanceCost();
+    state_estimation_msg.sensor_fusion_valid = m_sensor_fusion_valid;
     
     m_state_estimation_pub->publish(state_estimation_msg);
+
+    // Reset variables
+    m_sensor_fusion_valid = true;
 }
 
 void StateEstimatorNode::publishFeetHeight()
@@ -399,6 +404,7 @@ void StateEstimatorNode::publishMPCEstimation()
 
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions: %s", e.what());
+        m_sensor_fusion_valid = false;
         return;
     }
 
@@ -408,6 +414,7 @@ void StateEstimatorNode::publishMPCEstimation()
         transform_stamped = m_tf_buffer->lookupTransform("R_heel", "world", tf2::TimePointZero);
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
+        m_sensor_fusion_valid = false;
         return;
     }
     Eigen::Quaterniond q(transform_stamped.transform.rotation.w, transform_stamped.transform.rotation.x,
@@ -726,6 +733,7 @@ bool StateEstimatorNode::configureSensorFusion()
 {
     // Initialize and configure noise parameters in sensor fusion
     m_sensor_fusion = std::make_unique<SensorFusion>(m_dt);
+    m_sensor_fusion_valid = true;
 
     m_sensor_fusion->setProcessNoiseCovarianceMatrix(
         get_parameter("noise_parameters.process_noise.linear_acceleration").as_double_array(),
@@ -770,6 +778,7 @@ geometry_msgs::msg::TransformStamped StateEstimatorNode::getCurrentTransform(con
         transform_stamped = m_tf_buffer->lookupTransform(parent_frame, child_frame, tf2::TimePointZero);
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
+        m_sensor_fusion_valid = false;
     }
     return transform_stamped;
 }
@@ -788,6 +797,7 @@ geometry_msgs::msg::Pose StateEstimatorNode::getCurrentPose(const std::string& p
         pose.orientation.w = transform_stamped.transform.rotation.w;
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting pose: %s", e.what());
+        m_sensor_fusion_valid = false;
     }
     return pose;
 }

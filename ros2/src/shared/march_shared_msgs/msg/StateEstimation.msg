@@ -9,4 +9,7 @@ geometry_msgs/Pose[] body_foot_pose
 geometry_msgs/Pose[] world_foot_pose
 uint8 current_stance_leg
 uint8 next_stance_leg
+
+# Sensor fusion
 float64 performance_cost
+bool sensor_fusion_valid

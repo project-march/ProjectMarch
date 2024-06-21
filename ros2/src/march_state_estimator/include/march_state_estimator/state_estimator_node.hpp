@@ -96,6 +96,7 @@ private:
     // Member variables
     double m_dt;
     bool m_is_simulation;
+    bool m_sensor_fusion_valid;
 
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
     sensor_msgs::msg::Imu::SharedPtr m_imu;
