@@ -36,7 +36,7 @@ def calculate_bezier_curve(points, array_size = 100):
     return curve_points.T
 
 def create_bezier_csv(points, array_size, gait_type):
-    pause_time = int(array_size/8)
+    pause_time = int(array_size/4)
     step_length = points.max(axis=0)[0]
     ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
 
