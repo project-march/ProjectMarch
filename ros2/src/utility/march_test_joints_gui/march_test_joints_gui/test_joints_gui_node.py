@@ -12,7 +12,7 @@ import threading
 import sys
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtGui import QIcon
-from .window import Window
+from .window import Window, WindowState
 
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64MultiArray
@@ -45,23 +45,29 @@ class TestJointsGuiNode(Node):
         if self.window.joints is not None:
             self.window.update_actual_positions(self.joint_state_msg.name, self.joint_state_msg.position)
         
-        # Publish the desired joint positions
-        if self.window.is_running:
+        # # Publish the desired joint positions
+        # if self.window.is_running:
+        #     if len(self.window.linear_desired_positions) > 0:
+        #         joint_positions = self.window.linear_desired_positions.pop(0)
+        #         self.publish_joint_positions(joint_positions)
+        #     else:
+        #         joint_positions = self.window.get_desired_positions()
+        #         self.publish_joint_positions(joint_positions)
+
+        if self.window.state == WindowState.RUNNING:
             joint_positions = self.window.get_desired_positions()
             self.publish_joint_positions(joint_positions)
+        elif self.window.state == WindowState.TARGETS_SET:
+            if len(self.window.linear_desired_positions) > 0:
+                joint_positions = self.window.linear_desired_positions.pop(0)
+                self.publish_joint_positions(joint_positions)
+            else:
+                self.window.is_running = False
 
     def publish_joint_positions(self, joint_positions: list) -> None:
         desired_joint_positions = Float64MultiArray()
         desired_joint_positions.data = joint_positions
         self.desired_joint_positions_pub.publish(desired_joint_positions)
-
-    # def enable_timer(self) -> None:
-    #     self.get_logger().info("Running test.")
-    #     self.wall_timer.reset()
-
-    # def disable_timer(self) -> None:
-    #     self.get_logger().info("Stopping test.")
-    #     self.wall_timer.cancel()
 
 
 def sigint_handler(*args):

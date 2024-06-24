@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, \
     QLabel, QSlider, QDoubleSpinBox, QHBoxLayout, QPushButton, \
     QCheckBox
+from enum import Enum
 
 class Joint:
 
@@ -196,6 +197,14 @@ class Joint:
             self.counter = 1
         return desired_position
 
+
+class WindowState(Enum):
+    IDLE = 0
+    RUNNING = 1
+    STOPPED = 2
+    TARGETS_SET = 3
+    ERROR = 4
+
 class Window(QMainWindow):
 
     def __init__(self) -> None:
@@ -204,6 +213,8 @@ class Window(QMainWindow):
         self.setGeometry(100, 100, 1280, 768)
         self.is_running = False
         self.joints = None
+        self.state = "Idle"
+        self.linear_desired_positions = []
 
     def create_layout(self, joint_names: list, max_freq: float) -> None:
         self.centralWidget = QWidget()
@@ -250,8 +261,7 @@ class Window(QMainWindow):
         self.joint_layout.addLayout(menu_layout)
 
     def run_button_callback(self) -> None:
-        self.is_running = True
-        self.menu_label.setText("State: Running")
+        self.update_state(WindowState.RUNNING)
         self.run_button.setDisabled(True)
         self.stop_button.setDisabled(False)
         self.reset_button.setDisabled(True)
@@ -260,8 +270,7 @@ class Window(QMainWindow):
         self.is_running = True
 
     def stop_button_callback(self) -> None:
-        self.is_running = False
-        self.menu_label.setText("State: Stopped")
+        self.update_state(WindowState.STOPPED)
         self.stop_button.setDisabled(True)
         self.run_button.setDisabled(True)
         self.reset_button.setDisabled(False)
@@ -272,8 +281,7 @@ class Window(QMainWindow):
         self.is_running = False
 
     def reset_button_callback(self) -> None:
-        self.is_running = False
-        self.menu_label.setText("State: Targets Set")
+        self.update_state(WindowState.TARGETS_SET)
         self.run_button.setDisabled(False)
         self.stop_button.setDisabled(True)
         desired_joint_positions = []
@@ -286,7 +294,8 @@ class Window(QMainWindow):
                 joint.enable_widgets()
             else:
                 desired_joint_positions.append(joint.actual_position)
-        self.publish_callback(desired_joint_positions)
+        self.linearize_desired_positions(desired_joint_positions)
+        self.is_running = True
 
     def update_actual_positions(self, names: list, positions: list) -> None:
         for joint in self.joints:
@@ -305,3 +314,21 @@ class Window(QMainWindow):
 
     def disable_run_button(self) -> None:
         self.run_button.setDisabled(True)
+
+    def linearize_desired_positions(self, desired_positions: list) -> list:
+        current_positions = [joint.actual_position for joint in self.joints]
+        self.linear_desired_positions = np.linspace(current_positions, desired_positions, 100).tolist()
+
+    def update_state(self, state: WindowState) -> None:
+        self.state = state
+        if state == WindowState.IDLE:
+            self.menu_label.setText("State: Idle")
+        elif state == WindowState.RUNNING:
+            self.menu_label.setText("State: Running")
+        elif state == WindowState.STOPPED:
+            self.menu_label.setText("State: Stopped")
+        elif state == WindowState.TARGETS_SET:
+            self.menu_label.setText("State: Targets Set")
+        elif state == WindowState.ERROR:
+            self.menu_label.setText("State: Error")
+            
