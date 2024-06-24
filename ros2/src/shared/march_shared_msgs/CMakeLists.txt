@@ -76,6 +76,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RobotState.msg"
   "msg/StateEstimation.msg"
   "msg/StateEstimatorVisualization.msg"
+  "msg/VisualizationBeziers.msg"
   "srv/GetCurrentStanceLeg.srv"
   "srv/GetExoModeArray.srv"
   "srv/GetJointNames.srv"
