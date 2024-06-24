@@ -127,7 +127,7 @@ See <https://www.gnu.org/licenses/>.
         <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
         <!--  LEFT LEG -->
-        <body name="L_hip" pos="0.021 0.092 0.028">
+        <body name="L_hip" pos="0.021 0.081 0.028">
           <inertial 
             mass="3.684"
             pos="0.130 0.174 0.000" 
@@ -138,7 +138,7 @@ See <https://www.gnu.org/licenses/>.
             size="0.032" class="L_collision"/>
           <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
-          <body name="L_UL" pos="0.169 0.173 0">
+          <body name="L_UL" pos="0.169 0.176 0">
             <inertial 
               mass="1.520"
               pos="0.000 -0.044 -0.408" 
@@ -149,7 +149,7 @@ See <https://www.gnu.org/licenses/>.
               size="0.069" class="L_collision"/>
             <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
-            <body name="L_LL" pos="0 -0.077 -0.478">
+            <body name="L_LL" pos="0 -0.077 -0.463">
               <inertial 
                 mass="1.895"
                 pos="-0.049 0.000 -0.269" 
@@ -160,7 +160,7 @@ See <https://www.gnu.org/licenses/>.
               <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.474"
                 size="0.047" class="L_collision"/>
 
-              <body name="L_ankle" pos="0.000 -0.016 -0.474">
+              <body name="L_ankle" pos="0.000 -0.016 -0.469">
                 <inertial 
                   mass="0.683"
                   pos="0.070 0.043 -0.002" 
@@ -189,7 +189,7 @@ See <https://www.gnu.org/licenses/>.
         </body>
 
         <!--  RIGHT LEG -->
-        <body name="R_hip" pos="0.021 -0.092 0.028">
+        <body name="R_hip" pos="0.021 -0.081 0.028">
           <inertial 
               mass="3.684"
               pos="0.130 -0.174 0.000" 
@@ -200,7 +200,7 @@ See <https://www.gnu.org/licenses/>.
             size="0.032" class="R_collision"/>
           <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
-          <body name="R_UL" pos="0.169 -0.173 0">
+          <body name="R_UL" pos="0.169 -0.176 0">
             <inertial 
               mass="1.520"
               pos="0.000 0.044 -0.408"
@@ -211,7 +211,7 @@ See <https://www.gnu.org/licenses/>.
               size="0.069" class="R_collision"/>
             <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
-            <body name="R_LL" pos="0 0.077 -0.478">
+            <body name="R_LL" pos="0 0.077 -0.463">
               <inertial 
                 mass="1.895"
                 pos="-0.049 0.000 -0.269"
@@ -222,7 +222,7 @@ See <https://www.gnu.org/licenses/>.
                 size="0.047" class="R_collision"/>
               <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
-              <body name="R_ankle" pos="0.000 0.016 -0.474">
+              <body name="R_ankle" pos="0.000 0.016 -0.469">
                 <inertial 
                   mass="0.683"
                   pos="0.070 -0.043 -0.002"

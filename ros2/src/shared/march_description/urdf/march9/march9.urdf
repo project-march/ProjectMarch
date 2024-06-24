@@ -253,14 +253,14 @@
 		<child link="backpack"/>
 	</joint>
 	<joint name="left_hip_aa" type="revolute">
-		<origin rpy="0 0 0" xyz="0.021 0.092 0.028"/>
+		<origin rpy="0 0 0" xyz="0.021 0.081 0.028"/>
 		<axis xyz="-1 0 0"/>
 		<parent link="backpack"/>
 		<child link="L_hip"/>
 		<limit effort="280" lower="-0.349066" upper="0.174533" velocity="2.6"/>
 	</joint>
 	<joint name="left_hip_fe" type="revolute">
-		<origin rpy="0 0 0.0" xyz="0.169 0.173 0.000"/>
+		<origin rpy="0 0 0.0" xyz="0.169 0.176 0.000"/>
 		<axis xyz="0 -1 0"/>
 		<parent link="L_hip"/>
 		<child link="L_UL"/>
@@ -272,14 +272,14 @@
 		<child link="L_camera"/>
 	</joint>
 	<joint name="left_knee" type="revolute">
-		<origin rpy="0 0 0" xyz="0.000 -0.077 -0.478"/>
+		<origin rpy="0 0 0" xyz="0.000 -0.077 -0.463"/>
 		<axis xyz="0 1 0"/>
 		<parent link="L_UL"/>
 		<child link="L_LL"/>
 		<limit effort="250" lower="0" upper="2.18166" velocity="3.94"/>
 	</joint>
 	<joint name="left_ankle_dpf" type="revolute">
-		<origin rpy="0 0 0" xyz="0.000 -0.016 -0.474"/>
+		<origin rpy="0 0 0" xyz="0.000 -0.016 -0.469"/>
 		<axis xyz="0 -1 0"/>
 		<parent link="L_LL"/>
 		<child link="L_ankle"/>
@@ -308,14 +308,14 @@
 		<child link="L_toe"/>
 	</joint>
 	<joint name="right_hip_aa" type="revolute">
-		<origin rpy="0 0 0" xyz="0.021 -0.092 0.028"/>
+		<origin rpy="0 0 0" xyz="0.021 -0.081 0.028"/>
 		<axis xyz="1 0 0"/>
 		<parent link="backpack"/>
 		<child link="R_hip"/>
 		<limit effort="280" lower="-0.349066" upper="0.174533" velocity="2.6"/>
 	</joint>
 	<joint name="right_hip_fe" type="revolute">
-		<origin rpy="0 0 0.0" xyz="0.169 -0.173 0.000"/>
+		<origin rpy="0 0 0.0" xyz="0.169 -0.176 0.000"/>
 		<axis xyz="0 -1 0"/>
 		<parent link="R_hip"/>
 		<child link="R_UL"/>
@@ -327,14 +327,14 @@
 		<child link="R_camera"/>
 	</joint>
 	<joint name="right_knee" type="revolute">
-		<origin rpy="0 0 0" xyz="0.000 0.077 -0.478"/>
+		<origin rpy="0 0 0" xyz="0.000 0.077 -0.463"/>
 		<axis xyz="0 1 0"/>
 		<parent link="R_UL"/>
 		<child link="R_LL"/>
 		<limit effort="250" lower="0" upper="2.18166" velocity="3.94"/>
 	</joint>
 	<joint name="right_ankle_dpf" type="revolute">
-		<origin rpy="0 0 0" xyz="0.000 0.016 -0.474"/>
+		<origin rpy="0 0 0" xyz="0.000 0.016 -0.469"/>
 		<axis xyz="0 -1 0"/>
 		<parent link="R_LL"/>
 		<child link="R_ankle"/>
