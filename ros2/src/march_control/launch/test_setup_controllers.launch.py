@@ -86,6 +86,23 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
+    joint_position_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
+    )
+
+    fuzzy_weights_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=[
+            "march_fuzzy_weights_controller", 
+            "-t", 
+            "march_fuzzy_weights_controller/FuzzyWeightsController", 
+            "--controller-manager", 
+            "/controller_manager"],
+    )
+
     # region Start broadcasters
     motor_controller_state_broadcaster_spawner = Node(
         package="controller_manager",
@@ -98,20 +115,13 @@ def generate_launch_description():
             "/controller_manager",
         ],
     )
-        
-    joint_position_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
-    
-    )
-
     # endregion
 
     nodes = [
         joint_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
         joint_position_controller_spawner,
+        fuzzy_weights_controller_spawner
     ]
 
     robot_desc_dict = {"robot_description": Command(

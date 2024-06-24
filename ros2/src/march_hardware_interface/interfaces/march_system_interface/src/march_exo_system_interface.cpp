@@ -69,7 +69,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
         return hardware_interface::return_type::ERROR;
     }
 
-    // Checks if the joints have the correct command and state interfaces (if not check you controller.yaml).
+    // Checks if the joints have the correct command and state interfaces (if not check your controller.yaml).
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },

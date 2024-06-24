@@ -68,6 +68,12 @@ def generate_launch_description() -> LaunchDescription:
             executable='test_joints_gui_node',
             name='test_joints_gui_node',
         ),
+        Node(
+            package='march_fuzzy_generator',
+            executable='fuzzy_generator_node',
+            name='fuzzy_generator',
+            parameters=[{"system_type": "tsu"}],
+        ),
         test_setup_controllers_launch,
         record_rosbags_action,
     ])

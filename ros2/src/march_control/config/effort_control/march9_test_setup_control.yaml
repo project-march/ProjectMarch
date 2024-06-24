@@ -11,6 +11,9 @@ controller_manager:
     march_joint_position_controller:
       type: forward_command_controller/ForwardCommandController
 
+    march_fuzzy_weights_controller:
+      type: march_fuzzy_weights_controller/FuzzyWeightsController
+
 march_motor_controller_state_broadcaster:
   ros__parameters:
     possible_joints:
@@ -24,3 +27,10 @@ march_joint_position_controller:
       - linear_joint
       # - rotational_joint
     interface_name: position
+
+march_fuzzy_weights_controller:
+  ros__parameters:
+    joints:
+      - linear_joint
+      # - rotational_joint
+    interface_name: torque_weight
