@@ -62,6 +62,7 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
     {
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
+        mode_msg.header.stamp = this->now();
         mode_msg.mode = m_mode_machine.getCurrentMode();
 
         auto it = modeNodeTypeMap.find((ExoMode)mode_msg.mode); 

@@ -8,6 +8,7 @@ from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 import yaml
+import numpy as np
 
 def generate_launch_description():
     state_estimator_clock_period = LaunchConfiguration('state_estimator_timer_period', default='0.05')
@@ -44,7 +45,16 @@ def generate_launch_description():
             )
     joints_airgaiting_config = yaml.safe_load(open(joints_airgaiting_config_filepath, 'r'))
     actuator_names = [list(actuator.keys())[0] for actuator in joints_airgaiting_config['march9']['joints']]
-    print(actuator_names)
+    actuators_info = dict()
+    for actuator_idx, actuator in enumerate(actuator_names):
+        actuator_info = joints_airgaiting_config['march9']['joints'][actuator_idx][actuator]['motor_controller']['absoluteEncoder']
+        actuators_info[actuator] = {
+            'name': actuator,
+            'soft_lower_limit': np.rad2deg(actuator_info['lowerSoftLimitMarginRad']),
+            'soft_upper_limit': np.rad2deg(actuator_info['upperSoftLimitMarginRad']),
+        }
+    soft_upper_limits = [actuators_info[actuator]['soft_upper_limit'] for actuator in actuators_info]
+    soft_lower_limits = [actuators_info[actuator]['soft_lower_limit'] for actuator in actuators_info]
 
     return LaunchDescription([
         Node(
@@ -55,6 +65,9 @@ def generate_launch_description():
             parameters=[
                 ik_solver_config,
                 {'state_estimator_timer_period': state_estimator_clock_period},
+                {'actuator_names': actuator_names},
+                {'actuator_soft_upper_limits': soft_upper_limits},
+                {'actuator_soft_lower_limits': soft_lower_limits},
             ],
         ),
         Node(
