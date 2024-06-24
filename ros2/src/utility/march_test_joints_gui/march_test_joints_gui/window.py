@@ -26,6 +26,7 @@ class Joint:
         self.is_flipped = False
         self.counter = 0
         self.new_joints_selected = False
+        self.is_running = False
 
     def create_layout(self) -> QVBoxLayout:
         layout = QHBoxLayout()
@@ -200,7 +201,7 @@ class Window(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle('Test Joints GUI')
-        self.setGeometry(100, 100, 1024, 768)
+        self.setGeometry(100, 100, 1280, 768)
         self.is_running = False
         self.joints = None
 
@@ -256,7 +257,7 @@ class Window(QMainWindow):
         self.reset_button.setDisabled(True)
         for joint in self.joints:
             joint.disable_widgets()
-        self.enable_timer()
+        self.is_running = True
 
     def stop_button_callback(self) -> None:
         self.is_running = False
@@ -268,7 +269,7 @@ class Window(QMainWindow):
             joint.select_box.setDisabled(False)
             if joint.is_selected:
                 joint.enable_widgets()
-        self.disable_timer()
+        self.is_running = False
 
     def reset_button_callback(self) -> None:
         self.is_running = False

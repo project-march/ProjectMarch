@@ -22,14 +22,12 @@ class TestJointsGuiNode(Node):
     def __init__(self, window: Window) -> None:
         super().__init__('test_joints_gui')
         self.window = window
-        self.window.set_timer_callbacks(self.enable_timer, self.disable_timer)
         self.window.set_publish_callback(self.publish_joint_positions)
         self.timer_period = 0.05 # seconds
 
         self.joint_state_sub = self.create_subscription(JointState, 'joint_states', self.joint_state_callback, 10)
         self.desired_joint_positions_pub = self.create_publisher(Float64MultiArray, 'march_joint_position_controller/commands', 10)
         self.wall_timer = self.create_timer(self.timer_period, self.timer_callback)
-        self.wall_timer.cancel()
 
         self.joint_state_msg = None
         self.get_logger().info("Test Joints GUI Node has been initialized.")
@@ -38,30 +36,32 @@ class TestJointsGuiNode(Node):
     def joint_state_callback(self, msg: JointState) -> None:
         # Update with the new joint state message
         self.joint_state_msg = msg
-        if self.window.joints is not None:
-            self.window.update_actual_positions(msg.name, msg.position)
 
     def timer_callback(self) -> None:
         if self.joint_state_msg is None:
             self.get_logger().warn("No joint state message received yet", throttle_duration_sec=5.0)
             return
+
+        if self.window.joints is not None:
+            self.window.update_actual_positions(self.joint_state_msg.name, self.joint_state_msg.position)
         
         # Publish the desired joint positions
-        joint_positions = self.window.get_desired_positions()
-        self.publish_joint_positions(joint_positions)
+        if self.window.is_running:
+            joint_positions = self.window.get_desired_positions()
+            self.publish_joint_positions(joint_positions)
 
     def publish_joint_positions(self, joint_positions: list) -> None:
         desired_joint_positions = Float64MultiArray()
         desired_joint_positions.data = joint_positions
         self.desired_joint_positions_pub.publish(desired_joint_positions)
 
-    def enable_timer(self) -> None:
-        self.get_logger().info("Running test.")
-        self.wall_timer.reset()
+    # def enable_timer(self) -> None:
+    #     self.get_logger().info("Running test.")
+    #     self.wall_timer.reset()
 
-    def disable_timer(self) -> None:
-        self.get_logger().info("Stopping test.")
-        self.wall_timer.cancel()
+    # def disable_timer(self) -> None:
+    #     self.get_logger().info("Stopping test.")
+    #     self.wall_timer.cancel()
 
 
 def sigint_handler(*args):
