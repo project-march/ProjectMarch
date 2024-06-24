@@ -33,9 +33,9 @@ void IKManagerNode::publishIksCommand(const int iks_command)
         msg.task_names = m_exo_mode_to_task_stack_map[iks_command];
         m_iks_command_pub->publish(msg);
 
-        RCLCPP_INFO(this->get_logger(), "Updating stack of tasks in ik_solver_node with %d tasks.", msg.task_names.size());
+        RCLCPP_DEBUG(this->get_logger(), "Updating stack of tasks in ik_solver_node with %d tasks.", msg.task_names.size());
         for (unsigned long int i = 0; i < msg.task_names.size(); i++) {
-            RCLCPP_INFO(this->get_logger(), "Task %lu: %s", i, msg.task_names[i].c_str());
+            RCLCPP_DEBUG(this->get_logger(), "Task %lu: %s", i, msg.task_names[i].c_str());
         }
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Failed to publish IKS command: %s", e.what());

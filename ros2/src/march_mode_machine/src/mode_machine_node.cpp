@@ -26,6 +26,19 @@ ModeMachineNode::ModeMachineNode()
 
     m_mode_publisher = create_publisher<march_shared_msgs::msg::ExoMode>("current_mode", 10);
 
+    // Restore service client relation with footstep planner 
+    m_footstep_client = this->create_client<march_shared_msgs::srv::RequestFootsteps>("footstep_generator");
+    m_footstep_request = std::make_shared<march_shared_msgs::srv::RequestFootsteps::Request>();
+
+    while (!m_footstep_client->wait_for_service(std::chrono::seconds(1))) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+            return;
+        }
+        RCLCPP_INFO(this->get_logger(), "footstep_planner service not available, waiting again...");
+    }
+    RCLCPP_INFO(this->get_logger(), "footstep_planner service connected");
+
     RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Mode Machine Node succesfully initialized");
 }
 
@@ -34,6 +47,22 @@ ModeMachineNode::~ModeMachineNode()
     RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Deconstructor of Mode Machine node called");
 }
 
+void ModeMachineNode::sendRequest(int desired_mode) {
+    m_footstep_request->gait_type = desired_mode;
+    m_footstep_request->stance_leg = 0; 
+    m_footstep_future = m_footstep_client->async_send_request(
+        m_footstep_request, std::bind(&ModeMachineNode::responseFootstepCallback, this, _1));
+}
+
+void ModeMachineNode::responseFootstepCallback(
+    const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future)
+{
+    if (future.get()->status) {
+        RCLCPP_INFO(this->get_logger(), "Footstep request received successful!");
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Footstep request was not a success!");
+    }
+}
 
 void ModeMachineNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_Response::SharedPtr response) const
 {
@@ -48,6 +77,9 @@ void ModeMachineNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_R
         exoModeMsg.mode = static_cast<int8_t>(mode);
         response->mode_array.modes.push_back(exoModeMsg);
     }
+
+    response->current_mode.mode = m_mode_machine.getCurrentMode();
+
 }
 
 void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Request> request,
@@ -59,14 +91,39 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
     {
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
+        mode_msg.header.stamp = this->now();
         mode_msg.mode = m_mode_machine.getCurrentMode();
+
+        auto it = modeNodeTypeMap.find((ExoMode)mode_msg.mode); 
+        if (it != modeNodeTypeMap.end()){
+            mode_msg.node_type = it->second; 
+        } else {
+            mode_msg.node_type = "unknown"; 
+        }
+
+        // In case of VariableWalk, request footsteps from MPC footstep planner 
+        if (mode_msg.mode == 11){
+            // march_shared_msgs::msg::FootStepOutput feet_msg; 
+            // feet_msg.distance = 0.4;
+            // m_footsteps_dummy_publisher->publish(feet_msg); 
+            sendRequest(2);
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Node_type set to %s", mode_msg.node_type.c_str()); 
+        // end test lifecycle nodes 
         m_mode_publisher->publish(mode_msg);
+        if (mode_msg.mode == 10){
+            march_shared_msgs::msg::FootStepOutput feet_msg; 
+            feet_msg.distance = 0.4;
+            m_footsteps_dummy_publisher->publish(feet_msg); 
+        }
+
     } else 
     {
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Invalid mode transition! Ignoring new mode.");
     }
     fillExoModeArray(response);
-    RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Response sent!");
+    RCLCPP_INFO(this->get_logger(), "Response sent!");
 }
 /**
  * Main function to run the node.

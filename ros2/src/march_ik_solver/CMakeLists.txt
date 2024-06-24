@@ -31,6 +31,7 @@ find_package(pinocchio REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(OpenMP REQUIRED)
+find_package(message_filters REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
