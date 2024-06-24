@@ -21,12 +21,16 @@ public:
     }  
 
     ExoModeTransitions(const std::string& type) {
-        if (type == "Joint Angles"){
+        if(type == "Test Joints") {
             transitions = {
+                /*{CurrentMode, PossibleModes}*/
+                {ExoMode::BootUp, {ExoMode::Stand}},
+                {ExoMode::Stand, {ExoMode::Walk, ExoMode::BootUp}},
+                {ExoMode::Walk, {ExoMode::Stand}}, 
                 { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
-                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Hinge} },
+                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Ascending, ExoMode::Descending, ExoMode::Hinge} },
                 { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
-                { ExoMode::BootUp, { ExoMode::Stand, ExoMode::Sit } },
+                { ExoMode::BootUp, { ExoMode::Stand } },
                 { ExoMode::Error, {}},
                 { ExoMode::Sideways, { ExoMode::Stand}},
                 { ExoMode::Ascending, { ExoMode::Stand}},
@@ -34,14 +38,14 @@ public:
                 { ExoMode::Hinge, { ExoMode::Stand}}
             };
         }
-        else if (type == "Cartesian") {
+        else if (type == "Lifecycle nodes"){
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 { ExoMode::Stand,
-                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending}},
+                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending, ExoMode::Sit, ExoMode::Sideways, ExoMode::Hinge}},
                 { ExoMode::LargeWalk, { ExoMode::Stand, ExoMode::Error} },
                 { ExoMode::SmallWalk, {ExoMode::Stand, ExoMode::Error}}, 
-                { ExoMode::BootUp, { ExoMode::Stand } },
+                { ExoMode::BootUp, { ExoMode::Stand, ExoMode::Sit} },
                 { ExoMode::Error, {}},
                 { ExoMode::VariableStep, { ExoMode::Stand, ExoMode::Error}}, 
                 { ExoMode::VariableWalk, { ExoMode::Stand, ExoMode::Error}}, 
@@ -49,15 +53,11 @@ public:
                 { ExoMode::HighStep2, { ExoMode::Stand, ExoMode::Error}},
                 { ExoMode::HighStep3, { ExoMode::Stand, ExoMode::Error}},
                 { ExoMode::Ascending, { ExoMode::Stand, ExoMode::Error}}, 
-                { ExoMode::Descending, { ExoMode::Stand, ExoMode::Error}}
-            };
-        }
-        else if(type == "Test Joints") {
-            transitions = {
-                /*{CurrentMode, PossibleModes}*/
-                {ExoMode::BootUp, {ExoMode::Stand}},
-                {ExoMode::Stand, {ExoMode::Walk, ExoMode::BootUp}},
-                {ExoMode::Walk, {ExoMode::Stand}}
+                { ExoMode::Descending, { ExoMode::Stand, ExoMode::Error}}, 
+                { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
+                { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
+                { ExoMode::Sideways, { ExoMode::Stand}}, 
+                { ExoMode::Hinge, {ExoMode::Stand}}
             };
         }
 
