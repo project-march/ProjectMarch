@@ -24,6 +24,7 @@ class FuzzyGenerator {
         std::string m_system_type;
         std::string m_package_path;
         YAML::Node m_config;
+        std::string m_config_base;
         double m_lower_bound;
         double m_upper_bound;
         ExoMode m_gait_type;

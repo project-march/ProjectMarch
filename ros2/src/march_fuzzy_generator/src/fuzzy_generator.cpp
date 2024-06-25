@@ -10,13 +10,14 @@ FuzzyGenerator::FuzzyGenerator(std::string system_type)
     m_system_type = system_type;
 
     if (m_system_type == "tsu") {
-        m_config = YAML::LoadFile(m_package_path + "/config/default_weights_tsu.yaml");
+        m_config_base = m_package_path + "/config/tsu";
     } else if (m_system_type == "exo") {
-        m_config = YAML::LoadFile(m_package_path + "/config/default_weights.yaml");
+        m_config_base = m_package_path + "/config/exo";
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("FuzzyGenerator"), "System type not found."); 
     }
 
+    m_config = YAML::LoadFile(m_config_base + "/default_weights.yaml");
     m_torque_ranges = getTorqueRanges();
 }
 
@@ -98,7 +99,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateVari
             RCLCPP_WARN(rclcpp::get_logger("FuzzyGenerator"), "Joint name not found.");
         }
 
-        // calculate how far the parameter is in the 'fuzzy shifting range'
+        // calculate how far the parameter is in the 'fuzzy shifting range', where higher in the range means lower torque weights
         const float fuzzy_percentage = (m_upper_bound - fuzzy_parameter) / (m_upper_bound - m_lower_bound);
         float torque_weight = torque_range * fuzzy_percentage;
         torque_weight = std::max(minimum_torque_percentage, std::min(torque_weight, maximum_torque_percentage));
@@ -110,7 +111,7 @@ std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::calculateVari
 }
 
 
-//  Method to get the torque ranges
+//  Method to get the minimum and maximum torques, as well as the constant torque weight for each joint
 std::vector<std::tuple<std::string, float, float, float>> FuzzyGenerator::getTorqueRanges()
 {
     std::vector<std::tuple<std::string, float, float, float>> joint_torque_ranges;
@@ -128,7 +129,7 @@ std::vector<std::tuple<std::string, float, float, float>> FuzzyGenerator::getTor
 }
 
 
-// Method to get the joint names
+// Method to return position weights for the joints
 std::vector<std::tuple<std::string, float, float>> FuzzyGenerator::returnPositionWeights()
 {
     std::vector<std::tuple<std::string, float, float>> position_weights_vector;
@@ -147,42 +148,21 @@ void FuzzyGenerator::setConfigPath(const ExoMode &new_gait_type)
 {
     m_gait_type = new_gait_type;
 
+    // Set the config path based on the gait type, works for both exo and tsu
     if (new_gait_type == static_cast<ExoMode>(1)) {
-        m_config = YAML::LoadFile(m_package_path + "/config/default_weights.yaml");  
+        m_config = YAML::LoadFile(m_config_base + "/config/default_weights.yaml");  
         m_control_type = "constant";
     } else if (new_gait_type == static_cast<ExoMode>(2)) {
-        m_config = YAML::LoadFile(m_package_path + "/config/walk_weights.yaml");
+        m_config = YAML::LoadFile(m_config_base + "/config/walk_weights.yaml");
         m_control_type = "constant";    
     } else if (new_gait_type == static_cast<ExoMode>(5)) {
-        m_config = YAML::LoadFile(m_package_path + "/config/sideways_walk_weights.yaml");
+        m_config = YAML::LoadFile(m_config_base + "/config/sideways_walk_weights.yaml");
         m_control_type = "constant";    
     } 
-    
-    // else if (new_gait_type == static_cast<ExoMode>(6)) {
-    //     m_config = YAML::LoadFile(m_package_path + "/config/large_walk_weights_tsu.yaml");
-    //     m_control_type = "position";
-    // } else if (new_gait_type == static_cast<ExoMode>(7)) {
-    //     m_config = YAML::LoadFile(m_package_path + "/config/small_walk_weights_tsu.yaml");
-    //     m_control_type = "position";
-    // } else if (new_gait_type == static_cast<ExoMode>(8)) {
-    //     m_config = YAML::LoadFile(m_package_path + "/config/ascending_weights_tsu.yaml");
-    //     m_control_type = "position";
-    // } 
-    
     else {
         RCLCPP_WARN(rclcpp::get_logger("FuzzyGenerator"), "No config found for this gait, using position control");
         m_control_type = "position";
     }
-
+    
     m_torque_ranges = getTorqueRanges();
 }
-
-    // Sit = 0,
-    // Stand = 1,
-    // Walk = 2,
-    // BootUp = 3,
-    // Error = 4,
-    // Sideways = 5,
-    // LargeWalk = 6,
-    // SmallWalk = 7,
-    // Ascending = 8,
