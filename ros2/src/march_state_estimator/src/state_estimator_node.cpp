@@ -286,7 +286,7 @@ void StateEstimatorNode::noiseParametersCallback(const std_msgs::msg::Float64Mul
  * Publisher functions
  *******************************************************************************/
 
-void SensorFusionNode::publishClock()
+void StateEstimatorNode::publishClock()
 {
     std_msgs::msg::Header clock_msg;
     clock_msg.stamp = this->now();
