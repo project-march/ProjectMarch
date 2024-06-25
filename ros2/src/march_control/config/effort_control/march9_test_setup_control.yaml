@@ -17,20 +17,20 @@ controller_manager:
 march_motor_controller_state_broadcaster:
   ros__parameters:
     possible_joints:
-      - linear_joint
-      # - rotational_joint
+      # - linear_joint
+      - rotational_joint
     interface_name: position
 
 march_joint_position_controller:
   ros__parameters:
     joints:
-      - linear_joint
-      # - rotational_joint
+      # - linear_joint
+      - rotational_joint
     interface_name: position
 
 march_fuzzy_weights_controller:
   ros__parameters:
     joints:
-      - linear_joint
-      # - rotational_joint
+      # - linear_joint
+      - rotational_joint
     interface_name: torque_weight

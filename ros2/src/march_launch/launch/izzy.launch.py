@@ -200,7 +200,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-
     # region rosbags
     # Make sure you have build the ros bags from the library not the ones from foxy!
     record_rosbags_action = ExecuteProcess(
@@ -219,12 +218,6 @@ def generate_launch_description() -> LaunchDescription:
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
         condition=IfCondition(rosbags),
     )
-    # endregion
-
-
-    # region footstep_generation parameters
-    # n_footsteps = 20
-    # step_length = 0.2
     # endregion
 
     return LaunchDescription(declared_arguments + [
@@ -267,6 +260,12 @@ def generate_launch_description() -> LaunchDescription:
             output='screen',
             arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
             condition=IfCondition(rviz),
+        ),
+        Node(
+            package='march_fuzzy_generator',
+            executable='fuzzy_generator_node',
+            name='fuzzy_generator',
+            parameters=[{"system_type": "exo"}],
         ),
         mujoco_node,
         state_estimator,

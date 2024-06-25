@@ -77,6 +77,17 @@ def generate_launch_description():
         executable="spawner.py",
         arguments=["march_joint_position_controller", "--controller-manager", "/controller_manager"],
     )
+    
+    fuzzy_weights_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner.py",
+        arguments=[
+            "march_fuzzy_weights_controller", 
+            "-t", 
+            "march_fuzzy_weights_controller/FuzzyWeightsController", 
+            "--controller-manager", 
+            "/controller_manager"],
+    )
     # endregion
 
     # region Start broadcasters
@@ -112,6 +123,7 @@ def generate_launch_description():
         pdb_state_broadcaster_spawner,
         motor_controller_state_broadcaster_spawner,
         joint_position_controller_spawner,
+        fuzzy_weights_controller_spawner,
     ]
 
     robot_desc_xacro = Command(

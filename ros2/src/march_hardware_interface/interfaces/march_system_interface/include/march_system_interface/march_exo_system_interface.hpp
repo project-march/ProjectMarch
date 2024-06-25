@@ -31,10 +31,10 @@
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/motor_controller/odrive/odrive_state.h>
+#include <fuzzy_weights_controller/fuzzy_weights_controller.hpp>
 #include <rclcpp/clock.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/int32.hpp>
-#include "fuzzy_weights_controller/fuzzy_weights_controller.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;

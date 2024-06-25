@@ -147,16 +147,42 @@ void FuzzyGenerator::setConfigPath(const ExoMode &new_gait_type)
 {
     m_gait_type = new_gait_type;
 
-    if (new_gait_type == static_cast<ExoMode>(m_walk_index)) {
-        m_config = YAML::LoadFile(m_package_path + "/config/walk_weights_tsu.yaml");  
-        m_control_type = "position";
-    } else if (new_gait_type == static_cast<ExoMode>(m_sideways_walk_index)) {
-        m_config = YAML::LoadFile(m_package_path + "/config/sideways_walk_weights_tsu.yaml");
-        m_control_type = "stance_swing_leg";    
-    } else {
+    if (new_gait_type == static_cast<ExoMode>(1)) {
+        m_config = YAML::LoadFile(m_package_path + "/config/default_weights.yaml");  
+        m_control_type = "constant";
+    } else if (new_gait_type == static_cast<ExoMode>(2)) {
+        m_config = YAML::LoadFile(m_package_path + "/config/walk_weights.yaml");
+        m_control_type = "constant";    
+    } else if (new_gait_type == static_cast<ExoMode>(5)) {
+        m_config = YAML::LoadFile(m_package_path + "/config/sideways_walk_weights.yaml");
+        m_control_type = "constant";    
+    } 
+    
+    // else if (new_gait_type == static_cast<ExoMode>(6)) {
+    //     m_config = YAML::LoadFile(m_package_path + "/config/large_walk_weights_tsu.yaml");
+    //     m_control_type = "position";
+    // } else if (new_gait_type == static_cast<ExoMode>(7)) {
+    //     m_config = YAML::LoadFile(m_package_path + "/config/small_walk_weights_tsu.yaml");
+    //     m_control_type = "position";
+    // } else if (new_gait_type == static_cast<ExoMode>(8)) {
+    //     m_config = YAML::LoadFile(m_package_path + "/config/ascending_weights_tsu.yaml");
+    //     m_control_type = "position";
+    // } 
+    
+    else {
         RCLCPP_WARN(rclcpp::get_logger("FuzzyGenerator"), "No config found for this gait, using position control");
         m_control_type = "position";
     }
 
     m_torque_ranges = getTorqueRanges();
 }
+
+    // Sit = 0,
+    // Stand = 1,
+    // Walk = 2,
+    // BootUp = 3,
+    // Error = 4,
+    // Sideways = 5,
+    // LargeWalk = 6,
+    // SmallWalk = 7,
+    // Ascending = 8,
