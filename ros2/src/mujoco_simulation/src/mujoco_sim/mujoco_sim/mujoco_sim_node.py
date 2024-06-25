@@ -99,7 +99,7 @@ class MujocoSimNode(Node):
         self.declare_parameter("model_to_load")
         self.declare_parameter("aie_force")
 
-        self.SIM_TIMESTEP_ROS = 0.008
+        self.SIM_TIMESTEP_ROS = 0.001 # 1 kHz
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -204,7 +204,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.008
+        self.TIME_STEP_TRAJECTORY = 0.001
         self.trajectory_last_updated = self.get_clock().now()
 
     def set_initial_keyframe(self, keyframe_id):

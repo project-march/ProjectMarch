@@ -30,6 +30,7 @@
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
@@ -64,6 +65,7 @@ private:
     void noiseParametersCallback(const std_msgs::msg::Float64MultiArray::SharedPtr msg);
 
     // Publisher functions
+    void publishClock();
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
@@ -126,6 +128,7 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr m_noise_params_sub;
 
+    rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::Header>::SharedPtr m_clock_pub;
     rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 

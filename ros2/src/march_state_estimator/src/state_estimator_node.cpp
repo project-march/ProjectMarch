@@ -233,7 +233,9 @@ void StateEstimatorNode::timerCallback()
     if (m_is_simulation) {
         publishGroundReactionForce();
     }
+    
     publishStateEstimation();
+    publishClock();
 }
 
 void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
@@ -283,6 +285,13 @@ void StateEstimatorNode::noiseParametersCallback(const std_msgs::msg::Float64Mul
 /*******************************************************************************
  * Publisher functions
  *******************************************************************************/
+
+void SensorFusionNode::publishClock()
+{
+    std_msgs::msg::Header clock_msg;
+    clock_msg.stamp = this->now();
+    m_clock_pub->publish(clock_msg);
+}
 
 void StateEstimatorNode::publishStateEstimation()
 {
@@ -606,6 +615,7 @@ void StateEstimatorNode::configureSubscriptions()
 
 void StateEstimatorNode::configurePublishers()
 {
+    m_clock_pub = this->create_publisher<std_msgs::msg::Header>("state_estimation/clock", 10);
     m_state_estimation_pub = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
     m_torque_left_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/left", 10);

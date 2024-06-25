@@ -30,6 +30,7 @@ find_package(march_shared_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(OpenMP REQUIRED)
+find_package(message_filters REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
@@ -51,6 +52,7 @@ ament_target_dependencies(${PROJECT_NAME}
   march_shared_msgs
   pinocchio
   ament_index_cpp
+  message_filters
 )
 
 add_executable(ik_solver_node 
@@ -76,6 +78,7 @@ ament_target_dependencies(ik_solver_node
   march_shared_msgs
   pinocchio
   ament_index_cpp
+  message_filters
 )
 
 target_link_libraries(ik_solver_node
