@@ -120,9 +120,9 @@ std::vector<std::tuple<std::string, float, float, float>> FuzzyGenerator::getTor
         std::string joint_name = it->first.as<std::string>();
         const float min_torque = joints_config[joint_name]["minimum_torque"].as<float>();
         const float max_torque = joints_config[joint_name]["maximum_torque"].as<float>();
-        const float const_torque = joints_config[joint_name]["constant_weight"].as<float>();
+        const float const_tor_weight = joints_config[joint_name]["constant_torque_weight"].as<float>();
 
-        joint_torque_ranges.push_back(std::make_tuple(joint_name, min_torque, max_torque, const_torque));
+        joint_torque_ranges.push_back(std::make_tuple(joint_name, min_torque, max_torque, const_tor_weight));
     }
     return joint_torque_ranges;
 }

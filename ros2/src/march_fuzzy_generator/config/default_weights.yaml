@@ -11,32 +11,32 @@ joints:
   left_ankle_dpf:
     minimum_torque: 0.0
     maximum_torque: 0.3 
-    constant_weight: 0.4
+    constant_torque_weight: 0.4
   left_hip_aa:
     minimum_torque: 0.0
     maximum_torque: 0.2
-    constant_weight: 0.3
+    constant_torque_weight: 0.3
   left_hip_fe:
     minimum_torque: 0.0
     maximum_torque: 0.1
-    constant_weight: 0.2
+    constant_torque_weight: 0.2
   left_knee:
     minimum_torque: 0.0
     maximum_torque: 0.9
-    constant_weight: 0.1
+    constant_torque_weight: 0.1
   right_ankle_dpf:
     minimum_torque: 0.0
     maximum_torque: 0.3
-    constant_weight: 0.4
+    constant_torque_weight: 0.4
   right_hip_aa:
     minimum_torque: 0.0
     maximum_torque: 0.2
-    constant_weight: 0.3
+    constant_torque_weight: 0.3
   right_hip_fe:
     minimum_torque: 0.0
     maximum_torque: 0.1
-    constant_weight: 0.2
+    constant_torque_weight: 0.2
   right_knee:
     minimum_torque: 0.0
     maximum_torque: 0.1
-    constant_weight: 0.1
+    constant_torque_weight: 0.1

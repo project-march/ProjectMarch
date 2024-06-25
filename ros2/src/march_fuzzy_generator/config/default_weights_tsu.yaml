@@ -11,9 +11,9 @@ joints:
   linear_joint:
     minimum_torque: 0.0
     maximum_torque: 0.3 
-    constant_weight: 0.3
+    constant_torque_weight: 0.3
   rotational_joint:
     minimum_torque: 0.0
     maximum_torque: 0.2
-    constant_weight: 0.2
+    constant_torque_weight: 0.2
   
