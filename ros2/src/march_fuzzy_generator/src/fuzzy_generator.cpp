@@ -9,6 +9,7 @@ FuzzyGenerator::FuzzyGenerator(std::string system_type)
     m_package_path = ament_index_cpp::get_package_share_directory("march_fuzzy_generator");
     m_system_type = system_type;
 
+    // Set the base config path
     if (m_system_type == "tsu") {
         m_config_base = m_package_path + "/config/tsu";
     } else if (m_system_type == "exo") {
