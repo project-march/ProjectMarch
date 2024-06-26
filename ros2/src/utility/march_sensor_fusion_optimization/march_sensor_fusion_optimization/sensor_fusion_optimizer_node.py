@@ -4,20 +4,18 @@ Authors: Alexander James Becoy @alexanderjamesbecoy
          Alexander Andonov 
 """
 
+import time   
+import os
+from ament_index_python.packages import get_package_share_directory
+import numpy as np
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
-from ament_index_python.packages import get_package_share_directory
 
-from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from march_shared_msgs.msg import StateEstimation, ExoMode
-from std_msgs.msg import Bool
-
+from std_msgs.msg import Bool, Float64MultiArray
 from march_sensor_fusion_optimization.parameters_handler import ParametersHandler
-
-import time
-import numpy as np
 from bayes_opt import BayesianOptimization, UtilityFunction
 
 
@@ -27,25 +25,26 @@ class SensorFusionOptimizerNode(Node):
         super().__init__('sensor_fusion_optimizer')
 
         self.declare_parameter('parameters_filepath', get_package_share_directory('march_state_estimator') + '/config/sensor_fusion_noise_parameters.yaml')
+        self.current_dir = os.path.dirname(os.path.realpath(__file__))
 
         # Bayesian Optimization parameters
-        self.max_iterations = 3
+        self.max_iterations = 100
         self.param_file = self.get_parameter('parameters_filepath').value
         self.parameter_handler = ParametersHandler(self.param_file)
         self.num_optimization_parameters = 3
-        self.initial_population_size = 2
+        self.initial_population_size = 30
         self.performance_costs = []
-        self.dt = 0.025 # TODO: Check unit
+        self.dt = 0.025 # NOTE: Check unit and value from SE
         self.total_time = 0.0
-        self.num_monte_carlo_runs = 2
+        self.num_monte_carlo_runs = 200
         self.xi = 0.0  # exploration parameter in EI function
         self.kernel_alpha = 1e-8
-        self.simulation_time = 10
+        self.simulation_time = 12 # [seconds]
         # NOTE: Simplified noise observation parameters to reduce optimization problem dimensions
         self.bounds = np.array([
-            (1e-3, 1.0),  # foot position noise (assumption: x=y=z)
-            (1e-3, 1.0),  # foot slippage noise (assumption: roll=pitch=yaw)
-            (1e-3, 1.0)]) # joint position noise (assumption: all joints have same position noise)
+            (1e-3, 1.),  # foot position noise (assumption: x=y=z)
+            (1e-3, 1.),  # foot slippage noise (assumption: roll=pitch=yaw)
+            (1e-3, 1.)]) # joint position noise (assumption: all joints have same position noise)
 
         self.utility_function = UtilityFunction(kind="ei", kappa=2.5, xi=self.xi)
         self.optimizer = BayesianOptimization(
@@ -66,21 +65,25 @@ class SensorFusionOptimizerNode(Node):
         self.state_estimation_subscriber = self.create_subscription(StateEstimation, 'state_estimation/state', self.state_estimation_callback, 10)
         self.change_state_client = self.create_client(ChangeState, 'state_estimator/change_state')
         self.exo_mode_publisher = self.create_publisher(ExoMode, 'current_mode', 10)
-        self.simulation_command_publisher = self.create_publisher(Bool, 'mujoco_writer/reset', 10)
+        self.parameters_publisher = self.create_publisher(Float64MultiArray, 'state_estimation/noise_parameters', 10)
+        self.simulation_command_publisher = self.create_publisher(Bool, 'mujoco/writer/reset', 10)
 
         self.collect_performance = False
+        self.sensor_fusion_valid = True
 
     def state_estimation_callback(self, msg: StateEstimation) -> None:
         if self.collect_performance:
             self.performance_costs.append(msg.performance_cost)
-            # self.dt.append(msg.step_time)
             self.total_time += msg.step_time
+            self.sensor_fusion_valid = msg.sensor_fusion_valid
             # self.get_logger().info(f'Latest performance cost: {self.performance_costs[-1]}')
         else: 
-            self.get_logger().info('Not in test mode, skipping performance cost collection...')
+            # self.get_logger().info('Not in test mode, skipping performance cost collection...')
+            self.total_time += msg.step_time
+            self.sensor_fusion_valid = msg.sensor_fusion_valid
 
     def change_state(self, transition: int) -> bool:
-        self.get_logger().info(f'Transitioning SE state: {transition}')
+        # self.get_logger().info(f'Transitioning SE state: {transition}')
         
         while not self.change_state_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting again...')
@@ -105,37 +108,45 @@ class SensorFusionOptimizerNode(Node):
         self.total_time = 0.0
 
         for i in range(self.num_monte_carlo_runs):
-            self.parameter_handler.set_optimization_parameters(noise_parameters)
-            self.change_state(1)
-            self.change_state(3)
-            self.simulation_command_publisher.publish(Bool(data=True))
-            self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND))
-            self.collect_performance = True
-            # NOTE: Wait to be stable
-            time.sleep(7)
-            self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.SMALLWALK))
-            # Collect messages for the duration of the simulation
-            self.collect_messages_for_duration(self.simulation_time)
-            self.costs[i] = self.performance_costs
-            self.performance_costs = []
-            self.get_logger().info(f'Finished Monte Carlo run {i+1}')
-            self.collect_performance = False
-            self.change_state(4)
 
-        self.get_logger().info('Finished collecting performance costs for all Monte Carlo runs.')
+            # self.get_logger().info(f'Run {i+1}/{self.num_monte_carlo_runs}')
+            self.change_state(1) # Configure
+            self.parameters_publisher.publish(Float64MultiArray(data=noise_parameters))
+            time.sleep(1)
+            self.change_state(3) # Activate
+            if self.sensor_fusion_valid:
+                self.simulation_command_publisher.publish(Bool(data=True)) # Restart simulation
+                time.sleep(2)
+                self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND, node_type='joint_angles'))
+                self.collect_performance = True
+                self.collect_messages_for_duration(self.simulation_time/3)
+                self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.SMALLWALK, node_type='cartesian'))
+                self.collect_messages_for_duration(self.simulation_time)
+                self.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND, node_type='joint_angles'))
+                self.collect_messages_for_duration(self.simulation_time/3) # Wait for stability, otherwise cleanup crashes
+                self.costs[i] = self.performance_costs
+                self.performance_costs = []
+                self.collect_performance = False
+            else:
+                self.get_logger().error('Sensor fusion is not valid. Skipping Monte Carlo runs for the current params...')
+                self.costs[i] = [float('inf')]
+                self.performance_costs = []
+                self.collect_performance = False
+                self.change_state(4) # Deactivate
+                self.change_state(2) # Cleanup
+                break
+            self.change_state(4) # Deactivate
+            self.change_state(2) # Cleanup
 
     def evaluate_performance_cost(self) -> float:
         """Compute the JNIS performance cost of the state estimator with the current set of noise parameters."""
         if not self.costs:
             return float('inf')
         
+        # Some runs receive more messages than others
         min_length = min(len(arr) for arr in self.costs)
         trimmed_costs = [arr[:min_length] for arr in self.costs]
         trimmed_costs_array = np.array(trimmed_costs)
-        # self.get_logger().info(f'Trimmed costs array shape: {trimmed_costs_array.shape}')
-        # self.get_logger().info(f'Trimmed costs array: {trimmed_costs_array}')
-
-        # TODO: Fix this JNIS calculation
         average_costs_per_run = np.mean(trimmed_costs_array)
         average_costs_per_time = average_costs_per_run / self.total_time
         JNIS = np.abs(np.log(average_costs_per_time / self.num_optimization_parameters))
@@ -150,10 +161,12 @@ class SensorFusionOptimizerNode(Node):
             joint_position * np.ones((3,))
         ])
         self.run_filter_with_noise_parameters([foot_position, foot_slippage, joint_position])
-        # self.get_logger().info(f'Finished opt run with costs array shape: {self.costs}')
-        # self.get_logger().info(f'Finished opt run with total time: {self.total_time}')
         # Return the negative JNIS to maximize the performance
-        return -self.evaluate_performance_cost()
+        jnis = self.evaluate_performance_cost()
+        # Record in file for each run
+        with open(self.current_dir + '/last_run_record.txt', 'a') as f:
+            f.write(f"Foot_position: {foot_position} | Foot_slippage: {foot_slippage} | Joint_position: {joint_position} | JNIS: {jnis}\n")
+        return -jnis
 
     def optimize(self) -> np.ndarray:
         """Optimize the EKF parameters using Bayesian Optimization with Gaussian Processes."""
@@ -178,12 +191,13 @@ def main(args=None):
             return
         node.simulation_command_publisher.publish(Bool(data=True))
         # Wait for stability
+        time.sleep(3)
         if not node.change_state(3):
             node.get_logger().error("Failed to transition to ACTIVATE state.")
             return
-        node.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND))
+        node.exo_mode_publisher.publish(ExoMode(mode=ExoMode.STAND, node_type='joint_angles'))
         time.sleep(5)
-        node.exo_mode_publisher.publish(ExoMode(mode=ExoMode.SMALLWALK))
+        node.exo_mode_publisher.publish(ExoMode(mode=ExoMode.SMALLWALK, node_type='cartesian'))
         time.sleep(10)
         optimized_parameters = node.optimize()
         node.get_logger().info(f"Optimization complete. Optimized parameters: {optimized_parameters}")
