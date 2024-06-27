@@ -8,6 +8,8 @@ from tkinter import messagebox
 from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs
 from scipy.interpolate import interp1d
 
+LEG_LENGTH = 0.912
+
 def make_evenly_spaced_points(x, z, array_size):
     # Create an array of cumulative distances between points
     distances = np.sqrt(np.diff(x)**2 + np.diff(z)**2)
@@ -34,55 +36,104 @@ def calculate_bezier_curve(points, array_size = 100):
     return curve_points.T
 
 def create_bezier_csv(points, array_size, gait_type):
+    pause_time = int(array_size/3)
     step_length = points.max(axis=0)[0]
+    ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
+
+    # ------------------------------------------------- FIRST STEP ----------------------------------------------------------------------------------
+    phi_first_step = np.linspace(0, ending_angle, int(array_size))
+
+    # The stance leg follows a circle with radius LEG_LENGTH with center at (0, LEG_LENGTH). Sine and cosine are swapped from a usual circle, since we want the circle to start at the bottom and go backwards
+    x_stance_first_step = -LEG_LENGTH*np.sin(phi_first_step)
+    z_stance_first_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_first_step)
+
+    x_stance_first_step = np.append(x_stance_first_step, x_stance_first_step[-1]*np.ones(pause_time))
+    z_stance_first_step = np.append(z_stance_first_step, z_stance_first_step[-1]*np.ones(pause_time))
+
+    vertical_offset = z_stance_first_step[-1]
 
     first_step_points = points.copy()
     first_step_points[:, 0] = first_step_points[:, 0]/2
+    first_step_points[1:, 1] = first_step_points[1:, 1] + vertical_offset
+
     curvexz_first_step = bezier.Curve(first_step_points.T, degree=3)
     number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size))
     points_first_step= curvexz_first_step.evaluate_multi(number_of_time_points_first_step)
     x_swing_first_step = points_first_step[0,:]
     z_swing_first_step = points_first_step[1,:]
-    x_stance_first_step = np.linspace(0, 0 - (step_length/2), int(array_size))
-    # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
-    z_stance_first_step = [0]*int(array_size)
-    # z_swing_first_step = z_swing_first_step + z_stance_first_step
 
     x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size))
 
+    x_swing_first_step = np.append(x_swing_first_step, x_swing_first_step[-1]*np.ones(pause_time))
+    z_swing_first_step = np.append(z_swing_first_step, z_swing_first_step[-1]*np.ones(pause_time))
+
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
 
-    curvexz_complete_step = bezier.Curve(points.T, degree=3)
-    print(points.T)
+    plt.scatter(x_swing_first_step, z_swing_first_step)
+    plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
+    plt.title("First Step")
+    plt.show()
+
+    # ------------------------------------------------- FULL STEP ----------------------------------------------------------------------------------
+    phi_full_step = np.linspace(-ending_angle, ending_angle, int(array_size))
+
+    x_stance_complete_step = -LEG_LENGTH*np.sin(phi_full_step)
+    z_stance_complete_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_full_step)
+
+    x_stance_complete_step = np.append(x_stance_complete_step, x_stance_complete_step[-1]*np.ones(pause_time))
+    z_stance_complete_step = np.append(z_stance_complete_step, z_stance_complete_step[-1]*np.ones(pause_time))
+
+    full_step_points = points.copy()
+    full_step_points[:, 1] = full_step_points[:, 1] + vertical_offset
+
+    curvexz_complete_step = bezier.Curve(full_step_points.T, degree=3)
     number_of_time_points_complete_step = np.linspace(0, 1.0, array_size)
     points_complete_step= curvexz_complete_step.evaluate_multi(number_of_time_points_complete_step)
     x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
     z_swing_complete_step = points_complete_step[1,:]
-    x_stance_complete_step = np.linspace(0+(step_length/2), 0 - (step_length/2), array_size)
-    # z_stance_complete_step = compensation_for_circle(array_size, step_length)
-    z_stance_complete_step = [0]*array_size
-    # z_swing_complete_step = z_swing_complete_step + z_stance_complete_step
     
     x_swing_complete_step, z_swing_complete_step = make_evenly_spaced_points(x_swing_complete_step, z_swing_complete_step, array_size)
     
+    x_swing_complete_step = np.append(x_swing_complete_step, x_swing_complete_step[-1]*np.ones(pause_time))
+    z_swing_complete_step = np.append(z_swing_complete_step, z_swing_complete_step[-1]*np.ones(pause_time))
+
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
+
+    plt.plot(x_swing_complete_step, z_swing_complete_step)
+    plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
+    plt.title("Full Step")
+    plt.show()
+
+    # ------------------------------------------------- STEP CLOSE ----------------------------------------------------------------------------------
+    phi_step_close = np.linspace(0, -ending_angle, int(array_size))
+
+    x_stance_step_close = -LEG_LENGTH*np.sin(phi_step_close)
+    z_stance_step_close = LEG_LENGTH - LEG_LENGTH*np.cos(phi_step_close)
+
+    # x_stance_step_close = np.append(x_stance_step_close, x_stance_step_close[-1]*np.ones(pause_time))
+    # z_stance_step_close = np.append(z_stance_step_close, z_stance_step_close[-1]*np.ones(pause_time))
 
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
+    step_close_points[1:, 1] = step_close_points[1:, 1] + vertical_offset
     curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
     number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size))
     points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
     x_swing_step_close = points_step_close[0,:]
     z_swing_step_close = points_step_close[1,:]
-    x_stance_step_close = np.linspace(0, 0 - (-step_length/2), int(array_size))
-    # z_stance_first_step = compensation_for_circle(int(array_size/2), step_length/2)
-    z_stance_step_close = [0]*int(array_size)
-    # z_swing_first_step = z_swing_first_step + z_stance_first_step
 
     x_swing_step_close, z_swing_step_close = make_evenly_spaced_points(x_swing_step_close, z_swing_step_close, array_size)
 
+    # x_swing_step_close = np.append(x_swing_step_close, x_swing_step_close[-1]*np.ones(pause_time))
+    # z_swing_step_close = np.append(z_swing_step_close, z_swing_step_close[-1]*np.ones(pause_time))
+
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
+
+    plt.plot(x_swing_step_close, z_swing_step_close)
+    plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
+    plt.title("Full Step")
+    plt.show()
 
     if gait_type == "large_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')

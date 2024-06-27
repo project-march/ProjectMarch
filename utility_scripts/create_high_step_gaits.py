@@ -69,14 +69,14 @@ def high_step_down(dataset):
     return down_step
     
 
-high_step1_up = high_step_up(0.26, 200, 0.3)
+high_step1_up = high_step_up(0.26, 400, 0.3)
 high_step1_down = high_step_down(high_step1_up)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', high_step1_up, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1_down.csv', high_step1_down, delimiter=',')
-high_step2_up = high_step_up(0.22, 200, 0.3)
+high_step2_up = high_step_up(0.22, 400, 0.3)
 high_step2_down = high_step_down(high_step2_up)
-high_step3_up = high_step_up(0.18, 200, 0.3)
-high_step3_down = high_step_down(high_step2_up)
+high_step3_up = high_step_up(0.18, 400, 0.3)
+high_step3_down = high_step_down(high_step3_up)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step2.csv', high_step2_up, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step2_down.csv', high_step2_down, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step3.csv', high_step3_up, delimiter=',')
