@@ -1,7 +1,7 @@
 # March RQT Input Device
 **Author: Andrew Hutani, MIX**
 ## Overview
-This package is the implementation of the RQT input device, which allows the user to control the exoskeleton using a virtual button interface. In essence, the user can relay instructions to the whole ROS architecture using this packages. Note how the whole layout is dependant on the modes defined in the `modes.json` file in the `march_mode_machine` package. In this file, all possible exoModes are defined, which will all be tied to a button on the RQT Input Device. Note that exoMode::Error and exoMode::BootUp do **not** have a button in the RQT Input Device, since these should not be accessible by the user.
+This package is the implementation of the RQT input device, which allows the user to control the exoskeleton using a virtual button interface. In essence, the user can relay instructions to the whole ROS architecture using this package. Note how the whole layout is dependant on the modes defined in the `modes.json` file in the `march_mode_machine` package. In this file, all possible exoModes are defined, which will all be tied to a button on the RQT Input Device. Note that exoMode::Error and exoMode::BootUp do **not** have a button in the RQT Input Device, since these should not be accessible by the user.
 
 ## User Interface Structure
 The user interface of this plugin follows the classic Model-View-Controller (MVC) architectural pattern, which separates the application into three interconnected components. This allows for efficient code organization, modular design, and easier maintenance. Blame old Marchies for the naming convention, but in this case the following holds:
@@ -28,6 +28,18 @@ This MVC structure allows for a clear separation of concerns. Each component has
 
 ## Possible dependencies
 PyQt5 version <= 5.11.2
+
+## Known issues
+An issue that came up when launching the RQT input device, is the following error:
+```bash
+qt_gui_main() found no plugin matching "rqt_input_device"
+try passing the option "--force-discover"
+```
+This appears to be a problem with rqt caching the locations of plugins in its config and not updating that info. A workaround that works for me is delete that cache and relaunching the node:
+```
+rm ~/.config/ros.org/rqt_gui.ini
+```
+
 ## Node structure
 ### Client
 - `'get_exo_mode_array'` ([GetExoModeArray.srv](https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/srv/GetExoModeArray.srv))
