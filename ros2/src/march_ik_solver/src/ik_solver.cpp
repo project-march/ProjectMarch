@@ -12,6 +12,9 @@
 #include <boost/algorithm/clamp.hpp>
 #include <math.h>
 
+#include "ament_index_cpp/get_package_share_directory.hpp"
+#include "pinocchio/parsers/urdf.hpp"
+
 IKSolver::IKSolver()
 {
     m_dt = 1e-3; // s, 1 kHz control loop
@@ -123,6 +126,49 @@ void IKSolver::updateWorldToBaseOrientation(const double& w, const double& x, co
     for (const auto& task_name : m_task_names) {
         m_task_map.at(task_name)->setCurrentWorldToBaseOrientation(current_world_to_base_orientation);
     }
+}
+
+void IKSolver::configurePinocchioModel()
+{
+    // Load URDF model
+    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
+    pinocchio::urdf::buildModel(urdf_file_path, m_pinocchio_model);
+    m_pinocchio_data = std::make_unique<pinocchio::Data>(m_pinocchio_model);
+}
+
+void IKSolver::updatePinocchioModel(const Eigen::VectorXd& joint_positions)
+{
+    pinocchio::forwardKinematics(m_pinocchio_model, *m_pinocchio_data, joint_positions);
+}
+
+std::vector<Eigen::Vector3d> IKSolver::getEndEffectorPositions() const
+{
+    const int LEFT_FOOT_ID = 4;
+    const int RIGHT_FOOT_ID = 9;
+    int end_effector_ids[] = { LEFT_FOOT_ID, RIGHT_FOOT_ID };
+    std::vector<Eigen::Vector3d> end_effector_positions;
+
+    for (const auto& end_effector_id : end_effector_ids) {
+        Eigen::Vector3d end_effector_position = m_pinocchio_data->oMi[end_effector_id].translation();
+        end_effector_positions.push_back(end_effector_position);
+    }
+
+    return end_effector_positions;
+}
+
+std::vector<Eigen::Matrix3d> IKSolver::getEndEffectorOrientations() const
+{
+    const int LEFT_FOOT_ID = 4;
+    const int RIGHT_FOOT_ID = 9;
+    int end_effector_ids[] = { LEFT_FOOT_ID, RIGHT_FOOT_ID };
+    std::vector<Eigen::Matrix3d> end_effector_orientations;
+
+    for (const auto& end_effector_id : end_effector_ids) {
+        Eigen::Matrix3d end_effector_orientation = m_pinocchio_data->oMi[end_effector_id].rotation();
+        end_effector_orientations.push_back(end_effector_orientation);
+    }
+
+    return end_effector_orientations;
 }
 
 Eigen::VectorXd IKSolver::clampJointLimits(Eigen::VectorXd desired_joint_positions)
