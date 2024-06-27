@@ -200,7 +200,7 @@ march9:
             direction: 1
             minPositionIU: 176992
             maxPositionIU: 571303
-            zeroPositionIU: 235246
+            zeroPositionIU: 235176
             lowerSoftLimitMarginRad: 0.11798426
             upperSoftLimitMarginRad: 0.11798426
             lowerErrorSoftLimitMarginRad: 0.05899213

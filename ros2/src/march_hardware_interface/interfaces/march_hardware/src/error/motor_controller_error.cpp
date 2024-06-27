@@ -79,6 +79,7 @@ namespace error {
         "Unknown gains. ",
         "Controller initializing. ",
         "Unbalanced phases.",
+        "I2T limit violation.",
     };
 
     const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS = {
@@ -92,6 +93,9 @@ namespace error {
         "ABS SPI communication failure. ",
         "ABS SPI not ready. ",
         "Hall not calibrated yet. ",
+        "Unconnected cable. ",
+        "Unconnected AIE cable. ",
+        "Unsupported AIE encoder mode.",
     };
 
     const std::array<std::string, ODRIVE_TORQUESENSOR_ERRORS_SIZE> ODRIVE_TORQUESENSOR_ERRORS = {
@@ -109,7 +113,9 @@ namespace error {
         "Invalid estimate. ",
         "Invalid circular range. ",
         "Spinout detected (recalibrate, or replacing motor cable + recalibrate). ",
-        "Invalid weigths. ",
+        "Invalid weights. ",
+        "Target position delta too high. ",
+        "Controller moving in the wrong direction.",
     };
 
 
