@@ -26,7 +26,7 @@
 <xacro:macro name="march_joint"
              params="name type:=^|effort
                stop_when_outside_hard_limits:=^|true
-               msec_until_error_when_in_error_soft_limits:=^|1000">
+               msec_until_error_when_in_error_soft_limits:=^|100">
   <xacro:if value="${type != 'simulation'}">
     <xacro:effort_joint name="${name}"/>
   </xacro:if>
@@ -50,18 +50,16 @@
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
       <plugin>march_system_interface/MarchExoSystemInterface</plugin>
-      <param name="robot">march9</param>
+      <param name="robot">joints_airgaiting</param>
     </xacro:if>
   </hardware>
 
-  <xacro:march_joint name="left_ankle_dpf" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
-  <!-- <xacro:march_joint name="left_ankle_ie" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/> -->
-  <xacro:march_joint name="left_hip_aa" stop_when_outside_hard_limits="false"  msec_until_error_when_in_error_soft_limits="0"/>
+  <xacro:march_joint name="left_ankle_dpf"/>
+  <xacro:march_joint name="left_hip_aa"/>
   <xacro:march_joint name="left_hip_fe"/>
   <xacro:march_joint name="left_knee"/>
-  <xacro:march_joint name="right_ankle_dpf" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
-  <!-- <xacro:march_joint name="right_ankle_ie" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/> -->
-  <xacro:march_joint name="right_hip_aa" stop_when_outside_hard_limits="false" msec_until_error_when_in_error_soft_limits="0"/>
+  <xacro:march_joint name="right_ankle_dpf"/>
+  <xacro:march_joint name="right_hip_aa"/>
   <xacro:march_joint name="right_hip_fe"/>
   <xacro:march_joint name="right_knee"/>
 

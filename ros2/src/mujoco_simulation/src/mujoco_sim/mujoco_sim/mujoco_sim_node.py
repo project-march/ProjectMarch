@@ -12,6 +12,7 @@ from mujoco_interfaces.msg import MujocoDataSensing
 from mujoco_interfaces.msg import MujocoInput
 from mujoco_interfaces.msg import MujocoGains
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64MultiArray
 from mujoco_sim.mujoco_visualize import MujocoVisualizer
 from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
@@ -98,7 +99,7 @@ class MujocoSimNode(Node):
         self.declare_parameter("model_to_load")
         self.declare_parameter("aie_force")
 
-        self.SIM_TIMESTEP_ROS = 0.008
+        self.SIM_TIMESTEP_ROS = 0.001 # 1 kHz
         self.create_timer(self.SIM_TIMESTEP_ROS, self.sim_update_timer_callback)
         self.time_last_updated = self.get_clock().now()
         # Load in the model and initialize it as a Mujoco object.
@@ -115,8 +116,8 @@ class MujocoSimNode(Node):
 
         self.model_string = open(self.file_path, "r").read()
         self.model = mujoco.MjModel.from_xml_path(self.file_path)
-
         self.data = mujoco.MjData(self.model)
+        self.set_initial_keyframe(0)
 
         self.joint_names = get_joint_names(self.model)
         self.actuator_names = get_actuator_names(self.model)
@@ -157,12 +158,12 @@ class MujocoSimNode(Node):
                                                            self.model.sensor_type,
                                                            self.model.sensor_adr)
 
-        self.set_initial_keyframe(None)
 
         joint_val_dict = {}
         joint_val, _ = self.sensor_data_extraction.get_joint_pos()
-        for index, name in enumerate(self.actuator_names):
-            joint_val_dict[name] = joint_val[index]
+        for i, name in enumerate(self.joint_names):
+            if name in self.actuator_names:
+                joint_val_dict[name] = joint_val[i]
         self.get_logger().info(f"Keeping initial joint positions, "
                                f"set desired positions to {joint_val_dict}")
 
@@ -201,7 +202,7 @@ class MujocoSimNode(Node):
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT
-        self.TIME_STEP_TRAJECTORY = 0.008
+        self.TIME_STEP_TRAJECTORY = 0.001
         self.trajectory_last_updated = self.get_clock().now()
 
     def set_initial_keyframe(self, keyframe_id):
@@ -210,7 +211,7 @@ class MujocoSimNode(Node):
             return
         # mujoco.mj_step(self.model, self.data)
         mujoco.mj_resetDataKeyframe(self.model, self.data, keyframe_id)
-        # mujoco.mj_step(self.model, self.data)
+        mujoco.mj_step(self.model, self.data)
 
     def check_for_new_reference_update(self, time_current):
         """This checks if the new trajectory command should be sent.

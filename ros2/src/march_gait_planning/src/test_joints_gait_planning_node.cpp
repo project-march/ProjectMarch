@@ -47,26 +47,26 @@ TestJointsGaitPlanningNode::TestJointsGaitPlanningNode()
     m_joint_angle_trajectory_publisher = create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10); 
     RCLCPP_INFO(rclcpp::get_logger("march_gait_planning"), "Joint trajectory publisher created"); 
 
-    m_gait_planning.setGaitType(exoMode::BootUp); 
+    m_gait_planning.setGaitType(ExoMode::BootUp); 
 
     m_counter = 0;
 
-    m_home_stand = {-0.016, -0.03, 0.042, -0.0, -0.016, -0.03, 0.042, -0.0}; // This is already in alphabetical order
+    m_home_stand = {-0.016, -0.03, 0.042, 0.06, -0.016, -0.03, 0.042, 0.06}; // This is already in alphabetical order
 
     m_joint_index_mapping = generateJointIndexMapping(joints_actuated_index, joints_states_index); 
 
 }
 
 void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg){
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<exoMode>(msg->mode)).c_str()); 
+    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
     setActuatedJoint(msg->joint.data);
-    m_gait_planning.setGaitType((exoMode)msg->mode);
-    // if ((exoMode)msg->mode == exoMode::Walk){
+    m_gait_planning.setGaitType((ExoMode)msg->mode);
+    // if ((ExoMode)msg->mode == ExoMode::Walk){
     //     RCLCPP_INFO(this->get_logger(), "Actuated joint from callback: %d", m_actuated_joint); 
     //     // m_current_trajectory= m_gait_planning.getTrajectory(m_actuated_joint);
     // }
 
-    if ((exoMode)msg->mode == exoMode::Stand){
+    if ((ExoMode)msg->mode == ExoMode::Stand){
         m_counter = 0;
     }
 
@@ -76,18 +76,18 @@ void TestJointsGaitPlanningNode::currentModeCallback(const march_shared_msgs::ms
 void TestJointsGaitPlanningNode::footPositionsPublish(){
     // RCLCPP_INFO(rclcpp::get_logger("march_test_gait_planning_node"), "Current mode: %s", toString(m_gait_planning.getGaitType()).c_str());
     switch (m_gait_planning.getGaitType()){
-        case exoMode::BootUp: {
+        case ExoMode::BootUp: {
             m_counter = 0;
             break;
         }
 
-        case exoMode::Stand: {
+        case ExoMode::Stand: {
             processHomeStandGait();
             m_current_trajectory.clear();
             break;
         }
 
-        case exoMode::Walk: {
+        case ExoMode::Walk: {
             if (m_counter < INTERPOLATING_TIMESTEPS){
                 processHomeStandGait();
             }
@@ -97,6 +97,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                     //TODO: This gives an error: Mismatch between joint_names (1) and positions (0) at point #0.
                     RCLCPP_INFO(this->get_logger(), "Actuated joint for filling trajectory: %d", m_actuated_joint); 
                     m_current_trajectory = m_gait_planning.getTrajectory(m_actuated_joint);
+                    RCLCPP_INFO(this->get_logger(), "Trajectory size: %d", m_current_trajectory.size());
                 }
                 else{
                     double new_angle = m_current_trajectory.front();
@@ -108,7 +109,7 @@ void TestJointsGaitPlanningNode::footPositionsPublish(){
                     for (int i = 0; i < 8; i++) {
                         if (i == getActuatedJoint()) {
                             // This is the joint we want to actuate, set the new position
-                            m_joints_msg.data.push_back(new_angle + m_home_stand[i]);
+                            m_joints_msg.data.push_back(new_angle);
                         } else {
                             // This is not the joint we want to actuate, set the current position
                             m_joints_msg.data.push_back(m_home_stand[i]);
@@ -150,7 +151,7 @@ void TestJointsGaitPlanningNode::currentJointAnglesCallback(const march_shared_m
         selected_positions.push_back(msg->joint_state.position[index]);
     }
     
-    if (m_first_stand && m_gait_planning.getGaitType() == exoMode::Stand) {
+    if (m_first_stand && m_gait_planning.getGaitType() == ExoMode::Stand) {
         std::vector<double> point = msg->joint_state.position;
         if (point.size() >= 8) {
             m_gait_planning.setPrevPoint(selected_positions); // NOTE: also already in alphabetical order

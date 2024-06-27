@@ -10,13 +10,15 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>ament_index_python</depend>
+  <depend>ament_index_cpp</depend>
   <depend>std_msgs</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>trajectory_msgs</depend>
   <depend>march_shared_msgs</depend>
+  <depend>pinocchio</depend>
+  <depend>message_filters</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

@@ -4,17 +4,17 @@
 #include <iostream>
 
 IPD::IPD()
-    : m_current_mode (exoMode::BootUp)
+    : m_current_mode (ExoMode::BootUp)
 {
     std::cout << "IPD succesfully started" << std::endl;
 }
 
-exoMode IPD::getCurrentMode() const
+ExoMode IPD::getCurrentMode() const
 {
     return m_current_mode;
 }
 
-std::set<exoMode> IPD::getAvailableModes() const
+std::set<ExoMode> IPD::getAvailableModes() const
 {
     return m_available_modes;
 }
@@ -30,12 +30,12 @@ void IPD::askNewMode() const
     std::cout << '\n';
 }
 
-void IPD::setCurrentMode(const exoMode& current_mode)
+void IPD::setCurrentMode(const ExoMode& current_mode)
 {
     m_current_mode = current_mode;
 }
 
-void IPD::setAvailableModes(const std::set<exoMode>& available_modes)
+void IPD::setAvailableModes(const std::set<ExoMode>& available_modes)
 {
     m_available_modes = available_modes;
 }

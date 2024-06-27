@@ -19,20 +19,20 @@ private:
 
 TEST_F(ModeMachineTest, getCurrentModeTest)
 {
-    ASSERT_EQ(this->mode_machine->getCurrentMode(), (int)exoMode::BootUp);
+    ASSERT_EQ(this->mode_machine->getCurrentMode(), (int)ExoMode::BootUp);
 }
 
 TEST_F(ModeMachineTest, performTransitionSucces)
 {
-    this->mode_machine->performTransition(exoMode::Stand);
-    exoMode expectedMode = exoMode::Stand;
+    this->mode_machine->performTransition(ExoMode::Stand);
+    ExoMode expectedMode = ExoMode::Stand;
     ASSERT_EQ(this->mode_machine->getCurrentMode(), (int)expectedMode);
 }
 
 TEST_F(ModeMachineTest, performInvalidTansitionModeDontChange)
 {
-    this->mode_machine->performTransition(exoMode::Walk);
-    exoMode expectedMode = exoMode::BootUp;
+    this->mode_machine->performTransition(ExoMode::Walk);
+    ExoMode expectedMode = ExoMode::BootUp;
     ASSERT_EQ(this->mode_machine->getCurrentMode(), (int)expectedMode);
 }
 
