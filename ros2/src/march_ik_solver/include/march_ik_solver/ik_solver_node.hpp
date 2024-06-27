@@ -42,8 +42,10 @@ private:
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
     void newGaitCallback(const march_shared_msgs::msg::ExoMode::SharedPtr exo_mode_msg, 
         const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg);
+
     void publishJointTrajectory();
     void publishDesiredJointPositions();
+    void publishEstimatedFootPositions();
 
     void solveInverseKinematics(const rclcpp::Time& start_time);
     void updatePreviousJointTrajectoryPoint(const trajectory_msgs::msg::JointTrajectoryPoint& joint_trajectory_point);
@@ -78,13 +80,14 @@ private:
     std::shared_ptr<message_filters::Synchronizer<SyncPolicy_NewGait>> m_new_gait_sync;
 
     rclcpp::Subscription<march_shared_msgs::msg::IksCommand>::SharedPtr m_ik_solver_command_sub;
-    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_foot_positions_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_desired_foot_positions_sub;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
     rclcpp::Subscription<std_msgs::msg::Header>::SharedPtr m_clock_sub;
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
     rclcpp::Publisher<march_shared_msgs::msg::IksStatus>::SharedPtr m_iks_status_pub;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_estimated_foot_positions_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_callback_group;
     rclcpp::SubscriptionOptions m_subscription_options;
