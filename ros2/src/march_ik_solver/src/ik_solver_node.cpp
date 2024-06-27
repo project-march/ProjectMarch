@@ -26,19 +26,33 @@ IKSolverNode::IKSolverNode()
     m_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_subscription_options.callback_group = m_callback_group;
 
+    rclcpp::QoS qos(100);
+    auto rmw_qos_profile = qos.get_rmw_qos_profile();
+
+    m_new_gait_exo_mode_sub.subscribe(this, "current_mode", rmw_qos_profile);
+    m_new_gait_state_estimation_sub.subscribe(this, "state_estimation/state", rmw_qos_profile);
+    m_new_gait_sync.reset(new message_filters::Synchronizer<SyncPolicy_NewGait>(SyncPolicy_NewGait(10), m_new_gait_exo_mode_sub, m_new_gait_state_estimation_sub));
+    m_new_gait_sync->registerCallback(&IKSolverNode::newGaitCallback, this);
+
     // Create the subscriptions and publishers.
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
         "ik_solver/command", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
-    m_ik_solver_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_ik_solver_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
-    m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-        "state_estimation/state", rclcpp::SensorDataQoS(),
-        std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
+    // m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
+    //     "state_estimation/state", rclcpp::SensorDataQoS(),
+    //     std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
+    m_clock_sub = this->create_subscription<std_msgs::msg::Header>(
+        "state_estimation/clock", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_subscription_options);
+    
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "ik_solver/joint_trajectory", 10);
     m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
+    m_ik_solver_estimated_foot_positions_pub = this->create_publisher<march_shared_msgs::msg::IksFootPositions>(
+        "ik_solver/buffer/output", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
 
     RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
@@ -47,6 +61,17 @@ IKSolverNode::IKSolverNode()
 IKSolverNode::~IKSolverNode()
 {
     RCLCPP_WARN(this->get_logger(), "IKSolverNode has been stopped.");
+}
+
+void IKSolverNode::clockCallback(const std_msgs::msg::Header::SharedPtr msg)
+{
+    (void) msg;
+    // Publish the desired joint positions if there is a solution in the previous cycle.
+    if (m_has_solution) {
+        publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
+        publishEstimatedFootPositions(); // Publish the estimated foot positions for monitoring purposes.
+        m_has_solution = false;
+    }
 }
 
 void IKSolverNode::iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg)
@@ -64,6 +89,11 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     */
     std::vector<std::string> task_names = m_ik_solver->getTaskNames();
     if (task_names.empty()) {
+        return;
+    }
+
+    if (m_actual_joint_positions.empty() || m_actual_joint_velocities.empty()) {
+        RCLCPP_WARN(this->get_logger(), "Joint positions or velocities are empty.");
         return;
     }
 
@@ -103,13 +133,14 @@ void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEs
 
     m_current_world_to_base_orientation = Eigen::Quaterniond(
         msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
+}
 
-    // Publish the desired joint positions if there is a solution in the previous cycle.
-    if (m_has_solution) {
-        publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
-        publishJointTrajectory();       // Publish the desired joint trajectory to the torque controller.
-        m_has_solution = false;
-    }
+void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::SharedPtr exo_mode_msg, 
+    const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg)
+{
+    RCLCPP_INFO(this->get_logger(), "New gait callback.");
+    (void) exo_mode_msg;
+    stateEstimationCallback(state_estimation_msg);
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -160,6 +191,22 @@ void IKSolverNode::publishDesiredJointPositions()
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
 }
 
+void IKSolverNode::publishEstimatedFootPositions()
+{
+    m_ik_solver->updatePinocchioModel(m_desired_joint_positions);
+    std::vector<Eigen::Vector3d> estimated_foot_positions = m_ik_solver->getEndEffectorPositions();
+
+    march_shared_msgs::msg::IksFootPositions estimated_foot_positions_msg;
+    estimated_foot_positions_msg.header.stamp = this->now();
+    estimated_foot_positions_msg.left_foot_position.x = estimated_foot_positions[0].x();
+    estimated_foot_positions_msg.left_foot_position.y = estimated_foot_positions[0].y();
+    estimated_foot_positions_msg.left_foot_position.z = estimated_foot_positions[0].z();
+    estimated_foot_positions_msg.right_foot_position.x = estimated_foot_positions[1].x();
+    estimated_foot_positions_msg.right_foot_position.y = estimated_foot_positions[1].y();
+    estimated_foot_positions_msg.right_foot_position.z = estimated_foot_positions[1].z();
+    m_ik_solver_estimated_foot_positions_pub->publish(estimated_foot_positions_msg);
+}
+
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
 {
     uint32_t iteration = 0;
@@ -191,6 +238,12 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     iks_status_msg.end_time = this->now();
     iks_status_msg.duration = (iks_status_msg.end_time.nanosec - iks_status_msg.start_time.nanosec) * 1e-9;
     m_iks_status_pub->publish(iks_status_msg);
+
+    // Update actual joint positions and velocities.
+    m_actual_joint_positions = std::vector<double>(
+        m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
+    m_actual_joint_velocities = std::vector<double>(
+        m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
@@ -228,7 +281,11 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.multiplier", 1.0);
-    declare_parameter("joint.limits.positions.soft", std::vector<double>());
+
+    // Soft limits for the joint positions.
+    declare_parameter("actuator_names", std::vector<std::string>());
+    declare_parameter("actuator_soft_upper_limits", std::vector<double>());
+    declare_parameter("actuator_soft_lower_limits", std::vector<double>());
 
     m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -246,16 +303,20 @@ void IKSolverNode::configureIKSolverParameters()
     std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
     // Apply soft limits to the joint position limits.
-    RCLCPP_INFO(this->get_logger(), "Aplying soft limits to the joint position limits.");
-    std::vector<double> soft_limits = get_parameter("joint.limits.positions.soft").as_double_array();
-    if (soft_limits.size() != std::max(joint_position_limits_upper.size(), joint_position_limits_lower.size())) {
-        RCLCPP_WARN(this->get_logger(), "Soft limit size does not match the joint position limits size.");
-        exit(1);
-    }
+    std::vector<std::string> actuator_names = get_parameter("actuator_names").as_string_array();
+    std::vector<double> actuator_soft_upper_limits = get_parameter("actuator_soft_upper_limits").as_double_array();
+    std::vector<double> actuator_soft_lower_limits = get_parameter("actuator_soft_lower_limits").as_double_array();
+    
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
-        joint_position_limits_upper[i] -= soft_limits[i];
-        joint_position_limits_lower[i] += soft_limits[i];
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s, Upper limit: %f, Lower limit: %f",
+        auto it = std::find(actuator_names.begin(), actuator_names.end(), m_joint_names[i]);
+        RCLCPP_INFO(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
+            m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
+        if (it != actuator_names.end()) {
+            std::size_t actuator_id = std::distance(actuator_names.begin(), it);
+            joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_soft_upper_limits[actuator_id];
+            joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_soft_lower_limits[actuator_id];
+        }
+        RCLCPP_INFO(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
     }
 
@@ -299,6 +360,9 @@ void IKSolverNode::configureIKSolverParameters()
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
         RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
+
+    // Configure Pinocchio model.
+    m_ik_solver->configurePinocchioModel();
 
     // Initialize world-to-base orientation.
     m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
@@ -353,7 +417,7 @@ void IKSolverNode::configureIKSolutions()
 
 bool IKSolverNode::isWithinTimeWindow(const rclcpp::Time& time_stamp)
 {
-    return (this->now() - time_stamp) < rclcpp::Duration::from_seconds(m_state_estimator_time_offset);
+    return (this->now() - time_stamp) < rclcpp::Duration::from_seconds(0.8 * m_state_estimator_time_offset);
 }
 
 bool IKSolverNode::isWithinMaxIterations(const unsigned int& iterations)

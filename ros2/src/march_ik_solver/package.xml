@@ -18,6 +18,7 @@
   <depend>trajectory_msgs</depend>
   <depend>march_shared_msgs</depend>
   <depend>pinocchio</depend>
+  <depend>message_filters</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

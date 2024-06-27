@@ -56,12 +56,13 @@ void ModeMachineNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_R
 void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Response> response)
 {
-    RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Request received!");
+    RCLCPP_DEBUG(rclcpp::get_logger("mode_machine"), "Request received!");
     ExoMode new_mode = (ExoMode)request->desired_mode.mode;
     if (m_mode_machine.isValidTransition(new_mode))
     {
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
+        mode_msg.header.stamp = this->now();
         mode_msg.mode = m_mode_machine.getCurrentMode();
 
         auto it = modeNodeTypeMap.find((ExoMode)mode_msg.mode); 
@@ -85,7 +86,7 @@ void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_m
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Invalid mode transition! Ignoring new mode.");
     }
     fillExoModeArray(response);
-    RCLCPP_INFO(this->get_logger(), "Response sent!");
+    RCLCPP_DEBUG(this->get_logger(), "Response sent!");
 }
 /**
  * Main function to run the node.

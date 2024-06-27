@@ -27,6 +27,7 @@
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float64.hpp"
 
@@ -49,6 +50,7 @@ private:
     void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg);
 
+    void publishClock();
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
@@ -89,6 +91,8 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
+    
+    rclcpp::Publisher<std_msgs::msg::Header>::SharedPtr m_clock_pub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 
