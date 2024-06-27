@@ -1,6 +1,6 @@
 # For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march9:
-  network_interface_name: enp1s0
+  network_interface_name: enp2s0f0
   ecatCycleTime: 8
   ecatSlaveTimeout: 200
   joints:
@@ -105,9 +105,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 453543
-            maxPositionIU: 818338
-            zeroPositionIU: 453980
+            minPositionIU: 541190
+            maxPositionIU: 905664
+            zeroPositionIU: 541190
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154

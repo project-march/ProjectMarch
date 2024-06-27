@@ -37,7 +37,7 @@ class ServiceClient(Node):
 
         self.get_logger().info(COLOR_GREEN + 'Nodes activated! Ready to gait.' + RESET)
 
-        self.get_logger().info('Gait Planning node manager has been initialized')
+        self.get_logger().debug('Gait Planning node manager has been initialized')
 
     def publish_mode_to_gait_planning(self, msg):
         mode_msg = ExoMode()
@@ -46,7 +46,7 @@ class ServiceClient(Node):
         self.gaitplanning_mode_publisher.publish(mode_msg)
 
     def mode_callback(self, msg):   
-        self.get_logger().info(f'Received new mode! {msg.mode}\n')
+        # self.get_logger().info(f'Received new mode! {msg.mode}\n')
 
         if msg.mode == 1:
             if self.angles_active and self.cartesian_active:
@@ -92,7 +92,7 @@ class ServiceClient(Node):
         change_angles_state_request.transition = Transition(id=transition)
         change_angles_state_future = self.angles_client_change_state.call_async(change_angles_state_request)
 
-        self.get_logger().info('Service has been called.')
+        self.get_logger().debug('Service has been called.')
         return self.future
 
     def change_cartesian_state(self, transition: str) -> bool: 
@@ -103,7 +103,7 @@ class ServiceClient(Node):
         change_cartesian_state_request.transition = Transition(id=transition)
         change_cartesian_state_future = self.cartesian_client_change_state.call_async(change_cartesian_state_request)
 
-        self.get_logger().info('Service has been called.')
+        self.get_logger().debug('Service has been called.')
         return self.future
 
 def main(args=None):

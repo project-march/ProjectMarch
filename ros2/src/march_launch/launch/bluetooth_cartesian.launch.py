@@ -11,7 +11,22 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
-    """Generates the launch file for the march9 node structure."""
+    """Generates the launch file for the march8 node structure."""
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march8_v0.xml")
+    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
+    simulation = LaunchConfiguration("simulation", default="true")
+    rosbags = LaunchConfiguration("rosbags", default="true")
+    airgait = LaunchConfiguration("airgait", default="false")
+    robot = LaunchConfiguration("robot")
+    rviz = LaunchConfiguration("rviz", default="false")
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+    
+    # TODO: Configurable urdf
+    urdf_location = os.path.join(
+        get_package_share_directory("march_description"), "urdf", "march8", "hennie_with_koen.urdf")
+    with open(urdf_location, 'r') as infp:
+        robot_desc = infp.read()
+
     declared_arguments = [
         DeclareLaunchArgument(
             name="rosbags",
@@ -29,7 +44,7 @@ def generate_launch_description() -> LaunchDescription:
 
         DeclareLaunchArgument(
             name="robot",
-            default_value="march9",
+            default_value="march8",
             description="The name of the yaml that will be used for retrieving info about the exo.",
         ),
 
@@ -37,33 +52,8 @@ def generate_launch_description() -> LaunchDescription:
             name="IPD_new_terminal",
             default_value="true",
             description="Whether a new terminal should be openened, allowing you to give input.",
-        ),
-
-        DeclareLaunchArgument(
-            name="simulation",
-            default_value="true",
-            description="Whether the simulation should be launched.",
-            choices=["true", "false"],
-        ),
+        )
     ]
-
-    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
-    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
-    simulation = LaunchConfiguration("simulation", default="true")
-    rosbags = LaunchConfiguration("rosbags", default="true")
-    airgait = LaunchConfiguration("airgait", default="false")
-    robot = LaunchConfiguration("robot")
-    rviz = LaunchConfiguration("rviz", default="false")
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
-    ik_test = LaunchConfiguration("ik_test", default="false")
-    
-    # TODO: Configurable urdf
-    state_estimator_clock_period = 0.02
-    urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
-    with open(urdf_location, 'r') as infp:
-        robot_desc = infp.read()
-
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
@@ -85,7 +75,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_control"),
                 "launch",
-                "march9_controllers.launch.py",
+                "march8_controllers.launch.py",
             )
         ),
         launch_arguments=[("simulation", simulation)],
@@ -106,21 +96,21 @@ def generate_launch_description() -> LaunchDescription:
     #TODO: implement own input device M9 
 
     # region rqt input device
-    rqt_input_device = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_rqt_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("ping_safety_node", "true"),
-            ("use_sim_time", "false"),
-            ("layout", "training"),
-            ("testing", "false"),
-        ],
-    )
+    # rqt_input_device = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("march_rqt_input_device"),
+    #             "launch",
+    #             "input_device.launch.py",
+    #         )
+    #     ),
+    #     launch_arguments=[
+    #         ("ping_safety_node", "true"),
+    #         ("use_sim_time", "false"),
+    #         ("layout", "training"),
+    #         ("testing", "false"),
+    #     ],
+    # )
     # endregion
 
     # region Launch Safety
@@ -142,7 +132,7 @@ def generate_launch_description() -> LaunchDescription:
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
-                "mode_machine.launch.py",
+                "mode_machine_cartesian.launch.py",
             )
         ),
     )
@@ -157,46 +147,40 @@ def generate_launch_description() -> LaunchDescription:
                 "imu_launch.launch.py",
             )
         ),
-        condition=UnlessCondition(simulation),
     )
     # endregion
 
     # region Launch IPD
-    # ipd_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_ble_ipd"),
-    #             "launch",
-    #             "ble_ipd.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
-    # )
+    ipd_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_ble_ipd"),
+                "launch",
+                "ble_ipd.launch.py",
+            )
+        ),
+        launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+    )
     #endregion
-
 
     # region Launch State Estimator
     state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
 
     state_estimator = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([state_estimator_launch_dir, '/state_estimator.launch.py']),
-        launch_arguments=[
-            ("simulation", simulation),
-            ("clock_period", str(state_estimator_clock_period)),
-        ],
+        condition=UnlessCondition(airgait),
     )
     # endregion
 
     # region Launch IK Solver
     ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
+    # declare parameters
+    # in ms
+    trajectory_dt = 50
 
     ik_solver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-        launch_arguments=[
-            ("robot_description", urdf_location), 
-            ("state_estimator_timer_period", str(state_estimator_clock_period)),
-            ("test", ik_test),
-        ],
+        launch_arguments={'robot_description': urdf_location, "timestep": str(trajectory_dt)}.items(),
     )
     # endregion
 
@@ -244,27 +228,9 @@ def generate_launch_description() -> LaunchDescription:
         Node(
             package='march_gait_planning', 
             namespace='', 
-            executable='listener_gait_planning', 
-            name='listener_gait_planning', 
+            executable='gait_planning_node', 
+            name='march_gait_planning', 
         ),
-        Node(
-            package='gait_planning_manager', 
-            namespace='', 
-            executable='gait_planning_manager_node', 
-            name='gait_planning_manager', 
-        ),
-        Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_angles_node',
-            name='gait_planning_angles_node', 
-        ), 
-        Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_cartesian_node', 
-            name='gait_planning_cartesian_node', 
-        ), 
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -278,18 +244,17 @@ def generate_launch_description() -> LaunchDescription:
             executable='rviz2',
             name='rviz2',
             output='screen',
-            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
+            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen.rviz")],
             condition=IfCondition(rviz),
         ),
+
         mujoco_node,
-        state_estimator,
         march_control,
         mode_machine,
         record_rosbags_action,
-        safety_node,
         imu_nodes,
         ik_solver,
-        rqt_input_device, 
-        # ipd_node,
+        state_estimator,
+        ipd_node,
         # footstep_generator, 
     ])
