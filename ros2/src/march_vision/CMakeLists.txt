@@ -31,6 +31,9 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(realsense2 REQUIRED)
+find_package(CGAL REQUIRED)
+# TODO: Add ros2 foxy package for grid_map
+#find_package(grid_map REQUIRED) # foxy_devel branch
 
 find_package(pcl_conversions REQUIRED)
 find_package(PCL 1.10 REQUIRED COMPONENTS)
@@ -39,7 +42,6 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-#find_package(CGAL REQUIRED)
 
 include_directories(include)
 
@@ -47,15 +49,30 @@ add_library(${PROJECT_NAME} STATIC
 
     src/computer_vision_node.cpp
     src/computer_vision.cpp
-    # src/march_octree/march_octree_node.cpp
-    # src/march_octree/march_octree.cpp 
-    # src/march_octree/march_octree_utils.cpp 
-    # src/plane_segmentation/march_polygon.cpp 
-    # src/plane_segmentation/polygon_calculator.cpp 
-    #src/processing/cameras_interface.cpp
-    #src/processing/point_cloud_registration.cpp
-    #src/processing/input_source_manager.cpp
-
+    src/elevation_mapping/elevation_mapping.cpp
+    src/elevation_mapping/elevation_map.cpp
+    src/elevation_mapping/elevation_mapping_node.cpp
+    src/elevation_mapping/point_XYZ_RGB_confidence_ratio.cpp
+    src/elevation_mapping/robot_motion_map_updater.cpp
+    src/elevation_mapping/input_sources/input_source_manager.cpp
+    src/elevation_mapping/input_sources/input.cpp
+    src/elevation_mapping/postprocessing/postprocessing_pipeline_functor.cpp
+    src/elevation_mapping/postprocessing/postprocessing_worker.cpp
+    src/elevation_mapping/postprocessing/postprocessor_pool.cpp
+    src/elevation_mapping/sensor_processors/perfect_sensor_processor.cpp
+    src/elevation_mapping/sensor_processors/sensor_processor_base.cpp
+    src/elevation_mapping/sensor_processors/structured_light_sensor_processor.cpp
+    src/plane_segmentation/contour_segmentation.cpp
+    src/plane_segmentation/planar_image_segmentation.cpp
+    src/plane_segmentation/planar_region.cpp
+    src/plane_segmentation/plane_segmentation_pipeline_node.cpp
+    src/plane_segmentation/plane_segmentation_pipeline.cpp
+    src/plane_segmentation/polygon_decomposition.cpp
+    src/plane_segmentation/ransac_segmentation.cpp
+    src/plane_segmentation/visualization_utils.cpp
+    src/processing/camera_interface.cpp
+    src/processing/data_manager_node.cpp
+    src/processing/point_cloud_registration.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -70,6 +87,7 @@ ament_target_dependencies(${PROJECT_NAME}
     tf2_ros
     tf2
     tf2_geometry_msgs
+    visualization_msgs
 
     pcl_conversions
 )
@@ -78,14 +96,30 @@ add_executable(computer_vision_node
 
     src/computer_vision_node.cpp
     src/computer_vision.cpp
-    # src/march_octree/march_octree_node.cpp
-    # src/march_octree/march_octree.cpp 
-    # src/march_octree/march_octree_utils.cpp 
-    # src/plane_segmentation/march_polygon.cpp 
-    # src/plane_segmentation/polygon_calculator.cpp
-    #src/processing/cameras_interface.cpp
-    #src/processing/point_cloud_registration.cpp
-    #src/processing/input_source_manager.cpp
+    src/elevation_mapping/elevation_mapping.cpp
+    src/elevation_mapping/elevation_map.cpp
+    src/elevation_mapping/elevation_mapping_node.cpp
+    src/elevation_mapping/point_XYZ_RGB_confidence_ratio.cpp
+    src/elevation_mapping/robot_motion_map_updater.cpp
+    src/elevation_mapping/input_sources/input_source_manager.cpp
+    src/elevation_mapping/input_sources/input.cpp
+    src/elevation_mapping/postprocessing/postprocessing_pipeline_functor.cpp
+    src/elevation_mapping/postprocessing/postprocessing_worker.cpp
+    src/elevation_mapping/postprocessing/postprocessor_pool.cpp
+    src/elevation_mapping/sensor_processors/perfect_sensor_processor.cpp
+    src/elevation_mapping/sensor_processors/sensor_processor_base.cpp
+    src/elevation_mapping/sensor_processors/structured_light_sensor_processor.cpp
+    src/plane_segmentation/contour_segmentation.cpp
+    src/plane_segmentation/planar_image_segmentation.cpp
+    src/plane_segmentation/planar_region.cpp
+    src/plane_segmentation/plane_segmentation_pipeline_node.cpp
+    src/plane_segmentation/plane_segmentation_pipeline.cpp
+    src/plane_segmentation/polygon_decomposition.cpp
+    src/plane_segmentation/ransac_segmentation.cpp
+    src/plane_segmentation/visualization_utils.cpp
+    src/processing/camera_interface.cpp
+    src/processing/data_manager_node.cpp
+    src/processing/point_cloud_registration.cpp
 )
 
 target_include_directories(computer_vision_node PUBLIC
@@ -113,8 +147,8 @@ target_link_libraries(computer_vision_node
   ${PROJECT_NAME}
   ${realsense2_LIBRARY}
   ${PCL_LIBRARIES}
-  #${EIGEN3_INCLUDE_DIRS}
-  #${CGAL_LIBRARIES}
+  ${EIGEN3_INCLUDE_DIRS}
+  ${CGAL_LIBRARIES}
 )
 
 # Install targets and executables

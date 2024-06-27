@@ -9,6 +9,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include "march_vision/elevation_mapping/elevation_mapping.hpp"
 
+namespace elevation_mapping {
+
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
      
@@ -18,7 +20,7 @@ int main(int argc, char** argv) {
   // TODO: Fix ROS2 porting for filter chain, when using more threads
   nodeHandle->declare_parameter("postprocessor_num_threads", 1);
 
-  elevation_mapping::ElevationMapping elevationMap(nodeHandle);  
+  ElevationMapping elevationMap(nodeHandle);  
     
   rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), nodeHandle->get_parameter("num_callback_threads").as_int());
   executor.add_node(nodeHandle);
@@ -27,3 +29,4 @@ int main(int argc, char** argv) {
   rclcpp::shutdown();  
   return 0;
 }
+}  // namespace elevation_mapping

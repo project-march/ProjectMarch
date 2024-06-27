@@ -1,0 +1,13 @@
+march_vision:
+  ros__parameters:
+
+    cameras_used: "both" # ["left", "right", "both"]
+    left_camera_serial_number: 944622074337
+    right_camera_serial_number: 944622071535
+
+    realsense_camera_settings: # the specific parameters for each is in the code
+      decimation_filter: true
+      spatial_filter: true
+      temporal_filter: true
+      hole_filling_filter: true
+      threshold_filter: false

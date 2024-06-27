@@ -13,9 +13,18 @@ def generate_launch_description():
     march_vision_config = os.path.join(
                 get_package_share_directory('march_vision'),
                 'config',
-                ## TODO: Change to correct file for launching with exo
                 'march_vision_config.yaml'
             )
+    elevation_mapping_config = os.path.join(
+            get_package_share_directory('march_vision'),
+            'config',
+            'elevation_mapping_config.yaml'
+        )
+    plane_segmentation_config = os.path.join(
+            get_package_share_directory('march_vision'),
+            'config',
+            'plane_segmentation_config.yaml'
+        )
 
     return LaunchDescription([
         Node(
@@ -23,29 +32,22 @@ def generate_launch_description():
             executable='elevation_mapping_node',
             name='elevation_mapping',
             output='screen',
-            parameters=[march_vision_config],
+            parameters=[elevation_mapping_config],
         ),
 
-        Node(
-            package='march_vision',
-            executable='plane_segmentation_pipeline_node',
-            name='plane_segmentation_pipeline',
-            output='screen',
-            parameters=[march_vision_config],
-        ),
-
-        Node(
-            package='march_vision',
-            executable='computer_vision_node',
-            name='computer_vision',
-            output='screen',
-            parameters=[march_vision_config],
-        ),
-        # TODO: Add the test point cloud node 
-        # For debugging and testing with recorded point clouds
         # Node(
-        #     package='elevation_mapping',
-        #     executable="test_node_points",
-        #     name="test_node_points",
+        #     package='march_vision',
+        #     executable='plane_segmentation_pipeline_node',
+        #     name='plane_segmentation',
+        #     output='screen',
+        #     parameters=[plane_segmentation_config],
+        # ),
+
+        # Node(
+        #     package='march_vision',
+        #     executable='computer_vision_node',
+        #     name='march_vision',
+        #     output='screen',
+        #     parameters=[march_vision_config],
         # ),
     ])
