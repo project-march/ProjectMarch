@@ -2,6 +2,7 @@ plane_segmentation:
   ros__parameters:
 
     frequency_plane_segmentation_pipeline: 15.0 
+    postprocessing: false # TODO: Decide if we are going to use this
 
     planar_image_segmentation:
       kernel_size: 3                                        
@@ -25,8 +26,6 @@ plane_segmentation:
       cluster_epsilon: 0.041  
       normal_threshold: 25.0  
 
-    # TODO: Decide if we are going to postprocess plane_segmentation pipeline output
-    # postprocessing:
 
       
       

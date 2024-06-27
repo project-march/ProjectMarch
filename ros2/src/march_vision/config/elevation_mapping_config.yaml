@@ -6,7 +6,7 @@ elevation_mapping:
         type: pointcloud 
         topic: /right_camera/points
         queue_size: 1
-        publish_on_update: true # Whether to publish the elevation map after a callback from this source.
+        publish_on_update: true 
         # Sensor processors parameters for Realsense 435i
         sensor_processor:
           type: structured_light
@@ -24,7 +24,7 @@ elevation_mapping:
         type: pointcloud 
         topic: /left_camera/points
         queue_size: 1
-        publish_on_update: true # Whether to publish the elevation map after a callback from this source.
+        publish_on_update: true 
         # Sensor processors parameters for Realsense 435i
         sensor_processor:
           type: structured_light
