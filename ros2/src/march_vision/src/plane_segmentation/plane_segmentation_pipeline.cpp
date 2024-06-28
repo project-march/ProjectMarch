@@ -85,7 +85,7 @@ bool PlaneSegmentationPipeline::readParameters(){
   return true;
 }
 
-void ConvexPlaneExtractionROS::callback(const grid_map_msgs::GridMap& message) {
+void PlaneSegmentationNode::planeSegmentationCallback(const grid_map_msgs::GridMap& message) {
   //m_callback_timer.startTimer();
 
   // Convert message to map.
@@ -106,10 +106,9 @@ void ConvexPlaneExtractionROS::callback(const grid_map_msgs::GridMap& message) {
 
   m_region_publisher.publish(toMessage(planar_terrain));
 
-  // --- Visualize in Rviz --- Not published to the controller
-  // Add raw map
+  // --- Visualize in Rviz ---
+  // Not published to the controller
   planar_terrain.gridMap.add("elevation_raw", elevation_raw);
-
   planar_terrain.gridMap.add("segmentation");
   getSegmentation(planar_terrain.gridMap.get("segmentation"));
 

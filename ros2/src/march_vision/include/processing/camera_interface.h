@@ -17,6 +17,10 @@
 #include <tf2_eigen/tf2_eigen.h>
 #include <thread>
 #include <vector>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -30,7 +34,6 @@ class CameraInterface {
 public:
 
     explicit CameraInterface(rclcpp::Node* n, const std::string& left_or_right);
-    void readParameters(const std::vector<rclcpp::Parameter>& parameters);
     ~CameraInterface() = default;
 
 protected:
@@ -55,9 +58,11 @@ protected:
     clock_t m_last_frame_time;
     int m_frame_wait_counter;
     float m_frame_timeout;
+
     rs2::pipeline m_pipeline;
     rs2::config m_config;
     std::string m_serial_number;
+
     rs2::decimation_filter m_dec_filter;
     rs2::spatial_filter m_spat_filter;
     rs2::temporal_filter m_temp_filter;
@@ -66,15 +71,12 @@ protected:
     std::string m_other_frame_id;
     std::string m_current_frame_id;
     std::mutex m_mutex;
-    bool m_realsense_simulation;
-    double m_outlier_distance;
-    double m_height_zero_threshold;
-    double m_height_distance_coefficient;
-    int m_switch_factor;
-    int m_sample_size;
+
     // TODO: Do I need this?
     Point m_ORIGIN;
 
+    void declareParameters();
+    void initializeRealsenseCamera();
     PointCloud::Ptr pointsToPCL(const rs2::points& points);
     void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right);
 

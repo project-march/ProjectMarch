@@ -40,17 +40,19 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize cameras");
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
-    
-    // TODO: Implement this
-    if (!m_elevation_mapping_state_pub->) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to initialize elevation mapping.");
-        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
-    }
+    lifecycle_msgs::msg::Transition transition_msg = lifecycle_msgs::msg::Transition(1);
+    m_elevation_mapping_state_pub->publish(transition_msg);
+    if (m_plane_segmentation) { m_plane_segmentation_state_pub->publish(transition_msg); }
 
-    if (m_plane_segmentation && !configurePlaneSegmentation()) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to initialize plane segmentation.");
-        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
-    }
+    // if (!m_elevation_mapping_state_pub->) {
+    //     RCLCPP_ERROR(this->get_logger(), "Failed to initialize elevation mapping.");
+    //     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+    // }
+
+    // if (m_plane_segmentation && !configurePlaneSegmentation()) {
+    //     RCLCPP_ERROR(this->get_logger(), "Failed to initialize plane segmentation.");
+    //     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+    // }
 
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is fully configured.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -60,8 +62,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
 {
     (void) state;
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is activating...");
-
-    
+    lifecycle_msgs::msg::Transition transition_msg = lifecycle_msgs::msg::Transition(3);
+    m_elevation_mapping_state_pub->publish(transition_msg);
+    if (m_plane_segmentation) { m_plane_segmentation_state_pub->publish(transition_msg); }
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is active");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -70,7 +73,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
 {
     (void) state;
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is deactivating...");
-
+    lifecycle_msgs::msg::Transition transition_msg = lifecycle_msgs::msg::Transition(4);
+    m_elevation_mapping_state_pub->publish(transition_msg);
+    if (m_plane_segmentation) { m_plane_segmentation_state_pub->publish(transition_msg); }
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is inactive");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -79,7 +84,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
 {
     (void) state;
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node is cleaning up...");
-
+    lifecycle_msgs::msg::Transition transition_msg = lifecycle_msgs::msg::Transition(2);
+    m_elevation_mapping_state_pub->publish(transition_msg);
+    if (m_plane_segmentation) { m_plane_segmentation_state_pub->publish(transition_msg); }
     RCLCPP_INFO(this->get_logger(), "Computer Vision Node has been cleaned up");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -87,7 +94,10 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn ComputerVisionNode::on_shutdown(const rclcpp_lifecycle::State& state)
 {
     (void) state;
-    RCLCPP_INFO(this->get_logger(), "Computer Vision Node is shutting down...");
+    lifecycle_msgs::msg::Transition transition_msg = lifecycle_msgs::msg::Transition(7);
+    m_elevation_mapping_state_pub->publish(transition_msg);
+    if (m_plane_segmentation) { m_plane_segmentation_state_pub->publish(transition_msg); }
+    RCLCPP_INFO(this->get_logger(), "Computer Vision Node has shut down.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -158,19 +168,16 @@ void ComputerVisionNode::configurePublishers()
     rclcpp_lifecycle::LifecyclePublisher<lifecycle_msgs::msg::Transition>::SharedPtr m_plane_segmentation_state_pub;
     m_elevation_mapping_state_pub = this->create_publisher<lifecycle_msgs::msg::Transition>("/elevation_mapping/transition_event", 10);
     m_plane_segmentation_state_pub = this->create_publisher<lifecycle_msgs::msg::Transition>("/plane_segmentation/transition_event", 10);
-    lifecycle_msgs::msg::Transition transition_msg;
 }
 
 void ComputerVisionNode::configureSubscriptions()
 {
     if (m_cameras_used == "both" || m_cameras_used == "left") {
-        m_left_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_left/depth/color/points", 100);
+        m_left_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_left/depth/color/points", 10);
     }
-
     if (m_cameras_used == "both" || m_cameras_used == "right") {
-        m_right_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_right/depth/color/points", 100);
+        m_right_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_right/depth/color/points", 10);
     }
-
     if (m_cameras_used == "both" && m_left_camera_sub && m_right_camera_sub) {
         // Synchronize left and right camera messages
         m_sync = std::make_shared<message_filters::Synchronizer<m_sync_policy>>(m_sync_policy(100), *m_left_camera_sub, *m_right_camera_sub);
@@ -183,6 +190,8 @@ void ComputerVisionNode::configureSubscriptions()
             m_right_camera_sub->registerCallback(std::bind(&InputSourceManagerNode::singleCameraCallback, this, std::placeholders::_1));
         }
     }
+
+    m_exo_mode_sub = std::make_shared<rclcpp::Subscription<march_shared_msgs::msg::ExoMode>>(this, "/current_mode", 10);
 }
 
 void ComputerVisionNode::singleCameraCallback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
@@ -203,7 +212,8 @@ void ComputerVisionNode::dualCameraCallback(
     m_right_camera_interface.processPointCloud(right_msg);
 }
 
-void ComputerVisionNode::exoModeCallback(const std_msgs::msg::ExoMode::SharedPtr msg)
+// Cybathlon specific setup
+void ComputerVisionNode::exoModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
 {
     // TODO: Implement switch case / state machine for different modes
     m_exo_mode = msg->mode.to_string();
