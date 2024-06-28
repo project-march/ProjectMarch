@@ -161,10 +161,10 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
         = m_observation.right_foot_position - orientation_matrix * (m_state.right_foot_position - m_state.imu_position);
     
     // Compute the innovation for the left and right foot slippage
-    innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.inverse());
-    innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
-        = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.inverse());
+    // innovation.segment<3>(MEASUREMENT_INDEX_LEFT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.left_foot_slippage * m_state.imu_orientation.inverse());
+    // innovation.segment<3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
+    //     = computeEulerAngles(m_observation.right_foot_slippage * m_state.imu_orientation.inverse());
 
     #ifdef DEBUG
     std::cout << "Innovation: " << innovation.transpose() << std::endl;

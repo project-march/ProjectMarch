@@ -24,7 +24,7 @@ def generate_launch_description():
         'march9',
         'march9.urdf'
     )
-    force_stance_threshold = 65.0
+    force_stance_threshold = 15.0
 
     sensor_fusion_noise_parameters_config = os.path.join(
         get_package_share_directory('march_state_estimator'),

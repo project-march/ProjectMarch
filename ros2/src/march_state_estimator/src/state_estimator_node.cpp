@@ -29,6 +29,15 @@ StateEstimatorNode::StateEstimatorNode(): LifecycleNode("state_estimator")
     RCLCPP_INFO(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode is initializing...");
     declareParameters();
     RCLCPP_INFO(rclcpp::get_logger("march_state_estimator"), "StateEstimatorNode has been created.\nOn standby for configuration.");
+
+    // Delay the initialization of the node until the lifecycle manager activates it
+    rclcpp::Time start_time = this->now();
+    int timeout = 10; // s
+    while (this->now() - start_time < rclcpp::Duration(std::chrono::seconds(timeout))) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting to stabilize...");
+    }
+    this->on_configure(this->get_current_state());
+    this->on_activate(this->get_current_state());
 }
 
 StateEstimatorNode::~StateEstimatorNode()
