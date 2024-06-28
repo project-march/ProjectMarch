@@ -16,7 +16,7 @@ ComputerVisionNode::ComputerVisionNode(): LifecycleNode("march_vision")
 {
     RCLCPP_INFO(this->get_logger(), "ComputerVisionNode is initializing...");
     declareParameters();
-    RCLCPP_INFO(this->get_logger(), "ComputerVisionNode has been created.\nOn standby for configuration.");
+    RCLCPP_INFO(this->get_logger(), "ComputerVisionNode has been created.\n On standby for configuration.");
 }
 
 ComputerVisionNode::~ComputerVisionNode()
@@ -40,8 +40,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize cameras");
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
-
-    if (!configureElevationMapping()) {
+    
+    // TODO: Implement this
+    if (!m_elevation_mapping_state_pub->) {
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize elevation mapping.");
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
     }
@@ -104,10 +105,18 @@ void ComputerVisionNode::declareParameters()
 
     declare_parameter("plane_segmentation", bool());
 }
+
 void ComputerVisionNode::configureParameters()
 {
     // TODO: Check what default should be 
-    m_exo_mode = "Unknown"
+    m_exo_mode = "Unknown";
+    m_realsense_camera_settings = RealsenseCameraSettings{
+        false, // decimation_filter
+        false, // spatial_filter
+        false, // temporal_filter
+        false, // hole_filling_filter
+        false  // threshold_filter
+    };
 
     get_parameter("cameras_used", m_cameras_used);
     get_parameter("left_camera_serial_number", m_left_camera_serial_number);
@@ -121,38 +130,26 @@ void ComputerVisionNode::configureParameters()
 
     get_parameter("plane_segmentation", m_plane_segmentation);
 }
+
 bool ComputerVision::configureCameras()
 {
-    // Initialize the camera interfaces
-    m_left_camera_interface = CameraInterface(this, "left");
-    m_right_camera_interface = CameraInterface(this, "right");
-
-    // Initialize the camera interfaces
-    if (!m_left_camera_interface.initializeCamera(m_left_camera_serial_number, m_realsense_camera_settings)) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to initialize left camera");
-        return false;
+    if (m_cameras_used == "both" || m_cameras_used == "left") {
+        m_left_camera_interface = CameraInterface(this, "left", m_realse_camera_settings);
+        if (!m_left_camera_interface.initializeCamera(m_left_camera_serial_number)) {
+            RCLCPP_ERROR(this->get_logger(), "Failed to initialize left camera");
+            return false;
+        }
     }
 
-    if (!m_right_camera_interface.initializeCamera(m_right_camera_serial_number, m_realsense_camera_settings)) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to initialize right camera");
-        return false;
+    if (m_cameras_used == "both" || m_cameras_used == "right") {
+        m_right_camera_interface = CameraInterface(this, "right", m_realsense_camera_settings);
+        if (!m_right_camera_interface.initializeCamera(m_right_camera_serial_number)) {
+            RCLCPP_ERROR(this->get_logger(), "Failed to initialize right camera");
+            return false;
+        }
     }
 
     return true;
-}
-
-bool ComputerVisionNode::configureElevationMapping()
-{
-    transition_msg.transition.id = lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE;
-    transition_msg.transition.label = "Configuring";
-    m_elevation_mapping_state_pub->publish(transition_msg);
-}
-
-bool ComputerVisionNode::configurePlaneSegmentation()
-{
-    transition_msg.transition.id = lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE;
-    transition_msg.transition.label = "Configuring";
-    m_plane_segmentation_state_pub->publish(transition_msg);
 }
 
 void ComputerVisionNode::configurePublishers()
@@ -166,15 +163,36 @@ void ComputerVisionNode::configurePublishers()
 
 void ComputerVisionNode::configureSubscriptions()
 {
-    m_exo_mode_sub = this->create_subscription<std_msgs::msg::ExoMode>("current_mode", 
-                                               10, std::bind(&ComputerVisionNode::exoModeCallback, this, std::placeholders::_1));
-    m_left_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_left/depth/color/points", 100);
-    m_right_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_right/depth/color/points", 100);
+    if (m_cameras_used == "both" || m_cameras_used == "left") {
+        m_left_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_left/depth/color/points", 100);
+    }
 
-    // Syncing the left and right camera topics
-    m_sync = std::make_shared<message_filters::Synchronizer<m_sync_policy>>(m_sync_policy(100), *m_left_camera_sub, *m_right_camera_sub);
-    m_sync->registerCallback(std::bind(&InputSourceManagerNode::dualCameraCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (m_cameras_used == "both" || m_cameras_used == "right") {
+        m_right_camera_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>>(this, "cameras_right/depth/color/points", 100);
+    }
 
+    if (m_cameras_used == "both" && m_left_camera_sub && m_right_camera_sub) {
+        // Synchronize left and right camera messages
+        m_sync = std::make_shared<message_filters::Synchronizer<m_sync_policy>>(m_sync_policy(100), *m_left_camera_sub, *m_right_camera_sub);
+        m_sync->registerCallback(std::bind(&InputSourceManagerNode::dualCameraCallback, this, std::placeholders::_1, std::placeholders::_2));
+    } else {
+        if (m_left_camera_sub) {
+            m_left_camera_sub->registerCallback(std::bind(&InputSourceManagerNode::singleCameraCallback, this, std::placeholders::_1));
+        }
+        if (m_right_camera_sub) {
+            m_right_camera_sub->registerCallback(std::bind(&InputSourceManagerNode::singleCameraCallback, this, std::placeholders::_1));
+        }
+    }
+}
+
+void ComputerVisionNode::singleCameraCallback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
+{
+    // TODO: Check if these are the correct header frame ids
+    if (msg->header.frame_id == "left_camera") {
+        m_left_camera_interface.processPointCloud(msg);
+    } else if (msg->header.frame_id == "right_camera") {
+        m_right_camera_interface.processPointCloud(msg);
+    }
 }
 
 void ComputerVisionNode::dualCameraCallback(
