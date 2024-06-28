@@ -88,6 +88,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is activating...");
 
     // Activate lifecycle publishers
+    m_clock_pub->on_activate();
     m_state_estimation_pub->on_activate();
     m_feet_height_pub->on_activate();
     m_torque_left_pub->on_activate();
@@ -114,6 +115,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     (void) state;
     RCLCPP_INFO(this->get_logger(), "State Estimator Node is deactivating...");
 
+    m_clock_pub->on_deactivate();
     m_state_estimation_pub->on_deactivate();
     m_feet_height_pub->on_deactivate();
     m_torque_left_pub->on_deactivate();
