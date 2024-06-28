@@ -20,46 +20,38 @@ def plot_joints(dataset):
     plt.show()
 
 def stand_to_sit():
-    time_points = 70
-    lhaa = np.linspace(-0.055, -0.055, time_points)
-    lhfe = np.linspace(0.03490, 1.57, time_points)
-    lkfe = np.linspace(0.185, 1.57, time_points)
-    ladpf = np.linspace(0.162, 0.162, time_points)
+    time_points = 125
+    adpf = np.linspace(0.095, 0.087, time_points)
+    haa = np.linspace(-0.083, -0.065, time_points)
+    hfe = np.linspace(-0.014, 1.57, time_points)
+    kfe = np.linspace(0.081, 1.57, time_points)
 
-    rhaa = np.linspace(-0.055, -0.055, time_points)
-    rhfe = np.linspace(0.03490, 1.57, time_points)
-    rkfe = np.linspace(0.185, 1.57, time_points)
-    radpf = np.linspace(0.162, 0.162, time_points)
 
     # joint_angles_dataset = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
     # ])
 
     joint_angles_dataset = np.column_stack([
-        ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
+        adpf, haa, hfe, kfe, adpf, haa, hfe, kfe
     ])
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv', 
                joint_angles_dataset, delimiter=',')
 
 def sit_to_stand():
-    time_points = 70
-    lhaa = np.linspace(-0.055, -0.055, time_points)
-    lhfe = np.linspace(1.57, 0.03490, time_points)
-    lkfe = np.linspace(1.57, 0.185, time_points)
-    ladpf = np.linspace(0.162, 0.162, time_points)
+    time_points = 125
+    adpf = np.linspace(0.087, 0.095, time_points)
+    haa = np.linspace(-0.065, -0.083, time_points)
+    hfe = np.linspace(1.57, -0.014, time_points)
+    kfe = np.linspace(1.57, 0.081, time_points)
 
-    rhaa = np.linspace(-0.055, -0.055, time_points)
-    rhfe = np.linspace(1.57, 0.03490, time_points)
-    rkfe = np.linspace(1.57, 0.185, time_points)
-    radpf = np.linspace(0.162, 0.162, time_points)
 
     # sit_to_stand = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
     # ])
 
     sit_to_stand = np.column_stack([
-        ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
+        adpf, haa, hfe, kfe, adpf, haa, hfe, kfe
     ])
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
