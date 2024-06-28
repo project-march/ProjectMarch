@@ -34,9 +34,9 @@ class MujocoVisualizer:
         self.cam.type = 1
         self.cam.distance = 3.0
         self.cam.azimuth = 140.0
-        self.cam.trackbodyid = 2
-        self.cam.elevation = 1
-        self.cam.lookat[2] = 0.5
+        self.cam.trackbodyid = data.body("safety_catcher").id
+        self.cam.elevation = 2
+        self.cam.lookat[2] = 0.1
 
         self.scene = mujoco.MjvScene(model, maxgeom=10000)
         self.context = mujoco.MjrContext(model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
@@ -57,3 +57,16 @@ class MujocoVisualizer:
 
         mujoco.glfw.glfw.swap_buffers(self.window)
         mujoco.glfw.glfw.poll_events()
+
+    def modify_camera_attributes(self, cam_attributes):
+        """This function modifies the camera attributes.
+
+        Args:
+            cam_attributes (dict): A dictionary containing the camera attributes
+        """
+        self.cam.azimuth = cam_attributes["azimuth"]
+        self.cam.elevation = cam_attributes["elevation"]
+        self.cam.distance = cam_attributes["distance"]
+        self.cam.lookat[0] = cam_attributes["lookat"][0]
+        self.cam.lookat[1] = cam_attributes["lookat"][1]
+        self.cam.lookat[2] = cam_attributes["lookat"][2]
