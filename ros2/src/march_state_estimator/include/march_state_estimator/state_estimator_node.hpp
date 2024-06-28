@@ -15,6 +15,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
@@ -26,10 +27,11 @@
 #include "march_shared_msgs/srv/get_node_position.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/float64.hpp"
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/sensor_fusion.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
@@ -48,10 +50,20 @@ private:
     void imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
     void imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg);
 
+    void publishClock();
     void publishStateEstimation();
     void publishFeetHeight();
     void publishMPCEstimation();
-    void publishTorqueEstimation();
+    void publishGroundReactionForce();
+
+    void broadcastTransformToTf2();
+    void checkJointStateTimeout();
+    void checkImuTimeout();
+    geometry_msgs::msg::TransformStamped getCurrentTransform(const std::string& parent_frame, const std::string& child_frame);
+    geometry_msgs::msg::Pose getCurrentPose(const std::string& parent_frame, const std::string& child_frame);
+    std::vector<geometry_msgs::msg::Pose> getCurrentPoseArray(const std::string& parent_frame, const std::vector<std::string>& child_frames);
+
+    bool m_is_simulation;
 
     double m_dt;
     sensor_msgs::msg::JointState::SharedPtr m_joint_state;
@@ -69,11 +81,18 @@ private:
 
     std::vector<Eigen::Vector3d> m_force_feet;
 
+    double m_joint_state_timeout;
+    double m_imu_timeout;
+    rclcpp::Time m_joint_state_last_update;
+    rclcpp::Time m_imu_last_update;
+
     rclcpp::TimerBase::SharedPtr m_timer;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
     rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr m_imu_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr m_imu_velocity_sub;
+    
+    rclcpp::Publisher<std_msgs::msg::Header>::SharedPtr m_clock_pub;
     rclcpp::Publisher<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_pub;
     rclcpp::Publisher<march_shared_msgs::msg::FeetHeightStamped>::SharedPtr m_feet_height_pub;
 

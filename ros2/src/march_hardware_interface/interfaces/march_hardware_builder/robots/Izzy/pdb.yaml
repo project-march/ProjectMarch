@@ -1,0 +1,7 @@
+power_distribution_board:
+  network_interface_name: name
+  ecatCycleTime: 0
+  ecatSlaveTimeout: 0
+  power_distribution_board:
+      slaveIndex: 0
+      byteOffset: 0

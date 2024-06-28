@@ -21,7 +21,7 @@ def create_enum_from_json(json_filename):
     data = [item for sublist in data for item in sublist]
 
     # Create a dictionary where the keys are the names and the values are the exoModes
-    data_dict = {item['name']: item['exoMode'] for item in data}
+    data_dict = {item['name']: item['ExoMode'] for item in data}
 
     return NamedEnum('ExoMode', data_dict)
 

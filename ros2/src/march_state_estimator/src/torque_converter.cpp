@@ -10,7 +10,7 @@
 #include "kdl/chainidsolver_recursive_newton_euler.hpp"
 #include "urdf/model.h"
 
-#include "march_state_estimator/robot_joint.hpp"
+#include "march_state_estimator/robot_description/robot_joint.hpp"
 #include <math.h>
 
 TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_description, const std::string& urdf_file_path)
@@ -43,12 +43,12 @@ TorqueConverter::TorqueConverter(std::shared_ptr<RobotDescription> robot_descrip
     }
 
     // Get the left and right legs from the KDL tree and store them in the class.
-    if (!kdl_tree.getChain("backpack", "L_ground", m_kdl_chain_leg_left)) {
+    if (!kdl_tree.getChain("backpack", "L_heel", m_kdl_chain_leg_left)) {
         RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"), "Could not get left leg chain from KDL tree.");
         return;
     }
 
-    if (!kdl_tree.getChain("backpack", "R_ground", m_kdl_chain_leg_right)) {
+    if (!kdl_tree.getChain("backpack", "R_heel", m_kdl_chain_leg_right)) {
         RCLCPP_ERROR(rclcpp::get_logger("state_estimator_node"), "Could not get right leg chain from KDL tree.");
         return;
     }

@@ -16,7 +16,7 @@ class GainScheduler {
         std::vector<std::tuple<std::string, double, double, double>> getAllPidValues();
         std::vector<std::tuple<std::string, double, double, double>> getAllJointStatePidValues(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
         std::vector<std::tuple<std::string, double, double, double>> getInterpolatedPidValues();
-        void setConfigPath(const exoMode &new_gait_type);
+        void setConfigPath(const ExoMode &new_gait_type);
         void startInterpolation() {m_interpolating = true;}
         void stopInterpolation() {m_interpolating = false;}      
         bool isInterpolating() {return m_interpolating;}
@@ -26,7 +26,7 @@ class GainScheduler {
         double m_total_time = 0.89;
     private: 
         std::tuple<std::string, double, double, double> getPidValues(const std::string& joint, double current_position);
-        exoMode m_gait_type; 
+        ExoMode m_gait_type; 
         YAML::Node m_config;
         std::vector<std::tuple<std::string, double, double, double>> m_old_pid_values;
         std::vector<std::tuple<std::string, double, double, double>> m_new_pid_values;

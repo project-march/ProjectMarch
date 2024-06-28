@@ -11,7 +11,6 @@ find_package(ament_cmake REQUIRED)
 find_package(xacro REQUIRED)
 find_package(urdf REQUIRED)
 
-
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
 install(DIRECTORY urdf

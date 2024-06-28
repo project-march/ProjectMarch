@@ -23,11 +23,11 @@ private:
 public:
     using iterator = std::vector<Joint>::iterator;
 
-    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger, ::std::string if_name,
+    MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger, ::std::string network_interface_name,
         int ecatCycleTime, int ecatSlaveTimeout);
 
     MarchRobot(::std::vector<Joint> jointList, std::shared_ptr<march_logger::BaseLogger> logger,
-        ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout,
+        ::std::string network_interface_name, int ecatCycleTime, int ecatSlaveTimeout,
         std::optional<PowerDistributionBoard>);
 
     ~MarchRobot();
