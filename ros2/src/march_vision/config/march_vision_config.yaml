@@ -11,3 +11,5 @@ march_vision:
       temporal_filter: true
       hole_filling_filter: true
       threshold_filter: false
+    
+    plane_segmentation: true

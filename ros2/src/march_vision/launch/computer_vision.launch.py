@@ -35,19 +35,19 @@ def generate_launch_description():
             parameters=[elevation_mapping_config],
         ),
 
-        # Node(
-        #     package='march_vision',
-        #     executable='plane_segmentation_pipeline_node',
-        #     name='plane_segmentation',
-        #     output='screen',
-        #     parameters=[plane_segmentation_config],
-        # ),
+        Node(
+            package='march_vision',
+            executable='plane_segmentation_pipeline_node',
+            name='plane_segmentation',
+            output='screen',
+            parameters=[plane_segmentation_config],
+        ),
 
-        # Node(
-        #     package='march_vision',
-        #     executable='computer_vision_node',
-        #     name='march_vision',
-        #     output='screen',
-        #     parameters=[march_vision_config],
-        # ),
+        Node(
+            package='march_vision',
+            executable='computer_vision_node',
+            name='march_vision',
+            output='screen',
+            parameters=[march_vision_config],
+        ),
     ])
