@@ -29,8 +29,8 @@ SensorFusion::SensorFusion(double timestep) {
     m_state.imu_position = Eigen::Vector3d(0.0, 0.0, 1.0295092403533455);
     m_state.imu_velocity = Eigen::Vector3d::Zero();
     m_state.imu_orientation = Eigen::Quaterniond::Identity();
-    m_state.left_foot_position = Eigen::Vector3d(0.24743795173789007, 0.10789731603419578, 0.0);
-    m_state.right_foot_position = Eigen::Vector3d(0.24743795173789007, -0.10789731603419578, 0.0);
+    m_state.left_foot_position = Eigen::Vector3d(0.24919716760324423, 0.18988430009579504, 0.0);
+    m_state.right_foot_position = Eigen::Vector3d(0.24919716760324423, -0.18988430009579504, 0.0);
     m_state.accelerometer_bias = Eigen::Vector3d::Zero();
     m_state.gyroscope_bias = Eigen::Vector3d::Zero();
     m_state.left_foot_slippage = Eigen::Quaterniond::Identity();

@@ -507,7 +507,7 @@ class XMLModel:
             y = -1.0
             keyframes_str = f"<key name='train' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} 0 0 0 0 0 0 0 0 0 0'/>"
         else:
-            keyframes_str = f"<key name='stand' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} 0 0 0 0 0 0 0 0 0 0'/>"
+            keyframes_str = f"<key name='stand' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} -0.082 0 0 0 0 -0.082 0 0 0 0'/>"
 
         return prefix_keyframes_str + keyframes_str + suffix_keyframes_str
 
