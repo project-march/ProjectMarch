@@ -12,6 +12,10 @@ using std::placeholders::_1;
 
 int INTERPOLATING_TIMESTEPS = 100;
 
+#define COLOR_GREEN   "\033[32m"
+#define RESET   "\033[0m"
+#define COLOR_PERIWINKLE   "\033[38;5;147m"
+
 struct CSVRow {
     std::string left_hip_aa;
     std::string left_hip_fe;
@@ -47,7 +51,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_gait_planning.setPrevGaitType(ExoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
     m_gait_planning.setHomeStand(m_gait_planning.getStandToSitGait()[0]); 
-    RCLCPP_INFO(this->get_logger(), "Joint angles node configured!");
+    RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Joint angles node configured!" RESET);
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -95,7 +99,7 @@ void GaitPlanningAnglesNode::setFirstCallbackMsg(const march_shared_msgs::msg::E
 }
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s " RESET, toString(static_cast<ExoMode>(msg->mode)).c_str()); 
     if (m_active){
         // RCLCPP_INFO(this->get_logger(), "m_active = true"); 
         m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
@@ -138,7 +142,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
                 point_str += std::to_string(value) + " ";
             }
 
-            RCLCPP_INFO(this->get_logger(), "Point values: %s", point_str.c_str());
+            RCLCPP_DEBUG(this->get_logger(), "Point values: %s", point_str.c_str());
             m_first_stand = false;
         } else {
             RCLCPP_INFO(this->get_logger(), "Not enough joint angles to set previous point correctly!");
@@ -224,7 +228,7 @@ void GaitPlanningAnglesNode::processBootUpToStandGait(){
     std::vector<double> temp_moving_to_home_stand;
    
     if (m_gait_planning.getCounter() < INTERPOLATING_TIMESTEPS){
-        RCLCPP_INFO(this->get_logger(), "Moving towards sit position!");
+        RCLCPP_DEBUG(this->get_logger(), "Moving towards sit position!");
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);

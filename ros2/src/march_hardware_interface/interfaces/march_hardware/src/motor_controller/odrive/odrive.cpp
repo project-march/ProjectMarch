@@ -282,21 +282,17 @@ float ODrive::getIncrementalVelocityIU()
 
 float ODrive::getAIEAbsolutePositionRad()
 {
-    uint32_t aie_pos_iu = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).ui;
-    uint32_t aie_pos_check = 16384;
-    if (aie_pos_iu > aie_pos_check) {
-        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %u, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos_iu);
+    float aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).f;
+    float aie_pos_check = 0.4;
+    if (abs(aie_pos) > aie_pos_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
     }
-    return (float)this->getAbsoluteEncoder()->positionIUToRadians(aie_pos_iu); 
+    return aie_pos; 
 }
 
 uint32_t ODrive::getCheckSum()
 {
     uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
-    // uint32_t checksum_check = 987654321;
-    // if (checksum != checksum_check) {
-    //     RCLCPP_ERROR(rclcpp::get_logger("getCheckSum"), "Checksum value is %u, the CheckSum object's bits are probably scrambled like some tasty eggs.", checksum);
-    // }
     return checksum;
 }
 

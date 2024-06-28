@@ -13,11 +13,17 @@ NodeManagerGaitPlanning::NodeManagerGaitPlanning()
 
 
 void NodeManagerGaitPlanning::anglesNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition Join angle node from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
+   if (msg->goal_state.id == 3 || msg->goal_state.id == 2){
+    RCLCPP_INFO(this->get_logger(), "Joint angle node is in state %s ", msg->goal_state.label.c_str()); 
+   }
+   //  RCLCPP_INFO(this->get_logger(), "notificationCallback: transition Joint angle node from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
  }
 
  void NodeManagerGaitPlanning::cartesianNotificationCallback(const lifecycle_msgs::msg::TransitionEvent::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "notificationCallback: transition Cartesian node from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
+   if (msg->goal_state.id == 3 || msg->goal_state.id == 2){
+    RCLCPP_INFO(this->get_logger(), "Cartesian node is in state %s ", msg->goal_state.label.c_str()); 
+   }
+   //  RCLCPP_INFO(this->get_logger(), "notificationCallback: transition Cartesian node from state %s to %s \n", msg->start_state.label.c_str(), msg->goal_state.label.c_str()); 
  }
 
 int main(int argc, char *argv[]){

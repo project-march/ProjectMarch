@@ -21,22 +21,18 @@ def plot_joints(dataset):
 
 def stand_to_sit():
     time_points = 125
-    lhaa = np.linspace(-0.084, -0.084, time_points)
-    lhfe = np.linspace(0.1622, 1.57, time_points)
-    lkfe = np.linspace(0.436, 1.57, time_points)
-    ladpf = np.linspace(0.2731, 0, time_points)
+    adpf = np.linspace(0.095, 0.087, time_points)
+    haa = np.linspace(-0.083, -0.065, time_points)
+    hfe = np.linspace(-0.014, 1.57, time_points)
+    kfe = np.linspace(0.081, 1.57, time_points)
 
-    rhaa = np.linspace(-0.084, -0.084, time_points)
-    rhfe = np.linspace(0.1622, 1.57, time_points)
-    rkfe = np.linspace(0.436, 1.57, time_points)
-    radpf = np.linspace(0.2731, 0, time_points)
 
     # joint_angles_dataset = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
     # ])
 
     joint_angles_dataset = np.column_stack([
-        ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
+        adpf, haa, hfe, kfe, adpf, haa, hfe, kfe
     ])
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv', 
@@ -44,22 +40,18 @@ def stand_to_sit():
 
 def sit_to_stand():
     time_points = 125
-    lhaa = np.linspace(-0.084, -0.084, time_points)
-    lhfe = np.linspace(1.57, 0.1622, time_points)
-    lkfe = np.linspace(1.57, 0.436, time_points)
-    ladpf = np.linspace(0, 0.2731, time_points)
+    adpf = np.linspace(0.087, 0.095, time_points)
+    haa = np.linspace(-0.065, -0.083, time_points)
+    hfe = np.linspace(1.57, -0.014, time_points)
+    kfe = np.linspace(1.57, 0.081, time_points)
 
-    rhaa = np.linspace(-0.057, -0.057, time_points)
-    rhfe = np.linspace(1.57, 0.1622, time_points)
-    rkfe = np.linspace(1.57, 0.436, time_points)
-    radpf = np.linspace(0, 0.2731, time_points)
 
     # sit_to_stand = np.column_stack([
     #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
     # ])
 
     sit_to_stand = np.column_stack([
-        ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
+        adpf, haa, hfe, kfe, adpf, haa, hfe, kfe
     ])
 
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
