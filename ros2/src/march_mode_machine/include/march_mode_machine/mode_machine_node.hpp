@@ -1,21 +1,46 @@
 //
 // Created by marco on 13-2-23.
 //
-#pragma once
+
+#include "march_mode_machine/mode_machine.hpp"
 #include "march_shared_msgs/msg/gait_request.hpp"
 #include "march_shared_msgs/msg/gait_response.hpp"
+#include "march_shared_msgs/msg/foot_step_output.hpp"
 #include "march_shared_msgs/srv/gait_command.hpp"
 #include "march_shared_msgs/srv/request_footsteps.hpp"
 #include "march_shared_msgs/srv/request_gait.hpp"
+#include "march_shared_msgs/msg/exo_mode_array.hpp"
+#include "march_shared_msgs/srv/get_exo_mode_array.hpp"
+// #include "march_shared_msgs/msg/exo_mode.hpp"
+#include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "march_mode_machine/mode_machine.hpp"
+// #include "march_mode_machine/mode_machine_cartesian.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include <chrono>
 #include <cstdio>
 #include <march_shared_msgs/msg/error.hpp>
 #include <string>
-#include "march_shared_msgs/msg/exo_mode_array.hpp"
-#include "march_shared_msgs/srv/get_exo_mode_array.hpp"
+#include <unordered_map>
+
+//TODO: move to exomode generator python file 
+const std::unordered_map<ExoMode, std::string> modeNodeTypeMap = {
+    {ExoMode::Sit, "joint_angles"},
+    {ExoMode::Stand, "joint_angles"},
+    {ExoMode::Walk, "joint_angles"},
+    {ExoMode::BootUp, "joint_angles"},
+    {ExoMode::Error, "joint_angles"},
+    {ExoMode::Sideways, "joint_angles"},
+    {ExoMode::Hinge, "joint_angles"}, 
+    {ExoMode::LargeWalk, "cartesian"},
+    {ExoMode::SmallWalk, "cartesian"},
+    {ExoMode::Ascending, "cartesian"},
+    {ExoMode::Descending, "cartesian"},
+    {ExoMode::VariableStep, "cartesian"},
+    {ExoMode::VariableWalk, "cartesian"},
+    {ExoMode::HighStep1, "cartesian"},
+    {ExoMode::HighStep2, "cartesian"},
+    {ExoMode::HighStep3, "cartesian"}
+};
 
 class ModeMachineNode : public rclcpp::Node 
 {
@@ -25,7 +50,7 @@ public:
 
 private:
 
-    void sendRequest(const exoMode& desired_mode);
+    void sendRequest(const ExoMode& desired_mode);
     void responseFootstepCallback(
         const rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture future);
     void responseGaitCallback(const rclcpp::Client<march_shared_msgs::srv::RequestGait>::SharedFuture future);
@@ -38,6 +63,8 @@ private:
         std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Response> response);
 
     rclcpp::Publisher<march_shared_msgs::msg::ExoMode>::SharedPtr m_mode_publisher;
+
+    rclcpp::Publisher<march_shared_msgs::msg::FootStepOutput>::SharedPtr m_footsteps_dummy_publisher; 
 
     rclcpp::Service<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_service;
 

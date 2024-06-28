@@ -1,0 +1,32 @@
+[
+    [
+      {
+        "name": "left_ankle_dpf"
+      },
+      {
+        "name": "left_hip_aa"
+      },
+      {
+        "name": "left_hip_fe"
+      },
+      {
+        "name": "left_knee"
+      }
+    ],
+  
+  
+    [
+        {
+          "name": "right_ankle_dpf"
+        },
+        {
+          "name": "right_hip_aa"
+        },
+        {
+          "name": "right_hip_fe"
+        },
+        {
+          "name": "right_knee"
+        }
+    ]
+]

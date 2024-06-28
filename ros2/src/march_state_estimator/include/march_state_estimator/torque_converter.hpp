@@ -10,7 +10,7 @@
 #include <functional>
 #include <vector>
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/Geometry"

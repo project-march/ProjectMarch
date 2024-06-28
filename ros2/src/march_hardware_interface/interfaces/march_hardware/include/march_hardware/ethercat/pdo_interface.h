@@ -17,8 +17,10 @@ public:
     virtual void write32(uint16_t slave_index, uint8_t module_index, bit32 value) = 0;
 
     virtual bit8 read8(uint16_t slave_index, uint8_t module_index) const = 0;
+    virtual bit8 read8mosi(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual bit16 read16(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual bit32 read32(uint16_t slave_index, uint8_t module_index) const = 0;
+    virtual bit64 read64(uint16_t slave_index, uint8_t module_index) const = 0;
     virtual ~PdoInterface() = default;
 };
 
@@ -57,6 +59,12 @@ public:
     {
         return this->pdo_->read8(this->slave_index_, module_index);
     }
+
+    bit8 read8mosi(uint8_t module_index) const
+    {
+        return this->pdo_->read8mosi(this->slave_index_, module_index);
+    }
+
     bit16 read16(uint8_t module_index) const
     {
         return this->pdo_->read16(this->slave_index_, module_index);
@@ -64,6 +72,10 @@ public:
     bit32 read32(uint8_t module_index) const
     {
         return this->pdo_->read32(this->slave_index_, module_index);
+    }
+    bit64 read64(uint8_t module_index) const
+    {
+        return this->pdo_->read64(this->slave_index_, module_index);
     }
 
 private:
@@ -90,8 +102,10 @@ public:
     void write32(uint16_t slave_index, uint8_t module_index, bit32 value) override;
 
     bit8 read8(uint16_t slave_index, uint8_t module_index) const override;
+    bit8 read8mosi(uint16_t slave_index, uint8_t module_index) const override;
     bit16 read16(uint16_t slave_index, uint8_t module_index) const override;
     bit32 read32(uint16_t slave_index, uint8_t module_index) const override;
+    bit64 read64(uint16_t slave_index, uint8_t module_index) const override;
 };
 } // namespace march
 #endif // MARCH_HARDWARE_PDO_INTERFACE_H

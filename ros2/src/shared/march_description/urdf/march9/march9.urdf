@@ -48,6 +48,8 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="L_camera">
+	</link>
 	<link name="L_UL">
 		<inertial>
          <origin rpy="0 0 0" xyz="0.000 -0.044 -0.408"/>
@@ -128,6 +130,12 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="L_toe">
+	</link>
+	<link name="L_heel">
+	</link>
+	<link name="L_sole">
+	</link>
 	<link name="R_hip">
       <inertial>
          <origin rpy="0 0 0" xyz="0.130 -0.174 0.000"/>
@@ -147,6 +155,8 @@
 				<mesh filename="package://march_description/meshes/march9/L_Hip.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
+	</link>
+	<link name="R_camera">
 	</link>
 	<link name="R_UL">
 		<inertial>
@@ -228,6 +238,12 @@
 			</geometry>
 		</collision>
 	</link>
+	<link name="R_toe">
+	</link>
+	<link name="R_heel">
+	</link>
+	<link name="R_sole">
+	</link>
 
 	<!-- Robot Joint Definitions -->
 
@@ -237,7 +253,7 @@
 		<child link="backpack"/>
 	</joint>
 	<joint name="left_hip_aa" type="revolute">
-	<origin rpy="0 0 0" xyz="0.021 0.092 0.028"/>
+		<origin rpy="0 0 0" xyz="0.021 0.092 0.028"/>
 		<axis xyz="-1 0 0"/>
 		<parent link="backpack"/>
 		<child link="L_hip"/>
@@ -249,6 +265,11 @@
 		<parent link="L_hip"/>
 		<child link="L_UL"/>
 		<limit effort="250" lower="-0.349066" upper="2.00713" velocity="3.94"/>
+	</joint>
+	<joint name="L_UL_to_L_camera" type="fixed">
+		<origin rpy="0 0 0" xyz="0.050 0.000 -0.050"/>
+		<parent link="L_UL"/>
+		<child link="L_camera"/>
 	</joint>
 	<joint name="left_knee" type="revolute">
 		<origin rpy="0 0 0" xyz="0.000 -0.077 -0.478"/>
@@ -269,7 +290,22 @@
 		<axis xyz="1 0 0"/>
 		<parent link="L_ankle"/>
 		<child link="L_foot"/>
-		<limit effort="179" lower="-0.1396263" upper="0.1396263" velocity="4.1"/>
+		<limit effort="179" lower="-0.157079633" upper="0.157079633" velocity="4.1"/>
+	</joint>
+	<joint name="L_foot_to_L_heel" type="fixed">
+		<origin rpy="0 0 0" xyz="-0.015 0.0 -0.08"/>
+		<parent link="L_foot"/>
+		<child link="L_heel"/>
+	</joint>
+	<joint name="L_foot_to_L_sole" type="fixed">
+		<origin rpy="0 0 0" xyz="0.151 0.0 -0.080"/>
+		<parent link="L_foot"/>
+		<child link="L_sole"/>
+	</joint>
+	<joint name="L_foot_to_L_toe" type="fixed">
+		<origin rpy="0 0 0" xyz="0.317 0.0 -0.080"/>
+		<parent link="L_foot"/>
+		<child link="L_toe"/>
 	</joint>
 	<joint name="right_hip_aa" type="revolute">
 		<origin rpy="0 0 0" xyz="0.021 -0.092 0.028"/>
@@ -285,6 +321,11 @@
 		<child link="R_UL"/>
 		<limit effort="250" lower="-0.349066" upper="2.00713" velocity="3.94"/>
 	</joint>
+	<joint name="R_UL_to_R_camera" type="fixed">
+		<origin rpy="0 0 0" xyz="0.050 0.000 -0.050"/>
+		<parent link="R_UL"/>
+		<child link="R_camera"/>
+	</joint>
 	<joint name="right_knee" type="revolute">
 		<origin rpy="0 0 0" xyz="0.000 0.077 -0.478"/>
 		<axis xyz="0 1 0"/>
@@ -299,13 +340,29 @@
 		<child link="R_ankle"/>
 		<limit effort="179" lower="-0.488692" upper="0.349066" velocity="4.1"/>
 	</joint> 
-   	<joint name="right_foot_ie" type="revolute">
+   	<joint name="right_ankle_ie" type="revolute">
 		<origin rpy="0 0 0" xyz="-0.093 0.061 -0.025"/>
-		<axis xyz="1 0 0"/>
+		<axis xyz="-1 0 0"/>
 		<parent link="R_ankle"/>
 		<child link="R_foot"/>
-		<limit effort="179" lower="-0.1396263" upper="0.1396263" velocity="4.1"/>
-	</joint>	
+		<limit effort="179" lower="-0.157079633" upper="0.157079633" velocity="4.1"/>
+	</joint>
+	<joint name="R_foot_to_R_heel" type="fixed">
+		<origin rpy="0 0 0" xyz="-0.015 0.0 -0.08"/>
+		<parent link="R_foot"/>
+		<child link="R_heel"/>
+	</joint>
+	<joint name="R_foot_to_R_sole" type="fixed">
+		<origin rpy="0 0 0" xyz="0.151 0.0 -0.080"/>
+		<parent link="R_foot"/>
+		<child link="R_sole"/>
+	</joint>
+	<joint name="R_foot_to_R_toe" type="fixed">
+		<origin rpy="0 0 0" xyz="0.317 0.0 -0.080"/>
+		<parent link="R_foot"/>
+		<child link="R_toe"/>
+	</joint>
+	
 
 	<!-- Robot Transmission Definitions -->
 
@@ -331,7 +388,7 @@
             </actuator>
   	</transmission>
   	<transmission name="L_ADPFTransmission">
-            <joint name="left_ankle"/>
+            <joint name="left_ankle_dpf"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>
@@ -359,7 +416,7 @@
             </actuator>
   	</transmission>
   	<transmission name="R_ADPFTransmission">
-            <joint name="right_ankle"/>
+            <joint name="right_ankle_dpf"/>
             <actuator>
                     <mechanicalReduction>50</mechanicalReduction>
                     <motorInertia>2.2</motorInertia>

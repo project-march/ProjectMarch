@@ -21,7 +21,7 @@ TEST_F(TestSetupGaitPlanningTest, LoadTrajectoryCorrectly) {
 
 TEST_F(TestSetupGaitPlanningTest, setGaitTypeCorrectly){
     // Act
-    exoMode state = exoMode::Walk;
+    ExoMode state = ExoMode::Walk;
     test_setup_gait_planning.setGaitType(state);
 
     // Assert

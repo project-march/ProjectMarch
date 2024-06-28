@@ -18,8 +18,8 @@ public:
 private:
     rclcpp::Client<march_shared_msgs::srv::GetExoModeArray>::SharedPtr m_get_exo_mode_array_client;
     
-    void sendNewModeAndJoint(const exoMode& desired_mode);
-    exoMode askMode() const;
+    void sendNewModeAndJoint(const ExoMode& desired_mode);
+    ExoMode askMode() const;
     std::string askJoint() const;
 
     TestJointsIPD m_ipd;
