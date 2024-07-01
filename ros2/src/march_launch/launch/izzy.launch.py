@@ -105,6 +105,7 @@ def generate_launch_description() -> LaunchDescription:
             )
         ),
         launch_arguments=[("simulation", simulation)],
+        condition=UnlessCondition(simulation),
     )
     # endregion
 
