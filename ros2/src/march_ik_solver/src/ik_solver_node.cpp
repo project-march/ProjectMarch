@@ -139,8 +139,9 @@ void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::Shared
     const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg)
 {
     RCLCPP_INFO(this->get_logger(), "New gait callback.");
-    (void) exo_mode_msg;
-    stateEstimationCallback(state_estimation_msg);
+    if (exo_mode_msg->mode != march_shared_msgs::msg::ExoMode::STAND) {
+        stateEstimationCallback(state_estimation_msg);
+    }
 }
 
 void IKSolverNode::publishJointTrajectory()
