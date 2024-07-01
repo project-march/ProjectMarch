@@ -247,7 +247,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.joint.sendPID();
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true); // Operational check: check if there are already incoming low level errors
             jointInfo.position = jointInfo.joint.getPosition();
-            jointInfo.joint.sendTargetPosition(jointInfo.position);             
+            jointInfo.joint.getMotorController()->sendTargetPosition(jointInfo.joint.getPosition());             
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
             jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.target_torque = jointInfo.joint.getTorque();

@@ -58,7 +58,7 @@ def generate_launch_description() -> LaunchDescription:
     ik_test = LaunchConfiguration("ik_test", default="false")
     
     # TODO: Configurable urdf
-    state_estimator_clock_period = 0.02
+    state_estimator_clock_period = 0.005
     urdf_location = os.path.join(
         get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
