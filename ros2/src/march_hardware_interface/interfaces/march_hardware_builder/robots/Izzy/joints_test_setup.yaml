@@ -1,5 +1,5 @@
 testsetup:
-  network_interface_name: enp2s0
+  network_interface_name: enx00e04c360de2
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
@@ -41,9 +41,9 @@ testsetup:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 488647
-            maxPositionIU: 759751
-            zeroPositionIU: 624199
+            minPositionIU: 269857
+            maxPositionIU: 542247
+            zeroPositionIU: 406052
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154

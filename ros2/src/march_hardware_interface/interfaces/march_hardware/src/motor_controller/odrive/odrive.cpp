@@ -47,7 +47,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
         logger_->info("Initializing the encoder index search.");    
 
-        return std::chrono::seconds {20};
+        return std::chrono::seconds {9};
 
     } else {
         return std::chrono::nanoseconds(0);
