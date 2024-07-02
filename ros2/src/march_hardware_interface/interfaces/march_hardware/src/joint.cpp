@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 
+#define MAX_UPDATE_INTERVAL 6
 namespace march {
 Joint::Joint(
     std::string name,
@@ -140,17 +141,8 @@ void Joint::readEncoders()
             throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
                 "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
                 motor_controller_->getTorqueSensor()->getMaxTorque());
-        } else {
-        logger_->info(logger_->fstring("No reading the torque sensors"));
-        }
-    } else {
-        const std::chrono::milliseconds update_threshold{ 6 };
-        if (time_between_last_update >= update_threshold) { // 0.01 = 10 milliseconds (one ethercat cycle is 5 ms).
-            logger_->warn(
-                logger_->fstring("Data was not updated within %d milliseconds (threshold: %d ms) for joint %s, using old data.",
-                    this->name_.c_str(), time_between_last_update.count()));
-        }
-    }
+        } 
+    } 
 }
 
 void Joint::sendPID()
@@ -198,10 +190,10 @@ bool Joint::receivedDataUpdate()
 }
 
 void Joint::handleNoDataUpdate(std::chrono::duration<double> time_between_last_update) {
-    const std::chrono::milliseconds MAX_UPDATE_INTERVAL { 10 }; // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-    if (time_between_last_update >= MAX_UPDATE_INTERVAL) {
+    const std::chrono::milliseconds max_update_interval {MAX_UPDATE_INTERVAL}; 
+    if (time_between_last_update >= max_update_interval) {
         logger_->warn(
-            logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
+            logger_->fstring("Data was not updated within %.3f seconds for joint %s, using old data.",
                 this->name_.c_str(), time_between_last_update.count()));
     }
 }
