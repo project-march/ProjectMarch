@@ -44,6 +44,7 @@ public:
     void enableActuation() override;
     void actuateTorque(float target_torque, float fuzzy_weight) override;
     void actuateRadians(float target_position, float fuzzy_weight) override;
+    void sendTargetPosition(float target_position) override;
 
      void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) override;
 

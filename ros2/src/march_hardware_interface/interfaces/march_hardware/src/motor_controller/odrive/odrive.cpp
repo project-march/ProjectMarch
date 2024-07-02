@@ -102,6 +102,13 @@ void ODrive::actuateTorque(float target_torque, float fuzzy_weight)
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
+void ODrive::sendTargetPosition(float target_position)
+{
+    bit32 write_position {};
+    write_position.f = target_position;
+    this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
+}
+
 /*** This method writes the desired position to the ethercat, together with the corresponding fuzzy control weight.
  *
  * First there is a check to see if the position is within the joint limits.
