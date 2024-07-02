@@ -81,24 +81,24 @@ using BatteryMsg = march_shared_msgs::msg::BatteryState;
 
 class BatteryState {
 private:
-    float percentage_ = 0.F;
-    float voltage_ = 0.F;
-    float temperature_ = 0.F;
+    float battery_percentage_ = 0.F;
+    float battery_voltage_ = 0.F;
+    float battery_temperature_ = 0.F;
 
 public:
     void update(int& index, const StateInerfaces& state_interfaces)
     {
-        percentage_ = static_cast<float>(state_interface::get(index, state_interfaces));
-        voltage_ = static_cast<float>(state_interface::get(index, state_interfaces));
-        temperature_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_percentage_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_voltage_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_temperature_ = static_cast<float>(state_interface::get(index, state_interfaces));
     }
 
     explicit operator BatteryMsg() const
     {
         march_shared_msgs::msg::BatteryState battery_msg {};
-        battery_msg.percentage = percentage_;
-        battery_msg.voltage = voltage_;
-        battery_msg.temperature = temperature_;
+        battery_msg.battery_percentage = battery_percentage_;
+        battery_msg.battery_voltage = battery_voltage_;
+        battery_msg.battery_temperature = battery_temperature_;
         return battery_msg;
     }
 };
@@ -110,14 +110,12 @@ public:
     explicit PdbSemanticComponent()
         : SemanticComponentInterface("PDB", /*size=*/15)
     {
-        interface_names_.emplace_back(name_ + "/" + "emergency_button_pressed");
         interface_names_.emplace_back(name_ + "/" + "pdb_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.total_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv1_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv2_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv3_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv4_current");
-        interface_names_.emplace_back(name_ + "/" + "stop_button_pressed");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv1_current");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv2_current");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv1_ok");
@@ -125,6 +123,8 @@ public:
         interface_names_.emplace_back(name_ + "/" + "battery_state.percentage");
         interface_names_.emplace_back(name_ + "/" + "battery_state.voltage");
         interface_names_.emplace_back(name_ + "/" + "battery_state.temperature");
+        interface_names_.emplace_back(name_ + "/" + "pdb_temperature");
+        interface_names_.emplace_back(name_ + "/" + "checksum_miso");
     }
 
     virtual ~PdbSemanticComponent() = default;
@@ -142,12 +142,12 @@ public:
     void update()
     {
         int index = 0;
-        emergency_button_pressed_ = static_cast<bool>(state_interface::get(index, state_interfaces_));
         pdb_current_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         hv_state_.update(index, state_interfaces_);
-        stop_button_state = static_cast<bool>(state_interface::get(index, state_interfaces_));
         lv_state_.update(index, state_interfaces_);
         battery_state_.update(index, state_interfaces_);
+        pdb_temperature_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        checksum_miso_ = static_cast<float>(state_interface::get(index, state_interfaces_));
     }
 
     /**
@@ -160,22 +160,22 @@ public:
     {
         // update with the latest values
         update();
-        msg.emergency_button_pressed = emergency_button_pressed_;
         msg.pdb_current = pdb_current_;
         msg.hv_state = static_cast<HighVoltageMsg>(hv_state_);
-        msg.stop_button_pressed = stop_button_state;
         msg.lv_state = static_cast<LowVoltageMsg>(lv_state_);
         msg.battery_state = static_cast<BatteryMsg>(battery_state_);
+        msg.pdb_temperature = pdb_temperature_;
+        msg.checksum_miso = checksum_miso_;
         return true;
     }
 
 private:
-    bool emergency_button_pressed_ = false;
     float pdb_current_ = 0.F;
     HighVoltageState hv_state_ {};
-    bool stop_button_state = false;
     LowVoltageState lv_state_ {};
     BatteryState battery_state_ {};
+    float pdb_temperature_ = 0.F;
+    float checksum_miso_ = 0.F;
 };
 
 } // namespace march_pdb_state_broadcaster

@@ -12,19 +12,11 @@ namespace pdb {
 }
 
 struct PowerDistributionBoardData {
-    // Number of data values sent over
-
-    // Either pressed (0) or not (1)
-    double emergency_button_state;
-
     // Amount of current used by the PDB itself
     double pdb_current;
 
     // Total high voltage net current
     double hv_total_current;
-
-    // Either pressed (0) or not (1)
-    double stop_button_state;
 
     // High voltage net currents
     double hv1_current;
@@ -45,6 +37,10 @@ struct PowerDistributionBoardData {
     double battery_voltage;
     double battery_temperature;
 
+    // Additional information
+    double pdb_temperature;
+    double checksum_miso;
+
     /**
      * @brief Gives a pointer to the member variables so that the hardware interface can couple it back to the
      * broadcaster.
@@ -54,20 +50,23 @@ struct PowerDistributionBoardData {
      */
     inline std::array<std::pair<std::string, double*>, pdb::DATA_LENGTH> get_pointers()
     {
-        return { std::make_pair(/*__x=*/"emergency_button_pressed", &emergency_button_state),
-            std::make_pair(/*__x=*/"pdb_current", &pdb_current),
-            std::make_pair(/*__x=*/"hv_state.total_current", &hv_total_current),
-            std::make_pair(/*__x=*/"hv_state.hv1_current", &hv1_current),
-            std::make_pair(/*__x=*/"hv_state.hv2_current", &hv2_current),
-            std::make_pair(/*__x=*/"hv_state.hv3_current", &hv3_current),
-            std::make_pair(/*__x=*/"hv_state.hv4_current", &hv4_current),
-            std::make_pair(/*__x=*/"stop_button_pressed", &stop_button_state),
-            std::make_pair(/*__x=*/"lv_state.lv1_current", &lv1_current),
-            std::make_pair(/*__x=*/"lv_state.lv2_current", &lv2_current),
-            std::make_pair(/*__x=*/"lv_state.lv1_ok", &lv1_ok), std::make_pair(/*__x=*/"lv_state.lv2_ok", &lv2_ok),
-            std::make_pair(/*__x=*/"battery_state.percentage", &battery_percentage),
-            std::make_pair(/*__x=*/"battery_state.voltage", &battery_voltage),
-            std::make_pair(/*__x=*/"battery_state.temperature", &battery_temperature) };
+        return {   
+                std::make_pair(/*__x=*/"pdb_current", &pdb_current),
+                std::make_pair(/*__x=*/"hv_state.total_current", &hv_total_current),
+                std::make_pair(/*__x=*/"hv_state.hv1_current", &hv1_current),
+                std::make_pair(/*__x=*/"hv_state.hv2_current", &hv2_current),
+                std::make_pair(/*__x=*/"hv_state.hv3_current", &hv3_current),
+                std::make_pair(/*__x=*/"hv_state.hv4_current", &hv4_current),
+                std::make_pair(/*__x=*/"lv_state.lv1_current", &lv1_current),
+                std::make_pair(/*__x=*/"lv_state.lv2_current", &lv2_current),
+                std::make_pair(/*__x=*/"lv_state.lv1_ok", &lv1_ok), 
+                std::make_pair(/*__x=*/"lv_state.lv2_ok", &lv2_ok),
+                std::make_pair(/*__x=*/"battery_state.battery_percentage", &battery_percentage),
+                std::make_pair(/*__x=*/"battery_state.battery_voltage", &battery_voltage),
+                std::make_pair(/*__x=*/"battery_state.battery_temperature", &battery_temperature), 
+                std::make_pair(/*__x=*/"pdb_temperature", &pdb_temperature),
+                std::make_pair(/*__x=*/"checksum_miso", &checksum_miso)
+                };
     }
 
     /**
@@ -80,21 +79,21 @@ struct PowerDistributionBoardData {
      */
     inline void update_values(std::array<bit32, pdb::DATA_LENGTH> data)
     {
-        emergency_button_state = data[0].ui;
-        pdb_current = data[1].f;
-        hv_total_current = data[2].f;
-        stop_button_state = data[3].ui;
-        hv1_current = data[4].f;
-        hv2_current = data[5].f;
-        hv3_current = data[6].f;
-        hv4_current = data[7].f;
-        lv1_current = data[8].f;
-        lv2_current = data[9].f;
-        lv1_ok = data[10].ui;
-        lv2_ok = data[11].ui;
-        battery_percentage = data[12].f;
-        battery_voltage = data[13].f;
-        battery_temperature = data[14].f;
+        pdb_current = data[0].f;
+        hv_total_current = data[1].f;
+        hv1_current = data[2].f;
+        hv2_current = data[3].f;
+        hv3_current = data[4].f;
+        hv4_current = data[5].f;
+        lv1_current = data[6].f;
+        lv2_current = data[7].f;
+        lv1_ok = data[8].ui;
+        lv2_ok = data[9].ui;
+        battery_percentage = data[10].f;
+        battery_voltage = data[11].f;
+        battery_temperature = data[12].f;
+        pdb_temperature = data[13].f;
+        checksum_miso = data[14].f;
     }
 };
 
