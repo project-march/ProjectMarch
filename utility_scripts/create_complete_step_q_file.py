@@ -75,11 +75,6 @@ def hinge_gait(time_points):
     rkfe = np.linspace(0.468, 0.468, time_points)
     radpf = np.linspace(0.162, 0.162, time_points)
 
-
-    # hinge_gait = np.column_stack([
-    #     lhaa, lhfe, lkfe, ladpf, rhaa, rhfe, rkfe, radpf
-    # ])
-
     hinge_gait = np.column_stack([
         ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
     ])
@@ -93,26 +88,26 @@ def sideways(time_points):
     ladpf_h, lhaa_h, lhfe_h, lkfe_h, radpf_h, rhaa_h, rhfe_h, rkfe_h = homestand
 
 
-    ladpf1 = np.linspace(ladpf_h, ladpf_h, time_points)
+    ladpf1 = np.full(time_points, ladpf_h)
     lhaa1 = np.linspace(lhaa_h, -0.2, time_points)
-    lhfe1 = np.linspace(lhfe_h, lhfe_h, time_points)
+    lhfe1 = np.full(time_points, lhfe_h)
     lkfe1 = np.linspace(lkfe_h, 0.3, time_points)
-    radpf1 = np.linspace(radpf_h, radpf_h, time_points)
+    radpf1 = np.full(time_points, radpf_h)
     rhaa1 = np.append(np.linspace(rhaa_h, -0.15, int(((2000000000-1500000000)/2000000000)*time_points)), np.linspace(-0.15, -0.2, int(((1500000000)/2000000000)*time_points)))
-    rhfe1 = np.linspace(rhfe_h, rhfe_h, time_points)
+    rhfe1 = np.full(time_points, rhfe_h)
     rkfe1 = np.linspace(rkfe_h, 0.3, time_points)
     
     left_open = np.column_stack([
         ladpf1, lhaa1, lhfe1, lkfe1, radpf1, rhaa1, rhfe1, rkfe1
     ])
 
-    ladpf = np.linspace(ladpf_h, ladpf_h, time_points)
+    ladpf = np.full(time_points, ladpf_h)
     lhaa = np.append(np.linspace(-0.2, -0.15, int((1500000000/2000000000)*time_points)), np.linspace(-0.15, lhaa_h, int(((2000000000-1500000000)/2000000000)*time_points)))
-    lhfe = np.linspace(lhfe_h, lhfe_h, time_points)
+    lhfe = np.full(time_points, lhfe_h)
     lkfe = np.linspace(0.3, lkfe_h, time_points)
-    radpf = np.linspace(radpf_h, radpf_h, time_points)
+    radpf = np.full(time_points, radpf_h)
     rhaa = np.linspace(-0.2, rhaa_h, time_points)
-    rhfe = np.linspace(rhfe_h, rhfe_h, time_points)
+    rhfe = np.full(time_points, rhfe_h)
     rkfe = np.linspace(0.3, rkfe_h, time_points)
     
     right_close = np.column_stack([
@@ -121,12 +116,8 @@ def sideways(time_points):
 
     full_sidestep = np.vstack((left_open, right_close)) 
 
-    plt.plot(full_sidestep[:,2], label='LKFE')
-    plt.plot(full_sidestep[:,6], label='RKFE')
-    plt.plot(full_sidestep[:,1], label='LHFE')
-    plt.plot(full_sidestep[:,5], label='RHFE')
-    plt.plot(full_sidestep[:,0], label='LHAA')
-    plt.plot(full_sidestep[:,4], label='RHAA')
+    for i, label in enumerate(COLUMNS):
+        plt.plot(full_sidestep[:, i], label=label)
     plt.legend()
     plt.show()
        
@@ -135,9 +126,7 @@ def sideways(time_points):
 
 def remap_iks_translated_joint_angle_gaits(old_name, new_name):
     df = pd.read_csv(f'./ros2/src/march_gait_planning/m9_gait_files/joint_angles/{old_name}.csv', names = ['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-    # print(df)
     df = df[COLUMNS]
-    # print(df)
     df.to_csv(f'./ros2/src/march_gait_planning/m9_gait_files/joint_angles/{new_name}.csv', sep=',', header=False, index=False)
 
     
