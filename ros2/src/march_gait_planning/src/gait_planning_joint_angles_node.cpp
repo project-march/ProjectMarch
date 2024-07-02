@@ -10,7 +10,7 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 
 using std::placeholders::_1; 
 
-int INTERPOLATING_TIMESTEPS = 100;
+int INTERPOLATING_TIMESTEPS = 400;
 
 #define COLOR_GREEN   "\033[32m"
 #define RESET   "\033[0m"
