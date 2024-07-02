@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GiNaC
+Description: C++ library for symbolic calculations
+Version: 1.8.7
+Requires: cln >= 1.2.2
+Libs: -L${libdir} -lginac -Wl,-rpath -Wl,${libdir}
+Cflags: -I${includedir}

@@ -3,7 +3,7 @@
 
 class GaitPlanningNodeTest : public testing::Test {
     protected: 
-    GaitPlanningNode test_gait_planning_node = GaitPlanningNode();
+    GaitPlanningCartesianNode test_gait_planning_node = GaitPlanningCartesianNode();
 };
 
 TEST_F(GaitPlanningNodeTest, CurrentStateCallbackTest){

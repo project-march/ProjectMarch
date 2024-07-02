@@ -1,6 +1,7 @@
 #ExoMode.msg
 std_msgs/Header header
 int8 mode
+string node_type
 
 # Constant types of modes
 int8 SIT = 0
@@ -19,3 +20,9 @@ int8 HIGHSTEP1 = 12
 int8 HIGHSTEP2 = 13
 int8 HIGHSTEP3 = 14
 int8 HINGE = 15
+
+string CARTESIAN = "cartesian" 
+string JOINT_ANGLES = "joint_angles" 
+string TEST_JOINTS = "test_joints" 
+string TEST_SETUP = "test_setup" 
+

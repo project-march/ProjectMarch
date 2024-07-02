@@ -104,6 +104,7 @@ SensorFusionNode::SensorFusionNode(): Node("state_estimator")
         std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_clock_pub = this->create_publisher<std_msgs::msg::Header>("state_estimation/clock", 10);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub 
@@ -174,7 +175,9 @@ void SensorFusionNode::timerCallback()
     if (m_is_simulation) {
         publishGroundReactionForce();
     }
+    
     publishStateEstimation();
+    publishClock();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
@@ -198,6 +201,13 @@ void SensorFusionNode::imuPositionCallback(const geometry_msgs::msg::PointStampe
 void SensorFusionNode::imuVelocityCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg)
 {
     m_imu_velocity = msg;
+}
+
+void SensorFusionNode::publishClock()
+{
+    std_msgs::msg::Header clock_msg;
+    clock_msg.stamp = this->now();
+    m_clock_pub->publish(clock_msg);
 }
 
 void SensorFusionNode::publishStateEstimation()

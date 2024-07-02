@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
   <depend>march_shared_msgs</depend>
   <depend>trajectory_msgs</depend>
   <depend>ament_index_cpp</depend>

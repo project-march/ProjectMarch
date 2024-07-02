@@ -140,9 +140,16 @@ void Joint::readEncoders()
             throw error::HardwareException(error::ErrorType::MAX_TORQUE_EXCEEDED,
                 "Joint %s has a torque of %f, while absolute max torque is %f", name_.c_str(), torque_,
                 motor_controller_->getTorqueSensor()->getMaxTorque());
+        } else {
+        logger_->info(logger_->fstring("No reading the torque sensors"));
         }
     } else {
-        logger_->info(logger_->fstring("No reading the torque sensors"));
+        const std::chrono::milliseconds update_threshold{ 6 };
+        if (time_between_last_update >= update_threshold) { // 0.01 = 10 milliseconds (one ethercat cycle is 5 ms).
+            logger_->warn(
+                logger_->fstring("Data was not updated within %d milliseconds (threshold: %d ms) for joint %s, using old data.",
+                    this->name_.c_str(), time_between_last_update.count()));
+        }
     }
 }
 

@@ -14,6 +14,7 @@ setup(
         "mujoco_sim/low_level_control/controller_torque.py",
         "mujoco_sim/sensor_data_extraction.py",
         "mujoco_sim/aie_passive_force/aie_passive_force.py",
+        "mujoco_sim/model/robot_model.py",
     ],
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),

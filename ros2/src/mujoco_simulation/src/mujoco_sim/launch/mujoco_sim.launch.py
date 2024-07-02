@@ -14,6 +14,9 @@ def generate_launch_description():
     tunings_to_load = LaunchConfiguration("tunings_to_load_path")
     aie_force = LaunchConfiguration("aie_force", default="false")
 
+    gaiting_to_load = LaunchConfiguration("gaiting_to_load", default="air")
+    obstacle_to_load = LaunchConfiguration("obstacle_to_load", default="")
+
     return LaunchDescription(
         [
             Node(
@@ -21,10 +24,13 @@ def generate_launch_description():
                 namespace="",
                 executable="mujoco_sim_node",
                 name="mujoco_sim",
-                parameters=[tunings_to_load, 
-                            {"model_to_load": model_to_load}, 
-                            {"aie_force": aie_force},
-                            ],
+                parameters=[
+                    tunings_to_load,
+                    {"model_to_load": model_to_load}, 
+                    {"aie_force": aie_force},
+                    {"gaiting_to_load": gaiting_to_load},
+                    {"obstacle_to_load": obstacle_to_load},
+                ],
             ),
             Node(
                 package="mujoco_reader",

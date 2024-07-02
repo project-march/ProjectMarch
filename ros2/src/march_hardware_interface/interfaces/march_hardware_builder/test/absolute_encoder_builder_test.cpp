@@ -24,7 +24,6 @@ protected:
                               .append("/robots/test_yamls/encoder");
         this->joint = std::make_shared<urdf::Joint>();
         this->joint->limits = std::make_shared<urdf::JointLimits>();
-        this->joint->safety = std::make_shared<urdf::JointSafety>();
     }
 
     YAML::Node loadTestYaml(const std::string& relative_path)
@@ -33,48 +32,29 @@ protected:
     }
 };
 
-TEST_F(AbsoluteEncoderBuilderTest, ValidEncoderHip)
+TEST_F(AbsoluteEncoderBuilderTest, MissingKeys)
 {
-    YAML::Node config = this->loadTestYaml("/absolute_encoder_correct.yaml");
-    this->joint->limits->lower = 0.0;
-    this->joint->limits->upper = 1.9;
-    this->joint->safety->soft_lower_limit = 0.01;
-    this->joint->safety->soft_upper_limit = 2.0;
-
-    march::AbsoluteEncoder expected = march::AbsoluteEncoder(
-        /*counts_per_rotation=*/(size_t)1 << 16, motor_controller_type,
-        /*lower_limit_iu=*/22134,
-        /*upper_limit_iu=*/43436,
-        /*zero_position_iu*/ 30000, this->joint->limits->lower, this->joint->limits->upper,
-        this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-    auto created = HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type);
-    ASSERT_EQ(expected, *created);
-}
-
-TEST_F(AbsoluteEncoderBuilderTest, NoConfig)
-{
-    YAML::Node config;
-    ASSERT_EQ(nullptr, HardwareBuilder::createAbsoluteEncoder(config[""], motor_controller_type));
-}
-
-TEST_F(AbsoluteEncoderBuilderTest, NoResolutionOrCPR)
-{
-    YAML::Node config = this->loadTestYaml("/absolute_encoder_no_resolution.yaml");
-
+    YAML::Node config = this->loadTestYaml("/absolute_encoder_missing_keys.yaml");
     ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
 }
 
-TEST_F(AbsoluteEncoderBuilderTest, NoMinPosition)
+TEST_F(AbsoluteEncoderBuilderTest, FlippedDirection)
 {
-    YAML::Node config = this->loadTestYaml("/absolute_encoder_no_min_position.yaml");
+    YAML::Node config = this->loadTestYaml("/absolute_encoder_flipped_direction.yaml");
+    auto encoder = HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type);
 
-    ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
-}
+    // The expected values
+    double expected_min_position = 24;
+    double expected_max_position = 924;
+    double expected_zero_position = 624;
 
-TEST_F(AbsoluteEncoderBuilderTest, NoMaxPosition)
-{
-    YAML::Node config = this->loadTestYaml("/absolute_encoder_no_max_position.yaml");
+    // Call getCorrectLimits with the appropriate arguments
+    double actual_min_position = HardwareBuilder::getCorrectLimits(config, "maxPositionIU", 1024, true);
+    double actual_max_position = HardwareBuilder::getCorrectLimits(config, "minPositionIU", 1024, true);
+    double actual_zero_position = HardwareBuilder::getCorrectLimits(config, "zeroPositionIU", 1024, true);
 
-    ASSERT_THROW(HardwareBuilder::createAbsoluteEncoder(config, motor_controller_type), MissingKeyException);
+    ASSERT_EQ(expected_min_position, actual_min_position);
+    ASSERT_EQ(expected_max_position, actual_max_position);
+    ASSERT_EQ(expected_zero_position, actual_zero_position);
 }
 #endif
