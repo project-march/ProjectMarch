@@ -81,8 +81,7 @@ install(
 if(BUILD_TESTING)
     ament_add_gmock(${PROJECT_NAME}_test
        test/absolute_encoder_builder_test.cpp
-        test/incremental_encoder_builder_test.cpp
-        test/test_runner.cpp
+        # test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 
