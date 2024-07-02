@@ -23,8 +23,11 @@ IKSolverNode::IKSolverNode()
     configureIKSolutions();
 
     // Create the callback group and subscription options.
-    m_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_subscription_options.callback_group = m_callback_group;
+    m_estimation_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_estimation_subscription_options.callback_group = m_estimation_callback_group;
+
+    m_clock_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_clock_subscription_options.callback_group = m_clock_callback_group;
 
     rclcpp::QoS qos(100);
     auto rmw_qos_profile = qos.get_rmw_qos_profile();
@@ -37,16 +40,16 @@ IKSolverNode::IKSolverNode()
     // Create the subscriptions and publishers.
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
         "ik_solver/command", rclcpp::SensorDataQoS(),
-        std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
+        std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_estimation_subscription_options);
     m_ik_solver_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
-        std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
+        std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_estimation_subscription_options);
     // m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
     //     "state_estimation/state", rclcpp::SensorDataQoS(),
     //     std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_clock_sub = this->create_subscription<std_msgs::msg::Header>(
         "state_estimation/clock", rclcpp::SensorDataQoS(),
-        std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_subscription_options);
+        std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_clock_subscription_options);
     
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "ik_solver/joint_trajectory", 10);
@@ -434,7 +437,10 @@ int main(int argc, char** argv)
 {
     Eigen::initParallel();
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<IKSolverNode>());
+    rclcpp::executors::MultiThreadedExecutor executor;
+    auto node = std::make_shared<IKSolverNode>();
+    executor.add_node(node);
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }

@@ -89,8 +89,11 @@ private:
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_pub;
     rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_estimated_foot_positions_pub;
 
-    rclcpp::CallbackGroup::SharedPtr m_callback_group;
-    rclcpp::SubscriptionOptions m_subscription_options;
+    rclcpp::CallbackGroup::SharedPtr m_estimation_callback_group;
+    rclcpp::SubscriptionOptions m_estimation_subscription_options;
+
+    rclcpp::CallbackGroup::SharedPtr m_clock_callback_group;
+    rclcpp::SubscriptionOptions m_clock_subscription_options;
 };
 
 #endif // IK_SOLVER__IK_SOLVER_NODE_HPP_
