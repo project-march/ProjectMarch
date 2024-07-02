@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream> 
 #include <unistd.h>
+#include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp" 
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "march_gait_planning/gait_planning.hpp"
@@ -75,7 +76,6 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     void publishHeightGaits(); 
     void publishVariableWalk(); 
     std::vector<double> parseHomestandYAML(const std::string& file_path);  
-    // std::string getCurrentWorkingDirectory(); 
 
     GaitPlanning m_gait_planning; 
 

@@ -2,12 +2,16 @@
 
 #include "march_gait_planning/gait_planning_node.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 
 using std::placeholders::_1; 
 
 #define COLOR_GREEN   "\033[32m"
 #define RESET   "\033[0m"
 #define COLOR_RED   "\033[31m"
+#define COLOR_PERIWINKLE   "\033[38;5;147m"
+
 
 GaitPlanningCartesianNode::GaitPlanningCartesianNode()
     : rclcpp_lifecycle::LifecycleNode("gait_planning_cartesian_node", rclcpp::NodeOptions().use_intra_process_comms(false))
@@ -40,18 +44,16 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
     
-    // std::string current_path = getCurrentWorkingDirectory();
-    // RCLCPP_WARN(this->get_logger(), "current path: %s", current_path.c_str());  
-    // std::string homestand_path = "src/march_gait_planning/m9_gait_files/homestand.yaml";
-    // std::vector<double> m_home_stand = parseHomestandYAML(homestand_path);
+    std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
+    m_home_stand = parseHomestandYAML(homestand_path);
 
-    // if (m_home_stand.size() != 6) {
-    //     RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
-    // } else {
-    //     RCLCPP_INFO(this->get_logger(), "homestand: %d, %d, %d, %d, %d, %d", m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
-    // }
+    if (m_home_stand.size() != 6) {
+        RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f" RESET, m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
+    }
 
-    m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
+    // m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
 
     RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Cartesian node configured! " RESET); 
 
@@ -93,16 +95,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     (void) state; 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
-
-
-// std::string GaitPlanningCartesianNode::getCurrentWorkingDirectory() {
-//     char buffer[4096];
-//     if (getcwd(buffer, 4096) != nullptr) {
-//         return std::string(buffer);
-//     } else {
-//         return "";
-//     }
-// }
 
 
 void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
@@ -453,45 +445,22 @@ void GaitPlanningCartesianNode::publishFootPositions(){
 }
 
 std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::string& file_path){
-    std::vector<double> homestand_cartesian; 
-    std::ifstream file(file_path); 
-    std::string line; 
-    bool cartesianSection = false; 
 
-    if (!file.is_open()){
-        RCLCPP_WARN(this->get_logger(), "Unable to open file %s", file_path.c_str()); 
-        return homestand_cartesian; 
-    }
-
-    while (std::getline(file, line)) {
-        // Trim whitespace from the beginning of the line
-        line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
-
-        // Check for the cartesian section
-        if (line.find("cartesian:") != std::string::npos) {
-            cartesianSection = true;
-            continue;
-        }
-
-        // If we are in the cartesian section, read the values
-        if (cartesianSection) {
-            // Ignore lines that start with '#'
-            if (line[0] == '#') {
-                continue;
-            }
-
-            // Convert the line to a double and add to the vector
-            std::istringstream lineStream(line);
-            double value;
-            if (lineStream >> value) {
-                homestand_cartesian.push_back(value);
+    std::vector<double> values;
+    
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node cartesian = config["cartesian"];
+        if (cartesian && cartesian.IsSequence()) {
+            for (const auto& value : cartesian) {
+                values.push_back(value.as<double>());
             }
         }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
     }
 
-    file.close();
-    RCLCPP_INFO(this->get_logger(), "Succesfull retrieval of homestand!"); 
-    return homestand_cartesian;
+    return values;
 }
 
 int main(int argc, char *argv[]){
