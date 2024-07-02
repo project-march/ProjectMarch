@@ -1,0 +1,18 @@
+cartesian: 
+# left_x, left_y, left_z, right_x, right_y, right_z
+- 0.1386
+- 0.25
+- -0.912
+- 0.1386
+- -0.25 
+- -0.912
+joint_angles: 
+# ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe 
+- 0.095
+- -0.083
+- -0.014
+- 0.081
+- 0.095
+- -0.083 
+- -0.014
+- 0.081 
