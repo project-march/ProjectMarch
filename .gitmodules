@@ -39,7 +39,3 @@
 	path = ros2/src/libraries/bluespace_ai_xsens_ros_mti_driver
 	url = https://gitlab.com/project-march/libraries/bluespace_ai_xsens_ros_mti_driver
 	branch = ros2_0_foxy
-[submodule "ros2/src/libraries/ginac"]
-	path = ros2/src/libraries/ginac
-	url = ../libraries/ginac.git
-	branch = master

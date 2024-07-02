@@ -192,14 +192,16 @@ void Joint::readEncoders()
         } else {
             logger_->info(logger_->fstring("No reading the torque sensors"));
         }
-    } else {
-        if (time_between_last_update
-            >= std::chrono::milliseconds { 10 }) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
-            logger_->warn(
-                logger_->fstring("Data was not updated within %.3f milliseconds for joint %s, using old data.",
-                    this->name_.c_str(), time_between_last_update.count()));
-        }
-    }
+    } 
+    // else {
+    //     const std::chrono::milliseconds update_threshold{ 6 };
+    //     if (time_between_last_update >= update_threshold) { // 0.01 = 10 milliseconds (one ethercat cycle is 8 ms).
+    //         logger_->warn(
+    //             logger_->fstring("Data was not updated within %d milliseconds (threshold: %d ms) for joint %s, using old data.",
+    //                 this->name_.c_str(), time_between_last_update.count()));
+
+    //     }
+    // }
 }
 
 void Joint::sendPID()
