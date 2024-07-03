@@ -1,7 +1,7 @@
 std_msgs/Header header
+bool emergency_button_pressed
 float32 pdb_current
 march_shared_msgs/HighVoltageState hv_state
+bool stop_button_pressed
 march_shared_msgs/LowVoltageState lv_state
 march_shared_msgs/BatteryState battery_state
-float32 pdb_temperature
-float32 checksum_miso
