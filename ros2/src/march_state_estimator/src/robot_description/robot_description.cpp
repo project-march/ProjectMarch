@@ -33,7 +33,7 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
         std::vector<RobotPartData> robot_part_datas;
 
         // Create data structures for robot parts and initialize the robot parts.
-        std::cout << "Create data structures for robot parts and initialize the robot parts." << std::endl;
+        // std::cout << "Create data structures for robot parts and initialize the robot parts." << std::endl;
         for (auto& name : part_names) {
             RobotPartData robot_part_data;
             robot_part_data.name = name;
@@ -67,7 +67,7 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
         }
 
         // Set the parent and children of each robot node, including the absolute and relative joints.
-        std::cout << "Set the parent and children of each robot node, including the absolute and relative joints." << std::endl;
+        // std::cout << "Set the parent and children of each robot node, including the absolute and relative joints." << std::endl;
         for (const auto& robot_node : m_robot_node_ptrs) {
             std::vector<std::string> children_name
                 = yaml_node[robot_node->getName()]["children"].as<std::vector<std::string>>();
@@ -83,7 +83,7 @@ void RobotDescription::parseYAML(const std::string& yaml_path)
         }
 
         // Set the expressions for each robot node.
-        std::cout << "Set the expressions for each robot node." << std::endl;
+        // std::cout << "Set the expressions for each robot node." << std::endl;
         for (auto tuple : boost::combine(m_robot_node_ptrs, robot_part_datas)) {
             RobotNode::SharedPtr robot_node;
             RobotPartData robot_data;

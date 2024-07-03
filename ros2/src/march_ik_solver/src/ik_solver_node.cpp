@@ -309,14 +309,14 @@ void IKSolverNode::configureIKSolverParameters()
     
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         auto it = std::find(actuator_names.begin(), actuator_names.end(), m_joint_names[i]);
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
+        RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
         if (it != actuator_names.end()) {
             std::size_t actuator_id = std::distance(actuator_names.begin(), it);
             joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_soft_upper_limits[actuator_id];
             joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_soft_lower_limits[actuator_id];
         }
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
+        RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
     }
 
@@ -332,7 +332,7 @@ void IKSolverNode::configureIKSolverParameters()
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         if (joint_active[i]) {
             active_joint_names.push_back(m_joint_names[i]);
-            RCLCPP_INFO(this->get_logger(), "Active joint: %s", m_joint_names[i].c_str());
+            RCLCPP_DEBUG(this->get_logger(), "Active joint: %s", m_joint_names[i].c_str());
         }
     }
 
@@ -355,10 +355,10 @@ void IKSolverNode::configureIKSolverParameters()
     
     // Create the alphabetical joint names, and print the joint indices and names.
     m_joint_names_alphabetical.clear();
-    RCLCPP_INFO(this->get_logger(), "Alphabetical joint indices:");
+    RCLCPP_DEBUG(this->get_logger(), "Alphabetical joint indices:");
     for (const auto& joint_index : m_alphabetical_joint_indices) {
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
-        RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
+        RCLCPP_DEBUG(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
 
     // Configure Pinocchio model.
@@ -380,7 +380,7 @@ void IKSolverNode::configureTasksParameters()
     std::unordered_map<std::string, double> task_weights;
 
     for (const auto& task_name : task_names) {
-        RCLCPP_INFO(this->get_logger(), "Configuring task name: %s", task_name.c_str());
+        RCLCPP_DEBUG(this->get_logger(), "Configuring task name: %s", task_name.c_str());
         declare_parameter("task." + task_name + ".kp", std::vector<double>());
         declare_parameter("task." + task_name + ".kd", std::vector<double>());
         declare_parameter("task." + task_name + ".ki", std::vector<double>());

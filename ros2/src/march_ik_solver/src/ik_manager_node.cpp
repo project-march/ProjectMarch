@@ -46,7 +46,7 @@ void IKManagerNode::configureStackOfTasks()
 {
     declare_parameter("exo_modes", std::vector<std::string>());
     m_exo_modes = get_parameter("exo_modes").as_string_array();
-    RCLCPP_INFO(this->get_logger(), "Configuring stack of tasks for %lu exo modes.", m_exo_modes.size());
+    RCLCPP_DEBUG(this->get_logger(), "Configuring stack of tasks for %lu exo modes.", m_exo_modes.size());
 
     for (unsigned long int i = 0; i < m_exo_modes.size(); i++) {
         std::string exo_mode_param = "stack_of_tasks." + m_exo_modes[i];
@@ -55,7 +55,7 @@ void IKManagerNode::configureStackOfTasks()
         m_exo_mode_to_task_stack_map[i] = stack_of_tasks;
     }
 
-    RCLCPP_INFO(this->get_logger(), "Stack of tasks has been configured. There are %lu exo modes with stack of tasks.", m_exo_mode_to_task_stack_map.size());
+    RCLCPP_DEBUG(this->get_logger(), "Stack of tasks has been configured. There are %lu exo modes with stack of tasks.", m_exo_mode_to_task_stack_map.size());
 }
 
 int main(int argc, char* argv[]) {
