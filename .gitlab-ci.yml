@@ -28,9 +28,9 @@ variables:
 stages:
   - Build container
   - Documentation
-  # - Lint code
+  - Lint code
   - Build code
-  # - Test code
+  - Test code
 #  - Static analysis on code
 
 # GitLab defines different job types, depending on how the job is scheduled.
@@ -68,7 +68,7 @@ stages:
 include:
     - local: /.gitlab/pipeline/build-container.yml
     - local: /.gitlab/pipeline/documentation/docs.yml
-    - local: /.gitlab/pipeline/lint-code.yml
+    # - local: /.gitlab/pipeline/lint-code.yml
     - local: /.gitlab/pipeline/build-code.yml
-    - local: /.gitlab/pipeline/test-code.yml
+    # - local: /.gitlab/pipeline/test-code.yml
 #    - local: /.gitlab/pipeline/static-analysis.yml
