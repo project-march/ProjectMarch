@@ -7,7 +7,6 @@
 # Besides compiling, this also produces a "compile_commands.json" file that is used
 # by subsequent C++ static analysis stages.
 
-#
 # The following two hidden jobs are used to reduce duplication because these rules are
 # almost the same for a lot of subsequent jobs. They only vary in a few ways, which is why
 # some variables are introduced. The following three variables change, depending on the
