@@ -20,65 +20,58 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <visualization_msgs/msg/marker.hpp>
-
+#include <rclcpp/executors/single_threaded_executor.hpp>
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
 using MarkerPublisher = rclcpp::Publisher<visualization_msgs::msg::Marker>;
 
-
 namespace march_vision{
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
+
 class CameraInterface {
-
 public:
+    CameraInterface(rclcpp::Node* node, const std::string& left_or_right);
+    ~CameraInterface();
 
-    explicit CameraInterface(rclcpp::Node* n, const std::string& left_or_right);
-    ~CameraInterface() = default;
+    void run();
+    void stop();
+    void initializeCamera();
+    void shutdown();
 
-protected:
-
-    void processRealSenseDepthFrames();
-    void processPointCloud(const PointCloud::Ptr& pointcloud);
-
+private:
     rclcpp::Node* m_node;
-    std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
-    std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
-    rclcpp::Publisher<march_shared_msgs::msg::FootPosition>::SharedPtr m_point_publisher;
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr m_pointcloud_subscriber;
-    //rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_preprocessed_pointcloud_publisher;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_point_marker_publisher;
-    // TODO: How should I use these subscriptions?
-    rclcpp::Subscription<march_shared_msgs::msg::FootPosition>::SharedPtr m_other_chosen_point_subscriber;
-    rclcpp::Subscription<march_shared_msgs::msg::CurrentState>::SharedPtr m_current_state_subscriber;
+    std::string m_left_or_right;
+    std::string m_serial_number;
+    std::string m_frame_id;
+    std::string m_topic_camera;
+    std::clock_t m_last_frame_time;
+    int m_frame_wait_counter;
+    double m_frame_timeout;
+    rs2::config m_config;
+    rs2::pipeline m_pipe;
     rclcpp::TimerBase::SharedPtr m_realsense_timer;
-    rclcpp::TimerBase::SharedPtr m_initial_position_reset_timer;
+    PointCloudPublisher::SharedPtr m_preprocessed_pointcloud_publisher;
     rclcpp::CallbackGroup::SharedPtr m_realsense_callback_group;
     rclcpp::CallbackGroup::SharedPtr m_point_callback_group;
-    clock_t m_last_frame_time;
-    int m_frame_wait_counter;
-    float m_frame_timeout;
-
-    rs2::pipeline m_pipeline;
-    rs2::config m_config;
-    std::string m_serial_number;
-
-    rs2::decimation_filter m_dec_filter;
-    rs2::spatial_filter m_spat_filter;
-    rs2::temporal_filter m_temp_filter;
-    std::string m_topic_camera;
-    std::string m_left_or_right;
-    std::string m_other_frame_id;
-    std::string m_current_frame_id;
+    std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
+    std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
     std::mutex m_mutex;
 
-    // TODO: Do I need this?
-    Point m_ORIGIN;
+    bool m_decimation_filter;
+    bool m_spatial_filter;
+    bool m_temporal_filter;
+    bool m_hole_filling_filter;
+    bool m_threshold_filter;
 
     void declareParameters();
-    void initializeRealsenseCamera();
+    void readParameters();
+    void processRealSenseDepthFrames();
+    void processPointCloud(const PointCloud::Ptr& pointcloud);
     PointCloud::Ptr pointsToPCL(const rs2::points& points);
-    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right);
-
+    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud);
 };
+
 } // namespace march_vision

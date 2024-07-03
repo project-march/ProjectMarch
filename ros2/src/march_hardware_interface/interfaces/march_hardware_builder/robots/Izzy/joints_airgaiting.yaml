@@ -1,7 +1,7 @@
 # For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march9:
   network_interface_name: enp2s0f0
-  ecatCycleTime: 8
+  ecatCycleTime: 5
   ecatSlaveTimeout: 200
   joints:
     - left_ankle_dpf:
@@ -74,9 +74,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 12191
-            maxPositionIU: 404480
-            zeroPositionIU: 70445
+            minPositionIU: 644096
+            maxPositionIU: 1036385
+            zeroPositionIU: 978131
             lowerSoftLimitMarginRad: 0.11798426
             upperSoftLimitMarginRad: 0.11798426
             lowerErrorSoftLimitMarginRad: 0.05899213
@@ -229,9 +229,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 330877
-            maxPositionIU: 919222
-            zeroPositionIU: 330877
+            minPositionIU: 352644
+            maxPositionIU: 717216
+            zeroPositionIU: 717216
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154

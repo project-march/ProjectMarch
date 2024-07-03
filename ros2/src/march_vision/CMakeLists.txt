@@ -32,23 +32,23 @@ find_package(geometry_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
 find_package(realsense2 REQUIRED)
 find_package(CGAL REQUIRED)
-# TODO: Add ros2 foxy package for grid_map
-#find_package(grid_map REQUIRED) # foxy_devel branch
-
+find_package(grid_map REQUIRED) # foxy_devel branch
 find_package(pcl_conversions REQUIRED)
 find_package(PCL 1.10 REQUIRED COMPONENTS)
+
+# TODO: Install openCV
+# find_package(opencv REQUIRED)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
-
 
 include_directories(include)
 
 add_library(${PROJECT_NAME} STATIC
 
     src/computer_vision_node.cpp
-    src/computer_vision.cpp
+
     src/elevation_mapping/elevation_mapping.cpp
     src/elevation_mapping/elevation_map.cpp
     src/elevation_mapping/elevation_mapping_node.cpp
@@ -62,6 +62,7 @@ add_library(${PROJECT_NAME} STATIC
     src/elevation_mapping/sensor_processors/perfect_sensor_processor.cpp
     src/elevation_mapping/sensor_processors/sensor_processor_base.cpp
     src/elevation_mapping/sensor_processors/structured_light_sensor_processor.cpp
+
     src/plane_segmentation/contour_segmentation.cpp
     src/plane_segmentation/planar_image_segmentation.cpp
     src/plane_segmentation/planar_region.cpp
@@ -70,8 +71,8 @@ add_library(${PROJECT_NAME} STATIC
     src/plane_segmentation/polygon_decomposition.cpp
     src/plane_segmentation/ransac_segmentation.cpp
     src/plane_segmentation/visualization_utils.cpp
+
     src/processing/camera_interface.cpp
-    src/processing/data_manager_node.cpp
     src/processing/point_cloud_registration.cpp
 )
 
@@ -88,14 +89,14 @@ ament_target_dependencies(${PROJECT_NAME}
     tf2
     tf2_geometry_msgs
     visualization_msgs
-
     pcl_conversions
+
 )
 
 add_executable(computer_vision_node
 
     src/computer_vision_node.cpp
-    src/computer_vision.cpp
+
     src/elevation_mapping/elevation_mapping.cpp
     src/elevation_mapping/elevation_map.cpp
     src/elevation_mapping/elevation_mapping_node.cpp
@@ -109,6 +110,7 @@ add_executable(computer_vision_node
     src/elevation_mapping/sensor_processors/perfect_sensor_processor.cpp
     src/elevation_mapping/sensor_processors/sensor_processor_base.cpp
     src/elevation_mapping/sensor_processors/structured_light_sensor_processor.cpp
+
     src/plane_segmentation/contour_segmentation.cpp
     src/plane_segmentation/planar_image_segmentation.cpp
     src/plane_segmentation/planar_region.cpp
@@ -117,8 +119,8 @@ add_executable(computer_vision_node
     src/plane_segmentation/polygon_decomposition.cpp
     src/plane_segmentation/ransac_segmentation.cpp
     src/plane_segmentation/visualization_utils.cpp
+
     src/processing/camera_interface.cpp
-    src/processing/data_manager_node.cpp
     src/processing/point_cloud_registration.cpp
 )
 
@@ -138,9 +140,8 @@ ament_target_dependencies(computer_vision_node
     tf2
     tf2_ros
     tf2_geometry_msgs
-
     pcl_conversions
-    
+    visualization_msgs
 )
 
 target_link_libraries(computer_vision_node
@@ -149,6 +150,9 @@ target_link_libraries(computer_vision_node
   ${PCL_LIBRARIES}
   ${EIGEN3_INCLUDE_DIRS}
   ${CGAL_LIBRARIES}
+  # TODO: Check if I need this
+  ${grid_map_LIBRARIES}
+  # ${OpenCV_LIBRARIES}
 )
 
 # Install targets and executables

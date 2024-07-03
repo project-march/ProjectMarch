@@ -7,10 +7,9 @@
 // TODO: Include realsense2 sdk
 
 CameraInterface::CameraInterface(rclcpp::Node* node, 
-                                const std::string& left_or_right)
+                                 const std::string& left_or_right)
                                 : m_node(node),
-                                  m_left_or_right(left_or_right),
-                                  m_realsense_camera_settings(realsense_camera_settings)
+                                  m_left_or_right(left_or_right)
 {
     RCLCPP_INFO(m_node->get_logger(), "CameraInterface for %s camera is initializing...", m_left_or_right.c_str());
     declareParameters();
@@ -23,8 +22,6 @@ CameraInterface::~CameraInterface()
 
 void CameraInterface::declareParameters() 
 {
-    m_serial_number = "000000000000";
-
     m_tf_buffer = std::make_shared<tf2_ros::Buffer>(m_node->get_clock());
     m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
@@ -33,6 +30,9 @@ void CameraInterface::declareParameters()
     m_last_frame_time = std::clock();
     m_frame_wait_counter = 0;
     m_frame_timeout = 5.0;
+    // TODO: Change the topic name
+    m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(
+        "/cameras/" + m_left_or_right + "/depth/color/points", 10);
 
     m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -45,29 +45,35 @@ void CameraInterface::declareParameters()
 
     // TODO: Decide on topic
     m_topic_camera = "/cameras/" + left_or_right + "/depth/color/points";
-    m_node->declare_parameter("left_camera_serial_number", int());
-
 
     m_config = rs2::config();
     m_pipe = rs2::pipeline();
-    // TODO: Read it from here or get it passed through CV node?
-    // m_node->declare_parameter("left_camera_serial_number", int());
-    // declare_parameter("right_camera_serial_number", int());
-    // // Realsense cameras settings
-    // declare_parameter("realsense_camera_settings.decimation_filter", bool());
-    // declare_parameter("realsense_camera_settings.spatial_filter", bool());
-    // declare_parameter("realsense_camera_settings.temporal_filter", bool());
-    // declare_parameter("realsense_camera_settings.hole_filling_filter", bool());
-    // declare_parameter("realsense_camera_settings.threshold_filter", bool());
+    m_node->declare_parameter("m_serial_number", int());
+    // Realsense cameras settings
+    m_node->declare_parameter("m_decimation_filter", bool());
+    m_node->declare_parameter("m_spatial_filter", bool());
+    m_node->declare_parameter("m_temporal_filter", bool());
+    m_node->declare_parameter("m_hole_filling_filter", bool());
+    m_node->declare_parameter("m_threshold_filter", bool());
 }
 
 void CameraInterface::readParameters() 
 {
-    // TODO: Read it from here or get it passed through CV node?
+    if (m_left_or_right == "left") {
+        m_node->get_parameter("left_camera_serial_number", m_serial_number);
+    } else if (m_left_or_right == "right") {
+        m_node->get_parameter("right_camera_serial_number", m_serial_number);
+    }
+    m_node->get_parameter("realsense_camera_settings.decimation_filter", m_realsense_camera_settings.decimation_filter);
+    m_node->get_parameter("realsense_camera_settings.spatial_filter", m_realsense_camera_settings.spatial_filter);
+    m_node->get_parameter("realsense_camera_settings.temporal_filter", m_realsense_camera_settings.temporal_filter);
+    m_node->get_parameter("realsense_camera_settings.hole_filling_filter", m_realsense_camera_settings.hole_filling_filter);
+    m_node->get_parameter("realsense_camera_settings.threshold_filter", m_realsense_camera_settings.threshold_filter);
 }
 
-void CameraInterface::initializeCamera(const std::string& serial_number) 
+void CameraInterface::initializeCamera() 
 {
+    readParameters();
     while (true) {
         try {
             m_config.enable_device(serial_number);
@@ -80,6 +86,7 @@ void CameraInterface::initializeCamera(const std::string& serial_number)
             rclcpp::sleep_for(std::chrono::nanoseconds(1000000000)); // 1 second
             continue;
         }
+        // TODO: Put this in CV node
         m_realsense_timer = m_node->create_wall_timer(
             std::chrono::milliseconds(30),
             [this]() -> void { processRealSenseDepthFrames();}, m_realsense_callback_group);
@@ -112,11 +119,11 @@ void CameraInterface::processRealSenseDepthFrames() {
     PointCloud::Ptr point_cloud = pointsToPCL(points);
 
     // TODO: Change the topic?
-    //point_cloud->header.frame_id = "camera_" + m_left_or_right + "_depth_optical_frame";
+    point_cloud->header.frame_id = "camera_" + m_left_or_right + "_depth_optical_frame";
     processPointCloud(point_cloud);
 }
 
-// TODO: M7 waits for 1s ?
+// TODO: M7 waits for 1s ?; Remove this altogether
 void CameraInterface::processPointCloud(const PointCloud::Ptr& pointcloud) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_last_frame_time = std::clock();
@@ -146,34 +153,44 @@ PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) {
     return cloud;
 }
 
+// TODO: Implement this as a part of the callback on CV node sde with its node and publisher
 void CameraInterface::publishCloud(
-    const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud, std::string& left_or_right)
+    const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud)
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
     sensor_msgs::msg::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    msg.header.frame_id = "/cameras/" + left_or_right + "/depth/color/points";
+    msg.header.frame_id = "/cameras/" + m_left_or_right + "/depth/color/points";
 
     // TODO: Change to use the timeframe when the point cloud was received.
     msg.header.stamp = n->now();
     publisher->publish(msg);
 }
 
-// void CameraInterface::shutdown() {
+void CameraInterface::shutdown() 
+{
+    m_pipeline.stop();
+    m_tf_buffer.reset();
+    m_tf_listener.reset();
+    if (m_realsense_timer) {
+        m_realsense_timer->cancel();
+        m_realsense_timer.reset();
+    }
+    m_realsense_callback_group.reset();
+    m_point_callback_group.reset();
 
-//     m_pipeline.stop();
+//     RCLCPP_INFO(m_node->get_logger(), "CameraInterface for %s camera has been shut down.", m_left_or_right.c_str());
+}
 
-//     m_tf_buffer.reset();
-//     m_tf_listener.reset();
+void CameraInterface::run() 
+{
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(m_node->get_node_base_interface());
+    executor.spin();
+}
 
-//     if (m_realsense_timer) {
-//         m_realsense_timer->cancel();
-//         m_realsense_timer.reset();
-//     }
-
-//     m_realsense_callback_group.reset();
-//     m_point_callback_group.reset();
-
-////     RCLCPP_INFO(m_node->get_logger(), "CameraInterface for %s camera has been shut down.", m_left_or_right.c_str());
-// }
+void CameraInterface::stop() 
+{
+    executor.cancel();
+}
