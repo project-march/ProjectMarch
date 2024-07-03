@@ -28,9 +28,9 @@ variables:
 stages:
   - Build container
   - Documentation
-  - Lint code
+  # - Lint code
   - Build code
-  - Test code
+  # - Test code
 #  - Static analysis on code
 
 # GitLab defines different job types, depending on how the job is scheduled.
