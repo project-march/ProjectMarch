@@ -122,7 +122,7 @@ class MujocoSimNode(Node):
 
         obstacle = self.get_parameter("obstacle_to_load").get_parameter_value().string_value
         gaiting = self.get_parameter("gaiting_to_load").get_parameter_value().string_value
-        if gaiting == "ground":
+        if "ground" in gaiting:
             if "-" not in gaiting:
                 safety_catchers = [True, True, True, True, True, True]
             else:
