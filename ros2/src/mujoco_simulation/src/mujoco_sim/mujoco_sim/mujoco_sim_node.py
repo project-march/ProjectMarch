@@ -123,13 +123,22 @@ class MujocoSimNode(Node):
         obstacle = self.get_parameter("obstacle_to_load").get_parameter_value().string_value
         gaiting = self.get_parameter("gaiting_to_load").get_parameter_value().string_value
         if gaiting == "ground":
-            safety_catchers = [True, True, True, True, True, True]
-        elif gaiting == "ground-xz":
-            safety_catchers = [True, False, True, False, False, False]
-        elif gaiting == "ground-xyz":
-            safety_catchers = [True, True, True, False, False, False]
-        elif gaiting == "ground-xyzr":
-            safety_catchers = [True, True, True, True, False, False]
+            if "-" not in gaiting:
+                safety_catchers = [True, True, True, True, True, True]
+            else:
+                safety_catchers = [False, False, False, False, False, False]
+                if "x" in gaiting:
+                    safety_catchers[0] = True
+                if "y" in gaiting:
+                    safety_catchers[1] = True
+                if "z" in gaiting:
+                    safety_catchers[2] = True
+                if "r" in gaiting:
+                    safety_catchers[3] = True
+                if "p" in gaiting:
+                    safety_catchers[4] = True
+                if "s" in gaiting:
+                    safety_catchers[5] = True
         else: # safety_catchers == "air"
             safety_catchers = [False, False, False, False, False, False]
             obstacle = "" # No obstacle when airgaiting

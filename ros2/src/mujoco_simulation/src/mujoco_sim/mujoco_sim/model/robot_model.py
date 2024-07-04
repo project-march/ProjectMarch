@@ -149,7 +149,7 @@ class XMLModel:
             self.no_safety_catchers += 1
             self.safety_catch_roll = True
         if pitch:
-            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_y' type='hinge' axis='0 1 0' range='-180 180' pos='0 0 0'/>"
+            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_y' type='hinge' axis='0 1 0' range='-8 8' pos='0 0 0'/>"
             self.no_safety_catchers += 1
             self.safety_catch_pitch = True
         if yaw:
