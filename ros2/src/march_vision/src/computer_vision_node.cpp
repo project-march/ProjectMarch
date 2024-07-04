@@ -121,8 +121,11 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Comput
 
 void ComputerVisionNode::declareParameters()
 {
-    declare_parameter("cameras_used", std::string());
-    declare_parameter("plane_segmentation", true);
+    declare_parameter("m_cameras_used", std::string());
+    declare_parameter("m_plane_segmentation", true);
+    declare_parameter("m_latest_left_pc", PointCloud2::SharedPtr());
+    declare_parameter("m_latest_right_pc", PointCloud2::SharedPtr());
+    std::mutex pc_mutex;
 }
 
 void ComputerVisionNode::configureParameters()
@@ -194,9 +197,9 @@ void ComputerVisionNode::singleCameraCallback(const sensor_msgs::msg::PointCloud
     // TODO: Check if these are the correct header frame ids
     // TODO: Check if this is the correct way to process point clouds
     if (msg->header.frame_id == "left_camera") {
-        m_left_camera_interface.processPointCloud(msg);
+        m_cv_left_pc->publish(left_msg);
     } else if (msg->header.frame_id == "right_camera") {
-        m_right_camera_interface.processPointCloud(msg);
+        m_cv_right_pc->publish(right_msg);
     }
 }
 
@@ -204,8 +207,12 @@ void ComputerVisionNode::dualCameraCallback(
     const sensor_msgs::msg::PointCloud2::SharedPtr left_msg, 
     const sensor_msgs::msg::PointCloud2::SharedPtr right_msg)
 {
-    m_left_camera_interface.processPointCloud(left_msg);
-    m_right_camera_interface.processPointCloud(right_msg);
+    // m_left_camera_interface.processPointCloud(left_msg);
+    // m_right_camera_interface.processPointCloud(right_msg);
+    std::lock_guard<std::mutex> lock(pc_mutex);
+    // pointCloudRegistration(m_pc_registration_method, left_msg, right_msg);
+    m_cv_left_pc->publish(left_msg);
+    m_cv_right_pc->publish(right_msg);
 }
 
 // Cybathlon specific setup
@@ -219,7 +226,7 @@ int main(int argc, char* argv[])
 {
     rclcpp::init(argc, argv);
     // TODO: Multi or single threaded executor?
-    rclcpp::executors::SingleThreadedExecutor exec;
+    rclcpp::executors::MultiThreadedExecutor executor;
     auto node = std::make_shared<ComputerVisionNode>();
     rclcpp::spin(node);
     rclcpp::shutdown();
