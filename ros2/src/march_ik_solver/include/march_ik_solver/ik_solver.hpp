@@ -43,7 +43,7 @@ public:
     void updateDesiredTasks(const std::unordered_map<std::string, Eigen::VectorXd>& desired_tasks);
     void updateCurrentJointState(
         const std::vector<double>& current_joint_positions, const std::vector<double>& current_joint_velocities);
-    void updateWorldToBaseOrientation(const double& w, const double& x, const double& y, const double& z);
+    void updateCurrentWorldToBaseOrientation(const Eigen::Matrix3d& current_world_to_base_orientation);
     inline void updateCurrentStanceLeg(const uint8_t& current_stance_leg) { m_current_stance_leg = current_stance_leg; };
     inline void updateNextStanceLeg(const uint8_t& next_stance_leg) { m_next_stance_leg = next_stance_leg; };
     inline void updateCurrentLinearAcceleration(const Eigen::Vector3d& current_linear_acceleration) { m_current_linear_acceleration = current_linear_acceleration; };

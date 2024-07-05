@@ -115,6 +115,7 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
+    m_ik_solver->updateCurrentWorldToBaseOrientation(m_current_world_to_base_orientation);
     solveInverseKinematics(msg->header.stamp);
 }
 
