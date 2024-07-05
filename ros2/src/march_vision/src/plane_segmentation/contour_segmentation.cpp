@@ -76,7 +76,7 @@ ContourSegmentation::ContourSegmentation(const ContourSegmentationParameters& pa
   {
     int erosion_size = 1 + m_contour_parameters.margin_size;  // single sided length of the kernel
     int erosion_type = cv::MORPH_ELLIPSE;
-    m_margin_kernel = cv::getStructuringElement(erosion_type, cv::Size(2 * erosion_size + 1, 2 * erosionSize + 1));
+    m_margin_kernel = cv::getStructuringElement(erosion_type, cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1));
   }
 }
 
@@ -93,14 +93,14 @@ std::vector<PlanarRegion> ContourSegmentation::extractPlanarRegions(const Segmen
 
     // Try with safety margin
     cv::erode(m_binary_image, m_binary_image, m_margin_kernel, cv::Point(-1,-1), 1, cv::BORDER_REPLICATE);
-    auto boundaries_and_insets = contour_extraction::extractBoundaryAndInset(m_binary_image, m_inset_kernel);
+    auto boundaries_and_insets = extractBoundaryAndInset(m_binary_image, m_inset_kernel);
 
     // If safety margin makes the region disappear -> try without
     if (boundaries_and_insets.empty()) {
       m_binary_image = upsampled_map.labeled_image == label;
       // still 1 pixel erosion to remove the growth after upsampling
       cv::erode(m_binary_image, m_binary_image, m_inset_kernel, cv::Point(-1,-1), 1, cv::BORDER_REPLICATE);
-      boundaries_and_insets = contour_extraction::extractBoundaryAndInset(m_binary_image, m_inset_kernel);
+      boundaries_and_insets = extractBoundaryAndInset(m_binary_image, m_inset_kernel);
     }
 
     
@@ -109,15 +109,15 @@ std::vector<PlanarRegion> ContourSegmentation::extractPlanarRegions(const Segmen
     for (auto& boundary_and_inset : boundaries_and_insets) {
       // Transform points from pixel space to local terrain frame
       transformInPlace(boundary_and_inset, [&](CgalPoint2d& point) {
-        auto point_in_world = pixelToWorldFrame(point, upSampledMap.resolution, upsampled_map.map_origin);
+        auto point_in_world = pixelToWorldFrame(point, upsampled_map.resolution, upsampled_map.map_origin);
         point = projectToPlaneAlongGravity(point_in_world, plane_parameters);
       });
 
       PlanarRegion planar_region;
       planar_region.boundary_with_inset = std::move(boundary_and_inset);
-      planar_region.transform_plan_to_world = plane_parameters;
+      planar_region.transform_plane_to_world = plane_parameters;
       planar_region.bbox2d = planar_region.boundary_with_inset.boundary.outer_boundary().bbox();
-      planar_region.push_back(std::move(planar_region));
+      planar_regions.push_back(std::move(planar_region));
     }
   }
   return planar_regions;
@@ -160,7 +160,7 @@ std::vector<CgalPolygonWithHoles2d> extractPolygonsFromBinaryImage(const cv::Mat
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;  // [Next, Previous, First_Child, Parent]
-  auto isOuterContour = [](const cv::Vec4i& hierarchyVector) {
+  auto isOuterContour = [](const cv::Vec4i& hierarchy_vector) {
     return hierarchy_vector[3] < 0;  // no parent
   };
 

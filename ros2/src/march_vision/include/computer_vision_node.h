@@ -9,7 +9,7 @@
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/approximate_time.h"
 #include "march_shared_msgs/msg/exo_mode.hpp"
-#include "march_vision/processing/camera_interface.h"
+#include "processing/camera_interface.h"
 
 namespace march_vision {
     

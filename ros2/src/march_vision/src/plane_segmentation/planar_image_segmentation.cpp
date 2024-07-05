@@ -42,7 +42,7 @@ namespace {
 } // namespace
 
 PlanarImageSegmentation::PlanarImageSegmentation(const PlanarImageSegmentationParameters& parameters,
-    const RansacSegmentation::RansacSegmentationParameters& ransac_parameters)
+    const RansacSegmentationParameters& ransac_parameters)
     : m_parameters(parameters)
     , m_ransac_parameters(ransac_parameters)
 {
@@ -61,9 +61,9 @@ void PlanarImageSegmentation::runExtraction(const grid_map::GridMap& map, const 
     m_segmented_planes_map.label_plane_parameters.clear();
     const auto& map_size = m_map->getSize();
     m_binary_image_patch
-        = cv::Mat(mapSize(0), mapSize(1), CV_8U, 0.0); // Zero initialize to set untouched pixels to not planar;
+        = cv::Mat(map_size(0), map_size(1), CV_8U, 0.0); // Zero initialize to set untouched pixels to not planar;
     // Need a buffer of at least the linear size of the image. But there's no need to shrink if the buffer is already bigger.
-    const int linear_map_size = mapSize(0) * mapSize(1);
+    const int linear_map_size = map_size(0) * map_size(1);
 
     if (m_surface_normals.size() < linear_map_size) {
         m_surface_normals.reserve(linear_map_size);
@@ -160,13 +160,13 @@ void PlanarImageSegmentation::runSegmentation()
 {
     int number_of_label = cv::connectedComponents(
         m_binary_image_patch, m_segmented_planes_map.labeled_image, m_parameters.connectivity, CV_32S);
-    m_segmented_planes_map.highestLabel = number_of_label - 1; // Labels are [0, N-1]
+    m_segmented_planes_map.highest_label = number_of_label - 1; // Labels are [0, N-1]
 }
 
 void PlanarImageSegmentation::extractPlaneParametersFromLabeledImage()
 {
     const int number_of_extracted_planes_without_refinement
-        = m_segmented_planes_map.highestLabel; // Make local copy. The highestLabel is incremented inside the loop
+        = m_segmented_planes_map.highest_label; // Make local copy. The highestLabel is incremented inside the loop
 
     // Reserve a workvector that is reused between processing labels
     m_points_with_normal.reserve(m_segmented_planes_map.labeled_image.rows * m_segmented_planes_map.labeled_image.cols);
@@ -178,7 +178,7 @@ void PlanarImageSegmentation::extractPlaneParametersFromLabeledImage()
 }
 
 void PlanarImageSegmentation::computePlaneParametersForLabel(
-                    int label, std::vector<RansacSegmentation::PointWithNormal>& points_with_normal)
+                    int label, std::vector<PointWithNormal>& points_with_normal)
 {
     const auto& elevationData = (*m_map)[m_elevation_layer];
     points_with_normal.clear(); 
@@ -200,8 +200,8 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
                     sum_squared.noalias() += point3d * point3d.transpose();
 
                     const auto& local_surface_normal = m_surface_normals[getLinearIndex(row, col)];
-                    points_with_normal.emplace_back(RansacSegmentation::Point3D(point3d.x(), point3d.y(), point3d.z()),
-                        RansacSegmentation::Vector3D(
+                    points_with_normal.emplace_back(Point3D(point3d.x(), point3d.y(), point3d.z()),
+                        Vector3D(
                             local_surface_normal.x(), local_surface_normal.y(), local_surface_normal.z()));
                 }
             }
@@ -239,23 +239,24 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
 }
 
 void PlanarImageSegmentation::refineLabelWithRansac(
-    int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal) {
+    int label, std::vector<PointWithNormal>& points_with_normal) {
 
     CGAL::get_default_random() = CGAL::Random(0);
 
-    RansacSegmentation::RansacSegmentation ransac_segmentation(m_ransac_parameters);
-    ransac_segmentation.detectPlanes(points_with_normal);
-    const auto& planes = ransac_plane_extractor.getDetectedPlanes();
+    RansacSegmentation ransac_segmentation(m_ransac_parameters);
+    ransac_segmentation.detectPlanes(m_points_with_normal);
+    const auto& planes = ransac_segmentation.getDetectedPlanes();
 
     bool reuse_label = true;
     for (const auto& plane : planes) {
-        const auto plane_info = ransac_plane_extractor::RansacPlaneExtractor::getPlaneParameters(plane.get());
+        // TODO: Check if this is instance-specfic method
+        const auto plane_info = ransac_segmentation.getPlaneParameters(plane.get());
         const auto& normal_vector = plane_info.first;
         const auto& support_vector = plane_info.second;
 
         if (isWithinInclinationLimit(normal_vector)) {
             // reuse old label for the first plane
-            const int new_label = (reuse_label) ? label : ++m_segmented_planes_map.highestLabel;
+            const int new_label = (reuse_label) ? label : ++m_segmented_planes_map.highest_label;
             reuse_label = false;
 
             m_segmented_planes_map.label_plane_parameters.emplace_back(
@@ -297,7 +298,7 @@ void PlanarImageSegmentation::addSurfaceNormalToMap(grid_map::GridMap& map, cons
 
 bool PlanarImageSegmentation::isGloballyPlanar(const Eigen::Vector3d& normal_vector_plane,
     const Eigen::Vector3d& support_vector_plane,
-    const std::vector<RansacSegmentation::PointWithNormal>& points_with_normal) const
+    const std::vector<PointWithNormal>& points_with_normal) const
 {
     // Part of the plane projection that is independent of the point
     const double normal_dot_support_vector = normal_vector_plane.dot(support_vector_plane);

@@ -31,7 +31,7 @@ class PlaneSegmentationPipeline {
 
 
   PlaneSegmentationPipeline(const Config& config);
-
+  bool readParameters() const;
   void update(grid_map::GridMap&& grid_map, const std::string& elevation_layer);
 
   /// Access to the pipeline result.

@@ -49,7 +49,7 @@ class PlanarImageSegmentation {
  public:
 
   PlanarImageSegmentation(const PlanarImageSegmentationParameters& parameters,
-                              const RansacSegmentation::RansacSegmentationParameters& ransac_parameters);
+                              const RansacSegmentationParameters& ransac_parameters);
   void runExtraction(const grid_map::GridMap& map, const std::string& layer_height);
   const SegmentedPlanesMap& getSegmentedPlanesMap() const { return m_segmented_planes_map; }
   const cv::Mat& getBinaryLabeledImage() const { return m_binary_image_patch; }
@@ -59,27 +59,27 @@ class PlanarImageSegmentation {
  private:
 
   bool isGloballyPlanar(const Eigen::Vector3d& normal_vector_plane, const Eigen::Vector3d& support_vector_plane,
-                        const std::vector<RansacSegmentation::PointWithNormal>& points_with_normal) const;
+                        const std::vector<PointWithNormal>& points_with_normal) const;
   bool isWithinInclinationLimit(const Eigen::Vector3d& normal_vector_plane) const;
   std::pair<Eigen::Vector3d, double> computeNormalAndErrorForWindow(const Eigen::MatrixXf& window_data) const;
   bool isLocallyPlanar(const Eigen::Vector3d& localNormal, double mean_squared_error) const;
   int getLinearIndex(int row, int col) const { return row + col * m_map_rows; };
-  void computePlaneParametersForLabel(int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal);
-  void refineLabelWithRansac(int label, std::vector<ransac_plane_extractor::PointWithNormal>& points_with_normal);
+  void computePlaneParametersForLabel(int label, std::vector<PointWithNormal>& points_with_normal);
+  void refineLabelWithRansac(int label, std::vector<PointWithNormal>& points_with_normal);
   void extractPlaneParametersFromLabeledImage();
   void runSegmentation();
   void runSlidingWindowDetector();
   void setToBackground(int label);
 
   PlanarImageSegmentationParameters m_parameters;
-  RansacSegmentation::RansacSegmentationParameters m_ransac_parameters;
+  RansacSegmentationParameters m_ransac_parameters;
 
   const grid_map::GridMap* m_map;
   std::string m_elevation_layer;
   int m_map_rows;
 
   std::vector<Eigen::Vector3d> m_surface_normals;
-  std::vector<ransac_plane_extractor::PointWithNormal> m_points_with_normal;
+  std::vector<PointWithNormal> m_points_with_normal;
 
   cv::Mat m_binary_image_patch;
   SegmentedPlanesMap m_segmented_planes_map;
