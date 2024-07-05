@@ -1,11 +1,11 @@
 #pragma once
 
 //#include "plane_segmentation/grid_map_preprocessing.h"
-#include "march_vision/plane_segmentation/planar_region.h"
+#include "plane_segmentation/planar_region.h"
 // TODO: Remove if we're not going to use it
 // #include "march_vision/postprocessing.h"
-#include "march_vision/plane_segmentation/contour_segmentation.h"
-#include "march_vision/plane_segmentation/planar_image_segmentation.h"
+#include "plane_segmentation/contour_segmentation.h"
+#include "plane_segmentation/planar_image_segmentation.h"
 
 namespace plane_segmentation {
 
@@ -22,9 +22,9 @@ class PlaneSegmentationPipeline {
 
   struct Config {
     
-    planar_image_segmentation::PlanarImageSegmentationParameters PlanarImageSegmentationParameters;
-    ransac_segmentation::RansacSegmentationParameters RansacSegmentationParameters;
-    contour_segmentation::ContourSegmentationParameters ContourSegmentationParameters;
+    PlanarImageSegmentation::PlanarImageSegmentationParameters PlanarImageSegmentationParameters;
+    RansacSegmentation::RansacSegmentationParameters RansacSegmentationParameters;
+    ContourSegmentation::ContourSegmentationParameters ContourSegmentationParameters;
     // TODO: Remove if we're not going to use it
     PostprocessingParameters postprocessingParameters;
   };
@@ -45,8 +45,8 @@ class PlaneSegmentationPipeline {
 
   // Pipeline
   // GridMapPreprocessing preprocessing_;
-  planar_image_segmentation::PlanarImageSegmentation m_planar_image_segmentation;
-  contour_segmentation::ContourSegmentation m_contour_segmentation;
+  PlanarImageSegmentation::PlanarImageSegmentation m_planar_image_segmentation;
+  ContourSegmentation::ContourSegmentation m_contour_segmentation;
   // TODO: Remove if we're not going to use it
   Postprocessing postprocessing_;
 

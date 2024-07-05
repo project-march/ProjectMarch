@@ -4,7 +4,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-#include <march_vision/plane_segmentation/planar_region.h>
+#include <plane_segmentation/planar_region.h>
 
 namespace plane_segmentation {
 

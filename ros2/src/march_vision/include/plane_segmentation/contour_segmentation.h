@@ -7,8 +7,8 @@
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/property_map.h>
 
-#include "march_vision/plane_segmentation/planar_region.h"
-#include "march_vision/plane_segmentation/segmented_planes_map.h"
+#include "plane_segmentation/planar_region.h"
+#include "plane_segmentation/segmented_planes_map.h"
 
 namespace plane_segmentation {
 

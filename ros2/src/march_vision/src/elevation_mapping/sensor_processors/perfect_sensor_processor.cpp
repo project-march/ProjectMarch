@@ -6,7 +6,6 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "march_vision/elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
 
 // PCL
 #include <pcl/filters/filter.h>
@@ -16,7 +15,8 @@
 #include <string>
 #include <vector>
 
-#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
 
 namespace elevation_mapping {
 

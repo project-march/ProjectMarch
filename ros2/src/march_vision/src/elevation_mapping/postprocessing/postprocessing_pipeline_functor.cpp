@@ -11,7 +11,7 @@
 
 #include <grid_map_ros/grid_map_ros.hpp>
 
-#include "march_vision/elevation_mapping/postprocessing/postprocessing_pipeline_functor.hpp"
+#include "elevation_mapping/postprocessing/postprocessing_pipeline_functor.hpp"
 
 namespace elevation_mapping {
 

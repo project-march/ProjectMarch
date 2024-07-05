@@ -6,7 +6,6 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "march_vision/elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 
 // ROS
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -28,8 +27,8 @@
 #include <limits>
 #include <vector>
 
-#include "march_vision/elevation_mapping/[oint_XYZ_RGB_confidence_ratio.hpp"
-
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 namespace elevation_mapping {
 
 SensorProcessorBase::SensorProcessorBase(std::shared_ptr<rclcpp::Node>& nodeHandle, const GeneralParameters& generalConfig)

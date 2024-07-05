@@ -5,8 +5,8 @@
 #include <grid_map_core/GridMap.hpp>
 #include <opencv2/core/mat.hpp>
 
-#include "march_vision/plane_segmentation/segmented_planes_map.h"
-#include "march_vision/plane_segmentation/ransac_segmentation.h"
+#include "plane_segmentation/segmented_planes_map.h"
+#include "plane_segmentation/ransac_segmentation.h"
 
 namespace plane_segmentation {
 
@@ -49,7 +49,7 @@ class PlanarImageSegmentation {
  public:
 
   PlanarImageSegmentation(const PlanarImageSegmentationParameters& parameters,
-                              const ransac_segmentation::RansacSegmentationParameters& ransac_parameters);
+                              const RansacSegmentation::RansacSegmentationParameters& ransac_parameters);
   void runExtraction(const grid_map::GridMap& map, const std::string& layer_height);
   const SegmentedPlanesMap& getSegmentedPlanesMap() const { return m_segmented_planes_map; }
   const cv::Mat& getBinaryLabeledImage() const { return m_binary_image_patch; }
@@ -59,7 +59,7 @@ class PlanarImageSegmentation {
  private:
 
   bool isGloballyPlanar(const Eigen::Vector3d& normal_vector_plane, const Eigen::Vector3d& support_vector_plane,
-                        const std::vector<ransac_segmentation::PointWithNormal>& points_with_normal) const;
+                        const std::vector<RansacSegmentation::PointWithNormal>& points_with_normal) const;
   bool isWithinInclinationLimit(const Eigen::Vector3d& normal_vector_plane) const;
   std::pair<Eigen::Vector3d, double> computeNormalAndErrorForWindow(const Eigen::MatrixXf& window_data) const;
   bool isLocallyPlanar(const Eigen::Vector3d& localNormal, double mean_squared_error) const;
@@ -72,7 +72,7 @@ class PlanarImageSegmentation {
   void setToBackground(int label);
 
   PlanarImageSegmentationParameters m_parameters;
-  ransac_segmentation::RansacSegmentationParameters m_ransac_parameters;
+  RansacSegmentation::RansacSegmentationParameters m_ransac_parameters;
 
   const grid_map::GridMap* m_map;
   std::string m_elevation_layer;

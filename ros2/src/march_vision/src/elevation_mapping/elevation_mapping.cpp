@@ -26,11 +26,11 @@
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include "march_vision/elevation_mapping/elevation_map.hpp"
-#include "march_vision/elevation_mapping/elevation_mapping.hpp"
-#include "march_vision/elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
+#include "elevation_mapping/elevation_map.hpp"
+#include "elevation_mapping/elevation_mapping.hpp"
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
+#include "elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
 
 namespace elevation_mapping {
 
@@ -121,7 +121,7 @@ void ElevationMapping::setupServices() {
   disableUpdatesService_ = nodeHandle_->create_service<std_srvs::srv::Empty>("disable_updates", std::bind(&ElevationMapping::disableUpdatesServiceCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   maskedReplaceService_ = nodeHandle_->create_service<grid_map_msgs::srv::SetGridMap>("masked_replace", std::bind(&ElevationMapping::maskedReplaceServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
   saveMapService_ = nodeHandle_->create_service<grid_map_msgs::srv::ProcessFile>("save_map", std::bind(&ElevationMapping::saveMapServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
-  loadMapService_ = nodeHandle_-d Chair of Jewish Studies at Dartmouth College. She is the author of Common Sense and a Little Fire: Wome
+  loadMapService_ = nodeHandle_->create_service<grid_map_msgs::srv::ProcessFile>("load_map", std::bind(&ElevationMapping::loadMapServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void ElevationMapping::setupTimers() {

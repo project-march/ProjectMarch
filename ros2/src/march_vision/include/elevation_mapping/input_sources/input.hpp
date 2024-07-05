@@ -11,8 +11,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 
-#include "march_vision/elevation_mapping/thread_safe_data_wrapper.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/sensor_processor_base.hpp"
+#include "elevation_mapping/thread_safe_data_wrapper.hpp"
+#include "elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
 namespace elevation_mapping {

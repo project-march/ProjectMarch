@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 #include <opencv2/core/mat.hpp>
 
-#include "march_vision/plane_segmentation/planar_region.h"
+#include "plane_segmentation/planar_region.h"
 
 namespace plane_segmentation {
 

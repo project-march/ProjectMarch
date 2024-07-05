@@ -6,11 +6,9 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "march_vision/elevation_mapping/input_sources/input.hpp"
-
-#include "march_vision/elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/stereo_sensor_processor.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
+#include "elevation_mapping/input_sources/input.hpp"
+#include "elevation_mapping/sensor_processors/perfect_sensor_processor.hpp"
+#include "elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
 
 namespace elevation_mapping {
 

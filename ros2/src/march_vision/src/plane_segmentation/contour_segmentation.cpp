@@ -1,6 +1,5 @@
-#include "march_vision/plane_segmentation/contour_segmentation.h"
-
-#include <march_vision/plane_segmentation/geometry_utils.h>
+#include "plane_segmentation/contour_segmentation.h"
+#include "plane_segmentation/geometry_utils.h"
 #include <opencv2/imgproc.hpp>
 
 namespace plane_segmentation {

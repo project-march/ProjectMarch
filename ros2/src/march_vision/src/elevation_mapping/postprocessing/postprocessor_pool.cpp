@@ -6,7 +6,7 @@
  * MARCH functionality and ROS2 porting by Alexander Andonov
  */
 
-#include "march_vision/elevation_mapping/postprocessing/postprocessor_pool.hpp"
+#include "elevation_mapping/postprocessing/postprocessor_pool.hpp"
 
 namespace elevation_mapping {
 

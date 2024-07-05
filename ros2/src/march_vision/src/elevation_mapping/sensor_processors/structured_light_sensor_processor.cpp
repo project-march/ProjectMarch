@@ -13,8 +13,8 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/voxel_grid.h>
 
-#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/sensor_processors/structured_light_sensor_processor.hpp"
 
 namespace elevation_mapping {
 

@@ -34,12 +34,12 @@
 #include <boost/thread.hpp>
 
 // Elevation Mapping
-#include "march_vision/elevation_mapping/elevation_map.hpp"
-#include "march_vision/elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
-#include "march_vision/elevation_mapping/robot_motion_map_updater.hpp"
-#include "march_vision/elevation_mapping/weighted_empirical_cumulative_distribution_function.hpp"
-#include "march_vision/elevation_mapping/input_sources/input_source_manager.hpp"
-#include "march_vision/elevation_mapping/sensor_processors/sensor_processor_base.hpp"
+#include "elevation_mapping/elevation_map.hpp"
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/robot_motion_map_updater.hpp"
+#include "elevation_mapping/weighted_empirical_cumulative_distribution_function.hpp"
+#include "elevation_mapping/input_sources/input_source_manager.hpp"
+#include "elevation_mapping/sensor_processors/sensor_processor_base.hpp"
 
 namespace elevation_mapping {
 

@@ -13,10 +13,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <Eigen/Dense>
 
-#include "march_vision/elevation_mapping/ElevationMap.hpp"
-#include "march_vision/elevation_mapping/ElevationMapFunctors.hpp"
-#include "march_vision/elevation_mapping/PointXYZRGBConfidenceRatio.hpp"
-#include "march_vision/elevation_mapping/WeightedEmpiricalCumulativeDistributionFunction.hpp"
+#include "elevation_mapping/elevation_map.hpp"
+#include "elevation_mapping/elevation_map_functors.hpp"
+#include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"
+#include "elevation_mapping/weighted_empirical_cumulative_distribution_function.hpp"
 
 namespace {
 /**

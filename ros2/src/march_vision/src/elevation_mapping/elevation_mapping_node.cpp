@@ -7,7 +7,7 @@
  */
 
 #include <rclcpp/rclcpp.hpp>
-#include "march_vision/elevation_mapping/elevation_mapping.hpp"
+#include "elevation_mapping/elevation_mapping.hpp"
 
 namespace elevation_mapping {
 

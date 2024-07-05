@@ -1,4 +1,4 @@
-#include "march_vision/plane_segmentation/planar_image_segmentation.h"
+#include "plane_segmentation/planar_image_segmentation.h"
 
 #include <chrono>
 #include <cmath>
@@ -42,7 +42,7 @@ namespace {
 } // namespace
 
 PlanarImageSegmentation::PlanarImageSegmentation(const PlanarImageSegmentationParameters& parameters,
-    const ransac_segmentation::RansacSegmentationParameters& ransac_parameters)
+    const RansacSegmentation::RansacSegmentationParameters& ransac_parameters)
     : m_parameters(parameters)
     , m_ransac_parameters(ransac_parameters)
 {
@@ -178,7 +178,7 @@ void PlanarImageSegmentation::extractPlaneParametersFromLabeledImage()
 }
 
 void PlanarImageSegmentation::computePlaneParametersForLabel(
-                    int label, std::vector<ransac_segmentation::PointWithNormal>& points_with_normal)
+                    int label, std::vector<RansacSegmentation::PointWithNormal>& points_with_normal)
 {
     const auto& elevationData = (*m_map)[m_elevation_layer];
     points_with_normal.clear(); 
@@ -200,8 +200,8 @@ void PlanarImageSegmentation::computePlaneParametersForLabel(
                     sum_squared.noalias() += point3d * point3d.transpose();
 
                     const auto& local_surface_normal = m_surface_normals[getLinearIndex(row, col)];
-                    points_with_normal.emplace_back(ransac_segmentation::Point3D(point3d.x(), point3d.y(), point3d.z()),
-                        ransac_segmentation::Vector3D(
+                    points_with_normal.emplace_back(RansacSegmentation::Point3D(point3d.x(), point3d.y(), point3d.z()),
+                        RansacSegmentation::Vector3D(
                             local_surface_normal.x(), local_surface_normal.y(), local_surface_normal.z()));
                 }
             }
@@ -243,7 +243,7 @@ void PlanarImageSegmentation::refineLabelWithRansac(
 
     CGAL::get_default_random() = CGAL::Random(0);
 
-    ransac_segmentation::RansacSegmentation ransac_segmentation(m_ransac_parameters);
+    RansacSegmentation::RansacSegmentation ransac_segmentation(m_ransac_parameters);
     ransac_segmentation.detectPlanes(points_with_normal);
     const auto& planes = ransac_plane_extractor.getDetectedPlanes();
 
@@ -297,7 +297,7 @@ void PlanarImageSegmentation::addSurfaceNormalToMap(grid_map::GridMap& map, cons
 
 bool PlanarImageSegmentation::isGloballyPlanar(const Eigen::Vector3d& normal_vector_plane,
     const Eigen::Vector3d& support_vector_plane,
-    const std::vector<ransac_segmentation::PointWithNormal>& points_with_normal) const
+    const std::vector<RansacSegmentation::PointWithNormal>& points_with_normal) const
 {
     // Part of the plane projection that is independent of the point
     const double normal_dot_support_vector = normal_vector_plane.dot(support_vector_plane);

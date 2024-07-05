@@ -1,6 +1,5 @@
-#include "march_vision/plane_segmentation/polygon_decomposition.h"
-
-#include "march_vision/plane_segmentation/geometry_utils.h"
+#include "plane_segmentation/polygon_decomposition.h"
+#include "plane_segmentation/geometry_utils.h"
 
 namespace plane_segmentation {
 
