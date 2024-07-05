@@ -41,9 +41,9 @@ IKSolverNode::IKSolverNode()
     m_ik_solver_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
-    // m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-    //     "state_estimation/state", rclcpp::SensorDataQoS(),
-    //     std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
+    m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
+        "state_estimation/state", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_clock_sub = this->create_subscription<std_msgs::msg::Header>(
         "state_estimation/clock", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_subscription_options);
@@ -120,19 +120,7 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
 void IKSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg)
 {
-    m_actual_joint_positions.clear();
-    m_actual_joint_velocities.clear();
-    for (const auto& joint_name : m_joint_names) {
-        auto it = std::find(msg->joint_state.name.begin(), msg->joint_state.name.end(), joint_name);
-        if (it != msg->joint_state.name.end()) {
-            std::size_t joint_id = std::distance(msg->joint_state.name.begin(), it);
-            m_actual_joint_positions.push_back(msg->joint_state.position[joint_id]);
-            m_actual_joint_velocities.push_back(msg->joint_state.velocity[joint_id]);
-        }
-    }
-
-    m_current_world_to_base_orientation = Eigen::Quaterniond(
-        msg->imu.orientation.w, msg->imu.orientation.x, msg->imu.orientation.y, msg->imu.orientation.z).toRotationMatrix();
+    updateCurrentWorldToBaseOrientation(msg->imu.orientation);
 }
 
 void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::SharedPtr exo_mode_msg, 
@@ -140,7 +128,7 @@ void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::Shared
 {
     RCLCPP_INFO(this->get_logger(), "New gait callback.");
     (void) exo_mode_msg;
-    stateEstimationCallback(state_estimation_msg);
+    updateCurrentJointState(state_estimation_msg->joint_state);
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -244,6 +232,26 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
         m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
     m_actual_joint_velocities = std::vector<double>(
         m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
+}
+
+void IKSolverNode::updateCurrentJointState(const sensor_msgs::msg::JointState& joint_state_msg)
+{
+    m_actual_joint_positions.clear();
+    m_actual_joint_velocities.clear();
+    for (const auto& joint_name : m_joint_names) {
+        auto it = std::find(joint_state_msg.name.begin(), joint_state_msg.name.end(), joint_name);
+        if (it != joint_state_msg.name.end()) {
+            std::size_t joint_id = std::distance(joint_state_msg.name.begin(), it);
+            m_actual_joint_positions.push_back(joint_state_msg.position[joint_id]);
+            m_actual_joint_velocities.push_back(joint_state_msg.velocity[joint_id]);
+        }
+    }
+}
+
+void IKSolverNode::updateCurrentWorldToBaseOrientation(const geometry_msgs::msg::Quaternion& orientation_msg)
+{
+    m_current_world_to_base_orientation = Eigen::Quaterniond(
+        orientation_msg.w, orientation_msg.x, orientation_msg.y, orientation_msg.z).toRotationMatrix();
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(

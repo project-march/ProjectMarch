@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/quaternion.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/iks_command.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
@@ -48,6 +49,8 @@ private:
     void publishEstimatedFootPositions();
 
     void solveInverseKinematics(const rclcpp::Time& start_time);
+    void updateCurrentJointState(const sensor_msgs::msg::JointState& joint_state_msg);
+    void updateCurrentWorldToBaseOrientation(const geometry_msgs::msg::Quaternion& orientation_msg);
     void updatePreviousJointTrajectoryPoint(const trajectory_msgs::msg::JointTrajectoryPoint& joint_trajectory_point);
     void alphabetizeJointTrajectory(const trajectory_msgs::msg::JointTrajectoryPoint::SharedPtr joint_trajectory_point);
     void configureIKSolverParameters();
