@@ -165,7 +165,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         
         switch (m_gait_planning.getGaitType()){
             case ExoMode::Walk:
-            case ExoMode::Sideways:
+            case ExoMode::SidewaysRight:
                 m_gait_planning.setCounter(0); 
                 break;
 
@@ -371,7 +371,8 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     case ExoMode::Stand :
                     case ExoMode::Ascending :
                     case ExoMode::Descending :
-                    case ExoMode::Sideways :
+                    case ExoMode::SidewaysRight :
+                    case ExoMode::SidewaysLeft :
 
                         finishGaitBeforeStand(); 
                         break; 
@@ -409,8 +410,14 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
                 break;
             
-            case ExoMode::Sideways :
-                m_current_trajectory = m_gait_planning.getSidewaysGait(); 
+            case ExoMode::SidewaysRight :
+                m_current_trajectory = m_gait_planning.getSidewaysRightGait(); 
+                processMovingGaits(count); 
+                m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? 0 : (count + 1));
+                break;
+
+            case ExoMode::SidewaysLeft:
+                m_current_trajectory = m_gait_planning.getSidewaysLeftGait(); 
                 processMovingGaits(count); 
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? 0 : (count + 1));
                 break;
