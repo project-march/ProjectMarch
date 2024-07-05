@@ -25,7 +25,7 @@ void PostureTask::computeCurrentTaskCoordinates()
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
         // Fixed-size template cannot be used with aliases
         Eigen::Matrix3d rotation_matrix;
-        rotation_matrix.noalias() = m_current_world_to_base_orientation * m_data->oMi[m_joint_indices[i]].rotation();
+        rotation_matrix.noalias() = m_current_world_to_base_orientation.transpose() * m_data->oMi[m_joint_indices[i]].rotation();
         m_current_task(i) = rotation_matrix.eulerAngles(ROTATION_YAW_INDEX, ROTATION_PITCH_INDEX, ROTATION_ROLL_INDEX).y();
     }
 }
