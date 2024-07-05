@@ -40,7 +40,8 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getFirstStepAngleTrajectory() const; 
     std::vector<std::vector<double>> getFullGaitAngleCSV() const; 
     std::vector<std::vector<double>> getStandToSitGait() const; 
-    std::vector<std::vector<double>> getSidewaysGait() const; 
+    std::vector<std::vector<double>> getSidewaysRightGait() const; 
+    std::vector<std::vector<double>> getSidewaysLeftGait() const;
     std::vector<std::vector<double>> getSitToStandGait() const; 
     std::vector<std::vector<double>> getAscendingGait() const;
     std::vector<std::vector<double>> getDescendingGait() const;
@@ -58,7 +59,8 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_complete_step_angle_trajectory; 
     std::vector<std::vector<double>> m_half_step_angle_trajectory; 
     std::vector<std::vector<double>> m_stand_to_sit_trajectory; 
-    std::vector<std::vector<double>> m_sideways_trajectory; 
+    std::vector<std::vector<double>> m_sideways_right_trajectory; 
+    std::vector<std::vector<double>> m_sideways_left_trajectory;
     std::vector<std::vector<double>> m_sit_to_stand_trajectory; 
     std::vector<std::vector<double>> m_ascending_trajectory;
     std::vector<std::vector<double>> m_descending_trajectory;
