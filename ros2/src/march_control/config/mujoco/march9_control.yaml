@@ -1,12 +1,13 @@
 controller_manager:
   ros__parameters:
-    update_rate: 125  # Hz
+    update_rate: 200  # Hz
 
     march_pdb_state_broadcaster:
       type: pdb_state_broadcaster/PdbStateBroadcaster
 
     march_motor_controller_state_broadcaster:
       type: march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster
+    update_rate: 200  # Hz
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
@@ -26,7 +27,7 @@ march_motor_controller_state_broadcaster:
 
 joint_trajectory_controller:
   ros__parameters:
-    update_rate: 125
+    update_rate: 200
     joints:
       - left_ankle_dpf
       - left_ankle_ie

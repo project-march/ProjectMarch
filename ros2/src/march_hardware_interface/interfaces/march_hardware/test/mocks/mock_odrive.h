@@ -42,6 +42,7 @@ public:
     MOCK_METHOD0(getMotorCurrent, float());
 
     MOCK_METHOD1(actuateRadians, void(float));
+    MOCK_METHOD1(sendTargetPosition, void(float));
     MOCK_METHOD1(actuateTorque, void(float));
 
     MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));

@@ -18,7 +18,7 @@ from mujoco_sim.sensor_data_extraction import SensorDataExtraction
 from queue import Queue, Empty
 from rclpy.node import Node
 import aie_passive_force
-
+from robot_model import XMLModel
 
 def get_actuator_names(model):
     """This function returns an string array containing the actuator names defined in the mujoco model.
@@ -109,13 +109,43 @@ class MujocoSimNode(Node):
         self.model_name = self.get_parameter("model_to_load")
         self.get_logger().info("Launching Mujoco simulation with robot " + str(self.model_name.value))
         self.file_path = get_package_share_directory("march_description") + "/urdf/march9/" + str(self.model_name.value)
+        # self.model_string = open(self.file_path, "r").read()
+        # self.model = mujoco.MjModel.from_xml_path(self.file_path)
         
         # with open(os.path.join(get_package_share_directory("march_control"), "config", "mujoco", "march9_control.yaml")) as file:
         #     yaml_data = yaml.safe_load(file)
         #     self.actuator_names = yaml_data['march_joint_position_controller']['ros__parameters']['joints']
 
-        self.model_string = open(self.file_path, "r").read()
-        self.model = mujoco.MjModel.from_xml_path(self.file_path)
+        # Dynamic model loading
+        self.declare_parameter("gaiting_to_load")
+        self.declare_parameter("obstacle_to_load")
+
+        obstacle = self.get_parameter("obstacle_to_load").get_parameter_value().string_value
+        gaiting = self.get_parameter("gaiting_to_load").get_parameter_value().string_value
+        if gaiting == "ground":
+            safety_catchers = [True, True, True, True, True, True]
+        elif gaiting == "ground-xz":
+            safety_catchers = [True, False, True, False, False, False]
+        elif gaiting == "ground-xyz":
+            safety_catchers = [True, True, True, False, False, False]
+        elif gaiting == "ground-xyzr":
+            safety_catchers = [True, True, True, True, False, False]
+        else: # safety_catchers == "air"
+            safety_catchers = [False, False, False, False, False, False]
+            obstacle = "" # No obstacle when airgaiting
+        
+        xml_model = XMLModel()
+        xml_model.build_exoskeleton(
+            x=safety_catchers[0],
+            y=safety_catchers[1],
+            z=safety_catchers[2],
+            roll=safety_catchers[3],
+            pitch=safety_catchers[4],
+            yaw=safety_catchers[5],
+        )
+        xml_model.build_obstacle(obstacle)
+
+        self.model = mujoco.MjModel.from_xml_string(xml_model.build_mujoco_model())
         self.data = mujoco.MjData(self.model)
         self.set_initial_keyframe(0)
 
@@ -199,6 +229,7 @@ class MujocoSimNode(Node):
         # Create the visualizer and visualization timer
         sim_window_fps = 60
         self.visualizer = MujocoVisualizer(self.model, self.data)
+        self.visualizer.modify_camera_attributes(xml_model.get_camera_attributes())
         self.create_timer(1 / sim_window_fps, self.sim_visualizer_timer_callback)
 
         # Create time variables to check when the last trajectory point has been sent. We assume const DT

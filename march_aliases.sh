@@ -46,6 +46,8 @@ alias test_joints='cm2 && sros2 && sfox && ros2 launch march_launch test_joints.
 
 alias test_mpc='cm2 && sros2 && sfox && ros2 launch march_launch mpc.launch.py model_to_load_mujoco:="march8_v0_aie_v0.xml" rviz:=true'
 
+alias change_gaits='cd ~/march && /bin/python3 /home/control/march/utility_scripts/change_gaits_gui.py'
+
 # Alias to build one package, appended with specified package
 alias mbp='mba --packages-select'
 

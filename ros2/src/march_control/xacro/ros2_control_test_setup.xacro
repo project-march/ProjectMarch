@@ -54,9 +54,6 @@
     </xacro:if>
   </hardware>
 
-  <xacro:march_joint name="linear_joint"/>
-  <xacro:march_joint name="rotational_joint"/>
-
 </ros2_control>
 
 </robot>
