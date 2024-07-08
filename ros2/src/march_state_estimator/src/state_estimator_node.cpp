@@ -232,12 +232,12 @@ void StateEstimatorNode::timerCallback()
             body_foot_poses[LEFT_FOOT_ID].orientation.w, 
             body_foot_poses[LEFT_FOOT_ID].orientation.x, 
             body_foot_poses[LEFT_FOOT_ID].orientation.y, 
-            body_foot_poses[LEFT_FOOT_ID].orientation.z).inverse();
+            body_foot_poses[LEFT_FOOT_ID].orientation.z);
         ekf_observation.right_foot_slippage = Eigen::Quaterniond(
             body_foot_poses[RIGHT_FOOT_ID].orientation.w, 
             body_foot_poses[RIGHT_FOOT_ID].orientation.x, 
             body_foot_poses[RIGHT_FOOT_ID].orientation.y, 
-            body_foot_poses[RIGHT_FOOT_ID].orientation.z).inverse();
+            body_foot_poses[RIGHT_FOOT_ID].orientation.z);
         m_sensor_fusion->setObservation(ekf_observation);
 
         #ifdef DEBUG
