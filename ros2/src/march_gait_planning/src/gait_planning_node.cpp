@@ -2,12 +2,16 @@
 
 #include "march_gait_planning/gait_planning_node.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 
 using std::placeholders::_1; 
 
 #define COLOR_GREEN   "\033[32m"
 #define RESET   "\033[0m"
 #define COLOR_RED   "\033[31m"
+#define COLOR_PERIWINKLE   "\033[38;5;147m"
+
 
 GaitPlanningCartesianNode::GaitPlanningCartesianNode()
     : rclcpp_lifecycle::LifecycleNode("gait_planning_cartesian_node", rclcpp::NodeOptions().use_intra_process_comms(false))
@@ -39,8 +43,17 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningCartesianNode::MPCCallback, this, _1));
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
+    
+    std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
+    m_home_stand = parseHomestandYAML(homestand_path);
 
-    m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
+    if (m_home_stand.size() != 6) {
+        RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f" RESET, m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
+    }
+
+    // m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
 
     RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Cartesian node configured! " RESET); 
 
@@ -429,6 +442,25 @@ void GaitPlanningCartesianNode::publishFootPositions(){
         default :
             break;
     }
+}
+
+std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::string& file_path){
+
+    std::vector<double> values;
+    
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node cartesian = config["cartesian"];
+        if (cartesian && cartesian.IsSequence()) {
+            for (const auto& value : cartesian) {
+                values.push_back(value.as<double>());
+            }
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return values;
 }
 
 int main(int argc, char *argv[]){
