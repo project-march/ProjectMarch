@@ -57,10 +57,10 @@ def create_bezier_csv(points, array_size, gait_type):
 
     final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
 
-    plt.scatter(x_swing_first_step, z_swing_first_step)
-    plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
-    plt.title("First Step")
-    plt.show()
+    # plt.scatter(x_swing_first_step, z_swing_first_step)
+    # plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
+    # plt.title("First Step")
+    # plt.show()
 
     # ------------------------------------------------- FULL STEP ----------------------------------------------------------------------------------
     phi_full_step = np.linspace(-ending_angle, ending_angle, int(array_size))
@@ -87,10 +87,10 @@ def create_bezier_csv(points, array_size, gait_type):
 
     final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
 
-    plt.plot(x_swing_complete_step, z_swing_complete_step)
-    plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
-    plt.title("Full Step")
-    plt.show()
+    # plt.plot(x_swing_complete_step, z_swing_complete_step)
+    # plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
+    # plt.title("Full Step")
+    # plt.show()
 
     # ------------------------------------------------- STEP CLOSE ----------------------------------------------------------------------------------
     phi_step_close = np.linspace(0, -ending_angle, int(array_size))
@@ -118,10 +118,10 @@ def create_bezier_csv(points, array_size, gait_type):
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
 
-    plt.plot(x_swing_step_close, z_swing_step_close)
-    plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
-    plt.title("Step Close")
-    plt.show()
+    # plt.plot(x_swing_step_close, z_swing_step_close)
+    # plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
+    # plt.title("Step Close")
+    # plt.show()
 
     if gait_type == "large_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
@@ -181,9 +181,9 @@ def stair_gaits(set_of_points, array_size):
     final_points_stairs_up = np.concatenate((first_points_stairs, second_step_points_stairs, third_step_points_stairs, forth_step_points_stairs, final_step_points_stairs), axis=0)
 
 
-    plt.plot(final_points_stairs_up[:,0], final_points_stairs_up[:,1])
-    plt.plot(final_points_stairs_up[:,2], final_points_stairs_up[:,3], color="orange")
-    plt.show()
+    # plt.plot(final_points_stairs_up[:,0], final_points_stairs_up[:,1])
+    # plt.plot(final_points_stairs_up[:,2], final_points_stairs_up[:,3], color="orange")
+    # plt.show()
 
     return final_points_stairs_up
 
@@ -196,9 +196,9 @@ def descend_stairs(data_up):
 
     final_points_stairs_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
 
-    plt.plot(x_swing, z_swing)
-    plt.plot(x_stance, z_stance, color="orange")
-    plt.show()
+    # plt.plot(x_swing, z_swing)
+    # plt.plot(x_stance, z_stance, color="orange")
+    # plt.show()
     return final_points_stairs_down
 
 def high_step_up(bezier_points, array_size):
@@ -260,9 +260,9 @@ def high_step_up(bezier_points, array_size):
 
     final_points_high_step_up = np.column_stack((x_right_high_step, z_right_high_step, x_left_high_step, z_left_high_step))
 
-    plt.plot(x_right_high_step, z_right_high_step)
-    plt.plot(x_left_high_step, z_left_high_step, color="orange")
-    plt.show()
+    # plt.plot(x_right_high_step, z_right_high_step)
+    # plt.plot(x_left_high_step, z_left_high_step, color="orange")
+    # plt.show()
 
     return final_points_high_step_up
 
@@ -274,9 +274,9 @@ def high_step_down(high_step_up_dataset):
 
     step_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
 
-    plt.plot(x_swing, z_swing)
-    plt.plot(x_stance, z_stance, color="orange")
-    plt.show()
+    # plt.plot(x_swing, z_swing)
+    # plt.plot(x_stance, z_stance, color="orange")
+    # plt.show()
 
     return step_down
 
