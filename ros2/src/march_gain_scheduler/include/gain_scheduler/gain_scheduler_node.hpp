@@ -21,6 +21,5 @@ class GainSchedulerNode:public rclcpp::Node {
         std::string vectorToString(const std::vector<double>& vec);
         void publishPidValues();
         void timerCallback();
-        void setTimer(int publish_time);  
 };
 

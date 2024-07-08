@@ -17,18 +17,11 @@ GainSchedulerNode::GainSchedulerNode()
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoModeAndJoint>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
 
-
     m_joint_states_subscriber = create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 10, std::bind(&GainSchedulerNode::jointStatesCallback, this, _1));
 
     m_timer = create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::timerCallback, this));
  }
-
-void GainSchedulerNode::setTimer(int publish_time) {
-    m_timer->cancel();
-    m_timer = create_wall_timer(std::chrono::milliseconds(publish_time), std::bind(&GainSchedulerNode::timerCallback, this));
-}
-
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
     m_scheduler.setConfigPath((ExoMode)msg->mode);
@@ -58,7 +51,7 @@ void GainSchedulerNode::publishPidValues() {
     const unsigned int joint_d_gain = 3;
 
     if (m_latest_joint_state != nullptr) {
-        joints = m_scheduler.getAllJointStatePidValues(m_latest_joint_state);
+        joints = m_scheduler.getJointAngleGains(m_latest_joint_state);
     } else {
         joints = m_scheduler.getAllPidValues();
     }

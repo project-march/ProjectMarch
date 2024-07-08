@@ -14,7 +14,7 @@ class GainScheduler {
         ~GainScheduler() = default;
         explicit GainScheduler(std::string config_path); 
         std::vector<std::tuple<std::string, double, double, double>> getAllPidValues();
-        std::vector<std::tuple<std::string, double, double, double>> getAllJointStatePidValues(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
+        std::vector<std::tuple<std::string, double, double, double>> getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
         void setConfigPath(const ExoMode &new_gait_type);
     private: 
         std::tuple<std::string, double, double, double> getPidValues(const std::string& joint, double current_position);

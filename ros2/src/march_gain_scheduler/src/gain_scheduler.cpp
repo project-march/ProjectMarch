@@ -50,7 +50,7 @@ std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getA
 }
 
 // Method to get the PID values for all joints
-std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getAllJointStatePidValues(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {
+std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {
     std::vector<std::tuple<std::string, double, double, double>> joints;
 
     for (std::size_t i = 0; i < joint_states->name.size(); i++) {
@@ -69,8 +69,6 @@ void GainScheduler::setConfigPath(const ExoMode &new_gait_type) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains.yaml");
     } else if (new_gait_type == static_cast<ExoMode>(1)) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/stand_gains.yaml");
-    } else if (new_gait_type == static_cast<ExoMode>(2)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/walk_gains.yaml");
     } else {
         throw std::runtime_error("Gait type not found");
     }
