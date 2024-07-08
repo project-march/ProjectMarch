@@ -15,7 +15,7 @@ GainSchedulerNode::GainSchedulerNode()
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
-    m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoModeAndJoint>(
+    m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
 
     m_joint_states_subscriber = create_subscription<sensor_msgs::msg::JointState>(
@@ -24,7 +24,7 @@ GainSchedulerNode::GainSchedulerNode()
     m_timer = create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::timerCallback, this));
  }
 
-void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
+void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
     m_gain_scheduler.setConfigPath((ExoMode)msg->mode);
 }
 
