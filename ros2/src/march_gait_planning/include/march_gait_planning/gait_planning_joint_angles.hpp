@@ -43,8 +43,6 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getSidewaysRightGait() const; 
     std::vector<std::vector<double>> getSidewaysLeftGait() const;
     std::vector<std::vector<double>> getSitToStandGait() const; 
-    std::vector<std::vector<double>> getAscendingGait() const;
-    std::vector<std::vector<double>> getDescendingGait() const;
     std::vector<std::vector<double>> getStepCloseGait() const; 
     std::vector<std::vector<double>> getHingeGait() const;
     std::vector<double> getHomeStand() const; 
@@ -62,8 +60,6 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_sideways_right_trajectory; 
     std::vector<std::vector<double>> m_sideways_left_trajectory;
     std::vector<std::vector<double>> m_sit_to_stand_trajectory; 
-    std::vector<std::vector<double>> m_ascending_trajectory;
-    std::vector<std::vector<double>> m_descending_trajectory;
     std::vector<std::vector<double>> m_step_close_trajectory; 
     std::vector<std::vector<double>> m_hinge_trajectory; 
     std::vector<double> m_home_stand; 

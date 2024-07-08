@@ -46,8 +46,6 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep_left.csv", m_sideways_left_trajectory);
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
-    processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
@@ -57,7 +55,7 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     std::vector<CSVRow> data; 
     std::ifstream file(path); 
     if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
+        std::cerr << "Error opening file" << path << std::endl; 
     }
     std::string line; 
     while (std::getline(file, line)){
@@ -161,14 +159,6 @@ std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysLeftGait() const
 
 std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
     return m_sit_to_stand_trajectory; 
-}
-
-std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
-    return m_ascending_trajectory; 
-}
-
-std::vector<std::vector<double>> GaitPlanningAngles::getDescendingGait() const{
-    return m_descending_trajectory; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
