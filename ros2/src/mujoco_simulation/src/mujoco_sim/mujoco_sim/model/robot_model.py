@@ -227,7 +227,7 @@ class XMLModel:
                             mass="0.589" 
                             pos="0.139 0.001 -0.052" 
                             fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
-                        <joint name="left_ankle_ie" axis="1 0 0" range="-0.1 0.1" class="AIE_joint"/>
+                        <joint name="left_ankle_ie" axis="1 0 0" range="-9 9" class="AIE_joint"/>
                         <geom type="mesh" mesh="L_Sole"/>
                         <site name="tor_L_AIE" size="0.01" pos="0 0 0"/>
 
@@ -289,7 +289,7 @@ class XMLModel:
                             mass="0.589"
                             pos="0.139 -0.001 -0.052" 
                             fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
-                        <joint name="right_ankle_ie" axis="-1 0 0" range="-0.1 0.1" class="AIE_joint"/>
+                        <joint name="right_ankle_ie" axis="-1 0 0" range="-9 9" class="AIE_joint"/>
                         <geom type="mesh" mesh="R_Sole"/>
                         <site name="tor_R_AIE" size="0.01" pos="0 0 0"/>
 
