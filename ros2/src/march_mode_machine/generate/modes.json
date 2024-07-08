@@ -17,8 +17,12 @@
 
   [
     {
-      "name": "Sideways",
+      "name": "SidewaysRight",
       "ExoMode": 5
+    },
+    {
+      "name": "SidewaysLeft",
+      "ExoMode": 16
     },
     {
       "name": "Ascending",

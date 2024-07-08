@@ -239,7 +239,7 @@ def generate_launch_description() -> LaunchDescription:
             "stderr": "log",
         },
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
-        condition=IfCondition(rosbags),
+        condition=IfCondition(rosbags or simulation),
     )
     # endregion
 

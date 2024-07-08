@@ -10,11 +10,11 @@ public:
     ExoModeTransitions() {
         transitions = {
             { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
-            { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Ascending, ExoMode::Descending} },
+            { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::SidewaysRight, ExoMode::Ascending, ExoMode::Descending} },
             { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
             { ExoMode::BootUp, { ExoMode::Stand } },
             { ExoMode::Error, {}},
-            { ExoMode::Sideways, { ExoMode::Stand}},
+            { ExoMode::SidewaysRight, { ExoMode::Stand}},
             { ExoMode::Ascending, { ExoMode::Stand}},
             { ExoMode::Descending, { ExoMode::Stand}}
         };
@@ -28,11 +28,11 @@ public:
                 {ExoMode::Stand, {ExoMode::Walk, ExoMode::BootUp}},
                 {ExoMode::Walk, {ExoMode::Stand}}, 
                 { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
-                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::Sideways, ExoMode::Ascending, ExoMode::Descending, ExoMode::Hinge} },
+                { ExoMode::Stand, { ExoMode::Sit, ExoMode::Walk, ExoMode::BootUp, ExoMode::Error, ExoMode::SidewaysRight, ExoMode::Ascending, ExoMode::Descending, ExoMode::Hinge} },
                 { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
                 { ExoMode::BootUp, { ExoMode::Stand } },
                 { ExoMode::Error, {}},
-                { ExoMode::Sideways, { ExoMode::Stand}},
+                { ExoMode::SidewaysRight, { ExoMode::Stand}},
                 { ExoMode::Ascending, { ExoMode::Stand}},
                 { ExoMode::Descending, { ExoMode::Stand}},
                 { ExoMode::Hinge, { ExoMode::Stand}}
@@ -42,7 +42,7 @@ public:
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 { ExoMode::Stand,
-                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending, ExoMode::Sit, ExoMode::Sideways, ExoMode::Hinge}},
+                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending, ExoMode::Sit, ExoMode::SidewaysLeft, ExoMode::SidewaysRight, ExoMode::Hinge}},
                 { ExoMode::LargeWalk, { ExoMode::Stand, ExoMode::Error} },
                 { ExoMode::SmallWalk, {ExoMode::Stand, ExoMode::Error}}, 
                 { ExoMode::BootUp, { ExoMode::Stand, ExoMode::Sit} },
@@ -56,7 +56,8 @@ public:
                 { ExoMode::Descending, { ExoMode::Stand, ExoMode::Error}}, 
                 { ExoMode::Sit, { ExoMode::Stand, ExoMode::BootUp, ExoMode::Error } },
                 { ExoMode::Walk, { ExoMode::Stand, ExoMode::Error} },
-                { ExoMode::Sideways, { ExoMode::Stand}}, 
+                { ExoMode::SidewaysLeft, { ExoMode::Stand}}, 
+                { ExoMode::SidewaysRight, { ExoMode::Stand}},
                 { ExoMode::Hinge, {ExoMode::Stand}}
             };
         }

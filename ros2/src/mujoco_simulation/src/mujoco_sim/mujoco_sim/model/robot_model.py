@@ -434,6 +434,59 @@ class XMLModel:
             """
     
     def build_sensors(self) -> str:
+        # return """
+        #     <sensor>
+        #         <!-- User parameter is the number of absolute encoder bits -->
+        #         <!-- encodersoutput position; connected to the actuator -->
+        #         <jointpos name="L_ADPF_pos_output" joint="left_ankle_dpf" user="18" noise="000"/>
+        #         <jointpos name="L_AIE_pos_output" joint="left_ankle_ie" user="18" noise="000"/>
+        #         <jointpos name="L_HAA_pos_output" joint="left_hip_aa" user="18" noise="000"/>
+        #         <jointpos name="L_HFE_pos_output" joint="left_hip_fe" user="18" noise="000"/>
+        #         <jointpos name="L_KFE_pos_output" joint="left_knee" user="18" noise="000"/>
+        #         <jointpos name="R_ADPF_output" joint="right_ankle_dpf" user="18" noise="000"/>
+        #         <jointpos name="R_AIE_output" joint="right_ankle_ie" user="18" noise="000"/>
+        #         <jointpos name="R_HAA_output" joint="right_hip_aa" user="18" noise="000"/>
+        #         <jointpos name="R_HFE_output" joint="right_hip_fe" user="18" noise="000"/>
+        #         <jointpos name="R_KFE_output" joint="right_knee" user="18" noise="000"/>
+        #         <!-- encodersoutput velocity; connected to the actuator -->
+        #         <jointvel name="L_ADPF_vel_output" joint="left_ankle_dpf" user="18" noise="000"/>
+        #         <jointvel name="L_AIE_vel_output" joint="left_ankle_ie" user="18" noise="000"/>
+        #         <jointvel name="L_HAA_vel_output" joint="left_hip_aa" user="18" noise="000"/>
+        #         <jointvel name="L_HFE_vel_output" joint="left_hip_fe" user="18" noise="000"/>
+        #         <jointvel name="L_KFE_vel_output" joint="left_knee" user="18" noise="000"/>
+        #         <jointvel name="R_ADPF_vel_output" joint="right_ankle_dpf" user="18" noise="000"/>
+        #         <jointvel name="R_AIE_vel_output" joint="right_ankle_ie" user="18" noise="000"/>
+        #         <jointvel name="R_HAA_vel_output" joint="right_hip_aa" user="18" noise="000"/>
+        #         <jointvel name="R_HFE_vel_output" joint="right_hip_fe" user="18" noise="000"/>
+        #         <jointvel name="R_KFE_vel_output" joint="right_knee" user="18" noise="000"/>
+        #         <!-- torque sensors; connected to the actuator-->
+
+        #     <!--    TODO: This could also be of the type actuatorvel -->
+        #         <torque name="L_ADPF_tor_output" site="tor_L_ADPF" user="13" noise="000"/>
+        #         <torque name="L_AIE_tor_output" site="tor_L_AIE" user="13" noise="000"/>
+        #         <torque name="L_HAA_tor_output" site="tor_L_HAA" user="13" noise="000"/>
+        #         <torque name="L_HFE_tor_output" site="tor_L_HFE" user="13" noise="000"/>
+        #         <torque name="L_KFE_tor_output" site="tor_L_KFE" user="13" noise="000"/>
+        #         <torque name="R_ADPF_tor_output" site="tor_R_ADPF" user="13" noise="000"/>
+        #         <torque name="R_AIE_tor_output" site="tor_R_AIE" user="13" noise="000"/>
+        #         <torque name="R_HAA_tor_output" site="tor_R_HAA" user="13" noise="000"/>
+        #         <torque name="R_HFE_tor_output" site="tor_R_HFE" user="13" noise="000"/>
+        #         <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
+
+        #         <!-- Noise & cutoff must be determined -->
+        #         <framepos name='backpack_position' objtype='site' objname='imu_backpack'/>
+        #         <framelinvel name='backpack_velocity' objtype='site' objname='imu_backpack'/>
+        #         <framequat name='backpack_orientation' objtype='site' objname='imu_backpack'/>
+        #         <gyro name='vel_imu_backpack' site='imu_backpack' noise='5e-4' cutoff='34.9'/>
+        #         <accelerometer name='acc_imu_backpack' site='imu_backpack' noise='1e-5' cutoff='157'/>
+        #         <magnetometer name='magnet_imu_backpack' site='imu_backpack'/>
+
+        #         <framequat name='torso_orientation' objtype='site' objname='imu_torso'/>
+        #         <gyro name='vel_imu_torso' site='imu_torso' noise='5e-4' cutoff='34.9'/>
+        #         <accelerometer name='acc_imu_torso' site='imu_torso' noise='1e-5' cutoff='157'/>
+        #         <magnetometer name='magnet_imu_torso' site='imu_torso'/>
+        #     </sensor>
+        #     """
         return """
             <sensor>
                 <!-- User parameter is the number of absolute encoder bits -->
@@ -449,29 +502,21 @@ class XMLModel:
                 <jointpos name="R_HFE_output" joint="right_hip_fe" user="18" noise="000"/>
                 <jointpos name="R_KFE_output" joint="right_knee" user="18" noise="000"/>
                 <!-- encodersoutput velocity; connected to the actuator -->
-                <jointvel name="L_ADPF_vel_output" joint="left_ankle_dpf" user="18" noise="000"/>
-                <jointvel name="L_AIE_vel_output" joint="left_ankle_ie" user="18" noise="000"/>
-                <jointvel name="L_HAA_vel_output" joint="left_hip_aa" user="18" noise="000"/>
-                <jointvel name="L_HFE_vel_output" joint="left_hip_fe" user="18" noise="000"/>
-                <jointvel name="L_KFE_vel_output" joint="left_knee" user="18" noise="000"/>
-                <jointvel name="R_ADPF_vel_output" joint="right_ankle_dpf" user="18" noise="000"/>
-                <jointvel name="R_AIE_vel_output" joint="right_ankle_ie" user="18" noise="000"/>
-                <jointvel name="R_HAA_vel_output" joint="right_hip_aa" user="18" noise="000"/>
-                <jointvel name="R_HFE_vel_output" joint="right_hip_fe" user="18" noise="000"/>
-                <jointvel name="R_KFE_vel_output" joint="right_knee" user="18" noise="000"/>
+                <jointvel name="left_ankle_dpf_vel_output" joint="left_ankle_dpf" user="18" noise="000"/>
+                <jointvel name="left_hip_aa_vel_output" joint="left_hip_aa" user="18" noise="000"/>
+                <jointvel name="left_hip_fe_vel_output" joint="left_hip_fe" user="18" noise="000"/>
+                <jointvel name="left_knee_vel_output" joint="left_knee" user="18" noise="000"/>
+                <jointvel name="right_ankle_dpf_vel_output" joint="right_ankle_dpf" user="18" noise="000"/>
+                <jointvel name="right_hip_aa_vel_output" joint="right_hip_aa" user="18" noise="000"/>
+                <jointvel name="right_hip_fe_vel_output" joint="right_hip_fe" user="18" noise="000"/>
+                <jointvel name="right_knee_vel_output" joint="right_knee" user="18" noise="000"/>
                 <!-- torque sensors; connected to the actuator-->
 
             <!--    TODO: This could also be of the type actuatorvel -->
-                <torque name="L_ADPF_tor_output" site="tor_L_ADPF" user="13" noise="000"/>
-                <torque name="L_AIE_tor_output" site="tor_L_AIE" user="13" noise="000"/>
-                <torque name="L_HAA_tor_output" site="tor_L_HAA" user="13" noise="000"/>
-                <torque name="L_HFE_tor_output" site="tor_L_HFE" user="13" noise="000"/>
-                <torque name="L_KFE_tor_output" site="tor_L_KFE" user="13" noise="000"/>
-                <torque name="R_ADPF_tor_output" site="tor_R_ADPF" user="13" noise="000"/>
-                <torque name="R_AIE_tor_output" site="tor_R_AIE" user="13" noise="000"/>
-                <torque name="R_HAA_tor_output" site="tor_R_HAA" user="13" noise="000"/>
-                <torque name="R_HFE_tor_output" site="tor_R_HFE" user="13" noise="000"/>
-                <torque name="R_KFE_tor_output" site="tor_R_KFE" user="13" noise="000"/>
+                <torque name="left_ankle_dpf_tor_output" site="tor_L_ADPF" user="13" noise="000"/>
+                <torque name="left_hip_aa_tor_output" site="tor_L_HAA" user="13" noise="000"/>
+                <torque name="right_ankle_dpf_tor_output" site="tor_R_ADPF" user="13" noise="000"/>
+                <torque name="right_hip_aa_tor_output" site="tor_R_HAA" user="13" noise="000"/>
 
                 <!-- Noise & cutoff must be determined -->
                 <framepos name='backpack_position' objtype='site' objname='imu_backpack'/>

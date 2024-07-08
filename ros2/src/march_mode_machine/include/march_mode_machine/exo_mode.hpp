@@ -10,7 +10,7 @@ enum class ExoMode {
     Walk = 2,
     BootUp = 3,
     Error = 4,
-    Sideways = 5,
+    SidewaysRight = 5,
     LargeWalk = 6,
     SmallWalk = 7,
     Ascending = 8,
@@ -21,6 +21,7 @@ enum class ExoMode {
     HighStep2 = 13,
     HighStep3 = 14,
     Hinge = 15,
+    SidewaysLeft = 16,
 };
 
 inline std::string toString(ExoMode state) {
@@ -30,7 +31,7 @@ inline std::string toString(ExoMode state) {
         case ExoMode::Walk: return "Walk";
         case ExoMode::BootUp: return "BootUp";
         case ExoMode::Error: return "Error";
-        case ExoMode::Sideways: return "Sideways";
+        case ExoMode::SidewaysRight: return "SidewaysRight";
         case ExoMode::LargeWalk: return "LargeWalk";
         case ExoMode::SmallWalk: return "SmallWalk";
         case ExoMode::Ascending: return "Ascending";
@@ -41,6 +42,7 @@ inline std::string toString(ExoMode state) {
         case ExoMode::HighStep2: return "HighStep2";
         case ExoMode::HighStep3: return "HighStep3";
         case ExoMode::Hinge: return "Hinge";
+        case ExoMode::SidewaysLeft: return "SidewaysLeft";
         default: return "Unknown";
     }
 }

@@ -59,7 +59,7 @@ class InteractiveBezier:
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
         self.updated_points = None
-        self.array_size = array_size    
+        self.array_size = int(array_size)
 
         # Create a separate window for the coordinates
         self.root = tk.Tk()
@@ -258,7 +258,7 @@ def interactive_bezier(gait_type: str, array_size: int):
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
 
-step_time = 3 # seconds
+step_time = 3.5 # seconds
 
 # interactive_bezier("small_gait", 150)
-interactive_bezier("high_step_3", step_time*HIGH_LEVEL_FREQUENCY)
+# interactive_bezier("high_step_3", step_time*HIGH_LEVEL_FREQUENCY)
