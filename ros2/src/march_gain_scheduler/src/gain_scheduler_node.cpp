@@ -3,6 +3,8 @@
 
 using std::placeholders::_1; 
 
+#define PUBLISH_TIME 1000
+
 GainSchedulerNode::GainSchedulerNode()
  : Node("gain_scheduler_node")
  {
@@ -19,7 +21,7 @@ GainSchedulerNode::GainSchedulerNode()
     m_joint_states_subscriber = create_subscription<sensor_msgs::msg::JointState>(
         "joint_states", 10, std::bind(&GainSchedulerNode::jointStatesCallback, this, _1));
 
-    m_timer = create_wall_timer(std::chrono::milliseconds(1000), std::bind(&GainSchedulerNode::timerCallback, this));
+    m_timer = create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::timerCallback, this));
  }
 
 void GainSchedulerNode::setTimer(int publish_time) {
@@ -29,7 +31,6 @@ void GainSchedulerNode::setTimer(int publish_time) {
 
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
-    RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str());
     m_scheduler.setConfigPath((ExoMode)msg->mode);
 }
 
@@ -56,14 +57,10 @@ void GainSchedulerNode::publishPidValues() {
     const unsigned int joint_i_gain = 2;
     const unsigned int joint_d_gain = 3;
 
-    if (m_scheduler.isInterpolating()) {
-        joints = m_scheduler.getInterpolatedPidValues();
+    if (m_latest_joint_state != nullptr) {
+        joints = m_scheduler.getAllJointStatePidValues(m_latest_joint_state);
     } else {
-        if (m_latest_joint_state != nullptr) {
-            joints = m_scheduler.getAllJointStatePidValues(m_latest_joint_state);
-        } else {
-            joints = m_scheduler.getAllPidValues();
-        }
+        joints = m_scheduler.getAllPidValues();
     }
 
     for (const auto& joint : joints) {
@@ -75,25 +72,11 @@ void GainSchedulerNode::publishPidValues() {
 
         m_pid_values_publisher->publish(pid_values_msg);
     }
-       
 }   
 
 
 void GainSchedulerNode::timerCallback() {
-    
-    if (m_scheduler.isInterpolating()) {
-        setTimer(m_scheduler.m_publish_time);
         
-        if (m_scheduler.m_time_step < m_scheduler.m_total_time) {
-            m_scheduler.incrementTimeStep();
-        } else {
-            m_scheduler.stopInterpolation();
-            m_scheduler.m_time_step = 0;
-        }
-    } else {
-        setTimer(1000);  
-    }
-    
     publishPidValues();
 }
 

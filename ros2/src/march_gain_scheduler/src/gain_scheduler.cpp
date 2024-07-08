@@ -63,15 +63,7 @@ std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getA
 
 // Method to set the config path
 void GainScheduler::setConfigPath(const ExoMode &new_gait_type) {
-    if (m_last_joint_state != nullptr) {
-        m_old_pid_values = getAllJointStatePidValues(m_last_joint_state);
-    } else {
-        m_old_pid_values = getAllPidValues();
-    }
-    
     m_gait_type = new_gait_type;
-    // startInterpolation();
-    std::cout << "Gait type set to: " << m_gait_type << '\n';
 
     if (new_gait_type == static_cast<ExoMode>(0)) {
         m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains.yaml");
@@ -82,29 +74,4 @@ void GainScheduler::setConfigPath(const ExoMode &new_gait_type) {
     } else {
         throw std::runtime_error("Gait type not found");
     }
-}
-
-std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getInterpolatedPidValues() {
-
-    if (m_last_joint_state != nullptr) {
-        m_new_pid_values = getAllJointStatePidValues(m_last_joint_state);
-    } else {
-        m_new_pid_values = getAllPidValues();
-    }
-    std::vector<std::tuple<std::string, double, double, double>> interpolated_pid_values;
-
-    for (std::size_t i = 0; i < m_new_pid_values.size(); i++) {
-        const double old_kp = std::get<1>(m_old_pid_values[i]);
-        const double old_ki = std::get<2>(m_old_pid_values[i]);
-        const double old_kd = std::get<3>(m_old_pid_values[i]);
-        const double new_kp = std::get<1>(m_new_pid_values[i]);
-        const double new_ki = std::get<2>(m_new_pid_values[i]);
-        const double new_kd = std::get<3>(m_new_pid_values[i]);
-        const double interpolated_kp = old_kp + (new_kp - old_kp) * m_time_step / m_total_time;
-        const double interpolated_ki = old_ki + (new_ki - old_ki) * m_time_step / m_total_time;
-        const double interpolated_kd = old_kd + (new_kd - old_kd) * m_time_step / m_total_time;
-        interpolated_pid_values.push_back(std::make_tuple(std::get<0>(m_new_pid_values[i]), interpolated_kp, interpolated_ki, interpolated_kd));
-    }
-
-    return interpolated_pid_values;
 }
