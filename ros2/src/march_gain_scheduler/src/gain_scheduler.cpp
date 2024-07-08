@@ -1,11 +1,11 @@
 #include "gain_scheduler/gain_scheduler.hpp"
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 GainScheduler::GainScheduler()
 {
 }
 
-GainScheduler::GainScheduler(std::string config_path)
-    : m_gait_type(static_cast<ExoMode>(0)), m_config(YAML::LoadFile(config_path))
+GainScheduler::GainScheduler(std::string system_type)
 {
 }
 

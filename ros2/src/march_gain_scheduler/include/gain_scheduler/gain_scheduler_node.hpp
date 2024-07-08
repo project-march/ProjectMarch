@@ -14,7 +14,7 @@ class GainSchedulerNode:public rclcpp::Node {
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_states_subscriber;
         rclcpp::TimerBase::SharedPtr m_timer; 
         sensor_msgs::msg::JointState::SharedPtr m_latest_joint_state;
-        GainScheduler m_scheduler;
+        GainScheduler m_gain_scheduler;
 
         void currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg);   
         void jointStatesCallback(const sensor_msgs::msg::JointState::SharedPtr msg);

@@ -1,27 +1,25 @@
 from launch import LaunchDescription
+from launch.actions import SetEnvironmentVariable
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
+from launch.substitutions import LaunchConfiguration
 import os
 
+
 def generate_launch_description():
-    default_config = os.path.join(get_package_share_directory('march_gain_scheduler'),'config','stand_gains.yaml') # sets the default config file path 
-    config_path = LaunchConfiguration('config_path', default=default_config)
+    """Generate the launch description for the gain scheduler node."""
+    ld = LaunchDescription()
 
-    os.environ['RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED'] = '1'
+    # Set env var to print messages to stdout immediately
+    arg = SetEnvironmentVariable("RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED", "1")
+    ld.add_action(arg)
 
-    return LaunchDescription([
-        DeclareLaunchArgument(
-            'config_path',
-            default_value=default_config,
-            description='Path to the config file.'
-        ),
-        Node(
-            package='march_gain_scheduler',
-            executable='gain_scheduler_node',
-            name='gain_scheduler',
-            output='screen',
-            parameters=[{'config_path': config_path}]
-        ),
-    ])
+    # parameters
+    system_type = LaunchConfiguration("system_type", default="tsu")
+
+    fuzzy_generator_node = Node(
+        package="march_gain_scheduler", executable="gain_scheduler_node", name="gain_scheduler", parameters=[{"system_type": system_type}],
+    )
+    ld.add_action(fuzzy_generator_node)
+
+    return ld

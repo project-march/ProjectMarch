@@ -12,16 +12,17 @@ class GainScheduler {
     public:
         GainScheduler();
         ~GainScheduler() = default;
-        explicit GainScheduler(std::string config_path); 
+        explicit GainScheduler(std::string system_type); 
         std::vector<std::tuple<std::string, double, double, double>> getAllPidValues();
         std::vector<std::tuple<std::string, double, double, double>> getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
+        std::vector<std::tuple<std::string, double, double, double>> getStanceSwingLegGains();
+        std::vector<std::tuple<std::string, double, double, double>> getConstantGains();
         void setConfigPath(const ExoMode &new_gait_type);
     private: 
         std::tuple<std::string, double, double, double> getPidValues(const std::string& joint, double current_position);
         ExoMode m_gait_type; 
         YAML::Node m_config;
         std::vector<std::tuple<std::string, double, double, double>> m_new_pid_values;
-        bool m_interpolating = false;   
         sensor_msgs::msg::JointState::SharedPtr m_last_joint_state;  
         double m_default_position = 0.0;
 }; 

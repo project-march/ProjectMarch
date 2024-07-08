@@ -5,12 +5,13 @@ using std::placeholders::_1;
 
 #define PUBLISH_TIME 1000
 
-GainSchedulerNode::GainSchedulerNode()
- : Node("gain_scheduler_node")
+GainSchedulerNode::GainSchedulerNode() 
+    : Node("gain_scheduler_node")
  {
-    this->declare_parameter<std::string>("config_path", "src/march_gain_scheduler/config/walk_gains.yaml");   
-    auto config_path = this->get_parameter("config_path").as_string();                                                       
-    m_scheduler = GainScheduler(config_path);
+    declare_parameter("system_type", std::string("tsu"));
+    std::string system_type = this->get_parameter("system_type").as_string();
+                                                    
+    m_gain_scheduler = GainScheduler(system_type);
 
     m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
 
@@ -24,7 +25,7 @@ GainSchedulerNode::GainSchedulerNode()
  }
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoModeAndJoint::SharedPtr msg) {
-    m_scheduler.setConfigPath((ExoMode)msg->mode);
+    m_gain_scheduler.setConfigPath((ExoMode)msg->mode);
 }
 
 std::string GainSchedulerNode::vectorToString(const std::vector<double>& vec) {
@@ -51,9 +52,9 @@ void GainSchedulerNode::publishPidValues() {
     const unsigned int joint_d_gain = 3;
 
     if (m_latest_joint_state != nullptr) {
-        joints = m_scheduler.getJointAngleGains(m_latest_joint_state);
+        joints = m_gain_scheduler.getJointAngleGains(m_latest_joint_state);
     } else {
-        joints = m_scheduler.getAllPidValues();
+        joints = m_gain_scheduler.getAllPidValues();
     }
 
     for (const auto& joint : joints) {
