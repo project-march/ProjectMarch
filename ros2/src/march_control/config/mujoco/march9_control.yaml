@@ -7,7 +7,6 @@ controller_manager:
 
     march_motor_controller_state_broadcaster:
       type: march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster
-    update_rate: 200  # Hz
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
