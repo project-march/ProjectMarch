@@ -25,7 +25,6 @@
 #include <geometry_msgs/msg/point_stamped.h>
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
 #include "elevation_mapping/elevation_map.hpp"
 #include "elevation_mapping/elevation_mapping.hpp"
 #include "elevation_mapping/point_XYZ_RGB_confidence_ratio.hpp"

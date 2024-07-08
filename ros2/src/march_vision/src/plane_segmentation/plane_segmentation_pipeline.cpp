@@ -30,7 +30,7 @@
 //   // Clear/overwrite old result
 //   m_planar_terrain.planar_regions.clear();
 //   m_planar_terrain.grid_map = std::move(grid_map);
-
+ 
 //   m_planar_image_segmentation.runExtraction(m_planar_terrain.grid_map, elevation_layer);
 //   m_planar_terrain.planar_regions = m_contour_segmentation.extractPlanarRegions(m_planar_image_segmentation.getSegmentedPlanesMap());
 //   // TODO: Don't know if we're going to use this

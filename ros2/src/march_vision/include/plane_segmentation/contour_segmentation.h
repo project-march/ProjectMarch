@@ -32,7 +32,7 @@ struct ContourSegmentationParameters {
 
 /**
  * Extracts the contours in map resolution, but with the x and y axis flipped.
- * This way all contours are in counter clockwise direction.
+ * This way all contours are in counter clockwise direction for CGAL.
  */
 class ContourSegmentation {
  public:
@@ -45,7 +45,6 @@ class ContourSegmentation {
   cv::Mat m_inset_kernel;
   cv::Mat m_margin_kernel;
 
-  // Memory to reuse between calls
   cv::Mat m_binary_image;
 };
 
