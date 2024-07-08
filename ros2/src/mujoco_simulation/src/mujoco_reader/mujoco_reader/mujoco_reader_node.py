@@ -40,6 +40,9 @@ class MujocoReaderNode(Node):
         self.sensor_subscription = self.create_subscription(
             MujocoDataSensing, "mujoco_sensor_output", self.sensor_listener_callback, 100
         )
+        self.previous_backpack_imu = Imu()
+        self.previous_backpack_imu.linear_acceleration.z = 9.81
+        self.alpha = 0.9
 
     def sensor_listener_callback(self, msg):
         """Listens to mujoco_sensor_output topic, and retrieves all newly published messages.
@@ -52,7 +55,13 @@ class MujocoReaderNode(Node):
         backpack_imu = msg.backpack_imu
         backpack_imu.header.stamp = self.get_clock().now().to_msg()
         backpack_imu.header.frame_id = "imu_link"
+
+        # Low pass filter for the acceleration, and the angular velocity
+        backpack_imu.linear_acceleration = self.lpf_vector(self.alpha, backpack_imu.linear_acceleration, self.previous_backpack_imu.linear_acceleration)
+        backpack_imu.angular_velocity = self.lpf_vector(self.alpha, backpack_imu.angular_velocity, self.previous_backpack_imu.angular_velocity)
+        self.previous_backpack_imu = backpack_imu
         self.backpack_imu_publisher.publish(backpack_imu)
+
         torso_imu = msg.torso_imu
         torso_imu.header.stamp = self.get_clock().now().to_msg()
         torso_imu.header.frame_id = "imu_link"
@@ -73,7 +82,14 @@ class MujocoReaderNode(Node):
         names = ["l_heel_right", "l_heel_left", "l_met1", "l_hallux", "l_met3", "l_toes", "l_met5", "l_arch",
                  "r_heel_right", "r_heel_left", "r_met1", "r_hallux", "r_met3", "r_toes", "r_met5", "r_arch"]
     
-
+    def lpf(self, alpha, x, x_prev):
+        return alpha * x + (1 - alpha) * x_prev
+    
+    def lpf_vector(self, alpha, v, v_prev):
+        v.x = self.lpf(alpha, v.x, v_prev.x)
+        v.y = self.lpf(alpha, v.y, v_prev.y)
+        v.z = self.lpf(alpha, v.z, v_prev.z)
+        return v
 
 def main(args=None):
     """Main function of the node.

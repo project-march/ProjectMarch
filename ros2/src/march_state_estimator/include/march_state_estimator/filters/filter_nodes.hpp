@@ -53,9 +53,9 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_pub;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr m_imu_pub;
 
-  const unsigned int m_imu_acc_window_size = 125;
-  const unsigned int m_imu_gyro_window_size = 125;
-  const unsigned int m_torque_window_size = 125;
+  const unsigned int m_imu_acc_window_size = 256;
+  const unsigned int m_imu_gyro_window_size = 256;
+  const unsigned int m_torque_window_size = 256;
 };
 
 #endif  // MARCH_STATE_ESTIMATOR__FILTERS__FILTER_NODES_HPP_

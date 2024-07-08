@@ -11,9 +11,9 @@ state_estimator:
         - 0.00012217304  # rad/s/√Hz, pitch
         - 0.00012217304  # rad/s/√Hz, yaw
         foot_position:
-        - 1.0  # x
-        - 1.0  # y
-        - 1.0  # z
+        - 1e2  # x
+        - 1e2  # y
+        - 1e2  # z
         accelerometer_bias:
         - 4.25166e-11  # m/s^2/√Hz, x
         - 4.25166e-11  # m/s^2/√Hz, y
@@ -23,33 +23,33 @@ state_estimator:
         - 1.46670e-12  # rad/s/√Hz, pitch
         - 1.46670e-12  # rad/s/√Hz, yaw
         foot_slippage:
-        - 1.0  # roll
-        - 1.0  # pitch
-        - 1.0  # yaw
+        - 1e2  # roll
+        - 1e2  # pitch
+        - 1e2  # yaw
       observation_noise:
         foot_position:
-        - 1e-1  # x
-        - 1e-1  # y
-        - 1e-1  # z
+        - 1e3  # x
+        - 1e3  # y
+        - 1e3  # z
         foot_slippage:
-        - 1e-2  # roll
-        - 1e-2  # pitch
-        - 1e-2  # yaw
+        - 1e3  # roll
+        - 1e3  # pitch
+        - 1e3  # yaw
         joint_position:
-        - 1e-3  # left_hip_aa
-        - 1e-3  # left_hip_fe
-        - 1e-3  # left_knee
-        - 1e-3  # left_ankle_dpf
-        - 1e-3  # left_ankle_ie
-        - 1e-3  # right_hip_aa
-        - 1e-3  # right_hip_fe
-        - 1e-3  # right_knee
-        - 1e-3  # right_ankle_dpf
-        - 1e-3  # right_ankle_ie
+        - 1e-12  # left_hip_aa
+        - 1e-12  # left_hip_fe
+        - 1e-12  # left_knee
+        - 1e-12  # left_ankle_dpf
+        - 1e-12  # left_ankle_ie
+        - 1e-12  # right_hip_aa
+        - 1e-12  # right_hip_fe
+        - 1e-12  # right_knee
+        - 1e-12  # right_ankle_dpf
+        - 1e-12  # right_ankle_ie
     optimization_parameters:
-      # process_noise:
-      # - foot_position
-      # - foot_slippage
+      process_noise:
+      - foot_position
+      - foot_slippage
       observation_noise:
       - foot_position
       - foot_slippage

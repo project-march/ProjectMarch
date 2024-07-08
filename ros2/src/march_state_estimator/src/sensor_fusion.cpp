@@ -50,12 +50,12 @@ SensorFusion::SensorFusion(double timestep) {
     m_dynamics_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_observation_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     m_innovation_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_kalman_gain = Eigen::MatrixXd::Ones(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE) * 1e2;
-    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Zero(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
-    m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv) * 1e3;
-    m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
-    m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE) * 1e3;
+    m_kalman_gain = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_process_noise_covariance_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
+    m_observation_noise_covariance_matrix = Eigen::MatrixXd::Identity(MEASUREMENT_DIMENSION_SIZE, MEASUREMENT_DIMENSION_SIZE);
+    m_observation_noise_covariance_joint_matrix = Eigen::MatrixXd::Identity(m_robot_model.nv, m_robot_model.nv);
+    m_observation_noise_covariance_position_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE);
+    m_observation_noise_covariance_slippage_matrix = Eigen::MatrixXd::Identity(CARTESIAN_DIMENSION_SIZE, CARTESIAN_DIMENSION_SIZE);
 
     // Initialize the performance cost with a large value
     m_performance_cost = 1e23;
@@ -176,10 +176,10 @@ const Eigen::VectorXd SensorFusion::computeInnovation() const {
 const Eigen::MatrixXd SensorFusion::computeNoiseJacobianMatrix() const {
     Eigen::MatrixXd noise_jacobian_matrix = Eigen::MatrixXd::Identity(STATE_DIMENSION_SIZE, STATE_DIMENSION_SIZE);
     Eigen::Matrix3d orientation_matrix = m_state.imu_orientation.toRotationMatrix().transpose();
-    noise_jacobian_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_POSITION) = -orientation_matrix;
-    noise_jacobian_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;
-    noise_jacobian_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
-    noise_jacobian_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
+    noise_jacobian_matrix.block<3,3>(STATE_INDEX_POSITION, STATE_INDEX_POSITION) = -orientation_matrix;
+    noise_jacobian_matrix.block<3,3>(STATE_INDEX_VELOCITY, STATE_INDEX_VELOCITY) = -orientation_matrix;
+    noise_jacobian_matrix.block<3,3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = orientation_matrix;
+    noise_jacobian_matrix.block<3,3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = orientation_matrix;
     #ifdef DEBUG
     std::cout << "Noise Jacobian matrix:\n" << noise_jacobian_matrix << std::endl;
     #endif
@@ -191,14 +191,14 @@ void SensorFusion::computeDynamicsMatrix() {
     const Eigen::Matrix3d orientation_matrix = m_state.imu_orientation.toRotationMatrix().transpose();
 
     // Compute the dynamics matrix
-    m_dynamics_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_VELOCITY) = Eigen::Matrix3d::Identity() * m_timestep;
-    m_dynamics_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_ORIENTATION) 
+    m_dynamics_matrix.block<3,3>(STATE_INDEX_POSITION, STATE_INDEX_VELOCITY) = Eigen::Matrix3d::Identity() * m_timestep;
+    m_dynamics_matrix.block<3,3>(STATE_INDEX_VELOCITY, STATE_INDEX_ORIENTATION) 
         = -m_timestep * orientation_matrix * computeSkewSymmetricMatrix(computeMeasuredLinearAcceleration());
-    m_dynamics_matrix.block<3, 3>(STATE_INDEX_ORIENTATION, STATE_INDEX_ORIENTATION)
+    m_dynamics_matrix.block<3,3>(STATE_INDEX_ORIENTATION, STATE_INDEX_ORIENTATION)
         -= -m_timestep * computeSkewSymmetricMatrix(computeMeasuredAngularVelocity());
-    m_dynamics_matrix.block<3, 3>(STATE_INDEX_VELOCITY, STATE_INDEX_ACCELEROMETER_BIAS)
+    m_dynamics_matrix.block<3,3>(STATE_INDEX_VELOCITY, STATE_INDEX_ACCELEROMETER_BIAS)
         = -m_timestep * orientation_matrix;
-    m_dynamics_matrix.block<3, 3>(STATE_INDEX_ORIENTATION, STATE_INDEX_GYROSCOPE_BIAS)
+    m_dynamics_matrix.block<3,3>(STATE_INDEX_ORIENTATION, STATE_INDEX_GYROSCOPE_BIAS)
         = -m_timestep * Eigen::Matrix3d::Identity();
 
     #ifdef DEBUG
@@ -258,7 +258,7 @@ void SensorFusion::computeObservationNoiseCovarianceMatrix() {
     m_observation_noise_covariance_matrix.block<3, 3>(MEASUREMENT_INDEX_RIGHT_SLIPPAGE, MEASUREMENT_INDEX_RIGHT_SLIPPAGE).noalias()
         = m_observation_noise_covariance_right_slippage_matrix + jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv)
             * m_observation_noise_covariance_joint_matrix * jacobians[RIGHT_LEG_INDEX].block(JACOBIAN_ORIENTATION_INDEX, 0, CARTESIAN_DIMENSION_SIZE, m_robot_model.nv).transpose();
-    m_observation_noise_covariance_matrix.noalias() = m_observation_noise_covariance_matrix * (1.0 / m_timestep);
+    m_observation_noise_covariance_matrix.noalias() = m_observation_noise_covariance_matrix / m_timestep;
     #ifdef DEBUG
     std::cout << "Observation noise covariance matrix:\n" << m_observation_noise_covariance_matrix << std::endl;
     #endif
