@@ -422,22 +422,6 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? 0 : (count + 1));
                 break;
 
-            case ExoMode::Ascending :
-                m_current_trajectory = m_gait_planning.getAscendingGait(); 
-                if (count < m_current_trajectory.size()-1){
-                    processMovingGaits(count); 
-                    m_gait_planning.setCounter(count+1); 
-                }
-                break;
-
-            case ExoMode::Descending :
-                m_current_trajectory = m_gait_planning.getDescendingGait(); 
-                if (count < m_current_trajectory.size()-1){
-                    processMovingGaits(count); 
-                    m_gait_planning.setCounter(count+1); 
-                }
-                break;
-
             default :
                 break;
         }
