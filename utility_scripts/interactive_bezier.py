@@ -5,7 +5,7 @@ import yaml
 import os
 import tkinter as tk
 from tkinter import messagebox
-from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs, create_bezier_csv, create_high_step_csv
+from utility_scripts.convert_bezier_points_to_csv import create_ascend_csv, create_descend_csv, create_bezier_csv, create_high_step_csv
 from scipy.interpolate import interp1d
 
 LEG_LENGTH = 0.912
@@ -253,13 +253,11 @@ def interactive_bezier(gait_type: str, array_size: int):
             yaml.dump(data, f)
     
     if gait_type == "ascending":
-        ascend_csv = stair_gaits(data['ascending'], array_size)
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
+        create_ascend_csv(data['ascending'], array_size)
     elif gait_type == "descending":
-        descend_csv = descend_stairs(data['descending'], array_size)
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
-
-step_time = 3.5 # Always defined for one swing (or stance) phase in seconds
+        create_descend_csv(data['descending'], array_size)
+    
+step_time = 2.5 # Always defined for one swing (or stance) phase in seconds
 
 # interactive_bezier("small_gait", 150)
 # interactive_bezier("high_step_3", step_time*HIGH_LEVEL_FREQUENCY)
