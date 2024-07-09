@@ -7,6 +7,11 @@
 #define MARCH_STATE_ESTIMATOR__FILTERS__FILTER_NODES_HPP_
 
 #include "rclcpp/rclcpp.hpp"
+#include "message_filters/subscriber.h"
+#include "message_filters/sync_policies/approximate_time.h"
+#include "message_filters/synchronizer.h"
+
+#include "geometry_msgs/msg/vector3.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "march_state_estimator/filters/my_mean_filter.hpp"
@@ -29,6 +34,8 @@
 #define UPPER_LIMIT 1
 #define NUM_LIMITS 2
 
+typedef message_filters::sync_policies::ApproximateTime<geometry_msgs::msg::Vector3, geometry_msgs::msg::Vector3> SyncPolicy_IMU;
+
 class FiltersNode : public rclcpp::Node
 {
 public:
@@ -38,6 +45,8 @@ public:
 private:
   void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
   void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+  void imuSyncCallback(const geometry_msgs::msg::Vector3::SharedPtr acc_msg, 
+    const geometry_msgs::msg::Vector3::SharedPtr gyro_msg);
 
   std::vector<MyMeanFilter::SharedPtr> m_imu_acc_mean_filters;
   std::vector<MyMeanFilter::SharedPtr> m_imu_gyro_mean_filters;
@@ -52,6 +61,10 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_pub;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr m_imu_pub;
+
+  message_filters::Subscriber<geometry_msgs::msg::Vector3> m_imu_acc_sub;
+  message_filters::Subscriber<geometry_msgs::msg::Vector3> m_imu_gyro_sub;
+  std::shared_ptr<message_filters::Synchronizer<SyncPolicy_IMU>> m_imu_sync;
 
   const unsigned int m_imu_acc_window_size = 256;
   const unsigned int m_imu_gyro_window_size = 256;

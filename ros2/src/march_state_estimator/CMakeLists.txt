@@ -44,6 +44,7 @@ find_package(trajectory_msgs REQUIRED)
 find_package(filters REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -87,6 +88,7 @@ ament_target_dependencies(${PROJECT_NAME}
   urdf
   trajectory_msgs
   lifecycle_msgs
+  message_filters
 )
 
 # Create state_estimator_node executable
@@ -216,6 +218,7 @@ ament_target_dependencies(filters_node
   urdf
   sensor_msgs
   ament_index_cpp
+  message_filters
 )
 
 # Install targets and executables
