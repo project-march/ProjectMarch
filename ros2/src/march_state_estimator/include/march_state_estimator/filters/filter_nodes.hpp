@@ -35,6 +35,10 @@
 #define UPPER_LIMIT 1
 #define NUM_LIMITS 2
 
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Geometry>
+
 typedef message_filters::sync_policies::ApproximateTime<
   geometry_msgs::msg::QuaternionStamped,
   geometry_msgs::msg::Vector3Stamped, 
@@ -75,6 +79,7 @@ private:
   const unsigned int m_imu_acc_window_size = 256;
   const unsigned int m_imu_gyro_window_size = 256;
   const unsigned int m_torque_window_size = 256;
+  Eigen::Quaterniond m_imu_reset_orientation;
 };
 
 #endif  // MARCH_STATE_ESTIMATOR__FILTERS__FILTER_NODES_HPP_

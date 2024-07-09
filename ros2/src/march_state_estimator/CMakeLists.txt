@@ -219,6 +219,7 @@ ament_target_dependencies(filters_node
   sensor_msgs
   ament_index_cpp
   message_filters
+  Eigen3
 )
 
 # Install targets and executables

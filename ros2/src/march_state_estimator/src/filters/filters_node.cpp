@@ -68,6 +68,10 @@ FiltersNode::FiltersNode()
     rclcpp::QoS qos(100);
     auto rmw_qos_profile = qos.get_rmw_qos_profile();
 
+    // Create the quaternion to reset the orientation of the IMU into identity
+    m_imu_reset_orientation = Eigen::Quaterniond(
+        0.5447276234626771, 0.43958228826522827, 0.5590533018112183, 0.444408591201782);
+
     m_imu_quat_sub.subscribe(this, "filter/quaternion", rmw_qos_profile);
     m_imu_acc_sub.subscribe(this, "imu/acceleration", rmw_qos_profile);
     m_imu_gyro_sub.subscribe(this, "imu/angular_velocity", rmw_qos_profile);
@@ -100,9 +104,26 @@ void FiltersNode::imuSyncCallback(const geometry_msgs::msg::QuaternionStamped::S
 {
     sensor_msgs::msg::Imu filtered_msg;
     filtered_msg.header = quat_msg->header;
-    filtered_msg.orientation = quat_msg->quaternion;
-    filtered_msg.linear_acceleration = acc_msg->vector;
-    filtered_msg.angular_velocity = gyro_msg->vector;
+
+    Eigen::Quaterniond quat(quat_msg->quaternion.w, quat_msg->quaternion.x, quat_msg->quaternion.y, quat_msg->quaternion.z);
+    Eigen::Quaterniond reset_quat = m_imu_reset_orientation * quat;
+    filtered_msg.orientation.w = reset_quat.w();
+    filtered_msg.orientation.x = reset_quat.x();
+    filtered_msg.orientation.y = reset_quat.y();
+    filtered_msg.orientation.z = reset_quat.z();
+
+    Eigen::Vector3d acc(acc_msg->vector.x, acc_msg->vector.y, acc_msg->vector.z);
+    Eigen::Vector3d reset_acc = m_imu_reset_orientation * acc;
+    filtered_msg.linear_acceleration.x = reset_acc.x();
+    filtered_msg.linear_acceleration.y = reset_acc.y();
+    filtered_msg.linear_acceleration.z = reset_acc.z();
+    
+    Eigen::Vector3d gyro(gyro_msg->vector.x, gyro_msg->vector.y, gyro_msg->vector.z);
+    Eigen::Vector3d reset_gyro = m_imu_reset_orientation * gyro;
+    filtered_msg.angular_velocity.x = reset_gyro.x();
+    filtered_msg.angular_velocity.y = reset_gyro.y();
+    filtered_msg.angular_velocity.z = reset_gyro.z();
+
     m_imu_pub->publish(filtered_msg);
 }
 
