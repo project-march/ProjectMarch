@@ -74,6 +74,7 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {"urdf_file_path": urdf_file},
+                {"simulation": simulation},
             ],
         ),
     ])

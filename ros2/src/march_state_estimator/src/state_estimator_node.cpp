@@ -649,7 +649,7 @@ void StateEstimatorNode::configureSubscriptions()
 
     m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
         std::bind(&StateEstimatorNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&StateEstimatorNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
 
     // Simulation ground truth information about position and velocity in world frame

@@ -68,9 +68,11 @@ FiltersNode::FiltersNode()
     rclcpp::QoS qos(100);
     auto rmw_qos_profile = qos.get_rmw_qos_profile();
 
+    m_imu_quat_sub.subscribe(this, "filter/quaternion", rmw_qos_profile);
     m_imu_acc_sub.subscribe(this, "imu/acceleration", rmw_qos_profile);
     m_imu_gyro_sub.subscribe(this, "imu/angular_velocity", rmw_qos_profile);
-    m_imu_sync.reset(new message_filters::Synchronizer<SyncPolicy_IMU>(SyncPolicy_IMU(10), m_imu_acc_sub, m_imu_gyro_sub));
+    m_imu_sync.reset(new message_filters::Synchronizer<SyncPolicy_IMU>(SyncPolicy_IMU(10), 
+        m_imu_quat_sub, m_imu_acc_sub, m_imu_gyro_sub));
     m_imu_sync->registerCallback(&FiltersNode::imuSyncCallback, this);
 
     RCLCPP_INFO(this->get_logger(), "Filters node has been started.");
@@ -92,18 +94,15 @@ void FiltersNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
     m_imu_pub->publish(filtered_msg);
 }
 
-void FiltersNode::imuSyncCallback(const geometry_msgs::msg::Vector3::SharedPtr acc_msg, 
-    const geometry_msgs::msg::Vector3::SharedPtr gyro_msg)
+void FiltersNode::imuSyncCallback(const geometry_msgs::msg::QuaternionStamped::SharedPtr quat_msg,
+    const geometry_msgs::msg::Vector3Stamped::SharedPtr acc_msg, 
+    const geometry_msgs::msg::Vector3Stamped::SharedPtr gyro_msg)
 {
     sensor_msgs::msg::Imu filtered_msg;
-    filtered_msg.linear_acceleration.x = acc_msg->x;
-    filtered_msg.linear_acceleration.y = acc_msg->y;
-    filtered_msg.linear_acceleration.z = acc_msg->z;
-
-    filtered_msg.angular_velocity.x = gyro_msg->x;
-    filtered_msg.angular_velocity.y = gyro_msg->y;
-    filtered_msg.angular_velocity.z = gyro_msg->z;
-
+    filtered_msg.header = quat_msg->header;
+    filtered_msg.orientation = quat_msg->quaternion;
+    filtered_msg.linear_acceleration = acc_msg->vector;
+    filtered_msg.angular_velocity = gyro_msg->vector;
     m_imu_pub->publish(filtered_msg);
 }
 
