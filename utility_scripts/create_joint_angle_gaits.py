@@ -95,8 +95,8 @@ def sideways(time_points):
     lkfe1 = np.linspace(lkfe_h, lkfe_h, time_points)
 
     # Adpf should go up and then back down at the end, kfe should have small flexion and then back to homestand
-    adpf_swing_up = np.linspace(radpf_h, 0.30, int(time_points/2))
-    adpf_swing_down = np.linspace(0.30, radpf_h, int(time_points/2))
+    adpf_swing_up = np.linspace(radpf_h, 0.20, int(time_points/2))
+    adpf_swing_down = np.linspace(0.20, radpf_h, int(time_points/2))
     radpf1 = np.append(adpf_swing_up, adpf_swing_down)
     
     rhaa1 = np.linspace(rhaa_h, -0.2, time_points)
@@ -143,19 +143,8 @@ def sideways(time_points):
     np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv', 
                full_sidestep, delimiter=',')
 
-def remap_iks_translated_joint_angle_gaits(old_name, new_name):
-    df = pd.read_csv(f'./ros2/src/march_gait_planning/m9_gait_files/joint_angles/{old_name}.csv', names = ['LHAA', 'LHFE', 'LKFE', 'LADPF', 'RHAA', 'RHFE', 'RKFE', 'RADPF'])
-    df = df[COLUMNS]
-    df.to_csv(f'./ros2/src/march_gait_planning/m9_gait_files/joint_angles/{new_name}.csv', sep=',', header=False, index=False)
-
     
 # hinge_gait(100)
 # stand_to_sit(125)
 # sit_to_stand(125)
-sideways(800)
-
-
-
-# remap_iks_translated_joint_angle_gaits('cartesian_in_joint_angle_first_step_updated', 'cartesian_in_joint_angle_first_step')
-# remap_iks_translated_joint_angle_gaits('cartesian_in_joint_angle_step_close_updated', 'cartesian_in_joint_angle_step_close')
-# remap_iks_translated_joint_angle_gaits('cartesian_in_joint_angle_half_step', 'cartesian_in_joint_angle_half_step_def')
+# sideways(800)
