@@ -11,5 +11,15 @@ uint8 current_stance_leg
 uint8 next_stance_leg
 
 # Sensor fusion
+geometry_msgs/Point imu_position
+geometry_msgs/Vector3 imu_velocity
+geometry_msgs/Quaternion imu_orientation
+geometry_msgs/Point left_foot_position
+geometry_msgs/Point right_foot_position
+geometry_msgs/Vector3 accelerometer_bias
+geometry_msgs/Vector3 gyroscope_bias
+geometry_msgs/Quaternion left_foot_slippage
+geometry_msgs/Quaternion right_foot_slippage
+float64[] pose_covariance
 float64 performance_cost
 bool sensor_fusion_valid

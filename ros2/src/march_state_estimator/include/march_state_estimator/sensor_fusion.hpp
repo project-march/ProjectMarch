@@ -99,6 +99,15 @@ public:
 
     inline const EKFState& getState() const { return m_state; }
 
+    inline const std::vector<double> getPoseCovarianceMatrix() const {
+        Eigen::MatrixXd pose_covariance_matrix= Eigen::MatrixXd::Zero(SE3_DIMENSION_SIZE, SE3_DIMENSION_SIZE);
+        pose_covariance_matrix.block<3, 3>(0, 0) = m_state.covariance_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_POSITION);
+        pose_covariance_matrix.block<3, 3>(0, 3) = m_state.covariance_matrix.block<3, 3>(STATE_INDEX_POSITION, STATE_INDEX_ORIENTATION);
+        pose_covariance_matrix.block<3, 3>(3, 0) = m_state.covariance_matrix.block<3, 3>(STATE_INDEX_ORIENTATION, STATE_INDEX_POSITION);
+        pose_covariance_matrix.block<3, 3>(3, 3) = m_state.covariance_matrix.block<3, 3>(STATE_INDEX_ORIENTATION, STATE_INDEX_ORIENTATION);
+        return std::vector<double>(pose_covariance_matrix.data(), pose_covariance_matrix.data() + pose_covariance_matrix.size());
+    }
+
     inline double getPerformanceCost() const { return m_performance_cost; }
 
     inline void setObservation(const EKFObservation& observation) { m_observation = observation; }
@@ -196,8 +205,7 @@ public:
             m_observation_noise_covariance_left_position_matrix = m_observation_noise_covariance_position_matrix;
             m_observation_noise_covariance_left_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
             m_state.left_foot_position.z() = 0.0;
-            m_state.left_foot_slippage.z() = 0.0;
-            m_state.left_foot_slippage.normalize();
+            m_state.left_foot_slippage = Eigen::Quaterniond::Identity();
         } else {
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_FOOT_POSITION, STATE_INDEX_LEFT_FOOT_POSITION) = computeVeryLargeMatrix3d();
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE) = computeVeryLargeMatrix3d();
@@ -212,8 +220,7 @@ public:
             m_observation_noise_covariance_right_position_matrix = m_observation_noise_covariance_position_matrix;
             m_observation_noise_covariance_right_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
             m_state.right_foot_position.z() = 0.0;
-            m_state.right_foot_slippage.z() = 0.0;
-            m_state.right_foot_slippage.normalize();
+            m_state.right_foot_slippage = Eigen::Quaterniond::Identity();
         } else {
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_FOOT_POSITION, STATE_INDEX_RIGHT_FOOT_POSITION) = computeVeryLargeMatrix3d();
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE) = computeVeryLargeMatrix3d();

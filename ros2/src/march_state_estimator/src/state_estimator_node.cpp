@@ -379,6 +379,40 @@ void StateEstimatorNode::publishStateEstimation()
         state_estimation_msg.world_foot_pose = getCurrentPoseArray("world", {"L_sole", "R_sole"});
     }
 
+    // Variables for visualization of Kalman Filter
+    EKFState estimated_state = m_sensor_fusion->getState();
+    state_estimation_msg.imu_position.x = estimated_state.imu_position.x();
+    state_estimation_msg.imu_position.y = estimated_state.imu_position.y();
+    state_estimation_msg.imu_position.z = estimated_state.imu_position.z();
+    state_estimation_msg.imu_velocity.x = estimated_state.imu_velocity.x();
+    state_estimation_msg.imu_velocity.y = estimated_state.imu_velocity.y();
+    state_estimation_msg.imu_velocity.z = estimated_state.imu_velocity.z();
+    state_estimation_msg.imu_orientation.x = estimated_state.imu_orientation.x();
+    state_estimation_msg.imu_orientation.y = estimated_state.imu_orientation.y();
+    state_estimation_msg.imu_orientation.z = estimated_state.imu_orientation.z();
+    state_estimation_msg.imu_orientation.w = estimated_state.imu_orientation.w();
+    state_estimation_msg.left_foot_position.x = estimated_state.left_foot_position.x();
+    state_estimation_msg.left_foot_position.y = estimated_state.left_foot_position.y();
+    state_estimation_msg.left_foot_position.z = estimated_state.left_foot_position.z();
+    state_estimation_msg.right_foot_position.x = estimated_state.right_foot_position.x();
+    state_estimation_msg.right_foot_position.y = estimated_state.right_foot_position.y();
+    state_estimation_msg.right_foot_position.z = estimated_state.right_foot_position.z();
+    state_estimation_msg.left_foot_slippage.x = estimated_state.left_foot_slippage.x();
+    state_estimation_msg.left_foot_slippage.y = estimated_state.left_foot_slippage.y();
+    state_estimation_msg.left_foot_slippage.z = estimated_state.left_foot_slippage.z();
+    state_estimation_msg.left_foot_slippage.w = estimated_state.left_foot_slippage.w();
+    state_estimation_msg.right_foot_slippage.x = estimated_state.right_foot_slippage.x();
+    state_estimation_msg.right_foot_slippage.y = estimated_state.right_foot_slippage.y();
+    state_estimation_msg.right_foot_slippage.z = estimated_state.right_foot_slippage.z();
+    state_estimation_msg.right_foot_slippage.w = estimated_state.right_foot_slippage.w();
+    state_estimation_msg.accelerometer_bias.x = estimated_state.accelerometer_bias.x();
+    state_estimation_msg.accelerometer_bias.y = estimated_state.accelerometer_bias.y();
+    state_estimation_msg.accelerometer_bias.z = estimated_state.accelerometer_bias.z();
+    state_estimation_msg.gyroscope_bias.x = estimated_state.gyroscope_bias.x();
+    state_estimation_msg.gyroscope_bias.y = estimated_state.gyroscope_bias.y();
+    state_estimation_msg.gyroscope_bias.z = estimated_state.gyroscope_bias.z();
+    state_estimation_msg.pose_covariance = m_sensor_fusion->getPoseCovarianceMatrix();
+
     // Variables for optimization of Kalman Filter tuning
     state_estimation_msg.performance_cost = m_sensor_fusion->getPerformanceCost();
     state_estimation_msg.sensor_fusion_valid = m_sensor_fusion_valid;
