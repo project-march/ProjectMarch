@@ -39,3 +39,19 @@
 	path = ros2/src/libraries/bluespace_ai_xsens_ros_mti_driver
 	url = https://gitlab.com/project-march/libraries/bluespace_ai_xsens_ros_mti_driver
 	branch = ros2_0_foxy
+[submodule "ros2/src/libraries/CGAL"]
+	path = ros2/src/libraries/CGAL
+	url = https://github.com/CGAL/cgal.git
+	branch = 5.6.x-branch
+[submodule "ros2/src/libraries/grid_map"]
+	path = ros2/src/libraries/grid_map
+	url = https://github.com/ANYbotics/grid_map.git
+	branch = foxy-devel
+[submodule "ros2/src/libraries/kindr"]
+	path = ros2/src/libraries/kindr
+	url = https://github.com/ANYbotics/kindr.git
+	branch = master
+[submodule "ros2/src/libraries/kindr_ros"]
+	path = ros2/src/libraries/kindr_ros
+	url = https://github.com/SivertHavso/kindr_ros.git
+	branch = ros2
