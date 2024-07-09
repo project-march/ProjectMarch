@@ -137,7 +137,7 @@ def stair_gaits(set_of_points, array_size):
     first_step_points = np.array(set_of_points[0]["first_step"])
     full_step_points = np.array(set_of_points[1]["full_step"])
     step_close_points = np.array(set_of_points[2]["step_close"])
-    number_of_time_points = np.linspace(0, 1.0, int(array_size/2))
+    number_of_time_points = np.linspace(0, 1.0, int(array_size))
 
     # Part 1: swing leg goes up one step, stance leg stays on the ground
     first_step_curve = bezier.Curve(first_step_points.T, degree=3)
@@ -145,8 +145,8 @@ def stair_gaits(set_of_points, array_size):
 
     x_swing_stairs = points[0,:]
     z_swing_stairs = points[1,:]
-    x_stance_stairs = np.linspace(first_step_points[0][0], -first_step_points[3][0], int(array_size/2))
-    z_stance_stairs = [0]*int(array_size/2)
+    x_stance_stairs = np.linspace(first_step_points[0][0], -first_step_points[3][0], int(array_size))
+    z_stance_stairs = [0]*int(array_size)
 
     first_points_stairs = np.column_stack((x_swing_stairs, z_swing_stairs, x_stance_stairs, z_stance_stairs))
 
@@ -156,8 +156,8 @@ def stair_gaits(set_of_points, array_size):
 
     x_swing_stair = points[0,:]
     z_swing_stair = points[1,:]
-    x_stance_stair = np.linspace(full_step_points[3][0], full_step_points[0][0], int(array_size/2))
-    z_stance_stair = np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size/2))
+    x_stance_stair = np.linspace(full_step_points[3][0], full_step_points[0][0], int(array_size))
+    z_stance_stair = np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size))
 
     # Part 3: swing leg closes to stance leg (top of the stairs)
     step_close_curve = bezier.Curve(step_close_points.T, degree=3)
@@ -165,8 +165,8 @@ def stair_gaits(set_of_points, array_size):
 
     x_swing_last_step = points[0,:]
     z_swing_last_step = points[1,:]
-    x_stance_last_step = np.linspace(-step_close_points[0][0], step_close_points[3][0] , int(array_size/2))
-    z_stance_last_step = np.linspace(full_step_points[3][1], 0, int(array_size/2))
+    x_stance_last_step = np.linspace(-step_close_points[0][0], step_close_points[3][0] , int(array_size))
+    z_stance_last_step = np.linspace(full_step_points[3][1], 0, int(array_size))
 
     second_step_points_stairs = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
 
@@ -187,18 +187,55 @@ def stair_gaits(set_of_points, array_size):
 
     return final_points_stairs_up
 
-def descend_stairs(data_up): 
-     
-    x_stance = data_up[:,0][::-1]*-1
-    z_stance = data_up[:,1][::-1]
-    x_swing = data_up[:,2][::-1]*-1
-    z_swing = data_up[:,3][::-1]
+def descend_stairs(set_of_points, array_size): 
+    first_step_points = np.array(set_of_points[0]["first_step"])
+    full_step_points = np.array(set_of_points[1]["full_step"])
+    step_close_points = np.array(set_of_points[2]["step_close"])
+    number_of_time_points = np.linspace(0, 1.0, int(array_size))
 
-    final_points_stairs_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
+    # Part 1: swing leg goes down one step, stance leg stays on the upper step
+    first_step_curve = bezier.Curve(first_step_points.T, degree=3)
+    points= first_step_curve.evaluate_multi(number_of_time_points)
 
-    # plt.plot(x_swing, z_swing)
-    # plt.plot(x_stance, z_stance, color="orange")
-    # plt.show()
+    x_swing_stairs = points[0,:]
+    z_swing_stairs = points[1,:]
+    x_stance_stairs = np.linspace(first_step_points[0][0], -first_step_points[3][0], int(array_size))
+    z_stance_stairs = np.linspace(0, full_step_points[0][1], int(array_size)) # This is a bit weird, since the bezier points of the first step do not contain any information about the height of the step
+
+    first_points_descend = np.column_stack((x_swing_stairs, z_swing_stairs, x_stance_stairs, z_stance_stairs))
+
+    # Part 2: swing leg goes down two steps, stance leg stays still
+    full_step_curve = bezier.Curve(full_step_points.T, degree=3)
+    points= full_step_curve.evaluate_multi(number_of_time_points)
+
+    x_swing_stair = points[0,:]
+    z_swing_stair = points[1,:]
+    x_stance_stair = np.linspace(full_step_points[3][0], full_step_points[0][0], int(array_size))
+    z_stance_stair = np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size))
+
+    # Part 3: swing leg closes to stance leg (top of the stairs)
+    step_close_curve = bezier.Curve(step_close_points.T, degree=3)
+    points = step_close_curve.evaluate_multi(number_of_time_points)
+
+    x_swing_last_step = points[0,:]
+    z_swing_last_step = points[1,:]
+    x_stance_last_step = np.linspace(-step_close_points[0][0], step_close_points[3][0] , int(array_size))
+    z_stance_last_step = np.zeros(int(array_size))
+
+    second_step_points_descend = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
+
+    third_step_points_descend = np.column_stack((x_swing_stair, z_swing_stair, x_stance_stair, z_stance_stair))
+
+    forth_step_points_descend = np.column_stack((x_stance_stair, z_stance_stair, x_swing_stair, z_swing_stair))
+
+    final_step_points_descend = np.column_stack((x_swing_last_step, z_swing_last_step, x_stance_last_step, z_stance_last_step))
+
+
+    final_points_stairs_down = np.concatenate((first_points_descend, second_step_points_descend, third_step_points_descend, forth_step_points_descend, final_step_points_descend), axis=0)
+
+    plt.plot(final_points_stairs_down[:,0], final_points_stairs_down[:,1])
+    plt.plot(final_points_stairs_down[:,2], final_points_stairs_down[:,3], color="orange")
+    plt.show()
     return final_points_stairs_down
 
 def high_step_up(bezier_points, array_size):
