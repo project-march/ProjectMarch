@@ -87,13 +87,13 @@ void FiltersNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
     sensor_msgs::msg::Imu filtered_msg = *msg;
 
     // Filter the linear acceleration and angular velocity
-    m_imu_acc_mean_filters[AXIS_X]->update(msg->linear_acceleration.x, filtered_msg.linear_acceleration.x);
-    m_imu_acc_mean_filters[AXIS_Y]->update(msg->linear_acceleration.y, filtered_msg.linear_acceleration.y);
-    m_imu_acc_mean_filters[AXIS_Z]->update(msg->linear_acceleration.z, filtered_msg.linear_acceleration.z);
+    // m_imu_acc_mean_filters[AXIS_X]->update(msg->linear_acceleration.x, filtered_msg.linear_acceleration.x);
+    // m_imu_acc_mean_filters[AXIS_Y]->update(msg->linear_acceleration.y, filtered_msg.linear_acceleration.y);
+    // m_imu_acc_mean_filters[AXIS_Z]->update(msg->linear_acceleration.z, filtered_msg.linear_acceleration.z);
 
-    m_imu_gyro_mean_filters[AXIS_X]->update(msg->angular_velocity.x, filtered_msg.angular_velocity.x);
-    m_imu_gyro_mean_filters[AXIS_Y]->update(msg->angular_velocity.y, filtered_msg.angular_velocity.y);
-    m_imu_gyro_mean_filters[AXIS_Z]->update(msg->angular_velocity.z, filtered_msg.angular_velocity.z);
+    // m_imu_gyro_mean_filters[AXIS_X]->update(msg->angular_velocity.x, filtered_msg.angular_velocity.x);
+    // m_imu_gyro_mean_filters[AXIS_Y]->update(msg->angular_velocity.y, filtered_msg.angular_velocity.y);
+    // m_imu_gyro_mean_filters[AXIS_Z]->update(msg->angular_velocity.z, filtered_msg.angular_velocity.z);
 
     m_imu_pub->publish(filtered_msg);
 }

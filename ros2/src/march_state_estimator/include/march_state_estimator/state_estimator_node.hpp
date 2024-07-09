@@ -88,6 +88,7 @@ private:
    
     inline void updateJointStateTimeout() { m_joint_state_last_update = now(); }
     inline void updateImuTimeout() { m_imu_last_update = now(); }
+    void updateKalmanFilter(const double& dt);
     void checkJointStateTimeout();
     void checkImuTimeout();
    

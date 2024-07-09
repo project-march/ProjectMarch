@@ -206,46 +206,7 @@ void StateEstimatorNode::timerCallback()
     m_state_estimator->updateImuState(m_imu);
     if (m_is_simulation) {
         m_state_estimator->updateDynamicsState();
-
-        #ifdef DEBUG
-        RCLCPP_INFO(this->get_logger(), "Updating measurement data...");
-        #endif
-
-        // Update joint position and stance leg
-        m_sensor_fusion->setJointPosition(m_joint_state->name, m_joint_state->position);
-        m_sensor_fusion->updateStanceLeg(m_state_estimator->getCurrentStanceLeg());
-        
-        // Update observation
-        EKFObservation ekf_observation;
-        ekf_observation.imu_acceleration = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
-        ekf_observation.imu_angular_velocity.noalias() = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
-        std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
-        ekf_observation.left_foot_position = Eigen::Vector3d(
-            body_foot_poses[LEFT_FOOT_ID].position.x, 
-            body_foot_poses[LEFT_FOOT_ID].position.y, 
-            body_foot_poses[LEFT_FOOT_ID].position.z);
-        ekf_observation.right_foot_position = Eigen::Vector3d(
-            body_foot_poses[RIGHT_FOOT_ID].position.x, 
-            body_foot_poses[RIGHT_FOOT_ID].position.y, 
-            body_foot_poses[RIGHT_FOOT_ID].position.z);
-        ekf_observation.left_foot_slippage = Eigen::Quaterniond(
-            body_foot_poses[LEFT_FOOT_ID].orientation.w, 
-            body_foot_poses[LEFT_FOOT_ID].orientation.x, 
-            body_foot_poses[LEFT_FOOT_ID].orientation.y, 
-            body_foot_poses[LEFT_FOOT_ID].orientation.z);
-        ekf_observation.right_foot_slippage = Eigen::Quaterniond(
-            body_foot_poses[RIGHT_FOOT_ID].orientation.w, 
-            body_foot_poses[RIGHT_FOOT_ID].orientation.x, 
-            body_foot_poses[RIGHT_FOOT_ID].orientation.y, 
-            body_foot_poses[RIGHT_FOOT_ID].orientation.z);
-        m_sensor_fusion->setObservation(ekf_observation);
-
-        #ifdef DEBUG
-        RCLCPP_INFO(this->get_logger(), "Estimating state...");
-        #endif
-        m_sensor_fusion->estimateState();
     }
-    broadcastTransformToTf2();
 
     // publishFeetHeight();
     // publishMPCEstimation();
@@ -266,8 +227,13 @@ void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::
 
 void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
+    rclcpp::Duration dt = this->now() - m_imu_last_update;
     m_imu = msg;
     m_imu_last_update = this->now();
+
+    if (m_joint_state != nullptr) {
+        updateKalmanFilter(dt.seconds());
+    }
 }
 
 void StateEstimatorNode::imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg)
@@ -827,6 +793,51 @@ bool StateEstimatorNode::configureSensorFusion()
 /*******************************************************************************
  * Helper functions
  *******************************************************************************/
+
+void StateEstimatorNode::updateKalmanFilter(const double& dt)
+{
+    #ifdef DEBUG
+    RCLCPP_INFO(this->get_logger(), "Updating measurement data...");
+    #endif
+
+    // Update joint position, stance leg, and time step
+    m_sensor_fusion->setTimestep(dt);
+    m_sensor_fusion->setJointPosition(m_joint_state->name, m_joint_state->position);
+    m_sensor_fusion->updateStanceLeg(m_state_estimator->getCurrentStanceLeg());
+    
+    // Update observation
+    EKFObservation ekf_observation;
+    ekf_observation.imu_acceleration = Eigen::Vector3d(m_imu->linear_acceleration.x, m_imu->linear_acceleration.y, m_imu->linear_acceleration.z);
+    ekf_observation.imu_angular_velocity.noalias() = Eigen::Vector3d(m_imu->angular_velocity.x, m_imu->angular_velocity.y, m_imu->angular_velocity.z);
+    std::vector<geometry_msgs::msg::Pose> body_foot_poses = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
+    ekf_observation.left_foot_position = Eigen::Vector3d(
+        body_foot_poses[LEFT_FOOT_ID].position.x, 
+        body_foot_poses[LEFT_FOOT_ID].position.y, 
+        body_foot_poses[LEFT_FOOT_ID].position.z);
+    ekf_observation.right_foot_position = Eigen::Vector3d(
+        body_foot_poses[RIGHT_FOOT_ID].position.x, 
+        body_foot_poses[RIGHT_FOOT_ID].position.y, 
+        body_foot_poses[RIGHT_FOOT_ID].position.z);
+    ekf_observation.left_foot_slippage = Eigen::Quaterniond(
+        body_foot_poses[LEFT_FOOT_ID].orientation.w, 
+        body_foot_poses[LEFT_FOOT_ID].orientation.x, 
+        body_foot_poses[LEFT_FOOT_ID].orientation.y, 
+        body_foot_poses[LEFT_FOOT_ID].orientation.z);
+    ekf_observation.right_foot_slippage = Eigen::Quaterniond(
+        body_foot_poses[RIGHT_FOOT_ID].orientation.w, 
+        body_foot_poses[RIGHT_FOOT_ID].orientation.x, 
+        body_foot_poses[RIGHT_FOOT_ID].orientation.y, 
+        body_foot_poses[RIGHT_FOOT_ID].orientation.z);
+    m_sensor_fusion->setObservation(ekf_observation);
+
+    #ifdef DEBUG
+    RCLCPP_INFO(this->get_logger(), "Estimating state...");
+    #endif
+    m_sensor_fusion->estimateState();
+
+    // Publish new estimation of world frame
+    broadcastTransformToTf2();
+}
 
 void StateEstimatorNode::checkJointStateTimeout()
 {
