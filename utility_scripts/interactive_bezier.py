@@ -5,28 +5,11 @@ import yaml
 import os
 import tkinter as tk
 from tkinter import messagebox
-from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs
+from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs, create_bezier_csv, create_high_step_csv
 from scipy.interpolate import interp1d
 
 LEG_LENGTH = 0.912
-
-def make_evenly_spaced_points(x, z, array_size):
-    # Create an array of cumulative distances between points
-    distances = np.sqrt(np.diff(x)**2 + np.diff(z)**2)
-    cumulative_distances = np.insert(np.cumsum(distances), 0, 0)
-
-    # Generate new evenly spaced distances
-    even_distances = np.linspace(cumulative_distances[0], cumulative_distances[-1], num=array_size)
-
-    # Interpolate the x and z values over the new distances
-    interp_x = interp1d(cumulative_distances, x, kind='cubic')
-    interp_z = interp1d(cumulative_distances, z, kind='cubic')
-
-    x_new = interp_x(even_distances)
-    z_new = interp_z(even_distances)
-
-    return x_new, z_new
-
+HIGH_LEVEL_FREQUENCY = 200
 
 def calculate_bezier_curve(points, array_size = 100):
     """Calculate the Bezier curve for the given points."""
@@ -34,115 +17,6 @@ def calculate_bezier_curve(points, array_size = 100):
     t_values = np.linspace(0.0, 1.0, array_size)
     curve_points = curve.evaluate_multi(t_values)
     return curve_points.T
-
-def create_bezier_csv(points, array_size, gait_type):
-    pause_time = int(array_size/3)
-    step_length = points.max(axis=0)[0]
-    ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
-
-    # ------------------------------------------------- FIRST STEP ----------------------------------------------------------------------------------
-    phi_first_step = np.linspace(0, ending_angle, int(array_size))
-
-    # The stance leg follows a circle with radius LEG_LENGTH with center at (0, LEG_LENGTH). Sine and cosine are swapped from a usual circle, since we want the circle to start at the bottom and go backwards
-    x_stance_first_step = -LEG_LENGTH*np.sin(phi_first_step)
-    z_stance_first_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_first_step)
-
-    x_stance_first_step = np.append(x_stance_first_step, x_stance_first_step[-1]*np.ones(pause_time))
-    z_stance_first_step = np.append(z_stance_first_step, z_stance_first_step[-1]*np.ones(pause_time))
-
-    vertical_offset = z_stance_first_step[-1]
-
-    first_step_points = points.copy()
-    first_step_points[:, 0] = first_step_points[:, 0]/2
-    first_step_points[1:, 1] = first_step_points[1:, 1] + vertical_offset
-
-    curvexz_first_step = bezier.Curve(first_step_points.T, degree=3)
-    number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size))
-    points_first_step= curvexz_first_step.evaluate_multi(number_of_time_points_first_step)
-    x_swing_first_step = points_first_step[0,:]
-    z_swing_first_step = points_first_step[1,:]
-
-    x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size))
-
-    x_swing_first_step = np.append(x_swing_first_step, x_swing_first_step[-1]*np.ones(pause_time))
-    z_swing_first_step = np.append(z_swing_first_step, z_swing_first_step[-1]*np.ones(pause_time))
-
-    final_points_first_step = np.column_stack((x_swing_first_step, z_swing_first_step, x_stance_first_step, z_stance_first_step))
-
-    plt.scatter(x_swing_first_step, z_swing_first_step)
-    plt.plot(x_stance_first_step, z_stance_first_step, color="orange")
-    plt.title("First Step")
-    plt.show()
-
-    # ------------------------------------------------- FULL STEP ----------------------------------------------------------------------------------
-    phi_full_step = np.linspace(-ending_angle, ending_angle, int(array_size))
-
-    x_stance_complete_step = -LEG_LENGTH*np.sin(phi_full_step)
-    z_stance_complete_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_full_step)
-
-    x_stance_complete_step = np.append(x_stance_complete_step, x_stance_complete_step[-1]*np.ones(pause_time))
-    z_stance_complete_step = np.append(z_stance_complete_step, z_stance_complete_step[-1]*np.ones(pause_time))
-
-    full_step_points = points.copy()
-    full_step_points[:, 1] = full_step_points[:, 1] + vertical_offset
-
-    curvexz_complete_step = bezier.Curve(full_step_points.T, degree=3)
-    number_of_time_points_complete_step = np.linspace(0, 1.0, array_size)
-    points_complete_step= curvexz_complete_step.evaluate_multi(number_of_time_points_complete_step)
-    x_swing_complete_step = points_complete_step[0,:] - (step_length/2)
-    z_swing_complete_step = points_complete_step[1,:]
-    
-    x_swing_complete_step, z_swing_complete_step = make_evenly_spaced_points(x_swing_complete_step, z_swing_complete_step, array_size)
-    
-    x_swing_complete_step = np.append(x_swing_complete_step, x_swing_complete_step[-1]*np.ones(pause_time))
-    z_swing_complete_step = np.append(z_swing_complete_step, z_swing_complete_step[-1]*np.ones(pause_time))
-
-    final_points_complete_step = np.column_stack((x_swing_complete_step, z_swing_complete_step, x_stance_complete_step, z_stance_complete_step))
-
-    plt.plot(x_swing_complete_step, z_swing_complete_step)
-    plt.plot(x_stance_complete_step, z_stance_complete_step, color="orange")
-    plt.title("Full Step")
-    plt.show()
-
-    # ------------------------------------------------- STEP CLOSE ----------------------------------------------------------------------------------
-    phi_step_close = np.linspace(0, -ending_angle, int(array_size))
-
-    x_stance_step_close = -LEG_LENGTH*np.sin(phi_step_close)
-    z_stance_step_close = LEG_LENGTH - LEG_LENGTH*np.cos(phi_step_close)
-
-    # x_stance_step_close = np.append(x_stance_step_close, x_stance_step_close[-1]*np.ones(pause_time))
-    # z_stance_step_close = np.append(z_stance_step_close, z_stance_step_close[-1]*np.ones(pause_time))
-
-    step_close_points = points.copy()
-    step_close_points[:, 0] = step_close_points[:, 0]/-2
-    step_close_points[1:, 1] = step_close_points[1:, 1] + vertical_offset
-    curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
-    number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size))
-    points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
-    x_swing_step_close = points_step_close[0,:]
-    z_swing_step_close = points_step_close[1,:]
-
-    x_swing_step_close, z_swing_step_close = make_evenly_spaced_points(x_swing_step_close, z_swing_step_close, array_size)
-
-    # x_swing_step_close = np.append(x_swing_step_close, x_swing_step_close[-1]*np.ones(pause_time))
-    # z_swing_step_close = np.append(z_swing_step_close, z_swing_step_close[-1]*np.ones(pause_time))
-
-    final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
-    final_points_step_close = np.flip(final_points_step_close, axis=0)
-
-    plt.plot(x_swing_step_close, z_swing_step_close)
-    plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
-    plt.title("Full Step")
-    plt.show()
-
-    if gait_type == "large_gait":
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_large.csv', final_points_complete_step, delimiter=',')
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/large_step_close.csv', final_points_step_close, delimiter=',')
-    elif gait_type == "small_gait":
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_small.csv', final_points_first_step, delimiter=',')
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
-        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', final_points_step_close, delimiter=',')
 
 class DraggablePoint:
     """A class to represent a draggable point in matplotlib."""
@@ -185,7 +59,7 @@ class InteractiveBezier:
         curve_points = self.calculate_bezier_curve()
         self.line, = plt.plot(curve_points[:, 0], curve_points[:, 1])
         self.updated_points = None
-        self.array_size = array_size    
+        self.array_size = int(array_size)
 
         # Create a separate window for the coordinates
         self.root = tk.Tk()
@@ -288,20 +162,25 @@ class InteractiveBezier:
         self.root.destroy() 
         # Ask whether to save the points
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
-            create_bezier_csv(self.points, self.array_size, self.gait_type)
+            if self.gait_type == "small_gait" or self.gait_type == "large_gait":
+                create_bezier_csv(self.points, self.array_size, self.gait_type)
+            elif self.gait_type == "high_step_1" or  self.gait_type == "high_step_2" or  self.gait_type == "high_step_3":
+                create_high_step_csv(self.points, self.gait_type, self.array_size)
             self.updated_points = self.points.tolist()
         else:
             self.updated_points = self.initial_points.tolist()
 
 def interactive_bezier(gait_type: str, array_size: int): 
     if gait_type == "small_gait" or gait_type == "large_gait":  
+        print("Opening File")
         if os.path.exists('utility_scripts/points.yaml'):
             with open('utility_scripts/points.yaml', 'r') as f:
                 data = yaml.safe_load(f)
                 points = np.array(data[gait_type])
         else:
             print("No points file found")
-
+        
+        print("Passing points to class")
         interactive_bezier = InteractiveBezier(points, gait_type, array_size)
         interactive_bezier.connect()
 
@@ -331,7 +210,7 @@ def interactive_bezier(gait_type: str, array_size: int):
             points = np.array(step_type_dict[step_type])
 
             # Pass the points to the InteractiveBezier class
-            interactive_bezier = InteractiveBezier(points, gait_type)
+            interactive_bezier = InteractiveBezier(points, gait_type, array_size)
             interactive_bezier.connect()
 
             # Connect the on_close function to the close event
@@ -346,6 +225,28 @@ def interactive_bezier(gait_type: str, array_size: int):
 
             # Store the new points in the same spot in the data variable
             data[gait_type][i][step_type] = new_points
+
+    elif gait_type == "high_step_1" or  gait_type == "high_step_2" or  gait_type == "high_step_3":
+        if os.path.exists('utility_scripts/points.yaml'):
+            with open('utility_scripts/points.yaml', 'r') as f:
+                data = yaml.safe_load(f)
+                points = np.array(data[gait_type])
+        else:
+            print("No points file found")
+
+        interactive_bezier = InteractiveBezier(points, gait_type, array_size)
+        interactive_bezier.connect()
+
+        # Connect the on_close function to the close event
+        plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
+        plt.grid()
+
+        # Start the matplotlib event loop
+        plt.show()
+
+        new_points = interactive_bezier.updated_points
+        data[gait_type] = new_points
+        
             
 
     with open('utility_scripts/points.yaml', 'w') as f:
@@ -357,6 +258,7 @@ def interactive_bezier(gait_type: str, array_size: int):
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
 
+step_time = 3.5 # seconds
 
-
-interactive_bezier("small_gait", 150)
+# interactive_bezier("small_gait", 150)
+# interactive_bezier("high_step_3", step_time*HIGH_LEVEL_FREQUENCY)
