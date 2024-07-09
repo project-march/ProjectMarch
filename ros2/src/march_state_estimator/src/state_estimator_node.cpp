@@ -376,7 +376,7 @@ void StateEstimatorNode::publishStateEstimation()
         state_estimation_msg.body_ankle_pose[RIGHT_FOOT_ID].position.x);
     
     if (m_is_simulation) {
-        state_estimation_msg.world_foot_pose = getCurrentPoseArray("world", {"L_sole", "R_sole"});
+        state_estimation_msg.world_foot_pose = getCurrentPoseArray("world_ekf", {"L_sole", "R_sole"});
     }
 
     // Variables for visualization of Kalman Filter
@@ -427,7 +427,7 @@ void StateEstimatorNode::publishFeetHeight()
 {
     march_shared_msgs::msg::FeetHeightStamped feet_height_msg;
     feet_height_msg.header.stamp = this->now();
-    feet_height_msg.header.frame_id = "world";
+    feet_height_msg.header.frame_id = "world_ekf";
     feet_height_msg.heights = m_state_estimator->getFootContactHeight();
     m_feet_height_pub->publish(feet_height_msg);
 }
@@ -435,7 +435,7 @@ void StateEstimatorNode::publishFeetHeight()
 void StateEstimatorNode::publishMPCEstimation()
 {
     // Wait for transform otherwise return
-    if (!m_tf_buffer->canTransform("R_heel", "world", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_heel", "L_heel", tf2::TimePointZero)) {
+    if (!m_tf_buffer->canTransform("R_heel", "world_ekf", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_heel", "L_heel", tf2::TimePointZero)) {
         RCLCPP_WARN(this->get_logger(), "Cannot transform from world to R_heel");
         return;
     }
@@ -481,7 +481,7 @@ void StateEstimatorNode::publishMPCEstimation()
     // Get transform stamped from world to R_heel
     geometry_msgs::msg::TransformStamped transform_stamped;
     try {
-        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "world", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "world_ekf", tf2::TimePointZero);
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
         m_sensor_fusion_valid = false;
@@ -568,7 +568,7 @@ void StateEstimatorNode::publishGroundReactionForce()
     for (size_t i = 0; i < torque_pubs.size(); i++) {
         geometry_msgs::msg::Vector3Stamped torque_msg;
         torque_msg.header.stamp = current_time;
-        torque_msg.header.frame_id = "world";
+        torque_msg.header.frame_id = "world_ekf";
         torque_msg.vector.x = foot_forces[i].x();
         torque_msg.vector.y = foot_forces[i].y();
         torque_msg.vector.z = foot_forces[i].z();
@@ -580,7 +580,7 @@ void StateEstimatorNode::broadcastTransformToTf2()
 {
     geometry_msgs::msg::TransformStamped transform_stamped;
     transform_stamped.header.stamp = this->now();
-    transform_stamped.header.frame_id = "world";
+    transform_stamped.header.frame_id = "world_ekf";
     transform_stamped.child_frame_id = "base_link";
     // transform_stamped.transform = m_state_estimator->getRobotTransform();
     

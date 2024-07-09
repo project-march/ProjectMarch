@@ -69,13 +69,13 @@ class MujocoReaderNode(Node):
 
         backpack_position = PointStamped()
         backpack_position.header.stamp = self.get_clock().now().to_msg()
-        backpack_position.header.frame_id = "world"
+        backpack_position.header.frame_id = "world_ekf"
         backpack_position.point = msg.backpack_pos
         self.backpack_position_publisher.publish(backpack_position)
 
         backpack_velocity = Vector3Stamped()
         backpack_velocity.header.stamp = self.get_clock().now().to_msg()
-        backpack_velocity.header.frame_id = "world"
+        backpack_velocity.header.frame_id = "world_ekf"
         backpack_velocity.vector = msg.backpack_vel
         self.backpack_velocity_publisher.publish(backpack_velocity)
 

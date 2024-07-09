@@ -10,7 +10,7 @@
 StabilityTask::StabilityTask() : Task()
 {
     m_task_name = "stability";
-    m_reference_frame = "world";
+    m_reference_frame = "world_ekf";
     m_total_mass = pinocchio::computeTotalMass(m_model);
     setTaskM(STABILITY_COORDINATE_SIZE);
 }
