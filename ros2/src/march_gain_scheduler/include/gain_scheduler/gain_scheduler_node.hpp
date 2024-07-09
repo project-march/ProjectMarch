@@ -1,10 +1,11 @@
+#ifndef GAIN_SCHEDULER_NODE_HPP
+#define GAIN_SCHEDULER_NODE_HPP
 #include "gain_scheduler/gain_scheduler.hpp"
 #include "march_shared_msgs/msg/pid_values.hpp"     
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 
 class GainSchedulerNode:public rclcpp::Node {
-    
     public: 
         explicit GainSchedulerNode();
 
@@ -23,3 +24,4 @@ class GainSchedulerNode:public rclcpp::Node {
         void timerCallback();
 };
 
+#endif // GAIN_SCHEDULER_NODE_HPP

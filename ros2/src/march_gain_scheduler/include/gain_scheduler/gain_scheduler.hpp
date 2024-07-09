@@ -1,3 +1,5 @@
+#ifndef GAIN_SCHEDULER_HPP
+#define GAIN_SCHEDULER_HPP
 #pragma once
 
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
@@ -26,3 +28,5 @@ class GainScheduler {
         sensor_msgs::msg::JointState::SharedPtr m_last_joint_state;  
         double m_default_position = 0.0;
 }; 
+
+#endif // GAIN_SCHEDULER_HPP
