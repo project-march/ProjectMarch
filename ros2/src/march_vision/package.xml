@@ -15,19 +15,23 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_eigen</depend>
   <depend>std_msgs</depend>
+  <depend>std_srvs</depend> 
   <depend>sensor_msgs</depend>
+  <depend>message_filters</depend>
   <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
   <depend>march_shared_msgs</depend>
   <depend>eigen3_cmake_module</depend>
   <depend>grid_map_msgs</depend>
   <depend>grid_map_core</depend>
   <depend>grid_map_ros</depend>
-  <!-- <depend>grid_map</depend> -->
-  <!-- <depend>kindr</depend> -->
-  <!-- <depend>kindr_ros</depend> -->
+  <depend>kindr</depend>
+  <depend>kindr_ros</depend>
   <depend>realsense2_camera</depend>
-  <!-- <depend>CGAL</depend> -->
+  <depend>CGAL</depend>
+  <!-- <depend>grid_map</depend> -->
   <depend>opencv</depend>
+  <depend>boost</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

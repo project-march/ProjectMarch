@@ -22,11 +22,11 @@ class PlaneSegmentationPipeline {
 
   struct Config {
     
-    PlanarImageSegmentation::PlanarImageSegmentationParameters PlanarImageSegmentationParameters;
-    RansacSegmentation::RansacSegmentationParameters RansacSegmentationParameters;
-    ContourSegmentation::ContourSegmentationParameters ContourSegmentationParameters;
+    PlanarImageSegmentationParameters m_planar_image_segmentation_params;
+    RansacSegmentationParameters m_ransac_segmentation_params;
+    ContourSegmentationParameters m_contour_segmentation_params;
     // TODO: Remove if we're not going to use it
-    PostprocessingParameters postprocessingParameters;
+    // PostprocessingParameters postprocessingParameters;
   };
 
 
@@ -45,10 +45,10 @@ class PlaneSegmentationPipeline {
 
   // Pipeline
   // GridMapPreprocessing preprocessing_;
-  PlanarImageSegmentation::PlanarImageSegmentation m_planar_image_segmentation;
-  ContourSegmentation::ContourSegmentation m_contour_segmentation;
+  PlanarImageSegmentation m_planar_image_segmentation;
+  ContourSegmentation m_contour_segmentation;
   // TODO: Remove if we're not going to use it
-  Postprocessing postprocessing_;
+  // Postprocessing postprocessing_;
 
 };
 

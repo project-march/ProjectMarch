@@ -1,18 +1,18 @@
 #include "plane_segmentation/visualization_utils.h"
 
-#include <geometry_msgs/Point32.h>
+#include <geometry_msgs/msg/point32.hpp>
 
 namespace plane_segmentation {
 
 // Need to convert 2D polygon to 3D polygon for visualization within rviz2 environment
-geometry_msgs::PolygonStamped to3dRosPolygon(const CgalPolygon2d& polygon, const Eigen::Isometry3d& transform_plane_to_world,
-                                             const std_msgs::Header& header) {
+geometry_msgs::msg::PolygonStamped to3dRosPolygon(const CgalPolygon2d& polygon, const Eigen::Isometry3d& transform_plane_to_world,
+                                             const std_msgs::msg::Header& header) {
 
-  geometry_msgs::PolygonStamped polygon3d;
+  geometry_msgs::msg::PolygonStamped polygon3d;
   polygon3d.header = header;
   polygon3d.polygon.points.reserve(polygon.size());
   for (const auto& point : polygon) {
-    geometry_msgs::Point32 point_ros;
+    geometry_msgs::msg::Point32 point_ros;
     const auto point_in_world = positionInWorldFrameFromPosition2dInPlane(point, transform_plane_to_world);
     point_ros.x = static_cast<float>(point_in_world.x());
     point_ros.y = static_cast<float>(point_in_world.y());
@@ -22,10 +22,10 @@ geometry_msgs::PolygonStamped to3dRosPolygon(const CgalPolygon2d& polygon, const
   return polygon3d;
 }
 
-std::vector<geometry_msgs::PolygonStamped> to3dRosPolygon(const CgalPolygonWithHoles2d& polygon_with_holes,
-                                                          const Eigen::Isometry3d& transform_plane_to_world, const std_msgs::Header& header) {
+std::vector<geometry_msgs::msg::PolygonStamped> to3dRosPolygon(const CgalPolygonWithHoles2d& polygon_with_holes,
+                                                          const Eigen::Isometry3d& transform_plane_to_world, const std_msgs::msg::Header& header) {
 
-  std::vector<geometry_msgs::PolygonStamped> polygons;
+  std::vector<geometry_msgs::msg::PolygonStamped> polygons;
   polygons.reserve(polygon_with_holes.number_of_holes() + 1);
   polygons.emplace_back(to3dRosPolygon(polygon_with_holes.outer_boundary(), transform_plane_to_world, header));
 
@@ -37,7 +37,7 @@ std::vector<geometry_msgs::PolygonStamped> to3dRosPolygon(const CgalPolygonWithH
 
 namespace {  // Helper functions for convertBoundariesToRosMarkers and convertInsetsToRosMarkers
 
-std_msgs::ColorRGBA getColor(int id, float alpha = 1.0) {
+std_msgs::msg::ColorRGBA getColor(int id, float alpha = 1.0) {
   constexpr int num_colors = 7;
   using RGB = std::array<float, 3>;
   static const std::array<std::array<float, 3>, num_colors> color_map{
@@ -50,7 +50,7 @@ std_msgs::ColorRGBA getColor(int id, float alpha = 1.0) {
     RGB{0.2500F, 0.2500F, 0.2500F}
   };
 
-  std_msgs::ColorRGBA color_msg;
+  std_msgs::msg::ColorRGBA color_msg;
   const auto& rgb = color_map[id % num_colors];
   color_msg.r = rgb[0];
   color_msg.g = rgb[1];
@@ -59,13 +59,13 @@ std_msgs::ColorRGBA getColor(int id, float alpha = 1.0) {
   return color_msg;
 }
 
-visualization_msgs::Marker to3dRosMarker(const CgalPolygon2d& polygon, const Eigen::Isometry3d& transform_plane_to_world,
-                                         const std_msgs::Header& header, const std_msgs::ColorRGBA& color, int id, double line_width) {
+visualization_msgs::msg::Marker to3dRosMarker(const CgalPolygon2d& polygon, const Eigen::Isometry3d& transform_plane_to_world,
+                                         const std_msgs::msg::Header& header, const std_msgs::msg::ColorRGBA& color, int id, double line_width) {
 
-  visualization_msgs::Marker line;
+  visualization_msgs::msg::Marker line;
   line.id = id;
   line.header = header;
-  line.type = visualization_msgs::Marker::LINE_STRIP;
+  line.type = visualization_msgs::msg::Marker::LINE_STRIP;
   line.scale.x = line_width;
   line.color = color;
   if (!polygon.is_empty()) {
@@ -73,7 +73,7 @@ visualization_msgs::Marker to3dRosMarker(const CgalPolygon2d& polygon, const Eig
 
     for (const auto& point : polygon) {
       const auto point_in_world = positionInWorldFrameFromPosition2dInPlane(point, transform_plane_to_world);
-      geometry_msgs::Point point_ros;
+      geometry_msgs::msg::Point point_ros;
       point_ros.x = point_in_world.x();
       point_ros.y = point_in_world.y();
       point_ros.z = point_in_world.z();
@@ -81,7 +81,7 @@ visualization_msgs::Marker to3dRosMarker(const CgalPolygon2d& polygon, const Eig
     }
     // repeat the first point to close to polygon
     const auto point_in_world = positionInWorldFrameFromPosition2dInPlane(polygon.vertex(0), transform_plane_to_world);
-    geometry_msgs::Point point_ros;
+    geometry_msgs::msg::Point point_ros;
     point_ros.x = point_in_world.x();
     point_ros.y = point_in_world.y();
     point_ros.z = point_in_world.z();
@@ -94,11 +94,11 @@ visualization_msgs::Marker to3dRosMarker(const CgalPolygon2d& polygon, const Eig
   return line;
 }
 
-visualization_msgs::MarkerArray to3dRosMarker(const CgalPolygonWithHoles2d& polygon_with_holes,
-                                              const Eigen::Isometry3d& transform_plane_to_world, const std_msgs::Header& header,
-                                              const std_msgs::ColorRGBA& color, int id, double line_width) {
+visualization_msgs::msg::MarkerArray to3dRosMarker(const CgalPolygonWithHoles2d& polygon_with_holes,
+                                              const Eigen::Isometry3d& transform_plane_to_world, const std_msgs::msg::Header& header,
+                                              const std_msgs::msg::ColorRGBA& color, int id, double line_width) {
 
-  visualization_msgs::MarkerArray polygons;
+  visualization_msgs::msg::MarkerArray polygons;
 
   polygons.markers.reserve(polygon_with_holes.number_of_holes() + 1);
   polygons.markers.emplace_back(to3dRosMarker(polygon_with_holes.outer_boundary(), transform_plane_to_world, header, color, id, line_width));
@@ -113,17 +113,18 @@ visualization_msgs::MarkerArray to3dRosMarker(const CgalPolygonWithHoles2d& poly
 }  // namespace
 
 // Using markers as viz equivalent to polygon outlines
-visualization_msgs::MarkerArray convertBoundariesToRosMarkers(const std::vector<PlanarRegion>& planar_regions, const std::string& frameId,
+visualization_msgs::msg::MarkerArray convertBoundariesToRosMarkers(const std::vector<PlanarRegion>& planar_regions, const std::string& frameId,
                                                               grid_map::Time time, double line_width) {
 
-  std_msgs::Header header;
-  header.stamp.fromNSec(time);
+  std_msgs::msg::Header header;
+  // TODO: Fox this
+  // header.stamp.fromNSec(time);
   header.frame_id = frameId;
 
-  visualization_msgs::Marker delete_marker;
-  delete_marker.action = visualization_msgs::Marker::DELETEALL;
+  visualization_msgs::msg::Marker delete_marker;
+  delete_marker.action = visualization_msgs::msg::Marker::DELETEALL;
 
-  visualization_msgs::MarkerArray polygon_buffer;
+  visualization_msgs::msg::MarkerArray polygon_buffer;
   polygon_buffer.markers.reserve(planar_regions.size() + 1);  // lower bound
   polygon_buffer.markers.push_back(delete_marker);
   int colorIdx = 0;
@@ -140,16 +141,17 @@ visualization_msgs::MarkerArray convertBoundariesToRosMarkers(const std::vector<
   return polygon_buffer;
 }
 
-visualization_msgs::MarkerArray convertInsetsToRosMarkers(const std::vector<PlanarRegion>& planar_regions, const std::string& frameId,
+visualization_msgs::msg::MarkerArray convertInsetsToRosMarkers(const std::vector<PlanarRegion>& planar_regions, const std::string& frameId,
                                                           grid_map::Time time, double line_width) {
-  std_msgs::Header header;
-  header.stamp.fromNSec(time);frameId
+  std_msgs::msg::Header header;
+  // TODO: Fix this
+  // header.stamp.fromNSec(time);
   header.frame_id = frameId;
 
-  visualization_msgs::Marker delete_marker;
-  delete_marker.action = visualization_msgs::Marker::DELETEALL;
+  visualization_msgs::msg::Marker delete_marker;
+  delete_marker.action = visualization_msgs::msg::Marker::DELETEALL;
 
-  visualization_msgs::MarkerArray polygon_buffer;
+  visualization_msgs::msg::MarkerArray polygon_buffer;
   polygon_buffer.markers.reserve(planar_regions.size() + 1);  // lower bound
   polygon_buffer.markers.push_back(delete_marker);
   int colorIdx = 0;

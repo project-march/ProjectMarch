@@ -222,13 +222,13 @@
 //     m_exo_mode = msg->mode.to_string();
 // }
 
-// int main(int argc, char* argv[])
-// {
-//     rclcpp::init(argc, argv);
-//     // TODO: Multi or single threaded executor?
-//     rclcpp::executors::MultiThreadedExecutor executor;
-//     auto node = std::make_shared<ComputerVisionNode>();
-//     rclcpp::spin(node);
-//     rclcpp::shutdown();
-//     return 0;
-// }
+int main(int argc, char* argv[])
+{
+    // rclcpp::init(argc, argv);
+    // // TODO: Multi or single threaded executor?
+    // rclcpp::executors::MultiThreadedExecutor executor;
+    // auto node = std::make_shared<ComputerVisionNode>();
+    // rclcpp::spin(node);
+    // rclcpp::shutdown();
+    return 0;
+}
