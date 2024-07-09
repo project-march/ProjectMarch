@@ -11,9 +11,9 @@ state_estimator:
         - 0.00012217304  # rad/s/√Hz, pitch
         - 0.00012217304  # rad/s/√Hz, yaw
         foot_position:
-        - 1e8  # x
-        - 1e8  # y
-        - 1e8  # z
+        - 1e3  # x
+        - 1e3  # y
+        - 1e3  # z
         accelerometer_bias:
         - 4.25166e-11  # m/s^2/√Hz, x
         - 4.25166e-11  # m/s^2/√Hz, y
@@ -23,9 +23,9 @@ state_estimator:
         - 1.46670e-12  # rad/s/√Hz, pitch
         - 1.46670e-12  # rad/s/√Hz, yaw
         foot_slippage:
-        - 1e8  # roll
-        - 1e8  # pitch
-        - 1e8  # yaw
+        - 1e4  # roll
+        - 1e4  # pitch
+        - 1e4  # yaw
       observation_noise:
         foot_position:
         - 1e8  # x

@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+ <tabbed_widget name="Main Window" parent="main_window">
+  <Tab containers="1" tab_name="IMU State">
+   <Container>
+    <DockSplitter orientation="-" sizes="0.333333;0.333333;0.333333" count="3">
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.006289" left="1720511616.576331" top="0.089414" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_position/x" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.005131" left="1720511616.576331" top="0.032069" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_position/y" color="#d62728"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="1.022131" left="1720511616.576331" top="1.029376" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_position/z" color="#1ac938"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.005083" left="1720511616.576331" top="0.029950" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_velocity/x" color="#ff7f0e"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000402" left="1720511616.576331" top="0.011011" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_velocity/y" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.002379" left="1720511616.576331" top="0.000343" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_velocity/z" color="#9467bd"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.250111;0.250111;0.249667;0.250111" count="4">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="1.000000" left="1720511616.576331" top="1.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_orientation/w" color="#17becf"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.000008" left="1720511616.576331" top="0.000084" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_orientation/x" color="#d62728"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000084" left="1720511616.576331" top="-0.000009" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_orientation/y" color="#bcbd22"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000005" left="1720511616.576331" top="0.000015" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/imu_orientation/z" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab containers="1" tab_name="IMU error">
+   <Container>
+    <DockSplitter orientation="-" sizes="0.5;0.5" count="2">
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000001" left="1720511616.576331" top="0.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/accelerometer_bias/x" color="#1ac938"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000000" left="1720511616.576331" top="0.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/accelerometer_bias/y" color="#ff7f0e"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.000000" left="1720511616.576331" top="0.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/accelerometer_bias/z" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000005" left="1720511616.576331" top="-0.000002" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/gyroscope_bias/x" color="#9467bd"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.000002" left="1720511616.576331" top="0.000005" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/gyroscope_bias/y" color="#17becf"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000001" left="1720511616.576331" top="0.000001" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/gyroscope_bias/z" color="#bcbd22"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab containers="1" tab_name="Feet State">
+   <Container>
+    <DockSplitter orientation="-" sizes="0.250371;0.249629;0.250371;0.249629" count="4">
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.249162" left="1720511616.576331" top="0.249197" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_position/x" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.189855" left="1720511616.576331" top="0.189885" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_position/y" color="#d62728"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.000000" left="1720511616.576331" top="0.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_position/z" color="#1ac938"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.250111;0.250111;0.249667;0.250111" count="4">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.558606" left="1720511616.576331" top="1.037135" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_slippage/w" color="#ff7f0e"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-1.036623" left="1720511616.576331" top="0.549547" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_slippage/x" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-1.036394" left="1720511616.576331" top="0.553981" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_slippage/y" color="#9467bd"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.007594" left="1720511616.576331" top="0.000184" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/left_foot_slippage/z" color="#17becf"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.333481;0.333037;0.333481" count="3">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.249162" left="1720511616.576331" top="0.249197" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_position/x" color="#bcbd22"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.189920" left="1720511616.576331" top="-0.189884" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_position/y" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="0.000000" left="1720511616.576331" top="0.000000" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_position/z" color="#d62728"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter orientation="|" sizes="0.250111;0.250111;0.249667;0.250111" count="4">
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.569029" left="1720511616.576331" top="1.033723" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_slippage/w" color="#1ac938"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.564573" left="1720511616.576331" top="1.034204" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_slippage/x" color="#ff7f0e"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.560295" left="1720511616.576331" top="1.034616" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_slippage/y" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot style="Lines" mode="TimeSeries" flip_x="false" flip_y="false">
+        <range bottom="-0.000174" left="1720511616.576331" top="0.007114" right="1720511641.575527"/>
+        <limitY/>
+        <curve name="/state_estimation/state/right_foot_slippage/z" color="#9467bd"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="2"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="0"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <default time_axis="" delimiter="0"/>
+  </plugin>
+  <plugin ID="DataLoad MCAP"/>
+  <plugin ID="DataLoad ROS2 bags">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="ROS2 Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+  </plugin>
+  <plugin ID="UDP Server"/>
+  <plugin ID="WebSocket Server"/>
+  <plugin ID="ZMQ Subscriber"/>
+  <plugin ID="Fast Fourier Transform"/>
+  <plugin ID="Quaternion to RPY"/>
+  <plugin ID="Reactive Script Editor">
+   <library code="--[[ Helper function to create a series from arrays&#xa;&#xa; new_series: a series previously created with ScatterXY.new(name)&#xa; prefix:     prefix of the timeseries, before the index of the array&#xa; suffix_X:   suffix to complete the name of the series containing the X value. If [nil], use the index of the array.&#xa; suffix_Y:   suffix to complete the name of the series containing the Y value&#xa; timestamp:   usually the tracker_time variable&#xa;              &#xa; Example:&#xa; &#xa; Assuming we have multiple series in the form:&#xa; &#xa;   /trajectory/node.{X}/position/x&#xa;   /trajectory/node.{X}/position/y&#xa;   &#xa; where {N} is the index of the array (integer). We can create a reactive series from the array with:&#xa; &#xa;   new_series = ScatterXY.new(&quot;my_trajectory&quot;) &#xa;   CreateSeriesFromArray( new_series, &quot;/trajectory/node&quot;, &quot;position/x&quot;, &quot;position/y&quot;, tracker_time );&#xa;--]]&#xa;&#xa;function CreateSeriesFromArray( new_series, prefix, suffix_X, suffix_Y, timestamp )&#xa;  &#xa;  --- clear previous values&#xa;  new_series:clear()&#xa;  &#xa;  --- Append points to new_series&#xa;  index = 0&#xa;  while(true) do&#xa;&#xa;    x = index;&#xa;    -- if not nil, get the X coordinate from a series&#xa;    if suffix_X ~= nil then &#xa;      series_x = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_X) )&#xa;      if series_x == nil then break end&#xa;      x = series_x:atTime(timestamp)&#x9; &#xa;    end&#xa;    &#xa;    series_y = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_Y) )&#xa;    if series_y == nil then break end &#xa;    y = series_y:atTime(timestamp)&#xa;    &#xa;    new_series:push_back(x,y)&#xa;    index = index+1&#xa;  end&#xa;end&#xa;&#xa;--[[ Similar to the built-in function GetSeriesNames(), but select only the names with a give prefix. --]]&#xa;&#xa;function GetSeriesNamesByPrefix(prefix)&#xa;  -- GetSeriesNames(9 is a built-in function&#xa;  all_names = GetSeriesNames()&#xa;  filtered_names = {}&#xa;  for i, name in ipairs(all_names)  do&#xa;    -- check the prefix&#xa;    if name:find(prefix, 1, #prefix) then&#xa;      table.insert(filtered_names, name);&#xa;    end&#xa;  end&#xa;  return filtered_names&#xa;end&#xa;&#xa;--[[ Modify an existing series, applying offsets to all their X and Y values&#xa;&#xa; series: an existing timeseries, obtained with TimeseriesView.find(name)&#xa; delta_x: offset to apply to each x value&#xa; delta_y: offset to apply to each y value &#xa;  &#xa;--]]&#xa;&#xa;function ApplyOffsetInPlace(series, delta_x, delta_y)&#xa;  -- use C++ indeces, not Lua indeces&#xa;  for index=0, series:size()-1 do&#xa;    x,y = series:at(index)&#xa;    series:set(index, x + delta_x, y + delta_y)&#xa;  end&#xa;end&#xa;"/>
+   <scripts/>
+  </plugin>
+  <plugin ID="CSV Exporter"/>
+  <plugin ID="ROS2 Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <previouslyLoaded_Datafiles/>
+ <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <customMathEquations/>
+ <snippets/>
+ <!-- - - - - - - - - - - - - - - -->
+</root>
+

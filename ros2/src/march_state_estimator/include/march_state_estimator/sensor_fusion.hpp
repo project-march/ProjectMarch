@@ -204,6 +204,7 @@ public:
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_LEFT_SLIPPAGE, STATE_INDEX_LEFT_SLIPPAGE) = m_process_noise_foot_slippage;
             m_observation_noise_covariance_left_position_matrix = m_observation_noise_covariance_position_matrix;
             m_observation_noise_covariance_left_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
+            m_state.imu_velocity.z() = 0.0;
             m_state.left_foot_position.z() = 0.0;
             m_state.left_foot_slippage = Eigen::Quaterniond::Identity();
         } else {
@@ -219,6 +220,7 @@ public:
             m_process_noise_covariance_matrix.block<3, 3>(STATE_INDEX_RIGHT_SLIPPAGE, STATE_INDEX_RIGHT_SLIPPAGE) = m_process_noise_foot_slippage;
             m_observation_noise_covariance_right_position_matrix = m_observation_noise_covariance_position_matrix;
             m_observation_noise_covariance_right_slippage_matrix = m_observation_noise_covariance_slippage_matrix;
+            m_state.imu_velocity.z() = 0.0;
             m_state.right_foot_position.z() = 0.0;
             m_state.right_foot_slippage = Eigen::Quaterniond::Identity();
         } else {
