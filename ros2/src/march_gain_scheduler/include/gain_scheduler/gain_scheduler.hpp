@@ -23,7 +23,7 @@ class GainScheduler {
         std::tuple<std::string, double, double, double> getSpecificJointAngleGains(const std::string& joint_name, double joint_angle);
         ExoMode m_gait_type; 
         std::string m_config_base;
-        YAML::Node m_config;
-        sensor_msgs::msg::JointState::SharedPtr m_last_joint_state;  
+        YAML::Node m_joints_config;
+        joints_with_gains m_joints_with_gains;
 };
 #endif // GAIN_SCHEDULER_HPP
