@@ -21,6 +21,7 @@ int8 HIGHSTEP2 = 13
 int8 HIGHSTEP3 = 14
 int8 HINGE = 15
 int8 SIDEWAYSLEFT = 16
+int8 BALANCESTAND = 17
 
 string CARTESIAN = "cartesian" 
 string JOINT_ANGLES = "joint_angles" 

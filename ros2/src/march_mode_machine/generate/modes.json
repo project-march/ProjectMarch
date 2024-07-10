@@ -49,6 +49,10 @@
   ],
   [
     {
+      "name": "BalanceStand",
+      "ExoMode": 17
+    },
+    {
       "name": "VariableWalk",
       "ExoMode": 11
     },

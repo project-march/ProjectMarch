@@ -18,11 +18,11 @@ ik_manager:
     - HighStep2
     - HighStep3
     - Hinge
+    - BalanceStand
     stack_of_tasks:
       Stand:
       - posture
       - motion
-      - stability
       Sit:
       - posture
       - motion
@@ -60,3 +60,7 @@ ik_manager:
       HighStep3:
       - posture
       - motion
+      BalanceStand:
+      - posture
+      - motion
+      - stability

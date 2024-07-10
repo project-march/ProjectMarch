@@ -22,6 +22,7 @@ enum class ExoMode {
     HighStep3 = 14,
     Hinge = 15,
     SidewaysLeft = 16,
+    BalanceStand = 17,
 };
 
 inline std::string toString(ExoMode state) {
@@ -43,6 +44,7 @@ inline std::string toString(ExoMode state) {
         case ExoMode::HighStep3: return "HighStep3";
         case ExoMode::Hinge: return "Hinge";
         case ExoMode::SidewaysLeft: return "SidewaysLeft";
+        case ExoMode::BalanceStand: return "BalanceStand";
         default: return "Unknown";
     }
 }
