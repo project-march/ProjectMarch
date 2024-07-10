@@ -12,9 +12,16 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
+# Mainly for optimization of CGAL ops.
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
+
+# TODO: Write the CMake in a cleaner way
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -33,10 +40,9 @@ find_package(march_shared_msgs REQUIRED)
 find_package(realsense2 REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(PCL 1.10 REQUIRED COMPONENTS)
-find_package(visualization_msgs)
+find_package(visualization_msgs REQUIRED)
 
 find_package(CGAL REQUIRED)
-find_package(grid_map_cmake_helpers REQUIRED)
 find_package(grid_map_msgs REQUIRED)
 find_package(grid_map_core REQUIRED)
 find_package(grid_map_ros REQUIRED)
@@ -90,7 +96,6 @@ target_include_directories(${PROJECT_NAME}
   ${geometry_msgs_INCLUDE_DIRS}
   ${visualization_msgs_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -110,7 +115,6 @@ ament_target_dependencies(${PROJECT_NAME}
   CGAL
   kindr_ros
   kindr
-  grid_map_cmake_helpers
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -119,7 +123,7 @@ ament_target_dependencies(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   ${PCL_LIBRARIES}
-
+  ${realsense2_LIBRARY}
 )
 
 add_executable(computer_vision_node
@@ -150,7 +154,6 @@ ament_target_dependencies(computer_vision_node
   CGAL
   kindr_ros
   kindr
-  grid_map_cmake_helpers
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -160,6 +163,7 @@ ament_target_dependencies(computer_vision_node
 target_link_libraries(computer_vision_node
   ${PROJECT_NAME}
   ${PCL_LIBRARIES}
+  ${realsense2_LIBRARY}
 )
 
 add_executable(elevation_mapping_node
@@ -212,7 +216,6 @@ ament_target_dependencies(elevation_mapping_node
   CGAL
   kindr_ros
   kindr
-  grid_map_cmake_helpers
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -223,6 +226,7 @@ target_link_libraries(elevation_mapping_node
   ${PROJECT_NAME}
   ${PCL_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${realsense2_LIBRARY}
 )
 
 add_executable(plane_segmentation_pipeline_node
@@ -244,7 +248,6 @@ target_include_directories(plane_segmentation_pipeline_node PUBLIC
   ${realsense2_INCLUDE_DIRS}
   ${CGAL_INCLUDE_DIRS}
   ${grid_map_msgs_INCLUDE_DIRS}
-  ${grid_map_msgs_INCLUDE_DIRS}
   ${grid_map_core_INCLUDE_DIRS}
   ${grid_map_ros_INCLUDE_DIRS}
   ${kindr_INCLUDE_DIRS}
@@ -252,7 +255,6 @@ target_include_directories(plane_segmentation_pipeline_node PUBLIC
   ${geometry_msgs_INCLUDE_DIRS}
   ${visualization_msgs_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-
 )
 
 ament_target_dependencies(plane_segmentation_pipeline_node
@@ -272,7 +274,6 @@ ament_target_dependencies(plane_segmentation_pipeline_node
   CGAL
   kindr_ros
   kindr
-  grid_map_cmake_helpers
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -282,6 +283,7 @@ ament_target_dependencies(plane_segmentation_pipeline_node
 target_link_libraries(plane_segmentation_pipeline_node
   ${PROJECT_NAME}
   ${PCL_LIBRARIES}
+  ${realsense2_LIBRARY}
 )
 
 install(TARGETS
@@ -302,7 +304,6 @@ install(DIRECTORY
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 ament_export_dependencies(CGAL)
-ament_export_dependencies(grid_map_cmake_helpers)
 ament_export_dependencies(grid_map_msgs)
 ament_export_dependencies(grid_map_core)
 ament_export_dependencies(grid_map_ros)

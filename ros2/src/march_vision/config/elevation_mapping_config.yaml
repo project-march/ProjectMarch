@@ -62,7 +62,7 @@ elevation_mapping:
     max_variance: 10000.0
     mahalanobis_distance_threshold: 2.5 
     multi_height_noise: 0.00002
-    #visibility_cleanup_rate: 1.0
+    visibility_cleanup_rate: 1.0
 
     
     input_topic: elevation_map_raw

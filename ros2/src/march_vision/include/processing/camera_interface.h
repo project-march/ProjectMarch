@@ -28,6 +28,7 @@ using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
 using MarkerPublisher = rclcpp::Publisher<visualization_msgs::msg::Marker>;
 
 namespace march_vision{
+    
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using PointCloudPublisher = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>;
 
@@ -38,7 +39,7 @@ public:
 
     void run();
     void stop();
-    void initializeCamera();
+    bool initializeCamera();
     void shutdown();
 
 private:
@@ -50,8 +51,20 @@ private:
     std::clock_t m_last_frame_time;
     int m_frame_wait_counter;
     double m_frame_timeout;
+
     rs2::config m_config;
-    rs2::pipeline m_pipe;
+    rs2::pipeline m_pipeline;
+    rs2::decimation_filter m_decimation_filter;
+    rs2::spatial_filter m_spatial_filter;
+    rs2::temporal_filter m_temporal_filter;
+    rs2::hole_filling_filter m_hole_filling_filter;
+    // rs2::threshold_filter m_threshold_filter;
+
+    bool m_decimation_filter_enabled;
+    bool m_spatial_filter_enabled;
+    bool m_temporal_filter_enabled;
+    bool m_hole_filling_filter_enabled;
+
     rclcpp::TimerBase::SharedPtr m_realsense_timer;
     PointCloudPublisher::SharedPtr m_preprocessed_pointcloud_publisher;
     rclcpp::CallbackGroup::SharedPtr m_realsense_callback_group;
@@ -59,12 +72,6 @@ private:
     std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
     std::mutex m_mutex;
-
-    bool m_decimation_filter;
-    bool m_spatial_filter;
-    bool m_temporal_filter;
-    bool m_hole_filling_filter;
-    bool m_threshold_filter;
 
     void declareParameters();
     void readParameters();

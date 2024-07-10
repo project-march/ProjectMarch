@@ -2,8 +2,8 @@ march_vision:
   ros__parameters:
 
     cameras_used: "both" # ["left", "right", "both"]
-    left_camera_serial_number: 944622074337
-    right_camera_serial_number: 944622071535
+    left_camera_serial_number: "215222075881" 
+    right_camera_serial_number: "033322070612"
 
     realsense_camera_settings: # the specific parameters for each are in the code
       decimation_filter: true
