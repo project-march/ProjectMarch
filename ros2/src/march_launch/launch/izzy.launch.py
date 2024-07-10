@@ -328,7 +328,12 @@ def generate_launch_description() -> LaunchDescription:
             name='march_mpc_buffer_node',
             output='screen',
         ),
-
+        Node(
+            package='march_mpc_planning',
+            executable='mpc_planning_node',
+            name='mpc_planning_node',
+            output='screen',
+        ),
 
         mujoco_node,
         state_estimator,
@@ -342,5 +347,4 @@ def generate_launch_description() -> LaunchDescription:
         bezier_visualization, 
         rqt_input_device, 
         # ipd_node,
-        # footstep_generator, 
     ])

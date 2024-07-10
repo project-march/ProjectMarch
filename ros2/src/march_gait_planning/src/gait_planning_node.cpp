@@ -271,8 +271,8 @@ void GaitPlanningCartesianNode::stepClose(){
             break; 
         case ExoMode::LargeWalk:
         case ExoMode::SmallWalk: 
-        case ExoMode::VariableWalk:
-            break; 
+        // case ExoMode::VariableWalk:
+        //     break; 
         default: 
             break; 
     }
@@ -325,9 +325,9 @@ void GaitPlanningCartesianNode::processStand(){
             case ExoMode::HighStep1 :
             case ExoMode::HighStep2 :
             case ExoMode::HighStep3 :
-            case ExoMode::VariableWalk :
-                stepClose(); 
-                break; 
+            // case ExoMode::VariableWalk :
+            //     stepClose(); 
+            //     break; 
 
             case ExoMode::BootUp :
                 calculateIncrements(); 
@@ -435,9 +435,9 @@ void GaitPlanningCartesianNode::publishFootPositions(){
             publishHeightGaits(); 
             break;
         
-        case ExoMode::VariableWalk :
-            publishVariableWalk(); 
-            break; 
+        // case ExoMode::VariableWalk :
+        //     publishVariableWalk(); 
+        //     break; 
 
         default :
             break;

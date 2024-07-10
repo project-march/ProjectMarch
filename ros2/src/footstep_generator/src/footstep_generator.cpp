@@ -6,10 +6,12 @@ using std::placeholders::_2;
 FootstepGenerator::FootstepGenerator()
     : Node("footstep_generator_node")
     , m_steps(20) // Change this so we can interactively edit the amount of footsteps while Koengaiting
-    , m_vx(0.15)
+    , m_vx(0.1)
     , m_vy(0.0)
     , m_l(0.33)
 {
+    m_exo_mode_sub = this->create_subscription<march_shared_msgs::msg::ExoMode>(
+        "current_mode", 10, std::bind(&FootstepGenerator::exo_mode_callback, this, _1));
     m_service = this->create_service<march_shared_msgs::srv::RequestFootsteps>(
         "footstep_generator", std::bind(&FootstepGenerator::publish_foot_placements, this, _1, _2));
     m_publisher = this->create_publisher<geometry_msgs::msg::PoseArray>("/desired_footsteps", 10);
@@ -19,6 +21,15 @@ FootstepGenerator::FootstepGenerator()
     declare_parameter("step_length", 0.1);
     m_steps = this->get_parameter("n_footsteps").as_int();
     m_vx = this->get_parameter("step_length").as_double();
+}
+
+void FootstepGenerator::exo_mode_callback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
+{
+    if (msg->mode == march_shared_msgs::msg::ExoMode::BALANCESTAND) {
+        auto footsteps = generate_foot_placements(0, 1);
+        m_publisher->publish(footsteps);
+        RCLCPP_INFO(this->get_logger(), "Balance Stand");
+    }
 }
 
 void FootstepGenerator::publish_foot_placements(

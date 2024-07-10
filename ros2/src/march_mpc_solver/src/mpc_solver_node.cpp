@@ -119,7 +119,7 @@ void MpcSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateE
 
 void MpcSolverNode::timerCallback()
 {
-    if (m_mode != ExoMode::VariableWalk){ 
+    if ((m_mode != ExoMode::VariableWalk) && (m_mode != ExoMode::BalanceStand)) { 
         return;
     }
 
@@ -259,7 +259,7 @@ void MpcSolverNode::visualizeTrajectory()
     m_zmp_visualizer_publisher->publish(zmp_path);
     m_com_trajectory_publisher->publish(com_msg);
 
-    if (abs(foot_msg.poses[0].position.y - m_prev_foot_msg.poses[0].position.y) > 10e-2)
+    if ((abs(foot_msg.poses[0].position.y - m_prev_foot_msg.poses[0].position.y) > 10e-2) && (m_mode == ExoMode::VariableWalk))
     {
         // TODO: Move this into separate function
         // only publish when foot is changing
