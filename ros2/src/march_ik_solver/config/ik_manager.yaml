@@ -6,7 +6,8 @@ ik_manager:
     - Walk
     - BootUp
     - Error
-    - Sideways
+    - SidewaysRight
+    - SidewaysLeft
     - LargeWalk
     - SmallWalk
     - Ascending
@@ -25,7 +26,10 @@ ik_manager:
       Sit:
       - posture
       - motion
-      Sideways:
+      SidewaysRight:
+      - posture
+      - motion
+      SidewaysLeft:
       - posture
       - motion
       Ascending:

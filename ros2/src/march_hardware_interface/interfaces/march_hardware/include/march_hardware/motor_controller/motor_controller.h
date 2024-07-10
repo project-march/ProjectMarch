@@ -44,6 +44,7 @@ public:
     virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
     virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
 
+    virtual void sendTargetPosition(float target_position) = 0;
     virtual void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) = 0;
 
     // Getter and setter for the ActuationMode

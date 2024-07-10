@@ -76,6 +76,11 @@ public:
         const std::vector<double>& joint_velocity_lower_limits, const std::vector<double>& joint_velocity_upper_limits,
         const double& velocity_limit_multiplier);
 
+    void configurePinocchioModel();
+    void updatePinocchioModel(const Eigen::VectorXd& joint_positions);
+    std::vector<Eigen::Vector3d> getEndEffectorPositions() const;
+    std::vector<Eigen::Matrix3d> getEndEffectorOrientations() const;
+
 private:
     Eigen::VectorXd clampJointLimits(Eigen::VectorXd desired_joint_positions);
     Eigen::VectorXd clampJointVelocities(Eigen::VectorXd desired_joint_velocities);
@@ -99,6 +104,9 @@ private:
     std::vector<std::string> m_joint_names;
     std::vector<JointLimit> m_joint_position_limits;
     std::vector<JointLimit> m_joint_velocity_limits;
+
+    pinocchio::Model m_pinocchio_model;
+    std::unique_ptr<pinocchio::Data> m_pinocchio_data;
 };
 
 #endif // IK_SOLVER__IK_SOLVER_HPP_

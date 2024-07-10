@@ -2,8 +2,16 @@
 
 #include "march_gait_planning/gait_planning_node.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 
 using std::placeholders::_1; 
+
+#define COLOR_GREEN   "\033[32m"
+#define RESET   "\033[0m"
+#define COLOR_RED   "\033[31m"
+#define COLOR_PERIWINKLE   "\033[38;5;147m"
+
 
 GaitPlanningCartesianNode::GaitPlanningCartesianNode()
     : rclcpp_lifecycle::LifecycleNode("gait_planning_cartesian_node", rclcpp::NodeOptions().use_intra_process_comms(false))
@@ -35,10 +43,19 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_mpc_foot_positions_subscriber = create_subscription<geometry_msgs::msg::PoseArray>("mpc_solver/buffer/output", 10, std::bind(&GaitPlanningCartesianNode::MPCCallback, this, _1));
 
     m_gait_planning.setGaitType(ExoMode::BootUp); 
+    
+    std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
+    m_home_stand = parseHomestandYAML(homestand_path);
 
-    m_home_stand = {0.139, 0.25, -0.89, 0.139, -0.25, -0.89};
+    if (m_home_stand.size() != 6) {
+        RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f" RESET, m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
+    }
 
-    RCLCPP_INFO(this->get_logger(), "Cartesian node configured! "); 
+    // m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
+
+    RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Cartesian node configured! " RESET); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -107,7 +124,7 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         m_desired_footpositions_msg->header = msg->header;
         if (m_current_trajectory.empty()){
             m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-            // RCLCPP_INFO(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
+            RCLCPP_DEBUG(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
         }
         publishFootPositions();
     } else {
@@ -243,7 +260,7 @@ void GaitPlanningCartesianNode::publishIncrements(){
 
 
 void GaitPlanningCartesianNode::stepClose(){
-    RCLCPP_INFO(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
+    RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
 
     // Hier trajectory publishen naar visualizer, depending on previous gait type 
@@ -260,7 +277,7 @@ void GaitPlanningCartesianNode::stepClose(){
             break; 
     }
 
-    RCLCPP_INFO(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
+    RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
 
@@ -272,18 +289,18 @@ void GaitPlanningCartesianNode::calculateIncrements(){
     m_left_foot_offset = m_gait_planning.getCurrentLeftFootPos(); 
     m_right_foot_offset = m_gait_planning.getCurrentRightFootPos(); 
     m_initial_position = {m_left_foot_offset[0], m_left_foot_offset[1], m_left_foot_offset[2], m_right_foot_offset[0], m_right_foot_offset[1], m_right_foot_offset[2]}; 
-    RCLCPP_INFO(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
+    RCLCPP_DEBUG(this->get_logger(), "original position: %f, %f, %f, %f, %f, %f", m_initial_position[0], m_initial_position[1], m_initial_position[2], m_initial_position[3], m_initial_position[4], m_initial_position[5]); 
     for (unsigned i = 0; i < m_home_stand.size(); i++){
         m_increments.push_back((m_home_stand[i] - m_initial_position[i])/100); 
     }
-    RCLCPP_INFO(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
+    RCLCPP_DEBUG(this->get_logger(), "increments: %f, %f, %f, %f, %f, %f ", m_increments[0], m_increments[1], m_increments[2], m_increments[3], m_increments[4], m_increments[5]); 
     for (unsigned i = 0; i < 100; i++){
         for (unsigned i = 0; i < m_initial_position.size(); i++){
         m_initial_position[i] += m_increments[i]; 
         }
         m_home_stand_trajectory.push_back(m_initial_position); 
     }
-    RCLCPP_INFO(this->get_logger(), "Calculated incremental steps, length of trajectory: %d", m_home_stand_trajectory.size()); 
+    RCLCPP_DEBUG(this->get_logger(), "Calculated incremental steps, length of trajectory: %d", m_home_stand_trajectory.size()); 
     m_gait_planning.setPreviousGaitType(ExoMode::Stand); 
 }
 
@@ -326,7 +343,7 @@ void GaitPlanningCartesianNode::processStand(){
 void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
-        RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
+        RCLCPP_DEBUG(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
         m_current_trajectory.erase(m_current_trajectory.begin());
@@ -348,7 +365,7 @@ void GaitPlanningCartesianNode::publishHeightGaits(){
         m_current_trajectory = m_gait_planning.getTrajectory(); 
         m_single_execution_done = true;
 
-        RCLCPP_INFO(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
+        RCLCPP_DEBUG(this->get_logger(), "Height trajectory filled, size of current trajectory: %d", m_current_trajectory.size());
     }
     else if (m_current_trajectory.empty() && m_single_execution_done){
         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
@@ -425,6 +442,25 @@ void GaitPlanningCartesianNode::publishFootPositions(){
         default :
             break;
     }
+}
+
+std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::string& file_path){
+
+    std::vector<double> values;
+    
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node cartesian = config["cartesian"];
+        if (cartesian && cartesian.IsSequence()) {
+            for (const auto& value : cartesian) {
+                values.push_back(value.as<double>());
+            }
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return values;
 }
 
 int main(int argc, char *argv[]){

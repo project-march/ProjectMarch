@@ -28,6 +28,8 @@ find_package(std_msgs REQUIRED)
 find_package(ament_cmake_gtest)
 find_package(rclcpp_lifecycle REQUIRED)
 
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
+
 # Include directories
 include_directories(include)
 
@@ -122,6 +124,9 @@ ament_target_dependencies(listener_gait_planning
 install(TARGETS gait_planning_cartesian_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+target_link_libraries(gait_planning_cartesian_node ${YAMLCPP_LIBRARIES})
+target_link_libraries(gait_planning_angles_node ${YAMLCPP_LIBRARIES})
 
 install(TARGETS gait_planning_angles_node
   DESTINATION lib/${PROJECT_NAME}

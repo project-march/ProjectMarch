@@ -44,7 +44,7 @@ IKSolverNode::IKSolverNode()
     m_ik_solver_command_sub = this->create_subscription<march_shared_msgs::msg::IksCommand>(
         "ik_solver/command", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::iksCommandCallback, this, std::placeholders::_1), m_subscription_options);
-    m_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
+    m_ik_solver_desired_foot_positions_sub = this->create_subscription<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/input", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::desiredFootPositionsCallback, this, std::placeholders::_1), m_subscription_options);
     m_desired_com_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -59,9 +59,12 @@ IKSolverNode::IKSolverNode()
     m_clock_sub = this->create_subscription<std_msgs::msg::Header>(
         "state_estimation/clock", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_subscription_options);
+    
     m_joint_trajectory_pub = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "ik_solver/joint_trajectory", 10);
     m_iks_status_pub = this->create_publisher<march_shared_msgs::msg::IksStatus>("ik_solver/status", 10);
+    m_ik_solver_estimated_foot_positions_pub = this->create_publisher<march_shared_msgs::msg::IksFootPositions>(
+        "ik_solver/buffer/output", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
 
     RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
@@ -110,6 +113,7 @@ void IKSolverNode::clockCallback(const std_msgs::msg::Header::SharedPtr msg)
     // Publish the desired joint positions if there is a solution in the previous cycle.
     if (m_has_solution) {
         publishDesiredJointPositions(); // Publish the desired joint positions to the hardware interface / mujoco writer.
+        publishEstimatedFootPositions(); // Publish the estimated foot positions for monitoring purposes.
         m_has_solution = false;
     }
 }
@@ -187,8 +191,9 @@ void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::Shared
     const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg)
 {
     RCLCPP_INFO(this->get_logger(), "New gait callback.");
-    (void) exo_mode_msg;
-    stateEstimationCallback(state_estimation_msg);
+    if (exo_mode_msg->mode != march_shared_msgs::msg::ExoMode::STAND) {
+        stateEstimationCallback(state_estimation_msg);
+    }
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -237,6 +242,22 @@ void IKSolverNode::publishDesiredJointPositions()
         desired_joint_positions_msg.data.push_back(desired_joint_positions[idx]);
     }
     m_desired_joint_positions_pub->publish(desired_joint_positions_msg);
+}
+
+void IKSolverNode::publishEstimatedFootPositions()
+{
+    m_ik_solver->updatePinocchioModel(m_desired_joint_positions);
+    std::vector<Eigen::Vector3d> estimated_foot_positions = m_ik_solver->getEndEffectorPositions();
+
+    march_shared_msgs::msg::IksFootPositions estimated_foot_positions_msg;
+    estimated_foot_positions_msg.header.stamp = this->now();
+    estimated_foot_positions_msg.left_foot_position.x = estimated_foot_positions[0].x();
+    estimated_foot_positions_msg.left_foot_position.y = estimated_foot_positions[0].y();
+    estimated_foot_positions_msg.left_foot_position.z = estimated_foot_positions[0].z();
+    estimated_foot_positions_msg.right_foot_position.x = estimated_foot_positions[1].x();
+    estimated_foot_positions_msg.right_foot_position.y = estimated_foot_positions[1].y();
+    estimated_foot_positions_msg.right_foot_position.z = estimated_foot_positions[1].z();
+    m_ik_solver_estimated_foot_positions_pub->publish(estimated_foot_positions_msg);
 }
 
 void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
@@ -392,6 +413,9 @@ void IKSolverNode::configureIKSolverParameters()
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
         RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
+
+    // Configure Pinocchio model.
+    m_ik_solver->configurePinocchioModel();
 
     // Initialize world-to-base orientation.
     m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();

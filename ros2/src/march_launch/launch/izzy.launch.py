@@ -45,20 +45,34 @@ def generate_launch_description() -> LaunchDescription:
             description="Whether the simulation should be launched.",
             choices=["true", "false"],
         ),
+
+        DeclareLaunchArgument(
+            name="gaiting",
+            default_value="air",
+            description="The type of gaiting. Options: air, ground, ground-xz. Default is airgaiting.",
+        ),
+
+        DeclareLaunchArgument(
+            name="obstacle",
+            default_value="",
+            description="The obstacle that should be loaded. Default is empty. Note that it should not be airgaiting.",
+        ),
     ]
 
     mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
-    simulation = LaunchConfiguration("simulation", default="true")
     rosbags = LaunchConfiguration("rosbags", default="true")
-    airgait = LaunchConfiguration("airgait", default="false")
-    robot = LaunchConfiguration("robot")
     rviz = LaunchConfiguration("rviz", default="false")
     IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
     ik_test = LaunchConfiguration("ik_test", default="false")
+
+    # Simulation parameters
+    simulation = LaunchConfiguration("simulation", default="true")
+    gaiting_to_load = LaunchConfiguration("gaiting", default="air")
+    obstacle_to_load = LaunchConfiguration("obstacle", default="")
     
     # TODO: Configurable urdf
-    state_estimator_clock_period = 0.02
+    state_estimator_clock_period = 0.005
     urdf_location = os.path.join(
         get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
     with open(urdf_location, 'r') as infp:
@@ -74,6 +88,8 @@ def generate_launch_description() -> LaunchDescription:
                     [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
                 ),
             ),
+            ("gaiting_to_load", gaiting_to_load),
+            ("obstacle_to_load", obstacle_to_load),
         ],
         condition=IfCondition(simulation),
     )
@@ -106,21 +122,21 @@ def generate_launch_description() -> LaunchDescription:
     #TODO: implement own input device M9 
 
     # region rqt input device
-    # rqt_input_device = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_rqt_input_device"),
-    #             "launch",
-    #             "input_device.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[
-    #         ("ping_safety_node", "true"),
-    #         ("use_sim_time", "false"),
-    #         ("layout", "training"),
-    #         ("testing", "false"),
-    #     ],
-    # )
+    rqt_input_device = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_rqt_input_device"),
+                "launch",
+                "input_device.launch.py",
+            )
+        ),
+        launch_arguments=[
+            ("ping_safety_node", "true"),
+            ("use_sim_time", "false"),
+            ("layout", "training"),
+            ("testing", "false"),
+        ],
+    )
     # endregion
 
     # region Launch Safety
@@ -162,18 +178,18 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch IPD
-    ipd_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_rqt_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
-        condition=UnlessCondition(ik_test),
-    )
+    # ipd_node = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(
+    #             get_package_share_directory("march_ble_ipd"),
+    #             "launch",
+    #             "ble_ipd.launch.py",
+    #         )
+    #     ),
+    #     launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+    # )
     #endregion
+
 
     # region Launch State Estimator
     state_estimator_launch_dir = os.path.join(get_package_share_directory("march_state_estimator"), "launch")
@@ -223,7 +239,7 @@ def generate_launch_description() -> LaunchDescription:
             "stderr": "log",
         },
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
-        condition=IfCondition(rosbags),
+        condition=IfCondition(rosbags or simulation),
     )
     # endregion
 
@@ -322,7 +338,9 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         imu_nodes,
         ik_solver,
-        ipd_node,
         footstep_generator,
         bezier_visualization, 
+        rqt_input_device, 
+        # ipd_node,
+        # footstep_generator, 
     ])

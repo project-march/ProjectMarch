@@ -121,11 +121,11 @@ bool AbsoluteEncoder::isWithinErrorSoftLimitsRadians(double pos_in_radians) cons
 
 bool AbsoluteEncoder::isValidTargetIU(int32_t current_iu, int32_t target_iu) const
 {
-    if (target_iu <= lower_soft_limit_iu_) {
+    if (target_iu <= lower_error_soft_limit_iu_) {
         return target_iu >= current_iu;
     }
 
-    if (target_iu >= upper_soft_limit_iu_) {
+    if (target_iu >= upper_error_soft_limit_iu_) {
         return target_iu <= current_iu;
     }
 
