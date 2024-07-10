@@ -15,61 +15,51 @@ GainScheduler::GainScheduler(std::string system_type)
     } else if (system_type == "exo") {
         m_config_base = package_path + "/config/exo";
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("GainScheduler"), "System type %s is not defined.",system_type.c_str()); 
+        RCLCPP_ERROR(rclcpp::get_logger("GainScheduler"), "System type %s is not defined.", system_type.c_str()); 
     }
 
+    m_config = YAML::LoadFile(m_config_base + "/exemplary_config.yaml");
 }
 
-// Method to get the PID values for a specific joint
-std::tuple<std::string, double, double, double> GainScheduler::getPidValues(const std::string& joint, double current_position) {
-    
-    YAML::Node jointConfig = m_config["joints"][joint];
-    if (!jointConfig) {
-        throw std::runtime_error("Joint not found in config file");
-    }
-
-    int design_point_index = 0;
-
-    for (std::size_t i = 0; i < jointConfig["design_points"].size(); i++) {
-        if (jointConfig["design_points"][i]["design_point"].as<double>() <= current_position && 
-            (i + 1 == jointConfig["design_points"].size() || current_position < jointConfig["design_points"][i + 1]["design_point"].as<double>())) {
-            design_point_index = i;
-            break;
-        }
-    }
-    
-    const double kp = jointConfig["design_points"][design_point_index]["pid_values"]["kp"].as<double>();
-    const double ki = jointConfig["design_points"][design_point_index]["pid_values"]["ki"].as<double>();
-    const double kd = jointConfig["design_points"][design_point_index]["pid_values"]["kd"].as<double>();    
-
-    return std::make_tuple(joint, kp, ki, kd);
-   
-}
-
-// Method to get the (interpolated) PID values for all joints
-std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getAllPidValues() {
-        
-    std::vector<std::tuple<std::string, double, double, double>> joints;
+joints_with_gains GainScheduler::getConstantGains(std::string gains_type) {
+    joints_with_gains joints;
     YAML::Node joints_config = m_config["joints"];
-
-        for (YAML::const_iterator it = joints_config.begin(); it != joints_config.end(); ++it) {
-            std::string joint = it->first.as<std::string>();
-            joints.push_back(getPidValues(joint,m_default_position));
-        }
     
+    for (YAML::const_iterator it = joints_config.begin(); it != joints_config.end(); ++it) {
+        std::string joint_name = it->first.as<std::string>();
+        std::vector<double> gains = joints_config[joint_name][gains_type].as<std::vector<double>>();
+
+        joints.push_back(std::make_tuple(joint_name, gains[0], gains[1], gains[2]));
+    }
     return joints;
 }
+
 
 // Method to get the PID values for all joints
-std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {
-    std::vector<std::tuple<std::string, double, double, double>> joints;
-
-    for (std::size_t i = 0; i < joint_states->name.size(); i++) {
-        joints.push_back(getPidValues(joint_states->name[i], joint_states->position[i]));
+joints_with_gains GainScheduler::getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {
+    joints_with_gains joints;
+    
+    for (size_t i = 0; i < joint_states->name.size(); ++i) {
+        const auto& joint_name = joint_states->name[i];
+        double joint_angle = joint_states->position[i];
+        joints.push_back(getSpecificJointAngleGains(joint_name, joint_angle));
     }
-
-    m_last_joint_state = joint_states;
     return joints;
+}
+
+std::tuple<std::string, double, double, double> GainScheduler::getSpecificJointAngleGains(const std::string& joint_name, double joint_angle) {
+    const auto& joint_angle_ranges_config = m_config["joints"][joint_name]["joint_angle_ranges"];
+    const auto number_of_ranges = joint_angle_ranges_config.size();
+    std::vector<double> gains;
+
+    for (size_t i = 0; i < number_of_ranges; ++i) {
+        double min_range = joint_angle_ranges_config[i][0][0].as<double>();
+        double max_range = joint_angle_ranges_config[i][0][1].as<double>();
+        if (joint_angle >= min_range && joint_angle < max_range) {
+            gains = joint_angle_ranges_config[i][1].as<std::vector<double>>();
+        }
+    }
+    return std::make_tuple(joint_name, gains[0], gains[1], gains[2]);
 }
 
 // Method to set the config path

@@ -53,9 +53,7 @@ void GainSchedulerNode::publishPidValues() {
 
     if (m_latest_joint_state != nullptr) {
         joints = m_gain_scheduler.getJointAngleGains(m_latest_joint_state);
-    } else {
-        joints = m_gain_scheduler.getAllPidValues();
-    }
+    } 
 
     for (const auto& joint : joints) {
         march_shared_msgs::msg::PidValues pid_values_msg;

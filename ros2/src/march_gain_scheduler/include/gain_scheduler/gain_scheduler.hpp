@@ -9,25 +9,21 @@
 #include <iostream>
 #include <map>
 
-class GainScheduler {
+using joints_with_gains = std::vector<std::tuple<std::string, double, double, double>>;
 
+class GainScheduler {
     public:
         GainScheduler();
         ~GainScheduler() = default;
         explicit GainScheduler(std::string system_type); 
-        std::vector<std::tuple<std::string, double, double, double>> getAllPidValues();
-        std::vector<std::tuple<std::string, double, double, double>> getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
-        std::vector<std::tuple<std::string, double, double, double>> getStanceSwingLegGains();
-        std::vector<std::tuple<std::string, double, double, double>> getConstantGains();
+        joints_with_gains getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
+        joints_with_gains getConstantGains(std::string gains_type);
         void setConfigPath(const ExoMode &new_gait_type);
     private: 
-        std::tuple<std::string, double, double, double> getPidValues(const std::string& joint, double current_position);
+        std::tuple<std::string, double, double, double> getSpecificJointAngleGains(const std::string& joint_name, double joint_angle);
         ExoMode m_gait_type; 
         std::string m_config_base;
         YAML::Node m_config;
-        std::vector<std::tuple<std::string, double, double, double>> m_new_pid_values;
         sensor_msgs::msg::JointState::SharedPtr m_last_joint_state;  
-        double m_default_position = 0.0;
-}; 
-
+};
 #endif // GAIN_SCHEDULER_HPP
