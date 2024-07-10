@@ -7,6 +7,17 @@ GainScheduler::GainScheduler()
 
 GainScheduler::GainScheduler(std::string system_type)
 {
+    std::string package_path = ament_index_cpp::get_package_share_directory("march_gain_scheduler");
+
+    // Set the base config path
+    if (system_type == "tsu") {
+        m_config_base = package_path + "/config/tsu";
+    } else if (system_type == "exo") {
+        m_config_base = package_path + "/config/exo";
+    } else {
+        RCLCPP_ERROR(rclcpp::get_logger("GainScheduler"), "System type %s is not defined.",system_type.c_str()); 
+    }
+
 }
 
 // Method to get the PID values for a specific joint
@@ -65,11 +76,4 @@ std::vector<std::tuple<std::string, double, double, double>> GainScheduler::getJ
 void GainScheduler::setConfigPath(const ExoMode &new_gait_type) {
     m_gait_type = new_gait_type;
 
-    if (new_gait_type == static_cast<ExoMode>(0)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/sit_gains.yaml");
-    } else if (new_gait_type == static_cast<ExoMode>(1)) {
-        m_config = YAML::LoadFile("src/march_gain_scheduler/config/stand_gains.yaml");
-    } else {
-        throw std::runtime_error("Gait type not found");
-    }
 }

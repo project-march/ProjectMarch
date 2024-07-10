@@ -1,0 +1,14 @@
+joints:
+  left_ankle_dpf:
+    default_gains: [1.0, 2.0, 3.0]
+    swing_leg_gains: [4.0, 5.0, 6.0]
+    stance_leg_gains: [7.0, 8.0, 9.0]
+  
+  left_hip_aa: 
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]

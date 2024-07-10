@@ -23,6 +23,7 @@ class GainScheduler {
     private: 
         std::tuple<std::string, double, double, double> getPidValues(const std::string& joint, double current_position);
         ExoMode m_gait_type; 
+        std::string m_config_base;
         YAML::Node m_config;
         std::vector<std::tuple<std::string, double, double, double>> m_new_pid_values;
         sensor_msgs::msg::JointState::SharedPtr m_last_joint_state;  

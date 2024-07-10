@@ -80,7 +80,6 @@ public:
         m_pid_values_subscription = this->create_subscription<march_shared_msgs::msg::PidValues>(
             "pid_values", 10, std::bind(&GainsNode::pid_values_callback, this, _1));
 
-        RCLCPP_INFO(rclcpp::get_logger("gains_node"), "Creating the gains node!");
     }
 
     /**
