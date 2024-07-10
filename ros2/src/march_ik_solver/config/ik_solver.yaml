@@ -48,10 +48,10 @@ ik_solver:
         damp_coeff: 1e-4
         weight: 1.0
       stability:
-        kp: [2.5, 2.5]
+        kp: [5.0, 5.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
-        convergence_threshold: 1e-2
+        convergence_threshold: 1e-4
         damp_coeff: 1e-3
         weight: 1.0
       posture:

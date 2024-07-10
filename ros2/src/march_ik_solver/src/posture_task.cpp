@@ -24,7 +24,7 @@ void PostureTask::computeCurrentTaskCoordinates()
 {
     for (unsigned long int i = 0; i < m_joint_indices.size(); i++) {
         // Fixed-size template cannot be used with aliases
-        m_current_task(i) = m_data->oMi[m_joint_indices[i]].rotation().eulerAngles(
+        m_current_task(i) = (m_current_world_to_base_orientation.transpose() * m_data->oMi[m_joint_indices[i]].rotation()).eulerAngles(
             ROTATION_YAW_INDEX, ROTATION_PITCH_INDEX, ROTATION_ROLL_INDEX).y();
     }
 }
@@ -37,6 +37,6 @@ void PostureTask::computeCurrentTaskJacobian()
         jacobian_joint.setZero();
 
         pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, m_joint_indices[i], jacobian_joint);
-        m_jacobian.block(i, 0, 1, m_task_n) = jacobian_joint.row(ROTATION_PITCH_INDEX + EUCLIDEAN_SIZE);
+        m_jacobian.block(i, 0, 1, m_task_n) = (m_current_world_to_base_orientation.transpose() * jacobian_joint.bottomRows(EUCLIDEAN_SIZE)).row(ROTATION_PITCH_INDEX + EUCLIDEAN_SIZE);
     }
 }

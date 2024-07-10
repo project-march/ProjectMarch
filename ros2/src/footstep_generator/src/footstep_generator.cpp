@@ -6,9 +6,9 @@ using std::placeholders::_2;
 FootstepGenerator::FootstepGenerator()
     : Node("footstep_generator_node")
     , m_steps(20) // Change this so we can interactively edit the amount of footsteps while Koengaiting
-    , m_vx(0.1)
+    , m_vx(0.2)
     , m_vy(0.0)
-    , m_l(0.33)
+    , m_l(0.2)
 {
     m_exo_mode_sub = this->create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&FootstepGenerator::exo_mode_callback, this, _1));

@@ -53,9 +53,9 @@ IKSolverNode::IKSolverNode()
     // m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
     //     "state_estimation/state", rclcpp::SensorDataQoS(),
     //     std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
-    // m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
-    //     "state_estimation/state", rclcpp::SensorDataQoS(),
-    //     std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
+    m_state_estimation_sub = this->create_subscription<march_shared_msgs::msg::StateEstimation>(
+        "state_estimation/state", rclcpp::SensorDataQoS(),
+        std::bind(&IKSolverNode::stateEstimationCallback, this, std::placeholders::_1), m_subscription_options);
     m_clock_sub = this->create_subscription<std_msgs::msg::Header>(
         "state_estimation/clock", rclcpp::SensorDataQoS(),
         std::bind(&IKSolverNode::clockCallback, this, std::placeholders::_1), m_subscription_options);
@@ -191,9 +191,9 @@ void IKSolverNode::newGaitCallback(const march_shared_msgs::msg::ExoMode::Shared
     const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg)
 {
     RCLCPP_INFO(this->get_logger(), "New gait callback.");
-    if (exo_mode_msg->mode != march_shared_msgs::msg::ExoMode::STAND) {
-        stateEstimationCallback(state_estimation_msg);
-    }
+    // if (exo_mode_msg->mode != march_shared_msgs::msg::ExoMode::STAND) {
+    //     stateEstimationCallback(state_estimation_msg);
+    // }
 }
 
 void IKSolverNode::publishJointTrajectory()
@@ -293,10 +293,10 @@ void IKSolverNode::solveInverseKinematics(const rclcpp::Time& start_time)
     m_iks_status_pub->publish(iks_status_msg);
 
     // Update actual joint positions and velocities.
-    m_actual_joint_positions = std::vector<double>(
-        m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
-    m_actual_joint_velocities = std::vector<double>(
-        m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
+    // m_actual_joint_positions = std::vector<double>(
+    //     m_desired_joint_positions.data(), m_desired_joint_positions.data() + m_desired_joint_positions.size());
+    // m_actual_joint_velocities = std::vector<double>(
+    //     m_desired_joint_velocities.data(), m_desired_joint_velocities.data() + m_desired_joint_velocities.size());
 }
 
 void IKSolverNode::updatePreviousJointTrajectoryPoint(
