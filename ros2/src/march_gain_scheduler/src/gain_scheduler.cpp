@@ -28,11 +28,28 @@ joints_with_gains GainScheduler::getConstantGains(std::string gains_type) {
         std::string joint_name = it->first.as<std::string>();
         std::vector<double> gains = m_joints_config[joint_name][gains_type].as<std::vector<double>>();
 
-        m_joints_with_gains.push_back(std::make_tuple(joint_name, gains[0], gains[1], gains[2]));
+        m_joints_with_gains.push_back(std::make_tuple(joint_name, gains[p_gain_index], gains[i_gain_index], gains[d_gain_index]));
     }
     return m_joints_with_gains;
 }
 
+joints_with_gains GainScheduler::setStanceSwingLegGains(uint8_t current_stance_leg) {
+    bool left_leg_stance = current_stance_leg == 1;
+    bool right_leg_stance = current_stance_leg == 2;
+    bool both_legs_stance = current_stance_leg == 3;
+
+    for (size_t i = 0; i < m_joints_with_gains.size(); ++i) {
+        std::string joint_name = std::get<joint_name_index>(m_joints_with_gains[i]);
+
+        // Set the integral gain to 0.0 for the stance leg joints
+        if ((left_leg_stance && joint_name.find("left") != std::string::npos) ||
+            (right_leg_stance && joint_name.find("right") != std::string::npos) ||
+            both_legs_stance) {
+            std::get<i_gain_index>(m_joints_with_gains[i]) = 0.0;
+        }
+    }
+    return m_joints_with_gains;
+}
 
 joints_with_gains GainScheduler::getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {
     m_joints_with_gains.clear();
@@ -62,8 +79,7 @@ std::tuple<std::string, double, double, double> GainScheduler::getSpecificJointA
             gains = gains_values.as<std::vector<double>>();
         }
     }
-
-    return std::make_tuple(joint_name, gains[0], gains[1], gains[2]);
+    return std::make_tuple(joint_name, gains[p_gain_index], gains[i_gain_index], gains[d_gain_index]);
 }
 
 // Method to set the config path
