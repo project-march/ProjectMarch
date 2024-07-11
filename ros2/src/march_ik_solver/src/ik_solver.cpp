@@ -133,6 +133,7 @@ void IKSolver::configurePinocchioModel()
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_pinocchio_model);
+    m_pinocchio_data.reset();
     m_pinocchio_data = std::make_unique<pinocchio::Data>(m_pinocchio_model);
 }
 

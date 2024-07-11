@@ -364,6 +364,7 @@ void IKSolverNode::configureIKSolverParameters()
 
     // Configure Pinocchio model.
     m_ik_solver->configurePinocchioModel();
+    RCLCPP_INFO(this->get_logger(), "Pinocchio model is configured.");
 
     // Initialize world-to-base orientation.
     m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
