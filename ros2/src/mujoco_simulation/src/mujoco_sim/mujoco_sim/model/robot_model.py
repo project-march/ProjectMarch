@@ -145,15 +145,15 @@ class XMLModel:
             self.no_safety_catchers += 1
             self.safety_catch_z = True
         if roll:
-            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_x' type='hinge' axis='1 0 0' range='-8 8' pos='0 0 0'/>"
+            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_x' type='hinge' axis='1 0 0' range='-4 4' pos='0 0 0'/>"
             self.no_safety_catchers += 1
             self.safety_catch_roll = True
         if pitch:
-            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_y' type='hinge' axis='0 1 0' range='-180 180' pos='0 0 0'/>"
+            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_y' type='hinge' axis='0 1 0' range='-4 4' pos='0 0 0'/>"
             self.no_safety_catchers += 1
             self.safety_catch_pitch = True
         if yaw:
-            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_z' type='hinge' axis='0 0 1' range='-180 180' pos='0 0 0'/>"
+            safety_catcher_str = safety_catcher_str + "<joint name='safety_catch_hinge_z' type='hinge' axis='0 0 1' range='-4 4' pos='0 0 0'/>"
             self.no_safety_catchers += 1
             self.safety_catch_yaw = True
 
@@ -552,7 +552,7 @@ class XMLModel:
             y = -1.0
             keyframes_str = f"<key name='train' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} 0 0 0 0 0 0 0 0 0 0'/>"
         else:
-            keyframes_str = f"<key name='stand' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} 0 0 0 0 0 0 0 0 0 0'/>"
+            keyframes_str = f"<key name='stand' qpos='{self.generate_qpos_str(x, y, z, roll, pitch, yaw)} -0.072 0 0 0 0 -0.072 0 0 0 0'/>"
 
         return prefix_keyframes_str + keyframes_str + suffix_keyframes_str
 

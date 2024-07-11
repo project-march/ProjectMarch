@@ -33,7 +33,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr m_swing_trajectory_command_publisher;
     rclcpp::Service<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_service;
 
-    int m_steps;33
+    int m_steps;
     double m_vx;
     double m_vy;
     double m_l;

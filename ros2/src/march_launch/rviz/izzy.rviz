@@ -17,6 +17,8 @@ Panels:
         - /Path1
         - /Path2
         - /PointStamped2
+        - /PointStamped3
+        - /PointStamped4
       Splitter Ratio: 0.2946317195892334
     Tree Height: 1088
   - Class: rviz_common/Selection
@@ -394,6 +396,34 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /state_estimation/com_position
       Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 1
+      Name: PointStamped
+      Radius: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /ik_solver/desired/foot_position/left
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 1
+      Name: PointStamped
+      Radius: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /ik_solver/desired/foot_position/right
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -452,10 +482,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7503972053527832
+      Pitch: 0.17039738595485687
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.426775932312012
+      Yaw: 5.296776294708252
     Saved: ~
 Window Geometry:
   Displays:
