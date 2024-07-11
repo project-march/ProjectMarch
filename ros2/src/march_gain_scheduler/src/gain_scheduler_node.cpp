@@ -28,7 +28,7 @@ GainSchedulerNode::GainSchedulerNode()
  }
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
-    m_gain_scheduler.setConfigPath((ExoMode)msg->mode);
+    m_gain_scheduler.setGaitConfiguration((ExoMode)msg->mode);
 }
 
 void GainSchedulerNode::jointStatesCallback(const sensor_msgs::msg::JointState::SharedPtr msg) {
@@ -40,27 +40,11 @@ void GainSchedulerNode::stateEstimationCallback(const march_shared_msgs::msg::St
 }
 
 void GainSchedulerNode::publishPidValues() {   
-    std::vector<std::tuple<std::string, double, double, double>> joints;
-    const unsigned int joint_name = 0;
-    const unsigned int joint_p_gain = 1;
-    const unsigned int joint_i_gain = 2;
-    const unsigned int joint_d_gain = 3;
-
-
-    for (const auto& joint : joints) {
-        march_shared_msgs::msg::PidValues pid_values_msg;
-        pid_values_msg.joint_name = std::get<joint_name>(joint);
-        pid_values_msg.proportional_gain = std::get<joint_p_gain>(joint);
-        pid_values_msg.integral_gain = std::get<joint_i_gain>(joint);
-        pid_values_msg.derivative_gain = std::get<joint_d_gain>(joint);
-
-        m_pid_values_publisher->publish(pid_values_msg);
-    }
+   
 }   
 
 
-void GainSchedulerNode::timerCallback() {
-        
+void GainSchedulerNode::timerCallback() {    
     publishPidValues();
 }
 

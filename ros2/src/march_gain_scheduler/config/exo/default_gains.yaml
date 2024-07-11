@@ -1,0 +1,74 @@
+# DUMMY GAINS FOR TESTING
+joints:
+  left_ankle_dpf:
+    constant_gains: [1.0, 2.0, 3.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  left_hip_aa:
+    constant_gains: [2.0, 3.0, 4.0] 
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  left_hip_fe:
+    constant_gains: [3.0, 4.0, 5.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  left_knee_fe:
+    constant_gains: [4.0, 5.0, 6.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  right_ankle_dpf:
+    constant_gains: [5.0, 6.0, 7.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  right_hip_aa:
+    constant_gains: [6.0, 7.0, 8.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  right_hip_fe:
+    constant_gains: [7.0, 8.0, 9.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]
+  right_knee_fe:
+    constant_gains: [8.0, 9.0, 10.0]
+    joint_angle_ranges: 
+      - range: [-.inf, 0.5]
+        gains: [1.0, 2.0, 3.0]
+      - range: [0.5, 1.0]
+        gains: [4.0, 5.0, 6.0]
+      - range: [1.0, .inf]
+        gains: [7.0, 8.0, 9.0]

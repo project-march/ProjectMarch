@@ -1,0 +1,20 @@
+# DUMMY GAINS FOR TESTING, ALL NUMERICAL VALUES OF THE DEFAULT GAINS YAML ARE INCREMENTED BY 0.5 
+joints:
+  linear_joint:
+    constant_gains: [1.5, 2.5, 3.5]
+    joint_angle_ranges: 
+      - range: [-.inf, 1.0]
+        gains: [1.5, 2.5, 3.5]
+      - range: [1.0, 1.5]
+        gains: [4.5, 5.5, 6.5]
+      - range: [1.5, .inf]
+        gains: [7.5, 8.5, 9.5]
+  rotational_joint:
+    constant_gains: [2.5, 3.5, 4.5] 
+    joint_angle_ranges: 
+      - range: [-.inf, 1.0]
+        gains: [1.5, 2.5, 3.5]
+      - range: [1.0, 1.5]
+        gains: [4.5, 5.5, 6.5]
+      - range: [1.5, .inf]
+        gains: [7.5, 8.5, 9.5]

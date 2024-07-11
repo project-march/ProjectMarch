@@ -6,6 +6,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp"
+#include <unordered_map>
 #include <iostream>
 #include <map>
 
@@ -18,8 +19,10 @@ class GainScheduler {
         explicit GainScheduler(std::string system_type); 
         joints_with_gains getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states);
         joints_with_gains getConstantGains(std::string gains_type);
-        void setConfigPath(const ExoMode &new_gait_type);
+        void setGaitConfiguration(const ExoMode new_gait_type);
         uint8_t m_current_stance_leg;
+        std::string m_scheduling_variable;
+        bool m_use_stance_swing_leg_gains;
     private: 
         std::tuple<std::string, double, double, double> getSpecificJointAngleGains(const std::string& joint_name, double joint_angle);
         joints_with_gains setStanceSwingLegGains(uint8_t current_stance_leg);
