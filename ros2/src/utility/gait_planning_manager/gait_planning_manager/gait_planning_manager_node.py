@@ -4,6 +4,7 @@ from rclpy.executors import MultiThreadedExecutor
 from lifecycle_msgs.msg import State, Transition
 from lifecycle_msgs.srv import GetState, ChangeState
 from march_shared_msgs.msg import ExoMode 
+from enum import Enum 
 
 
 COLOR_GREEN = "\033[32m"
@@ -24,7 +25,7 @@ class ServiceClient(Node):
 
         self.angles_active = True
         self.cartesian_active = True
-        self.future = True
+        self.future = True 
 
         if not self.change_angles_state(ChangeState.Request().transition.TRANSITION_CONFIGURE):
             self.get_logger().info(COLOR_MAGENTA + 'Angles not able to configure' + RESET)
@@ -43,10 +44,11 @@ class ServiceClient(Node):
         mode_msg = ExoMode()
         mode_msg.mode = msg.mode
         mode_msg.node_type = msg.node_type
+        mode_msg.previous_mode = msg.previous_mode
         self.gaitplanning_mode_publisher.publish(mode_msg)
 
     def mode_callback(self, msg):   
-        # self.get_logger().info(f'Received new mode! {msg.mode}\n')
+        self.get_logger().debug(f'Received previous mode! {msg.previous_mode}')
 
         if msg.mode == 1:
             if self.angles_active and self.cartesian_active:
