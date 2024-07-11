@@ -1,15 +1,55 @@
 march_vision:
   ros__parameters:
-
-    cameras_used: "both" # ["left", "right", "both"]
-    left_camera_serial_number: "215222075881" 
-    right_camera_serial_number: "033322070612"
-
-    realsense_camera_settings: # the specific parameters for each are in the code
-      decimation_filter: true
-      spatial_filter: true
-      temporal_filter: true
-      hole_filling_filter: true
-      threshold_filter: false
     
+    cameras_used: "left" # ["left", "right", "both"]
     plane_segmentation: true
+
+    left_camera:
+      serial_number: "215222075881"
+      resolution:
+        width: 640
+        height: 480
+      fps: 15
+
+      realsense_camera_settings:
+
+        decimation_filter_enabled: true
+        spatial_filter_enabled: true
+        temporal_filter_enabled: true
+        hole_filling_filter_enabled: false
+        threshold_filter_enabled: true
+
+        decimation_filter_magnitude: 2.0
+        spatial_filter_magnitude: 2.0
+        spatial_filter_smooth_alpha: 0.5
+        spatial_filter_smooth_delta: 20.0
+        temporal_filter_smooth_alpha: 0.4
+        temporal_filter_smooth_delta: 20.0
+        hole_filling_filter_mode: "fill"    # ["fill", "2d"]
+        threshold_filter_max_distance: 3.5  # [m]
+        threshold_filter_min_distance: 0.9  # [m] Threshold to see just past Daan's toes
+
+    right_camera:
+      serial_number: "033322070612"
+      resolution:
+        width: 640
+        height: 480
+      fps: 15
+
+      realsense_camera_settings:
+
+        decimation_filter_enabled: true
+        spatial_filter_enabled: true
+        temporal_filter_enabled: true
+        hole_filling_filter_enabled: false
+        threshold_filter_enabled: true
+        
+        decimation_filter_magnitude: 2.0
+        spatial_filter_magnitude: 2.0
+        spatial_filter_smooth_alpha: 0.5
+        spatial_filter_smooth_delta: 20.0
+        temporal_filter_smooth_alpha: 0.4
+        temporal_filter_smooth_delta: 20.0
+        hole_filling_filter_mode: "fill"    # ["fill", "2d"]
+        threshold_filter_max_distance: 3.5  # [m]
+        threshold_filter_min_distance: 0.9  # [m] Threshold to see just past Daan's toe

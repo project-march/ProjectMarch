@@ -46,11 +46,15 @@ private:
     rclcpp::Node* m_node;
     std::string m_left_or_right;
     std::string m_serial_number;
+    int m_resolution_width;
+    int m_resolution_height;
+    int m_fps;
     std::string m_frame_id;
     std::string m_topic_camera;
     std::clock_t m_last_frame_time;
     int m_frame_wait_counter;
     double m_frame_timeout;
+    double m_frame_time;
 
     rs2::config m_config;
     rs2::pipeline m_pipeline;
@@ -58,12 +62,23 @@ private:
     rs2::spatial_filter m_spatial_filter;
     rs2::temporal_filter m_temporal_filter;
     rs2::hole_filling_filter m_hole_filling_filter;
-    // rs2::threshold_filter m_threshold_filter;
+    rs2::threshold_filter m_threshold_filter;
 
     bool m_decimation_filter_enabled;
     bool m_spatial_filter_enabled;
     bool m_temporal_filter_enabled;
     bool m_hole_filling_filter_enabled;
+    bool m_threshold_filter_enabled;
+
+    double m_decimation_filter_magnitude;
+    double m_spatial_filter_magnitude;
+    double m_spatial_filter_smooth_alpha;
+    double m_spatial_filter_smooth_delta;
+    double m_temporal_filter_smooth_alpha;
+    double m_temporal_filter_smooth_delta;
+    std::string m_hole_filling_filter_mode;
+    double m_threshold_filter_max_distance;
+    double m_threshold_filter_min_distance;
 
     rclcpp::TimerBase::SharedPtr m_realsense_timer;
     PointCloudPublisher::SharedPtr m_preprocessed_pointcloud_publisher;
@@ -75,10 +90,11 @@ private:
 
     void declareParameters();
     void readParameters();
+    void readFilterOptions();
     void processRealSenseDepthFrames();
     void processPointCloud(const PointCloud::Ptr& pointcloud);
     PointCloud::Ptr pointsToPCL(const rs2::points& points);
-    void publishCloud(const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud);
+    void publishCloud(PointCloud cloud);
 };
 
 } // namespace march_vision

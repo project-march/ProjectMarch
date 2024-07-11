@@ -1,11 +1,7 @@
 #define BOOST_BIND_NO_PLACEHOLDERS
+
 #include "processing/camera_interface.h"
-// TODO: Change to new msg for current state
-// #include "march_shared_msgs/msg/current_state.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/point_cloud2.hpp"
-#include "visualization_msgs/msg/marker.hpp"
-// TODO: Include realsense2 sdk
+
 namespace march_vision {
 
 CameraInterface::CameraInterface(rclcpp::Node* node, 
@@ -16,6 +12,7 @@ CameraInterface::CameraInterface(rclcpp::Node* node,
     RCLCPP_INFO(m_node->get_logger(), "CameraInterface for %s camera is initializing...", m_left_or_right.c_str());
     declareParameters();
     readParameters();
+    readFilterOptions();
 }
 
 CameraInterface::~CameraInterface() 
@@ -23,7 +20,6 @@ CameraInterface::~CameraInterface()
     RCLCPP_WARN(m_node->get_logger(), "CameraInterface for %s camera has been destroyed.", m_left_or_right.c_str());
 }
 
-// TODO: Fix this so that it doesn't redeclare from the same ComputerVisionNode
 void CameraInterface::declareParameters() 
 {
     m_tf_buffer = std::make_shared<tf2_ros::Buffer>(m_node->get_clock());
@@ -35,15 +31,13 @@ void CameraInterface::declareParameters()
     m_frame_wait_counter = 0;
     m_frame_timeout = 5.0;
     // TODO: Change the topic name
+
     m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(
         "/cameras/" + m_left_or_right + "/depth/color/points", 10);
-
     m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-
     rclcpp::SubscriptionOptions realsense_callback_options_;
     realsense_callback_options_.callback_group = m_realsense_callback_group;
-
     rclcpp::SubscriptionOptions point_callback_options_;
     point_callback_options_.callback_group = m_point_callback_group;
 
@@ -52,39 +46,132 @@ void CameraInterface::declareParameters()
 
     m_config = rs2::config();
     m_pipeline = rs2::pipeline();
-    // m_node->declare_parameter("m_serial_number", std::string());
-    // Realsense cameras settings
-    m_spatial_filter;
-    m_temporal_filter;
-    m_hole_filling_filter;
-    // m_threshold_filter;
-    m_decimation_filter;
-    m_node->declare_parameter("realsense_camera_settings.decimation_filter", false);
-    m_node->declare_parameter("realsense_camera_settings.spatial_filter_enabled", false);
-    m_node->declare_parameter("realsense_camera_settings.temporal_filter_enabled", false);
-    m_node->declare_parameter("realsense_camera_settings.hole_filling_filter_enabled", false);
 
     if (m_left_or_right == "left") {
-        m_node->declare_parameter("left_camera_serial_number", std::string());
-    } else if (m_left_or_right == "right") {
-        m_node->declare_parameter("right_camera_serial_number", std::string());
-    }
 
+        m_node->declare_parameter("left_camera.serial_number", std::string());
+        m_node->declare_parameter("left_camera.resolution.width", 640);
+        m_node->declare_parameter("left_camera.resolution.height", 480);
+        m_node->declare_parameter("left_camera.fps", 15);
+
+        m_node->declare_parameter("left_camera.realsense_camera_settings.decimation_filter_enabled", false);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.spatial_filter_enabled", false);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.temporal_filter_enabled", false);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.hole_filling_filter_enabled", false);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.threshold_filter_enabled", false);
+        
+        m_node->declare_parameter("left_camera.realsense_camera_settings.decimation_filter_magnitude", 2.0);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.spatial_filter_magnitude", 2.0);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.spatial_filter_smooth_alpha", 0.5);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.spatial_filter_smooth_delta", 20.0);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.temporal_filter_smooth_alpha", 0.4);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.temporal_filter_smooth_delta", 20.0);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.hole_filling_filter_mode", "2d");
+        m_node->declare_parameter("left_camera.realsense_camera_settings.threshold_filter_max_distance", 3.5);
+        m_node->declare_parameter("left_camera.realsense_camera_settings.threshold_filter_min_distance", 0.9);
+
+    } else if (m_left_or_right == "right") {
+
+        m_node->declare_parameter("right_camera.serial_number", std::string());
+        m_node->declare_parameter("right_camera.resolution.width", 640);
+        m_node->declare_parameter("right_camera.resolution.height", 480);
+        m_node->declare_parameter("right_camera.fps", 15);
+
+        m_node->declare_parameter("right_camera.realsense_camera_settings.decimation_filter_enabled", false);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.spatial_filter_enabled", false);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.temporal_filter_enabled", false);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.hole_filling_filter_enabled", false);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_enabled", false);
+        
+        m_node->declare_parameter("right_camera.realsense_camera_settings.decimation_filter_magnitude", 2.0);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.spatial_filter_magnitude", 2.0);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.spatial_filter_smooth_alpha", 0.5);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.spatial_filter_smooth_delta", 20.0);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.temporal_filter_smooth_alpha", 0.4);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.temporal_filter_smooth_delta", 20.0);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.hole_filling_filter_mode", "2d");
+        m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_max_distance", 3.5);
+        m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_min_distance", 0.9);
+    }
 }
 
-void CameraInterface::readParameters() 
+void CameraInterface::readParameters()
 {
     if (m_left_or_right == "left") {
-        m_serial_number = m_node->get_parameter("left_camera_serial_number").as_string();
+
+        m_serial_number = m_node->get_parameter("left_camera.serial_number").as_string();
+        m_resolution_width = m_node->get_parameter("left_camera.resolution.width").as_int();
+        m_resolution_height = m_node->get_parameter("left_camera.resolution.height").as_int();
+        m_fps = m_node->get_parameter("left_camera.fps").as_int();
+
+        m_decimation_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.decimation_filter_enabled").as_bool();
+        m_spatial_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.spatial_filter_enabled").as_bool();
+        m_temporal_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.temporal_filter_enabled").as_bool();
+        m_hole_filling_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.hole_filling_filter_enabled").as_bool();
+        m_threshold_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.threshold_filter_enabled").as_bool();
+
+        m_decimation_filter_magnitude = m_node->get_parameter("left_camera.realsense_camera_settings.decimation_filter_magnitude").as_double();
+        m_spatial_filter_magnitude = m_node->get_parameter("left_camera.realsense_camera_settings.spatial_filter_magnitude").as_double();
+        m_spatial_filter_smooth_alpha = m_node->get_parameter("left_camera.realsense_camera_settings.spatial_filter_smooth_alpha").as_double();
+        m_spatial_filter_smooth_delta = m_node->get_parameter("left_camera.realsense_camera_settings.spatial_filter_smooth_delta").as_double();
+        m_temporal_filter_smooth_alpha = m_node->get_parameter("left_camera.realsense_camera_settings.temporal_filter_smooth_alpha").as_double();
+        m_temporal_filter_smooth_delta = m_node->get_parameter("left_camera.realsense_camera_settings.temporal_filter_smooth_delta").as_double();
+        m_hole_filling_filter_mode = m_node->get_parameter("left_camera.realsense_camera_settings.hole_filling_filter_mode").as_string();
+        m_threshold_filter_max_distance = m_node->get_parameter("left_camera.realsense_camera_settings.threshold_filter_max_distance").as_double();
+        m_threshold_filter_min_distance = m_node->get_parameter("left_camera.realsense_camera_settings.threshold_filter_min_distance").as_double();
+
     } else if (m_left_or_right == "right") {
-        m_serial_number = m_node->get_parameter("right_camera_serial_number").as_string();
+
+        m_serial_number = m_node->get_parameter("right_camera.serial_number").as_string();
+        m_resolution_width = m_node->get_parameter("right_camera.resolution.width").as_int();
+        m_resolution_height = m_node->get_parameter("right_camera.resolution.height").as_int();
+        m_fps = m_node->get_parameter("right_camera.fps").as_int();
+
+        m_decimation_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.decimation_filter_enabled").as_bool();
+        m_spatial_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.spatial_filter_enabled").as_bool();
+        m_temporal_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.temporal_filter_enabled").as_bool();
+        m_hole_filling_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.hole_filling_filter_enabled").as_bool();
+
+        m_decimation_filter_magnitude = m_node->get_parameter("right_camera.realsense_camera_settings.decimation_filter_magnitude").as_double();
+        m_spatial_filter_magnitude = m_node->get_parameter("right_camera.realsense_camera_settings.spatial_filter_magnitude").as_double();
+        m_spatial_filter_smooth_alpha = m_node->get_parameter("right_camera.realsense_camera_settings.spatial_filter_smooth_alpha").as_double();
+        m_spatial_filter_smooth_delta = m_node->get_parameter("right_camera.realsense_camera_settings.spatial_filter_smooth_delta").as_double();
+        m_temporal_filter_smooth_alpha = m_node->get_parameter("right_camera.realsense_camera_settings.temporal_filter_smooth_alpha").as_double();
+        m_temporal_filter_smooth_delta = m_node->get_parameter("right_camera.realsense_camera_settings.temporal_filter_smooth_delta").as_double();
+        m_hole_filling_filter_mode = m_node->get_parameter("right_camera.realsense_camera_settings.hole_filling_filter_mode").as_string();
+        m_threshold_filter_max_distance = m_node->get_parameter("right_camera.realsense_camera_settings.threshold_filter_max_distance").as_double();
+        m_threshold_filter_min_distance = m_node->get_parameter("right_camera.realsense_camera_settings.threshold_filter_min_distance").as_double();
     }
-    RCLCPP_INFO(m_node->get_logger(), "Serial number for %s camera: %s", m_left_or_right.c_str(), m_serial_number.c_str());
-    m_decimation_filter_enabled = m_node->get_parameter("realsense_camera_settings.decimation_filter").as_bool();
-    m_spatial_filter_enabled = m_node->get_parameter("realsense_camera_settings.spatial_filter_enabled").as_bool();
-    m_temporal_filter_enabled = m_node->get_parameter("realsense_camera_settings.temporal_filter_enabled").as_bool();
-    m_hole_filling_filter_enabled = m_node->get_parameter("realsense_camera_settings.hole_filling_filter_enabled").as_bool();
-    // m_threshold_filter = m_node->get_parameter("realsense_camera_settings.threshold_filter").as_bool();
+}
+
+void CameraInterface::readFilterOptions()
+{
+    if (m_decimation_filter_enabled) {
+        m_decimation_filter.set_option(RS2_OPTION_FILTER_MAGNITUDE, m_decimation_filter_magnitude);
+    }
+
+    if (m_spatial_filter_enabled) {
+        m_spatial_filter.set_option(RS2_OPTION_FILTER_MAGNITUDE, m_spatial_filter_magnitude);
+        m_spatial_filter.set_option(RS2_OPTION_FILTER_SMOOTH_ALPHA, m_spatial_filter_smooth_alpha);
+        m_spatial_filter.set_option(RS2_OPTION_FILTER_SMOOTH_DELTA, m_spatial_filter_smooth_delta);
+    }
+
+    if (m_temporal_filter_enabled) {
+        m_temporal_filter.set_option(RS2_OPTION_FILTER_SMOOTH_ALPHA, m_temporal_filter_smooth_alpha);
+        m_temporal_filter.set_option(RS2_OPTION_FILTER_SMOOTH_DELTA, m_temporal_filter_smooth_delta);
+    }
+
+    if (m_hole_filling_filter_enabled) {
+        if (m_hole_filling_filter_mode == "fill") { // "fill"
+            m_hole_filling_filter.set_option(RS2_OPTION_HOLES_FILL, 1);
+        } else if (m_hole_filling_filter_mode == "2d") { // "2d"
+            m_hole_filling_filter.set_option(RS2_OPTION_HOLES_FILL, 2);
+        }
+    }
+    if (m_threshold_filter_enabled) {
+        m_threshold_filter.set_option(RS2_OPTION_MIN_DISTANCE, m_threshold_filter_min_distance);
+        m_threshold_filter.set_option(RS2_OPTION_MAX_DISTANCE, m_threshold_filter_max_distance);
+    }
 }
 
 bool CameraInterface::initializeCamera() 
@@ -93,7 +180,8 @@ bool CameraInterface::initializeCamera()
         try {
             RCLCPP_INFO(m_node->get_logger(), "Looking for %s cam with serial number: %s", m_left_or_right.c_str(), m_serial_number.c_str());
             m_config.enable_device(m_serial_number);
-            m_config.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 15);
+            // TODO: Change the resolution and frame rate
+            m_config.enable_stream(RS2_STREAM_DEPTH, m_resolution_width, m_resolution_height, RS2_FORMAT_Z16, m_fps);
             m_pipeline.start(m_config);
             
             // Setup successful, create timer and log success
@@ -118,11 +206,9 @@ bool CameraInterface::initializeCamera()
     return false;
 }
 
-void CameraInterface::processRealSenseDepthFrames() {
-    
-    RCLCPP_INFO(m_node->get_logger(), "Processing RealSense depth frames for camera number %s", m_serial_number.c_str());   
+void CameraInterface::processRealSenseDepthFrames() 
+{
     float difference = float(std::clock() - m_last_frame_time) / CLOCKS_PER_SEC;
-
     if ((int)(difference / m_frame_timeout) > m_frame_wait_counter) {
         m_frame_wait_counter++;
         RCLCPP_WARN(m_node->get_logger(), "RealSense (%s) did not receive frames last %d seconds", m_left_or_right.c_str(),
@@ -136,26 +222,21 @@ void CameraInterface::processRealSenseDepthFrames() {
     if (m_decimation_filter_enabled){ depth_frame = m_decimation_filter.process(depth_frame);}
     if (m_spatial_filter_enabled){ depth_frame = m_spatial_filter.process(depth_frame);}
     if (m_temporal_filter_enabled){ depth_frame = m_temporal_filter.process(depth_frame);}
+    if (m_hole_filling_filter_enabled){ depth_frame = m_hole_filling_filter.process(depth_frame);}
+    if (m_threshold_filter_enabled){ depth_frame = m_threshold_filter.process(depth_frame);}
 
     rs2::pointcloud pc;
     rs2::points points = pc.calculate(depth_frame);
     PointCloud::Ptr point_cloud = pointsToPCL(points);
 
-    // TODO: Change the topic?
-    point_cloud->header.frame_id = "camera_" + m_left_or_right + "_depth_optical_frame";
+    m_frame_time = depth_frame.get_timestamp();
+    RCLCPP_INFO(m_node->get_logger(), "%s cam | frame_time: %f", m_left_or_right.c_str(), m_frame_time);
+    point_cloud->header.frame_id = m_frame_id;
     processPointCloud(point_cloud);
 }
 
-// TODO: M7 waits for 1s ?; Remove this altogether
-void CameraInterface::processPointCloud(const PointCloud::Ptr& pointcloud) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_last_frame_time = std::clock();
-    m_frame_wait_counter = 0;
-    publishCloud(m_preprocessed_pointcloud_publisher, m_node, *pointcloud);
-}
-
-PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) {
-
+PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) 
+{
     PointCloud::Ptr cloud = boost::make_shared<PointCloud>();
 
     auto sp = points.get_profile().as<rs2::video_stream_profile>();
@@ -176,19 +257,25 @@ PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) {
     return cloud;
 }
 
-// TODO: Implement this as a part of the callback on CV node sde with its node and publisher
-void CameraInterface::publishCloud(
-    const PointCloudPublisher::SharedPtr& publisher, rclcpp::Node* n, PointCloud cloud)
+void CameraInterface::processPointCloud(const PointCloud::Ptr& pointcloud) 
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_last_frame_time = std::clock();
+    m_frame_wait_counter = 0;
+    publishCloud(*pointcloud);
+}
+
+void CameraInterface::publishCloud(PointCloud cloud) 
 {
     cloud.width = 1;
     cloud.height = cloud.points.size();
     sensor_msgs::msg::PointCloud2 msg;
     pcl::toROSMsg(cloud, msg);
-    msg.header.frame_id = "/cameras/" + m_left_or_right + "/depth/color/points";
-
-    // TODO: Change to use the timeframe when the point cloud was received.
-    msg.header.stamp = n->now();
-    publisher->publish(msg);
+    msg.header.frame_id = m_frame_id;
+    msg.header.stamp = m_node->now();
+    
+    // RCLCPP_INFO(m_node->get_logger(), "PC from %s camera published at %f", m_left_or_right.c_str(), msg.header.stamp.nanosec);
+    m_preprocessed_pointcloud_publisher->publish(msg);
 }
 
 void CameraInterface::shutdown() 

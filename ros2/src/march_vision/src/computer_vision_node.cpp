@@ -8,23 +8,22 @@ namespace march_vision {
 
 ComputerVisionNode::ComputerVisionNode(): Node("computer_vision_node")
 {
-    RCLCPP_INFO(get_logger(), "ComputerVisionNodeeee is initializing...");
+    RCLCPP_INFO(get_logger(), "ComputerVisionNode is initializing...");
     declareParameters();
-    RCLCPP_INFO(get_logger(), "ComputerVisionNode has been created.\n On standby for configuration.");
 
     configureParameters();
     configurePublishers();
     configureSubscriptions();
     configureCameras();
 
-    // // For Cybathlon specific setup
+    // For Cybathlon specific setup
     // m_exo_mode_sub = create_subscription<march_shared_msgs::msg::ExoMode>(
-    //     "/current_mode", 10, std::bind(&ComputerVisionNode::exoModeCallback, this, std::placeholders::_2));
+    //     "/current_mode", 10, std::bind(&ComputerVisionNode::exoModeCallback, this, std::placeholders::_1));
 }
 
 void ComputerVisionNode::declareParameters()
 {
-    declare_parameter("cameras_used", std::string());   
+    this->declare_parameter("cameras_used", std::string());   
     this->declare_parameter("plane_segmentation", true);
 }
 
@@ -34,12 +33,10 @@ void ComputerVisionNode::configureParameters()
     this->get_parameter("plane_segmentation", m_plane_segmentation);
     RCLCPP_INFO(get_logger(), "Cameras used: %s", m_cameras_used.c_str());
     RCLCPP_INFO(get_logger(), "Plane segmentation: %s", m_plane_segmentation ? "true" : "false");
-
 }
 
 bool ComputerVisionNode::configureCameras()
 {
-    RCLCPP_INFO(get_logger(), "Configuring cameras...");
     if (m_cameras_used == "both" || m_cameras_used == "left") {
         m_left_camera_interface = std::make_shared<CameraInterface>(this, std::string("left"));
         if (!m_left_camera_interface->initializeCamera()) {

@@ -43,10 +43,6 @@ find_package(PCL 1.10 REQUIRED COMPONENTS)
 find_package(visualization_msgs REQUIRED)
 
 find_package(CGAL REQUIRED)
-<<<<<<< HEAD
-=======
-# find_package(grid_map_cmake_helpers REQUIRED)
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
 find_package(grid_map_msgs REQUIRED)
 find_package(grid_map_core REQUIRED)
 find_package(grid_map_ros REQUIRED)
@@ -119,10 +115,6 @@ ament_target_dependencies(${PROJECT_NAME}
   CGAL
   kindr_ros
   kindr
-<<<<<<< HEAD
-=======
-  # grid_map_cmake_helpers
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -162,10 +154,6 @@ ament_target_dependencies(computer_vision_node
   CGAL
   kindr_ros
   kindr
-<<<<<<< HEAD
-=======
-  # grid_map_cmake_helpers
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -228,10 +216,6 @@ ament_target_dependencies(elevation_mapping_node
   CGAL
   kindr_ros
   kindr
-<<<<<<< HEAD
-=======
-  # grid_map_cmake_helpers
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -290,10 +274,6 @@ ament_target_dependencies(plane_segmentation_pipeline_node
   CGAL
   kindr_ros
   kindr
-<<<<<<< HEAD
-=======
-  # grid_map_cmake_helpers
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
   grid_map_msgs
   grid_map_core
   grid_map_ros
@@ -324,10 +304,6 @@ install(DIRECTORY
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 ament_export_dependencies(CGAL)
-<<<<<<< HEAD
-=======
-# ament_export_dependencies(grid_map_cmake_helpers)
->>>>>>> cfd2fa9cccd84aa87903e499ca409eeec7345301
 ament_export_dependencies(grid_map_msgs)
 ament_export_dependencies(grid_map_core)
 ament_export_dependencies(grid_map_ros)

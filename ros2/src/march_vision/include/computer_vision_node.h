@@ -41,7 +41,7 @@ private:
 
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_left_synced_pc_pub;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_right_synced_pc_pub;
-    // rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_sub;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr m_left_camera_sub;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr m_right_camera_sub;
     std::shared_ptr<CameraInterface> m_left_camera_interface;
