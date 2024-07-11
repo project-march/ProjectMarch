@@ -3,14 +3,10 @@
 #include "march_gait_planning/gait_planning_node.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include "../logging_colors.hpp"
 
 
 using std::placeholders::_1; 
-
-#define COLOR_GREEN   "\033[32m"
-#define RESET   "\033[0m"
-#define COLOR_RED   "\033[31m"
-#define COLOR_PERIWINKLE   "\033[38;5;147m"
 
 
 GaitPlanningCartesianNode::GaitPlanningCartesianNode()
@@ -28,6 +24,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_single_execution_done = false; 
     m_variable_first_step_done = false; 
     m_active = false; 
+    m_home_stand_trajectory.clear(); 
 
     m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -62,11 +59,11 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPlanningCartesianNode::on_activate(const rclcpp_lifecycle::State &state) {
     
-    (void) state; 
+    (void) state;
     m_active = true;  
     m_iks_foot_positions_publisher->on_activate(); 
     m_interpolated_bezier_visualization_publisher_rviz->on_activate();
-    RCLCPP_DEBUG(this->get_logger(), "Cartesian node activated!"); 
+    RCLCPP_INFO(this->get_logger(),  "Cartesian node " COLOR_GREEN "activated!" RESET); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -76,7 +73,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_active = false; 
     m_iks_foot_positions_publisher->on_deactivate(); 
     m_interpolated_bezier_visualization_publisher_rviz->on_deactivate(); 
-    RCLCPP_DEBUG(this->get_logger(), "Cartesian node deactivated!"); 
+    RCLCPP_INFO(this->get_logger(), "Cartesian node " COLOR_RED "deactivated!" RESET); 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -98,16 +95,19 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 
 void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current mode: %s", toString(static_cast<ExoMode>(msg->mode)).c_str()); 
-    // RCLCPP_INFO(get_logger(), "Previous mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getGaitType())).c_str());
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s" RESET " with node_type" COLOR_PERIWINKLE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str()); 
+    // RCLCPP_INFO(this->get_logger(), "Received previous mode " COLOR_PERIWINKLE "%s" RESET, toString(static_cast<ExoMode>(msg->previous_mode)).c_str()); 
+    // RCLCPP_INFO(this->get_logger(), "State of node is %s%s%s", 
+    // m_active ? COLOR_GREEN : COLOR_RED, 
+    // m_active ? "ACTIVE" : "INACTIVE", 
+    // RESET);
     if (m_active){
-        m_gait_planning.setPreviousGaitType(m_gait_planning.getGaitType()); 
+        m_gait_planning.setPreviousGaitType((ExoMode)msg->previous_mode);  
         m_gait_planning.setGaitType((ExoMode)msg->mode);
 
     if ((ExoMode)msg->mode == ExoMode::Descending){
         m_single_execution_done = false; 
     }
-
         publishFootPositions(); 
     } else {
         RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
@@ -124,7 +124,10 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         m_desired_footpositions_msg->header = msg->header;
         if (m_current_trajectory.empty()){
             m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-            RCLCPP_DEBUG(this->get_logger(), "Current stance foot is= %i", m_gait_planning.getCurrentStanceFoot());
+            if (m_gait_planning.getGaitType() == ExoMode::LargeWalk || m_gait_planning.getGaitType() == ExoMode::SmallWalk){
+                RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
+            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
+            }
         }
         publishFootPositions();
     } else {
@@ -232,7 +235,6 @@ void GaitPlanningCartesianNode::setFootPositionsMessage(double left_x, double le
 
 void GaitPlanningCartesianNode::finishCurrentTrajectory(){
     RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 100, "Finishing current trajectory before standing."); 
-    // RCLCPP_INFO(this->get_logger(), "current trajectory size: %d \n", m_current_trajectory.size()); 
     GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
     m_current_trajectory.erase(m_current_trajectory.begin());
     if (m_gait_planning.getCurrentStanceFoot() & 0b1 || m_variable_walk_swing_leg == 1){
@@ -283,6 +285,7 @@ void GaitPlanningCartesianNode::stepClose(){
 
 
 void GaitPlanningCartesianNode::calculateIncrements(){
+    RCLCPP_WARN(this->get_logger(), "Calculating homestand trajectory in cartesian node "); 
     m_current_trajectory.clear(); 
     m_home_stand_trajectory.clear();  
     RCLCPP_INFO(this->get_logger(), "Incrementing to homestand"); 
@@ -309,14 +312,16 @@ void GaitPlanningCartesianNode::publishHomeStand(){
     setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     m_single_execution_done = false; 
-    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Publishing homestand position.");
+    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 10000, "Publishing homestand position.");
 }
 
 void GaitPlanningCartesianNode::processStand(){
     m_single_execution_done = false;
     if (!m_current_trajectory.empty()){
         finishCurrentTrajectory(); 
-    } else if (!m_home_stand_trajectory.empty()){
+    } else if (!m_home_stand_trajectory.empty() && m_gait_planning.getPreviousGaitType() == ExoMode::BootUp){
+        // Incrementing to homestand should only happen when coming from bootup mode. Due to switching between LCNs the incrementing trajectory was still stored in the cartesian node when exo had already transitioned to Stand. 
+        RCLCPP_WARN(this->get_logger(), "homestand trajectory not empty"); 
         publishIncrements(); 
     } else {
         switch (m_gait_planning.getPreviousGaitType()){
@@ -330,7 +335,8 @@ void GaitPlanningCartesianNode::processStand(){
                 break; 
 
             case ExoMode::BootUp :
-                calculateIncrements(); 
+            // As the stand mode is executed from the joint angles node from now on, calculating increments is not necessary. This will only cause logic errors down the line. 
+                // calculateIncrements(); 
                 break; 
 
             default :
