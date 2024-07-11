@@ -342,35 +342,33 @@ void SensorFusionNode::publishMPCEstimation()
     // Publish MPC estimation
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = current_time;
-    foot_positions_msg.header.frame_id = "R_sole";
+    foot_positions_msg.header.frame_id = "world";
     foot_positions_msg.poses = getCurrentPoseArray("R_sole", {"L_sole", "R_sole"});
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = current_time;
-    com_msg.header.frame_id = "R_sole";
+    com_msg.header.frame_id = "world";
     com_msg.position.header = com_msg.header;
-    com_msg.position.point.x = com_position_R_sole.x();
-    com_msg.position.point.y = com_position_R_sole.y();
-    com_msg.position.point.z = com_position_R_sole.z();
-    com_msg.velocity.x = com_velocity_R_sole.x();
-    com_msg.velocity.y = com_velocity_R_sole.y();
-    com_msg.velocity.z = com_velocity_R_sole.z();
+    com_msg.position.point.x = com_position.x();
+    com_msg.position.point.y = com_position.y();
+    com_msg.position.point.z = com_position.z();
+    com_msg.velocity.x = com_velocity.x();
+    com_msg.velocity.y = com_velocity.y();
+    com_msg.velocity.z = com_velocity.z();
     m_mpc_com_pub->publish(com_msg);
 
     geometry_msgs::msg::PointStamped com_pos_msg;
     com_pos_msg.header.stamp = current_time;
-    com_pos_msg.header.frame_id = "R_sole";
-    com_pos_msg.point.x = com_position_R_sole.x();
-    com_pos_msg.point.y = com_position_R_sole.y();
-    com_pos_msg.point.z = com_position_R_sole.z();
+    com_pos_msg.header.frame_id = "world";
+    com_pos_msg.point = com_msg.position.point;
     m_mpc_com_pos_pub->publish(com_pos_msg);
 
     geometry_msgs::msg::PointStamped zmp_msg;
     zmp_msg.header.stamp = current_time;
-    zmp_msg.header.frame_id = "R_sole";
-    zmp_msg.point.x = zmp_R_sole.x();
-    zmp_msg.point.y = zmp_R_sole.y();
+    zmp_msg.header.frame_id = "world";
+    zmp_msg.point.x = zmp_x;
+    zmp_msg.point.y = zmp_y;
     zmp_msg.point.z = 0.0;
     m_mpc_zmp_pub->publish(zmp_msg);
 
