@@ -22,30 +22,13 @@ CameraInterface::~CameraInterface()
 
 void CameraInterface::declareParameters() 
 {
-    m_tf_buffer = std::make_shared<tf2_ros::Buffer>(m_node->get_clock());
-    m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+    // m_tf_buffer = std::make_shared<tf2_ros::Buffer>(m_node->get_clock());
+    // m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 
     // TODO: Change the name of the frame to correct one
-    m_frame_id = "camera_" + m_left_or_right + "_frame";
     m_last_frame_time = std::clock();
     m_frame_wait_counter = 0;
     m_frame_timeout = 5.0;
-    // TODO: Change the topic name
-
-    m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(
-        "/cameras/" + m_left_or_right + "/depth/color/points", 10);
-    m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    rclcpp::SubscriptionOptions realsense_callback_options_;
-    realsense_callback_options_.callback_group = m_realsense_callback_group;
-    rclcpp::SubscriptionOptions point_callback_options_;
-    point_callback_options_.callback_group = m_point_callback_group;
-
-    // TODO: Decide on topic
-    m_topic_camera = "/cameras/" + m_left_or_right + "/depth/color/points";
-
-    m_config = rs2::config();
-    m_pipeline = rs2::pipeline();
 
     if (m_left_or_right == "left") {
 
@@ -53,6 +36,8 @@ void CameraInterface::declareParameters()
         m_node->declare_parameter("left_camera.resolution.width", 640);
         m_node->declare_parameter("left_camera.resolution.height", 480);
         m_node->declare_parameter("left_camera.fps", 15);
+        m_node->declare_parameter("left_camera.frame_id", "L_camera");
+        m_node->declare_parameter("left_camera.topic", "/cameras/left/pointcloud");
 
         m_node->declare_parameter("left_camera.realsense_camera_settings.decimation_filter_enabled", false);
         m_node->declare_parameter("left_camera.realsense_camera_settings.spatial_filter_enabled", false);
@@ -76,6 +61,8 @@ void CameraInterface::declareParameters()
         m_node->declare_parameter("right_camera.resolution.width", 640);
         m_node->declare_parameter("right_camera.resolution.height", 480);
         m_node->declare_parameter("right_camera.fps", 15);
+        m_node->declare_parameter("right_camera.frame_id", "R_camera");
+        m_node->declare_parameter("right_camera.topic", "/cameras/right/pointcloud");
 
         m_node->declare_parameter("right_camera.realsense_camera_settings.decimation_filter_enabled", false);
         m_node->declare_parameter("right_camera.realsense_camera_settings.spatial_filter_enabled", false);
@@ -93,6 +80,17 @@ void CameraInterface::declareParameters()
         m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_max_distance", 3.5);
         m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_min_distance", 0.9);
     }
+
+    m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(m_topic, 10);
+    m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    rclcpp::SubscriptionOptions realsense_callback_options_;
+    realsense_callback_options_.callback_group = m_realsense_callback_group;
+    rclcpp::SubscriptionOptions point_callback_options_;
+    point_callback_options_.callback_group = m_point_callback_group;
+
+    m_config = rs2::config();
+    m_pipeline = rs2::pipeline();
 }
 
 void CameraInterface::readParameters()
@@ -103,6 +101,8 @@ void CameraInterface::readParameters()
         m_resolution_width = m_node->get_parameter("left_camera.resolution.width").as_int();
         m_resolution_height = m_node->get_parameter("left_camera.resolution.height").as_int();
         m_fps = m_node->get_parameter("left_camera.fps").as_int();
+        m_frame_id = m_node->get_parameter("left_camera.frame_id").as_string();
+        m_topic = m_node->get_parameter("left_camera.topic").as_string();
 
         m_decimation_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.decimation_filter_enabled").as_bool();
         m_spatial_filter_enabled = m_node->get_parameter("left_camera.realsense_camera_settings.spatial_filter_enabled").as_bool();
@@ -126,6 +126,8 @@ void CameraInterface::readParameters()
         m_resolution_width = m_node->get_parameter("right_camera.resolution.width").as_int();
         m_resolution_height = m_node->get_parameter("right_camera.resolution.height").as_int();
         m_fps = m_node->get_parameter("right_camera.fps").as_int();
+        m_frame_id = m_node->get_parameter("right_camera.frame_id").as_string();
+        m_topic = m_node->get_parameter("right_camera.topic").as_string();
 
         m_decimation_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.decimation_filter_enabled").as_bool();
         m_spatial_filter_enabled = m_node->get_parameter("right_camera.realsense_camera_settings.spatial_filter_enabled").as_bool();
@@ -232,7 +234,7 @@ void CameraInterface::processRealSenseDepthFrames()
     m_frame_time = depth_frame.get_timestamp();
     RCLCPP_INFO(m_node->get_logger(), "%s cam | frame_time: %f", m_left_or_right.c_str(), m_frame_time);
     point_cloud->header.frame_id = m_frame_id;
-    processPointCloud(point_cloud);
+    publishCloud(*point_cloud);
 }
 
 PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points) 
@@ -257,16 +259,9 @@ PointCloud::Ptr CameraInterface::pointsToPCL(const rs2::points& points)
     return cloud;
 }
 
-void CameraInterface::processPointCloud(const PointCloud::Ptr& pointcloud) 
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_last_frame_time = std::clock();
-    m_frame_wait_counter = 0;
-    publishCloud(*pointcloud);
-}
-
 void CameraInterface::publishCloud(PointCloud cloud) 
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     cloud.width = 1;
     cloud.height = cloud.points.size();
     sensor_msgs::msg::PointCloud2 msg;
@@ -281,8 +276,8 @@ void CameraInterface::publishCloud(PointCloud cloud)
 void CameraInterface::shutdown() 
 {
     m_pipeline.stop();
-    m_tf_buffer.reset();
-    m_tf_listener.reset();
+    // m_tf_buffer.reset();
+    // m_tf_listener.reset();
     if (m_realsense_timer) {
         m_realsense_timer->cancel();
         m_realsense_timer.reset();

@@ -10,6 +10,8 @@ march_vision:
         width: 640
         height: 480
       fps: 15
+      frame_id: "L_camera"
+      topic: "/camera/left/pointcloud"
 
       realsense_camera_settings:
 
@@ -35,6 +37,8 @@ march_vision:
         width: 640
         height: 480
       fps: 15
+      frame_id: "R_camera"
+      topic: "/camera/right/pointcloud"
 
       realsense_camera_settings:
 

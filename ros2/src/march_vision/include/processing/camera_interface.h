@@ -50,7 +50,7 @@ private:
     int m_resolution_height;
     int m_fps;
     std::string m_frame_id;
-    std::string m_topic_camera;
+    std::string m_topic;
     std::clock_t m_last_frame_time;
     int m_frame_wait_counter;
     double m_frame_timeout;
@@ -92,7 +92,6 @@ private:
     void readParameters();
     void readFilterOptions();
     void processRealSenseDepthFrames();
-    void processPointCloud(const PointCloud::Ptr& pointcloud);
     PointCloud::Ptr pointsToPCL(const rs2::points& points);
     void publishCloud(PointCloud cloud);
 };

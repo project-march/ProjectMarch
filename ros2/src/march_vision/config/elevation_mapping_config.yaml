@@ -4,14 +4,14 @@ elevation_mapping:
     input_sources:
       right_camera: 
         type: pointcloud 
-        topic: /right_camera/points
+        topic: /cameras/right/pointcloud
         queue_size: 1
         publish_on_update: true 
         # Sensor processors parameters for Realsense 435i
         sensor_processor:
           type: structured_light
-          cutoff_min_depth: 0.2
-          cutoff_max_depth: 3.25
+          cutoff_min_depth: 0.9   # match the threshold of the depth camera
+          cutoff_max_depth: 3.5  # match the threshold of the depth camera
           normal_factor_a: 0.000611
           normal_factor_b:  0.003587
           normal_factor_c: 0.3515
@@ -22,14 +22,14 @@ elevation_mapping:
       # TODO: Check in input_source_manager if this is set up properly now
       left_camera: 
         type: pointcloud 
-        topic: /left_camera/points
+        topic: /cameras/left/pointcloud
         queue_size: 1
         publish_on_update: true 
         # Sensor processors parameters for Realsense 435i
         sensor_processor:
           type: structured_light
-          cutoff_min_depth: 0.2
-          cutoff_max_depth: 3.25
+          cutoff_min_depth: 0.9   # match the threshold of the depth camera
+          cutoff_max_depth: 3.5  # match the threshold of the depth camera
           normal_factor_a: 0.000611
           normal_factor_b:  0.003587
           normal_factor_c: 0.3515
@@ -57,16 +57,15 @@ elevation_mapping:
     length_in_y: 20.0  #20.0
     position_x: 0.0
     position_y: 0.0
-    resolution: 0.05 
+    resolution: 0.05  # [m/cell]
     min_variance: 0.0001
     max_variance: 10000.0
     mahalanobis_distance_threshold: 2.5 
     multi_height_noise: 0.00002
     visibility_cleanup_rate: 1.0
 
-    
-    input_topic: elevation_map_raw
-    output_topic: elevation_map_filtered
+    input_topic: elevation_map_raw  # The topic to which the elevation map is published.
+    output_topic: elevation_map_filtered # The topic to which the filtered elevation map is published.
 
     filters:
       filter1:
