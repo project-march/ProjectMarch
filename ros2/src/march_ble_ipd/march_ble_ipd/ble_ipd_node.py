@@ -28,6 +28,9 @@ class BLEInputDeviceNode(Node):
         self._connected = False 
         self._connected_first_time = False
         self._disconnect_timestamp = None
+        self._disconnection_handled = False
+        self._connection_handled = False
+        self._current_mode = 3 # BOOTUP
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(), user=getpass.getuser())
 
         self._get_exo_mode_array_client = self.create_client(GetExoModeArray, 'get_exo_mode_array')
@@ -60,27 +63,32 @@ class BLEInputDeviceNode(Node):
         
         available_modes = future.result().mode_array.modes
         mode_list = [exo_mode.mode for exo_mode in available_modes]
-        print(mode_list)
+        self._current_mode = future.result().current_mode.mode
     
     def check_connectivity(self) -> None:
         """Check whether a bluetooth device is still connected"""
-        if (self._connected == False and self._connected_first_time):
-            # If the device was connected before, but is now disconnected
-            if self._disconnect_timestamp is None:
-                # The moment the device disconnects, store the time and send exoMode Stand
-                self._disconnect_timestamp = self.get_clock().now()
+        if self._connected == True:
+            if not self._connection_handled:  # Check if connection message has been printed
+                self.get_logger().info("Device is connected")
+                self._connection_handled = True  # Mark connection message as printed
+                self._disconnection_handled = False  # Reset disconnection handled flag for future disconnections
+        elif self._connected == False and self._connected_first_time and not self._disconnection_handled:
+            self.get_logger().warn("Device disconnected")
+            if self._current_mode == 3:  # Exo is in BootUp
+                self.publish_mode(3)
+                self.get_logger().warn("Device disconnected, sending BootUp mode")
+            elif self._current_mode == 0:  # Exo is in Sit
+                self.publish_mode(0)
+                self.get_logger().warn("Device disconnected, sending Sit mode")
+            else:
                 self.publish_mode(1)
                 self.get_logger().warn("Device disconnected, sending Stand mode")
-            elif ((self.get_clock().now() - self._disconnect_timestamp) > rclpy.time.Duration(seconds=TIMEOUT)):
-                # If the device has been disconnected for TIMEOUT seconds, kill the node
-                self.get_logger().error("Device has been disconnected for too long, shutting down all ROS nodes")
-                os.kill(os.getppid(), signal.SIGINT)  # Send SIGINT to parent process
-                rclpy.shutdown()
+            self._disconnection_handled = True  # Mark disconnection message as printed
+            self._connection_handled = False  # Reset connection handled flag for future connections
         else:
-            # If the device is connected, reset the disconnect timestamp
             if self._disconnect_timestamp is not None:
                 self.get_logger().info("Device is reconnected!")
-            self._disconnect_timestamp = None 
+            self._disconnect_timestamp = None
         
 
 
