@@ -35,6 +35,11 @@ joints_with_gains GainScheduler::getConstantGains(std::string gains_type) {
 }
 
 joints_with_gains GainScheduler::setStanceSwingLegGains(joints_with_gains joints_with_gains, uint8_t current_stance_leg) {
+
+    // If the state estimator communicates a current stance leg of 0, both legs should be in swing phase, indicating an airgait
+    if (current_stance_leg == 0) {
+        return joints_with_gains;
+    }
     // This is how the state estimator communicates the current stance leg
     bool left_leg_stance = current_stance_leg == 1;
     bool right_leg_stance = current_stance_leg == 2;
@@ -84,8 +89,8 @@ std::tuple<std::string, double, double, double> GainScheduler::getSpecificJointA
     return std::make_tuple(joint_name, gains[p_gain_index], gains[i_gain_index], gains[d_gain_index]);
 }
 
-// Method to set the config path and scheduling variable based on the new gait type
 void GainScheduler::setGaitConfiguration(ExoMode new_gait_type) {
+    // Map to store the config file, scheduling variable and whether to use stance-swing leg gains for specific gait types
     static const std::unordered_map<ExoMode, std::tuple<std::string, std::string, bool>> gait_config_map = {
         {ExoMode::Sit, {"/default_gains.yaml", "constant_gains", false}},
         {ExoMode::Stand, {"/default_gains.yaml", "constant_gains", false}},
