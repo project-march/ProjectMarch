@@ -41,6 +41,7 @@
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
+    - apt install -qqy libgmp-dev
     - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
     # - git submodule update --remote src/libraries/acados
     # - colcon build --packages-select acados
