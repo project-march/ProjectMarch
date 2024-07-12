@@ -23,29 +23,30 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
-#include "march_state_estimator/robot_description/robot_description.hpp"
-#include "march_state_estimator/torque_converter.hpp"
+#include "pinocchio/algorithm/kinematics.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
+#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
 
 class StateEstimator {
 public:
-    StateEstimator(const RobotDescription::SharedPtr robot_description, const std::string& urdf_file_path);
+    StateEstimator(const std::string& urdf_file_path);
     ~StateEstimator() = default;
 
-    void configureJointNames(const std::vector<std::string>& joint_names);
     void configureStanceThresholds(const double& left_foot_threshold, const double& right_foot_threshold);
 
     void updateJointState(const sensor_msgs::msg::JointState::SharedPtr joint_state);
     void updateImuState(const sensor_msgs::msg::Imu::SharedPtr imu);
     void updateDynamicsState();
 
-    Eigen::Vector3d getLeftFootForce() const;
-    Eigen::Vector3d getRightFootForce() const;
-    uint8_t getCurrentStanceLeg() const;
+    inline Eigen::Vector3d getLeftFootForce() const { return m_left_foot_force; }
+    inline Eigen::Vector3d getRightFootForce() const { return m_right_foot_force; }
+    inline uint8_t getCurrentStanceLeg() const { return m_current_stance_leg; }
     uint8_t getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const;
 
     sensor_msgs::msg::JointState getEstimatedJointState() const;
 
-    RobotNode::JointNameToValueMap getJointPositions() const;
+    std::unordered_map<std::string, double> getJointPosition() const;
     Eigen::Quaterniond getInertialOrientation() const;
     Eigen::Vector3d getCOM() const;
     Eigen::Vector3d getCOMVelocity() const;
@@ -56,28 +57,32 @@ public:
     std::vector<double> getJointDynamicalTorques(const std::vector<std::string>& joint_names) const;
     std::vector<double> getJointExternalTorques(const std::vector<std::string>& joint_names) const;
 
-    std::vector<Eigen::Vector3d> getWorldTorqueInLegs() const;
-    std::vector<Eigen::Vector3d> getWorldForceInLegs() const;
-
-    void setTimeStep(const double& timestep);
+    inline void setTimeStep(const double& timestep) { m_timestep = timestep; }
 
 private:
+    void configureRobotModel(const std::string& urdf_file_path);
+    void configureJointState(const std::vector<std::string>& joint_names);
+    void initializeCurrentStanceLeg();
+    void initalizeFeetForce();
+
+    Eigen::Vector3d computeTotalForce(const std::string& joint_name) const;
+    Eigen::Vector3d computeExternalForce(const std::string& joint_name) const;
+
+    void computeJointAcceleration(const Eigen::VectorXd& joint_velocities);
     void updateCurrentStanceLeg(
         const double& left_foot_torque, const double& right_foot_torque,
         const Eigen::Vector3d& left_foot_force, const Eigen::Vector3d& right_foot_force);
 
-    RobotDescription::SharedPtr m_robot_description;
-    TorqueConverter::UniquePtr m_torque_converter;
-    sensor_msgs::msg::JointState::SharedPtr m_recent_joint_state_msg;
-    sensor_msgs::msg::Imu::SharedPtr m_recent_imu_msg;
-
     std::vector<std::string> m_joint_names;
-    RobotNode::JointNameToValueMap m_joint_positions;
-    RobotNode::JointNameToValueMap m_joint_velocities;
-    RobotNode::JointNameToValueMap m_joint_accelerations;
-    RobotNode::JointNameToValueMap m_joint_total_torques;
-    RobotNode::JointNameToValueMap m_joint_dynamical_torques;
-    RobotNode::JointNameToValueMap m_joint_external_torques;
+
+    Eigen::VectorXd m_joint_position;
+    Eigen::VectorXd m_joint_velocity;
+    Eigen::VectorXd m_joint_acceleration;
+
+    Eigen::VectorXd m_joint_total_torque;
+    Eigen::VectorXd m_joint_dynamical_torque;
+    Eigen::VectorXd m_joint_external_torque;
+
     Eigen::Vector3d m_left_foot_force;
     Eigen::Vector3d m_right_foot_force;
 
@@ -86,7 +91,10 @@ private:
     uint8_t m_current_stance_leg;
 
     Eigen::Quaterniond m_quaternion;
-    double m_state_estimator_timestep;
+    double m_timestep;
+
+    pinocchio::Model m_robot_model;
+    std::unique_ptr<pinocchio::Data> m_robot_data;
 };
 
 #endif // MARCH_STATE_ESTIMATOR__STATE_ESTIMATOR_HPP_

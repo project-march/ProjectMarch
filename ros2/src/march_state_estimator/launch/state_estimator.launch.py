@@ -24,7 +24,7 @@ def generate_launch_description():
         'march9',
         'march9.urdf'
     )
-    force_stance_threshold = 15.0
+    force_stance_threshold = 25.0
 
     sensor_fusion_noise_parameters_config = os.path.join(
         get_package_share_directory('march_state_estimator'),
@@ -48,25 +48,16 @@ def generate_launch_description():
                 sensor_fusion_noise_parameters_config,
             ],
         ),
-        Node(
-            package='march_state_estimator',
-            executable='torque_converter_node',
-            name='torque_converter',
-            output='screen',
-            parameters=[
-                {"robot_definition": robot_description},
-                {"urdf_file_path": urdf_file},
-            ],
-        ),
-        Node(
-            package='march_state_estimator',
-            executable='robot_description_node',
-            name='robot_description',
-            output='screen',
-            parameters=[
-                {"robot_definition": robot_description},
-            ],
-        ),
+        # Node(
+        #     package='march_state_estimator',
+        #     executable='torque_converter_node',
+        #     name='torque_converter',
+        #     output='screen',
+        #     parameters=[
+        #         {"robot_definition": robot_description},
+        #         {"urdf_file_path": urdf_file},
+        #     ],
+        # ),
         Node(
             package='march_state_estimator',
             executable='filters_node',

@@ -161,7 +161,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn StateE
     m_imu_position_sub.reset();
     m_imu_velocity_sub.reset();
 
-    m_robot_description.reset();
     m_state_estimator.reset();
     m_sensor_fusion.reset();
 
@@ -194,7 +193,7 @@ void StateEstimatorNode::timerCallback()
 
     // Comment this out for real robot
     if (m_is_simulation && (m_imu_position == nullptr)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu position data received yet");
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2500, "No imu position data received yet");
         return;
     }
 
@@ -203,7 +202,6 @@ void StateEstimatorNode::timerCallback()
     checkImuTimeout();
 
     // Update and estimate current state
-    m_state_estimator->updateImuState(m_imu);
     if (m_is_simulation) {
         m_state_estimator->updateDynamicsState();
     }
@@ -214,6 +212,7 @@ void StateEstimatorNode::timerCallback()
         publishGroundReactionForce();
     }
     
+    broadcastTransformToTf2();
     publishStateEstimation();
     publishClock();
 }
@@ -227,11 +226,13 @@ void StateEstimatorNode::jointStateCallback(const sensor_msgs::msg::JointState::
 
 void StateEstimatorNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
-    rclcpp::Duration dt = this->now() - m_imu_last_update;
     m_imu = msg;
+    m_state_estimator->updateImuState(m_imu);
     m_imu_last_update = this->now();
 
+    // TODO: Create a synchronized callback for joint state and IMU for this to work
     if (m_joint_state != nullptr) {
+        rclcpp::Duration dt = this->now() - m_imu_last_update;
         updateKalmanFilter(dt.seconds());
     }
 }
@@ -319,18 +320,18 @@ void StateEstimatorNode::publishStateEstimation()
     state_estimation_msg.header.stamp = this->now();
     state_estimation_msg.header.frame_id = "base_link";
     state_estimation_msg.step_time = m_dt;
-    state_estimation_msg.joint_state = m_state_estimator->getEstimatedJointState();
-    state_estimation_msg.joint_state.header.stamp = this->now();
-    state_estimation_msg.joint_state.header.frame_id = m_joint_state->header.frame_id;
+    state_estimation_msg.joint_state = *m_joint_state;
+    // state_estimation_msg.joint_state.header.stamp = this->now();
+    // state_estimation_msg.joint_state.header.frame_id = m_joint_state->header.frame_id;
 
-    if (m_is_simulation) {
-        state_estimation_msg.dynamical_joint_state.header.stamp = current_time;
-        state_estimation_msg.header.frame_id = "joint_link";
-        state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
-        state_estimation_msg.dynamical_joint_state.joint_acceleration = m_state_estimator->getJointAcceleration(m_joint_state->name);
-        state_estimation_msg.dynamical_joint_state.effort_dynamical = m_state_estimator->getJointDynamicalTorques(m_joint_state->name);
-        state_estimation_msg.dynamical_joint_state.effort_external = m_state_estimator->getJointExternalTorques(m_joint_state->name);
-    }
+    // if (m_is_simulation) {
+    //     state_estimation_msg.dynamical_joint_state.header.stamp = current_time;
+    //     state_estimation_msg.header.frame_id = "joint_link";
+    //     state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
+    //     state_estimation_msg.dynamical_joint_state.joint_acceleration = m_state_estimator->getJointAcceleration(m_joint_state->name);
+    //     state_estimation_msg.dynamical_joint_state.effort_dynamical = m_state_estimator->getJointDynamicalTorques(m_joint_state->name);
+    //     state_estimation_msg.dynamical_joint_state.effort_external = m_state_estimator->getJointExternalTorques(m_joint_state->name);
+    // }
 
     // state_estimation_msg.imu = *m_state_estimator->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
@@ -409,7 +410,6 @@ void StateEstimatorNode::publishMPCEstimation()
     // Get current time
     rclcpp::Time current_time = this->now();
 
-    std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
     std::vector<geometry_msgs::msg::Pose> foot_poses = m_state_estimator->getFootPoses();
     uint8_t stance_leg = m_state_estimator->getCurrentStanceLeg();
 
@@ -734,17 +734,6 @@ bool StateEstimatorNode::configureImuMsg()
 
 bool StateEstimatorNode::configureStateEstimator()
 {
-    // Configure robot description
-    std::string yaml_filename = get_parameter("robot_definition").as_string();
-
-    if (yaml_filename.empty())
-    {
-        RCLCPP_ERROR(this->get_logger(), "No robot description file has been provided.");
-        return false;
-    }
-
-    m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
-
     // Configure state estimator
     std::string urdf_file_path = get_parameter("urdf_file_path").as_string();
 
@@ -755,9 +744,8 @@ bool StateEstimatorNode::configureStateEstimator()
     }
 
     // Initialize state estimator
-    m_node_feet_names = { "L_sole", "R_sole" };
-    m_state_estimator = std::make_unique<StateEstimator>(m_robot_description, urdf_file_path);
-    m_state_estimator->configureJointNames(m_joint_state->name);
+    m_state_estimator = std::make_unique<StateEstimator>(urdf_file_path);
+    m_state_estimator->setTimeStep(m_dt);
     m_state_estimator->configureStanceThresholds(
         get_parameter("left_stance_threshold").as_double(),
         get_parameter("right_stance_threshold").as_double());
@@ -834,9 +822,6 @@ void StateEstimatorNode::updateKalmanFilter(const double& dt)
     RCLCPP_INFO(this->get_logger(), "Estimating state...");
     #endif
     m_sensor_fusion->estimateState();
-
-    // Publish new estimation of world frame
-    broadcastTransformToTf2();
 }
 
 void StateEstimatorNode::checkJointStateTimeout()

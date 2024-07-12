@@ -35,7 +35,6 @@
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 
-#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/state_estimator.hpp"
 #include "march_state_estimator/sensor_fusion.hpp"
 #include "march_state_estimator/torque_converter.hpp"
@@ -105,12 +104,10 @@ private:
     sensor_msgs::msg::Imu::SharedPtr m_imu;
     geometry_msgs::msg::PointStamped::SharedPtr m_imu_position;
     geometry_msgs::msg::Vector3Stamped::SharedPtr m_imu_velocity;
-    std::vector<std::string> m_node_feet_names;
     std::vector<geometry_msgs::msg::Point> m_foot_positions;
 
     std::unique_ptr<StateEstimator> m_state_estimator;
     std::unique_ptr<SensorFusion> m_sensor_fusion;
-    std::shared_ptr<RobotDescription> m_robot_description; // TODO: TO be obtained from SensorFusion.
     std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
     std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
     std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
