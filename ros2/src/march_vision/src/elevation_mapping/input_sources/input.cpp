@@ -14,37 +14,36 @@ namespace elevation_mapping {
 
 Input::Input(std::shared_ptr<rclcpp::Node> nh) : nodeHandle_(nh) {}
 
-bool Input::configure(std::string& inputSourceName, const std::string& sourceConfigurationName, const SensorProcessorBase::GeneralParameters& generalSensorProcessorParameters) {
+bool Input::configure(std::string& inputSourceName, const SensorProcessorBase::GeneralParameters& generalSensorProcessorParameters) {
   // TODO: Write this in a cleaner way and add checks?
-  // TODO: sourceConfigurationName not used
   RCLCPP_INFO(nodeHandle_->get_logger(), "Configuring input source:  %s.", inputSourceName.c_str());
   Parameters parameters;
 
   std::string sensorProcessorType;
 
-  nodeHandle_->declare_parameter(sourceConfigurationName + "." + inputSourceName + ".type");
-  nodeHandle_->declare_parameter(sourceConfigurationName + "." + inputSourceName + ".topic");
-  nodeHandle_->declare_parameter(sourceConfigurationName + "." + inputSourceName + ".queue_size");
-  nodeHandle_->declare_parameter(sourceConfigurationName + "." + inputSourceName + ".publish_on_update");
-  nodeHandle_->declare_parameter(sourceConfigurationName + "." + inputSourceName + ".sensor_processor.type");
+  nodeHandle_->declare_parameter(inputSourceName + ".type");
+  nodeHandle_->declare_parameter(inputSourceName + ".topic");
+  nodeHandle_->declare_parameter(inputSourceName + ".queue_size");
+  nodeHandle_->declare_parameter(inputSourceName + ".publish_on_update");
+  nodeHandle_->declare_parameter(inputSourceName + ".sensor_processor.type");
 
-  if (!nodeHandle_->get_parameter(sourceConfigurationName + "." + inputSourceName + ".type", parameters.type_)){
+  if (!nodeHandle_->get_parameter(inputSourceName + ".type", parameters.type_)){
     RCLCPP_ERROR(nodeHandle_->get_logger(), "Could not configure input source %s because no type was given.", inputSourceName.c_str());
   } else RCLCPP_INFO(nodeHandle_->get_logger(), "Input source type: %s", parameters.type_.c_str());
 
-  if (!nodeHandle_->get_parameter(sourceConfigurationName + "." + inputSourceName + ".topic", parameters.topic_)){
+  if (!nodeHandle_->get_parameter(inputSourceName + ".topic", parameters.topic_)){
     RCLCPP_ERROR(nodeHandle_->get_logger(), "Could not configure input source %s because no topic was given.", inputSourceName.c_str());
   }else RCLCPP_INFO(nodeHandle_->get_logger(), "Input source topic: %s", parameters.topic_.c_str());
 
-  if (!nodeHandle_->get_parameter(sourceConfigurationName + "." + inputSourceName + ".queue_size", parameters.queueSize_)){
+  if (!nodeHandle_->get_parameter(inputSourceName + ".queue_size", parameters.queueSize_)){
     RCLCPP_ERROR(nodeHandle_->get_logger(), "Could not configure input source %s because no queue_size was given.", inputSourceName.c_str());
   }else RCLCPP_INFO(nodeHandle_->get_logger(), "Input source queue_size: %d", parameters.queueSize_);
 
-  if (!nodeHandle_->get_parameter(sourceConfigurationName + "." + inputSourceName + ".publish_on_update", parameters.publishOnUpdate_)){
+  if (!nodeHandle_->get_parameter(inputSourceName + ".publish_on_update", parameters.publishOnUpdate_)){
     RCLCPP_ERROR(nodeHandle_->get_logger(), "Could not configure input source %s because no publish_on_update was given.", inputSourceName.c_str());
   }else RCLCPP_INFO(nodeHandle_->get_logger(), "Input source publish_on_update: %s", parameters.publishOnUpdate_ ? "true" : "false");
 
-  if (!nodeHandle_->get_parameter(sourceConfigurationName + "." + inputSourceName + ".sensor_processor.type", sensorProcessorType)){
+  if (!nodeHandle_->get_parameter(inputSourceName + ".sensor_processor.type", sensorProcessorType)){
     RCLCPP_ERROR(nodeHandle_->get_logger(), "Could not configure input source %s because no sensor_processor was given.", inputSourceName.c_str());
   }else RCLCPP_INFO(nodeHandle_->get_logger(), "Input source sensor_processor: %s", sensorProcessorType.c_str());
 

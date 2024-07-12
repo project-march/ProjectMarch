@@ -13,42 +13,25 @@ namespace elevation_mapping {
 
 InputSourceManager::InputSourceManager(const std::shared_ptr<rclcpp::Node>& nodeHandle) : nodeHandle_(nodeHandle) {}
 
-bool InputSourceManager::configureFromRos(const std::string& inputSourcesNamespace) {
+bool InputSourceManager::configureFromRos() {
+  nodeHandle_->declare_parameter("inputs", std::vector<std::string>());
 
-  nodeHandle_->declare_parameter(inputSourcesNamespace, std::vector<std::string>());
   // Configure the visualizations from a configuration stored on the parameter server.
   std::vector<std::string> inputSourcesConfiguration;
-
-  //std::string source1_type;
-  // nodeHandle_->declare_parameter("input_sources.ground_truth_cloud.type", "some data");
-  // nodeHandle_->get_parameter("input_sources.ground_truth_cloud.type", source1_type);
-  // RCLCPP_INFO(nodeHandle_->get_logger(), "source1_type: %s", source1_type.c_str());
-
-  if (!nodeHandle_->get_parameter(inputSourcesNamespace, inputSourcesConfiguration)) {
+  if (!nodeHandle_->get_parameter("inputs", inputSourcesConfiguration)) {
     RCLCPP_WARN(nodeHandle_->get_logger(),
         "Could not load the input sources configuration from parameter\n "
         "%s, are you sure it was pushed to the parameter server? Assuming\n "
-        "that you meant to leave it empty. Not subscribing to any inputs!\n",
-        inputSourcesNamespace.c_str());
+        "that you meant to leave it empty. Not subscribing to any inputs!\n", "inputs");
     return false;
   }
-  //RCLCPP_INFO(nodeHandle_->get_logger(), "Configuring input sources from %s.", inputSourcesNamespace.c_str());
-  //RCLCPP_INFO(nodeHandle_->get_logger(), "Input sources configuration size: %d", inputSourcesConfiguration.size());
-  // Print the contents of inputSourcesConfiguration
-  for (const auto& config : inputSourcesConfiguration) {
-    RCLCPP_INFO(nodeHandle_->get_logger(), "Input source configuration: %s", config.c_str());
-  }
-
-  // TODO: Change to camera_left and camera_right and refactor 
-  std::vector<std::string> inputSourcesConfigurationTest = {"ground_truth_cloud"};
-  return configure(inputSourcesConfigurationTest, inputSourcesNamespace);
-
-  //return configure(inputSourcesConfiguration, inputSourcesNamespace);  
+  
+  return configure(inputSourcesConfiguration);  
 }
 
-bool InputSourceManager::configure(const std::vector<std::string>& config, const std::string& sourceConfigurationName) {
+bool InputSourceManager::configure(const std::vector<std::string>& config) {
+  
   if (config.size() == 0) {  // Use Empty array as special case to explicitly configure no inputs.
-    RCLCPP_INFO(nodeHandle_->get_logger(), "No input sources configured, so it returns true");
     return true;
   }
  
@@ -58,14 +41,12 @@ bool InputSourceManager::configure(const std::vector<std::string>& config, const
                                                                       nodeHandle_->get_parameter("map_frame_id").as_string()};
   // Configure all input sources in the list.
   for (auto inputConfig : config) {
-    //RCLCPP_INFO(nodeHandle_->get_logger(), "Configuring input source %s.", inputConfig.c_str());
     // FIXME: fix namespace and subnode
     // return leading / -> rclcpp::expand_topic_or_service_name(sourceConfigurationName + "/" + inputConfig, nodeHandle_->get_name(), nodeHandle_->get_namespace()
     // auto subnode = nodeHandle_->create_sub_node(sourceConfigurationName + "/" + inputConfig);
     Input source = Input(nodeHandle_);
 
-    std::string sourceConfigurationName = "input_sources";
-    bool configured = source.configure(inputConfig, sourceConfigurationName, generalSensorProcessorConfig);
+    bool configured = source.configure(inputConfig, generalSensorProcessorConfig);
     if (!configured) {
       successfulConfiguration = false;
       continue;
@@ -91,5 +72,4 @@ bool InputSourceManager::configure(const std::vector<std::string>& config, const
 int InputSourceManager::getNumberOfSources() {
   return static_cast<int>(sources_.size());
 }
-
 }  // namespace elevation_mapping

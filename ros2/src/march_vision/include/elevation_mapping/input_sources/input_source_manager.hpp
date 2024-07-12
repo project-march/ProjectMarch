@@ -31,19 +31,17 @@ class InputSourceManager {
   /**
    * @brief Configure the input sources from a configuration stored on the
    * parameter server under inputSourcesNamespace.
-   * @param inputSourcesNamespace The namespace of the subscribers list to load.
    * @return True if configuring was successful.
    */
-  bool configureFromRos(const std::string& inputSourcesNamespace);
+  bool configureFromRos();
 
   /**
    * @brief Configure the input sources.
    * This will configure all managed input sources.
    * @param parameters The list of input source parameters.
-   * @param sourceConfigurationName The name of the input source configuration.
    * @return True if configuring was successful.
    */
-  bool configure(const std::vector<std::string>& parameters, const std::string& sourceConfigurationName);
+  bool configure(const std::vector<std::string>& parameters);
     
   /**
    * @brief Registers the corresponding callback in the elevationMap.

@@ -83,7 +83,7 @@ void ElevationMapping::setupSubscribers() {  // Handle deprecated point_cloud_to
     RCLCPP_INFO(nodeHandle_->get_logger(), "topic: %s", a.first.c_str());
   }
 
-  const bool configuredInputSources = inputSources_.configureFromRos("input_sources");
+  const bool configuredInputSources = inputSources_.configureFromRos();
   const bool hasDeprecatedPointcloudTopic = nodeHandle_->get_parameter("point_cloud_topic", pointCloudTopic_);
   if (hasDeprecatedPointcloudTopic) {
     RCLCPP_WARN(nodeHandle_->get_logger(), "Parameter 'point_cloud_topic' is deprecated, please use 'input_sources' instead.");
@@ -321,33 +321,6 @@ bool ElevationMapping::readParameters() {
 
   nodeHandle_->declare_parameter("robot_base_frame_id", std::string("/robot"));
 
-
-  // TODO: Hardcode input source or fix the config launch reading
-  // std::string sensorType;
-  // nodeHandle_->declare_parameter("sensor_processor/type", std::string("structured_light"));
-  // nodeHandle_->get_parameter("sensor_processor/type", sensorType);
-  
-  // // SensorProcessor parameters. Deprecated, use the sensorProcessor from within input sources instead!
-
-  // SensorProcessorBase::GeneralParameters generalSensorProcessorConfig{nodeHandle_->get_parameter("robot_base_frame_id").as_string(), mapFrameId_};
-
-  // std::string sensorType;
-  // nodeHandle_->declare_parameter("sensor_processor/type", std::string("structured_light"));
-  // nodeHandle_->get_parameter("sensor_processor/type", sensorType);
-  
-  // SensorProcessorBase::GeneralParameters generalSensorProcessorConfig{nodeHandle_->get_parameter("robot_base_frame_id").as_string(), mapFrameId_};
-  // if (sensorType == "structured_light") {
-  //   sensorProcessor_.reset(new StructuredLightSensorProcessor(nodeHandle_, generalSensorProcessorConfig)); // ERROR
-  // } else if (sensorType == "perfect") {
-  //   sensorProcessor_.reset(new PerfectSensorProcessor(nodeHandle_, generalSensorProcessorConfig));
-  // } else {
-  //   RCLCPP_ERROR(nodeHandle_->get_logger(), "The sensor type %s is not available.", sensorType.c_str());
-  // }
-  // if (!sensorProcessor_->readParameters()) {
-  //   return false;
-  // }
-
-
   if (!robotMotionMapUpdater_.readParameters()) {
     return false;
   }
@@ -390,6 +363,8 @@ bool ElevationMapping::initialize() {
   }
 }*/
 
+
+// TODO: Check PC conversion for issues
 void ElevationMapping::pointCloudCallback(sensor_msgs::msg::PointCloud2::ConstSharedPtr pointCloudMsg, bool publishPointCloud,
                                           const SensorProcessorBase::Ptr& sensorProcessor_) {
 
@@ -422,7 +397,7 @@ void ElevationMapping::pointCloudCallback(sensor_msgs::msg::PointCloud2::ConstSh
   stopMapUpdateTimer();
 
   // Convert the sensor_msgs/PointCloud2 data to pcl/PointCloud.
-  // TODO(max): Double check with http://wiki.ros.org/hydro/Migration
+  // TODO: Double check with http://wiki.ros.org/hydro/Migration
   pcl::PCLPointCloud2 pcl_pc;
   pcl_conversions::toPCL(*pointCloudMsg, pcl_pc);
 

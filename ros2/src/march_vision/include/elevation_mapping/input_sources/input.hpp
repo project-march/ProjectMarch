@@ -41,7 +41,7 @@ class Input {
    * @param generalSensorProcessorParameters Parameters shared by all sensor processors.
    * @return True if configuring was successful.
    */
-  bool configure(std::string& inputSourceName, const std::string& sourceConfigurationName, const SensorProcessorBase::GeneralParameters& generalSensorProcessorParameters);
+  bool configure(std::string& inputSourceName, const SensorProcessorBase::GeneralParameters& generalSensorProcessorParameters);
 
   /**
    * @brief Registers the corresponding callback in the elevationMap.

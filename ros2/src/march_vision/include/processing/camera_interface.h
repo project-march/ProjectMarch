@@ -91,6 +91,7 @@ private:
     void declareParameters();
     void readParameters();
     void readFilterOptions();
+    void configurePublishersAndRS2Pipeline();
     void processRealSenseDepthFrames();
     PointCloud::Ptr pointsToPCL(const rs2::points& points);
     void publishCloud(PointCloud cloud);

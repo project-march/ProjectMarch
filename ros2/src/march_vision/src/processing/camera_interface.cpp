@@ -13,6 +13,7 @@ CameraInterface::CameraInterface(rclcpp::Node* node,
     declareParameters();
     readParameters();
     readFilterOptions();
+    configurePublishersAndRS2Pipeline();
 }
 
 CameraInterface::~CameraInterface() 
@@ -80,17 +81,6 @@ void CameraInterface::declareParameters()
         m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_max_distance", 3.5);
         m_node->declare_parameter("right_camera.realsense_camera_settings.threshold_filter_min_distance", 0.9);
     }
-
-    m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(m_topic, 10);
-    m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    rclcpp::SubscriptionOptions realsense_callback_options_;
-    realsense_callback_options_.callback_group = m_realsense_callback_group;
-    rclcpp::SubscriptionOptions point_callback_options_;
-    point_callback_options_.callback_group = m_point_callback_group;
-
-    m_config = rs2::config();
-    m_pipeline = rs2::pipeline();
 }
 
 void CameraInterface::readParameters()
@@ -176,6 +166,20 @@ void CameraInterface::readFilterOptions()
     }
 }
 
+void CameraInterface::configurePublishersAndRS2Pipeline() 
+{
+    m_preprocessed_pointcloud_publisher = m_node->create_publisher<sensor_msgs::msg::PointCloud2>(m_topic, 10);
+    m_realsense_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    m_point_callback_group = m_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    rclcpp::SubscriptionOptions realsense_callback_options_;
+    realsense_callback_options_.callback_group = m_realsense_callback_group;
+    rclcpp::SubscriptionOptions point_callback_options_;
+    point_callback_options_.callback_group = m_point_callback_group;
+
+    m_config = rs2::config();
+    m_pipeline = rs2::pipeline();
+}
+
 bool CameraInterface::initializeCamera() 
 {
     while (true) {
@@ -232,7 +236,7 @@ void CameraInterface::processRealSenseDepthFrames()
     PointCloud::Ptr point_cloud = pointsToPCL(points);
 
     m_frame_time = depth_frame.get_timestamp();
-    RCLCPP_INFO(m_node->get_logger(), "%s cam | frame_time: %f", m_left_or_right.c_str(), m_frame_time);
+    // RCLCPP_INFO(m_node->get_logger(), "%s cam | frame_time: %f", m_left_or_right.c_str(), m_frame_time);
     point_cloud->header.frame_id = m_frame_id;
     publishCloud(*point_cloud);
 }
