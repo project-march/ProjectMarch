@@ -14,6 +14,10 @@
 #include <stdlib.h>
 #include <string>
 
+#include "geometry_msgs/msg/transform_stamped.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+
 MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
     , m_desired_previous_foot_x(0.0)
     , m_desired_previous_foot_y(0.33)
@@ -50,6 +54,9 @@ MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
     prev_foot_pose_container.position.z = 0.0;
     m_prev_foot_msg.poses.push_back(prev_foot_pose_container);
 
+    m_tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+    m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+
     m_solving_timer = this->create_wall_timer(std::chrono::milliseconds(50), 
         std::bind(&MpcSolverNode::timerCallback, this));
     RCLCPP_INFO(this->get_logger(), "MPC Solver node has been started.");
@@ -57,8 +64,16 @@ MpcSolverNode::MpcSolverNode(): Node("mpc_solver")
 
 void MpcSolverNode::currentComCallback(march_shared_msgs::msg::CenterOfMass::SharedPtr msg)
 {
-    m_mpc_solver->set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
-    m_mpc_solver->set_com_height(msg->position.point.z);
+    // m_mpc_solver->set_current_com(msg->position.point.x, msg->position.point.y, msg->velocity.x, msg->velocity.y);
+    // m_mpc_solver->set_com_height(msg->position.point.z);
+
+    m_current_com_position.x() = msg->position.point.x;
+    m_current_com_position.y() = msg->position.point.y;
+    m_current_com_position.z() = msg->position.point.z;
+
+    m_current_com_velocity.x() = msg->velocity.x;
+    m_current_com_velocity.y() = msg->velocity.y;
+    m_current_com_velocity.z() = msg->velocity.z;
 }
 
 void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg)
@@ -69,11 +84,14 @@ void MpcSolverNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::S
 void MpcSolverNode::currentStanceFootCallback(std_msgs::msg::Int32::SharedPtr msg)
 {
     m_mpc_solver->set_current_stance_foot(msg->data);
+    m_current_stance_foot = msg->data;
 }
 
 void MpcSolverNode::currentZmpCallback(geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
-    m_mpc_solver->set_current_zmp(msg->point.x, msg->point.y);
+    m_current_zmp.x() = msg->point.x;
+    m_current_zmp.y() = msg->point.y;
+    m_current_zmp.z() = msg->point.z;
 }
 
 void MpcSolverNode::desiredFeetPositionsCallback(geometry_msgs::msg::PoseArray::SharedPtr msg)
@@ -87,27 +105,13 @@ void MpcSolverNode::desiredFeetPositionsCallback(geometry_msgs::msg::PoseArray::
 
 void MpcSolverNode::estimatedFeetPositionsCallback(geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
-    // msg->poses[0] is the left foot
-    // msg->poses[1] is the right foot
-    if ((m_mpc_solver->get_current_stance_foot() == -1)
-        || (m_mpc_solver->get_current_stance_foot() == 1
-            && m_mpc_solver->get_current_shooting_node().data == 0)) { // if stance foot is the left foot
-        // only change the desired previous footsteps when current shooting node is 1 and the footstep changes
-        if (abs(m_desired_previous_foot_y - msg->poses[LEFT_FOOT_ID].position.y) > 10e-2
-            && m_mpc_solver->get_current_shooting_node().data == 1) {
-            m_desired_previous_foot_x = msg->poses[LEFT_FOOT_ID].position.x;
-            m_desired_previous_foot_y = msg->poses[LEFT_FOOT_ID].position.y;
-        }
-    }
-    if (m_mpc_solver->get_current_stance_foot() == 1
-        || (m_mpc_solver->get_current_stance_foot() == -1 && m_mpc_solver->get_current_shooting_node().data == 0)) {
-        if (abs(m_desired_previous_foot_y - msg->poses[RIGHT_FOOT_ID].position.y) > 10e-2
-            && m_mpc_solver->get_current_shooting_node().data == 1) {
-            m_desired_previous_foot_x = msg->poses[RIGHT_FOOT_ID].position.x;
-            m_desired_previous_foot_y = msg->poses[RIGHT_FOOT_ID].position.y;
-        }
-    }
-    m_mpc_solver->set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
+    m_current_left_foot_position.x() = msg->poses[LEFT_FOOT_ID].position.x;
+    m_current_left_foot_position.y() = msg->poses[LEFT_FOOT_ID].position.y;
+    m_current_left_foot_position.z() = msg->poses[LEFT_FOOT_ID].position.z;
+
+    m_current_right_foot_position.x() = msg->poses[RIGHT_FOOT_ID].position.x;
+    m_current_right_foot_position.y() = msg->poses[RIGHT_FOOT_ID].position.y;
+    m_current_right_foot_position.z() = msg->poses[RIGHT_FOOT_ID].position.z;
 }
 
 void MpcSolverNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) 
@@ -122,6 +126,8 @@ void MpcSolverNode::timerCallback()
     if ((m_mode != ExoMode::VariableWalk) && (m_mode != ExoMode::BalanceStand)) { 
         return;
     }
+
+    transformCurrentStateToStanceFootFrame();
 
     if (!(m_desired_footsteps)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "Waiting for input from footstep planner");
@@ -149,39 +155,46 @@ void MpcSolverNode::timerCallback()
 
 void MpcSolverNode::visualizeTrajectory()
 {
+    std::string stance_foot_frame_id;
+    if (m_current_stance_foot == 1) {
+        stance_foot_frame_id = "L_sole";
+    } else {
+        stance_foot_frame_id = "R_sole";
+    }
+
     auto com_msg = geometry_msgs::msg::PoseArray();
     com_msg.header.stamp = this->get_clock()->now();
-    com_msg.header.frame_id = "R_sole";
+    com_msg.header.frame_id = stance_foot_frame_id;
 
     auto foot_msg = geometry_msgs::msg::PoseArray();
     foot_msg.header.stamp = this->get_clock()->now();
-    foot_msg.header.frame_id = "R_sole";
+    foot_msg.header.frame_id = stance_foot_frame_id;
 
     geometry_msgs::msg::Pose pose_container;
 
     visualization_msgs::msg::Marker current_footsteps_marker;
     current_footsteps_marker.type = 8;
-    current_footsteps_marker.header.frame_id = "R_sole";
+    current_footsteps_marker.header.frame_id = stance_foot_frame_id;
     current_footsteps_marker.id = 0;
 
     visualization_msgs::msg::Marker previous_footsteps_marker;
     previous_footsteps_marker.type = 8;
-    previous_footsteps_marker.header.frame_id = "R_sole";
+    previous_footsteps_marker.header.frame_id = stance_foot_frame_id;
     previous_footsteps_marker.id = 1;
 
     geometry_msgs::msg::Point marker_container;
 
     nav_msgs::msg::Path com_path;
-    com_path.header.frame_id = "R_sole";
+    com_path.header.frame_id = stance_foot_frame_id;
 
     nav_msgs::msg::Path zmp_path;
-    zmp_path.header.frame_id = "R_sole";
+    zmp_path.header.frame_id = stance_foot_frame_id;
 
     geometry_msgs::msg::PoseStamped com_path_wrapper;
-    com_path_wrapper.header.frame_id = "R_sole";
+    com_path_wrapper.header.frame_id = stance_foot_frame_id;
 
     geometry_msgs::msg::PoseStamped zmp_path_wrapper;
-    zmp_path_wrapper.header.frame_id = "R_sole";
+    zmp_path_wrapper.header.frame_id = stance_foot_frame_id;
 
     const std::array<double, NX* ZMP_PENDULUM_ODE_N>* trajectory_pointer = m_mpc_solver->get_state_trajectory();
 
@@ -196,7 +209,7 @@ void MpcSolverNode::visualizeTrajectory()
         // Visualize the ZMP trajectory
         pose_container.position.x = (*trajectory_pointer)[(i * NX + 2)];
         pose_container.position.y = (*trajectory_pointer)[(i * NX + 5)];
-        pose_container.position.z = 0 ; // m_mpc_solver->get_com_height();
+        pose_container.position.z = 0;
         zmp_path_wrapper.pose = pose_container;
         zmp_path.poses.push_back(zmp_path_wrapper);
 
@@ -266,6 +279,75 @@ void MpcSolverNode::visualizeTrajectory()
         m_final_feet_publisher->publish(foot_msg);
         m_prev_foot_msg = foot_msg;
     }
+}
+
+void MpcSolverNode::transformCurrentStateToStanceFootFrame()
+{
+    Eigen::Quaterniond world_to_stance_foot_rotation;
+    Eigen::Vector3d world_to_stance_foot_translation;
+
+    try {
+        geometry_msgs::msg::TransformStamped tf_world_to_stance_foot;
+
+        // if the stance foot is the left foot
+        if (m_current_stance_foot == 1) {
+            tf_world_to_stance_foot  = m_tf_buffer->lookupTransform("L_sole", "world", tf2::TimePointZero);
+        } else { // if the stance foot is the right foot, or both feet
+            tf_world_to_stance_foot = m_tf_buffer->lookupTransform("R_sole", "world", tf2::TimePointZero);
+        }
+
+        world_to_stance_foot_rotation = Eigen::Quaterniond(
+            tf_world_to_stance_foot.transform.rotation.w,
+            tf_world_to_stance_foot.transform.rotation.x,
+            tf_world_to_stance_foot.transform.rotation.y,
+            tf_world_to_stance_foot.transform.rotation.z);
+
+        world_to_stance_foot_translation = Eigen::Vector3d(
+            tf_world_to_stance_foot.transform.translation.x,
+            tf_world_to_stance_foot.transform.translation.y,
+            tf_world_to_stance_foot.transform.translation.z);
+    } catch (tf2::TransformException& ex) {
+        RCLCPP_ERROR(this->get_logger(), "Could not find transform from world to stance foot: %s", ex.what());
+        return;
+    }
+
+    // Transform the current states to the stance foot frame
+    Eigen::Vector3d current_com_position = transformPoint(m_current_com_position, world_to_stance_foot_translation, world_to_stance_foot_rotation);
+    Eigen::Vector3d current_com_velocity = transformPoint(m_current_com_velocity, world_to_stance_foot_translation, world_to_stance_foot_rotation);
+    Eigen::Vector3d current_zmp = transformPoint(m_current_zmp, world_to_stance_foot_translation, world_to_stance_foot_rotation);
+    Eigen::Vector3d current_left_foot_position = transformPoint(m_current_left_foot_position, world_to_stance_foot_translation, world_to_stance_foot_rotation);
+    Eigen::Vector3d current_right_foot_position = transformPoint(m_current_right_foot_position, world_to_stance_foot_translation, world_to_stance_foot_rotation);
+
+    m_mpc_solver->set_current_com(current_com_position.x(), current_com_position.y(), current_com_velocity.x(), current_com_velocity.y());
+    m_mpc_solver->set_com_height(current_com_position.z());
+    m_mpc_solver->set_current_zmp(current_zmp.x(), current_zmp.y());
+
+    if ((m_mpc_solver->get_current_stance_foot() == -1)
+        || (m_mpc_solver->get_current_stance_foot() == 1
+            && m_mpc_solver->get_current_shooting_node().data == 0)) { // if stance foot is the left foot
+        // only change the desired previous footsteps when current shooting node is 1 and the footstep changes
+        if (abs(m_desired_previous_foot_y - current_left_foot_position.y()) > 10e-3
+            && m_mpc_solver->get_current_shooting_node().data == 1) {
+            m_desired_previous_foot_x = current_left_foot_position.x();
+            m_desired_previous_foot_y = current_left_foot_position.y();
+        }
+    }
+    if (m_mpc_solver->get_current_stance_foot() == 1
+        || (m_mpc_solver->get_current_stance_foot() == -1 && m_mpc_solver->get_current_shooting_node().data == 0)) {
+        if (abs(m_desired_previous_foot_y - current_right_foot_position.y()) > 10e-3
+            && m_mpc_solver->get_current_shooting_node().data == 1) {
+            m_desired_previous_foot_x = current_right_foot_position.x();
+            m_desired_previous_foot_y = current_right_foot_position.y();
+        }
+    }
+
+    m_mpc_solver->set_previous_foot(m_desired_previous_foot_x, m_desired_previous_foot_y);
+}
+
+Eigen::Vector3d MpcSolverNode::transformPoint(const Eigen::Vector3d& point, 
+    const Eigen::Vector3d& translation, const Eigen::Quaterniond& rotation) const
+{
+    return rotation * point + translation;
 }
 
 int main(int argc, char** argv)

@@ -7,6 +7,7 @@
 #define MARCH_MPC_SOLVER__MPC_SOLVER_HPP_
 
 #include "geometry_msgs/msg/pose_array.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "visualization_msgs/msg/marker.hpp"

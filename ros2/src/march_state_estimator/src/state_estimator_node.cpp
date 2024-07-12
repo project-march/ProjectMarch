@@ -343,7 +343,7 @@ void SensorFusionNode::publishMPCEstimation()
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = current_time;
     foot_positions_msg.header.frame_id = "world";
-    foot_positions_msg.poses = getCurrentPoseArray("R_sole", {"L_sole", "R_sole"});
+    foot_positions_msg.poses = getCurrentPoseArray("world", {"L_sole", "R_sole"});
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;

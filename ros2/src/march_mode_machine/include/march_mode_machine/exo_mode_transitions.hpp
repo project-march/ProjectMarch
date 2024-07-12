@@ -43,7 +43,7 @@ public:
             transitions = {
                 /*{CurrentMode, PossibleModes}*/
                 { ExoMode::Stand,
-                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending, ExoMode::Sit, ExoMode::SidewaysLeft, ExoMode::SidewaysRight, ExoMode::Hinge}},
+                    { ExoMode::LargeWalk, ExoMode::SmallWalk, ExoMode::BootUp, ExoMode::Error, ExoMode::VariableStep, ExoMode::VariableWalk, ExoMode::HighStep1, ExoMode::HighStep2, ExoMode::HighStep3, ExoMode::Ascending, ExoMode::Descending, ExoMode::Sit, ExoMode::SidewaysLeft, ExoMode::SidewaysRight, ExoMode::Hinge, ExoMode::BalanceStand}},
                 { ExoMode::LargeWalk, { ExoMode::Stand, ExoMode::Error} },
                 { ExoMode::SmallWalk, {ExoMode::Stand, ExoMode::Error}}, 
                 { ExoMode::BootUp, { ExoMode::Stand, ExoMode::Sit, ExoMode::BalanceStand} },

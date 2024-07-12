@@ -34,7 +34,7 @@ ik_solver:
         velocities:
           upper: [ 50.0,  119.82,  236.16,  140.04, 0.0,  50.0,  119.82,  236.16,  140.04, 0.0]     # deg/s
           lower: [-50.0, -80.10, -200.05, -100.16, 0.0, -50.0, -80.10, -200.05, -100.16, 0.0]   # deg/s
-          multiplier: 1.0
+          multiplier: 0.8
     task:
       names:
       - posture
@@ -48,7 +48,7 @@ ik_solver:
         damp_coeff: 1e-4
         weight: 1.0
       stability:
-        kp: [2.5, 2.5]
+        kp: [25.0, 25.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
         convergence_threshold: 1e-4

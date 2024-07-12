@@ -8,9 +8,12 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "march_mpc_solver/mpc_solver.hpp"
+#include "tf2_ros/transform_listener.h"
+#include "tf2/LinearMath/Quaternion.h"
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "geometry_msgs/msg/vector3_stamped.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
@@ -26,6 +29,9 @@
 
 #define LEFT_FOOT_ID 0
 #define RIGHT_FOOT_ID 1
+
+#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
 
 class MpcSolverNode : public rclcpp::Node {
 public:
@@ -44,6 +50,10 @@ private:
 
     void visualizeTrajectory();
 
+    void transformCurrentStateToStanceFootFrame();
+    Eigen::Vector3d transformPoint(const Eigen::Vector3d& point, 
+        const Eigen::Vector3d& translation, const Eigen::Quaterniond& rotation) const;
+
     std::unique_ptr<MpcSolver> m_mpc_solver;
 
     double m_desired_previous_foot_x;
@@ -56,6 +66,16 @@ private:
     geometry_msgs::msg::PoseArray m_prev_des_footsteps;
     geometry_msgs::msg::PoseArray m_prev_foot_msg;
     std::vector<geometry_msgs::msg::Pose> m_inertial_foot_positions;
+
+    Eigen::Vector3d m_current_com_position;
+    Eigen::Vector3d m_current_com_velocity;
+    Eigen::Vector3d m_current_zmp;
+    Eigen::Vector3d m_current_left_foot_position;
+    Eigen::Vector3d m_current_right_foot_position;
+    int32_t m_current_stance_foot;
+
+    std::shared_ptr<tf2_ros::TransformListener> m_tf_listener;
+    std::shared_ptr<tf2_ros::Buffer> m_tf_buffer;
 
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_final_feet_publisher;
     rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_com_trajectory_publisher;
