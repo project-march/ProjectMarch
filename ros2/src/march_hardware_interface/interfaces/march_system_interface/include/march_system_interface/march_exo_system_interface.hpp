@@ -22,7 +22,7 @@
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include "march_shared_msgs/msg/weight_stamped.hpp"
-#include "march_shared_msgs/msg/pid_values.hpp"
+#include "march_shared_msgs/msg/joint_gains.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
@@ -72,51 +72,41 @@ struct JointInfo {
     JointLimit limit;
 };
 
+// TODO: create a ROS controller that can be used to set the gains
 class GainsNode : public rclcpp::Node {
 public:
     explicit GainsNode()
         : Node("gains_node")
     {
-        m_pid_values_subscription = this->create_subscription<march_shared_msgs::msg::PidValues>(
-            "pid_values", 10, std::bind(&GainsNode::pid_values_callback, this, _1));
-
+        m_joint_gains_subscriber = this->create_subscription<march_shared_msgs::msg::JointGains>(
+            "joint_gains", 10, std::bind(&GainsNode::jointGainsCallback, this, _1));
     }
 
-    /**
-     * Callback function for the pid_values topic.
-     * @param msg The received message.
-     */
-    void pid_values_callback(const march_shared_msgs::msg::PidValues::SharedPtr msg)
-    {      
-        setPidValues(msg->joint_name, std::array<double, 3>{msg->proportional_gain, msg->integral_gain, msg->derivative_gain});
+    void jointGainsCallback(const march_shared_msgs::msg::JointGains::SharedPtr msg) {
+    setJointGains(msg->joint_name, {msg->proportional_gain, msg->integral_gain, msg->derivative_gain});
     }
 
-    /**
-     * Sets the PID values for a joint.
-     * @param joint_name The name of the joint.
-     * @param new_position_gains The new PID values.
-     */
-    void setPidValues(std::string joint_name, const std::array<double, 3>& new_position_gains)
-    {
-        bool jointFound = false;
-        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
-            if (jointInfo.name == joint_name) {
-                jointInfo.joint.setPositionPIDValues(new_position_gains);
-                jointFound = true;
-
-                // Call sendPID() after new PID values are set
-                // jointInfo.joint.sendPID();
-            }
-        }
-
-        if (!jointFound) {
+    void setJointGains(const std::string& joint_name, const std::array<double, 3>& new_position_gains) {
+        if (!updateJointGains(joint_name, new_position_gains)) {
             RCLCPP_WARN_ONCE(get_logger(), "Joint '%s' not found!", joint_name.c_str());
         }
     }
 
+    bool updateJointGains(const std::string& joint_name, const std::array<double, 3>& new_position_gains) {
+        for (march_system_interface::JointInfo& jointInfo : *joints_info_) {
+            if (jointInfo.name == joint_name) {
+                jointInfo.joint.setPositionPIDValues(new_position_gains);
+                // Commented for now, since the gains are not configured correctly yet
+                // jointInfo.joint.sendPID();
+                return true;
+            }
+        }
+        return false;
+    }
+
     std::vector<JointInfo>* joints_info_;
 private:
-    rclcpp::Subscription<march_shared_msgs::msg::PidValues>::SharedPtr m_pid_values_subscription;
+    rclcpp::Subscription<march_shared_msgs::msg::JointGains>::SharedPtr m_joint_gains_subscriber;
 };
 
 class WeightNode : public rclcpp::Node {
