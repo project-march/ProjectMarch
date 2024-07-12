@@ -41,9 +41,19 @@
     - cd $ROS_VERSION/
     - source /opt/ros/$ROS_CODENAME/local_setup.bash
     - pushd src/libraries/bluespace_ai_xsens_ros_mti_driver/lib/xspublic && make && popd
+    - PREFIX=/home/gmp/  # Change this to install GMP wherever you want.                                                  # Start of GiNaC installation
+    - curl -fLO https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz
+    - tar -xf gmp-6.2.1.tar.xz
+    - cd gmp-6.2.1
+    - ./configure --prefix=$PREFIX
+    - make all
+    - make install
+    - cp gmpxx.h $PREFIX/include
+    - export GMP_INCLUDE_DIR=$PREFIX/include
+    - export GMP_LIBRARIES=$PREFIX/lib
     - apt install -qqy libmpfr-dev libgmp-dev libboost-all-dev
     - git submodule update --remote src/libraries/ginac
-    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd
+    - mkdir -p src/libraries/ginac/build && pushd src/libraries/ginac/build && cmake .. && make && make install && popd   # End of GiNaC installation
     # - git submodule update --remote src/libraries/acados
     # - colcon build --packages-select acados
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
