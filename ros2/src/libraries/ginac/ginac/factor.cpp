@@ -2380,8 +2380,7 @@ static ex factor_multivariate(const ex& poly, const exset& syms)
 		copy_if(syms.begin(), syms.end(),
 		        inserter(syms_wox, syms_wox.end()), [x](const ex& y){ return y != x; });
 
-		factorization_ctx ctx = {.poly = poly, .x = x,
-		                         .syms_wox = syms_wox};
+		factorization_ctx ctx{poly, x, syms_wox};
 
 		// make polynomial primitive
 		poly.unitcontprim(x, ctx.unit, ctx.cont, ctx.pp);

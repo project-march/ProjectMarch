@@ -1,0 +1,14 @@
+compile
+config.guess
+config.h
+config.h.in
+config.sub
+depcomp
+install-sh
+ltmain.sh
+mdate-sh
+missing
+stamp-h1
+test-driver
+texinfo.tex
+ylwrap
