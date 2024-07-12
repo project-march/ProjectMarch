@@ -18,7 +18,8 @@ GainScheduler::GainScheduler(std::string system_type)
         RCLCPP_ERROR(rclcpp::get_logger("GainScheduler"), "System type %s is not defined.", system_type.c_str()); 
     }
 
-    m_joints_config = YAML::LoadFile(m_config_base + "/exemplary_config.yaml")["joints"];
+    m_joints_config = YAML::LoadFile(m_config_base + "/default_gains.yaml")["joints"];
+    m_scheduling_variable = "constant_gains";
 }
 
 joints_with_gains GainScheduler::getConstantGains(std::string gains_type) {
@@ -33,23 +34,23 @@ joints_with_gains GainScheduler::getConstantGains(std::string gains_type) {
     return m_joints_with_gains;
 }
 
-joints_with_gains GainScheduler::setStanceSwingLegGains(uint8_t current_stance_leg) {
+joints_with_gains GainScheduler::setStanceSwingLegGains(joints_with_gains joints_with_gains, uint8_t current_stance_leg) {
     // This is how the state estimator communicates the current stance leg
     bool left_leg_stance = current_stance_leg == 1;
     bool right_leg_stance = current_stance_leg == 2;
     bool both_legs_stance = current_stance_leg == 3;
 
-    for (size_t i = 0; i < m_joints_with_gains.size(); ++i) {
-        std::string joint_name = std::get<joint_name_index>(m_joints_with_gains[i]);
+    for (size_t i = 0; i < joints_with_gains.size(); ++i) {
+        std::string joint_name = std::get<joint_name_index>(joints_with_gains[i]);
 
         // Set the integral gain to 0.0 for the stance leg joints
         if ((left_leg_stance && joint_name.find("left") != std::string::npos) ||
             (right_leg_stance && joint_name.find("right") != std::string::npos) ||
             both_legs_stance) {
-            std::get<i_gain_index>(m_joints_with_gains[i]) = 0.0;
+            std::get<i_gain_index>(joints_with_gains[i]) = 0.0;
         }
     }
-    return m_joints_with_gains;
+    return joints_with_gains;
 }
 
 joints_with_gains GainScheduler::getJointAngleGains(const sensor_msgs::msg::JointState::SharedPtr& joint_states) {

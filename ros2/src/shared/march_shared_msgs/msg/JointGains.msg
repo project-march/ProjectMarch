@@ -1,6 +1,5 @@
 std_msgs/Header header
-
+string joint_name
 float64 proportional_gain
 float64 integral_gain
 float64 derivative_gain
-string joint_name

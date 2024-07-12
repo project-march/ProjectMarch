@@ -13,7 +13,7 @@ GainSchedulerNode::GainSchedulerNode()
                                                     
     m_gain_scheduler = GainScheduler(system_type);
 
-    m_pid_values_publisher = create_publisher<march_shared_msgs::msg::PidValues>("pid_values", 10);
+    m_joint_gains_publisher = create_publisher<march_shared_msgs::msg::JointGains>("joint_gains", 10);
 
     m_mode_subscriber = create_subscription<march_shared_msgs::msg::ExoMode>(
         "current_mode", 10, std::bind(&GainSchedulerNode::currentModeCallback, this, _1));
@@ -24,7 +24,7 @@ GainSchedulerNode::GainSchedulerNode()
     m_state_estimation_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation", 10, std::bind(&GainSchedulerNode::stateEstimationCallback, this, _1));
 
-    m_timer = create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::timerCallback, this));
+    m_timer = this->create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::publishJointsWithGains, this));
  }
 
 void GainSchedulerNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg) {
@@ -36,16 +36,35 @@ void GainSchedulerNode::jointStatesCallback(const sensor_msgs::msg::JointState::
 }
 
 void GainSchedulerNode::stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg) {
-    m_gain_scheduler.m_current_stance_leg = msg->current_stance_leg;
+    m_current_stance_leg = msg->current_stance_leg;
 }
 
-void GainSchedulerNode::publishPidValues() {   
-   
+void GainSchedulerNode::publishJointsWithGains() {   
+    joints_with_gains joints_with_gains = getJointsWithGains();
+
+    for (size_t i = 0; i < joints_with_gains.size(); ++i) {
+        march_shared_msgs::msg::JointGains joint_gains_msg;
+        joint_gains_msg.joint_name = std::get<GainScheduler::joint_name_index>(joints_with_gains[i]);
+        joint_gains_msg.proportional_gain = std::get<GainScheduler::p_gain_index>(joints_with_gains[i]);
+        joint_gains_msg.integral_gain = std::get<GainScheduler::i_gain_index>(joints_with_gains[i]);
+        joint_gains_msg.derivative_gain = std::get<GainScheduler::d_gain_index>(joints_with_gains[i]);
+        m_joint_gains_publisher->publish(joint_gains_msg);
+    }
 }   
 
+joints_with_gains GainSchedulerNode::getJointsWithGains() {
+    joints_with_gains joints_with_gains;
 
-void GainSchedulerNode::timerCallback() {    
-    publishPidValues();
+    if (m_gain_scheduler.m_scheduling_variable == "constant_gains") {
+        joints_with_gains = m_gain_scheduler.getConstantGains("constant_gains");
+    } else if (m_gain_scheduler.m_scheduling_variable == "joint_angle_gains") {
+        joints_with_gains = m_gain_scheduler.getJointAngleGains(m_latest_joint_state);
+    }
+
+    if (m_gain_scheduler.m_use_stance_swing_leg_gains) {
+        joints_with_gains = m_gain_scheduler.setStanceSwingLegGains(joints_with_gains, m_current_stance_leg);
+    }
+    return joints_with_gains;
 }
 
 

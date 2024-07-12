@@ -71,7 +71,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageState.msg"
   "msg/MotorControllerStates.msg"
   "msg/NodeJacobian.msg"
-  "msg/PidValues.msg"
+  "msg/JointGains.msg"
   "msg/PowerDistributionBoardData.msg"
   "msg/RobotState.msg"
   "msg/TorqueStamped.msg"
