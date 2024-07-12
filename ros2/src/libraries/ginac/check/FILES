@@ -1,8 +1,0 @@
-Files in this directory
-=======================
-
-exam*:  test result for specific input (like a pupil's exam)
-
-check*: test coherence of results among each other, with random input
-
-time*:  measure run-time

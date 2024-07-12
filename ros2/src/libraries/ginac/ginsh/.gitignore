@@ -1,7 +1,0 @@
-ginsh
-ginsh.1
-ginsh_parser.cpp
-ginsh_parser.hpp
-ginsh_lexer.cpp
-ginsh_op_help.h
-ginsh_fcn_help.h
