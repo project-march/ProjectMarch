@@ -40,8 +40,8 @@ def generate_launch_description():
     # Load the soft joint limits from the robot config
     joints_airgaiting_config_filepath = os.path.join(
                 get_package_share_directory('march_hardware_builder'),
-                'robots', 'Izzy',
-                'joints_airgaiting.yaml'
+                'robots',
+                'hardware_izzy.yaml'
             )
     joints_airgaiting_config = yaml.safe_load(open(joints_airgaiting_config_filepath, 'r'))
     actuator_names = [list(actuator.keys())[0] for actuator in joints_airgaiting_config['march9']['joints']]

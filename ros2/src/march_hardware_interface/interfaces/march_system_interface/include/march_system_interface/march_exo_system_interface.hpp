@@ -293,13 +293,11 @@ public:
 
 private:
     rclcpp::executors::SingleThreadedExecutor executor_; // Executor needed to subscriber
-    void pdb_read();
     bool is_joint_in_valid_state(JointInfo& jointInfo);
     bool is_joint_outside_limits(JointInfo& jointInfo);
     JointInfo build_joint_info(const hardware_interface::ComponentInfo& joint);
 
     std::unique_ptr<march::MarchRobot> load_march_hardware(const hardware_interface::HardwareInfo& info) const;
-    bool has_correct_actuation_mode(march::Joint& joint) const;
     void make_joints_operational(std::vector<march::Joint*> joints);
 
     const std::shared_ptr<rclcpp::Logger> logger_;

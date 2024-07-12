@@ -12,6 +12,8 @@
 #include <pthread.h>
 #include <soem/ethercat.h>
 
+#define PDB_CHECKSUM_MISO_OFFSET 60
+
 namespace march {
 EthercatMaster::EthercatMaster(std::string network_interface_name, int max_slave_index, int cycle_time, int slave_timeout,
     std::shared_ptr<march_logger::BaseLogger> logger)
@@ -210,13 +212,20 @@ void EthercatMaster::ethercatLoop()
 bool EthercatMaster::isCheckSumValid(uint16_t slave)
 {
     uint32_t checkSumValue = 0;
-    // NOTE: If the PDO mapping is changed, the "124" must be changed to the new length of the PDO MISO
-    for (int byte_offset = 0; byte_offset < 124; byte_offset++) {
+    int8_t miso_object_byte_offset;
+
+    // TODO: see if its possible to implement this in a more generic way, using usePDBAsSlave for example
+    if (slave == 3){
+        miso_object_byte_offset = PDB_CHECKSUM_MISO_OFFSET;
+    } else {
+        miso_object_byte_offset = ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None);
+    }
+
+    for (int byte_offset = 0; byte_offset < miso_object_byte_offset; byte_offset++) {
         checkSumValue += pdo_interface_.read8(slave, byte_offset).ui;
     }
-    checkSumValue = checkSumValue % 4294967296;
 
-    uint32_t receivedCheckSum = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
+    uint32_t receivedCheckSum = pdo_interface_.read32(slave, miso_object_byte_offset).ui;
 
     if (receivedCheckSum != checkSumValue) {
         logger_->warn(logger_->fstring("Slave %d: Checksum value is not correct. Received checksum: %d, calculated checksum: %d", slave, receivedCheckSum, checkSumValue));
@@ -225,27 +234,41 @@ bool EthercatMaster::isCheckSumValid(uint16_t slave)
     return true;
 }
 
+bool EthercatMaster::checkSlaveName(uint16_t slave, const char* name)
+{
+    uint32_t slave_name_index = 0x1008;
+    int name_length = 48;
+    char slave_name[48] = {""};
+
+    ec_SDOread(slave, slave_name_index, 0, FALSE, &name_length, &slave_name, EC_TIMEOUTRXM);
+    if (strcmp(name, slave_name) != 0) {
+        return false;
+    }
+    return true;
+}
+
 void EthercatMaster::writeChecksumMOSI()
 {
     for (int slave = 1; slave <= max_slave_index_; slave++) {
-        uint32_t checkSumValue = 0;
-        // NOTE: If the PDO mapping is changed, the "80" must be changed to the new length of the PDO MOSI
-        for (int byte_offset = 0; byte_offset < 80; byte_offset++) {
-            checkSumValue += pdo_interface_.read8mosi(slave, byte_offset).ui;
+
+        if (slave != 3) {
+            uint32_t checkSumValue = 0;
+            int8_t mosi_byte_offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::CheckSumMOSI, ODriveAxis::One);
+            for (int byte_offset = 0; byte_offset < mosi_byte_offset; byte_offset++) {
+                checkSumValue += pdo_interface_.read8mosi(slave, byte_offset).ui;
+            }
+
+            uint32_t receivedCheckSumMOSIStatus = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMOSIStatus, ODriveAxis::None)).ui;
+        
+            if (receivedCheckSumMOSIStatus != 0) {
+                logger_->warn(logger_->fstring("Slave %d: Checksum MOSI status is not zero. Received checksum: %d", slave, receivedCheckSumMOSIStatus));
+            }
+
+            bit32 write_checksum = {};
+            write_checksum.ui = checkSumValue;
+
+            pdo_interface_.write32(slave, mosi_byte_offset, write_checksum);
         }
-        checkSumValue = checkSumValue % 4294967296;
-
-        uint32_t receivedCheckSumMOSIStatus = pdo_interface_.read32(slave, ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMOSIStatus, ODriveAxis::None)).ui;
-    
-        if (receivedCheckSumMOSIStatus != 0) {
-            logger_->warn(logger_->fstring("Slave %d: Checksum MOSI status is not zero. Received checksum: %d", slave, receivedCheckSumMOSIStatus));
-        }
-
-        bit32 write_checksum = {};
-        write_checksum.ui = checkSumValue;
-
-        pdo_interface_.write32(slave, ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::CheckSumMOSI, ODriveAxis::One), write_checksum);
-
     }
 }
 
