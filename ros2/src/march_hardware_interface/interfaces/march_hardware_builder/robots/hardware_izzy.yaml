@@ -6,15 +6,15 @@ march9:
   joints:
     - left_ankle_dpf:
         motor_controller:
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 1
           useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 8000
-            maxPositionIU: 10104
-            zeroPositionIU: 9274
+            minPositionIU: 4998
+            maxPositionIU: 7076
+            zeroPositionIU: 6272
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -37,15 +37,15 @@ march9:
 
     - left_hip_aa:
         motor_controller:
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 1
           useIncrementalEncoderForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 4792
-            maxPositionIU: 6057
-            zeroPositionIU: 5702
+            minPositionIU: 6741
+            maxPositionIU: 8049
+            zeroPositionIU: 7552
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
@@ -68,7 +68,7 @@ march9:
 
     - left_hip_fe:
         motor_controller:
-          slaveIndex: 3
+          slaveIndex: 4
           axis: 0
           useIncrementalEncoderForPosition: true
           absoluteEncoder:
@@ -99,7 +99,7 @@ march9:
 
     - left_knee:
         motor_controller:
-          slaveIndex: 4
+          slaveIndex: 5
           axis: 0
           useIncrementalEncoderForPosition: true
           absoluteEncoder:
@@ -136,9 +136,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 12984
-            maxPositionIU: 15070
-            zeroPositionIU: 14258
+            minPositionIU: 8372
+            maxPositionIU: 10603
+            zeroPositionIU: 9646
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -167,9 +167,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 6523
-            maxPositionIU: 7811
-            zeroPositionIU: 7433
+            minPositionIU: 14874
+            maxPositionIU: 16168
+            zeroPositionIU: 15716
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
@@ -251,3 +251,7 @@ march9:
           torque:
             p: 0.1
             d: 0.0
+            
+  power_distribution_board:
+    slaveIndex: 3
+    byteOffset: 0

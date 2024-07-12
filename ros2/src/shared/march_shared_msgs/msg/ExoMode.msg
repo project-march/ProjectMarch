@@ -2,6 +2,7 @@
 std_msgs/Header header
 int8 mode
 string node_type
+int8 previous_mode
 
 # Constant types of modes
 int8 SIT = 0

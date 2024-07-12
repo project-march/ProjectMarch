@@ -11,11 +11,11 @@
 #include "semantic_components/semantic_component_interface.hpp"
 
 namespace march_pdb_state_broadcaster {
-using StateInerfaces = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
+using StateInterfaces = std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>;
 using HighVoltageMsg = march_shared_msgs::msg::HighVoltageState;
 
 namespace state_interface {
-    inline double get(int& index, const StateInerfaces& state_interfaces)
+    inline double get(int& index, const StateInterfaces& state_interfaces)
     {
         index++;
         return state_interfaces[index - 1].get().get_value();
@@ -28,7 +28,7 @@ private:
     std::array<float, 4> hv_currents_ {};
 
 public:
-    void update(int& index, const StateInerfaces& state_interfaces)
+    void update(int& index, const StateInterfaces& state_interfaces)
     {
         total_current_ = static_cast<float>(state_interface::get(index, state_interfaces));
         for (auto& hv_current : hv_currents_) {
@@ -56,7 +56,7 @@ private:
     std::array<bool, 2> are_lvs_ok_ {};
 
 public:
-    void update(int& index, const StateInerfaces& state_interfaces)
+    void update(int& index, const StateInterfaces& state_interfaces)
     {
         for (auto& lv_current : lv_currents_) {
             lv_current = static_cast<float>(state_interface::get(index, state_interfaces));
@@ -81,24 +81,24 @@ using BatteryMsg = march_shared_msgs::msg::BatteryState;
 
 class BatteryState {
 private:
-    float percentage_ = 0.F;
-    float voltage_ = 0.F;
-    float temperature_ = 0.F;
+    float battery_percentage_ = 0.F;
+    float battery_voltage_ = 0.F;
+    float battery_temperature_ = 0.F;
 
 public:
-    void update(int& index, const StateInerfaces& state_interfaces)
+    void update(int& index, const StateInterfaces& state_interfaces)
     {
-        percentage_ = static_cast<float>(state_interface::get(index, state_interfaces));
-        voltage_ = static_cast<float>(state_interface::get(index, state_interfaces));
-        temperature_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_percentage_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_voltage_ = static_cast<float>(state_interface::get(index, state_interfaces));
+        battery_temperature_ = static_cast<float>(state_interface::get(index, state_interfaces));
     }
 
     explicit operator BatteryMsg() const
     {
         march_shared_msgs::msg::BatteryState battery_msg {};
-        battery_msg.percentage = percentage_;
-        battery_msg.voltage = voltage_;
-        battery_msg.temperature = temperature_;
+        battery_msg.battery_percentage = battery_percentage_;
+        battery_msg.battery_voltage = battery_voltage_;
+        battery_msg.battery_temperature = battery_temperature_;
         return battery_msg;
     }
 };
@@ -108,23 +108,24 @@ using PdbMsg = march_shared_msgs::msg::PowerDistributionBoardData;
 class PdbSemanticComponent : public semantic_components::SemanticComponentInterface<PdbMsg> {
 public:
     explicit PdbSemanticComponent()
-        : SemanticComponentInterface("PDB", /*size=*/15)
+        : SemanticComponentInterface("PDB", /*size=*/16)
     {
-        interface_names_.emplace_back(name_ + "/" + "emergency_button_pressed");
         interface_names_.emplace_back(name_ + "/" + "pdb_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.total_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv1_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv2_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv3_current");
         interface_names_.emplace_back(name_ + "/" + "hv_state.hv4_current");
-        interface_names_.emplace_back(name_ + "/" + "stop_button_pressed");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv1_current");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv2_current");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv1_ok");
         interface_names_.emplace_back(name_ + "/" + "lv_state.lv2_ok");
-        interface_names_.emplace_back(name_ + "/" + "battery_state.percentage");
-        interface_names_.emplace_back(name_ + "/" + "battery_state.voltage");
-        interface_names_.emplace_back(name_ + "/" + "battery_state.temperature");
+        interface_names_.emplace_back(name_ + "/" + "battery_state.battery_percentage");
+        interface_names_.emplace_back(name_ + "/" + "battery_state.battery_voltage");
+        interface_names_.emplace_back(name_ + "/" + "battery_state.battery_temperature");
+        interface_names_.emplace_back(name_ + "/" + "pdb_temperature");
+        interface_names_.emplace_back(name_ + "/" + "emergency_button_state");
+        interface_names_.emplace_back(name_ + "/" + "checksum_miso");
     }
 
     virtual ~PdbSemanticComponent() = default;
@@ -142,12 +143,13 @@ public:
     void update()
     {
         int index = 0;
-        emergency_button_pressed_ = static_cast<bool>(state_interface::get(index, state_interfaces_));
         pdb_current_ = static_cast<float>(state_interface::get(index, state_interfaces_));
         hv_state_.update(index, state_interfaces_);
-        stop_button_state = static_cast<bool>(state_interface::get(index, state_interfaces_));
         lv_state_.update(index, state_interfaces_);
         battery_state_.update(index, state_interfaces_);
+        pdb_temperature_ = static_cast<float>(state_interface::get(index, state_interfaces_));
+        emergency_button_pressed_ = static_cast<bool>(state_interface::get(index, state_interfaces_));
+        checksum_miso_ = static_cast<uint32_t>(state_interface::get(index, state_interfaces_));
     }
 
     /**
@@ -163,19 +165,21 @@ public:
         msg.emergency_button_pressed = emergency_button_pressed_;
         msg.pdb_current = pdb_current_;
         msg.hv_state = static_cast<HighVoltageMsg>(hv_state_);
-        msg.stop_button_pressed = stop_button_state;
         msg.lv_state = static_cast<LowVoltageMsg>(lv_state_);
         msg.battery_state = static_cast<BatteryMsg>(battery_state_);
+        msg.pdb_temperature = pdb_temperature_;
+        msg.checksum_miso = checksum_miso_;
         return true;
     }
 
 private:
-    bool emergency_button_pressed_ = false;
     float pdb_current_ = 0.F;
     HighVoltageState hv_state_ {};
-    bool stop_button_state = false;
     LowVoltageState lv_state_ {};
     BatteryState battery_state_ {};
+    float pdb_temperature_ = 0.F;
+    bool emergency_button_pressed_ = false;
+    uint32_t checksum_miso_ = 0.F;
 };
 
 } // namespace march_pdb_state_broadcaster

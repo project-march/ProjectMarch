@@ -233,12 +233,12 @@ std::optional<march::PowerDistributionBoard> HardwareBuilder::createPowerDistrib
     if (!power_distribution_board_config) {
         return std::nullopt;
     }
-    
+
     HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS, "power_distribution_board");
 
     const auto slave_index = power_distribution_board_config["slaveIndex"].as<int>();
     const auto byte_offset = power_distribution_board_config["byteOffset"].as<int>();
-   
+
     return std::make_optional<march::PowerDistributionBoard>(march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }
 

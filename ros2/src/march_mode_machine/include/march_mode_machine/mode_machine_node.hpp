@@ -11,7 +11,7 @@
 #include "march_shared_msgs/srv/request_gait.hpp"
 #include "march_shared_msgs/msg/exo_mode_array.hpp"
 #include "march_shared_msgs/srv/get_exo_mode_array.hpp"
-// #include "march_shared_msgs/msg/exo_mode.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
 #include "../../march_mode_machine/include/march_mode_machine/exo_mode.hpp"
 #include "rclcpp/rclcpp.hpp"
 // #include "march_mode_machine/mode_machine_cartesian.hpp"
@@ -74,6 +74,7 @@ private:
     rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedPtr m_footstep_client;
     march_shared_msgs::srv::RequestFootsteps::Request::SharedPtr m_footstep_request;
     rclcpp::Client<march_shared_msgs::srv::RequestFootsteps>::SharedFuture m_footstep_future;
+    int m_previous_mode;
 
     ModeMachine m_mode_machine;
 };

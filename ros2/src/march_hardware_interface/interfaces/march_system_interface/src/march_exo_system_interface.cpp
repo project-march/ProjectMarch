@@ -415,6 +415,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
  */
 hardware_interface::return_type MarchExoSystemInterface::read()
 {
+    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
         // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
         throw runtime_error("Ethercat is not alive!");
@@ -423,6 +425,7 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
+    // Read out the joint data, published through the march_motor_controller_state_broadcaster
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
@@ -432,28 +435,11 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }  
 
-    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+    // Read out the pdb data, published through the march_pdb_state_broadcaster
+    // TODO: test what happens when the pdb isn't 
+    march_robot_->getPowerDistributionBoard().read(pdb_data_);
 
     return hardware_interface::return_type::OK;
-}
-
-/**
- * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
- * Raises warnings if the voltage goes below a certain value.
- * The data is published on `/march/pdb_data`.
- */
-void MarchExoSystemInterface::pdb_read()
-{
-    march_robot_->getPowerDistributionBoard().read(pdb_data_);
-    if (pdb_data_.battery_voltage != 0) {
-        if (pdb_data_.battery_voltage < 40) {
-            RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 40V, it is: %gV.", pdb_data_.battery_voltage);
-        } else if (pdb_data_.battery_voltage < 45) {
-            RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
-        }
-    }
 }
 
 /** This is the update loop of the command interface.
@@ -552,11 +538,9 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
 {
     auto pos_iterator = info.hardware_parameters.find("robot");
     if (pos_iterator == info.hardware_parameters.end()) {
-        throw std::invalid_argument("Hardware Parameter 'robot' not specified. Check under your "
-                                    "'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
+        throw std::invalid_argument("Hardware Parameter 'robot' not specified. Check under your ""'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
     }
-    string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
-        + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + "Izzy" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
+    string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder") + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
@@ -571,19 +555,6 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
     return hw_builder.createMarchRobot(/*active_joint_names=*/joint_names);
 }
 
-// TODO: remove or move to hwi_util
-bool MarchExoSystemInterface::has_correct_actuation_mode(march::Joint& joint) const
-{
-    const auto& actuation_mode = joint.getMotorController()->getActuationMode();
-    if (actuation_mode != march::ActuationMode::torque) {
-        RCLCPP_FATAL((*logger_),
-            "Actuation mode for joint %s is not torque, but is %s.\n "
-            "Check your `march_hardware_builder/robots/... .yaml`.",
-            joint.getName().c_str(), actuation_mode.toString().c_str());
-        return false;
-    }
-    return true;
-}
 
 } // namespace march_system_interface
 
