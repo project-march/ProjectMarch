@@ -215,7 +215,7 @@ bool EthercatMaster::isCheckSumValid(uint16_t slave)
     int8_t miso_object_byte_offset;
 
     // TODO: see if its possible to implement this in a more generic way, using usePDBAsSlave for example
-    if (slave == 3){
+    if (strcmp(ec_slave[slave].name, "PDBm9") == 0){
         miso_object_byte_offset = PDB_CHECKSUM_MISO_OFFSET;
     } else {
         miso_object_byte_offset = ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None);
@@ -251,7 +251,7 @@ void EthercatMaster::writeChecksumMOSI()
 {
     for (int slave = 1; slave <= max_slave_index_; slave++) {
 
-        if (slave != 3) {
+        if (strcmp(ec_slave[slave].name, "MDrive") == 0) {
             uint32_t checkSumValue = 0;
             int8_t mosi_byte_offset = ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::CheckSumMOSI, ODriveAxis::One);
             for (int byte_offset = 0; byte_offset < mosi_byte_offset; byte_offset++) {
