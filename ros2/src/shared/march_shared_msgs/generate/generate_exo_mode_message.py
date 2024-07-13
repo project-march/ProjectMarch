@@ -33,7 +33,8 @@ with open(os.path.join(output_dir, 'ExoMode.msg'), 'w') as f:
     f.write("#ExoMode.msg\n")
     f.write("std_msgs/Header header\n")
     f.write("int8 mode\n")
-    f.write("string node_type\n\n")
+    f.write("string node_type\n")
+    f.write("int8 previous_mode\n\n")
 
     f.write("# Constant types of modes\n")
     for mode in all_modes:
