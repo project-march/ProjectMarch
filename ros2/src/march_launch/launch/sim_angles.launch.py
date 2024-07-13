@@ -1,6 +1,6 @@
 """Author: MARCH."""
 import os
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python import get_package_share_directory
 from launch import LaunchDescription, condition
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition, UnlessCondition
@@ -11,7 +11,23 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description() -> LaunchDescription:
-    """Generates the launch file for the march9 node structure."""
+    """Generates the launch file for the march8 node structure."""
+    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
+    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
+    simulation = LaunchConfiguration("simulation", default="true")
+    rosbags = LaunchConfiguration("rosbags", default="true")
+    airgait = LaunchConfiguration("airgait", default="false")
+    robot = LaunchConfiguration("robot")
+    rviz = LaunchConfiguration("rviz", default="false")
+    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+
+    # TODO: Configurable urdf
+    state_estimator_clock_period = 0.025
+    urdf_location = os.path.join(
+        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
+    with open(urdf_location, 'r') as infp:
+        robot_desc = infp.read()
+
     declared_arguments = [
         DeclareLaunchArgument(
             name="rosbags",
@@ -29,7 +45,7 @@ def generate_launch_description() -> LaunchDescription:
 
         DeclareLaunchArgument(
             name="robot",
-            default_value="march9",
+            default_value="march8",
             description="The name of the yaml that will be used for retrieving info about the exo.",
         ),
 
@@ -37,47 +53,8 @@ def generate_launch_description() -> LaunchDescription:
             name="IPD_new_terminal",
             default_value="true",
             description="Whether a new terminal should be openened, allowing you to give input.",
-        ),
-
-        DeclareLaunchArgument(
-            name="simulation",
-            default_value="true",
-            description="Whether the simulation should be launched.",
-            choices=["true", "false"],
-        ),
-
-        DeclareLaunchArgument(
-            name="gaiting",
-            default_value="air",
-            description="The type of gaiting. Options: air, ground, ground-xz. Default is airgaiting.",
-        ),
-
-        DeclareLaunchArgument(
-            name="obstacle",
-            default_value="",
-            description="The obstacle that should be loaded. Default is empty. Note that it should not be airgaiting.",
-        ),
+        )
     ]
-
-    mujoco_to_load = LaunchConfiguration("model_to_load_mujoco", default="march9.xml")
-    tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
-    rosbags = LaunchConfiguration("rosbags", default="true")
-    rviz = LaunchConfiguration("rviz", default="false")
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
-    ik_test = LaunchConfiguration("ik_test", default="false")
-
-    # Simulation parameters
-    simulation = LaunchConfiguration("simulation", default="true")
-    gaiting_to_load = LaunchConfiguration("gaiting", default="air")
-    obstacle_to_load = LaunchConfiguration("obstacle", default="")
-    
-    # TODO: Configurable urdf
-    state_estimator_clock_period = 0.005
-    urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
-    with open(urdf_location, 'r') as infp:
-        robot_desc = infp.read()
-
     # region Launch Mujoco
     mujoco_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([PathJoinSubstitution([FindPackageShare("mujoco_sim"), "mujoco_sim.launch.py"])]),
@@ -88,8 +65,6 @@ def generate_launch_description() -> LaunchDescription:
                     [get_package_share_directory("march_control"), "config", "mujoco", tunings_to_load]
                 ),
             ),
-            ("gaiting_to_load", gaiting_to_load),
-            ("obstacle_to_load", obstacle_to_load),
         ],
         condition=IfCondition(simulation),
     )
@@ -108,37 +83,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch Footstep Generator
-    # footstep_generator_launch_dir = os.path.join(get_package_share_directory("footstep_generator"), "launch")
-    # n_footsteps = 20
-    # step_length = 0.2
-
-    # footstep_generator = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource([footstep_generator_launch_dir, '/footstep_generator.launch.py']),
-    #     # launch_arguments=[('n_footsteps', n_footsteps), ('step_length', step_length)],
-    # )
-    # endregion
-
-    #TODO: implement own input device M9 
-
-    # region rqt input device
-    rqt_input_device = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory("march_rqt_input_device"),
-                "launch",
-                "input_device.launch.py",
-            )
-        ),
-        launch_arguments=[
-            ("ping_safety_node", "true"),
-            ("use_sim_time", "false"),
-            ("layout", "training"),
-            ("testing", "false"),
-        ],
-    )
-    # endregion
-
     # region Launch Safety
     safety_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -152,13 +96,25 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-    # region Launch state machine
+    # region Launch mode machine
     mode_machine = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory("march_mode_machine"),
                 "launch",
                 "mode_machine.launch.py",
+            )
+        ),
+    )
+    # endregion
+
+    # region Launch gait planning
+    gait_planning = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_gait_planning"),
+                "launch",
+                "march_gait_planning_angles.launch.py",
             )
         ),
     )
@@ -178,16 +134,16 @@ def generate_launch_description() -> LaunchDescription:
     # endregion
 
     # region Launch IPD
-    # ipd_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory("march_ble_ipd"),
-    #             "launch",
-    #             "ble_ipd.launch.py",
-    #         )
-    #     ),
-    #     launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
-    # )
+    ipd_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_rqt_input_device"),
+                "launch",
+                "input_device.launch.py",
+            )
+        ),
+        launch_arguments=[("IPD_new_terminal", IPD_new_terminal)],
+    )
     #endregion
 
 
@@ -202,21 +158,6 @@ def generate_launch_description() -> LaunchDescription:
         ],
     )
     # endregion
-
-    # region Launch IK Solver
-    ik_solver_launch_dir = os.path.join(get_package_share_directory("march_ik_solver"), "launch")
-
-    ik_solver = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ik_solver_launch_dir, '/ik_solver.launch.py']),
-        launch_arguments=[
-            ("robot_description", urdf_location), 
-            ("state_estimator_timer_period", str(state_estimator_clock_period)),
-            ("test", ik_test),
-        ],
-    )
-    # endregion
-
-
 
     fuzzy_default_config = os.path.join(get_package_share_directory("fuzzy_generator"), "config", "joints.yaml")
 
@@ -239,7 +180,7 @@ def generate_launch_description() -> LaunchDescription:
             "stderr": "log",
         },
         shell=True,  # noqa: S604 This is ran as shell so that -o data parsing and regex can work correctly.
-        condition=IfCondition(rosbags or simulation),
+        condition=IfCondition(rosbags),
     )
     # endregion
 
@@ -258,30 +199,6 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[{'config_path': fuzzy_config_path}]
         ),
         Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='listener_gait_planning', 
-            name='listener_gait_planning', 
-        ),
-        Node(
-            package='gait_planning_manager', 
-            namespace='', 
-            executable='gait_planning_manager_node', 
-            name='gait_planning_manager', 
-        ),
-        Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_angles_node',
-            name='gait_planning_angles_node', 
-        ), 
-        Node(
-            package='march_gait_planning', 
-            namespace='', 
-            executable='gait_planning_cartesian_node', 
-            name='gait_planning_cartesian_node', 
-        ), 
-        Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher',
@@ -294,18 +211,24 @@ def generate_launch_description() -> LaunchDescription:
             executable='rviz2',
             name='rviz2',
             output='screen',
-            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "izzy.rviz")],
+            arguments=['-d', os.path.join(get_package_share_directory("march_launch"), "rviz", "hennie_with_koen.rviz")],
             condition=IfCondition(rviz),
         ),
+
+
         mujoco_node,
         state_estimator,
         march_control,
         mode_machine,
+        gait_planning,
         record_rosbags_action,
-        safety_node,
         imu_nodes,
-        ik_solver,
-        rqt_input_device, 
-        # ipd_node,
-        # footstep_generator, 
+        ipd_node,
+        safety_node,
+        # Node(
+        #     package='plotjuggler',
+        #     executable='plotjuggler',
+        #     name='plotjuggler',
+        # #     arguments=['--layout', get_package_share_directory('march_launch') + '/launch/joint_angles_plotjuggler.xml']
+        # ),
     ])

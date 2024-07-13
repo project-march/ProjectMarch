@@ -1,3 +1,3 @@
-float32 battery_percentage
-float32 battery_voltage
-float32 battery_temperature
+float32 percentage
+float32 voltage
+float32 temperature

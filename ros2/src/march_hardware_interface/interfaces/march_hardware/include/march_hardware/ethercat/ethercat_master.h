@@ -89,8 +89,6 @@ private:
      */
     bool sendReceivePdo();
 
-    bool checkSlaveName(uint16_t slave, const char* name);
-
     void writeChecksumMOSI();
 
     bool isCheckSumValid(uint16_t slave);

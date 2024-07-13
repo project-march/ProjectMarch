@@ -8,12 +8,14 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 
 #include "march_gait_planning/gait_planning_joint_angles_node.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "../logging_colors.hpp"
 
 using std::placeholders::_1; 
 
 int INTERPOLATING_TIMESTEPS = 400;
 
+#define COLOR_GREEN   "\033[32m"
+#define RESET   "\033[0m"
+#define COLOR_PERIWINKLE   "\033[38;5;147m"
 
 struct CSVRow {
     std::string left_hip_aa;
@@ -72,7 +74,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_active = true;  
 
-    RCLCPP_INFO(this->get_logger(), "Joint angles node " COLOR_GREEN "activated!" RESET); 
+    RCLCPP_DEBUG(this->get_logger(), "Joint angles node activated!"); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -81,9 +83,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     (void) state; 
     m_joint_angle_trajectory_publisher->on_deactivate(); 
-    m_active = false; 
-    RCLCPP_INFO(this->get_logger(), "Joint angles node " COLOR_RED "deactivated!" RESET); 
+    RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
 
+    m_active = false; 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -108,15 +110,10 @@ void GaitPlanningAnglesNode::setFirstCallbackMsg(const march_shared_msgs::msg::E
 }
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_TURQUOISE "%s" RESET " with node_type" COLOR_TURQUOISE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "Received previous mode " COLOR_TURQUOISE "%s" RESET, toString(static_cast<ExoMode>(msg->previous_mode)).c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "State of node is %s%s%s", 
-    // m_active ? COLOR_GREEN : COLOR_RED, 
-    // m_active ? "ACTIVE" : "INACTIVE", 
-    // RESET);    
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s " RESET, toString(static_cast<ExoMode>(msg->mode)).c_str()); 
     if (m_active){
         // RCLCPP_INFO(this->get_logger(), "m_active = true"); 
-        m_gait_planning.setPrevGaitType((ExoMode)msg->previous_mode); 
+        m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
         m_gait_planning.setGaitType((ExoMode)msg->mode);
         // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
         if ((ExoMode)msg->mode != ExoMode::Stand){
