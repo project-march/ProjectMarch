@@ -292,7 +292,7 @@ float ODrive::getAIEAbsolutePositionRad()
     float aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).f;
     float aie_pos_check = 0.4;
     if (abs(aie_pos) > aie_pos_check) {
-        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
+        RCLCPP_ERROR_ONCE(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
     }
     return aie_pos; 
 }
