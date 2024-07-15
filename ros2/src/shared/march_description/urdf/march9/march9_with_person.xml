@@ -116,8 +116,8 @@ See <https://www.gnu.org/licenses/>.
         <camera name="right" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="track"/>
         <site name='imu_backpack' size='0.01' pos="0 0 0"/>
 
-        <inertial pos="0.015 0 0.194" mass="3.362"
-                  fullinertia="0.1373 0.0379 0.1005 0.000 -0.0002 0.000"/>
+        <inertial pos="0.2 -0.026 0.294" mass="64.559"
+                  fullinertia="3.9893	3.7436	1.5564	0.0529	-0.3975	0.0803"/>
         <!-- <freejoint/> -->
         <geom type="mesh" mesh="backpack" />
         <geom name="backpack" type="box"
@@ -143,9 +143,9 @@ See <https://www.gnu.org/licenses/>.
 
           <body name="L_UL" pos="0.169 0.173 0">
             <inertial 
-              mass="1.520"
-              pos="0.000 -0.044 -0.408" 
-              fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 -0.0115"/>
+              mass="12.791"
+              pos="0.003 -0.140 -0.243" 
+              fullinertia="0.4303	0.3727 0.1035 0.0057 0.0317 -0.0947"/>
             <joint name="left_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="L_UpperLeg"/>
             <geom name="L_UL" fromto="0 0 0 0 -0.077 -0.478"
@@ -156,9 +156,9 @@ See <https://www.gnu.org/licenses/>.
 
             <body name="L_LL" pos="0 -0.077 -0.478">
               <inertial 
-                mass="1.895"
-                pos="-0.049 0.000 -0.269" 
-                fullinertia="0.0388 0.0427 0.0046 -0.0005 -0.0049 -0.0015"/>
+                mass="5.796"
+                pos="-0.029	-0.043 -0.278" 
+                fullinertia="0.1082 0.1066 0.0294 0.0054 -0.0138 0.0050"/>
               <joint name="left_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="L_LowerLeg"/>
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
@@ -178,9 +178,9 @@ See <https://www.gnu.org/licenses/>.
 
                 <body name="L_foot" pos="-0.093 -0.061 -0.025">
                   <inertial
-                    mass="0.589" 
-                    pos="0.139 0.001 -0.052" 
-                    fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
+                    mass="2.128" 
+                    pos="0.117 -0.002 -0.031" 
+                    fullinertia="0.0042 0.0220 0.0217 0.0003 0.0008 0.0001"/>
                   <joint name="left_ankle_ie" axis="1 0 0" range="-9 9" class="AIE_joint"/>
                   <geom type="mesh" mesh="L_Sole"/>
                   <site name="tor_L_AIE" size="0.01" pos="0 0 0"/>
@@ -209,9 +209,9 @@ See <https://www.gnu.org/licenses/>.
 
           <body name="R_UL" pos="0.169 -0.173 0">
             <inertial 
-              mass="1.520"
-              pos="0.000 0.044 -0.408"
-              fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 0.0115"/>
+              mass="12.791"
+              pos="0.003 0.140 -0.243"
+              fullinertia="0.4303 0.3727 0.1035 -0.0057 0.0317 0.0947"/>
             <joint name="right_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="R_UpperLeg"/>
             <geom name="R_UL" fromto="0 0 0 0 0.077 -0.478"
@@ -222,9 +222,9 @@ See <https://www.gnu.org/licenses/>.
             </body>
             <body name="R_LL" pos="0 0.077 -0.478">
               <inertial 
-                mass="1.895"
-                pos="-0.049 0.000 -0.269"
-                fullinertia="0.0388 0.0427 0.0046 0.0005 -0.0049 0.0015"/>
+                mass="5.796"
+                pos="-0.029	0.043	-0.278"
+                fullinertia="0.1082 0.1066 0.0294 -0.0054 -0.0138 -0.0050"/>
               <joint name="right_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="R_LowerLeg"/>
               <geom name="R_LL" fromto="0 0 0 0.000 0.016 -0.474"
@@ -244,9 +244,9 @@ See <https://www.gnu.org/licenses/>.
             
                 <body name="R_foot" pos="-0.093 0.061 -0.025">
                   <inertial 
-                    mass="0.589"
-                    pos="0.139 -0.001 -0.052" 
-                    fullinertia="0.0016 0.0077 0.0083 0.000 -0.0001 0.000"/>
+                    mass="2.128"
+                    pos="0.117	0.002	-0.031" 
+                    fullinertia="0.0042 0.0220 0.0217 -0.0003 0.0008 -0.0001"/>
                   <joint name="right_ankle_ie" axis="-1 0 0" range="-9 9" class="AIE_joint"/>
                   <geom type="mesh" mesh="R_Sole"/>
                   <site name="tor_R_AIE" size="0.01" pos="0 0 0"/>
