@@ -349,7 +349,8 @@ void GaitPlanningCartesianNode::processStand(){
 void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
-        RCLCPP_DEBUG(this->get_logger(), "Trajectory refilled!");
+        RCLCPP_INFO(this->get_logger(), "Current stance foot is: %d", m_gait_planning.getCurrentStanceFoot());
+        RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
         m_current_trajectory.erase(m_current_trajectory.begin());
