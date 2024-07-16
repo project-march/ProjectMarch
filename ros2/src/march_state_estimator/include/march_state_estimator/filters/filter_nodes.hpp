@@ -39,8 +39,12 @@ private:
   void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
   void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
 
-  inline bool jointNameBlacklisted(const std::string& joint_name) {
+  inline bool isJointBlacklisted(const std::string& joint_name) {
     return std::find(m_blacklist_joint_names.begin(), m_blacklist_joint_names.end(), joint_name) != m_blacklist_joint_names.end();
+  }
+
+  inline bool isJointLinear(const std::string& joint_name) {
+    return std::find(m_linear_joint_names.begin(), m_linear_joint_names.end(), joint_name) != m_linear_joint_names.end();
   }
 
   std::vector<MyMeanFilter::SharedPtr> m_imu_acc_mean_filters;
@@ -61,7 +65,10 @@ private:
   const unsigned int m_imu_gyro_window_size = 125;
   const unsigned int m_torque_window_size = 125;
 
+  const double JOINT_TORQUE_LINEAR_SCALE = 1e3;
+
   std::vector<std::string> m_blacklist_joint_names;
+  std::vector<std::string> m_linear_joint_names;
 };
 
 #endif  // MARCH_STATE_ESTIMATOR__FILTERS__FILTER_NODES_HPP_

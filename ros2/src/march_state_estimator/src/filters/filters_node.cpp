@@ -63,6 +63,13 @@ FiltersNode::FiltersNode()
         "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle_ie"
     };
 
+    // Get the joint names that are linear
+    // TODO: Parameterize the linear joint names
+    m_linear_joint_names = {
+        "left_hip_aa", "left_ankle_dpf", 
+        "right_hip_aa", "right_ankle_dpf"
+    };
+
     // Create the subscriptions and publishers
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "lower_imu", rclcpp::SensorDataQoS(), std::bind(&FiltersNode::imuCallback, this, std::placeholders::_1));
@@ -113,24 +120,24 @@ void FiltersNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedP
         if (!std::isnan(msg->effort[i])) {
             m_joint_effort_map[msg->name[i]] = msg->effort[i];
         }
-    }
 
-    // Filter the joint efforts
-    for (unsigned i = 0; i < NUM_CHANNELS_TORQUE; i++) {
-        // Filter the torque values
-        m_torque_mean_filters[i]->update(m_joint_effort_map[msg->name[i]], filtered_msg.effort[i]);
+        // Replace the joint velocity and effort to zero if joint is blacklisted
+        if (isJointBlacklisted(msg->name[i])) {
+            m_joint_velocity_map[msg->name[i]] = 0.0;
+            m_joint_effort_map[msg->name[i]] = 0.0;
+        }
+
+        // Scale the linear joint efforts
+        if (isJointLinear(msg->name[i])) {
+            m_joint_effort_map[msg->name[i]] = JOINT_TORQUE_LINEAR_SCALE * m_joint_effort_map[msg->name[i]];
+        }
     }
 
     // Replace the joint positions, and velocities with the filtered values
     for (unsigned i = 0; i < msg->name.size(); i++) {
         filtered_msg.position[i] = m_joint_position_map[msg->name[i]];
         filtered_msg.velocity[i] = m_joint_velocity_map[msg->name[i]];
-
-        // Replace the joint velocity and effort to zero if joint is blacklisted
-        if (jointNameBlacklisted(msg->name[i])) {
-            filtered_msg.velocity[i] = 0.0;
-            filtered_msg.effort[i] = 0.0;
-        }
+        m_torque_mean_filters[i]->update(m_joint_effort_map[msg->name[i]], filtered_msg.effort[i]);
     }
 
     m_joint_state_pub->publish(filtered_msg);
