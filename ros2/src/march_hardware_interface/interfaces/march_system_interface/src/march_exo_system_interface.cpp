@@ -77,8 +77,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
-            /*required_state_interfaces=*/
-            { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
+            /*required_state_interfaces=*/   { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
         RCLCPP_FATAL((*logger_), "Joints do not have the right interface types");
         return hardware_interface::return_type::ERROR;
@@ -99,7 +98,6 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         joints_info_.push_back(jointInfo);
-        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max effort difference.", joint.name.c_str(), jointInfo.limit.max_effort_differance);
     }
 
     status_ = hardware_interface::status::CONFIGURED;
@@ -131,9 +129,6 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
@@ -145,17 +140,13 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
                 stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "1000")) },
             /*soft_error_limit_warning_throttle_msec=*/
             stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "300")),
-            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")),
             /*stop_when_outside_hard_limits=*/stop_when_outside_hard_limits } };
 }
 
 /** Returns a vector of the StateInterfaces.
  *
- * This method is implemented so that the joint_state_broadcaster controller can publish joint positions.
- * It does this by getting a pointer to the variable that stores the positions in this class.
- *
- * In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
- * will say that the joints are in the exact positions position controller wants them to be.
+ * This method is implemented so that the joint_state_broadcaster controller can publish joint positions, velocities and torques.
+ * It does this by getting a pointer to the variables that store these three interfaces in this class.
  */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
@@ -163,11 +154,14 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
     std::vector<hardware_interface::StateInterface> state_interfaces;
     
     for (JointInfo& jointInfo : joints_info_) {
-        // Position: Couples the state controller to the value jointInfo.position through a pointer.
+        // Couple the joint state broadcaster to the correct jointInfo parameters through pointers.
         state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position));
-        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
+
+        // Placeholders for the AIE velocity and effort states are needed since these motor controller states don't exist but must be communicated over the joint states.    
+        double placeholder_velocity = 0.0;
+        double placeholder_effort = 0.0;
 
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
@@ -183,6 +177,8 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
                 auto it = joint_to_interface.find(jointInfo.name);
                 if (it != joint_to_interface.end()) {
                     state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_VELOCITY, &placeholder_velocity));
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_EFFORT, &placeholder_effort));
                 }
             }
         }
@@ -200,11 +196,8 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 /** Returns a vector of the CommandInterfaces.
  *
  * This method is implemented so that the position controller can set the calculated positions.
- * It does this by getting a pointer to the variable that stores the effort_commands in this class.
- *
- * In this case this is the same as the vector containing the position state. Meaning that the broadcaster controller
- * will say that the joints are in the exact positions position controller wants them to be.
- */
+ * It does this by getting a pointer to the variable that stores the target positions in this class.
+*/
 std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::export_command_interfaces()
 {
     RCLCPP_INFO((*logger_), "Creating export command interface.");
@@ -257,8 +250,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             RCLCPP_WARN((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
             // If no weight has been assigned, we start in position control.
-            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight
-                || isnan(jointInfo.position_weight)) {
+            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
             }               
@@ -431,7 +423,6 @@ hardware_interface::return_type MarchExoSystemInterface::read()
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
         jointInfo.torque = jointInfo.joint.getTorque();
-        jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }  
 

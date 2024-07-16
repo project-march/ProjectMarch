@@ -31,6 +31,7 @@ class GaitPlanningAngles{
     void setPrevPoint(const std::vector<double> &point); 
     void setHomeStand(const std::vector<double> &stand); 
     void setStanceFoot(const uint8_t &foot); 
+    void setHipTilt(const double &hip_tilt); 
 
     // Getters
     ExoMode getGaitType() const; 
@@ -47,6 +48,7 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getHingeGait() const;
     std::vector<double> getHomeStand() const; 
     uint8_t getStanceFoot() const; 
+    double getHipTilt() const; 
 
     std::vector<std::vector<double>> swapLeftAndRightColumns(const std::vector<std::vector<double>>& matrix) const; 
     
@@ -64,6 +66,7 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_hinge_trajectory; 
     std::vector<double> m_home_stand; 
     std::vector<double> m_prev_point; 
+    double m_hip_tilt; 
     int m_counter; 
     uint8_t m_stance_foot; 
 };

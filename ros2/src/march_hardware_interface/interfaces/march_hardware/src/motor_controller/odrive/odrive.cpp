@@ -326,8 +326,7 @@ float ODrive::getIncrementalVelocityUnchecked()
 
 float ODrive::getTorqueUnchecked()
 {
-    float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
-    return measured_torque;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
 }
 
 float ODrive::getMotorCurrent()
@@ -338,11 +337,6 @@ float ODrive::getMotorCurrent()
         RCLCPP_ERROR(rclcpp::get_logger("getMotorCurrent"), "Motor current is %f, the Current object's bits are probably scrambled like some tasty eggs.", motor_current);
     }
     return motor_current * (float)getMotorDirection();
-}
-
-float ODrive::getActualEffort()
-{
-    return getMotorCurrent();
 }
 
 uint32_t ODrive::getODriveError()
