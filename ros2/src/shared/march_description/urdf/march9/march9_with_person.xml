@@ -165,7 +165,7 @@ See <https://www.gnu.org/licenses/>.
               <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.474"
                 size="0.047" class="L_collision"/>
             <body>
-            <geom type="capsule" fromto="0 -0.1 0 0 -0.1 -0.4" size="0.05"/>
+            <geom type="capsule" fromto="0 -0.1 0 0 -0.08 -0.5" size="0.05"/>
             </body>
               <body name="L_ankle" pos="0.000 -0.016 -0.474">
                 <inertial 
@@ -188,6 +188,8 @@ See <https://www.gnu.org/licenses/>.
                   <geom name="L_foot" type="box" size="0.166 0.07 0.035"
                       pos="0.151 0 -.045"  class="L_collision"
                       friction="3.0"/>
+                <body><geom type="box" pos="0.151 0 -.045" size="0.15 0.04 0.02"/></body>
+
 </body>
                 </body>
               </body>
@@ -231,7 +233,7 @@ See <https://www.gnu.org/licenses/>.
                 size="0.047" class="R_collision"/>
               <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
               <body>
-            <geom type="capsule" fromto="0 0.1 0 0 0.1 -0.4" size="0.05"/>
+            <geom type="capsule" fromto="0 0.1 0 0 0.08 -0.5" size="0.05"/>
             </body>
               <body name="R_ankle" pos="0.000 0.016 -0.474">
                 <inertial 
@@ -254,7 +256,8 @@ See <https://www.gnu.org/licenses/>.
                   <geom name="R_foot" type="box" size="0.166 0.07 0.035"
                     pos="0.151 0 -.045" class="R_collision"
                     friction="3.0"/>
-
+                <!-- capsule foot -->
+                <body><geom type="box" pos="0.151 0 -.045" size="0.15 0.04 0.02"/></body>
                 </body>
               </body>
             </body>
