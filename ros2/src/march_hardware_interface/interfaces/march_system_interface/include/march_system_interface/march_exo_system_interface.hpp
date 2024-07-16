@@ -46,7 +46,6 @@ struct JointLimit {
     std::chrono::time_point<std::chrono::steady_clock> last_time_not_in_soft_error_limit;
     std::chrono::milliseconds msec_until_error_when_in_error_soft_limits;
     int soft_error_limit_warning_throttle_msec;
-    double max_effort_differance; // Outdated?
     bool stop_when_outside_hard_limits;
 };
 /// Contains all the needed information for the Hardware Interface for a Joint.
@@ -59,11 +58,6 @@ struct JointInfo {
     double velocity;
     double torque;
     double target_torque;
-
-    // TODO: outdated parameters that should be completely removed in the cleanup.
-    double effort_actual;
-    double effort_command;
-    double effort_command_converted;
 
     // Values for the fuzzy control on the ODrive
     double position_weight;
@@ -304,13 +298,11 @@ public:
 
 private:
     rclcpp::executors::SingleThreadedExecutor executor_; // Executor needed to subscriber
-    void pdb_read();
     bool is_joint_in_valid_state(JointInfo& jointInfo);
     bool is_joint_outside_limits(JointInfo& jointInfo);
     JointInfo build_joint_info(const hardware_interface::ComponentInfo& joint);
 
     std::unique_ptr<march::MarchRobot> load_march_hardware(const hardware_interface::HardwareInfo& info) const;
-    bool has_correct_actuation_mode(march::Joint& joint) const;
     void make_joints_operational(std::vector<march::Joint*> joints);
 
     const std::shared_ptr<rclcpp::Logger> logger_;

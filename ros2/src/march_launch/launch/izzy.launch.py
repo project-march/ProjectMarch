@@ -34,9 +34,9 @@ def generate_launch_description() -> LaunchDescription:
         ),
 
         DeclareLaunchArgument(
-            name="IPD_new_terminal",
-            default_value="true",
-            description="Whether a new terminal should be openened, allowing you to give input.",
+            name="use_bluetooth",
+            default_value="false",
+            description="Whether we need to use the bluetooth IPD node, or the regular RQT input device.",
         ),
 
         DeclareLaunchArgument(
@@ -63,7 +63,7 @@ def generate_launch_description() -> LaunchDescription:
     tunings_to_load = LaunchConfiguration("tunings_to_load", default="low_level_controller_tunings.yaml")
     rosbags = LaunchConfiguration("rosbags", default="true")
     rviz = LaunchConfiguration("rviz", default="false")
-    IPD_new_terminal = LaunchConfiguration("IPD_new_terminal")
+    use_bluetooth = LaunchConfiguration("use_bluetooth", default="false")
     ik_test = LaunchConfiguration("ik_test", default="false")
 
     # Simulation parameters
@@ -131,12 +131,20 @@ def generate_launch_description() -> LaunchDescription:
                 "input_device.launch.py",
             )
         ),
-        launch_arguments=[
-            ("ping_safety_node", "true"),
-            ("use_sim_time", "false"),
-            ("layout", "training"),
-            ("testing", "false"),
-        ],
+        condition = UnlessCondition(use_bluetooth)
+    )
+    # endregion
+
+    # region Launch IPD
+    bluetooth_input_device = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_ble_ipd"),
+                "launch",
+                "ble_ipd.launch.py",
+            )
+        ),
+        condition = IfCondition(use_bluetooth)
     )
     # endregion
 
@@ -149,6 +157,7 @@ def generate_launch_description() -> LaunchDescription:
                 "march_safety.launch.py",
             )
         ),
+        condition = UnlessCondition(use_bluetooth),
         launch_arguments=[("simulation", "true")],
     )
     # endregion
@@ -306,7 +315,7 @@ def generate_launch_description() -> LaunchDescription:
         safety_node,
         imu_nodes,
         ik_solver,
-        rqt_input_device, 
-        # ipd_node,
+        rqt_input_device,
+        bluetooth_input_device
         # footstep_generator, 
     ])

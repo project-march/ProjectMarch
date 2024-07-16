@@ -292,7 +292,7 @@ float ODrive::getAIEAbsolutePositionRad()
     float aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).f;
     float aie_pos_check = 0.4;
     if (abs(aie_pos) > aie_pos_check) {
-        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
+        RCLCPP_ERROR_ONCE(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
     }
     return aie_pos; 
 }
@@ -326,8 +326,7 @@ float ODrive::getIncrementalVelocityUnchecked()
 
 float ODrive::getTorqueUnchecked()
 {
-    float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
-    return measured_torque;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
 }
 
 float ODrive::getMotorCurrent()
@@ -338,11 +337,6 @@ float ODrive::getMotorCurrent()
         RCLCPP_ERROR(rclcpp::get_logger("getMotorCurrent"), "Motor current is %f, the Current object's bits are probably scrambled like some tasty eggs.", motor_current);
     }
     return motor_current * (float)getMotorDirection();
-}
-
-float ODrive::getActualEffort()
-{
-    return getMotorCurrent();
 }
 
 uint32_t ODrive::getODriveError()
