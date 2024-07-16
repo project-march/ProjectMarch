@@ -33,6 +33,7 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
+   m_hip_tilt(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
@@ -104,6 +105,10 @@ void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
 
 void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
     m_stance_foot = foot; 
+}
+
+void GaitPlanningAngles::setHipTilt(const double &hip_tilt){
+    m_hip_tilt = hip_tilt; 
 }
 
 ExoMode GaitPlanningAngles::getGaitType() const {
@@ -191,4 +196,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::swapLeftAndRightColumns(con
         std::swap(row[3], row[7]);
     }
     return half_step_swapped; 
+}
+
+double GaitPlanningAngles::getHipTilt() const {
+    return m_hip_tilt; 
 }

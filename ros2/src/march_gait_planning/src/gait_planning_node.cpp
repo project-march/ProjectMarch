@@ -11,8 +11,6 @@
 
 using std::placeholders::_1; 
 
-double ADDED_HIP_TILT = 0.2;
-
 
 GaitPlanningCartesianNode::GaitPlanningCartesianNode()
     : rclcpp_lifecycle::LifecycleNode("gait_planning_cartesian_node", rclcpp::NodeOptions().use_intra_process_comms(false))
@@ -48,6 +46,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     
     std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
     m_home_stand = parseHomestandYAML(homestand_path);
+    m_hip_tilt = parseHipTiltYAML(homestand_path); 
 
     if (m_home_stand.size() != 6) {
         RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
@@ -55,7 +54,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
         RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f" RESET, m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
     }
 
-    // m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
+    if (m_hip_tilt){
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of hip tilt: " COLOR_PERIWINKLE "%f" RESET, m_hip_tilt); 
+    }
 
     RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Cartesian node configured! " RESET); 
 
@@ -130,8 +131,8 @@ void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_
         if (m_current_trajectory.empty()){
             m_gait_planning.setStanceFoot(msg->next_stance_leg); 
             if (m_gait_planning.getGaitType() == ExoMode::LargeWalk || m_gait_planning.getGaitType() == ExoMode::SmallWalk){
-                RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
-            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
+            //     RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
+            // (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
             }
         }
         publishFootPositions();
@@ -343,7 +344,8 @@ void GaitPlanningCartesianNode::processStand(){
 void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
         m_current_trajectory = m_gait_planning.getTrajectory(); 
-        RCLCPP_INFO(this->get_logger(), "Current stance foot is: %d", m_gait_planning.getCurrentStanceFoot());
+        RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
+            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -453,7 +455,7 @@ void GaitPlanningCartesianNode::publishFootPositions(){
 
 void GaitPlanningCartesianNode::rotateFootPositions() {
     // Create a rotation matrix about the Y-axis.
-    Eigen::Matrix3d rotation_matrix = Eigen::AngleAxisd(ADDED_HIP_TILT, Eigen::Vector3d::UnitY()).toRotationMatrix().transpose();
+    Eigen::Matrix3d rotation_matrix = Eigen::AngleAxisd(m_hip_tilt, Eigen::Vector3d::UnitY()).toRotationMatrix().transpose();
     Eigen::Quaterniond rotation_quaternion(rotation_matrix);
 
     Eigen::Vector3d left_foot_position = Eigen::Vector3d(
@@ -471,7 +473,7 @@ void GaitPlanningCartesianNode::rotateFootPositions() {
     m_desired_footpositions_msg->right_foot_position.y = right_foot_position.y();
     m_desired_footpositions_msg->right_foot_position.z = right_foot_position.z();
 
-    m_desired_footpositions_msg->backpack_tilt = ADDED_HIP_TILT;
+    m_desired_footpositions_msg->backpack_tilt = m_hip_tilt;
 }
 
 std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::string& file_path){
@@ -491,6 +493,21 @@ std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::str
     }
 
     return values;
+}
+
+double GaitPlanningCartesianNode::parseHipTiltYAML(const std::string& file_path){
+    double hip_tilt; 
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node hip_tilt_node = config["hip_tilt"];
+        if (hip_tilt_node) {
+            hip_tilt = hip_tilt_node.as<double>();
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return hip_tilt;
 }
 
 int main(int argc, char *argv[]){
