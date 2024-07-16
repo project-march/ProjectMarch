@@ -38,23 +38,55 @@ def generate_launch_description():
     )
 
     # Load the soft joint limits from the robot config
-    joints_airgaiting_config_filepath = os.path.join(
+    exo_hardware_config_filepath = os.path.join(
                 get_package_share_directory('march_hardware_builder'),
                 'robots',
                 'hardware_izzy.yaml'
             )
-    joints_airgaiting_config = yaml.safe_load(open(joints_airgaiting_config_filepath, 'r'))
-    actuator_names = [list(actuator.keys())[0] for actuator in joints_airgaiting_config['march9']['joints']]
-    actuators_info = dict()
-    for actuator_idx, actuator in enumerate(actuator_names):
-        actuator_info = joints_airgaiting_config['march9']['joints'][actuator_idx][actuator]['motor_controller']['absoluteEncoder']
-        actuators_info[actuator] = {
-            'name': actuator,
-            'soft_lower_limit': np.rad2deg(actuator_info['lowerSoftLimitMarginRad']),
-            'soft_upper_limit': np.rad2deg(actuator_info['upperSoftLimitMarginRad']),
+
+    # Use context manager for file operations
+    with open(exo_hardware_config_filepath, 'r') as file:
+        exo_hardware_config = yaml.safe_load(file)
+
+    # Extract actuator names
+    actuator_names = [actuator for actuator in exo_hardware_config['march9']['joints']]
+
+    # Simplify actuator names extraction and actuators_info construction
+    actuators_info = {
+        actuator_name: {
+            'name': actuator_name,
+            'resolution': actuator_info['motor_controller']['absoluteEncoder']['resolution'],
+            'direction': actuator_info['motor_controller']['absoluteEncoder']['direction'],
+            'min_position_iu': actuator_info['motor_controller']['absoluteEncoder']['minPositionIU'],
+            'max_position_iu': actuator_info['motor_controller']['absoluteEncoder']['maxPositionIU'],
+            'zero_position_iu': actuator_info['motor_controller']['absoluteEncoder']['zeroPositionIU'],
+            'soft_lower_limit': np.rad2deg(actuator_info['motor_controller']['absoluteEncoder']['lowerSoftLimitMarginRad']),
+            'soft_upper_limit': np.rad2deg(actuator_info['motor_controller']['absoluteEncoder']['upperSoftLimitMarginRad']),
         }
-    soft_upper_limits = [actuators_info[actuator]['soft_upper_limit'] for actuator in actuators_info]
-    soft_lower_limits = [actuators_info[actuator]['soft_lower_limit'] for actuator in actuators_info]
+        for actuator_name, actuator_info in exo_hardware_config['march9']['joints'].items()
+    }
+
+    # Calculate cpr_absolute, direction, min_position_degrees, and max_position_degrees
+    cpr_absolute = {actuator: 2 << info['resolution'] for actuator, info in actuators_info.items()}
+    direction = {actuator: info['direction'] for actuator, info in actuators_info.items()}
+    min_position_degrees = {
+        actuator: 360 * (info['min_position_iu'] - info['zero_position_iu']) / cpr_absolute[actuator]
+        for actuator, info in actuators_info.items()
+    }
+    max_position_degrees = {
+        actuator: 360 * (info['max_position_iu'] - info['zero_position_iu']) / cpr_absolute[actuator]
+        for actuator, info in actuators_info.items()
+    }
+
+    # Adjust min and max positions based on direction
+    for actuator, dir_value in direction.items():
+        if dir_value == -1:
+            min_position_degrees[actuator], max_position_degrees[actuator] = -max_position_degrees[actuator], -min_position_degrees[actuator]
+
+    # Extract soft limits
+    soft_upper_limits = [info['soft_upper_limit'] for info in actuators_info.values()]
+    soft_lower_limits = [info['soft_lower_limit'] for info in actuators_info.values()]
+
 
     return LaunchDescription([
         Node(
@@ -66,6 +98,8 @@ def generate_launch_description():
                 ik_solver_config,
                 {'state_estimator_timer_period': state_estimator_clock_period},
                 {'actuator_names': actuator_names},
+                {'actuator_min_position_degrees': min_position_degrees},
+                {'actuator_max_position_degrees': max_position_degrees},
                 {'actuator_soft_upper_limits': soft_upper_limits},
                 {'actuator_soft_lower_limits': soft_lower_limits},
             ],
