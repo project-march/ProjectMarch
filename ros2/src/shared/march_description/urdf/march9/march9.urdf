@@ -267,7 +267,7 @@
 		<limit effort="250" lower="-0.349066" upper="2.00713" velocity="3.94"/>
 	</joint>
 	<joint name="L_UL_to_L_camera" type="fixed">
-		<origin rpy="0 0 0" xyz="0.050 0.000 -0.050"/>
+		<origin rpy="0 0.6970 0" xyz="0.0801 0.0019 -0.1424"/>
 		<parent link="L_UL"/>
 		<child link="L_camera"/>
 	</joint>
@@ -322,7 +322,7 @@
 		<limit effort="250" lower="-0.349066" upper="2.00713" velocity="3.94"/>
 	</joint>
 	<joint name="R_UL_to_R_camera" type="fixed">
-		<origin rpy="0 0 0" xyz="0.050 0.000 -0.050"/>
+		<origin rpy="0 0.6970 0" xyz="0.0801 -0.0019 -0.1424"/>
 		<parent link="R_UL"/>
 		<child link="R_camera"/>
 	</joint>
