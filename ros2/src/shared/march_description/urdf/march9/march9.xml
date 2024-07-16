@@ -127,29 +127,29 @@ See <https://www.gnu.org/licenses/>.
         <site name="imu_torso" size='0.01' pos="0.2 0 0.4"/>
 
         <!--  LEFT LEG -->
-        <body name="L_hip" pos="0.021 0.092 0.028">
+        <body name="L_hip" pos="0.021 0.081 0.028">
           <inertial 
             mass="3.684"
             pos="0.130 0.174 0.000" 
             fullinertia="0.0146 0.0255 0.0321 -0.0106 0.0000 0.000"/>
           <joint name="left_hip_aa" axis="-1 0 0" range="-20 10" class="HAA_joint" />
           <geom type="mesh" mesh="L_Hip" />
-          <geom name="L_hip" fromto="0 0 0 0.169 0.173 0"
+          <geom name="L_hip" fromto="0 0 0 0.169 0.176 0"
             size="0.032" class="L_collision"/>
           <site name="tor_L_HAA" size="0.01" pos="0 0 0"/>
 
-          <body name="L_UL" pos="0.169 0.173 0">
+          <body name="L_UL" pos="0.169 0.176 0">
             <inertial 
               mass="1.520"
               pos="0.000 -0.044 -0.408" 
               fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 -0.0115"/>
             <joint name="left_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="L_UpperLeg"/>
-            <geom name="L_UL" fromto="0 0 0 0 -0.077 -0.478"
+            <geom name="L_UL" fromto="0 0 0 0 -0.077 -0.463"
               size="0.069" class="L_collision"/>
             <site name="tor_L_HFE" size="0.01" pos="0 0 0"/>
 
-            <body name="L_LL" pos="0 -0.077 -0.478">
+            <body name="L_LL" pos="0 -0.077 -0.463">
               <inertial 
                 mass="1.895"
                 pos="-0.049 0.000 -0.269" 
@@ -157,10 +157,10 @@ See <https://www.gnu.org/licenses/>.
               <joint name="left_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="L_LowerLeg"/>
               <site name="tor_L_KFE" size="0.01" pos="0 0 0"/>
-              <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.474"
+              <geom name="L_LL" fromto="0 0 0 0.000 -0.016 -0.469"
                 size="0.047" class="L_collision"/>
 
-              <body name="L_ankle" pos="0.000 -0.016 -0.474">
+              <body name="L_ankle" pos="0.000 -0.016 -0.469">
                 <inertial 
                   mass="0.683"
                   pos="0.070 0.043 -0.002" 
@@ -189,40 +189,40 @@ See <https://www.gnu.org/licenses/>.
         </body>
 
         <!--  RIGHT LEG -->
-        <body name="R_hip" pos="0.021 -0.092 0.028">
+        <body name="R_hip" pos="0.021 -0.081 0.028">
           <inertial 
               mass="3.684"
               pos="0.130 -0.174 0.000" 
               fullinertia="0.0146 0.0255 0.0321 0.0106 0.000 0.000"/>
           <joint name="right_hip_aa" axis="1 0 0" range="-20 10" class="HAA_joint" />
           <geom type="mesh" mesh="R_Hip" />
-          <geom name="R_hip" fromto="0 0 0 0.169 -0.173 0"
+          <geom name="R_hip" fromto="0 0 0 0.169 -0.176 0"
             size="0.032" class="R_collision"/>
           <site name="tor_R_HAA" size="0.01" pos="0 0 0"/>
 
-          <body name="R_UL" pos="0.169 -0.173 0">
+          <body name="R_UL" pos="0.169 -0.176 0">
             <inertial 
               mass="1.520"
               pos="0.000 0.044 -0.408"
               fullinertia="0.0816 0.0831 0.0069 0.0000 0.0000 0.0115"/>
             <joint name="right_hip_fe" axis="0 -1 0" range="-20 115" class="rotational_joint" />
             <geom type="mesh" mesh="R_UpperLeg"/>
-            <geom name="R_UL" fromto="0 0 0 0 0.077 -0.478"
+            <geom name="R_UL" fromto="0 0 0 0 0.077 -0.463"
               size="0.069" class="R_collision"/>
             <site name="tor_R_HFE" size="0.01" pos="0 0 0"/>
 
-            <body name="R_LL" pos="0 0.077 -0.478">
+            <body name="R_LL" pos="0 0.077 -0.463">
               <inertial 
                 mass="1.895"
                 pos="-0.049 0.000 -0.269"
                 fullinertia="0.0388 0.0427 0.0046 0.0005 -0.0049 0.0015"/>
               <joint name="right_knee" axis="0 1 0" range="0 125" class="rotational_joint" />
               <geom type="mesh" mesh="R_LowerLeg"/>
-              <geom name="R_LL" fromto="0 0 0 0.000 0.016 -0.474"
+              <geom name="R_LL" fromto="0 0 0 0.000 0.016 -0.469"
                 size="0.047" class="R_collision"/>
               <site name="tor_R_KFE" size="0.01" pos="0 0 0"/>
 
-              <body name="R_ankle" pos="0.000 0.016 -0.474">
+              <body name="R_ankle" pos="0.000 0.016 -0.469">
                 <inertial 
                   mass="0.683"
                   pos="0.070 -0.043 -0.002"
