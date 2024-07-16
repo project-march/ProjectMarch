@@ -40,6 +40,7 @@ ik_solver:
       - posture
       - motion
       - stability
+      - tilt
       motion:
         kp: [25.0, 25.0, 10.0, 25.0, 25.0, 10.0]
         kd: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
@@ -55,7 +56,14 @@ ik_solver:
         damp_coeff: 1e-4
         weight: 1.0
       posture:
-        kp: [4.0, 4.0]
+        kp: [25.0, 25.0]
+        kd: [0.0, 0.0]
+        ki: [0.0, 0.0]
+        convergence_threshold: 1e-3   # rad
+        damp_coeff: 1e-4
+        weight: 1.0
+      tilt:
+        kp: [25.0, 25.0]
         kd: [0.0, 0.0]
         ki: [0.0, 0.0]
         convergence_threshold: 1e-3   # rad
