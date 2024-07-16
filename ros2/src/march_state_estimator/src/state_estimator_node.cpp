@@ -164,18 +164,15 @@ void SensorFusionNode::timerCallback()
 
     // Update and estimate current state
     m_sensor_fusion->updateImuState(m_imu);
+    m_sensor_fusion->updateDynamicsState();
     if (m_is_simulation) {
-        m_sensor_fusion->updateDynamicsState();
         // m_sensor_fusion->updateKalmanFilter();
     }
     broadcastTransformToTf2();
 
     // publishFeetHeight();
     // publishMPCEstimation();
-    if (m_is_simulation) {
         publishGroundReactionForce();
-    }
-    
     publishStateEstimation();
     publishClock();
 }
@@ -254,14 +251,12 @@ void SensorFusionNode::publishStateEstimation()
     state_estimation_msg.joint_state.header.stamp = this->now();
     state_estimation_msg.joint_state.header.frame_id = m_joint_state->header.frame_id;
 
-    if (m_is_simulation) {
-        state_estimation_msg.dynamical_joint_state.header.stamp = current_time;
-        state_estimation_msg.header.frame_id = "joint_link";
-        state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
-        state_estimation_msg.dynamical_joint_state.joint_acceleration = m_sensor_fusion->getJointAcceleration(m_joint_state->name);
-        state_estimation_msg.dynamical_joint_state.effort_dynamical = m_sensor_fusion->getJointDynamicalTorques(m_joint_state->name);
-        state_estimation_msg.dynamical_joint_state.effort_external = m_sensor_fusion->getJointExternalTorques(m_joint_state->name);
-    }
+    state_estimation_msg.dynamical_joint_state.header.stamp = current_time;
+    state_estimation_msg.header.frame_id = "joint_link";
+    state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
+    state_estimation_msg.dynamical_joint_state.joint_acceleration = m_sensor_fusion->getJointAcceleration(m_joint_state->name);
+    state_estimation_msg.dynamical_joint_state.effort_dynamical = m_sensor_fusion->getJointDynamicalTorques(m_joint_state->name);
+    state_estimation_msg.dynamical_joint_state.effort_external = m_sensor_fusion->getJointExternalTorques(m_joint_state->name);
 
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
