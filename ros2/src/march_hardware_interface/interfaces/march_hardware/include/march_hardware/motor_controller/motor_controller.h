@@ -85,13 +85,10 @@ public:
     bool hasTorqueSensor() const;
     std::unique_ptr<TorqueSensor>& getTorqueSensor();
 
-    // Getters for specific information about the state of the motor and its
-    // controller
-    // virtual float getTorque() = 0;
+    // Getters for specific information about the state of the motor and its controller
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
-    virtual float getActualEffort() = 0;
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
