@@ -214,7 +214,6 @@ bool EthercatMaster::isCheckSumValid(uint16_t slave)
     uint32_t checkSumValue = 0;
     int8_t miso_object_byte_offset;
 
-    // TODO: see if its possible to implement this in a more generic way, using usePDBAsSlave for example
     if (strcmp(ec_slave[slave].name, "PDBm9") == 0){
         miso_object_byte_offset = PDB_CHECKSUM_MISO_OFFSET;
     } else {

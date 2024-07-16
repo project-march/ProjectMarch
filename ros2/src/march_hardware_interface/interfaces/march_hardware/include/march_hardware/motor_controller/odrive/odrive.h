@@ -59,13 +59,10 @@ public:
     // Get a full description of the state of the ODrive
     std::unique_ptr<MotorControllerState> getState() override;
 
-    // Getters for specific information about the state of the motor and the
-    // ODrive
-    //    float getTorque() override;
+    // Getters for specific information about the state of the motor and the MDrive
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
-    float getActualEffort() override;
     float getMotorTemperature();
     float getOdriveTemperature();
 
