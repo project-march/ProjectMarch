@@ -36,6 +36,8 @@ void MotionTask::computeCurrentTaskJacobian()
         jacobian_joint.setZero();
 
         pinocchio::computeJointJacobian(m_model, *m_data, *m_current_joint_positions_ptr, m_joint_indices[i], jacobian_joint);
+
+        // Take only the linear part (XYZ) of the Jacobian
         m_jacobian.block(EUCLIDEAN_SIZE * i, 0, EUCLIDEAN_SIZE, m_model.nv) = jacobian_joint.topRows(EUCLIDEAN_SIZE);
     }
 }

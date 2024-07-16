@@ -13,6 +13,7 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 using std::placeholders::_1; 
 
 int INTERPOLATING_TIMESTEPS = 400;
+double ADDED_HIP_TILT = 0.2;
 
 
 struct CSVRow {
@@ -45,7 +46,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_current_state_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1));
     m_exo_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));
     m_joint_angle_trajectory_publisher = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
-
+    
     m_gait_planning.setGaitType(ExoMode::BootUp);
     m_gait_planning.setPrevGaitType(ExoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
@@ -188,6 +189,8 @@ void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
     // TODO: Whenever this function is called, we first need to check whether the trajectory is empty BEFORE IT IS FILLED WITH THE NEW GAIT, and empty it before filling it with the new gait.
     if (!m_current_trajectory.empty()){
         m_joints_msg.data = m_current_trajectory[counter];
+        m_joints_msg.data[2] += ADDED_HIP_TILT;
+        m_joints_msg.data[6] += ADDED_HIP_TILT;
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         RCLCPP_DEBUG(this->get_logger(), "Gait message published!"); 
     }
@@ -199,7 +202,7 @@ std::vector<double> GaitPlanningAnglesNode::remapKinematicChaintoAlphabetical(co
 }
 
 void GaitPlanningAnglesNode::processHomeStandGait(){
-    if (m_gait_planning.getCounter() == 0){ // When switching to homestand
+    if (m_gait_planning.getCounter() == 0){ // When switching to homestand from bootup
         m_incremental_steps_to_home_stand.clear();
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
@@ -214,12 +217,16 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
-        } 
+        }
+        temp_moving_to_home_stand[2] += m_gait_planning.getCounter() * (ADDED_HIP_TILT / INTERPOLATING_TIMESTEPS);
+        temp_moving_to_home_stand[6] += m_gait_planning.getCounter() * (ADDED_HIP_TILT / INTERPOLATING_TIMESTEPS);
 
     }
     else{
         RCLCPP_DEBUG(this->get_logger(), "Home stand position reached!");
         temp_moving_to_home_stand = m_gait_planning.getHomeStand();
+        temp_moving_to_home_stand[2] += ADDED_HIP_TILT;
+        temp_moving_to_home_stand[6] += ADDED_HIP_TILT;
         m_initial_point.clear();
     }
 
@@ -229,9 +236,9 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
     m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
 }
 
-void GaitPlanningAnglesNode::processBootUpToStandGait(){
+void GaitPlanningAnglesNode::processBootUpToStandGait(){ //TODO: Rename this function to processBootUpToSitGait
     if (m_gait_planning.getCounter() == 0){ 
-        // This is the moment we go from BootUp to Stand, so we obtain the current joint angles and calculate the increments to reach the sit position
+        // This is the moment we go from BootUp to Sit, so we obtain the current joint angles and calculate the increments to reach the sit position
         m_incremental_steps_to_home_stand.clear();
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getSitToStandGait()[0][i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
@@ -247,10 +254,15 @@ void GaitPlanningAnglesNode::processBootUpToStandGait(){
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
         }
+        RCLCPP_INFO(this->get_logger(), "Gradually adding hip tilt");
+        temp_moving_to_home_stand[2] += m_gait_planning.getCounter() * (ADDED_HIP_TILT / INTERPOLATING_TIMESTEPS);
+        temp_moving_to_home_stand[6] += m_gait_planning.getCounter() * (ADDED_HIP_TILT / INTERPOLATING_TIMESTEPS);
     }
     else{
         RCLCPP_DEBUG(this->get_logger(), "Sit Position reached");
         temp_moving_to_home_stand = m_gait_planning.getSitToStandGait()[0];
+        temp_moving_to_home_stand[2] += ADDED_HIP_TILT;
+        temp_moving_to_home_stand[6] += ADDED_HIP_TILT;
         m_initial_point.clear();
     }
 
@@ -268,6 +280,8 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
         // RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_joints_msg.data = m_gait_planning.getHomeStand(); 
+        m_joints_msg.data[2] += ADDED_HIP_TILT;
+        m_joints_msg.data[6] += ADDED_HIP_TILT;
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand());
         m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 

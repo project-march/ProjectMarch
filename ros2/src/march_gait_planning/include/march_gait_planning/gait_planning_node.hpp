@@ -65,7 +65,8 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     void MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
-    void publishFootPositions(); 
+    void publishFootPositions();
+    void rotateFootPositions();
     void processStand(); 
     void finishCurrentTrajectory(); 
     void publishIncrements(); 

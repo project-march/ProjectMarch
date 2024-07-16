@@ -54,6 +54,7 @@ IKSolverNode::IKSolverNode()
     m_ik_solver_estimated_foot_positions_pub = this->create_publisher<march_shared_msgs::msg::IksFootPositions>(
         "ik_solver/buffer/output", 10);
     m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
+    // m_desired_joint_positions_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>("iks_desired_joint_angles", 10);
 
     RCLCPP_INFO(this->get_logger(), "IKSolverNode has been started.");
 }
@@ -101,6 +102,12 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
     std::unordered_map<std::string, Eigen::VectorXd> desired_tasks;
     // TODO: Magic number will be replaced in new ik_solver_buffer with ZMP.
     Eigen::VectorXd desired_motion = Eigen::VectorXd::Zero(6);
+
+    // Create a rotation matrix about the Y-axis.
+    Eigen::Matrix3d rotation_matrix = Eigen::AngleAxisd(
+        msg->backpack_tilt, Eigen::Vector3d::UnitY()).toRotationMatrix().transpose();
+    Eigen::Quaterniond rotation_quaternion(rotation_matrix);
+
     desired_motion << 
         msg->left_foot_position.x, msg->left_foot_position.y, msg->left_foot_position.z,
         msg->right_foot_position.x, msg->right_foot_position.y, msg->right_foot_position.z;
@@ -115,6 +122,7 @@ void IKSolverNode::iksFootPositionsCallback(const march_shared_msgs::msg::IksFoo
 
     m_ik_solver->updateDesiredTasks(desired_tasks);
     m_ik_solver->updateCurrentJointState(m_actual_joint_positions, m_actual_joint_velocities);
+    m_ik_solver->updateWorldToBaseOrientation(rotation_quaternion.w(), rotation_quaternion.x(), rotation_quaternion.y(), rotation_quaternion.z());
     solveInverseKinematics(msg->header.stamp);
 }
 
@@ -310,14 +318,14 @@ void IKSolverNode::configureIKSolverParameters()
     
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         auto it = std::find(actuator_names.begin(), actuator_names.end(), m_joint_names[i]);
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
+        RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
         if (it != actuator_names.end()) {
             std::size_t actuator_id = std::distance(actuator_names.begin(), it);
             joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_soft_upper_limits[actuator_id];
             joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_soft_lower_limits[actuator_id];
         }
-        RCLCPP_INFO(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
+        RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
     }
 
@@ -333,7 +341,7 @@ void IKSolverNode::configureIKSolverParameters()
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         if (joint_active[i]) {
             active_joint_names.push_back(m_joint_names[i]);
-            RCLCPP_INFO(this->get_logger(), "Active joint: %s", m_joint_names[i].c_str());
+            RCLCPP_DEBUG(this->get_logger(), "Active joint: %s", m_joint_names[i].c_str());
         }
     }
 
@@ -359,7 +367,7 @@ void IKSolverNode::configureIKSolverParameters()
     RCLCPP_INFO(this->get_logger(), "Alphabetical joint indices:");
     for (const auto& joint_index : m_alphabetical_joint_indices) {
         m_joint_names_alphabetical.push_back(m_joint_names[joint_index]);
-        RCLCPP_INFO(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
+        RCLCPP_DEBUG(this->get_logger(), "Joint index: %d, Joint name: %s", joint_index, m_joint_names[joint_index].c_str());
     }
 
     // Configure Pinocchio model.
