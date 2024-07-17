@@ -48,40 +48,40 @@ def generate_launch_description():
     with open(exo_hardware_config_filepath, 'r') as file:
         exo_hardware_config = yaml.safe_load(file)
 
-    # Extract actuator names
-    actuator_names = [list(actuator.keys())[0] for actuator in exo_hardware_config['march9']['joints']]
-    actuators_info = dict()
+    # Extract joint names
+    joint_names = [list(joint.keys())[0] for joint in exo_hardware_config['march9']['joints']]
+    joints_info = dict()
     
-    for actuator_idx, actuator in enumerate(actuator_names):
-        actuator_info = exo_hardware_config['march9']['joints'][actuator_idx][actuator]['motor_controller']['absoluteEncoder']
-        actuators_info[actuator] = {
-            'name': actuator,
-            'cpr_absolute': 1 << actuator_info['resolution'],
-            'direction': actuator_info['direction'],
-            'min_position_iu': actuator_info['minPositionIU'],
-            'max_position_iu': actuator_info['maxPositionIU'],
-            'zero_position_iu': actuator_info['zeroPositionIU'],
-            'lower_error_soft_limit': np.rad2deg(actuator_info['lowerErrorSoftLimitMarginRad']),
-            'upper_error_soft_limit': np.rad2deg(actuator_info['upperErrorSoftLimitMarginRad']),
+    for joint_idx, joint in enumerate(joint_names):
+        joint_info = exo_hardware_config['march9']['joints'][joint_idx][joint]['motor_controller']['absoluteEncoder']
+        joints_info[joint] = {
+            'name': joint,
+            'cpr_absolute': 1 << joint_info['resolution'],
+            'direction': joint_info['direction'],
+            'min_position_iu': joint_info['minPositionIU'],
+            'max_position_iu': joint_info['maxPositionIU'],
+            'zero_position_iu': joint_info['zeroPositionIU'],
+            'lower_error_soft_limit': np.rad2deg(joint_info['lowerErrorSoftLimitMarginRad']),
+            'upper_error_soft_limit': np.rad2deg(joint_info['upperErrorSoftLimitMarginRad']),
         }
     
     min_position_degrees = [
-        360 * (actuators_info[actuator]['min_position_iu'] - actuators_info[actuator]['zero_position_iu'])/actuators_info[actuator]['cpr_absolute']
-        for actuator, info in actuators_info.items()
+        360 * (joints_info[joint]['min_position_iu'] - joints_info[joint]['zero_position_iu'])/joints_info[joint]['cpr_absolute']
+        for joint, info in joints_info.items()
     ]
     
     max_position_degrees = [
-        360 * (actuators_info[actuator]['max_position_iu'] - actuators_info[actuator]['zero_position_iu'])/actuators_info[actuator]['cpr_absolute']
-        for actuator, info in actuators_info.items()
+        360 * (joints_info[joint]['max_position_iu'] - joints_info[joint]['zero_position_iu'])/joints_info[joint]['cpr_absolute']
+        for joint, info in joints_info.items()
     ]
 
-    for actuator in actuators_info:
-        if actuators_info[actuator]['direction'] == -1:
-            actuators_info[actuator]['min_position_iu'] = -actuators_info[actuator]['max_position_iu']
-            actuators_info[actuator]['max_position_iu'] = -actuators_info[actuator]['min_position_iu']
+    for joint in joints_info:
+        if joints_info[joint]['direction'] == -1:
+            joints_info[joint]['min_position_iu'] = -joints_info[joint]['max_position_iu']
+            joints_info[joint]['max_position_iu'] = -joints_info[joint]['min_position_iu']
     
-    lower_error_soft_limits = [actuators_info[actuator]['lower_error_soft_limit'] for actuator in actuators_info]
-    upper_error_soft_limits = [actuators_info[actuator]['upper_error_soft_limit'] for actuator in actuators_info]
+    lower_error_soft_limits = [joints_info[joint]['lower_error_soft_limit'] for joint in joints_info]
+    upper_error_soft_limits = [joints_info[joint]['upper_error_soft_limit'] for joint in joints_info]
 
     return LaunchDescription([
         Node(
@@ -92,11 +92,11 @@ def generate_launch_description():
             parameters=[
                 ik_solver_config,
                 {'state_estimator_timer_period': state_estimator_clock_period},
-                {'actuator_names': actuator_names},
-                {'actuator_min_position_degrees': min_position_degrees},
-                {'actuator_max_position_degrees': max_position_degrees},
-                {'actuator_lower_error_soft_limits': lower_error_soft_limits},
-                {'actuator_upper_error_soft_limits': upper_error_soft_limits},
+                {'joint_names': joint_names},
+                {'joint_min_position_degrees': min_position_degrees},
+                {'joint_max_position_degrees': max_position_degrees},
+                {'joint_lower_error_soft_limits': lower_error_soft_limits},
+                {'joint_upper_error_soft_limits': upper_error_soft_limits},
             ],
         ),
         Node(
