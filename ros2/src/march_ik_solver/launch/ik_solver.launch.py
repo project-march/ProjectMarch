@@ -49,42 +49,39 @@ def generate_launch_description():
         exo_hardware_config = yaml.safe_load(file)
 
     # Extract actuator names
-    actuator_names = [actuator for actuator in exo_hardware_config['march9']['joints']]
-
-    # Simplify actuator names extraction and actuators_info construction
-    actuators_info = {
-        actuator_name: {
-            'name': actuator_name,
-            'resolution': actuator_info['motor_controller']['absoluteEncoder']['resolution'],
-            'direction': actuator_info['motor_controller']['absoluteEncoder']['direction'],
-            'min_position_iu': actuator_info['motor_controller']['absoluteEncoder']['minPositionIU'],
-            'max_position_iu': actuator_info['motor_controller']['absoluteEncoder']['maxPositionIU'],
-            'zero_position_iu': actuator_info['motor_controller']['absoluteEncoder']['zeroPositionIU'],
-            'lower_error_soft_limit': actuator_info['motor_controller']['absoluteEncoder']['lowerErrorSoftLimitMarginRad'],
-            'upper_error_soft_limit': actuator_info['motor_controller']['absoluteEncoder']['upperErrorSoftLimitMarginRad'],
+    actuator_names = [list(actuator.keys())[0] for actuator in exo_hardware_config['march9']['joints']]
+    actuators_info = dict()
+    
+    for actuator_idx, actuator in enumerate(actuator_names):
+        actuator_info = exo_hardware_config['march9']['joints'][actuator_idx][actuator]['motor_controller']['absoluteEncoder']
+        actuators_info[actuator] = {
+            'name': actuator,
+            'cpr_absolute': 1 << actuator_info['resolution'],
+            'direction': actuator_info['direction'],
+            'min_position_iu': actuator_info['minPositionIU'],
+            'max_position_iu': actuator_info['maxPositionIU'],
+            'zero_position_iu': actuator_info['zeroPositionIU'],
+            'lower_error_soft_limit': np.rad2deg(actuator_info['lowerErrorSoftLimitMarginRad']),
+            'upper_error_soft_limit': np.rad2deg(actuator_info['upperErrorSoftLimitMarginRad']),
         }
-        for actuator_name, actuator_info in exo_hardware_config['march9']['joints'].items()
-    }
-
-    # Calculate cpr_absolute, direction, min_position_degrees, and max_position_degrees
-    cpr_absolute = {actuator: 2 << info['resolution'] for actuator, info in actuators_info.items()}
-    direction = {actuator: info['direction'] for actuator, info in actuators_info.items()}
-    min_position_degrees = {
-        actuator: 360 * (info['min_position_iu'] - info['zero_position_iu']) / cpr_absolute[actuator]
+    
+    min_position_degrees = [
+        360 * (actuators_info[actuator]['min_position_iu'] - actuators_info[actuator]['zero_position_iu'])/actuators_info[actuator]['cpr_absolute']
         for actuator, info in actuators_info.items()
-    }
-    max_position_degrees = {
-        actuator: 360 * (info['max_position_iu'] - info['zero_position_iu']) / cpr_absolute[actuator]
+    ]
+    
+    max_position_degrees = [
+        360 * (actuators_info[actuator]['max_position_iu'] - actuators_info[actuator]['zero_position_iu'])/actuators_info[actuator]['cpr_absolute']
         for actuator, info in actuators_info.items()
-    }
+    ]
 
-    # Adjust min and max positions based on direction
-    for actuator, dir_value in direction.items():
-        if dir_value == -1:
-            min_position_degrees[actuator], max_position_degrees[actuator] = -max_position_degrees[actuator], -min_position_degrees[actuator]
-
-    lower_error_soft_limits = [info['lower_error_soft_limit'] for info in actuators_info.values()]
-    upper_error_soft_limits = [info['upper_error_soft_limit'] for info in actuators_info.values()]
+    for actuator in actuators_info:
+        if actuators_info[actuator]['direction'] == -1:
+            actuators_info[actuator]['min_position_iu'] = -actuators_info[actuator]['max_position_iu']
+            actuators_info[actuator]['max_position_iu'] = -actuators_info[actuator]['min_position_iu']
+    
+    lower_error_soft_limits = [actuators_info[actuator]['lower_error_soft_limit'] for actuator in actuators_info]
+    upper_error_soft_limits = [actuators_info[actuator]['upper_error_soft_limit'] for actuator in actuators_info]
 
     return LaunchDescription([
         Node(

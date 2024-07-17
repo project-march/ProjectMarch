@@ -293,8 +293,8 @@ void IKSolverNode::configureIKSolverParameters()
 
     // Soft limits for the joint positions.
     declare_parameter("actuator_names", std::vector<std::string>());
-    declare_parameter("min_position_degrees", std::vector<double>());
-    declare_parameter("max_position_degrees", std::vector<double>());
+    declare_parameter("actuator_min_position_degrees", std::vector<double>());
+    declare_parameter("actuator_max_position_degrees", std::vector<double>());
     declare_parameter("actuator_lower_error_soft_limits", std::vector<double>());
     declare_parameter("actuator_upper_error_soft_limits", std::vector<double>());
 
@@ -315,15 +315,15 @@ void IKSolverNode::configureIKSolverParameters()
 
     // Overwrite the hard limits for actuators
     std::vector<std::string> actuator_names = get_parameter("actuator_names").as_string_array();
-    std::vector<double> min_position_degrees = get_parameter("min_position_degrees").as_double_array();
-    std::vector<double> max_position_degrees = get_parameter("max_position_degrees").as_double_array();
+    std::vector<double> min_position_degrees = get_parameter("actuator_min_position_degrees").as_double_array();
+    std::vector<double> max_position_degrees = get_parameter("actuator_max_position_degrees").as_double_array();
 
     for (unsigned long int i = 0; i < actuator_names.size(); i++) {
         auto it = std::find(m_joint_names.begin(), m_joint_names.end(), actuator_names[i]);
         if (it != m_joint_names.end()) {
             std::size_t joint_id = std::distance(m_joint_names.begin(), it);
-            joint_position_limits_upper[joint_id] = min_position_degrees[i];
-            joint_position_limits_lower[joint_id] = max_position_degrees[i];
+            joint_position_limits_upper[joint_id] = max_position_degrees[i];
+            joint_position_limits_lower[joint_id] = min_position_degrees[i];
         }
     }
 
@@ -337,8 +337,8 @@ void IKSolverNode::configureIKSolverParameters()
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
         if (it != actuator_names.end()) {
             std::size_t actuator_id = std::distance(actuator_names.begin(), it);
-            joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_lower_error_soft_limits[actuator_id];
-            joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_upper_error_soft_limits[actuator_id];
+            joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_upper_error_soft_limits[actuator_id];
+            joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_lower_error_soft_limits[actuator_id];
         }
         RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
