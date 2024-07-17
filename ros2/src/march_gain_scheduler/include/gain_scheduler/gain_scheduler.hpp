@@ -21,6 +21,8 @@ class GainScheduler {
         joints_with_gains getConstantGains(std::string gains_type);
         joints_with_gains setStanceSwingLegGains(joints_with_gains joints_with_gains, uint8_t current_stance_leg);
         void setGaitConfiguration(const ExoMode new_gait_type);
+        float calculateInertia(const sensor_msgs::msg::JointState::SharedPtr& joint_states, const std::string& joint_name);
+        float calculateComDistance(const sensor_msgs::msg::JointState::SharedPtr& joint_states, const std::string& joint_name);
         std::string m_scheduling_variable;
         bool m_use_stance_swing_leg_gains;
 

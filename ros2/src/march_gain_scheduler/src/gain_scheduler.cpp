@@ -69,6 +69,33 @@ joints_with_gains GainScheduler::getJointAngleGains(const sensor_msgs::msg::Join
     return m_joints_with_gains;
 }
 
+float GainScheduler::calculateComDistance(const sensor_msgs::msg::JointState::SharedPtr& joint_states, const std::string& joint_name) {
+    float com_distance = 0.0;
+
+    return com_distance;
+}
+
+float GainScheduler::calculateInertia(const sensor_msgs::msg::JointState::SharedPtr& joint_states, const std::string& joint_name) {
+    double inertia = 0.0;
+    double mass_ankle = 0.2;
+    double mass_knee = 0.5;
+    double dist_com_ankle = 0.1; 
+    double dist_com_knee = 0.2;
+    if (joint_name == "ankle") {
+        inertia = mass_ankle * dist_com_ankle * dist_com_ankle;
+    } 
+    else if (joint_name == "lk") {
+        inertia = mass_knee* dist_com_knee * dist_com_knee + mass_ankle*(joint_states->position[0]);
+    }
+    //  else if (joint_name = "hip") {
+    //     inertia = 0.0;
+    // } else {
+    //     inertia = 0.0;
+    //     RCLCPP_WARN(rclcpp::get_logger("GainScheduler"), "Joint %s is not defined.", joint_name.c_str());
+    // }
+    return inertia;
+}
+
 std::tuple<std::string, double, double, double> GainScheduler::getSpecificJointAngleGains(const std::string& joint_name, double joint_angle) {
     const auto& joint_angle_ranges_config = m_joints_config[joint_name]["joint_angle_ranges"];
     const auto number_of_ranges = joint_angle_ranges_config.size();
