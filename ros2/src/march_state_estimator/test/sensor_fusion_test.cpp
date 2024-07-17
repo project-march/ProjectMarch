@@ -42,7 +42,7 @@ protected:
     void setupRotationalTestSetup()
     {
         std::string yaml_filename = "robot_definition-rotational_test_setup.yaml";
-        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/rotational_test_setup.urdf";
+        std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/models/rotational_test_setup.urdf";
         m_robot_description = std::make_shared<RobotDescription>(yaml_filename);
         m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
 

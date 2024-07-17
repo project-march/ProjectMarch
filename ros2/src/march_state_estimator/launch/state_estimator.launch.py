@@ -20,8 +20,7 @@ def generate_launch_description():
     robot_description = 'robot_definition-izzy.yaml'
     urdf_file = os.path.join(
         get_package_share_directory('march_description'),
-        'urdf',
-        'march9',
+        'models',
         'march9.urdf'
     )
     force_stance_threshold = 65.0

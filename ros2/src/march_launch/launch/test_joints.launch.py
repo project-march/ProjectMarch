@@ -27,7 +27,7 @@ def generate_launch_description() -> LaunchDescription:
 
     # TODO: Configurable urdf
     urdf_location = os.path.join(
-        get_package_share_directory("march_description"), "urdf", "march9", "march9.urdf")
+        get_package_share_directory("march_description"), "models", "march9.urdf")
     with open(urdf_location, 'r') as infp:
         robot_desc = infp.read()
 

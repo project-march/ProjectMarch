@@ -20,7 +20,7 @@ Task::Task()
     m_current_world_to_base_orientation = Eigen::Matrix3d::Identity();
 
     // Load URDF model
-    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
+    std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/models/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_model);
     m_data = std::make_unique<pinocchio::Data>(m_model);
     m_task_n = m_model.nv;

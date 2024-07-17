@@ -16,7 +16,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/backpack.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/backpack.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -24,7 +24,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/backpack.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/backpack.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -36,7 +36,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Hip.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Hip.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -44,7 +44,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Hip.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Hip.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -58,7 +58,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_UpperLeg.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_UpperLeg.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -66,7 +66,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_UpperLeg.stl"  scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_UpperLeg.stl"  scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -78,7 +78,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_LowerLeg.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_LowerLeg.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -86,7 +86,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_LowerLeg.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_LowerLeg.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -98,7 +98,7 @@
       </inertial>
       <visual>
          <geometry>
-            <mesh filename="package://march_description/meshes/march9/L_Ankle.stl" scale="1 1 1"/>
+            <mesh filename="package://march_description/models/assets/L_Ankle.stl" scale="1 1 1"/>
          </geometry>
          <material name="">
             <color rgba="0.8 0.8 0.8 1.0"/>
@@ -106,7 +106,7 @@
       </visual>
       <collision>
          <geometry>
-            <mesh filename="package://march_description/meshes/march9/L_Ankle.stl" scale="1 1 1"/>
+            <mesh filename="package://march_description/models/assets/L_Ankle.stl" scale="1 1 1"/>
          </geometry>
       </collision>
 	</link>
@@ -118,7 +118,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Sole.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Sole.stl" scale="1 1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -126,7 +126,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Sole.stl" scale="1 1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Sole.stl" scale="1 1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -144,7 +144,7 @@
       </inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Hip.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Hip.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -152,7 +152,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Hip.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Hip.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -166,7 +166,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_UpperLeg.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_UpperLeg.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -174,7 +174,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_UpperLeg.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_UpperLeg.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -186,7 +186,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_LowerLeg.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_LowerLeg.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -194,7 +194,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_LowerLeg.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_LowerLeg.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>
@@ -206,7 +206,7 @@
       </inertial>
       <visual>
          <geometry>
-            <mesh filename="package://march_description/meshes/march9/L_Ankle.stl" scale="1 -1 1"/>
+            <mesh filename="package://march_description/models/assets/L_Ankle.stl" scale="1 -1 1"/>
          </geometry>
          <material name="">
             <color rgba="0.8 0.8 0.8 1.0"/>
@@ -214,7 +214,7 @@
       </visual>
       <collision>
          <geometry>
-            <mesh filename="package://march_description/meshes/march9/L_Ankle.stl" scale="1 -1 1"/>
+            <mesh filename="package://march_description/models/assets/L_Ankle.stl" scale="1 -1 1"/>
          </geometry>
       </collision>
    	</link>
@@ -226,7 +226,7 @@
 		</inertial>
 		<visual>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Sole.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Sole.stl" scale="1 -1 1"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.8 0.8 0.8 1.0"/>
@@ -234,7 +234,7 @@
 		</visual>
 		<collision>
 			<geometry>
-				<mesh filename="package://march_description/meshes/march9/L_Sole.stl" scale="1 -1 1"/>
+				<mesh filename="package://march_description/models/assets/L_Sole.stl" scale="1 -1 1"/>
 			</geometry>
 		</collision>
 	</link>

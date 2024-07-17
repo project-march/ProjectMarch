@@ -52,7 +52,7 @@ class XMLModel:
         return config_str
     
     def build_assets(self) -> str:
-        mesh_dir = get_package_share_directory('march_description') + '/urdf/march9/obj-files'
+        mesh_dir = get_package_share_directory('march_description') + '/models/assets'
         return f"""
             <asset>
                 <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>

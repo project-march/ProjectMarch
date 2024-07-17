@@ -16,7 +16,7 @@ See <https://www.gnu.org/licenses/>.
 -->
 
 <mujoco model="exoskeleton">
-  <compiler meshdir="obj-files" angle="degree" autolimits="true"/>
+  <compiler meshdir="assets" angle="degree" autolimits="true"/>
   <size nuser_actuator='1' nuser_sensor='1' nuser_geom='1'/>
   <option timestep='0.01' iterations='50' solver='PGS' gravity='0 0 -9.81'>
     <!-- <0flag energy="enable"/> -->
