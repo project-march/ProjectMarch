@@ -37,7 +37,7 @@ def generate_launch_description():
         condition=IfCondition(test),
     )
 
-    # Load the soft joint limits from the robot config
+    # Load the exo hardware configuration file
     exo_hardware_config_filepath = os.path.join(
                 get_package_share_directory('march_hardware_builder'),
                 'robots',
@@ -60,8 +60,8 @@ def generate_launch_description():
             'min_position_iu': actuator_info['motor_controller']['absoluteEncoder']['minPositionIU'],
             'max_position_iu': actuator_info['motor_controller']['absoluteEncoder']['maxPositionIU'],
             'zero_position_iu': actuator_info['motor_controller']['absoluteEncoder']['zeroPositionIU'],
-            'soft_lower_limit': np.rad2deg(actuator_info['motor_controller']['absoluteEncoder']['lowerSoftLimitMarginRad']),
-            'soft_upper_limit': np.rad2deg(actuator_info['motor_controller']['absoluteEncoder']['upperSoftLimitMarginRad']),
+            'lower_error_soft_limit': actuator_info['motor_controller']['absoluteEncoder']['lowerErrorSoftLimitMarginRad'],
+            'upper_error_soft_limit': actuator_info['motor_controller']['absoluteEncoder']['upperErrorSoftLimitMarginRad'],
         }
         for actuator_name, actuator_info in exo_hardware_config['march9']['joints'].items()
     }
@@ -83,10 +83,8 @@ def generate_launch_description():
         if dir_value == -1:
             min_position_degrees[actuator], max_position_degrees[actuator] = -max_position_degrees[actuator], -min_position_degrees[actuator]
 
-    # Extract soft limits
-    soft_upper_limits = [info['soft_upper_limit'] for info in actuators_info.values()]
-    soft_lower_limits = [info['soft_lower_limit'] for info in actuators_info.values()]
-
+    lower_error_soft_limits = [info['lower_error_soft_limit'] for info in actuators_info.values()]
+    upper_error_soft_limits = [info['upper_error_soft_limit'] for info in actuators_info.values()]
 
     return LaunchDescription([
         Node(
@@ -100,8 +98,8 @@ def generate_launch_description():
                 {'actuator_names': actuator_names},
                 {'actuator_min_position_degrees': min_position_degrees},
                 {'actuator_max_position_degrees': max_position_degrees},
-                {'actuator_soft_upper_limits': soft_upper_limits},
-                {'actuator_soft_lower_limits': soft_lower_limits},
+                {'actuator_lower_error_soft_limits': lower_error_soft_limits},
+                {'actuator_upper_error_soft_limits': upper_error_soft_limits},
             ],
         ),
         Node(
