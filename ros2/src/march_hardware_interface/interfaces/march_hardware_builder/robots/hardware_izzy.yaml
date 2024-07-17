@@ -172,7 +172,7 @@ march9:
             p: 0.0
             d: 0.0
 
-    - left_ankle_ie:
+    - right_ankle_ie:
         motor_controller:
           slaveIndex: 1
           axis: 1
@@ -180,7 +180,7 @@ march9:
             resolution: 14
             direction: 1
             minPositionIU: 5651
-            maxPositionIU: 6377
+            maxPositionIU: 6477
             zeroPositionIU: 6064
             lowerErrorSoftLimitMarginRad: 0.0
             upperErrorSoftLimitMarginRad: 0.0

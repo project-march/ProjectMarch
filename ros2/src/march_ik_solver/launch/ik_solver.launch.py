@@ -50,8 +50,9 @@ def generate_launch_description():
 
     # Extract joint names
     joint_names = [list(joint.keys())[0] for joint in exo_hardware_config['march9']['joints']]
-    joints_info = dict()
-    
+ 
+    # Calculate joint information and store it in a dictionary
+    joints_info = {}
     for joint_idx, joint in enumerate(joint_names):
         joint_info = exo_hardware_config['march9']['joints'][joint_idx][joint]['motor_controller']['absoluteEncoder']
         joints_info[joint] = {
@@ -65,23 +66,26 @@ def generate_launch_description():
             'upper_error_soft_limit': np.rad2deg(joint_info['upperErrorSoftLimitMarginRad']),
         }
     
+    # Calculate min and max position degrees for each joint
     min_position_degrees = [
-        360 * (joints_info[joint]['min_position_iu'] - joints_info[joint]['zero_position_iu'])/joints_info[joint]['cpr_absolute']
-        for joint, info in joints_info.items()
+        360 * (info['min_position_iu'] - info['zero_position_iu']) / info['cpr_absolute']
+        for info in joints_info.values()
     ]
     
     max_position_degrees = [
-        360 * (joints_info[joint]['max_position_iu'] - joints_info[joint]['zero_position_iu'])/joints_info[joint]['cpr_absolute']
-        for joint, info in joints_info.items()
+        360 * (info['max_position_iu'] - info['zero_position_iu']) / info['cpr_absolute']
+        for info in joints_info.values()
     ]
-
-    for joint in joints_info:
-        if joints_info[joint]['direction'] == -1:
-            joints_info[joint]['min_position_iu'] = -joints_info[joint]['max_position_iu']
-            joints_info[joint]['max_position_iu'] = -joints_info[joint]['min_position_iu']
     
-    lower_error_soft_limits = [joints_info[joint]['lower_error_soft_limit'] for joint in joints_info]
-    upper_error_soft_limits = [joints_info[joint]['upper_error_soft_limit'] for joint in joints_info]
+    # Adjust positions based on direction
+    for i, info in enumerate(joints_info.values()):
+        if info['direction'] == -1:
+            min_position_degrees[i], max_position_degrees[i] = -max_position_degrees[i], -min_position_degrees[i]
+    
+    # Extract lower and upper error soft limits
+    lower_error_soft_limits = [info['lower_error_soft_limit'] for info in joints_info.values()]
+    upper_error_soft_limits = [info['upper_error_soft_limit'] for info in joints_info.values()]
+    
 
     return LaunchDescription([
         Node(
