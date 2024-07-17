@@ -266,23 +266,80 @@ def high_step_up(bezier_points, array_size):
 
     return final_points_high_step_up
 
-def high_step_down(high_step_up_dataset):
-    x_stance = high_step_up_dataset[:,0][::-1]*-1
-    z_stance = high_step_up_dataset[:,1][::-1]
-    x_swing = high_step_up_dataset[:,2][::-1]*-1
-    z_swing = high_step_up_dataset[:,3][::-1]
+def high_step_down(bezier_points, array_size):
+    pause_time = int(array_size/6)
+    step_length = bezier_points.max(axis=0)[0]
+    ending_angle = np.arcsin((step_length)/LEG_LENGTH)
+    phi_first_step = np.linspace(0, ending_angle, int(array_size))
 
-    step_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
+    #----------------------------- Part 1, first step ----------------------------------------------
 
-    # plt.plot(x_swing, z_swing)
-    # plt.plot(x_stance, z_stance, color="orange")
-    # plt.show()
+    step_down_bezier_points = bezier_points.copy()
+    step_down_bezier_points[:, 1] = 0.3*step_down_bezier_points[:, 1]
 
-    return step_down
+    curve_first_step = bezier.Curve(step_down_bezier_points.T, degree=3)
+    number_of_time_points_first_step = np.linspace(0, 1.0, int(array_size))
+    points_first_step= curve_first_step.evaluate_multi(number_of_time_points_first_step)
+
+    x_swing_first_step = points_first_step[0,:]
+    z_swing_first_step = points_first_step[1,:]
+
+    x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size))
+
+    x_swing_first_step = np.append(x_swing_first_step, x_swing_first_step[-1]*np.ones(int(pause_time/2)))
+    z_swing_first_step = np.append(z_swing_first_step, z_swing_first_step[-1]*np.ones(int(pause_time/2)))
+
+    x_stance_first_step = -LEG_LENGTH*np.sin(phi_first_step)
+    z_stance_first_step = LEG_LENGTH - LEG_LENGTH*np.cos(phi_first_step)
+
+    x_stance_first_step = np.append(x_stance_first_step, x_stance_first_step[-1]*np.ones(int(pause_time/2)))
+    z_stance_first_step = np.append(z_stance_first_step, z_stance_first_step[-1]*np.ones(int(pause_time/2)))
+
+    # ----------------------------- Part 2, "Falling off the box" ----------------------------------------------
+    x_right_fall = np.linspace(x_swing_first_step[-1], x_swing_first_step[-1]/2, int(array_size/3))
+    z_right_fall = z_swing_first_step[-1] * np.ones(int(array_size/3))
+
+    x_left_fall = np.linspace(x_stance_first_step[-1], -step_length, int(array_size/3))
+    z_left_fall = np.linspace(z_stance_first_step[-1], bezier_points[3,1], int(array_size/3))
+
+    x_right_fall = np.append(x_right_fall, x_right_fall[-1]*np.ones(pause_time))
+    z_right_fall = np.append(z_right_fall, z_right_fall[-1]*np.ones(pause_time))
+    x_left_fall = np.append(x_left_fall, x_left_fall[-1]*np.ones(pause_time))
+    z_left_fall = np.append(z_left_fall, z_left_fall[-1]*np.ones(pause_time))
+
+    # ---------------------------- Part 3, step close -----------------------------------------------------------
+    x_right_step_close = np.linspace(x_right_fall[-1], 0, int(array_size))
+    z_right_step_close = np.linspace(z_right_fall[-1], 0, int(array_size))
+
+    step_close_bezier_points = bezier_points.copy()
+    step_close_bezier_points[:, 0] = step_close_bezier_points[:, 0][::-1]*-1
+    step_close_bezier_points[:, 1] = step_close_bezier_points[:, 1][::-1]
+
+    print(step_close_bezier_points)
+
+    curve_step_close = bezier.Curve(step_close_bezier_points.T, degree=3)
+    points_step_close= curve_step_close.evaluate_multi(number_of_time_points_first_step)
+
+    x_left_step_close = points_step_close[0,:]
+    z_left_step_close = points_step_close[1,:]
+
+    x_left_step_close, z_left_step_close = make_evenly_spaced_points(x_left_step_close, z_left_step_close, int(array_size))
+
+    x_right_high_step = np.concatenate([x_swing_first_step, x_right_fall, x_right_step_close])
+    z_right_high_step = np.concatenate([z_swing_first_step, z_right_fall, z_right_step_close])
+    x_left_high_step = np.concatenate([x_stance_first_step, x_left_fall, x_left_step_close])
+    z_left_high_step = np.concatenate([z_stance_first_step, z_left_fall, z_left_step_close])
+    final_points_high_step = np.column_stack((x_right_high_step, z_right_high_step, x_left_high_step, z_left_high_step))
+
+    plt.plot(x_right_high_step, z_right_high_step)
+    plt.plot(x_left_high_step, z_left_high_step, color="orange")
+    plt.show()
+    
+    return final_points_high_step
 
 def create_high_step_csv(bezier_points: np.array, gait_type: str, array_size: int):
     step_up = high_step_up(bezier_points, array_size)
-    step_down = high_step_down(step_up)
+    step_down = high_step_down(bezier_points, array_size)
 
     if gait_type == "high_step_1":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', step_up, delimiter=',')
