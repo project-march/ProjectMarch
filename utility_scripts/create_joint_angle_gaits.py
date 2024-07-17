@@ -90,7 +90,7 @@ def sideways(time_points):
     ladpf_h, lhaa_h, lhfe_h, lkfe_h, radpf_h, rhaa_h, rhfe_h, rkfe_h = homestand
 
     ladpf1 = np.full(time_points, homestand[0])
-    lhaa1 = np.linspace(lhaa_h, -0.2, time_points)
+    lhaa1 = np.linspace(lhaa_h, -0.25, time_points)
     lhfe1 = np.full(time_points, lhfe_h)
     lkfe1 = np.linspace(lkfe_h, lkfe_h, time_points)
 
@@ -99,14 +99,14 @@ def sideways(time_points):
     adpf_swing_down = np.linspace(0.20, radpf_h, int(time_points/2))
     radpf1 = np.append(adpf_swing_up, adpf_swing_down)
     
-    rhaa1 = np.linspace(rhaa_h, -0.2, time_points)
+    rhaa1 = np.linspace(rhaa_h, -0.25, time_points)
 
-    hfe_swing_up = np.linspace(rhfe_h, 0.4, int(time_points/2))
-    hfe_swing_down = np.linspace(0.4, rhfe_h, int(time_points/2))
+    hfe_swing_up = np.linspace(rhfe_h, 0.45, int(time_points/2))
+    hfe_swing_down = np.linspace(0.45, rhfe_h, int(time_points/2))
     rhfe1 = np.append(hfe_swing_up, hfe_swing_down)
 
-    kfe_swing_up = np.linspace(rkfe_h, 0.8, int(time_points/2))
-    kfe_swing_down = np.linspace(0.8, rkfe_h, int(time_points/2)) 
+    kfe_swing_up = np.linspace(rkfe_h, 0.9, int(time_points/2))
+    kfe_swing_down = np.linspace(0.9, rkfe_h, int(time_points/2)) 
     rkfe1 = np.append(kfe_swing_up, kfe_swing_down)
     
     right_open = np.column_stack([
@@ -118,13 +118,13 @@ def sideways(time_points):
 
     # Right stance leg
     radpf = np.full(time_points, radpf_h)
-    rhaa = np.linspace(-0.2, rhaa_h, time_points)
+    rhaa = np.linspace(-0.25, rhaa_h, time_points)
     rhfe = np.full(time_points, rhfe_h)
     rkfe = np.full(time_points, rkfe_h)
 
 
     ladpf = np.append(adpf_swing_up, adpf_swing_down)
-    lhaa =  np.linspace(-0.2, lhaa_h, time_points)
+    lhaa =  np.linspace(-0.25, lhaa_h, time_points)
     lhfe = np.append(hfe_swing_up, hfe_swing_down)
     lkfe = np.append(kfe_swing_up, kfe_swing_down)
 
