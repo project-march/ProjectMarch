@@ -104,6 +104,7 @@ def create_bezier_csv(points, array_size, gait_type):
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
     step_close_points[1:, 1] = step_close_points[1:, 1] + vertical_offset
+    step_close_points[2, 0] = step_close_points[2, 0] * 0.3
     curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
     number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size))
     points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
@@ -118,10 +119,10 @@ def create_bezier_csv(points, array_size, gait_type):
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
 
-    # plt.plot(x_swing_step_close, z_swing_step_close)
-    # plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
-    # plt.title("Step Close")
-    # plt.show()
+    plt.plot(x_swing_step_close, z_swing_step_close)
+    plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
+    plt.title("Step Close")
+    plt.show()
 
     if gait_type == "large_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
