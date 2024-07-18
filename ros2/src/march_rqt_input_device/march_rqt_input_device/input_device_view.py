@@ -43,7 +43,7 @@ class InputDeviceView(QWidget):
         with open(self._layout_file) as file:
             json_content = json.loads(file.read())
 
-        self._button_layout = [[self.create_button(**button_dict) for button_dict in row if button_dict['name'] in ['SmallWalk', 'Stand', 'Sit', 'SidewaysLeft']] for row in json_content]
+        self._button_layout = [[self.create_button(**button_dict) for button_dict in row if button_dict['name'] not in ['BootUp', 'Error']] for row in json_content]
 
         # Create the qt_layout from the button layout.
         qt_layout = self.create_layout(self._button_layout)
