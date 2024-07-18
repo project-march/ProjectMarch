@@ -62,8 +62,8 @@ def generate_launch_description():
             'min_position_iu': joint_info['minPositionIU'],
             'max_position_iu': joint_info['maxPositionIU'],
             'zero_position_iu': joint_info['zeroPositionIU'],
-            'lower_error_soft_limit': np.rad2deg(joint_info['lowerErrorSoftLimitMarginRad']),
-            'upper_error_soft_limit': np.rad2deg(joint_info['upperErrorSoftLimitMarginRad']),
+            'lower_soft_limit': np.rad2deg(joint_info['lowerSoftLimitMarginRad']),
+            'upper_soft_limit': np.rad2deg(joint_info['upperSoftLimitMarginRad']),
         }
     
     # Calculate min and max position degrees for each joint
@@ -83,8 +83,8 @@ def generate_launch_description():
             min_position_degrees[i], max_position_degrees[i] = -max_position_degrees[i], -min_position_degrees[i]
     
     # Extract lower and upper error soft limits
-    lower_error_soft_limits = [info['lower_error_soft_limit'] for info in joints_info.values()]
-    upper_error_soft_limits = [info['upper_error_soft_limit'] for info in joints_info.values()]
+    lower_soft_limits = [info['lower_soft_limit'] for info in joints_info.values()]
+    upper_soft_limits = [info['upper_soft_limit'] for info in joints_info.values()]
     
 
     return LaunchDescription([
@@ -99,8 +99,8 @@ def generate_launch_description():
                 {'joint_names': joint_names},
                 {'joint_min_position_degrees': min_position_degrees},
                 {'joint_max_position_degrees': max_position_degrees},
-                {'joint_lower_error_soft_limits': lower_error_soft_limits},
-                {'joint_upper_error_soft_limits': upper_error_soft_limits},
+                {'joint_lower_soft_limits': lower_soft_limits},
+                {'joint_upper_soft_limits': upper_soft_limits},
             ],
         ),
         Node(

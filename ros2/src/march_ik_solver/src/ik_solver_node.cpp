@@ -293,8 +293,8 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("joint_names", std::vector<std::string>());
     declare_parameter("joint_min_position_degrees", std::vector<double>());
     declare_parameter("joint_max_position_degrees", std::vector<double>());
-    declare_parameter("joint_lower_error_soft_limits", std::vector<double>());
-    declare_parameter("joint_upper_error_soft_limits", std::vector<double>());
+    declare_parameter("joint_lower_soft_limits", std::vector<double>());
+    declare_parameter("joint_upper_soft_limits", std::vector<double>());
 
     m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -326,8 +326,8 @@ void IKSolverNode::configureIKSolverParameters()
     }
 
     // Apply soft limits to the joint position limits.
-    std::vector<double> joint_lower_error_soft_limits = get_parameter("joint_lower_error_soft_limits").as_double_array();
-    std::vector<double> joint_upper_error_soft_limits = get_parameter("joint_upper_error_soft_limits").as_double_array();
+    std::vector<double> joint_lower_soft_limits = get_parameter("joint_lower_soft_limits").as_double_array();
+    std::vector<double> joint_upper_soft_limits = get_parameter("joint_upper_soft_limits").as_double_array();
     
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
         auto it = std::find(joint_names.begin(), joint_names.end(), m_joint_names[i]);
@@ -335,8 +335,8 @@ void IKSolverNode::configureIKSolverParameters()
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
         if (it != joint_names.end()) {
             std::size_t joint_id = std::distance(joint_names.begin(), it);
-            joint_position_limits_upper[i] = joint_position_limits_upper[i] - joint_upper_error_soft_limits[joint_id];
-            joint_position_limits_lower[i] = joint_position_limits_lower[i] + joint_lower_error_soft_limits[joint_id];
+            joint_position_limits_upper[i] = joint_position_limits_upper[i] - joint_upper_soft_limits[joint_id];
+            joint_position_limits_lower[i] = joint_position_limits_lower[i] + joint_lower_soft_limits[joint_id];
         }
         RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
