@@ -1,0 +1,257 @@
+# For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
+march9:
+  network_interface_name: enp2s0f0
+  ecatCycleTime: 5
+  ecatSlaveTimeout: 200
+  joints:
+    - left_ankle_dpf:
+        motor_controller:
+          slaveIndex: 5
+          axis: 1
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 4968
+            maxPositionIU: 7049
+            zeroPositionIU: 6139
+            lowerSoftLimitMarginRad: 0.00349066
+            upperSoftLimitMarginRad: 0.00349066
+            lowerErrorSoftLimitMarginRad: 0.00174533
+            upperErrorSoftLimitMarginRad: 0.00174533
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 215.797
+            direction: 1
+          torqueSensor:
+            maxTorque: 150.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 20.0
+            i: 0.0
+            d: 0.4
+          torque:
+            p: 0.0
+            d: 0.0
+
+    - left_hip_aa:
+        motor_controller:
+          slaveIndex: 4
+          axis: 1
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 6856
+            maxPositionIU: 8150
+            zeroPositionIU: 7695
+            lowerSoftLimitMarginRad: 0.02617994
+            upperSoftLimitMarginRad: 0.02617994
+            lowerErrorSoftLimitMarginRad: 0.01308997
+            upperErrorSoftLimitMarginRad: 0.01308997
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 411.1
+            direction: 1
+          torqueSensor:
+            maxTorque: 150.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 45.0
+            i: 0.0
+            d: 0.6
+          torque:
+            p: 45.0
+            d: 0.0004
+
+    - left_hip_fe:
+        motor_controller:
+          slaveIndex: 4
+          axis: 0
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 20
+            direction: -1
+            minPositionIU: 644096
+            maxPositionIU: 1036385
+            zeroPositionIU: 979058
+            lowerSoftLimitMarginRad: 0.11798426
+            upperSoftLimitMarginRad: 0.11798426
+            lowerErrorSoftLimitMarginRad: 0.05899213
+            upperErrorSoftLimitMarginRad: 0.05899213
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 101
+          torqueSensor:
+            maxTorque: 250.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 35.0
+            i: 0.0
+            d: 0.4
+          torque:
+            p: 0.1
+            d: 0.0
+
+    - left_knee:
+        motor_controller:
+          slaveIndex: 5
+          axis: 0
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 20
+            direction: 1
+            minPositionIU: 541190
+            maxPositionIU: 905664
+            zeroPositionIU: 541575
+            lowerSoftLimitMarginRad: 0.07908308
+            upperSoftLimitMarginRad: 0.10908308
+            lowerErrorSoftLimitMarginRad: 0.05454154
+            upperErrorSoftLimitMarginRad: 0.05454154
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 101
+          torqueSensor:
+            maxTorque: 250.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 20.0
+            i: 0.0
+            d: 1.5
+          torque:
+            p: 0.1
+            d: 0.0
+
+    - right_ankle_dpf:
+        motor_controller:
+          slaveIndex: 1
+          axis: 1
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 8453
+            maxPositionIU: 10684
+            zeroPositionIU: 9774
+            lowerSoftLimitMarginRad: 0.00349066
+            upperSoftLimitMarginRad: 0.00349066
+            lowerErrorSoftLimitMarginRad: 0.00174533
+            upperErrorSoftLimitMarginRad: 0.00174533
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 215.797
+            direction: 1
+          torqueSensor:
+            maxTorque: 150.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 20
+            i: 0.0
+            d: 0.4
+          torque:
+            p: 0.0
+            d: 0.0
+
+    - right_hip_aa:
+        motor_controller:
+          slaveIndex: 2
+          axis: 1
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 14904
+            maxPositionIU: 16195
+            zeroPositionIU: 15740
+            lowerSoftLimitMarginRad: 0.02617994
+            upperSoftLimitMarginRad: 0.02617994
+            lowerErrorSoftLimitMarginRad: 0.01308997
+            upperErrorSoftLimitMarginRad: 0.01308997
+          incrementalEncoder:
+            countsPerRotation: 6400
+            transmission: 411.1
+            direction: 1
+          torqueSensor:
+            maxTorque: 150.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 45.0
+            i: 0.0
+            d: 0.6
+          torque:
+            p: 15.0
+            d: 0.0002
+
+    - right_hip_fe:
+        motor_controller:
+          slaveIndex: 2
+          axis: 0
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 20
+            direction: 1
+            minPositionIU: 176992
+            maxPositionIU: 568198
+            zeroPositionIU: 233236
+            lowerSoftLimitMarginRad: 0.11798426
+            upperSoftLimitMarginRad: 0.11798426
+            lowerErrorSoftLimitMarginRad: 0.05899213
+            upperErrorSoftLimitMarginRad: 0.05899213
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 101
+          torqueSensor:
+            maxTorque: 250.0
+            averageTorque: 10
+        gains:
+          position:
+            p: 35.0
+            i: 0.0
+            d: 0.4
+          torque:
+            p: 0.1
+            d: 0.0
+
+    - right_knee:
+        motor_controller:
+          slaveIndex: 1
+          axis: 0
+          useIncrementalEncoderForPosition: true
+          absoluteEncoder:
+            resolution: 20
+            direction: -1
+            minPositionIU: 352644
+            maxPositionIU: 717216
+            zeroPositionIU: 716733
+            lowerSoftLimitMarginRad: 0.07908308
+            upperSoftLimitMarginRad: 0.10908308
+            lowerErrorSoftLimitMarginRad: 0.05454154
+            upperErrorSoftLimitMarginRad: 0.05454154
+          incrementalEncoder:
+            direction: 1
+            resolution: 12
+            transmission: 101
+          torqueSensor:
+            maxTorque: 250.0
+            averageTorque: 10.0
+        gains:
+          position:
+            p: 20.0
+            i: 0.0
+            d: 1.5
+          torque:
+            p: 0.1
+            d: 0.0
+            
+  power_distribution_board:
+    slaveIndex: 3
+    byteOffset: 0

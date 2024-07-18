@@ -7,6 +7,7 @@
 #include "march_ik_solver/stability_task.hpp"
 #include "march_ik_solver/motion_task.hpp"
 #include "march_ik_solver/posture_task.hpp"
+#include "march_ik_solver/tilt_task.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/clamp.hpp>
@@ -35,6 +36,7 @@ void IKSolver::createTask(
     // Create tasks
     m_task_map["motion"] = std::make_unique<MotionTask>();
     m_task_map["posture"] = std::make_unique<PostureTask>();
+    m_task_map["tilt"] = std::make_unique<TiltTask>();
 
     // Create and set stability task
     std::unique_ptr<StabilityTask> stability_task = std::make_unique<StabilityTask>();
@@ -133,6 +135,7 @@ void IKSolver::configurePinocchioModel()
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_pinocchio_model);
+    m_pinocchio_data.reset();
     m_pinocchio_data = std::make_unique<pinocchio::Data>(m_pinocchio_model);
 }
 

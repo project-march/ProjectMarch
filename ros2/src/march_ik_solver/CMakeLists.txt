@@ -40,6 +40,7 @@ add_library(${PROJECT_NAME} STATIC
   src/motion_task.cpp
   src/posture_task.cpp
   src/stability_task.cpp
+  src/tilt_task.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -62,6 +63,7 @@ add_executable(ik_solver_node
   src/motion_task.cpp
   src/posture_task.cpp
   src/stability_task.cpp
+  src/tilt_task.cpp
 )
 
 target_include_directories(ik_solver_node PUBLIC

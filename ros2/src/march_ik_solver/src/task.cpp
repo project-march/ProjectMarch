@@ -26,6 +26,18 @@ Task::Task()
     m_task_n = m_model.nv;
 }
 
+Task::~Task()
+{
+    m_joint_names_ptr = new std::vector<std::string>;
+    m_current_joint_positions_ptr = new Eigen::VectorXd;
+
+    delete m_joint_names_ptr;
+    delete m_current_joint_positions_ptr;
+
+    m_joint_names_ptr = NULL;
+    m_current_joint_positions_ptr = NULL;
+}
+
 void Task::setTaskName(const std::string& task_name)
 {
     m_task_name = task_name;

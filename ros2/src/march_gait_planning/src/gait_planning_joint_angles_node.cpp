@@ -7,14 +7,12 @@ Gait logic is mainly located here, as the publishing of gaits is dependent on ca
 */ 
 
 #include "march_gait_planning/gait_planning_joint_angles_node.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
+#include "../logging_colors.hpp"
 
 using std::placeholders::_1; 
 
-int INTERPOLATING_TIMESTEPS = 100;
-
-#define COLOR_GREEN   "\033[32m"
-#define RESET   "\033[0m"
-#define COLOR_PERIWINKLE   "\033[38;5;147m"
+int INTERPOLATING_TIMESTEPS = 400;
 
 struct CSVRow {
     std::string left_hip_aa;
@@ -46,11 +44,26 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_current_state_subscriber = this->create_subscription<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10, std::bind(&GaitPlanningAnglesNode::currentJointAnglesCallback, this, _1));
     m_exo_mode_subscriber = this->create_subscription<march_shared_msgs::msg::ExoMode>("gait_planning_mode", 10, std::bind(&GaitPlanningAnglesNode::currentModeCallback, this, _1));
     m_joint_angle_trajectory_publisher = this->create_publisher<std_msgs::msg::Float64MultiArray>("march_joint_position_controller/commands", 10);
-
+    
     m_gait_planning.setGaitType(ExoMode::BootUp);
     m_gait_planning.setPrevGaitType(ExoMode::BootUp); 
     m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
-    m_gait_planning.setHomeStand(m_gait_planning.getStandToSitGait()[0]); 
+    // change sethomestand to parsing yaml aswell? Or still use gaitfiles as these should be the same? 
+
+    std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
+    m_gait_planning.setHomeStand(parseHomestandYAML(homestand_path)); 
+    m_gait_planning.setHipTilt(parseHipTiltYAML(homestand_path)); 
+
+    if (m_gait_planning.getHomeStand().size() != 8) {
+        RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_gait_planning.getHomeStand().size()); 
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f, %f, %f" RESET, m_gait_planning.getHomeStand()[0], m_gait_planning.getHomeStand()[1], m_gait_planning.getHomeStand()[2], m_gait_planning.getHomeStand()[3], m_gait_planning.getHomeStand()[4], m_gait_planning.getHomeStand()[5], m_gait_planning.getHomeStand()[6], m_gait_planning.getHomeStand()[7]); 
+    }
+
+    if (m_gait_planning.getHipTilt()){
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of hip tilt: " COLOR_PERIWINKLE "%f" RESET, m_gait_planning.getHipTilt());
+    }
+
     RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Joint angles node configured!" RESET);
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -63,7 +76,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     m_active = true;  
 
-    RCLCPP_DEBUG(this->get_logger(), "Joint angles node activated!"); 
+    RCLCPP_INFO(this->get_logger(), "Joint angles node " COLOR_GREEN "activated!" RESET); 
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -72,9 +85,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
     (void) state; 
     m_joint_angle_trajectory_publisher->on_deactivate(); 
-    RCLCPP_DEBUG(this->get_logger(), "Joint angles node deactivated!"); 
-
     m_active = false; 
+    RCLCPP_INFO(this->get_logger(), "Joint angles node " COLOR_RED "deactivated!" RESET); 
+
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -99,10 +112,15 @@ void GaitPlanningAnglesNode::setFirstCallbackMsg(const march_shared_msgs::msg::E
 }
 
 void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s " RESET, toString(static_cast<ExoMode>(msg->mode)).c_str()); 
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_TURQUOISE "%s" RESET " with node_type" COLOR_TURQUOISE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str()); 
+    // RCLCPP_INFO(this->get_logger(), "Received previous mode " COLOR_TURQUOISE "%s" RESET, toString(static_cast<ExoMode>(msg->previous_mode)).c_str()); 
+    // RCLCPP_INFO(this->get_logger(), "State of node is %s%s%s", 
+    // m_active ? COLOR_GREEN : COLOR_RED, 
+    // m_active ? "ACTIVE" : "INACTIVE", 
+    // RESET);    
     if (m_active){
         // RCLCPP_INFO(this->get_logger(), "m_active = true"); 
-        m_gait_planning.setPrevGaitType(m_gait_planning.getGaitType());
+        m_gait_planning.setPrevGaitType((ExoMode)msg->previous_mode); 
         m_gait_planning.setGaitType((ExoMode)msg->mode);
         // DO NOT set counter to 0 if you switch from walking to standing (prev type is walk and new type is stand) 
         if ((ExoMode)msg->mode != ExoMode::Stand){
@@ -154,7 +172,7 @@ void GaitPlanningAnglesNode::currentJointAnglesCallback(const march_shared_msgs:
         
         switch (m_gait_planning.getGaitType()){
             case ExoMode::Walk:
-            case ExoMode::Sideways:
+            case ExoMode::SidewaysRight:
                 m_gait_planning.setCounter(0); 
                 break;
 
@@ -174,6 +192,8 @@ void GaitPlanningAnglesNode::processMovingGaits(const int &counter){
     // TODO: Whenever this function is called, we first need to check whether the trajectory is empty BEFORE IT IS FILLED WITH THE NEW GAIT, and empty it before filling it with the new gait.
     if (!m_current_trajectory.empty()){
         m_joints_msg.data = m_current_trajectory[counter];
+        m_joints_msg.data[2] += m_gait_planning.getHipTilt();
+        m_joints_msg.data[6] += m_gait_planning.getHipTilt();
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         RCLCPP_DEBUG(this->get_logger(), "Gait message published!"); 
     }
@@ -185,7 +205,7 @@ std::vector<double> GaitPlanningAnglesNode::remapKinematicChaintoAlphabetical(co
 }
 
 void GaitPlanningAnglesNode::processHomeStandGait(){
-    if (m_gait_planning.getCounter() == 0){ // When switching to homestand
+    if (m_gait_planning.getCounter() == 0){ // When switching to homestand from bootup
         m_incremental_steps_to_home_stand.clear();
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getHomeStand()[i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
@@ -200,12 +220,16 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
-        } 
+        }
+        temp_moving_to_home_stand[2] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
+        temp_moving_to_home_stand[6] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
 
     }
     else{
         RCLCPP_DEBUG(this->get_logger(), "Home stand position reached!");
         temp_moving_to_home_stand = m_gait_planning.getHomeStand();
+        temp_moving_to_home_stand[2] += m_gait_planning.getHipTilt();
+        temp_moving_to_home_stand[6] += m_gait_planning.getHipTilt();
         m_initial_point.clear();
     }
 
@@ -215,9 +239,9 @@ void GaitPlanningAnglesNode::processHomeStandGait(){
     m_gait_planning.setCounter(m_gait_planning.getCounter() + 1);
 }
 
-void GaitPlanningAnglesNode::processBootUpToStandGait(){
+void GaitPlanningAnglesNode::processBootUpToStandGait(){ //TODO: Rename this function to processBootUpToSitGait
     if (m_gait_planning.getCounter() == 0){ 
-        // This is the moment we go from BootUp to Stand, so we obtain the current joint angles and calculate the increments to reach the sit position
+        // This is the moment we go from BootUp to Sit, so we obtain the current joint angles and calculate the increments to reach the sit position
         m_incremental_steps_to_home_stand.clear();
         for (unsigned i = 0; i < m_gait_planning.getHomeStand().size(); ++i) {
                 m_incremental_steps_to_home_stand.push_back((m_gait_planning.getSitToStandGait()[0][i] - m_gait_planning.getPrevPoint()[i]) / INTERPOLATING_TIMESTEPS); // 40 iterations to reach the target, i.e. in 2 seconds
@@ -233,10 +257,15 @@ void GaitPlanningAnglesNode::processBootUpToStandGait(){
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
         }
+        RCLCPP_INFO(this->get_logger(), "Gradually adding hip tilt");
+        temp_moving_to_home_stand[2] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
+        temp_moving_to_home_stand[6] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
     }
     else{
         RCLCPP_DEBUG(this->get_logger(), "Sit Position reached");
         temp_moving_to_home_stand = m_gait_planning.getSitToStandGait()[0];
+        temp_moving_to_home_stand[2] += m_gait_planning.getHipTilt();
+        temp_moving_to_home_stand[6] += m_gait_planning.getHipTilt();
         m_initial_point.clear();
     }
 
@@ -254,6 +283,8 @@ void GaitPlanningAnglesNode::finishGaitBeforeStand(){
         // RCLCPP_INFO(this->get_logger(), "Finishing gait, with count: %d", count);
     } if (count == m_current_trajectory.size()-1) { 
         m_joints_msg.data = m_gait_planning.getHomeStand(); 
+        m_joints_msg.data[2] += m_gait_planning.getHipTilt();
+        m_joints_msg.data[6] += m_gait_planning.getHipTilt();
         m_joint_angle_trajectory_publisher->publish(m_joints_msg);
         m_gait_planning.setPrevPoint(m_gait_planning.getHomeStand());
         m_gait_planning.setStanceFoot(DOUBLE_STANCE_LEG); 
@@ -360,7 +391,8 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     case ExoMode::Stand :
                     case ExoMode::Ascending :
                     case ExoMode::Descending :
-                    case ExoMode::Sideways :
+                    case ExoMode::SidewaysRight :
+                    case ExoMode::SidewaysLeft :
 
                         finishGaitBeforeStand(); 
                         break; 
@@ -398,32 +430,56 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                 // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter());
                 break;
             
-            case ExoMode::Sideways :
-                m_current_trajectory = m_gait_planning.getSidewaysGait(); 
+            case ExoMode::SidewaysRight :
+                m_current_trajectory = m_gait_planning.getSidewaysRightGait(); 
                 processMovingGaits(count); 
                 m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? 0 : (count + 1));
                 break;
 
-            case ExoMode::Ascending :
-                m_current_trajectory = m_gait_planning.getAscendingGait(); 
-                if (count < m_current_trajectory.size()-1){
-                    processMovingGaits(count); 
-                    m_gait_planning.setCounter(count+1); 
-                }
-                break;
-
-            case ExoMode::Descending :
-                m_current_trajectory = m_gait_planning.getDescendingGait(); 
-                if (count < m_current_trajectory.size()-1){
-                    processMovingGaits(count); 
-                    m_gait_planning.setCounter(count+1); 
-                }
+            case ExoMode::SidewaysLeft:
+                m_current_trajectory = m_gait_planning.getSidewaysLeftGait(); 
+                processMovingGaits(count); 
+                m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? 0 : (count + 1));
                 break;
 
             default :
                 break;
         }
     }
+
+std::vector<double> GaitPlanningAnglesNode::parseHomestandYAML(const std::string& file_path){
+
+    std::vector<double> values;
+    
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node joint_angles = config["joint_angles"];
+        if (joint_angles && joint_angles.IsSequence()) {
+            for (const auto& value : joint_angles) {
+                values.push_back(value.as<double>());
+            }
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return values;
+}
+
+double GaitPlanningAnglesNode::parseHipTiltYAML(const std::string& file_path){
+    double hip_tilt; 
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node hip_tilt_node = config["hip_tilt"];
+        if (hip_tilt_node) {
+            hip_tilt = hip_tilt_node.as<double>();
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return hip_tilt;
+}
 
 int main(int argc, char *argv[]){
     
