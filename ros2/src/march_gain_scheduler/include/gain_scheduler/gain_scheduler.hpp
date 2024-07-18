@@ -22,6 +22,18 @@ class GainScheduler {
         joints_with_gains setStanceSwingLegGains(joints_with_gains joints_with_gains, uint8_t current_stance_leg);
         void setGaitConfiguration(const ExoMode new_gait_type);
         float calculateInertia(double mass, double distance);
+        template<typename... Args>
+        double sumInertia(Args... args) {
+                static_assert(sizeof...(args) % 2 == 0, "Function only accepts an even number of arguments.");
+    
+                double arr[] = {args...};
+                double result = 0;
+                for (size_t i = 0; i < sizeof...(args); i += 2) {
+                    result += calculateInertia(arr[i], arr[i + 1]);
+                }
+
+                return result;
+        }
         float calculateComDistance(const sensor_msgs::msg::JointState::SharedPtr& joint_states, const std::string& joint_name);
         std::string m_scheduling_variable;
         bool m_use_stance_swing_leg_gains;

@@ -82,8 +82,6 @@ float GainScheduler::calculateInertia(double mass, double distance) {
     return mass*distance*distance;
 }
 
-
-
 std::tuple<std::string, double, double, double> GainScheduler::getSpecificJointAngleGains(const std::string& joint_name, double joint_angle) {
     const auto& joint_angle_ranges_config = m_joints_config[joint_name]["joint_angle_ranges"];
     const auto number_of_ranges = joint_angle_ranges_config.size();

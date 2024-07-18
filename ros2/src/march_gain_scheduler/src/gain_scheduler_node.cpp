@@ -41,6 +41,10 @@ void GainSchedulerNode::stateEstimationCallback(const march_shared_msgs::msg::St
 
 void GainSchedulerNode::publishJointsWithGains() {   
     joints_with_gains joints_with_gains = getJointsWithGains();
+    // m_gain_scheduler.calculateInertia(1.0, 1.0);
+    // RCLCPP_INFO(this->get_logger(), "Inertia: %f", m_gain_scheduler.calculateInertia(1.0, 1.0));
+    // RCLCPP_INFO(this->get_logger(), "Summed inertia: %f", m_gain_scheduler.sumInertia(2.0, 1.0, 3.0, 1.0, 4.0, 1.0));
+    // printf("Inertia: %f\n", m_gain_scheduler.calculateInertia(1.0, 1.0)); 
 
     for (size_t i = 0; i < joints_with_gains.size(); ++i) {
         march_shared_msgs::msg::JointGains joint_gains_msg;
