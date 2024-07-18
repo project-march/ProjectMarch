@@ -27,7 +27,10 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_single_execution_done = false; 
     m_variable_first_step_done = false; 
     m_active = false; 
+    m_first_step = true; 
     m_home_stand_trajectory.clear(); 
+
+    m_gait_planning.setStanceFoot(3); 
 
     m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -101,12 +104,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 
 void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s" RESET " with node_type" COLOR_PERIWINKLE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "Received previous mode " COLOR_PERIWINKLE "%s" RESET, toString(static_cast<ExoMode>(msg->previous_mode)).c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "State of node is %s%s%s", 
-    // m_active ? COLOR_GREEN : COLOR_RED, 
-    // m_active ? "ACTIVE" : "INACTIVE", 
-    // RESET);
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s" RESET " with node_type" COLOR_PERIWINKLE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str());
     if (m_active){
         m_gait_planning.setPreviousGaitType((ExoMode)msg->previous_mode);  
         m_gait_planning.setGaitType((ExoMode)msg->mode);
@@ -121,20 +119,11 @@ void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current foot positions");
-
     if (m_active){
         GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
         GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
         m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
         m_desired_footpositions_msg->header = msg->header;
-        if (m_current_trajectory.empty()){
-            m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-            if (m_gait_planning.getGaitType() == ExoMode::LargeWalk || m_gait_planning.getGaitType() == ExoMode::SmallWalk){
-            //     RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
-            // (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
-            }
-        }
         publishFootPositions();
     } else {
         RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
@@ -152,9 +141,7 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
     if (!m_current_trajectory.empty()){
         // wait until trajectory is finished
     } else if (m_current_trajectory.empty()){
-
         //Remove duplicates from PoseArray message to identify the two desired footsteps
-
         std::set<geometry_msgs::msg::Pose, GaitPlanningCartesianNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
@@ -165,13 +152,11 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
             // first step 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]); 
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
@@ -189,13 +174,11 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
             // full steps 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0];
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]);  
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
@@ -257,9 +240,7 @@ void GaitPlanningCartesianNode::finishCurrentTrajectory(){
 }
 
 void GaitPlanningCartesianNode::publishIncrements(){
-    // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
-    // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
     m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
     setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
     rotateFootPositions();
@@ -270,9 +251,15 @@ void GaitPlanningCartesianNode::publishIncrements(){
 
 
 void GaitPlanningCartesianNode::stepClose(){
+    if (m_gait_planning.getCurrentStanceFoot() == 3){
+        m_gait_planning.setStanceFoot(2); 
+    } else {
+        m_gait_planning.setStanceFoot(m_gait_planning.getCurrentStanceFoot() == 1 ? 2 : 1);
+    }
+    RCLCPP_INFO(this->get_logger(), "Current stance foot is" BRIGHT_YELLOW " %s" RESET,
+            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
     RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
-
     RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
@@ -302,6 +289,8 @@ void GaitPlanningCartesianNode::calculateIncrements(){
 }
 
 void GaitPlanningCartesianNode::publishHomeStand(){
+    m_gait_planning.setStanceFoot(3); 
+    m_first_step = true; 
     m_current_trajectory.clear();
     setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
     rotateFootPositions();
@@ -343,8 +332,17 @@ void GaitPlanningCartesianNode::processStand(){
 
 void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
+        if (m_gait_planning.getCurrentStanceFoot() != 3) {
+            m_first_step = false;
+            m_gait_planning.setStanceFoot(m_gait_planning.getCurrentStanceFoot() == 1 ? 2 : 1);
+        } else if (m_gait_planning.getCurrentStanceFoot() == 3 && m_first_step){
+            m_first_step = false; 
+        } else {
+            m_gait_planning.setStanceFoot(2); 
+        }
+
         m_current_trajectory = m_gait_planning.getTrajectory(); 
-        RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
+        RCLCPP_INFO(this->get_logger(), "Current stance foot is" BRIGHT_YELLOW " %s" RESET,
             (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
