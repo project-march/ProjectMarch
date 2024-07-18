@@ -95,6 +95,7 @@ public:
      * @throws MissingKeyException when required keys are missing.
      */
     static size_t validate_and_get_counts_per_rotation(const YAML::Node& config);
+    static int32_t getCorrectLimits(const YAML::Node& config, const std::string& key, unsigned long counts_per_rotation, bool isNegative);
 
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;

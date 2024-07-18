@@ -44,6 +44,7 @@ public:
     void enableActuation() override;
     void actuateTorque(float target_torque, float fuzzy_weight) override;
     void actuateRadians(float target_position, float fuzzy_weight) override;
+    void sendTargetPosition(float target_position) override;
 
      void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) override;
 
@@ -58,13 +59,10 @@ public:
     // Get a full description of the state of the ODrive
     std::unique_ptr<MotorControllerState> getState() override;
 
-    // Getters for specific information about the state of the motor and the
-    // ODrive
-    //    float getTorque() override;
+    // Getters for specific information about the state of the motor and the MDrive
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
-    float getActualEffort() override;
     float getMotorTemperature();
     float getOdriveTemperature();
 

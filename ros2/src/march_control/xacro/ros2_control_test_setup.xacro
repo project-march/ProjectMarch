@@ -8,6 +8,7 @@
     <command_interface name="position"/>
     <state_interface name="position"/>
     <state_interface name="velocity"/>
+    <state_interface name="effort"/>
     <param name="stop_when_outside_hard_limits">${stop_when_outside_hard_limits}</param>
     <param name="msec_until_error_when_in_error_soft_limits">${msec_until_error_when_in_error_soft_limits}</param>
   </joint>
@@ -49,12 +50,9 @@
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
       <plugin>march_system_interface/MarchExoSystemInterface</plugin>
-      <param name="robot">joints_test_setup</param>
+      <param name="robot">hardware_test_setup</param>
     </xacro:if>
   </hardware>
-
-  <xacro:march_joint name="linear_joint"/>
-  <xacro:march_joint name="rotational_joint"/>
 
 </ros2_control>
 

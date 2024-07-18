@@ -6,6 +6,11 @@
 #include <vector>
 #include <array>  
 #include <set>
+#include <iostream>
+#include <fstream>
+#include <sstream> 
+#include <unistd.h>
+#include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp" 
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "march_gait_planning/gait_planning.hpp"
@@ -60,7 +65,8 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     void MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
-    void publishFootPositions(); 
+    void publishFootPositions();
+    void rotateFootPositions();
     void processStand(); 
     void finishCurrentTrajectory(); 
     void publishIncrements(); 
@@ -69,7 +75,9 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     void publishHomeStand(); 
     void publishWalk(); 
     void publishHeightGaits(); 
-    void publishVariableWalk();  
+    void publishVariableWalk(); 
+    std::vector<double> parseHomestandYAML(const std::string& file_path);  
+    double parseHipTiltYAML(const std::string& file_path); 
 
     GaitPlanning m_gait_planning; 
 
@@ -85,9 +93,11 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg_rviz; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
+    double m_hip_tilt; 
     bool m_single_execution_done;
     bool m_variable_first_step_done; 
     int m_variable_walk_swing_leg; 
     bool m_active; 
+    bool m_first_step; 
 
 };

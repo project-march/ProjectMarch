@@ -127,7 +127,7 @@ public:
     // TODO: add torque_sensor_error
     bool hasError() const override
     {
-        return odrive_error_ != 0 || axis_error_ != 0 || motor_error_ != 0 || encoder_error_ != 0 || controller_error_ != 0;
+        return odrive_error_ != 0 || axis_error_ != 0 || motor_error_ != 0 || encoder_error_ != 0 || controller_error_ != 0 || torquesensor_error_ != 0;
     }
 
     std::string getErrorStatus() const override

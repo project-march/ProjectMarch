@@ -1,0 +1,94 @@
+Prerequisites.
+=============
+
+C++11-compliant C++ compiler. GNU C++ compiler (version >= 4.8.1) is recommend.
+Non-GNU compilers might not work at the moment.
+
+GNU multiprecision library (http://gmplib.org), version > 4.0.
+
+[Optional] To build CLN documentation texinfo and TeX are necessary.
+
+If you install CLN from git, you also need 
+
+git itself (http://git-scm.com), version >= 1.5.0
+GNU autoconf (http://www.gnu.org/software/autoconf), version >= 2.63
+GNU libtool  (http://www.gnu.org/software/libtool), version >= 1.5
+GNU automake (http://www.gnu.org/software/automake), version >= 1.11
+
+Installation from a source .tar.bz2 distribution.
+================================================
+
+$ ./configure
+$ make
+$ make check
+[ become root if necessary ]
+# make install
+
+To build the manual in PDF, HTML, or PostScript formats, use one of
+
+$ make pdf
+$ make html
+$ make ps
+
+To compile and run CLN's test suite and check whether the library was
+compiled correctly you can use
+
+$ make check
+
+The "configure" script can be given a number of options to enable and
+disable various features. Most useful ones are:
+
+--prefix=DIR
+
+Install CLN into the directory DIR (default: /usr/local).
+
+--with-gmp
+
+Use GNU multiprecision library (default: yes, if available)
+
+--disable-static
+
+Don't build static version of CLN library. This option is useful if
+want to reduce the build time (and you don't need the static library).
+
+For a complete list, run:
+
+$ ./configure --help
+
+
+Installation from git.
+=====================
+
+1. Download the code.
+
+Initial download:
+
+$ git clone git://www.ginac.de/cln.git
+
+Later on you can update your copy with
+
+$ git pull
+
+2. Make sure all required software is installed. This is *really*
+important step. If some package is missing, the ‘configure’ script might
+be misgenerated,
+
+3. Run
+
+$ ./autogen.sh
+
+to generate the ‘configure’ script, and proceed in a standard way, i.e.
+
+$ ./configure
+$ make
+[become root if necessary]
+# make install
+
+On some platforms (arm, hppa, sparc), problems with the assembler routines
+have been reported. It may be best to add "-DNO_ASM" to CPPFLAGS before
+configuring:
+
+$ ./configure CPPFLAGS=-DNO_ASM
+
+More detailed installation instructions can be found in the documentation,
+in the doc/ directory.

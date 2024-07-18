@@ -156,9 +156,16 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(c
     HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config, HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS, "absoluteEncoder");
 
     const auto counts_per_rotation = validate_and_get_counts_per_rotation(absolute_encoder_config);
-    const auto min_position = absolute_encoder_config["minPositionIU"].as<int32_t>();
-    const auto max_position = absolute_encoder_config["maxPositionIU"].as<int32_t>();
-    const auto zero_position = absolute_encoder_config["zeroPositionIU"].as<int32_t>();
+    const auto encoder_direction = getEncoderDirection(absolute_encoder_config);
+    const bool isNegative = encoder_direction == march::Encoder::Direction::Negative;
+
+    int32_t min_position = getCorrectLimits(absolute_encoder_config, isNegative ? "maxPositionIU" : "minPositionIU", counts_per_rotation, isNegative);
+    int32_t max_position = getCorrectLimits(absolute_encoder_config, isNegative ? "minPositionIU" : "maxPositionIU", counts_per_rotation, isNegative);
+    int32_t zero_position = getCorrectLimits(absolute_encoder_config, "zeroPositionIU", counts_per_rotation, isNegative);
+
+    std::string message = isNegative ? "Set the following flipped limits: min_position: %d, max_position: %d, zero_position: %d" : "Set the following limits: min_position: %d, max_position: %d, zero_position: %d";
+    RCLCPP_INFO(rclcpp::get_logger("createAbsoluteEncoder"), message, min_position, max_position, zero_position);
+
     const auto lower_soft_limit_margin = absolute_encoder_config["lowerSoftLimitMarginRad"].as<double>();
     const auto upper_soft_limit_margin = absolute_encoder_config["upperSoftLimitMarginRad"].as<double>();
     const auto lower_error_soft_limit_margin = absolute_encoder_config["lowerErrorSoftLimitMarginRad"].as<double>();
@@ -226,12 +233,10 @@ std::optional<march::PowerDistributionBoard> HardwareBuilder::createPowerDistrib
     if (!power_distribution_board_config) {
         return std::nullopt;
     }
-    
     HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS, "power_distribution_board");
 
     const auto slave_index = power_distribution_board_config["slaveIndex"].as<int>();
     const auto byte_offset = power_distribution_board_config["byteOffset"].as<int>();
-   
     return std::make_optional<march::PowerDistributionBoard>(march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }
 
@@ -252,5 +257,13 @@ size_t HardwareBuilder::validate_and_get_counts_per_rotation(const YAML::Node& c
         return (size_t)1 << config["resolution"].as<size_t>();
     } else {
         throw MissingKeyException("resolution' or 'countsPerRotation", "incrementalEncoder");
+    }
+}
+
+int32_t HardwareBuilder::getCorrectLimits(const YAML::Node& config, const std::string& key, unsigned long counts_per_rotation, bool isNegative) {
+    if (isNegative) {
+        return static_cast<int32_t>(counts_per_rotation) - config[key].as<int32_t>();
+    } else {
+        return config[key].as<int32_t>();
     }
 }

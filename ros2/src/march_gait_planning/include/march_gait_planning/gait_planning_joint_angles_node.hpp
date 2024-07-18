@@ -24,6 +24,7 @@ This is the header file for the GaitPlanningAnglesNode class.
 #include <fstream> 
 #include <sstream> 
 #include <cmath>
+#include <yaml-cpp/yaml.h>
 #include "std_msgs/msg/float64_multi_array.hpp"
 
 //FILMPJE
@@ -59,7 +60,10 @@ private:
     void processHomeStandGait();
     void processBootUpToStandGait();
     void finishGaitBeforeStand(); 
-    void processMovingGaits(const int &counter);     
+    void processMovingGaits(const int &counter);    
+    
+    std::vector<double> parseHomestandYAML(const std::string& file_path);   
+    double parseHipTiltYAML(const std::string& file_path); 
     
     // Final joint angle trajectory publisher
     void publishJointTrajectoryPoints(); 

@@ -44,6 +44,7 @@ public:
     virtual void actuateTorque(float target_effort, float fuzzy_weight) = 0;
     virtual void actuateRadians(float target_position, float fuzzy_weight) = 0;
 
+    virtual void sendTargetPosition(float target_position) = 0;
     virtual void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) = 0;
 
     // Getter and setter for the ActuationMode
@@ -84,13 +85,10 @@ public:
     bool hasTorqueSensor() const;
     std::unique_ptr<TorqueSensor>& getTorqueSensor();
 
-    // Getters for specific information about the state of the motor and its
-    // controller
-    // virtual float getTorque() = 0;
+    // Getters for specific information about the state of the motor and its controller
     virtual float getMotorCurrent() = 0;
     virtual float getMotorControllerVoltage() = 0;
     virtual float getMotorVoltage() = 0;
-    virtual float getActualEffort() = 0;
 
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;

@@ -25,12 +25,15 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_prev_gait_type(), 
    m_first_step_angle_trajectory(), 
    m_complete_step_angle_trajectory(),
+   m_half_step_angle_trajectory(),
    m_stand_to_sit_trajectory(), 
-   m_sideways_trajectory(),
+   m_sideways_right_trajectory(),
+   m_sideways_left_trajectory(),
    m_sit_to_stand_trajectory(),
    m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
+   m_hip_tilt(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
@@ -40,11 +43,10 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep_right.csv", m_sideways_right_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep_left.csv", m_sideways_left_trajectory);
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
-    processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
@@ -54,7 +56,7 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     std::vector<CSVRow> data; 
     std::ifstream file(path); 
     if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
+        std::cerr << "Error opening file" << path << std::endl; 
     }
     std::string line; 
     while (std::getline(file, line)){
@@ -105,6 +107,10 @@ void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
     m_stance_foot = foot; 
 }
 
+void GaitPlanningAngles::setHipTilt(const double &hip_tilt){
+    m_hip_tilt = hip_tilt; 
+}
+
 ExoMode GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
@@ -148,20 +154,16 @@ std::vector<std::vector<double>> GaitPlanningAngles::getStandToSitGait() const{
     return m_stand_to_sit_trajectory; 
 }
 
-std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysGait() const{
-    return m_sideways_trajectory; 
+std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysRightGait() const{
+    return m_sideways_right_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysLeftGait() const{
+    return m_sideways_left_trajectory; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
     return m_sit_to_stand_trajectory; 
-}
-
-std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
-    return m_ascending_trajectory; 
-}
-
-std::vector<std::vector<double>> GaitPlanningAngles::getDescendingGait() const{
-    return m_descending_trajectory; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
@@ -194,4 +196,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::swapLeftAndRightColumns(con
         std::swap(row[3], row[7]);
     }
     return half_step_swapped; 
+}
+
+double GaitPlanningAngles::getHipTilt() const {
+    return m_hip_tilt; 
 }
