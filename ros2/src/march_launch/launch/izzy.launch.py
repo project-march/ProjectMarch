@@ -173,7 +173,6 @@ def generate_launch_description() -> LaunchDescription:
     )
     # endregion
 
-
     # region Launch IMU
     imu_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

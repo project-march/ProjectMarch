@@ -98,5 +98,6 @@ class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     bool m_variable_first_step_done; 
     int m_variable_walk_swing_leg; 
     bool m_active; 
+    bool m_first_step; 
 
 };

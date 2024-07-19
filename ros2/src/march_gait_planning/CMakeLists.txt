@@ -76,6 +76,21 @@ add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles.cpp
 )
 
+# create the service client manager node 
+add_executable(service_client_node
+  src/manager_nodes_service_client.cpp 
+)
+
+ament_target_dependencies(service_client_node
+  rclcpp
+  lifecycle_msgs
+  std_msgs
+  rclcpp_lifecycle
+  march_shared_msgs
+)
+
+
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_cartesian_node
   rclcpp
