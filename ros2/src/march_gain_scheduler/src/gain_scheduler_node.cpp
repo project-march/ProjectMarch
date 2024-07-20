@@ -24,6 +24,9 @@ GainSchedulerNode::GainSchedulerNode()
     m_state_estimation_subscriber = create_subscription<march_shared_msgs::msg::StateEstimation>(
         "state_estimation", 10, std::bind(&GainSchedulerNode::stateEstimationCallback, this, _1));
 
+    m_robot_description_subscriber = create_subscription<std_msgs::msg::String>(
+        "robot_description", 10, std::bind(&GainSchedulerNode::robotDescriptionCallback, this, _1));
+
     m_timer = this->create_wall_timer(std::chrono::milliseconds(PUBLISH_TIME), std::bind(&GainSchedulerNode::publishJointsWithGains, this));
  }
 
@@ -39,11 +42,16 @@ void GainSchedulerNode::stateEstimationCallback(const march_shared_msgs::msg::St
     m_current_stance_leg = msg->current_stance_leg;
 }
 
+void GainSchedulerNode::robotDescriptionCallback(const std_msgs::msg::String::SharedPtr msg) {
+    m_robot_description = msg;
+}
+
 void GainSchedulerNode::publishJointsWithGains() {   
     joints_with_gains joints_with_gains = getJointsWithGains();
     // m_gain_scheduler.calculateInertia(1.0, 1.0);
     // RCLCPP_INFO(this->get_logger(), "Inertia: %f", m_gain_scheduler.calculateInertia(1.0, 1.0));
     // RCLCPP_INFO(this->get_logger(), "Summed inertia: %f", m_gain_scheduler.sumInertia(2.0, 1.0, 3.0, 1.0, 4.0, 1.0));
+    // RCLCPP_INFO(this->get_logger(), m_robot_description->data.c_str());
     // printf("Inertia: %f\n", m_gain_scheduler.calculateInertia(1.0, 1.0)); 
 
     for (size_t i = 0; i < joints_with_gains.size(); ++i) {
