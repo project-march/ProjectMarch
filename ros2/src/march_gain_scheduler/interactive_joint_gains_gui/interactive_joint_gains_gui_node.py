@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QLabel, QLineEdit, QFrame, QVBoxLayout
 from PyQt5.QtCore import QTimer, Qt
 
 import rclpy
@@ -8,6 +8,7 @@ from std_msgs.msg import String
 from sensor_msgs.msg import JointState
 from march_shared_msgs.msg import JointGains, JointMotorControllerState
 from std_msgs.msg import Float64MultiArray
+
 
 CHECK_MESSAGE_STATUS_INTERVAL = 5000  # milliseconds
 
@@ -42,49 +43,78 @@ class InteractiveJointGainsGuiNode(Node, QWidget):
         self.joint_position_commands_received = False
 
     def init_ui(self):
-        self.layout = QVBoxLayout()
+        self.layout = QGridLayout()
+        self.layout.setSpacing(0)  # Remove space between cells
+        # self.layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
 
-        self.label = QLabel('Waiting for data...', self)
-        self.layout.addWidget(self.label)
+        def add_grid_cell(widget, row, col, center=True, side_margins=0,top_margins=3, color=None):
+            frame = QFrame()
+            inner_layout = QVBoxLayout()
+            inner_layout.addWidget(widget)
+            if center:
+                inner_layout.setAlignment(Qt.AlignCenter)  # Center the text within the cell
+            if color:
+                frame.setStyleSheet(f'background-color: {color};')
+            inner_layout.setContentsMargins(side_margins,top_margins, side_margins,top_margins) 
+            frame.setLayout(inner_layout)
+            frame.setFrameShape(QFrame.Box)
+            self.layout.addWidget(frame, row, col)
+        
+        # Helper function to create bold labels
+        def create_bold_label(text):
+            label = QLabel(text)
+            label.setStyleSheet("font-weight: bold; color: white;")
+            return label
 
-        self.publish_button = QPushButton('Publish New Gains', self)
-        self.publish_button.clicked.connect(self.publish_new_gains)
-        self.layout.addWidget(self.publish_button)
+        # Column Headers
+        add_grid_cell(create_bold_label('Gains'), 0, 0,color='#26a69a')
+        add_grid_cell(create_bold_label('Proportional'), 0, 1,color='#26a69a')
+        add_grid_cell(create_bold_label('Integral'), 0, 2,color='#26a69a')
+        add_grid_cell(create_bold_label('Derivative'), 0, 3,color='#26a69a')
 
-        # Proportional Gain Label
-        self.pg_label = QLabel(f'Current proportional gain: {self.proportional_gain}', self)
-        self.layout.addWidget(self.pg_label)
+        # Current Gains
+        add_grid_cell(QLabel('Current Gains'), 1, 0, center=False, side_margins=4, color='white')
+        self.pg_label = QLabel(f'{self.proportional_gain:.2f}')
+        add_grid_cell(self.pg_label, 1, 1, color='white')
+        self.ig_label = QLabel(f'{self.integral_gain:.2f}')
+        add_grid_cell(self.ig_label, 1, 2, color='white')
+        self.dg_label = QLabel(f'{self.derivative_gain:.2f}')
+        add_grid_cell(self.dg_label, 1, 3, color='white')
 
-        # Integral Gain Label
-        self.ig_label = QLabel(f'Current integral gain: {self.integral_gain}', self)
-        self.layout.addWidget(self.ig_label)
-
-        # Derivative Gain Label
-        self.dg_label = QLabel(f'Current derivative gain: {self.derivative_gain}', self)
-        self.layout.addWidget(self.dg_label)
-
-        # Proportional Gain Input Field
+        # New Gains Input Fields
+        add_grid_cell(QLabel('New Gains'), 2, 0, center=False, side_margins=4,top_margins=0,color='#ddf2f0')
         self.pg_input = QLineEdit(str(self.proportional_gain))
+        self.pg_input.setAlignment(Qt.AlignCenter)
         self.pg_input.textChanged.connect(self.update_proportional_gain)
-        self.layout.addWidget(self.pg_input)
+        add_grid_cell(self.pg_input, 2, 1,top_margins=0,color='#ddf2f0')
 
-        # Integral Gain Input Field
         self.ig_input = QLineEdit(str(self.integral_gain))
+        self.ig_input.setAlignment(Qt.AlignCenter)  
         self.ig_input.textChanged.connect(self.update_integral_gain)
-        self.layout.addWidget(self.ig_input)
+        add_grid_cell(self.ig_input, 2, 2,top_margins=0,color='#ddf2f0')
 
-        # Derivative Gain Input Field
         self.dg_input = QLineEdit(str(self.derivative_gain))
+        self.dg_input.setAlignment(Qt.AlignCenter)
         self.dg_input.textChanged.connect(self.update_derivative_gain)
-        self.layout.addWidget(self.dg_input)
+        add_grid_cell(self.dg_input, 2, 3,top_margins=0,color='#ddf2f0')
 
         self.pg_input.textChanged.connect(self.on_gain_changed)
         self.ig_input.textChanged.connect(self.on_gain_changed)
         self.dg_input.textChanged.connect(self.on_gain_changed)
 
+        # Publish Button
+        self.publish_button = QPushButton('Publish New Gains', self)
+        self.publish_button.clicked.connect(self.publish_new_gains)
+        self.layout.addWidget(self.publish_button, 3, 0, 1, 4,)
+
+        # Status Label
+        self.label = QLabel('Waiting for data...', self)
+        self.layout.addWidget(self.label, 4, 0, 1, 4)
+
         self.setLayout(self.layout)
-        self.setWindowTitle('Beautiful Interactive Joint Gains GUI')
+        self.setWindowTitle('Interactive Joint Gains GUI')
         self.show()
+
 
     def update_proportional_gain(self, value):
         try:
@@ -120,30 +150,14 @@ class InteractiveJointGainsGuiNode(Node, QWidget):
         self.label.setText(f'Received Joint Position Commands Data')
         self.joint_position_commands_received = True
         if self.joint_position_commands_received:
-            self.joint_position_commands = self.get_all_joint_position_commands(msg)
-
-    def get_all_joint_positions(self, msg):
-        joint_position_tuples = []
-        self.all_joint_names = []
-        for i in range(len(msg.name)):
-            if 'ie' not in msg.name[i]:
-                self.all_joint_names.append(msg.name[i])
-                joint_position_tuples.append((msg.name[i], msg.position[i]))
-        return joint_position_tuples
+            self.joint_position_commands = msg.data
 
     def get_all_joint_currents(self, msg):
-        joint_current_tuples = [] 
-        for i in range(len(msg.joint_name)):
-            if 'ie' not in msg.joint_name[i]:
-                joint_current_tuples.append((msg.joint_name[i], msg.motor_current[i]))
+        joint_current_tuples = []
+        for joint_name, current in zip(msg.joint_name, msg.current):
+            if 'ie' not in joint_name:
+                joint_current_tuples.append((joint_name, current))
         return joint_current_tuples
-    
-    def get_all_joint_position_commands(self, msg):
-        joint_position_commands = []
-        # Assuming that the joint names are in the same order as the joint position commands
-        for i in range(len(msg.data)):
-            joint_position_commands.append(self.all_joint_names[i], msg.data[i])
-        return joint_position_commands
 
     def publish_new_gains(self):
         self.is_publish_button_pressed = True
@@ -156,9 +170,9 @@ class InteractiveJointGainsGuiNode(Node, QWidget):
             self.derivative_gain = self.temp_derivative_gain
 
             # Update the labels to reflect the new gains
-            self.pg_label.setText(f'Proportional Gain: {self.proportional_gain:.2f}')
-            self.ig_label.setText(f'Integral Gain: {self.integral_gain:.2f}')
-            self.dg_label.setText(f'Derivative Gain: {self.derivative_gain:.2f}')
+            self.pg_label.setText(f'{self.proportional_gain:.2f}')
+            self.ig_label.setText(f'{self.integral_gain:.2f}')
+            self.dg_label.setText(f'{self.derivative_gain:.2f}')
 
         self.gains_changed = False
         self.is_publish_button_pressed = False
@@ -175,6 +189,13 @@ class InteractiveJointGainsGuiNode(Node, QWidget):
         msg.integral_gain = self.temp_integral_gain
         msg.derivative_gain = self.temp_derivative_gain
         self.pub.publish(msg)
+
+    def get_all_joint_positions(self, msg):
+        joint_position_tuples = []
+        for i in range(len(msg.name)):
+            if 'ie' not in msg.name[i]:
+                joint_position_tuples.append((msg.name[i], msg.position[i]))
+        return joint_position_tuples
 
     def check_message_status(self):
         message = ''
