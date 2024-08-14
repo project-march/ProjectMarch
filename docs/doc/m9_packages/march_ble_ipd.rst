@@ -3,13 +3,14 @@
 
 march_ble_ipd
 ==============
+**Author**: Andrew Hutani, MIX
 
 Overview
 --------
 This package is the implementation of the Bluetooth Input Device used to communicate with the smartwatch app, developed by MIX. This implementation **heavily** relies on the implementation from
 `Bluetooth Technology for Linux Developers <https://www.bluetooth.com/bluetooth-resources/bluetooth-for-linux//>`_
 
-This package implements a BLE Server which is basically copied one to one and altered for the use of receiving integers that correspond to exoModes. In addition to that it publishes alive messages to the safety node.
+This package implements a BLE Server which is basically copied one to one and altered for the use of receiving integers that correspond to exoModes.
 
 Initialization
 ---------------
@@ -39,16 +40,11 @@ Nodes
 *ble_ipd_node* - Handles inputs from the smartwatch, and passes these on to the rest of the architecture
 
 
-Published Topics
-^^^^^^^^^^^^^^^^
-* | :code:`"/march/input_device/alive"` `Alive <https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/msg/Alive.msg/>`_
-  | Publishes alive messages every so often to the Safety node
-
 Service Client
 ^^^^^^^^^^^^^^
-* | :code:`"get_exo_mode_array"` `GetExoModeArray.srv <https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/srv/GetExoModeArray.srv>`_ 
+* | :code:`"get_exo_mode_array"` `GetExoModeArray <https://gitlab.com/project-march/march/-/blob/dev/ros2/src/shared/march_shared_msgs/srv/GetExoModeArray.srv>`_ 
   | Sends requested mode to the :code:`ModeMachine` and receives possible new modes
   
 Bluetooth Connections
 ^^^^^^^^^^^^^^^^^^^^^
-* The node also advertises a BLE characteristic
+* The node also advertises a BLE characteristic, on which the exoModes will be received.
