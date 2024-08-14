@@ -31,6 +31,9 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
+// Uncomment this line to fully disable actuation, and have additional logging.
+// #define DEBUG_MODE
+
 using namespace march_system_interface_util;
 
 namespace march_system_interface {
@@ -74,8 +77,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     if (!joints_have_interface_types(
             /*joints=*/info.joints,
             /*required_command_interfaces=*/ { hardware_interface::HW_IF_POSITION },
-            /*required_state_interfaces=*/
-            { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY },
+            /*required_state_interfaces=*/   { hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT },
             /*logger=*/(*logger_))) {
         RCLCPP_FATAL((*logger_), "Joints do not have the right interface types");
         return hardware_interface::return_type::ERROR;
@@ -95,12 +97,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
-        if (!has_correct_actuation_mode(jointInfo.joint)) {
-            return hardware_interface::return_type::ERROR;
-        }
         joints_info_.push_back(jointInfo);
-        RCLCPP_INFO((*logger_), "Joint: %s, has '%g' max effort difference.", joint.name.c_str(),
-            jointInfo.limit.max_effort_differance);
     }
 
     status_ = hardware_interface::status::CONFIGURED;
@@ -113,6 +110,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
 JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint)
 {
 
+    // TODO: reduce the amount of if statements. parameter should only be able to be set to true or false.
     string stop_hardl_param = get_parameter(joint, "stop_when_outside_hard_limits", "true");
     bool stop_when_outside_hard_limits
         = !(stop_hardl_param == "false" or stop_hardl_param == "0" or stop_hardl_param == "False");
@@ -131,9 +129,6 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*velocity=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque=*/std::numeric_limits<double>::quiet_NaN(),
         /*target_torque=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_actual=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command=*/std::numeric_limits<double>::quiet_NaN(),
-        /*effort_command_converted=*/std::numeric_limits<double>::quiet_NaN(),
         /*position_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
@@ -145,41 +140,51 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
                 stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "1000")) },
             /*soft_error_limit_warning_throttle_msec=*/
             stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "300")),
-            /*max_effort_differance=*/stod(get_parameter(joint, "max_effort_differance", "10")),
             /*stop_when_outside_hard_limits=*/stop_when_outside_hard_limits } };
 }
 
 /** Returns a vector of the StateInterfaces.
  *
- * This method is implemented so that the joint_state_broadcaster controller can publish joint positions.
- * It does this by getting a pointer to the variable that stores the positions in this class.
- *
- * In this case this is the same as the vector containing the position_command. Meaning that the broadcaster controller
- * will say that the joints are in the exact positions position controller wants them to be.
+ * This method is implemented so that the joint_state_broadcaster controller can publish joint positions, velocities and torques.
+ * It does this by getting a pointer to the variables that store these three interfaces in this class.
  */
 std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_state_interfaces()
 {
     RCLCPP_INFO((*logger_), "Creating export state interface.");
     std::vector<hardware_interface::StateInterface> state_interfaces;
+    
     for (JointInfo& jointInfo : joints_info_) {
-        // Position: Couples the state controller to the value jointInfo.position through a pointer.
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position));
-        // Velocity: Couples the state controller to the value jointInfo.velocity through a pointer.
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-            jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
-        // Effort: Couples the state controller to the value jointInfo.velocity through a pointer.
-        // state_interfaces.emplace_back(
-        //     hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
-        // For motor controller state broadcasting.
+        // Couple the joint state broadcaster to the correct jointInfo parameters through pointers.
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.position));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_VELOCITY, &jointInfo.velocity));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.torque));
+
+        // Placeholders for the AIE velocity and effort states are needed since these motor controller states don't exist but must be communicated over the joint states.    
+        double placeholder_velocity = 0.0;
+        double placeholder_effort = 0.0;
+
         for (std::pair<std::string, double*>& motor_controller_pointer :
             jointInfo.motor_controller_data.get_pointers()) {
-            state_interfaces.emplace_back(hardware_interface::StateInterface(
-                jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+            state_interfaces.emplace_back(hardware_interface::StateInterface(jointInfo.name, motor_controller_pointer.first, motor_controller_pointer.second));
+
+            std::map<std::string, std::string> joint_to_interface = {
+                {"left_ankle_dpf", "left_ankle_ie"},
+                {"right_ankle_dpf", "right_ankle_ie"},
+                {"linear_joint", "test_linear_ie"}
+            };
+
+            if (motor_controller_pointer.first == "AIE_absolute_position") {
+                auto it = joint_to_interface.find(jointInfo.name);
+                if (it != joint_to_interface.end()) {
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_POSITION, motor_controller_pointer.second));
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_VELOCITY, &placeholder_velocity));
+                    state_interfaces.emplace_back(hardware_interface::StateInterface(it->second, hardware_interface::HW_IF_EFFORT, &placeholder_effort));
+                }
+            }
         }
     }
 
-    // // For the PDB broadcaster.
+    // For the PDB broadcaster.
     for (std::pair<std::string, double*>& pdb_pointer : pdb_data_.get_pointers()) {
         state_interfaces.emplace_back(hardware_interface::StateInterface("PDB", pdb_pointer.first, pdb_pointer.second));
     }
@@ -191,20 +196,14 @@ std::vector<hardware_interface::StateInterface> MarchExoSystemInterface::export_
 /** Returns a vector of the CommandInterfaces.
  *
  * This method is implemented so that the position controller can set the calculated positions.
- * It does this by getting a pointer to the variable that stores the effort_commands in this class.
- *
- * In this case this is the same as the vector containing the position state. Meaning that the broadcaster controller
- * will say that the joints are in the exact positions position controller wants them to be.
- */
+ * It does this by getting a pointer to the variable that stores the target positions in this class.
+*/
 std::vector<hardware_interface::CommandInterface> MarchExoSystemInterface::export_command_interfaces()
 {
     RCLCPP_INFO((*logger_), "Creating export command interface.");
     std::vector<hardware_interface::CommandInterface> command_interfaces;
-    for (JointInfo& jointInfo : joints_info_) {
-        RCLCPP_INFO((*logger_), "Creating command interface for joint %s", jointInfo.name.c_str());
-        // Effort: Couples the command controller to the value jointInfo.target_torque through a pointer.
-        // command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        //     jointInfo.name, hardware_interface::HW_IF_EFFORT, &jointInfo.target_torque));
+
+    for (JointInfo& jointInfo : joints_info_) {      
         // Position: Couples the command controller to the value jointInfo.target_position through a pointer.
         command_interfaces.emplace_back(hardware_interface::CommandInterface(
             jointInfo.name, hardware_interface::HW_IF_POSITION, &jointInfo.target_position));
@@ -241,6 +240,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             jointInfo.joint.sendPID();             
             jointInfo.joint.readFirstEncoderValues(/*operational_check/=*/true); // Operational check: check if there are already incoming low level errors
             jointInfo.position = jointInfo.joint.getPosition();
+            jointInfo.joint.getMotorController()->sendTargetPosition((float)jointInfo.joint.getPosition());
             jointInfo.target_position = (float)jointInfo.joint.getPosition();
             jointInfo.torque = jointInfo.joint.getTorque();
             jointInfo.target_torque = jointInfo.joint.getTorque();
@@ -250,8 +250,7 @@ hardware_interface::return_type MarchExoSystemInterface::start()
             RCLCPP_WARN((*logger_), "The first set torque value is %f", jointInfo.target_torque);
 
             // If no weight has been assigned, we start in position control.
-            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight
-                || isnan(jointInfo.position_weight)) {
+            if (!jointInfo.torque_weight || isnan(jointInfo.torque_weight) || !jointInfo.position_weight || isnan(jointInfo.position_weight)) {
                 jointInfo.torque_weight = 0.0f;
                 jointInfo.position_weight = 1.0f;
             }               
@@ -361,12 +360,12 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
         /*function=*/
         [this](march::Joint& joint) {
             
-            // For debugging purposes.
-            // auto motor_controller_state = joint.getMotorController()->getState();
-            // RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
-            // joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
-            // motor_controller_state->getErrorStatus().c_str());
-
+// #ifdef DEBUG_MODE
+            auto motor_controller_state = joint.getMotorController()->getState();
+            RCLCPP_WARN((*logger_), "MotorController of joint %s is in the following state %s.\n Error Status: \n%s",
+            joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
+            motor_controller_state->getErrorStatus().c_str());
+// #endif
             return joint.getMotorController()->getState()->isOperational();
         },
         /*logger=*/(*logger_), /*joints=*/joints,
@@ -378,6 +377,7 @@ void MarchExoSystemInterface::make_joints_operational(std::vector<march::Joint*>
                 joint.getName().c_str(),
                 march::ODriveAxisState::toString(march::ODriveAxisState::CLOSED_LOOP_CONTROL).c_str(),
                 joint.getMotorController()->getState()->getOperationalState().c_str());
+            
         });
 }
 
@@ -388,8 +388,10 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
     RCLCPP_INFO_ONCE((*logger_), "Stopping EthercatCycle...");
     for (JointInfo& jointInfo : joints_info_) {
         // control on zero output torque when the exo shuts down.
-        // RCLCPP_INFO(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
+#ifndef DEBUG_MODE
+        RCLCPP_WARN(rclcpp::get_logger(jointInfo.joint.getName().c_str()), "Position is: %f", jointInfo.position);
         jointInfo.joint.actuate((float)jointInfo.position, /*torque=*/0.0f, 1.0f, 0.0f);
+#endif
     }
     joints_ready_for_actuation_ = false;
     march_robot_->stopEtherCAT();
@@ -405,6 +407,8 @@ hardware_interface::return_type MarchExoSystemInterface::stop()
  */
 hardware_interface::return_type MarchExoSystemInterface::read()
 {
+    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+
     if (!is_ethercat_alive(this->march_robot_->getLastEthercatException(), (*logger_))) {
         // This is necessary as in ros foxy return::type error does not yet bring it to a stop (which it should).
         throw runtime_error("Ethercat is not alive!");
@@ -413,37 +417,20 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     // Wait for the ethercat train to be back.
     this->march_robot_->waitForPdo();
 
+    // Read out the joint data, published through the march_motor_controller_state_broadcaster
     for (JointInfo& jointInfo : joints_info_) {
         jointInfo.joint.readEncoders();
         jointInfo.position = jointInfo.joint.getPosition();
         jointInfo.velocity = jointInfo.joint.getVelocity();
         jointInfo.torque = jointInfo.joint.getTorque();
-        jointInfo.effort_actual = jointInfo.joint.getMotorController()->getActualEffort();
         jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
     }  
 
-    RCLCPP_INFO_ONCE((*logger_), "%sReading has started!",LColor::BLUE);
+    // Read out the pdb data, published through the march_pdb_state_broadcaster
+    // TODO: test what happens when the pdb isn't 
+    march_robot_->getPowerDistributionBoard().read(pdb_data_);
 
     return hardware_interface::return_type::OK;
-}
-
-/**
- * @brief Reads the pdb data from the hardware and updates it so that the broadcaster can publish it.
- * Raises warnings if the voltage goes below a certain value.
- * The data is published on `/march/pdb_data`.
- */
-void MarchExoSystemInterface::pdb_read()
-{
-    march_robot_->getPowerDistributionBoard().read(pdb_data_);
-    if (pdb_data_.battery_voltage != 0) {
-        if (pdb_data_.battery_voltage < 40) {
-            RCLCPP_ERROR_THROTTLE(
-                (*logger_), clock_, 500, "Battery voltage is less then 40V, it is: %gV.", pdb_data_.battery_voltage);
-        } else if (pdb_data_.battery_voltage < 45) {
-            RCLCPP_WARN_THROTTLE(
-                (*logger_), clock_, 1000, "Battery voltage is less then 45V, it is: %gV.", pdb_data_.battery_voltage);
-        }
-    }
 }
 
 /** This is the update loop of the command interface.
@@ -467,9 +454,11 @@ hardware_interface::return_type MarchExoSystemInterface::write()
             throw runtime_error("Joint not in valid state!");
         }
 
-    // Actuate joint in state 8, comment for debugging
+    // Actuate joint in state 8
+#ifndef DEBUG_MODE
     jointInfo.joint.actuate((float)jointInfo.target_position, (float)jointInfo.target_torque,
         (float)jointInfo.position_weight, (float)jointInfo.torque_weight);
+#endif
     }
 
     RCLCPP_INFO_ONCE((*logger_), "%sActuation has started!",LColor::BLUE);
@@ -481,10 +470,10 @@ hardware_interface::return_type MarchExoSystemInterface::write()
 // TODO: (re)move to hwi_util. Possibly add additional checks. 
 bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 {
-    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_in_limit(jointInfo);
+    return is_motor_controller_in_a_valid_state(jointInfo.joint, (*logger_)) && !is_joint_outside_limits(jointInfo);
 }
 
-bool MarchExoSystemInterface::is_joint_in_limit(JointInfo& jointInfo)
+bool MarchExoSystemInterface::is_joint_outside_limits(JointInfo& jointInfo)
 {
     // SOFT Limit check.
     if (jointInfo.joint.isWithinSoftLimits()) {
@@ -540,11 +529,9 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
 {
     auto pos_iterator = info.hardware_parameters.find("robot");
     if (pos_iterator == info.hardware_parameters.end()) {
-        throw std::invalid_argument("Hardware Parameter 'robot' not specified. Check under your "
-                                    "'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
+        throw std::invalid_argument("Hardware Parameter 'robot' not specified. Check under your ""'<hardware>' tag in the 'control/xacro/ros2_control.xacro' file.");
     }
-    string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder")
-        + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
+    string robot_config_file_path = ament_index_cpp::get_package_share_directory("march_hardware_builder") + PATH_SEPARATOR + "robots" + PATH_SEPARATOR + pos_iterator->second + ".yaml";
 
     RCLCPP_INFO((*logger_), "Robot config file path: %s", robot_config_file_path.c_str());
 
@@ -559,18 +546,6 @@ std::unique_ptr<march::MarchRobot> MarchExoSystemInterface::load_march_hardware(
     return hw_builder.createMarchRobot(/*active_joint_names=*/joint_names);
 }
 
-bool MarchExoSystemInterface::has_correct_actuation_mode(march::Joint& joint) const
-{
-    const auto& actuation_mode = joint.getMotorController()->getActuationMode();
-    if (actuation_mode != march::ActuationMode::torque) {
-        RCLCPP_FATAL((*logger_),
-            "Actuation mode for joint %s is not torque, but is %s.\n "
-            "Check your `march_hardware_builder/robots/... .yaml`.",
-            joint.getName().c_str(), actuation_mode.toString().c_str());
-        return false;
-    }
-    return true;
-}
 
 } // namespace march_system_interface
 

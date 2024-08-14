@@ -1,7 +1,7 @@
 [
     [
       {
-        "name": "left_ankle"
+        "name": "left_ankle_dpf"
       },
       {
         "name": "left_hip_aa"
@@ -17,7 +17,7 @@
   
     [
         {
-          "name": "right_ankle"
+          "name": "right_ankle_dpf"
         },
         {
           "name": "right_hip_aa"

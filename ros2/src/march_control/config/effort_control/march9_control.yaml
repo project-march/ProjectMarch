@@ -1,0 +1,42 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 200  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    march_pdb_state_broadcaster:
+      type: pdb_state_broadcaster/PdbStateBroadcaster
+
+    march_motor_controller_state_broadcaster:
+      type: march_motor_controller_state_broadcaster/MotorControllerStateBroadcaster
+    
+    march_joint_position_controller:
+      type: forward_command_controller/ForwardCommandController
+
+march_motor_controller_state_broadcaster:
+  ros__parameters:
+    # If the one of the following joint names is in the xacro than the pdb will broadcast its motor controller info.
+    possible_joints:
+      - left_ankle_dpf
+      - left_hip_aa
+      - left_hip_fe
+      - left_knee
+      - right_ankle_dpf
+      - right_hip_aa
+      - right_hip_fe
+      - right_knee
+    interface_name: position
+
+march_joint_position_controller:
+  ros__parameters:
+    joints:
+      - left_ankle_dpf
+      - left_hip_aa
+      - left_hip_fe
+      - left_knee
+      - right_ankle_dpf
+      - right_hip_aa
+      - right_hip_fe
+      - right_knee
+    interface_name: position

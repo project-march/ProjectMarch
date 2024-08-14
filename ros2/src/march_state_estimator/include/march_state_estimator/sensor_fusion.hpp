@@ -23,7 +23,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
-#include "march_state_estimator/robot_description.hpp"
+#include "march_state_estimator/robot_description/robot_description.hpp"
 #include "march_state_estimator/torque_converter.hpp"
 
 const unsigned int STATE_DIMENSION_SIZE = 27;
@@ -68,6 +68,7 @@ public:
     uint8_t getCurrentStanceLeg() const;
     uint8_t getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const;
 
+    sensor_msgs::msg::JointState getEstimatedJointState() const;
 
     RobotNode::JointNameToValueMap getJointPositions() const;
     Eigen::Quaterniond getInertialOrientation() const;

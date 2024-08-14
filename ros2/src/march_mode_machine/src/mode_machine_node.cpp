@@ -26,6 +26,8 @@ ModeMachineNode::ModeMachineNode()
 
     m_mode_publisher = create_publisher<march_shared_msgs::msg::ExoMode>("current_mode", 10);
 
+    m_previous_mode = 3; 
+
     RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Mode Machine Node succesfully initialized");
 }
 
@@ -37,7 +39,7 @@ ModeMachineNode::~ModeMachineNode()
 
 void ModeMachineNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_Response::SharedPtr response) const
 {
-    std::set<exoMode> available_modes = m_mode_machine.getAvailableModes((exoMode)m_mode_machine.getCurrentMode());
+    std::set<ExoMode> available_modes = m_mode_machine.getAvailableModes((ExoMode)m_mode_machine.getCurrentMode());
 
     // Clear the existing modes in the msg
     response->mode_array.modes.clear();
@@ -48,25 +50,47 @@ void ModeMachineNode::fillExoModeArray(march_shared_msgs::srv::GetExoModeArray_R
         exoModeMsg.mode = static_cast<int8_t>(mode);
         response->mode_array.modes.push_back(exoModeMsg);
     }
+
+    response->current_mode.mode = m_mode_machine.getCurrentMode();
+
 }
 
 void ModeMachineNode::handleGetExoModeArray(const std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Request> request,
         std::shared_ptr<march_shared_msgs::srv::GetExoModeArray::Response> response)
 {
-    RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Request received!");
-    exoMode new_mode = (exoMode)request->desired_mode.mode;
+    RCLCPP_DEBUG(rclcpp::get_logger("mode_machine"), "Request received!");
+    ExoMode new_mode = (ExoMode)request->desired_mode.mode;
+    m_previous_mode = m_mode_machine.getCurrentMode(); 
     if (m_mode_machine.isValidTransition(new_mode))
     {
         m_mode_machine.performTransition(new_mode);
         auto mode_msg = march_shared_msgs::msg::ExoMode();
+        mode_msg.header.stamp = this->now();
         mode_msg.mode = m_mode_machine.getCurrentMode();
+        mode_msg.previous_mode = m_previous_mode; 
+
+        auto it = modeNodeTypeMap.find((ExoMode)mode_msg.mode); 
+        if (it != modeNodeTypeMap.end()){
+            mode_msg.node_type = it->second; 
+        } else {
+            mode_msg.node_type = "unknown"; 
+        }
+
+        RCLCPP_DEBUG(this->get_logger(), "Node_type set to %s", mode_msg.node_type.c_str()); 
+        // end test lifecycle nodes 
         m_mode_publisher->publish(mode_msg);
+        if (mode_msg.mode == 10){
+            march_shared_msgs::msg::FootStepOutput feet_msg; 
+            feet_msg.distance = 0.4;
+            m_footsteps_dummy_publisher->publish(feet_msg); 
+        }
+
     } else 
     {
         RCLCPP_WARN(rclcpp::get_logger("mode_machine"), "Invalid mode transition! Ignoring new mode.");
     }
     fillExoModeArray(response);
-    RCLCPP_INFO(rclcpp::get_logger("mode_machine"), "Response sent!");
+    RCLCPP_DEBUG(this->get_logger(), "Response sent!");
 }
 /**
  * Main function to run the node.

@@ -25,26 +25,29 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_prev_gait_type(), 
    m_first_step_angle_trajectory(), 
    m_complete_step_angle_trajectory(),
+   m_half_step_angle_trajectory(),
    m_stand_to_sit_trajectory(), 
-   m_sideways_trajectory(),
+   m_sideways_right_trajectory(),
+   m_sideways_left_trajectory(),
    m_sit_to_stand_trajectory(),
    m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
+   m_hip_tilt(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_first_step.csv", m_first_step_angle_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_full_step.csv", m_complete_step_angle_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close.csv", m_step_close_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_half_step.csv", m_half_step_angle_trajectory); 
+
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv", m_stand_to_sit_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv", m_sideways_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep_right.csv", m_sideways_right_trajectory); 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sidestep_left.csv", m_sideways_left_trajectory);
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
-    processCSVFile("src/march_gait_planning/m9_gait_files/ascending/ascending_gait.csv", m_ascending_trajectory);
-    processCSVFile("src/march_gait_planning/m9_gait_files/descending/descending_gait.csv", m_descending_trajectory);
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
-
-    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/cartesian_in_joint_angle_step_close.csv", m_step_close_trajectory); 
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -53,7 +56,7 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     std::vector<CSVRow> data; 
     std::ifstream file(path); 
     if (!file.is_open()){
-        std::cerr << "Error opening file" << std::endl; 
+        std::cerr << "Error opening file" << path << std::endl; 
     }
     std::string line; 
     while (std::getline(file, line)){
@@ -80,11 +83,11 @@ void GaitPlanningAngles::processCSVFile(const std::string &path, std::vector<std
     m_prev_point = member_variable[0];
 }
 
-void GaitPlanningAngles::setGaitType(const exoMode &new_gait_type){
+void GaitPlanningAngles::setGaitType(const ExoMode &new_gait_type){
     m_gait_type = new_gait_type; 
 }
 
-void GaitPlanningAngles::setPrevGaitType(const exoMode &prev_gait_type){
+void GaitPlanningAngles::setPrevGaitType(const ExoMode &prev_gait_type){
     m_prev_gait_type = prev_gait_type; 
 }
 
@@ -100,11 +103,19 @@ void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
     m_home_stand = stand; 
 }
 
-exoMode GaitPlanningAngles::getGaitType() const {
+void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
+    m_stance_foot = foot; 
+}
+
+void GaitPlanningAngles::setHipTilt(const double &hip_tilt){
+    m_hip_tilt = hip_tilt; 
+}
+
+ExoMode GaitPlanningAngles::getGaitType() const {
     return m_gait_type; 
 }
 
-exoMode GaitPlanningAngles::getPrevGaitType() const {
+ExoMode GaitPlanningAngles::getPrevGaitType() const {
     return m_prev_gait_type; 
 }
 
@@ -125,33 +136,68 @@ std::vector<std::vector<double>> GaitPlanningAngles::getFirstStepAngleTrajectory
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getFullGaitAngleCSV() const{
-    return m_complete_step_angle_trajectory; 
+    switch (m_stance_foot){
+        case RIGHT_STANCE_LEG :
+        // right stance foot
+        return m_half_step_angle_trajectory; 
+        case LEFT_STANCE_LEG : {
+        // left stance foot 
+        std::vector<std::vector<double>> swapped_half_step = swapLeftAndRightColumns(m_half_step_angle_trajectory); 
+        return swapped_half_step; 
+        }
+        default : 
+        return m_half_step_angle_trajectory; 
+    }
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getStandToSitGait() const{
     return m_stand_to_sit_trajectory; 
 }
 
-std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysGait() const{
-    return m_sideways_trajectory; 
+std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysRightGait() const{
+    return m_sideways_right_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getSidewaysLeftGait() const{
+    return m_sideways_left_trajectory; 
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getSitToStandGait() const{
     return m_sit_to_stand_trajectory; 
 }
 
-std::vector<std::vector<double>> GaitPlanningAngles::getAscendingGait() const{
-    return m_ascending_trajectory; 
-}
-
-std::vector<std::vector<double>> GaitPlanningAngles::getDescendingGait() const{
-    return m_descending_trajectory; 
-}
-
 std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
-    return m_step_close_trajectory; 
+    switch (m_stance_foot){
+        case RIGHT_STANCE_LEG :
+        return m_step_close_trajectory;  
+        case LEFT_STANCE_LEG : {
+        std::vector<std::vector<double>> swapped_step_close = swapLeftAndRightColumns(m_step_close_trajectory); 
+        return swapped_step_close; 
+        }
+        default : 
+        return m_step_close_trajectory; 
+    }
 }
 
 std::vector<std::vector<double>> GaitPlanningAngles::getHingeGait() const{
     return m_hinge_trajectory; 
+}
+
+uint8_t GaitPlanningAngles::getStanceFoot() const {
+    return m_stance_foot; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::swapLeftAndRightColumns(const std::vector<std::vector<double>>& matrix) const{
+    std::vector<std::vector<double>> half_step_swapped = matrix; 
+    for (auto& row : half_step_swapped){
+        std::swap(row[0], row[4]);
+        std::swap(row[1], row[5]);
+        std::swap(row[2], row[6]);
+        std::swap(row[3], row[7]);
+    }
+    return half_step_swapped; 
+}
+
+double GaitPlanningAngles::getHipTilt() const {
+    return m_hip_tilt; 
 }

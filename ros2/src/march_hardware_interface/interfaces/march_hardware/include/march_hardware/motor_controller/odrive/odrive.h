@@ -18,12 +18,6 @@
 #include <string>
 #include <unordered_map>
 
-/* For more info see
- * https://docs.odriverobotics.com/
- * https://discourse.odriverobotics.com/t/where-does-the-formula-for-calculating-torque-come-from/1169
- */
-#define KV_TO_TORQUE_CONSTANT 8.27
-
 namespace march {
 class ODrive : public MotorController {
 public:
@@ -35,15 +29,13 @@ public:
      * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr.
      * @param torque_sensor pointer to the torque sensor, required so cannot be nullptr.
      * @param actuation_mode actuation mode in which the ODrive must operate.
-     * @param is_incremental_encoder_more_precise whether to use the incremental or absolute encoder at every 'relative'
-     * update.
+     * @param use_inc_enc_for_position whether to use the incremental encoder for position updates.
      * @param logger The logger to print warning or info to the terminal.
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-        ActuationMode actuation_mode, bool index_found, unsigned int motor_kv, bool is_incremental_encoder_more_precise,
-        std::shared_ptr<march_logger::BaseLogger> logger);
+        ActuationMode actuation_mode, bool use_inc_enc_for_position,bool index_found,std::shared_ptr<march_logger::BaseLogger> logger);
 
     ~ODrive() noexcept override = default;
 
@@ -52,9 +44,9 @@ public:
     void enableActuation() override;
     void actuateTorque(float target_torque, float fuzzy_weight) override;
     void actuateRadians(float target_position, float fuzzy_weight) override;
+    void sendTargetPosition(float target_position) override;
 
-     void sendPID(
-        std::array<double, 3> pos_pid, std::array<double, 3> tor_pid) override;
+     void sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pid) override;
 
     // Override reset function
     std::chrono::nanoseconds reset() override;
@@ -67,13 +59,10 @@ public:
     // Get a full description of the state of the ODrive
     std::unique_ptr<MotorControllerState> getState() override;
 
-    // Getters for specific information about the state of the motor and the
-    // ODrive
-    //    float getTorque() override;
+    // Getters for specific information about the state of the motor and the MDrive
     float getMotorCurrent() override;
     float getMotorControllerVoltage() override;
     float getMotorVoltage() override;
-    float getActualEffort() override;
     float getMotorTemperature();
     float getOdriveTemperature();
 
@@ -94,20 +83,21 @@ private:
     void waitForState(ODriveAxisState target_state);
     ODriveAxisState getAxisState();
 
-    int32_t getAbsolutePositionIU();
+    uint32_t getAbsolutePositionIU();
     int32_t getIncrementalPositionIU();
     float getIncrementalVelocityIU();
+    float getAIEAbsolutePositionRad(); 
+    uint32_t getCheckSum();
 
-    uint32_t getOdriveError();
+    uint32_t getODriveError();
     uint32_t getAxisError();
-    uint32_t getMotorError();
-    uint32_t getDieBOSlaveError();
+    uint64_t getMotorError();
     uint32_t getEncoderError();
+    uint32_t getTorqueSensorError();
     uint32_t getControllerError();
 
     ODriveAxis axis_;
     bool index_found_;
-    float torque_constant_;
 };
 
 } // namespace march

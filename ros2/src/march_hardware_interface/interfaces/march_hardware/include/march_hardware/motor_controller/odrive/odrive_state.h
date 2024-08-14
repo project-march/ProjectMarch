@@ -32,10 +32,8 @@ public:
         ENCODER_HALL_PHASE_CALIBRATION = 13,
 
         // Custom MARCH-made request-only states
-        // This will execute functions on the DieBoSlave while the ODrive stays
-        // in Idle state
+        // This will execute functions while the ODrive stays in idle state
         CLEAR_ODRIVE_ERRORS = 32,
-        CLEAR_DIEBOSLAVE_ERRORS = 33,
         CLEAR_ALL_ERRORS = 34
     };
 
@@ -117,7 +115,6 @@ public:
 
     bool dataIsValid() const override
     {
-        // std::cout << axis_state_.value_ << '\n';
         return axis_state_.value_ != ODriveAxisState::UNDEFINED;
     }
 
@@ -127,10 +124,10 @@ public:
         return axis_state_.value_ == ODriveAxisState::CLOSED_LOOP_CONTROL;
     }
 
+    // TODO: add torque_sensor_error
     bool hasError() const override
     {
-        return odrive_error_ != 0 || axis_error_ != 0 || motor_error_ != 0 || encoder_error_ != 0
-            || dieboslave_error_ != 0 || controller_error_ != 0;
+        return odrive_error_ != 0 || axis_error_ != 0 || motor_error_ != 0 || encoder_error_ != 0 || controller_error_ != 0 || torquesensor_error_ != 0;
     }
 
     std::string getErrorStatus() const override
@@ -145,11 +142,9 @@ public:
                         << std::endl
                         << "Encoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR)
                         << std::endl
-                        << "DieBOSlave: "
-                        << error::parseError(dieboslave_error_, error::ErrorRegister::ODRIVE_DIEBOSLAVE_ERROR)
+                        << "Torque sensor: " << error::parseError(torquesensor_error_, error::ErrorRegister::ODRIVE_TORQUESENSOR_ERROR)
                         << std::endl
-                        << "Controller: "
-                        << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
+                        << "Controller: " << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
         return error_stream.str();
     }
 
@@ -162,9 +157,9 @@ public:
     ODriveAxisState axis_state_;
     uint32_t odrive_error_ {};
     uint32_t axis_error_ {};
-    uint32_t motor_error_ {};
+    uint64_t motor_error_ {};
     uint32_t encoder_error_ {};
-    uint32_t dieboslave_error_ {};
+    uint32_t torquesensor_error_ {};
     uint32_t controller_error_ {};
 };
 

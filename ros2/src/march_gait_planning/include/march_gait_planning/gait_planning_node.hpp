@@ -6,24 +6,37 @@
 #include <vector>
 #include <array>  
 #include <set>
+#include <iostream>
+#include <fstream>
+#include <sstream> 
+#include <unistd.h>
+#include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp" 
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "march_gait_planning/gait_planning.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
 #include "march_shared_msgs/msg/exo_mode.hpp"
 #include "march_shared_msgs/msg/foot_step_output.hpp"
+#include "march_shared_msgs/msg/visualization_beziers.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "std_msgs/msg/string.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "march_shared_msgs/srv/get_current_stance_leg.hpp"
 
+using namespace std::chrono_literals; 
 
-class GaitPlanningNode:public rclcpp::Node {
+class GaitPlanningCartesianNode:public rclcpp_lifecycle::LifecycleNode {
     public: 
-    explicit GaitPlanningNode();
-    // typedef std::array<double, 4> XZFeetPositionsArray; 
-    // typedef std::array<double, 3> XYZFootPositionArray; 
+    explicit GaitPlanningCartesianNode();
+
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &state) override;
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &state) override; 
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &state) override; 
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &state) override;
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State &state) override;
 
     private: 
 
@@ -38,8 +51,8 @@ class GaitPlanningNode:public rclcpp::Node {
         }
     };
     
-    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
-    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr m_interpolated_bezier_visualization_publisher; 
+    rclcpp_lifecycle::LifecyclePublisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_iks_foot_positions_publisher; 
+    rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseArray>::SharedPtr m_interpolated_bezier_visualization_publisher_rviz; 
     rclcpp::Subscription<march_shared_msgs::msg::ExoMode>::SharedPtr m_exo_mode_subscriber; // exo_mode == gait_type 
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_exo_joint_state_subscriber; 
 
@@ -52,7 +65,8 @@ class GaitPlanningNode:public rclcpp::Node {
     void MPCCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg); 
     void setFootPositionsMessage(double left_x, double left_y, double left_z, 
                             double right_x, double right_y, double right_z);
-    void publishFootPositions(); 
+    void publishFootPositions();
+    void rotateFootPositions();
     void processStand(); 
     void finishCurrentTrajectory(); 
     void publishIncrements(); 
@@ -62,6 +76,8 @@ class GaitPlanningNode:public rclcpp::Node {
     void publishWalk(); 
     void publishHeightGaits(); 
     void publishVariableWalk(); 
+    std::vector<double> parseHomestandYAML(const std::string& file_path);  
+    double parseHipTiltYAML(const std::string& file_path); 
 
     GaitPlanning m_gait_planning; 
 
@@ -72,13 +88,16 @@ class GaitPlanningNode:public rclcpp::Node {
     std::vector<double> m_increments; 
 
     std::vector<GaitPlanning::XZFeetPositionsArray> m_current_trajectory; 
-    march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg;
-    geometry_msgs::msg::Pose::SharedPtr m_pose;  
-    geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg; 
+    march_shared_msgs::msg::IksFootPositions::SharedPtr m_desired_footpositions_msg; 
+    geometry_msgs::msg::Pose::SharedPtr m_pose; 
+    geometry_msgs::msg::PoseArray::SharedPtr m_visualization_msg_rviz; 
     rclcpp::TimerBase::SharedPtr m_timer;
     std::vector<double> m_home_stand; 
+    double m_hip_tilt; 
     bool m_single_execution_done;
     bool m_variable_first_step_done; 
     int m_variable_walk_swing_leg; 
+    bool m_active; 
+    bool m_first_step; 
 
 };

@@ -1,0 +1,61 @@
+ik_manager:
+  ros__parameters:
+    exo_modes:
+    - Sit
+    - Stand
+    - Walk
+    - BootUp
+    - Error
+    - SidewaysRight
+    - SidewaysLeft
+    - LargeWalk
+    - SmallWalk
+    - Ascending
+    - Descending
+    - VariableStep
+    - VariableWalk
+    - HighStep1
+    - HighStep2
+    - HighStep3
+    - Hinge
+    stack_of_tasks:
+      Stand:
+      - posture
+      - motion
+      Sit:
+      - posture
+      - motion
+      SidewaysRight:
+      - posture
+      - motion
+      SidewaysLeft:
+      - posture
+      - motion
+      Ascending:
+      - posture
+      - motion
+      Descending:
+      - posture
+      - motion
+      LargeWalk:
+      - posture
+      - motion
+      SmallWalk:
+      - posture
+      - motion
+      VariableStep:
+      - posture
+      - motion
+      VariableWalk:
+      - posture
+      - motion
+      - stability
+      HighStep1:
+      - posture
+      - motion
+      HighStep2:
+      - posture
+      - motion
+      HighStep3:
+      - posture
+      - motion

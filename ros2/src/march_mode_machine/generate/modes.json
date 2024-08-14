@@ -2,79 +2,83 @@
   [
     {
       "name": "Stand",
-      "exoMode": 1
+      "ExoMode": 1
     },
     {
       "name": "Walk",
-      "exoMode": 2
+      "ExoMode": 2
     },
     {
       "name": "Sit",
-      "exoMode": 0
+      "ExoMode": 0
     }
   ],
 
 
   [
     {
-      "name": "Sideways",
-      "exoMode": 5
+      "name": "SidewaysRight",
+      "ExoMode": 5
+    },
+    {
+      "name": "SidewaysLeft",
+      "ExoMode": 16
     },
     {
       "name": "Ascending",
-      "exoMode": 8
+      "ExoMode": 8
     },
     {
       "name": "Descending",
-      "exoMode": 9
+      "ExoMode": 9
     }
   ],
   [
     {
       "name": "LargeWalk",
-      "exoMode": 6
+      "ExoMode": 6
     },
     {
       "name": "SmallWalk",
-      "exoMode": 7
+      "ExoMode": 7
     },
     {
       "name": "VariableStep",
-      "exoMode": 10
+      "ExoMode": 10
     }
   ],
   [
     {
       "name": "VariableWalk",
-      "exoMode": 11
+      "ExoMode": 11
     },
     {
       "name": "Hinge",
-      "exoMode": 15
+      "ExoMode": 15
     }
   ],
   [
     {
       "name": "HighStep1",
-      "exoMode": 12
+      "ExoMode": 12
     },
     {
       "name": "HighStep2",
-      "exoMode": 13
+      "ExoMode": 13
     },
     {
       "name": "HighStep3",
-      "exoMode": 14
+      "ExoMode": 14
     }
   ],
   [
     {
       "name": "Error",
-      "exoMode": 4
+      "ExoMode": 4
     },
     {
       "name": "BootUp",
-      "exoMode": 3
+      "ExoMode": 3
     }
   ]
 ]

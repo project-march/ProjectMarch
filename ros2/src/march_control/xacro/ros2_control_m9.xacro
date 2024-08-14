@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- Defines a normal effort joint used for within a ros2_control tag. Used in the exo. -->
+<xacro:macro name="effort_joint"
+             params="name stop_when_outside_hard_limits:=^ msec_until_error_when_in_error_soft_limits:=^">
+  <joint name="${name}">
+    <command_interface name="position"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+    <state_interface name="effort"/>
+    <param name="stop_when_outside_hard_limits">${stop_when_outside_hard_limits}</param>
+    <param name="msec_until_error_when_in_error_soft_limits">${msec_until_error_when_in_error_soft_limits}</param>
+  </joint>
+</xacro:macro>
+
+<!-- Defines a basic position joint used for within a ros2_control tag. Used when running simulation only. -->
+<xacro:macro name="simulation_joint" params="name">
+  <joint name="${name}">
+    <command_interface name="position"/>
+    <state_interface name="position"/>
+  </joint>
+</xacro:macro>
+
+<xacro:macro name="march_joint"
+             params="name type:=^|effort
+               stop_when_outside_hard_limits:=^|true
+               msec_until_error_when_in_error_soft_limits:=^|100">
+  <xacro:if value="${type != 'simulation'}">
+    <xacro:effort_joint name="${name}"/>
+  </xacro:if>
+  <xacro:if value="${type == 'simulation'}">
+    <xacro:simulation_joint name="${name}"/>
+  </xacro:if>
+</xacro:macro>
+
+<!-- You have 2 types 'effort' or 'simulation' if you do simulation you should only open simulation. -->
+<xacro:arg name="type" default='effort'/>
+<xacro:property name="type" value="$(arg type)"/>
+
+<!-- You have 2 types 'effort' or 'simulation' if you do simulation you should only open simulation (not gazebo!). -->
+<!-- Has no effect if type is simulation.-->
+<xacro:arg name="simulation" default="true"/>
+
+<ros2_control name="march" type="system">
+  <hardware>
+    <xacro:if value="${type == 'simulation'}">
+      <plugin>march_system_interface/MarchMockSystemInterface</plugin>
+    </xacro:if>
+    <xacro:if value="${type == 'effort'}">
+      <plugin>march_system_interface/MarchExoSystemInterface</plugin>
+      <param name="robot">hardware_izzy</param>
+    </xacro:if>
+  </hardware>
+
+  <xacro:march_joint name="left_ankle_dpf"/>
+  <xacro:march_joint name="left_hip_aa"/>
+  <xacro:march_joint name="left_hip_fe"/>
+  <xacro:march_joint name="left_knee"/>
+  <xacro:march_joint name="right_ankle_dpf"/>
+  <xacro:march_joint name="right_hip_aa"/>
+  <xacro:march_joint name="right_hip_fe"/>
+  <xacro:march_joint name="right_knee"/>
+
+</ros2_control>
+
+</robot>

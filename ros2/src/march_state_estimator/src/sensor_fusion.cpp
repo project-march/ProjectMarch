@@ -42,6 +42,7 @@ SensorFusion::SensorFusion(const RobotDescription::SharedPtr robot_description, 
 void SensorFusion::configureJointNames(const std::vector<std::string>& joint_names)
 {
     m_joint_names = joint_names;
+
     m_joint_positions.clear();
     m_joint_velocities.clear();
     m_joint_accelerations.clear();
@@ -68,18 +69,9 @@ void SensorFusion::updateJointState(const sensor_msgs::msg::JointState::SharedPt
 {
     for (unsigned int i = 0; i < joint_state->name.size(); i++) {
         m_joint_accelerations[joint_state->name[i]] = (joint_state->velocity[i] - m_joint_velocities[joint_state->name[i]]) / m_state_estimator_timestep;
-        
-        if (!isnanl(joint_state->position[i])) {
-            m_joint_positions[joint_state->name[i]] = joint_state->position[i];
-        }
-
-        if (!isnanl(joint_state->velocity[i])) {
-            m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
-        }
-
-        if (!isnanl(joint_state->effort[i])) {
-            m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
-        }
+        m_joint_positions[joint_state->name[i]] = joint_state->position[i];
+        m_joint_velocities[joint_state->name[i]] = joint_state->velocity[i];
+        m_joint_total_torques[joint_state->name[i]] = joint_state->effort[i];
     }
 }
 
@@ -96,12 +88,12 @@ void SensorFusion::updateDynamicsState()
     m_joint_dynamical_torques = m_torque_converter->getDynamicalTorques(m_joint_positions, m_joint_velocities, m_joint_accelerations);
     m_joint_external_torques = m_torque_converter->getExternalTorques(m_joint_total_torques, m_joint_dynamical_torques);
 
-    m_left_foot_force = m_torque_converter->getExternalForceByNode("L_foot", m_joint_positions, m_joint_external_torques);
-    m_right_foot_force = m_torque_converter->getExternalForceByNode("R_foot", m_joint_positions, m_joint_external_torques);
+    m_left_foot_force = m_torque_converter->getExternalForceByNode("L_sole", m_joint_positions, m_joint_external_torques);
+    m_right_foot_force = m_torque_converter->getExternalForceByNode("R_sole", m_joint_positions, m_joint_external_torques);
 
     updateCurrentStanceLeg(m_left_foot_force.z(), m_right_foot_force.z(),
-        m_robot_description->findNode("L_foot")->getGlobalPosition(m_joint_positions),
-        m_robot_description->findNode("R_foot")->getGlobalPosition(m_joint_positions));
+        m_robot_description->findNode("L_sole")->getGlobalPosition(m_joint_positions),
+        m_robot_description->findNode("R_sole")->getGlobalPosition(m_joint_positions));
 }
 
 Eigen::Vector3d SensorFusion::getLeftFootForce() const
@@ -121,7 +113,7 @@ uint8_t SensorFusion::getCurrentStanceLeg() const
 
 uint8_t SensorFusion::getNextStanceLeg(const double& left_foot_position, const double& right_foot_position) const
 {
-    const double margin = 0.01;
+    const double margin = 0.05;
 
     if (left_foot_position + margin <= right_foot_position) {
         return 0b10;
@@ -153,6 +145,21 @@ Eigen::Quaterniond SensorFusion::getInertialOrientation() const
 {
     // return m_state_posterior.imu_orientation;
     return m_quaternion;
+}
+
+sensor_msgs::msg::JointState SensorFusion::getEstimatedJointState() const
+{
+    sensor_msgs::msg::JointState estimated_joint_state;
+    estimated_joint_state.name = m_joint_names;
+
+    for (const auto& joint_name : m_joint_names)
+    {
+        estimated_joint_state.position.push_back(m_joint_positions.at(joint_name));
+        estimated_joint_state.velocity.push_back(m_joint_velocities.at(joint_name));
+        estimated_joint_state.effort.push_back(m_joint_total_torques.at(joint_name));
+    }
+
+    return estimated_joint_state;
 }
 
 RobotNode::JointNameToValueMap SensorFusion::getJointPositions() const

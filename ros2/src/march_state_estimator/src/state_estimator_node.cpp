@@ -5,10 +5,7 @@
 
 #include "march_state_estimator/state_estimator_node.hpp"
 
-#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/point.hpp"
-#include "geometry_msgs/msg/pose.hpp"
-#include "sensor_msgs/msg/joint_state.hpp"
 
 #include <chrono>
 #include <functional>
@@ -24,9 +21,50 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-SensorFusionNode::SensorFusionNode()
-    : Node("state_estimator_node")
+SensorFusionNode::SensorFusionNode(): Node("state_estimator")
 {
+    // Determine if it is a simulation or real robot
+    declare_parameter("simulation", true);
+    m_is_simulation = get_parameter("simulation").as_bool();
+    RCLCPP_INFO(this->get_logger(), "Simulation: %s", m_is_simulation ? "true" : "false");
+
+    // First initialize sensor values to zero
+    // Initialize joint states to zero
+    std::vector<std::string> joint_names = { 
+        "left_ankle_dpf", "left_ankle_ie", "left_hip_aa", "left_hip_fe", "left_knee",
+        "right_ankle_dpf", "right_ankle_ie", "right_hip_aa", "right_hip_fe", "right_knee"
+    };
+    m_joint_state = nullptr;
+    // m_joint_state = std::make_shared<sensor_msgs::msg::JointState>();
+    // m_joint_state->header.frame_id = "joint_link";
+    // m_joint_state->header.stamp = this->now();
+    // m_joint_state->name = joint_names;
+    // m_joint_state->position = std::vector<double>(joint_names.size(), 0.0);
+    // m_joint_state->velocity = std::vector<double>(joint_names.size(), 0.0);
+    // m_joint_state->effort = std::vector<double>(joint_names.size(), 0.0);
+    m_joint_state_last_update = this->now();
+
+    // Initialize IMU to identity quaternion and gravity in z-axis
+    m_imu = std::make_shared<sensor_msgs::msg::Imu>();
+    m_imu->header.frame_id = "backpack";
+    m_imu->header.stamp = this->now();
+    m_imu->orientation.w = 1.0;
+    m_imu->orientation.x = 0.0;
+    m_imu->orientation.y = 0.0;
+    m_imu->orientation.z = 0.0;
+    m_imu->angular_velocity.x = 0.0;
+    m_imu->angular_velocity.y = 0.0;
+    m_imu->angular_velocity.z = 0.0;
+    m_imu->linear_acceleration.x = 0.0;
+    m_imu->linear_acceleration.y = 0.0;
+    m_imu->linear_acceleration.z = -9.81;
+    m_imu_last_update = this->now();
+
+    // Set timeout values in seconds
+    // TODO: Set these values in a parameter file
+    m_joint_state_timeout = 1.0;
+    m_imu_timeout = 5.0;
+
     declare_parameter("robot_definition", std::string());
     std::string yaml_filename = get_parameter("robot_definition").as_string();
 
@@ -47,8 +85,8 @@ SensorFusionNode::SensorFusionNode()
         return;
     }
 
-    declare_parameter("timestep_in_ms", 50);
-    int dt = get_parameter("timestep_in_ms").as_int();
+    declare_parameter("clock_period", 0.05);
+    m_dt = get_parameter("clock_period").as_double();
 
     declare_parameter("left_stance_threshold", 400.0);
     declare_parameter("right_stance_threshold", 400.0);
@@ -62,23 +100,23 @@ SensorFusionNode::SensorFusionNode()
     m_sensors_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     m_sensors_subscription_options.callback_group = m_sensors_callback_group;
 
-    m_timer = this->create_wall_timer(
-        std::chrono::milliseconds(dt), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
-    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", rclcpp::SensorDataQoS(),
-        std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1),
-        m_sensors_subscription_options);
-    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu", rclcpp::SensorDataQoS(),
+    m_joint_state_sub = this->create_subscription<sensor_msgs::msg::JointState>("joint_states/filtered", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::jointStateCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>("lower_imu/filtered", rclcpp::SensorDataQoS(),
         std::bind(&SensorFusionNode::imuCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
-        std::bind(&SensorFusionNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
-    m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
-        std::bind(&SensorFusionNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_clock_pub = this->create_publisher<std_msgs::msg::Header>("state_estimation/clock", 10);
     m_state_estimation_pub
         = this->create_publisher<march_shared_msgs::msg::StateEstimation>("state_estimation/state", 10);
     m_feet_height_pub 
         = this->create_publisher<march_shared_msgs::msg::FeetHeightStamped>("state_estimation/feet_height", 10);
-    m_torque_left_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/torque/left", 10);
-    m_torque_right_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/torque/right", 10);
+    m_torque_left_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/left", 10);
+    m_torque_right_pub = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("state_estimation/ground_reaction_force/right", 10);
+
+    // Simulation ground truth information about position and velocity in world frame
+    m_imu_position_sub = this->create_subscription<geometry_msgs::msg::PointStamped>("lower_imu/position", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::imuPositionCallback, this, std::placeholders::_1), m_sensors_subscription_options);
+    m_imu_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("lower_imu/velocity", rclcpp::SensorDataQoS(),
+        std::bind(&SensorFusionNode::imuVelocityCallback, this, std::placeholders::_1), m_sensors_subscription_options);
 
     // M8's MPC
     m_mpc_foot_positions_pub = this->create_publisher<geometry_msgs::msg::PoseArray>("est_foot_position", 10);
@@ -87,18 +125,17 @@ SensorFusionNode::SensorFusionNode()
     m_mpc_stance_foot_pub = this->create_publisher<std_msgs::msg::Int32>("current_stance_foot", 10);
 
     m_mpc_com_pos_pub = this->create_publisher<geometry_msgs::msg::PointStamped>("state_estimation/com_position", 10);
-
-    std::vector<std::string> joint_names = { 
-        "left_ankle", "left_hip_aa", "left_hip_fe", "left_knee",
-        "right_ankle", "right_hip_aa", "right_hip_fe", "right_knee"
-    };
+    
+    // Initialize sensor fusion
+    m_node_feet_names = { "L_sole", "R_sole" };
     m_sensor_fusion = std::make_unique<SensorFusion>(m_robot_description, urdf_file_path);
     m_sensor_fusion->configureJointNames(joint_names);
     m_sensor_fusion->configureStanceThresholds(left_stance_threshold, right_stance_threshold);
-    m_dt = static_cast<double>(dt) / 1000.0;
-    m_joint_state = nullptr;
-    m_imu = nullptr;
-    m_node_feet_names = { "L_foot", "R_foot" };
+    RCLCPP_INFO(this->get_logger(), "State estimator clock period: %f s", m_dt);
+
+    // Initialize timer
+    m_timer = this->create_wall_timer(
+        std::chrono::milliseconds(static_cast<int>(m_dt * 1000)), std::bind(&SensorFusionNode::timerCallback, this), m_sensors_callback_group);
 
     RCLCPP_INFO(this->get_logger(), "State Estimator Node initialized");
 }
@@ -110,50 +147,47 @@ SensorFusionNode::~SensorFusionNode()
 
 void SensorFusionNode::timerCallback()
 {
-    if (m_joint_state == nullptr || m_imu == nullptr) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state or imu data received yet");
+    // Check if joint state is initialized properly
+    if (m_joint_state == nullptr) {
         return;
     }
 
-    if (m_imu_position == nullptr) {
+    // Comment this out for real robot
+    if (m_is_simulation && (m_imu_position == nullptr)) {
         RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu position data received yet");
         return;
     }
 
+    // Check if joint state and imu data are received
+    checkJointStateTimeout();
+    checkImuTimeout();
+
     // Update and estimate current state
-    m_sensor_fusion->updateJointState(m_joint_state);
     m_sensor_fusion->updateImuState(m_imu);
     m_sensor_fusion->updateDynamicsState();
-    // m_sensor_fusion->updateKalmanFilter();
+    if (m_is_simulation) {
+        // m_sensor_fusion->updateKalmanFilter();
+    }
+    broadcastTransformToTf2();
 
-    geometry_msgs::msg::TransformStamped transform_stamped;
-    transform_stamped.header.stamp = this->now();
-    transform_stamped.header.frame_id = "world";
-    transform_stamped.child_frame_id = "backpack";
-    // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
-    transform_stamped.transform.translation.x = m_imu_position->point.x;
-    transform_stamped.transform.translation.y = m_imu_position->point.y;
-    transform_stamped.transform.translation.z = m_imu_position->point.z;
-    transform_stamped.transform.rotation.x = m_imu->orientation.x;
-    transform_stamped.transform.rotation.y = m_imu->orientation.y;
-    transform_stamped.transform.rotation.z = m_imu->orientation.z;
-    transform_stamped.transform.rotation.w = m_imu->orientation.w;
-    m_tf_broadcaster->sendTransform(transform_stamped);
-
-    publishFeetHeight();
-    publishMPCEstimation();
-    publishTorqueEstimation();
+    // publishFeetHeight();
+    // publishMPCEstimation();
+        publishGroundReactionForce();
     publishStateEstimation();
+    publishClock();
 }
 
 void SensorFusionNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
 {
     m_joint_state = msg;
+    m_sensor_fusion->updateJointState(m_joint_state);
+    m_joint_state_last_update = this->now();
 }
 
 void SensorFusionNode::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
 {
     m_imu = msg;
+    m_imu_last_update = this->now();
 }
 
 void SensorFusionNode::imuPositionCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg)
@@ -166,95 +200,58 @@ void SensorFusionNode::imuVelocityCallback(const geometry_msgs::msg::Vector3Stam
     m_imu_velocity = msg;
 }
 
+void SensorFusionNode::publishClock()
+{
+    std_msgs::msg::Header clock_msg;
+    clock_msg.stamp = this->now();
+    m_clock_pub->publish(clock_msg);
+}
+
 void SensorFusionNode::publishStateEstimation()
 {
     march_shared_msgs::msg::StateEstimation state_estimation_msg;
-    std::vector<RobotNode::SharedPtr> feet_nodes = m_robot_description->findNodes(m_node_feet_names);
+    rclcpp::Time current_time = current_time;
 
-    // std::vector<geometry_msgs::msg::Pose> body_foot_poses = m_sensor_fusion->getFootPoses();
-    std::vector<geometry_msgs::msg::Pose> body_foot_poses;
+    std::vector<geometry_msgs::msg::Pose> body_sole_poses;
     try {
-        geometry_msgs::msg::PoseStamped foot_pose;
+        geometry_msgs::msg::PoseStamped sole_pose;
         geometry_msgs::msg::TransformStamped transform_stamped;
 
         // Get left foot positions w.r.t. backpack frame
-        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_ground", tf2::TimePointZero);
-        foot_pose.pose.position.x = transform_stamped.transform.translation.x;
-        foot_pose.pose.position.y = transform_stamped.transform.translation.y;
-        foot_pose.pose.position.z = transform_stamped.transform.translation.z;
-        foot_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
-        foot_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
-        body_foot_poses.push_back(foot_pose.pose);
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "L_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
 
         // Get right foot positions in body frame w.r.t. backpack frame
-        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_ground", tf2::TimePointZero);
-        foot_pose.pose.position.x = transform_stamped.transform.translation.x;
-        foot_pose.pose.position.y = transform_stamped.transform.translation.y;
-        foot_pose.pose.position.z = transform_stamped.transform.translation.z;
-        foot_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
-        foot_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
-        body_foot_poses.push_back(foot_pose.pose);
+        transform_stamped = m_tf_buffer->lookupTransform("backpack", "R_sole", tf2::TimePointZero);
+        sole_pose.pose.position.x = transform_stamped.transform.translation.x;
+        sole_pose.pose.position.y = transform_stamped.transform.translation.y;
+        sole_pose.pose.position.z = transform_stamped.transform.translation.z;
+        sole_pose.pose.orientation.x = transform_stamped.transform.rotation.x;
+        sole_pose.pose.orientation.y = transform_stamped.transform.rotation.y;
+        sole_pose.pose.orientation.z = transform_stamped.transform.rotation.z;
+        sole_pose.pose.orientation.w = transform_stamped.transform.rotation.w;
+        body_sole_poses.push_back(sole_pose.pose);
     }
     catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in body frame: %s", e.what());
         return;
     }
 
-    std::vector<geometry_msgs::msg::Pose> inertial_foot_positions;
-    try {
-        geometry_msgs::msg::Pose foot_pose;
-        geometry_msgs::msg::TransformStamped transform_stamped;
-
-        // Get left foot position in world frame w.r.t. right ground frame.
-        transform_stamped = m_tf_buffer->lookupTransform("world", "L_ground", tf2::TimePointZero);
-        foot_pose.position.x = transform_stamped.transform.translation.x;
-        foot_pose.position.y = transform_stamped.transform.translation.y;
-        foot_pose.position.z = transform_stamped.transform.translation.z;
-        foot_pose.orientation.x = transform_stamped.transform.rotation.x;
-        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
-        inertial_foot_positions.push_back(foot_pose);
-
-        // Get right foot position in world frame w.r.t. right ground frame
-        transform_stamped = m_tf_buffer->lookupTransform("world", "R_ground", tf2::TimePointZero);
-
-        foot_pose.orientation.y = transform_stamped.transform.rotation.y;
-        foot_pose.orientation.z = transform_stamped.transform.rotation.z;
-        foot_pose.orientation.w = transform_stamped.transform.rotation.w;
-        inertial_foot_positions.push_back(foot_pose);
-
-    } catch (const std::exception& e) {
-        RCLCPP_ERROR(this->get_logger(), "Error while getting foot positions in world frame: %s", e.what());
-        return;
-    }
-
-    std::vector<std::string> ankle_names = {"left_ankle", "right_ankle"};
-    std::vector<RobotNode::SharedPtr> ankle_nodes = m_robot_description->findNodes(ankle_names);
-    std::vector<geometry_msgs::msg::Pose> body_ankle_poses;
-    for (const auto& ankle_node : ankle_nodes) {
-        geometry_msgs::msg::Pose ankle_pose;
-        Eigen::Vector3d ankle_position = ankle_node->getGlobalPosition(m_sensor_fusion->getJointPositions());
-        Eigen::Quaterniond ankle_orientation(ankle_node->getGlobalRotation(m_sensor_fusion->getJointPositions()));
-        ankle_pose.position.x = ankle_position.x();
-        ankle_pose.position.y = ankle_position.y();
-        ankle_pose.position.z = ankle_position.z();
-        ankle_pose.orientation.x = ankle_orientation.x();
-        ankle_pose.orientation.y = ankle_orientation.y();
-        ankle_pose.orientation.z = ankle_orientation.z();
-        ankle_pose.orientation.w = ankle_orientation.w();
-        body_ankle_poses.push_back(ankle_pose);
-    }
-
     state_estimation_msg.header.stamp = this->now();
-    state_estimation_msg.header.frame_id = "joint_link";
+    state_estimation_msg.header.frame_id = "base_link";
     state_estimation_msg.step_time = m_dt;
-    state_estimation_msg.joint_state = *m_joint_state;
-    state_estimation_msg.dynamical_joint_state.header.stamp = this->now();
+    state_estimation_msg.joint_state = m_sensor_fusion->getEstimatedJointState();
+    state_estimation_msg.joint_state.header.stamp = this->now();
+    state_estimation_msg.joint_state.header.frame_id = m_joint_state->header.frame_id;
+
+    state_estimation_msg.dynamical_joint_state.header.stamp = current_time;
     state_estimation_msg.header.frame_id = "joint_link";
     state_estimation_msg.dynamical_joint_state.joint_name = m_joint_state->name;
     state_estimation_msg.dynamical_joint_state.joint_acceleration = m_sensor_fusion->getJointAcceleration(m_joint_state->name);
@@ -263,11 +260,17 @@ void SensorFusionNode::publishStateEstimation()
 
     // state_estimation_msg.imu = *m_sensor_fusion->getFilteredImuMsg();
     state_estimation_msg.imu = *m_imu;
-    state_estimation_msg.body_ankle_pose = body_ankle_poses;
-    state_estimation_msg.foot_pose = body_foot_poses;
-    state_estimation_msg.inertial_foot_position = inertial_foot_positions;
+    state_estimation_msg.body_ankle_pose = getCurrentPoseArray("backpack", {"L_ankle", "R_ankle"});
+    state_estimation_msg.body_foot_pose = getCurrentPoseArray("backpack", {"L_sole", "R_sole"});
     state_estimation_msg.current_stance_leg = m_sensor_fusion->getCurrentStanceLeg();
-    state_estimation_msg.next_stance_leg = m_sensor_fusion->getNextStanceLeg(body_foot_poses[LEFT_FOOT_ID].position.x, body_foot_poses[RIGHT_FOOT_ID].position.x);
+    state_estimation_msg.next_stance_leg = m_sensor_fusion->getNextStanceLeg(
+        state_estimation_msg.body_ankle_pose[LEFT_FOOT_ID].position.x,
+        state_estimation_msg.body_ankle_pose[RIGHT_FOOT_ID].position.x);
+    
+    if (m_is_simulation) {
+        state_estimation_msg.world_foot_pose = getCurrentPoseArray("world", {"L_sole", "R_sole"});
+    }
+    
     m_state_estimation_pub->publish(state_estimation_msg);
 }
 
@@ -283,8 +286,8 @@ void SensorFusionNode::publishFeetHeight()
 void SensorFusionNode::publishMPCEstimation()
 {
     // Wait for transform otherwise return
-    if (!m_tf_buffer->canTransform("R_ground", "world", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_ground", "L_ground", tf2::TimePointZero)) {
-        RCLCPP_WARN(this->get_logger(), "Cannot transform from world to R_ground");
+    if (!m_tf_buffer->canTransform("R_heel", "world", tf2::TimePointZero) || !m_tf_buffer->canTransform("R_heel", "L_heel", tf2::TimePointZero)) {
+        RCLCPP_WARN(this->get_logger(), "Cannot transform from world to R_heel");
         return;
     }
 
@@ -301,7 +304,7 @@ void SensorFusionNode::publishMPCEstimation()
         
         // Get left foot position w.r.t. right ground frame.
         geometry_msgs::msg::TransformStamped transform_stamped;
-        transform_stamped = m_tf_buffer->lookupTransform("R_ground", "L_ground", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "L_heel", tf2::TimePointZero);
         foot_pose.position.x = transform_stamped.transform.translation.x;
         foot_pose.position.y = transform_stamped.transform.translation.y;
         foot_pose.position.z = 0;
@@ -325,10 +328,10 @@ void SensorFusionNode::publishMPCEstimation()
         return;
     }
 
-    // Get transform stamped from world to R_ground
+    // Get transform stamped from world to R_heel
     geometry_msgs::msg::TransformStamped transform_stamped;
     try {
-        transform_stamped = m_tf_buffer->lookupTransform("R_ground", "world", tf2::TimePointZero);
+        transform_stamped = m_tf_buffer->lookupTransform("R_heel", "world", tf2::TimePointZero);
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
         return;
@@ -344,54 +347,54 @@ void SensorFusionNode::publishMPCEstimation()
     double zmp_x = com_position.x() + (com_velocity.x() / sqrt(gravity / com_position.z())) * com_position.y();
     double zmp_y = com_position.y() + (com_velocity.y() / sqrt(gravity / com_position.z())) * com_position.z();
 
-    // Transform COM and ZMP to R_ground frame
+    // Transform COM and ZMP to R_heel frame
     Eigen::Vector3d com_position_world(com_position.x(), com_position.y(), com_position.z());
-    Eigen::Vector3d com_position_R_ground = q * com_position_world;
-    com_position_R_ground.x() += transform_stamped.transform.translation.x;
-    com_position_R_ground.y() += transform_stamped.transform.translation.y;
-    com_position_R_ground.z() += transform_stamped.transform.translation.z;
+    Eigen::Vector3d com_position_R_heel = q * com_position_world;
+    com_position_R_heel.x() += transform_stamped.transform.translation.x;
+    com_position_R_heel.y() += transform_stamped.transform.translation.y;
+    com_position_R_heel.z() += transform_stamped.transform.translation.z;
 
     Eigen::Vector3d com_velocity_world(com_velocity.x(), com_velocity.y(), com_velocity.z());
-    Eigen::Vector3d com_velocity_R_ground = q * com_velocity_world;
+    Eigen::Vector3d com_velocity_R_heel = q * com_velocity_world;
     
     Eigen::Vector3d zmp_world(zmp_x, zmp_y, 0);
-    Eigen::Vector3d zmp_R_ground = q * zmp_world;
-    zmp_R_ground.x() += transform_stamped.transform.translation.x;
-    zmp_R_ground.y() += transform_stamped.transform.translation.y;
-    zmp_R_ground.z() += transform_stamped.transform.translation.z;
+    Eigen::Vector3d zmp_R_heel = q * zmp_world;
+    zmp_R_heel.x() += transform_stamped.transform.translation.x;
+    zmp_R_heel.y() += transform_stamped.transform.translation.y;
+    zmp_R_heel.z() += transform_stamped.transform.translation.z;
 
     // Publish MPC estimation
     geometry_msgs::msg::PoseArray foot_positions_msg;
     foot_positions_msg.header.stamp = current_time;
-    foot_positions_msg.header.frame_id = "R_ground";
+    foot_positions_msg.header.frame_id = "R_heel";
     foot_positions_msg.poses = inertial_foot_positions;
     m_mpc_foot_positions_pub->publish(foot_positions_msg);
 
     march_shared_msgs::msg::CenterOfMass com_msg;
     com_msg.header.stamp = current_time;
-    com_msg.header.frame_id = "R_ground";
+    com_msg.header.frame_id = "R_heel";
     com_msg.position.header = com_msg.header;
-    com_msg.position.point.x = com_position_R_ground.x();
-    com_msg.position.point.y = com_position_R_ground.y();
-    com_msg.position.point.z = com_position_R_ground.z();
-    com_msg.velocity.x = com_velocity_R_ground.x();
-    com_msg.velocity.y = com_velocity_R_ground.y();
-    com_msg.velocity.z = com_velocity_R_ground.z();
+    com_msg.position.point.x = com_position_R_heel.x();
+    com_msg.position.point.y = com_position_R_heel.y();
+    com_msg.position.point.z = com_position_R_heel.z();
+    com_msg.velocity.x = com_velocity_R_heel.x();
+    com_msg.velocity.y = com_velocity_R_heel.y();
+    com_msg.velocity.z = com_velocity_R_heel.z();
     m_mpc_com_pub->publish(com_msg);
 
     geometry_msgs::msg::PointStamped com_pos_msg;
     com_pos_msg.header.stamp = current_time;
-    com_pos_msg.header.frame_id = "R_ground";
-    com_pos_msg.point.x = com_position_R_ground.x();
-    com_pos_msg.point.y = com_position_R_ground.y();
-    com_pos_msg.point.z = com_position_R_ground.z();
+    com_pos_msg.header.frame_id = "R_heel";
+    com_pos_msg.point.x = com_position_R_heel.x();
+    com_pos_msg.point.y = com_position_R_heel.y();
+    com_pos_msg.point.z = com_position_R_heel.z();
     m_mpc_com_pos_pub->publish(com_pos_msg);
 
     geometry_msgs::msg::PointStamped zmp_msg;
     zmp_msg.header.stamp = current_time;
-    zmp_msg.header.frame_id = "R_ground";
-    zmp_msg.point.x = zmp_R_ground.x();
-    zmp_msg.point.y = zmp_R_ground.y();
+    zmp_msg.header.frame_id = "R_heel";
+    zmp_msg.point.x = zmp_R_heel.x();
+    zmp_msg.point.y = zmp_R_heel.y();
     zmp_msg.point.z = 0.0;
     m_mpc_zmp_pub->publish(zmp_msg);
 
@@ -405,26 +408,98 @@ void SensorFusionNode::publishMPCEstimation()
     m_mpc_stance_foot_pub->publish(stance_foot_msg);
 }
 
-void SensorFusionNode::publishTorqueEstimation()
+void SensorFusionNode::publishGroundReactionForce()
 {
-    Eigen::Vector3d m_left_foot_force = m_sensor_fusion->getLeftFootForce();
-    Eigen::Vector3d m_right_foot_force = m_sensor_fusion->getRightFootForce();
+    std::vector<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr>  torque_pubs = { m_torque_left_pub, m_torque_right_pub };
+    std::vector<Eigen::Vector3d> foot_forces = { m_sensor_fusion->getLeftFootForce(), m_sensor_fusion->getRightFootForce() };
+    rclcpp::Time current_time = this->now();
 
-    geometry_msgs::msg::Vector3Stamped torque_left_msg;
-    torque_left_msg.header.stamp = this->now();
-    torque_left_msg.header.frame_id = "world";
-    torque_left_msg.vector.x = m_left_foot_force.x();
-    torque_left_msg.vector.y = m_left_foot_force.y();
-    torque_left_msg.vector.z = m_left_foot_force.z();
-    m_torque_left_pub->publish(torque_left_msg);
+    for (size_t i = 0; i < torque_pubs.size(); i++) {
+        geometry_msgs::msg::Vector3Stamped torque_msg;
+        torque_msg.header.stamp = current_time;
+        torque_msg.header.frame_id = "world";
+        torque_msg.vector.x = foot_forces[i].x();
+        torque_msg.vector.y = foot_forces[i].y();
+        torque_msg.vector.z = foot_forces[i].z();
+        torque_pubs[i]->publish(torque_msg);
+    }
+}
 
-    geometry_msgs::msg::Vector3Stamped torque_right_msg;
-    torque_right_msg.header.stamp = this->now();
-    torque_right_msg.header.frame_id = "world";
-    torque_right_msg.vector.x = m_right_foot_force.x();
-    torque_right_msg.vector.y = m_right_foot_force.y();
-    torque_right_msg.vector.z = m_right_foot_force.z();
-    m_torque_right_pub->publish(torque_right_msg);
+void SensorFusionNode::broadcastTransformToTf2()
+{
+    geometry_msgs::msg::TransformStamped transform_stamped;
+    transform_stamped.header.stamp = this->now();
+    transform_stamped.header.frame_id = "world";
+    transform_stamped.child_frame_id = "base_link";
+    // transform_stamped.transform = m_sensor_fusion->getRobotTransform();
+    
+    if (m_is_simulation) {
+        transform_stamped.transform.translation.x = m_imu_position->point.x;
+        transform_stamped.transform.translation.y = m_imu_position->point.y;
+        transform_stamped.transform.translation.z = m_imu_position->point.z;
+    } else {
+        transform_stamped.transform.translation.x = 0.0;
+        transform_stamped.transform.translation.y = 0.0;
+        transform_stamped.transform.translation.z = 0.0;
+    }
+    transform_stamped.transform.rotation.x = m_imu->orientation.x;
+    transform_stamped.transform.rotation.y = m_imu->orientation.y;
+    transform_stamped.transform.rotation.z = m_imu->orientation.z;
+    transform_stamped.transform.rotation.w = m_imu->orientation.w;
+
+    m_tf_broadcaster->sendTransform(transform_stamped);
+}
+
+void SensorFusionNode::checkJointStateTimeout()
+{
+    if ((this->now() - m_joint_state_last_update) > rclcpp::Duration::from_seconds(m_joint_state_timeout)) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No joint state data received yet");
+    }
+}
+
+void SensorFusionNode::checkImuTimeout()
+{
+    if ((this->now() - m_imu_last_update) > rclcpp::Duration::from_seconds(m_imu_timeout)) {
+        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu data received yet");
+    }
+}
+
+geometry_msgs::msg::TransformStamped SensorFusionNode::getCurrentTransform(const std::string& parent_frame, const std::string& child_frame)
+{
+    geometry_msgs::msg::TransformStamped transform_stamped;
+    try {
+        transform_stamped = m_tf_buffer->lookupTransform(parent_frame, child_frame, tf2::TimePointZero);
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting transform stamped: %s", e.what());
+    }
+    return transform_stamped;
+}
+
+geometry_msgs::msg::Pose SensorFusionNode::getCurrentPose(const std::string& parent_frame, const std::string& child_frame)
+{
+    geometry_msgs::msg::Pose pose;
+    try {
+        geometry_msgs::msg::TransformStamped transform_stamped = getCurrentTransform(parent_frame, child_frame);
+        pose.position.x = transform_stamped.transform.translation.x;
+        pose.position.y = transform_stamped.transform.translation.y;
+        pose.position.z = transform_stamped.transform.translation.z;
+        pose.orientation.x = transform_stamped.transform.rotation.x;
+        pose.orientation.y = transform_stamped.transform.rotation.y;
+        pose.orientation.z = transform_stamped.transform.rotation.z;
+        pose.orientation.w = transform_stamped.transform.rotation.w;
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error while getting pose: %s", e.what());
+    }
+    return pose;
+}
+
+std::vector<geometry_msgs::msg::Pose> SensorFusionNode::getCurrentPoseArray(const std::string& parent_frame, const std::vector<std::string>& child_frames)
+{
+    std::vector<geometry_msgs::msg::Pose> poses;
+    for (const std::string& child_frame : child_frames) {
+        poses.push_back(getCurrentPose(parent_frame, child_frame));
+    }
+    return poses;
 }
 
 int main(int argc, char** argv)

@@ -1,5 +1,16 @@
+/*
+ * Project MARCH IX, 2023-2024
+ * Author: Alexander James Becoy @alexanderjamesbecoy
+ */
+
 #ifndef IK_SOLVER__IK_SOLVER_NODE_HPP_
 #define IK_SOLVER__IK_SOLVER_NODE_HPP_
+
+#include "rclcpp/rclcpp.hpp"
+#include "march_ik_solver/ik_solver.hpp"
+#include "message_filters/subscriber.h"
+#include "message_filters/sync_policies/approximate_time.h"
+#include "message_filters/synchronizer.h"
 
 #include <functional>
 #include <future>
@@ -7,15 +18,17 @@
 #include <vector>
 
 #include "geometry_msgs/msg/point.hpp"
-#include "march_ik_solver/ik_solver.hpp"
+#include "march_shared_msgs/msg/exo_mode.hpp"
+#include "march_shared_msgs/msg/iks_command.hpp"
 #include "march_shared_msgs/msg/iks_foot_positions.hpp"
+#include "march_shared_msgs/msg/iks_status.hpp"
 #include "march_shared_msgs/msg/state_estimation.hpp"
-#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "std_msgs/msg/float64.hpp"
-#include "std_msgs/msg/u_int64.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
+
+typedef message_filters::sync_policies::ApproximateTime<march_shared_msgs::msg::ExoMode, march_shared_msgs::msg::StateEstimation> SyncPolicy_NewGait;
 
 class IKSolverNode : public rclcpp::Node {
 public:
@@ -23,12 +36,16 @@ public:
     ~IKSolverNode();
 
 private:
+    void clockCallback(const std_msgs::msg::Header::SharedPtr msg);
+    void iksCommandCallback(const march_shared_msgs::msg::IksCommand::SharedPtr msg);
     void iksFootPositionsCallback(const march_shared_msgs::msg::IksFootPositions::SharedPtr msg);
     void stateEstimationCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg);
+    void newGaitCallback(const march_shared_msgs::msg::ExoMode::SharedPtr exo_mode_msg, 
+        const march_shared_msgs::msg::StateEstimation::SharedPtr state_estimation_msg);
+
     void publishJointTrajectory();
     void publishDesiredJointPositions();
-    void publishErrorNorm(const double& error_norm);
-    void publishIterations(const unsigned int& iterations);
+    void publishEstimatedFootPositions();
 
     void solveInverseKinematics(const rclcpp::Time& start_time);
     void updatePreviousJointTrajectoryPoint(const trajectory_msgs::msg::JointTrajectoryPoint& joint_trajectory_point);
@@ -45,6 +62,7 @@ private:
     double m_state_estimator_time_offset;
     double m_convergence_threshold;
     unsigned int m_max_iterations;
+    bool m_has_solution;
 
     std::vector<std::string> m_joint_names;
     std::vector<std::string> m_joint_names_alphabetical;
@@ -53,15 +71,23 @@ private:
     std::vector<double> m_actual_joint_velocities;
     Eigen::VectorXd m_desired_joint_positions;
     Eigen::VectorXd m_desired_joint_velocities;
+    Eigen::Matrix3d m_current_world_to_base_orientation;
     trajectory_msgs::msg::JointTrajectoryPoint m_joint_trajectory_point_prev;
 
     // ROS2 communication
-    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_command_sub;
+    message_filters::Subscriber<march_shared_msgs::msg::ExoMode> m_new_gait_exo_mode_sub;
+    message_filters::Subscriber<march_shared_msgs::msg::StateEstimation> m_new_gait_state_estimation_sub;
+    std::shared_ptr<message_filters::Synchronizer<SyncPolicy_NewGait>> m_new_gait_sync;
+
+    rclcpp::Subscription<march_shared_msgs::msg::IksCommand>::SharedPtr m_ik_solver_command_sub;
+    rclcpp::Subscription<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_desired_foot_positions_sub;
     rclcpp::Subscription<march_shared_msgs::msg::StateEstimation>::SharedPtr m_state_estimation_sub;
+    rclcpp::Subscription<std_msgs::msg::Header>::SharedPtr m_clock_sub;
+
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr m_joint_trajectory_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::IksStatus>::SharedPtr m_iks_status_pub;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr m_desired_joint_positions_pub;
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr m_error_norm_pub;
-    rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr m_iterations_pub;
+    rclcpp::Publisher<march_shared_msgs::msg::IksFootPositions>::SharedPtr m_ik_solver_estimated_foot_positions_pub;
 
     rclcpp::CallbackGroup::SharedPtr m_callback_group;
     rclcpp::SubscriptionOptions m_subscription_options;
