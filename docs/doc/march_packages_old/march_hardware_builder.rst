@@ -5,20 +5,13 @@ march_hardware_builder
 
 Overview
 --------
-This package contains a library which can be included to create a ``MarchRobot`` from YAML config files
-and a robot description in URDF. Whereas the YAML describes some properties of the hardware used in the robot,
-the hardware builder uses the URDF for joint limits. The joints in the YAML and the URDF must match.
-The implementation is rather straightforward and nearly all the logic can be found in the
-`HardwareBuilder class <march_hardware_builder/src/hardware_builder.cpp>`.
 
-ROS API
--------
-The hardware builder is written without depending on ROS for its core
-functionality to ensure that it can remain functional even when ROS will no
-longer be used. The package does depend on ROS for logging and the urdf ROS
-package for parsing URDF, but that can be easily changed if needed, since none
-of these functionalities are ROS specific.
-
+This package contains a library that facilitates the creation of a MarchRobot from YAML configuration 
+files. The YAML files specify certain properties of the hardware used in the robot.
+It is crucial that the joints defined in the YAML files match those in the URDF. The core logic of this 
+implementation is encapsulated in the HardwareBuilder class, which can be found in 
+`march_hardware_builder/src/hardware_builder.cpp.`. This package is largely independent from ROS logic,
+only using it for logging purposes.
 
 Tutorials
 ---------

@@ -1,7 +1,7 @@
 .. _fuzzy_generator-label:
 
 fuzzy_generator
-==============
+================
 
 Overview
 --------
