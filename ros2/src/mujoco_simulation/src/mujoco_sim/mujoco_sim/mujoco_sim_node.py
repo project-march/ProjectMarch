@@ -126,10 +126,14 @@ class MujocoSimNode(Node):
             safety_catchers = [True, True, True, True, True, True]
         elif gaiting == "ground-xz":
             safety_catchers = [True, False, True, False, False, False]
+        elif gaiting == "ground-xzp":
+            safety_catchers = [True, False, True, False, True, False]
         elif gaiting == "ground-xyz":
             safety_catchers = [True, True, True, False, False, False]
         elif gaiting == "ground-xyzr":
             safety_catchers = [True, True, True, True, False, False]
+        elif gaiting == "air-p":
+            safety_catchers = [False, False, False, False, True, False]
         else: # safety_catchers == "air"
             safety_catchers = [False, False, False, False, False, False]
             obstacle = "" # No obstacle when airgaiting

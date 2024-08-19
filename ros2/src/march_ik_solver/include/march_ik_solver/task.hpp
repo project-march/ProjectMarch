@@ -27,7 +27,7 @@ public:
     typedef std::shared_ptr<Task> SharedPtr;
 
     Task();
-    ~Task() = default;
+    ~Task();
 
     Eigen::VectorXd solveTask();
     Eigen::VectorXd calculateError();

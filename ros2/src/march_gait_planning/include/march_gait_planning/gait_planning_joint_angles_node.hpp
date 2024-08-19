@@ -63,6 +63,7 @@ private:
     void processMovingGaits(const int &counter);    
     
     std::vector<double> parseHomestandYAML(const std::string& file_path);   
+    double parseHipTiltYAML(const std::string& file_path); 
     
     // Final joint angle trajectory publisher
     void publishJointTrajectoryPoints(); 

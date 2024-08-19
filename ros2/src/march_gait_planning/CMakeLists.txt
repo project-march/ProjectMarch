@@ -27,6 +27,8 @@ find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(ament_cmake_gtest)
 find_package(rclcpp_lifecycle REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
 
 pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.6)
 
@@ -55,6 +57,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp_lifecycle
   lifecycle_msgs
   std_msgs
+  Eigen3
 )
 
 # Create the listener executable
@@ -73,6 +76,21 @@ add_executable(gait_planning_angles_node
   src/gait_planning_joint_angles.cpp
 )
 
+# create the service client manager node 
+add_executable(service_client_node
+  src/manager_nodes_service_client.cpp 
+)
+
+ament_target_dependencies(service_client_node
+  rclcpp
+  lifecycle_msgs
+  std_msgs
+  rclcpp_lifecycle
+  march_shared_msgs
+)
+
+
+
 # Link against ROS 2 dependencies
 ament_target_dependencies(gait_planning_cartesian_node
   rclcpp
@@ -81,8 +99,9 @@ ament_target_dependencies(gait_planning_cartesian_node
   ament_index_cpp
   rclcpp_lifecycle
   lifecycle_msgs
+  Eigen3
   # filesystem
-  )
+)
 
 ament_target_dependencies(gait_planning_angles_node
   rclcpp
@@ -174,6 +193,10 @@ install(DIRECTORY
   launch test m9_gait_files
   DESTINATION share/${PROJECT_NAME}/ 
 )
+
+# Install header files.
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 if(BUILD_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)

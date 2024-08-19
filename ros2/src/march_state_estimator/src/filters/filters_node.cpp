@@ -56,6 +56,13 @@ FiltersNode::FiltersNode()
         m_joint_position_limits_map[joint.first][UPPER_LIMIT] = joint.second->limits->upper;
     }
 
+    // Get the joint names that are blacklisted
+    // TODO: Parameterize the blacklisted joint names
+    m_blacklist_joint_names = {
+        "left_hip_aa", "left_hip_fe", "left_knee", "left_ankle_ie", 
+        "right_hip_aa", "right_hip_fe", "right_knee", "right_ankle_ie"
+    };
+
     // Create the subscriptions and publishers
     m_imu_sub = this->create_subscription<sensor_msgs::msg::Imu>(
         "lower_imu", rclcpp::SensorDataQoS(), std::bind(&FiltersNode::imuCallback, this, std::placeholders::_1));
@@ -151,16 +158,22 @@ void FiltersNode::jointStateCallback(const sensor_msgs::msg::JointState::SharedP
         }
     }
 
-    // Replace the joint positions, and velocities with the filtered values
-    for (unsigned i = 0; i < msg->name.size(); i++) {
-        filtered_msg.position[i] = m_joint_position_map[msg->name[i]];
-        filtered_msg.velocity[i] = m_joint_velocity_map[msg->name[i]];
-    }
-
     // Filter the joint efforts
     for (unsigned i = 0; i < NUM_CHANNELS_TORQUE; i++) {
         // Filter the torque values
         m_torque_mean_filters[i]->update(m_joint_effort_map[msg->name[i]], filtered_msg.effort[i]);
+    }
+
+    // Replace the joint positions, and velocities with the filtered values
+    for (unsigned i = 0; i < msg->name.size(); i++) {
+        filtered_msg.position[i] = m_joint_position_map[msg->name[i]];
+        filtered_msg.velocity[i] = m_joint_velocity_map[msg->name[i]];
+
+        // Replace the joint velocity and effort to zero if joint is blacklisted
+        if (jointNameBlacklisted(msg->name[i])) {
+            filtered_msg.velocity[i] = 0.0;
+            filtered_msg.effort[i] = 0.0;
+        }
     }
 
     m_joint_state_pub->publish(filtered_msg);

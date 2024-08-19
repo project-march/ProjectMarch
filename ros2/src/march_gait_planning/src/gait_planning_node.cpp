@@ -5,6 +5,9 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "../logging_colors.hpp"
 
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Geometry>
 
 using std::placeholders::_1; 
 
@@ -24,7 +27,10 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     m_single_execution_done = false; 
     m_variable_first_step_done = false; 
     m_active = false; 
+    m_first_step = true; 
     m_home_stand_trajectory.clear(); 
+
+    m_gait_planning.setStanceFoot(3); 
 
     m_iks_foot_positions_publisher = this->create_publisher<march_shared_msgs::msg::IksFootPositions>("ik_solver/buffer/input", 10);
 
@@ -43,6 +49,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
     
     std::string homestand_path = ament_index_cpp::get_package_share_directory("march_gait_planning") + "/m9_gait_files/homestand.yaml";
     m_home_stand = parseHomestandYAML(homestand_path);
+    m_hip_tilt = parseHipTiltYAML(homestand_path); 
 
     if (m_home_stand.size() != 6) {
         RCLCPP_WARN(this->get_logger(), "Unexpected number of values in homestand, %d", m_home_stand.size()); 
@@ -50,7 +57,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
         RCLCPP_INFO(this->get_logger(), "Successful retrieval of homestand: " COLOR_PERIWINKLE "%f, %f, %f, %f, %f, %f" RESET, m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]); 
     }
 
-    // m_home_stand = {0.1386, 0.25, -0.912, 0.1386, -0.25, -0.912};
+    if (m_hip_tilt){
+        RCLCPP_INFO(this->get_logger(), "Successful retrieval of hip tilt: " COLOR_PERIWINKLE "%f" RESET, m_hip_tilt); 
+    }
 
     RCLCPP_DEBUG(this->get_logger(), COLOR_GREEN "Cartesian node configured! " RESET); 
 
@@ -95,12 +104,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn GaitPl
 
 
 void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg::ExoMode::SharedPtr msg){
-    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s" RESET " with node_type" COLOR_PERIWINKLE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "Received previous mode " COLOR_PERIWINKLE "%s" RESET, toString(static_cast<ExoMode>(msg->previous_mode)).c_str()); 
-    // RCLCPP_INFO(this->get_logger(), "State of node is %s%s%s", 
-    // m_active ? COLOR_GREEN : COLOR_RED, 
-    // m_active ? "ACTIVE" : "INACTIVE", 
-    // RESET);
+    RCLCPP_INFO(this->get_logger(), "Received current mode: " COLOR_PERIWINKLE "%s" RESET " with node_type" COLOR_PERIWINKLE " %s" RESET, toString(static_cast<ExoMode>(msg->mode)).c_str(), msg->node_type.c_str());
     if (m_active){
         m_gait_planning.setPreviousGaitType((ExoMode)msg->previous_mode);  
         m_gait_planning.setGaitType((ExoMode)msg->mode);
@@ -115,20 +119,11 @@ void GaitPlanningCartesianNode::currentModeCallback(const march_shared_msgs::msg
 }
 
 void GaitPlanningCartesianNode::currentExoJointStateCallback(const march_shared_msgs::msg::StateEstimation::SharedPtr msg){
-    // RCLCPP_INFO(get_logger(), "Received current foot positions");
-
     if (m_active){
         GaitPlanning::XYZFootPositionArray new_left_foot_position = {msg->body_ankle_pose[0].position.x, msg->body_ankle_pose[0].position.y, msg->body_ankle_pose[0].position.z};
         GaitPlanning::XYZFootPositionArray new_right_foot_position = {msg->body_ankle_pose[1].position.x, msg->body_ankle_pose[1].position.y, msg->body_ankle_pose[1].position.z};
         m_gait_planning.setFootPositions(new_left_foot_position, new_right_foot_position); 
         m_desired_footpositions_msg->header = msg->header;
-        if (m_current_trajectory.empty()){
-            m_gait_planning.setStanceFoot(msg->next_stance_leg); 
-            if (m_gait_planning.getGaitType() == ExoMode::LargeWalk || m_gait_planning.getGaitType() == ExoMode::SmallWalk){
-                RCLCPP_INFO(this->get_logger(), "Current stance foot is %s",
-            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
-            }
-        }
         publishFootPositions();
     } else {
         RCLCPP_DEBUG_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "not active"); 
@@ -146,9 +141,7 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
     if (!m_current_trajectory.empty()){
         // wait until trajectory is finished
     } else if (m_current_trajectory.empty()){
-
         //Remove duplicates from PoseArray message to identify the two desired footsteps
-
         std::set<geometry_msgs::msg::Pose, GaitPlanningCartesianNode::PoseXComparator> final_feet(msg->poses.begin(), msg->poses.end());
 
         geometry_msgs::msg::Pose foot_pos = *final_feet.begin(); 
@@ -159,13 +152,11 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
             // first step 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]); 
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
@@ -183,13 +174,11 @@ void GaitPlanningCartesianNode::MPCCallback(const geometry_msgs::msg::PoseArray:
             // full steps 
             if (foot_pos.position.y > second_foot->position.y){
             // left foot 
-                // m_variable_distance = foot_pos.position.x - m_left_foot_offset[0]; 
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_left_foot_offset[0]); 
                 m_variable_walk_swing_leg = 0; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a left swing foot!"); 
             } else if (foot_pos.position.y < second_foot->position.y){
             // right foot 
-                // m_variable_distance = foot_pos.position.x - m_right_foot_offset[0];
                 m_gait_planning.setVariableDistance(foot_pos.position.x - m_right_foot_offset[0]);  
                 m_variable_walk_swing_leg = 1; 
                 RCLCPP_INFO(this->get_logger(), "Going to send a right swing foot!"); 
@@ -246,15 +235,15 @@ void GaitPlanningCartesianNode::finishCurrentTrajectory(){
         setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
                         current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
     }
+    rotateFootPositions();
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
 void GaitPlanningCartesianNode::publishIncrements(){
-    // RCLCPP_INFO(this->get_logger(), "publishing increment number %d", m_home_stand_trajectory.size()); 
     std::array<double, 6> current_step = m_home_stand_trajectory.front();
-    // RCLCPP_INFO(this->get_logger(), "current step: %f, %f, %f, %f, %f, %f", current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]); 
     m_home_stand_trajectory.erase(m_home_stand_trajectory.begin());   
     setFootPositionsMessage(current_step[0], current_step[1], current_step[2], current_step[3], current_step[4], current_step[5]);
+    rotateFootPositions();
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
 }
 
@@ -262,23 +251,15 @@ void GaitPlanningCartesianNode::publishIncrements(){
 
 
 void GaitPlanningCartesianNode::stepClose(){
+    if (m_gait_planning.getCurrentStanceFoot() == 3){
+        m_gait_planning.setStanceFoot(2); 
+    } else {
+        m_gait_planning.setStanceFoot(m_gait_planning.getCurrentStanceFoot() == 1 ? 2 : 1);
+    }
+    RCLCPP_INFO(this->get_logger(), "Current stance foot is" BRIGHT_YELLOW " %s" RESET,
+            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
     RCLCPP_DEBUG(this->get_logger(), "Calling step close trajectory with mode: %s", toString(static_cast<ExoMode>(m_gait_planning.getPreviousGaitType())).c_str());
     m_current_trajectory = m_gait_planning.getTrajectory();
-
-    // Hier trajectory publishen naar visualizer, depending on previous gait type 
-    switch (m_gait_planning.getPreviousGaitType()){
-        case ExoMode::HighStep1: 
-        case ExoMode::HighStep2:
-        case ExoMode::HighStep3: 
-            break; 
-        case ExoMode::LargeWalk:
-        case ExoMode::SmallWalk: 
-        case ExoMode::VariableWalk:
-            break; 
-        default: 
-            break; 
-    }
-
     RCLCPP_DEBUG(this->get_logger(), "Size of step close trajectory: %d", m_current_trajectory.size());
     m_gait_planning.setPreviousGaitType(ExoMode::Stand);
 }
@@ -308,8 +289,11 @@ void GaitPlanningCartesianNode::calculateIncrements(){
 }
 
 void GaitPlanningCartesianNode::publishHomeStand(){
+    m_gait_planning.setStanceFoot(3); 
+    m_first_step = true; 
     m_current_trajectory.clear();
     setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+    rotateFootPositions();
     m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     m_single_execution_done = false; 
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 10000, "Publishing homestand position.");
@@ -348,8 +332,18 @@ void GaitPlanningCartesianNode::processStand(){
 
 void GaitPlanningCartesianNode::publishWalk(){
     if (m_current_trajectory.empty()) {
+        if (m_gait_planning.getCurrentStanceFoot() != 3) {
+            m_first_step = false;
+            m_gait_planning.setStanceFoot(m_gait_planning.getCurrentStanceFoot() == 1 ? 2 : 1);
+        } else if (m_gait_planning.getCurrentStanceFoot() == 3 && m_first_step){
+            m_first_step = false; 
+        } else {
+            m_gait_planning.setStanceFoot(2); 
+        }
+
         m_current_trajectory = m_gait_planning.getTrajectory(); 
-        RCLCPP_INFO(this->get_logger(), "Current stance foot is: %d", m_gait_planning.getCurrentStanceFoot());
+        RCLCPP_INFO(this->get_logger(), "Current stance foot is" BRIGHT_YELLOW " %s" RESET,
+            (m_gait_planning.getCurrentStanceFoot() == 1 ? "left foot" : (m_gait_planning.getCurrentStanceFoot() == 2 ? "right foot" : "both feet")));
         RCLCPP_INFO(this->get_logger(), "Trajectory refilled!");
     } else {
         GaitPlanning::XZFeetPositionsArray current_step = m_current_trajectory.front();
@@ -363,6 +357,7 @@ void GaitPlanningCartesianNode::publishWalk(){
             setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
                             current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
         }
+        rotateFootPositions();
         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     }
 }
@@ -376,6 +371,7 @@ void GaitPlanningCartesianNode::publishHeightGaits(){
     }
     else if (m_current_trajectory.empty() && m_single_execution_done){
         setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+        rotateFootPositions();
         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     }
     else {
@@ -383,6 +379,7 @@ void GaitPlanningCartesianNode::publishHeightGaits(){
         m_current_trajectory.erase(m_current_trajectory.begin());
         setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
                         current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
+        rotateFootPositions();
         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     }
 }
@@ -401,6 +398,7 @@ void GaitPlanningCartesianNode::publishVariableWalk(){
             setFootPositionsMessage(current_step[0]+m_home_stand[0], m_home_stand[1], current_step[1]+m_home_stand[2], 
                             current_step[2]+m_home_stand[3], m_home_stand[4], current_step[3]+m_home_stand[5]);
         }
+        rotateFootPositions();
         m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
     }
 }
@@ -423,6 +421,7 @@ void GaitPlanningCartesianNode::publishFootPositions(){
         case ExoMode::VariableStep : 
             if (m_current_trajectory.empty()){
                 setFootPositionsMessage(m_home_stand[0], m_home_stand[1], m_home_stand[2], m_home_stand[3], m_home_stand[4], m_home_stand[5]);
+                rotateFootPositions();
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             }
             else { 
@@ -430,6 +429,7 @@ void GaitPlanningCartesianNode::publishFootPositions(){
                 m_current_trajectory.erase(m_current_trajectory.begin());
                 setFootPositionsMessage(current_step[2]+m_home_stand[0], m_home_stand[1], current_step[3] + m_home_stand[2], 
                                 current_step[0]+m_home_stand[3], m_home_stand[4], current_step[1] + m_home_stand[5]);
+                rotateFootPositions();
                 m_iks_foot_positions_publisher->publish(*m_desired_footpositions_msg);
             } 
             break;
@@ -451,6 +451,29 @@ void GaitPlanningCartesianNode::publishFootPositions(){
     }
 }
 
+void GaitPlanningCartesianNode::rotateFootPositions() {
+    // Create a rotation matrix about the Y-axis.
+    Eigen::Matrix3d rotation_matrix = Eigen::AngleAxisd(m_hip_tilt, Eigen::Vector3d::UnitY()).toRotationMatrix().transpose();
+    Eigen::Quaterniond rotation_quaternion(rotation_matrix);
+
+    Eigen::Vector3d left_foot_position = Eigen::Vector3d(
+        m_desired_footpositions_msg->left_foot_position.x, m_desired_footpositions_msg->left_foot_position.y, m_desired_footpositions_msg->left_foot_position.z);
+    Eigen::Vector3d right_foot_position = Eigen::Vector3d(
+        m_desired_footpositions_msg->right_foot_position.x, m_desired_footpositions_msg->right_foot_position.y, m_desired_footpositions_msg->right_foot_position.z);
+    left_foot_position.noalias() = rotation_matrix * left_foot_position + Eigen::Vector3d(0.0, 0.0, -0.032);
+    right_foot_position.noalias() = rotation_matrix * right_foot_position + Eigen::Vector3d(0.0, 0.0, -0.032);
+
+    m_desired_footpositions_msg->left_foot_position.x = left_foot_position.x();
+    m_desired_footpositions_msg->left_foot_position.y = left_foot_position.y();
+    m_desired_footpositions_msg->left_foot_position.z = left_foot_position.z();
+
+    m_desired_footpositions_msg->right_foot_position.x = right_foot_position.x();
+    m_desired_footpositions_msg->right_foot_position.y = right_foot_position.y();
+    m_desired_footpositions_msg->right_foot_position.z = right_foot_position.z();
+
+    m_desired_footpositions_msg->backpack_tilt = m_hip_tilt;
+}
+
 std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::string& file_path){
 
     std::vector<double> values;
@@ -468,6 +491,21 @@ std::vector<double> GaitPlanningCartesianNode::parseHomestandYAML(const std::str
     }
 
     return values;
+}
+
+double GaitPlanningCartesianNode::parseHipTiltYAML(const std::string& file_path){
+    double hip_tilt; 
+    try {
+        YAML::Node config = YAML::LoadFile(file_path);
+        YAML::Node hip_tilt_node = config["hip_tilt"];
+        if (hip_tilt_node) {
+            hip_tilt = hip_tilt_node.as<double>();
+        }
+    } catch (const YAML::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Error parsing YAML file: %s", e.what());
+    }
+
+    return hip_tilt;
 }
 
 int main(int argc, char *argv[]){

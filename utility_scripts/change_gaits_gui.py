@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the parent directory of utility_scripts to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 import numpy as np
 from utility_scripts.create_joint_angle_gaits import * 
 from utility_scripts.interactive_bezier import * 

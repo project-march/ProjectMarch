@@ -208,7 +208,6 @@ void StateEstimatorNode::timerCallback()
 
     // publishFeetHeight();
     // publishMPCEstimation();
-    if (m_is_simulation) {
         publishGroundReactionForce();
     }
     

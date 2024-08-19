@@ -57,6 +57,10 @@ private:
     const geometry_msgs::msg::Vector3Stamped::SharedPtr acc_msg, 
     const geometry_msgs::msg::Vector3Stamped::SharedPtr gyro_msg);
 
+  inline bool jointNameBlacklisted(const std::string& joint_name) {
+    return std::find(m_blacklist_joint_names.begin(), m_blacklist_joint_names.end(), joint_name) != m_blacklist_joint_names.end();
+  }
+
   std::vector<MyMeanFilter::SharedPtr> m_imu_acc_mean_filters;
   std::vector<MyMeanFilter::SharedPtr> m_imu_gyro_mean_filters;
   std::vector<MyMeanFilter::SharedPtr> m_torque_mean_filters;
