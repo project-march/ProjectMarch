@@ -86,6 +86,8 @@ ament_target_dependencies(ik_solver_node
 target_link_libraries(ik_solver_node
   ${PROJECT_NAME}
   ${OpenMP_CXX_LIBRARIES}
+  Eigen3::Eigen
+  pinocchio::pinocchio
 )
 
 install(TARGETS
