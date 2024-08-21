@@ -36,6 +36,8 @@ Task::~Task()
 
     m_joint_names_ptr = NULL;
     m_current_joint_positions_ptr = NULL;
+
+    m_data.reset();
 }
 
 void Task::setTaskName(const std::string& task_name)

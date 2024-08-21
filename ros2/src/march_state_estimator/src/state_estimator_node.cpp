@@ -208,8 +208,8 @@ void StateEstimatorNode::timerCallback()
 
     // publishFeetHeight();
     // publishMPCEstimation();
-        publishGroundReactionForce();
-    }
+        // publishGroundReactionForce();
+    // }
     
     broadcastTransformToTf2();
     publishStateEstimation();

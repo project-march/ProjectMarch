@@ -69,6 +69,7 @@ private:
   std::unordered_map<std::string, double> m_joint_velocity_map;
   std::unordered_map<std::string, double> m_joint_effort_map;
   std::unordered_map<std::string, double[NUM_LIMITS]> m_joint_position_limits_map;
+  std::vector<std::string> m_blacklist_joint_names;
 
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_sub;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr m_imu_sub;

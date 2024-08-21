@@ -23,7 +23,7 @@ public:
     typedef std::array<double, 2> JointLimit;
 
     IKSolver();
-    ~IKSolver() = default;
+    ~IKSolver();
 
     void createTask(
         std::unordered_map<std::string, std::vector<double>> task_gains_p,
@@ -106,7 +106,7 @@ private:
     std::vector<JointLimit> m_joint_velocity_limits;
 
     pinocchio::Model m_pinocchio_model;
-    std::unique_ptr<pinocchio::Data> m_pinocchio_data;
+    std::shared_ptr<pinocchio::Data> m_pinocchio_data;
 };
 
 #endif // IK_SOLVER__IK_SOLVER_HPP_

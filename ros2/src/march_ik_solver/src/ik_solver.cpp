@@ -25,6 +25,16 @@ IKSolver::IKSolver()
     m_current_linear_acceleration = Eigen::Vector3d::Zero();
 }
 
+IKSolver::~IKSolver()
+{
+    m_pinocchio_data.reset();
+
+    m_joint_names.clear();
+    m_joint_position_limits.clear();
+    m_joint_velocity_limits.clear();
+    m_task_map.clear();
+}
+
 void IKSolver::createTask(
     std::unordered_map<std::string, std::vector<double>> task_gains_p,
     std::unordered_map<std::string, std::vector<double>> task_gains_d,
@@ -135,8 +145,7 @@ void IKSolver::configurePinocchioModel()
     // Load URDF model
     std::string urdf_file_path = ament_index_cpp::get_package_share_directory("march_description") + "/urdf/march9/march9.urdf";
     pinocchio::urdf::buildModel(urdf_file_path, m_pinocchio_model);
-    m_pinocchio_data.reset();
-    m_pinocchio_data = std::make_unique<pinocchio::Data>(m_pinocchio_model);
+    m_pinocchio_data = std::make_shared<pinocchio::Data>(m_pinocchio_model);
 }
 
 void IKSolver::updatePinocchioModel(const Eigen::VectorXd& joint_positions)

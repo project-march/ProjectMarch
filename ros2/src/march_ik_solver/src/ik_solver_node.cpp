@@ -371,6 +371,7 @@ void IKSolverNode::configureIKSolverParameters()
     }
 
     // Configure Pinocchio model.
+    RCLCPP_INFO(this->get_logger(), "Configuring Pinocchio model...");
     m_ik_solver->configurePinocchioModel();
     RCLCPP_INFO(this->get_logger(), "Pinocchio model is configured.");
 
