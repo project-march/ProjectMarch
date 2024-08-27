@@ -75,7 +75,7 @@ def descend_stairs(data_up):
     plt.show()
     return final_points_stairs_down
 
-stairs_up = ascend_stairs(0.171, 200, 0.28)
+stairs_up = ascend_stairs(0.171, 1000, 0.28)
 stairs_down = descend_stairs(stairs_up)
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', stairs_up, delimiter=',')
 np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', stairs_down, delimiter=',')
