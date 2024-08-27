@@ -261,4 +261,4 @@ def interactive_bezier(gait_type: str, array_size: int):
 step_time = 3 # seconds
 
 # interactive_bezier("small_gait", 150)
-interactive_bezier("small_gait", step_time*HIGH_LEVEL_FREQUENCY)
+# interactive_bezier("small_gait", step_time*HIGH_LEVEL_FREQUENCY)

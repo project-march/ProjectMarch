@@ -156,4 +156,4 @@ HIGH_LEVEL_FREQUENCY = 200
 # hinge_gait(100)
 # stand_to_sit(125)
 # sit_to_stand(125)
-sideways(HIGH_LEVEL_FREQUENCY * 3)
+# sideways(HIGH_LEVEL_FREQUENCY * 3)
