@@ -35,6 +35,19 @@ march9:
             p: 0.0
             d: 0.0
 
+    - left_ankle_ie:
+        motor_controller:
+          slaveIndex: 5
+          axis: 1
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 9837
+            maxPositionIU: 10637
+            zeroPositionIU: 10237
+            lowerSoftLimitMarginRad: 0.0
+            upperSoftLimitMarginRad: 0.0
+
     - left_hip_aa:
         motor_controller:
           slaveIndex: 4
@@ -43,9 +56,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 6856
-            maxPositionIU: 8150
-            zeroPositionIU: 7695
+            minPositionIU: 6943
+            maxPositionIU: 8243
+            zeroPositionIU: 7948
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
@@ -138,7 +151,7 @@ march9:
             direction: 1
             minPositionIU: 3874
             maxPositionIU: 5905
-            zeroPositionIU: 5148
+            zeroPositionIU: 4995
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -158,6 +171,19 @@ march9:
           torque:
             p: 0.0
             d: 0.0
+
+    - right_ankle_ie:
+        motor_controller:
+          slaveIndex: 1
+          axis: 1
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 5651
+            maxPositionIU: 6477
+            zeroPositionIU: 6064
+            lowerSoftLimitMarginRad: 0.0
+            upperSoftLimitMarginRad: 0.0
 
     - right_hip_aa:
         motor_controller:

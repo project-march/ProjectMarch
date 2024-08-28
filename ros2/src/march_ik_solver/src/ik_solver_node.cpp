@@ -285,16 +285,16 @@ void IKSolverNode::configureIKSolverParameters()
     declare_parameter("integral_dt", 0.01);
     declare_parameter("joint.names", std::vector<std::string>());
     declare_parameter("joint.active", std::vector<bool>());
-    declare_parameter("joint.limits.positions.upper", std::vector<double>());
-    declare_parameter("joint.limits.positions.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.upper", std::vector<double>());
     declare_parameter("joint.limits.velocities.lower", std::vector<double>());
     declare_parameter("joint.limits.velocities.multiplier", 1.0);
 
     // Soft limits for the joint positions.
-    declare_parameter("actuator_names", std::vector<std::string>());
-    declare_parameter("actuator_soft_upper_limits", std::vector<double>());
-    declare_parameter("actuator_soft_lower_limits", std::vector<double>());
+    declare_parameter("joint_names", std::vector<std::string>());
+    declare_parameter("joint_min_position_degrees", std::vector<double>());
+    declare_parameter("joint_max_position_degrees", std::vector<double>());
+    declare_parameter("joint_lower_soft_limits", std::vector<double>());
+    declare_parameter("joint_upper_soft_limits", std::vector<double>());
 
     m_state_estimator_time_offset = get_parameter("state_estimator_timer_period").as_double();
     m_convergence_threshold = get_parameter("convergence_threshold").as_double();
@@ -306,24 +306,37 @@ void IKSolverNode::configureIKSolverParameters()
     double joint_trajectory_controller_period = get_parameter("joint_trajectory_controller_period").as_double();
     m_joint_trajectory_controller_period = (uint64_t)(joint_trajectory_controller_period * 1e9);
 
-    std::vector<double> joint_position_limits_upper = get_parameter("joint.limits.positions.upper").as_double_array();
-    std::vector<double> joint_position_limits_lower = get_parameter("joint.limits.positions.lower").as_double_array();
+    std::vector<double> joint_position_limits_upper(m_joint_names.size());
+    std::vector<double> joint_position_limits_lower(m_joint_names.size());
     std::vector<double> joint_velocity_limits_upper = get_parameter("joint.limits.velocities.upper").as_double_array();
     std::vector<double> joint_velocity_limits_lower = get_parameter("joint.limits.velocities.lower").as_double_array();
 
+    // Overwrite the hard limits for the joints
+    std::vector<std::string> joint_names = get_parameter("joint_names").as_string_array();
+    std::vector<double> min_position_degrees = get_parameter("joint_min_position_degrees").as_double_array();
+    std::vector<double> max_position_degrees = get_parameter("joint_max_position_degrees").as_double_array();
+
+    for (unsigned long int i = 0; i < joint_names.size(); i++) {
+        auto it = std::find(m_joint_names.begin(), m_joint_names.end(), joint_names[i]);
+        if (it != m_joint_names.end()) {
+            std::size_t joint_id = std::distance(m_joint_names.begin(), it);
+            joint_position_limits_upper[joint_id] = max_position_degrees[i];
+            joint_position_limits_lower[joint_id] = min_position_degrees[i];
+        }
+    }
+
     // Apply soft limits to the joint position limits.
-    std::vector<std::string> actuator_names = get_parameter("actuator_names").as_string_array();
-    std::vector<double> actuator_soft_upper_limits = get_parameter("actuator_soft_upper_limits").as_double_array();
-    std::vector<double> actuator_soft_lower_limits = get_parameter("actuator_soft_lower_limits").as_double_array();
+    std::vector<double> joint_lower_soft_limits = get_parameter("joint_lower_soft_limits").as_double_array();
+    std::vector<double> joint_upper_soft_limits = get_parameter("joint_upper_soft_limits").as_double_array();
     
     for (unsigned long int i = 0; i < m_joint_names.size(); i++) {
-        auto it = std::find(actuator_names.begin(), actuator_names.end(), m_joint_names[i]);
+        auto it = std::find(joint_names.begin(), joint_names.end(), m_joint_names[i]);
         RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, hard upper limit: %f, hard lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
-        if (it != actuator_names.end()) {
-            std::size_t actuator_id = std::distance(actuator_names.begin(), it);
-            joint_position_limits_upper[i] = joint_position_limits_upper[i] - actuator_soft_upper_limits[actuator_id];
-            joint_position_limits_lower[i] = joint_position_limits_lower[i] + actuator_soft_lower_limits[actuator_id];
+        if (it != joint_names.end()) {
+            std::size_t joint_id = std::distance(joint_names.begin(), it);
+            joint_position_limits_upper[i] = joint_position_limits_upper[i] - joint_upper_soft_limits[joint_id];
+            joint_position_limits_lower[i] = joint_position_limits_lower[i] + joint_lower_soft_limits[joint_id];
         }
         RCLCPP_DEBUG(this->get_logger(), "Joint name: %s, soft upper limit: %f, soft lower limit: %f",
             m_joint_names[i].c_str(), joint_position_limits_upper[i], joint_position_limits_lower[i]);
