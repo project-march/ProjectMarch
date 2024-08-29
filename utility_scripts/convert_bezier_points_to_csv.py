@@ -133,8 +133,8 @@ def create_bezier_csv(points, array_size, gait_type):
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', final_points_step_close, delimiter=',')
 
-def stair_gaits(set_of_points, array_size):
-    pause_time = int(array_size/6)
+def stair_gaits(set_of_points, array_size, pause_time_fraction = 6):
+    pause_time = int(array_size/pause_time_fraction)
     first_step_points = np.array(set_of_points[0]["first_step"])
     full_step_points = np.array(set_of_points[1]["full_step"])
     step_close_points = np.array(set_of_points[2]["step_close"])
@@ -198,8 +198,8 @@ def stair_gaits(set_of_points, array_size):
 
     return final_points_stairs_up
 
-def descend_stairs(set_of_points, array_size): 
-    data_up = stair_gaits(set_of_points, array_size)
+def descend_stairs(set_of_points, array_size, pause_time_fraction = 6): 
+    data_up = stair_gaits(set_of_points, array_size, pause_time_fraction)
 
     x_stance = data_up[:,0][::-1]*-1
     z_stance = data_up[:,1][::-1]
