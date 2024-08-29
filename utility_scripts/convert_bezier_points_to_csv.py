@@ -198,14 +198,15 @@ def stair_gaits(set_of_points, array_size):
 
     return final_points_stairs_up
 
-def descend_stairs(data_up): 
-     
+def descend_stairs(set_of_points, array_size): 
+    data_up = stair_gaits(set_of_points, array_size)
+
     x_stance = data_up[:,0][::-1]*-1
     z_stance = data_up[:,1][::-1]
     x_swing = data_up[:,2][::-1]*-1
     z_swing = data_up[:,3][::-1]
 
-    final_points_stairs_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
+    final_points_stairs_down = np.column_stack((x_stance, z_stance, x_swing, z_swing))
 
     # plt.plot(x_swing, z_swing)
     # plt.plot(x_stance, z_stance, color="orange")
