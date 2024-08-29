@@ -282,4 +282,4 @@ step_time = 3 # seconds
 
 # interactive_bezier("small_gait", 150)
 # interactive_bezier("small_gait", step_time*HIGH_LEVEL_FREQUENCY)
-# interactive_bezier("high_step_1", 500)
+interactive_bezier("ascending", 1000)
