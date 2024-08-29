@@ -192,9 +192,9 @@ def stair_gaits(set_of_points, array_size):
     final_points_stairs_up = np.concatenate((first_points_stairs, second_step_points_stairs, third_step_points_stairs, forth_step_points_stairs, final_step_points_stairs), axis=0)
 
 
-    plt.plot(final_points_stairs_up[:,0], final_points_stairs_up[:,1])
-    plt.plot(final_points_stairs_up[:,2], final_points_stairs_up[:,3], color="orange")
-    plt.show()
+    # plt.plot(final_points_stairs_up[:,0], final_points_stairs_up[:,1])
+    # plt.plot(final_points_stairs_up[:,2], final_points_stairs_up[:,3], color="orange")
+    # plt.show()
 
     return final_points_stairs_up
 
