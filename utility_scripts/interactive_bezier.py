@@ -262,7 +262,7 @@ def interactive_bezier(gait_type: str, array_size: int):
         ascend_csv = stair_gaits(data['ascending'], array_size)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
     elif gait_type == "descending": 
-        descend_csv = descend_stairs(data['descending'], array_size, 3)
+        descend_csv = descend_stairs(data['descending'], array_size, 4.5)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
     elif gait_type == "high_step_3":
         high_step_csv = high_step_up(np.array(data['high_step_3'][0]['up']), array_size)
