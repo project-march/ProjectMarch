@@ -25,9 +25,9 @@
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, bool use_inc_enc_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
+    ActuationMode actuation_mode, bool use_low_level_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
     : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor),
-        actuation_mode, std::move(use_inc_enc_for_position) , std::move(logger))
+        actuation_mode, std::move(use_low_level_for_position) , std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
 {
@@ -207,6 +207,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
+    state->pos_abs_rad_ = getPosAbsRad();
     state->AIE_absolute_position_ = getAIEAbsolutePositionRad();
     state->check_sum_ = getCheckSum();
 
@@ -299,8 +300,7 @@ float ODrive::getAIEAbsolutePositionRad()
 
 uint32_t ODrive::getCheckSum()
 {
-    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
-    return checksum;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -327,6 +327,16 @@ float ODrive::getIncrementalVelocityUnchecked()
 float ODrive::getTorqueUnchecked()
 {
     return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
+}
+
+float ODrive::getPosAbsRad()
+{
+    float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
+    float pos_abs_rad_check = 2;
+    if (abs(pos_abs_rad) > pos_abs_rad_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
+    }
+    return pos_abs_rad;
 }
 
 float ODrive::getMotorCurrent()

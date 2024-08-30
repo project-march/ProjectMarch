@@ -8,7 +8,7 @@ march9:
         motor_controller:
           slaveIndex: 5
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -52,7 +52,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -83,7 +83,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1
@@ -114,13 +114,13 @@ march9:
         motor_controller:
           slaveIndex: 5
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 541190
+            minPositionIU: 540225
             maxPositionIU: 905664
-            zeroPositionIU: 541575
+            zeroPositionIU: 540225
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
@@ -145,7 +145,7 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -189,7 +189,7 @@ march9:
         motor_controller:
           slaveIndex: 2
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -220,7 +220,7 @@ march9:
         motor_controller:
           slaveIndex: 2
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -251,7 +251,7 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1

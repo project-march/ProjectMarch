@@ -1,5 +1,5 @@
 testsetup:
-  network_interface_name: enp2s0
+  network_interface_name: enx00e04c360de2
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
@@ -7,13 +7,13 @@ testsetup:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 13248
-            maxPositionIU: 14999
-            zeroPositionIU: 14141
+            minPositionIU: 12833
+            maxPositionIU: 14700
+            zeroPositionIU: 13766
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -37,7 +37,7 @@ testsetup:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
