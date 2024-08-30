@@ -30,7 +30,7 @@ class GUI:
         self.gait_type_combobox = ttk.Combobox(self.root, textvariable=self.gait_type_var)
         self.gait_type_combobox['width'] = 40
         self.gait_type_combobox['state'] = 'readonly'
-        self.gait_type_combobox['values'] = ("small_gait", "large_gait", "high_step_1", "high_step_2", "high_step_3", "ascending", "sit_to_stand", "stand_to_sit", "hinge", "sideways")
+        self.gait_type_combobox['values'] = ("small_gait", "large_gait", "high_step_1", "high_step_2", "high_step_3", "ascending", "descending", "sit_to_stand", "stand_to_sit", "hinge", "sideways")
         self.gait_type_combobox.grid(row=0, column=1, padx=20, pady=20)
 
         # Create a label and entry for gait length in seconds
