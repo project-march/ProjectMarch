@@ -29,13 +29,13 @@ public:
      * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr.
      * @param torque_sensor pointer to the torque sensor, required so cannot be nullptr.
      * @param actuation_mode actuation mode in which the ODrive must operate.
-     * @param use_inc_enc_for_position whether to use the incremental encoder for position updates.
+     * @param use_low_level_for_position whether to use the low level for the position calculation. Uses the incrementals.
      * @param logger The logger to print warning or info to the terminal.
      * @throws error::HardwareException When an absolute encoder is nullptr.
      */
     ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-        ActuationMode actuation_mode, bool use_inc_enc_for_position,bool index_found,std::shared_ptr<march_logger::BaseLogger> logger);
+        ActuationMode actuation_mode, bool use_low_level_for_position,bool index_found,std::shared_ptr<march_logger::BaseLogger> logger);
 
     ~ODrive() noexcept override = default;
 
@@ -76,6 +76,7 @@ protected:
     float getAbsoluteVelocityUnchecked() override;
     float getIncrementalVelocityUnchecked() override;
     float getTorqueUnchecked() override;
+    float getPosAbsRad() override;
 
 private:
     // Getter and setter for the axis state

@@ -212,7 +212,7 @@ void EthercatMaster::ethercatLoop()
 bool EthercatMaster::isCheckSumValid(uint16_t slave)
 {
     uint32_t checkSumValue = 0;
-    int8_t miso_object_byte_offset;
+    uint8_t miso_object_byte_offset;
 
     if (strcmp(ec_slave[slave].name, "PDBm9") == 0){
         miso_object_byte_offset = PDB_CHECKSUM_MISO_OFFSET;

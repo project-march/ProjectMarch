@@ -11,5 +11,6 @@ float32 absolute_position
 float32 incremental_position
 float32 absolute_velocity
 float32 incremental_velocity
+float32 pos_abs_rad
 float32 aie_absolute_position
 float32 check_sum

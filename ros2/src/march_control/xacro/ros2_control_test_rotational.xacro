@@ -50,7 +50,7 @@
     </xacro:if>
     <xacro:if value="${type == 'effort'}">
       <plugin>march_system_interface/MarchExoSystemInterface</plugin>
-      <param name="robot">joints_test_setup</param>
+      <param name="robot">hardware_test_setup</param>
     </xacro:if>
   </hardware>
 

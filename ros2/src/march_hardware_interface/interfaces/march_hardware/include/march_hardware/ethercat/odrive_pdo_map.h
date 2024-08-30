@@ -36,6 +36,7 @@ enum class ODriveObjectName {
     MotorTemperature,
     ShadowCount,
     Torque,
+    PosAbsRad,
     AIEAbsolutePosition,
     CheckSumMISO,
     CheckSumMOSIStatus,
@@ -57,12 +58,6 @@ enum class ODriveObjectName {
 
 class ODrivePDOmap {
 public:
-    /* Compared to the IMCPDOMap, the ODrivePDOmap is much simpler.
-     * All byte offsets can be stored directly and no additional logic is
-     * required. We also don't need to configure the PDO at runtime, meaning we
-     * need to implement fewer methods.
-     */
-
     // Map ODriveObjectsNames to ODriveObjects, which contain the byte offset of
     // the object
     using ObjectMap = std::unordered_map<ODriveObjectName, ODriveObject>;
@@ -74,8 +69,8 @@ public:
     static ObjectMap miso_objects_axis_none;
 
     // Get the byte offset for an ODriveObject of an axis
-    static int8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
-    static int8_t getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis);
+    static uint8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
+    static uint8_t getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis);
 };
 
 } // namespace march
