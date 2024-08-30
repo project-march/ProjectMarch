@@ -12,13 +12,13 @@
 namespace march {
 MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, bool use_inc_enc_for_position ,std::shared_ptr<march_logger::BaseLogger> logger)
+    ActuationMode actuation_mode, bool use_low_level_for_position ,std::shared_ptr<march_logger::BaseLogger> logger)
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
     , torque_sensor_(std::move(torque_sensor))
     , actuation_mode_(actuation_mode)
-    , use_inc_enc_for_position_(use_inc_enc_for_position)
+    , use_low_level_for_position_(use_low_level_for_position)
     , logger_(std::move(logger))
 {
     if (!incremental_encoder_) {
@@ -37,15 +37,15 @@ std::chrono::nanoseconds MotorController::reset()
     return std::chrono::nanoseconds(0);
 }
 
-bool MotorController::useIncrementalEncoderForPosition() const
+bool MotorController::useLowLevelForPosition() const
 {
-    return use_inc_enc_for_position_;
+    return use_low_level_for_position_;
 }
 
 float MotorController::getPosition()
 {
-    if (useIncrementalEncoderForPosition()) {
-        return getIncrementalPosition();
+    if (useLowLevelForPosition()) {
+        return getLowLevelPosition();
     }
     return getAbsolutePosition();
 }
@@ -53,7 +53,7 @@ float MotorController::getPosition()
 
 float MotorController::getVelocity()
 {
-    if (useIncrementalEncoderForPosition()) {
+    if (useLowLevelForPosition()) {
         return getIncrementalVelocity();
     }
     return getAbsoluteVelocity();
@@ -103,6 +103,11 @@ float MotorController::getTorque()
     } else {
         return getTorqueUnchecked();
     }
+}
+
+float MotorController::getLowLevelPosition()
+{
+    return getPosAbsRad();
 }
 
 double MotorController::getMotorControllerSpecificEffort(double joint_effort_command) const

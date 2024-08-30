@@ -17,7 +17,7 @@ class MotorController : public Slave {
 public:
     MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-        ActuationMode actuation_mode, bool use_inc_enc_for_position, std::shared_ptr<march_logger::BaseLogger> logger);
+        ActuationMode actuation_mode, bool use_low_level_for_position, std::shared_ptr<march_logger::BaseLogger> logger);
 
     // Get the most precise position or velocity
     float getPosition();
@@ -31,6 +31,7 @@ public:
     float getIncrementalPosition();
     float getIncrementalVelocity();
     float getTorque();
+    float getLowLevelPosition();
 
     /**
      * \brief Applies an clamp, an motor-direction and Effort to IU Effort conversion transformation.
@@ -72,8 +73,8 @@ public:
      // Are the slaves of this MotorController unique
     virtual bool requiresUniqueSlaves() const = 0;
 
-    // Check if we want to use the incremental encoder to update the position
-    bool useIncrementalEncoderForPosition() const;
+    // Check if we want to use the low level for position. Uses the incrementals.
+    bool useLowLevelForPosition() const;
 
     // A MotorController doesn't necessarily have an AbsoluteEncoder and an
     // IncrementalEncoder, but will have at least one of the two
@@ -145,12 +146,13 @@ protected:
     virtual float getAbsoluteVelocityUnchecked() = 0;
     virtual float getIncrementalVelocityUnchecked() = 0;
     virtual float getTorqueUnchecked() = 0;
+    virtual float getPosAbsRad() = 0;
 
     std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
     std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     std::unique_ptr<TorqueSensor> torque_sensor_;
     ActuationMode actuation_mode_;
-    bool use_inc_enc_for_position_;
+    bool use_low_level_for_position_;
 
     std::shared_ptr<march_logger::BaseLogger> logger_;
 

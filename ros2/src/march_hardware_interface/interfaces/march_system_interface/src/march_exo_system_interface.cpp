@@ -95,6 +95,7 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
     joints_info_.reserve(info_.joints.size());
     pdb_data_ = {};
 
+
     for (const auto& joint : info.joints) {
         JointInfo jointInfo = build_joint_info(joint);
         joints_info_.push_back(jointInfo);
@@ -427,8 +428,13 @@ hardware_interface::return_type MarchExoSystemInterface::read()
     }  
 
     // Read out the pdb data, published through the march_pdb_state_broadcaster
-    // TODO: test what happens when the pdb isn't 
-    march_robot_->getPowerDistributionBoard().read(pdb_data_);
+    auto pdb_optional = march_robot_->getPowerDistributionBoard();
+
+    if (pdb_optional.has_value()) {
+        pdb_optional.value().read(pdb_data_);
+    } else {
+        // Do nothing if the Power Distribution Board is not available
+    }
 
     return hardware_interface::return_type::OK;
 }
