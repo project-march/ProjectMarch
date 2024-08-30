@@ -90,9 +90,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 80.0
+            p: 35.0
             i: 0.0
-            d: 0.8
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
@@ -121,7 +121,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 50
+            p: 20.0
             i: 0.0
             d: 0.6
           torque:
@@ -214,9 +214,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 80.0
+            p: 35.0
             i: 0.0
-            d: 0.8
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
@@ -230,8 +230,8 @@ march9:
             resolution: 20
             direction: -1
             minPositionIU: 308535
-            maxPositionIU: 673188
-            zeroPositionIU: 673188
+            maxPositionIU: 673504
+            zeroPositionIU: 673504
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
@@ -245,7 +245,7 @@ march9:
             averageTorque: 10.0
         gains:
           position:
-            p: 50
+            p: 20.0
             i: 0.0
             d: 0.6
           torque:
