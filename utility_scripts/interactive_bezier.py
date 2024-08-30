@@ -195,7 +195,7 @@ def interactive_bezier(gait_type: str, array_size: int):
 
         
     
-    elif gait_type == "ascending":
+    elif gait_type == "ascending" or gait_type == "descending":
         if os.path.exists('utility_scripts/points.yaml'):
             with open('utility_scripts/points.yaml', 'r') as f:
                 data = yaml.safe_load(f)
@@ -260,8 +260,9 @@ def interactive_bezier(gait_type: str, array_size: int):
     
     if gait_type == "ascending":
         ascend_csv = stair_gaits(data['ascending'], array_size)
-        descend_csv = descend_stairs(data['ascending'], array_size, 3)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
+    elif gait_type == "descending": 
+        descend_csv = descend_stairs(data['descending'], array_size, 3)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
     elif gait_type == "high_step_3":
         high_step_csv = high_step_up(np.array(data['high_step_3'][0]['up']), array_size)
@@ -282,4 +283,4 @@ step_time = 3 # seconds
 
 # interactive_bezier("small_gait", 150)
 # interactive_bezier("small_gait", step_time*HIGH_LEVEL_FREQUENCY)
-interactive_bezier("ascending", 1000)
+# interactive_bezier("descending", 1000)
