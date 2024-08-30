@@ -224,7 +224,7 @@ def descend_stairs(set_of_points, array_size, pause_time_fraction = 6):
     x_swing_first_step, z_swing_first_step = make_evenly_spaced_points(x_swing_first_step, z_swing_first_step, int(array_size/2))
     
     x_stance_first_step = np.linspace(first_step_points[0][0], -first_step_points[3][0], int(array_size/2))
-    z_stance_first_step = np.linspace(0, full_step_points[0][1], int(array_size/2))
+    z_stance_first_step = np.concatenate((np.zeros(int(array_size/4)), np.linspace(0, full_step_points[0][1], int(array_size/4))))
 
     x_swing_first_step = np.append(x_swing_first_step, x_swing_first_step[-1]*np.ones(pause_time))
     z_swing_first_step = np.append(z_swing_first_step, z_swing_first_step[-1]*np.ones(pause_time))
@@ -241,7 +241,7 @@ def descend_stairs(set_of_points, array_size, pause_time_fraction = 6):
     x_swing_full_step, z_swing_full_step = make_evenly_spaced_points(x_swing_full_step, z_swing_full_step, int(array_size/2))
 
     x_stance_full_step = np.linspace(full_step_points[3][0], full_step_points[0][0], int(array_size/2))
-    z_stance_full_step = np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size/2))
+    z_stance_full_step = np.concatenate((full_step_points[3][1]*np.ones(int(array_size/4)), np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size/4))))
 
     x_swing_full_step = np.append(x_swing_full_step, x_swing_full_step[-1]*np.ones(pause_time))
     z_swing_full_step = np.append(z_swing_full_step, z_swing_full_step[-1]*np.ones(pause_time))
