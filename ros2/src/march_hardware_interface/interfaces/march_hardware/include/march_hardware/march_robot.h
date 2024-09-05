@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace march {
 class MarchRobot {
@@ -71,7 +72,7 @@ public:
     iterator end();
 
     bool hasPowerDistributionBoard() const;
-    PowerDistributionBoard getPowerDistributionBoard() const;
+    std::optional<PowerDistributionBoard> getPowerDistributionBoard() const;
 
     /**
      * Are the joints of the robot operational

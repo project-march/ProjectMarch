@@ -1,6 +1,6 @@
 # For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march9:
-  network_interface_name: enp2s0f0
+  network_interface_name: enp1s0
   ecatCycleTime: 5
   ecatSlaveTimeout: 200
   joints:
@@ -8,7 +8,7 @@ march9:
         motor_controller:
           slaveIndex: 5
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -28,24 +28,37 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 20.0
+            p: 140.0
             i: 0.0
-            d: 0.4
+            d: 0.2
           torque:
             p: 0.0
             d: 0.0
+
+    - left_ankle_ie:
+        motor_controller:
+          slaveIndex: 5
+          axis: 1
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 9837
+            maxPositionIU: 10637
+            zeroPositionIU: 10237
+            lowerSoftLimitMarginRad: 0.0
+            upperSoftLimitMarginRad: 0.0
 
     - left_hip_aa:
         motor_controller:
           slaveIndex: 4
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 6856
-            maxPositionIU: 8150
-            zeroPositionIU: 7695
+            minPositionIU: 6943
+            maxPositionIU: 8243
+            zeroPositionIU: 7948
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
             lowerErrorSoftLimitMarginRad: 0.01308997
@@ -59,7 +72,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 45.0
+            p: 200.0
             i: 0.0
             d: 0.6
           torque:
@@ -70,7 +83,7 @@ march9:
         motor_controller:
           slaveIndex: 4
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1
@@ -92,7 +105,7 @@ march9:
           position:
             p: 35.0
             i: 0.0
-            d: 0.4
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
@@ -101,13 +114,13 @@ march9:
         motor_controller:
           slaveIndex: 5
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 541190
+            minPositionIU: 540225
             maxPositionIU: 905664
-            zeroPositionIU: 541575
+            zeroPositionIU: 540225
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
@@ -123,7 +136,7 @@ march9:
           position:
             p: 20.0
             i: 0.0
-            d: 1.5
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
@@ -132,13 +145,13 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 8453
-            maxPositionIU: 10684
-            zeroPositionIU: 9774
+            minPositionIU: 3874
+            maxPositionIU: 5905
+            zeroPositionIU: 4995
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
             lowerErrorSoftLimitMarginRad: 0.00174533
@@ -152,18 +165,31 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 20
+            p: 140
             i: 0.0
-            d: 0.4
+            d: 0.2
           torque:
             p: 0.0
             d: 0.0
+
+    - right_ankle_ie:
+        motor_controller:
+          slaveIndex: 1
+          axis: 1
+          absoluteEncoder:
+            resolution: 14
+            direction: 1
+            minPositionIU: 5651
+            maxPositionIU: 6477
+            zeroPositionIU: 6064
+            lowerSoftLimitMarginRad: 0.0
+            upperSoftLimitMarginRad: 0.0
 
     - right_hip_aa:
         motor_controller:
           slaveIndex: 2
           axis: 1
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
@@ -183,7 +209,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 45.0
+            p: 200.0
             i: 0.0
             d: 0.6
           torque:
@@ -194,7 +220,7 @@ march9:
         motor_controller:
           slaveIndex: 2
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -216,7 +242,7 @@ march9:
           position:
             p: 35.0
             i: 0.0
-            d: 0.4
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
@@ -225,13 +251,13 @@ march9:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 352644
-            maxPositionIU: 717216
-            zeroPositionIU: 716733
+            minPositionIU: 308535
+            maxPositionIU: 673504
+            zeroPositionIU: 673504
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
             lowerErrorSoftLimitMarginRad: 0.05454154
@@ -247,7 +273,7 @@ march9:
           position:
             p: 20.0
             i: 0.0
-            d: 1.5
+            d: 0.6
           torque:
             p: 0.1
             d: 0.0
