@@ -7,7 +7,6 @@
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
 #include <march_hardware/motor_controller/motor_controller_state.h>
-
 #include "march_hardware/motor_controller/actuation_mode.h"
 
 #include <rclcpp/rclcpp.hpp>
@@ -118,12 +117,13 @@ void ODrive::sendTargetPosition(float target_position)
  */
 void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 {
-    if (this->hasAbsoluteEncoder()
-        && !this->absolute_encoder_->isValidTargetIU(
-            this->getAbsolutePositionIU(), this->absolute_encoder_->positionRadiansToIU(target_position))) {
+    int32_t current_position_iu = this->getAbsolutePositionIU();
+    int32_t target_position_iu = this->absolute_encoder_->positionRadiansToIU(target_position);
+
+    if (!this->absolute_encoder_->isValidTargetIU(current_position_iu, target_position_iu)) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
-            "Error in Odrive %i \nThe requested position is outside the limits, for requested position %f: ",
-            this->getSlaveIndex(), target_position);
+            "Error in Slave %i \nThe requested position of %f for axis %d is outside the limits of this joint.",
+            this->getSlaveIndex(), target_position, axis_);
     }
 
     bit32 write_position {};
@@ -257,7 +257,7 @@ uint32_t ODrive::getAbsolutePositionIU()
         }
     }
 
-    uint32_t abs_pos_check = 1048576; // Better would be to differentiate between the different joints but this is a good start
+    uint32_t abs_pos_check = 1 << 20; // Better would be to differentiate between the different joints but this is a good start
     if (abs_pos_iu > abs_pos_check) {
         RCLCPP_ERROR(rclcpp::get_logger("getAbsolutePositionIU"), "Absolute encoder value is %u, the AbsolutePosition object's bits are probably scrambled like some tasty eggs.", abs_pos_iu);
     }

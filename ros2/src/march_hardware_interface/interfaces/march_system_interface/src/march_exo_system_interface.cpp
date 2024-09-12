@@ -31,6 +31,8 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <csignal>
 
+#define OUTSIDE_SOFT_LIMITS_WARNING_INTERVAL_MS 2000
+
 // Uncomment this line to fully disable actuation, and have additional logging.
 // #define DEBUG_MODE
 
@@ -110,18 +112,15 @@ hardware_interface::return_type MarchExoSystemInterface::configure(const hardwar
  */
 JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::ComponentInfo& joint)
 {
+    string stop_when_outside_hard_limits_parameter = get_parameter(joint, "stop_when_outside_hard_limits", "True");
+    bool stop_when_outside_hard_limits = stop_when_outside_hard_limits_parameter == "True";
 
-    // TODO: reduce the amount of if statements. parameter should only be able to be set to true or false.
-    string stop_hardl_param = get_parameter(joint, "stop_when_outside_hard_limits", "true");
-    bool stop_when_outside_hard_limits
-        = !(stop_hardl_param == "false" or stop_hardl_param == "0" or stop_hardl_param == "False");
-    if (stop_when_outside_hard_limits
-        and !(stop_hardl_param == "true" or stop_hardl_param == "1" or stop_hardl_param == "True")) {
-        RCLCPP_WARN((*logger_),
-            "Joint: %s, got param '%s' for `stop_when_outside_hard_limits` but expected "
-            "['true', 'false', '0', '1', 'True', 'False']. Defaulting to True.",
-            joint.name.c_str(), stop_hardl_param.c_str());
-    }
+    // Check if the xacro parameter is set correctly. Case sensitive!
+    if (stop_when_outside_hard_limits_parameter != "True" && stop_when_outside_hard_limits_parameter != "False") {
+        RCLCPP_WARN((*logger_), "Parameter 'stop_when_outside_hard_limits' for joint '%s' is not 'True' or 'False'. Defaulting to 'True'.", joint.name.c_str());
+        stop_when_outside_hard_limits = true;
+    }    
+
     return { /*name=*/joint.name.c_str(),
         /*joint=*/march_robot_->getJoint(joint.name.c_str()),
         /*motor_controller_data=*/march::ODriveState(),
@@ -134,13 +133,9 @@ JointInfo MarchExoSystemInterface::build_joint_info(const hardware_interface::Co
         /*torque_weight=*/std::numeric_limits<double>::quiet_NaN(),
         /*limit=*/
         JointLimit {
-            /*soft_limit_warning_throttle_msec=*/stoi(get_parameter(joint, "soft_limit_warning_throttle_msec", "1500")),
-            /*last_time_not_in_soft_error_limit=*/std::chrono::steady_clock::now(),
-            /*msec_until_error_when_in_error_soft_limits=*/
-            std::chrono::milliseconds {
-                stoi(get_parameter(joint, "msec_until_error_when_in_error_soft_limits", "1000")) },
-            /*soft_error_limit_warning_throttle_msec=*/
-            stoi(get_parameter(joint, "soft_error_limit_warning_throttle_msec", "300")),
+            /*outside_soft_limits_warning_interval_ms=*/
+            stoi(get_parameter(joint, "outside_soft_limits_warning_interval_ms", std::to_string(OUTSIDE_SOFT_LIMITS_WARNING_INTERVAL_MS))),            
+            /*last_time_within_soft_limits=*/std::chrono::steady_clock::now(),
             /*stop_when_outside_hard_limits=*/stop_when_outside_hard_limits } };
 }
 
@@ -313,7 +308,7 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
                 jointInfo.target_torque = jointInfo.joint.getTorque();
                 jointInfo.motor_controller_data.update_values(jointInfo.joint.getMotorController()->getState().get());
 
-                jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
+                jointInfo.limit.last_time_within_soft_limits = std::chrono::steady_clock::now();
             }
         }
     } catch (const std::exception& e) {
@@ -481,50 +476,39 @@ bool MarchExoSystemInterface::is_joint_in_valid_state(JointInfo& jointInfo)
 
 bool MarchExoSystemInterface::is_joint_outside_limits(JointInfo& jointInfo)
 {
-    // SOFT Limit check.
+    // Soft Limit check.
     if (jointInfo.joint.isWithinSoftLimits()) {
-        jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
+        jointInfo.limit.last_time_within_soft_limits = std::chrono::steady_clock::now();
         return false;
     }
+
+    // Get the joint information for limit checking and logging.
     const auto& abs_encoder = jointInfo.joint.getMotorController()->getAbsoluteEncoder();
     const double joint_pos_rad = jointInfo.joint.getPosition();
-    const int joint_pos_iu = abs_encoder->positionRadiansToIU(joint_pos_rad);
-
-    RCLCPP_WARN_THROTTLE((*logger_), clock_, jointInfo.limit.soft_limit_warning_throttle_msec,
-        "Joint %s outside its soft limits [%i, %i] at (%g rad; %i IU)", jointInfo.name.c_str(),
-        abs_encoder->getLowerSoftLimitIU(), abs_encoder->getUpperSoftLimitIU(), joint_pos_rad, joint_pos_iu);
-
-    // ERROR Soft Limit Check
-    if (jointInfo.joint.isWithinSoftErrorLimits()) {
-        jointInfo.limit.last_time_not_in_soft_error_limit = std::chrono::steady_clock::now();
-        return false;
-    }
-    auto time_in_error_limits = (std::chrono::steady_clock::now() - jointInfo.limit.last_time_not_in_soft_error_limit);
-    if (jointInfo.limit.msec_until_error_when_in_error_soft_limits > 0s
-        && time_in_error_limits > jointInfo.limit.msec_until_error_when_in_error_soft_limits) {
-        RCLCPP_FATAL((*logger_),
-            "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d "
-            "milliseconds. REACHED its max allowed time of %i milliseconds, STOPPING ROS...",
-            jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu, abs_encoder->getLowerErrorSoftLimitIU(),
-            abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count(),
-            jointInfo.limit.msec_until_error_when_in_error_soft_limits.count());
-        return true;
-    }
-    RCLCPP_WARN_THROTTLE((*logger_), clock_, jointInfo.limit.soft_error_limit_warning_throttle_msec,
-        "Joint %s (%g rad; %i IU) is outside its soft ERROR limits [%i, %i], for %d milliseconds",
-        jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu, abs_encoder->getLowerErrorSoftLimitIU(),
-        abs_encoder->getUpperErrorSoftLimitIU(), time_in_error_limits.count());
-
-    // HARD limit check.
+    const int joint_pos_iu = abs_encoder->positionRadiansToIU(jointInfo.joint.getPosition());
+    const int lower_hard_limit_iu = abs_encoder->getLowerHardLimitIU();
+    const int upper_hard_limit_iu = abs_encoder->getUpperHardLimitIU();
+    const double lower_soft_limit_rad = abs_encoder->positionIUToRadians(abs_encoder->getLowerSoftLimitIU());
+    const double upper_soft_limit_rad = abs_encoder->positionIUToRadians(abs_encoder->getUpperSoftLimitIU());
+    const double lower_hard_limit_rad = abs_encoder->positionIUToRadians(abs_encoder->getLowerHardLimitIU());
+    const double upper_hard_limit_rad = abs_encoder->positionIUToRadians(abs_encoder->getUpperHardLimitIU());
+    
+    // Soft limit violation warning.
+    RCLCPP_WARN_THROTTLE((*logger_), clock_, jointInfo.limit.outside_soft_limits_warning_interval_ms,
+    "Joint %s outside its soft limits for more than %i ms. "
+    "\n\tPosition: %g radians."
+    "\n\tSoft limits: [%g, %g] radians.",
+    jointInfo.name.c_str(), jointInfo.limit.outside_soft_limits_warning_interval_ms, joint_pos_rad, lower_soft_limit_rad, upper_soft_limit_rad);
+    
+    // Hard limit check and system shutdown.
     if (jointInfo.limit.stop_when_outside_hard_limits && !jointInfo.joint.isWithinHardLimits()) {
         RCLCPP_FATAL((*logger_),
-            "Joint %s IS OUTSIDE ITS HARD LIMIT STOPPING. "
-            "\n\tposition: %g rad; %i IU."
-            "\n\thard limit: [%i, %i]"
-            "\n\thard limit rad: [%g, %g]",
-            jointInfo.name.c_str(), joint_pos_rad, joint_pos_iu, abs_encoder->getLowerHardLimitIU(),
-            abs_encoder->getUpperHardLimitIU(), abs_encoder->positionIUToRadians(abs_encoder->getLowerHardLimitIU()),
-            abs_encoder->positionIUToRadians(abs_encoder->getUpperHardLimitIU()));
+        "Joint %s is outside its hard limits. Stopping the system."
+        "\n\tPosition in radians: %g."
+        "\n\tHard limits: [%g, %g] radians."
+        "\n\tPosition in IU: %d."
+        "\n\tHard limits: [%d, %d] IU.",
+        jointInfo.name.c_str(), joint_pos_rad, lower_hard_limit_rad, upper_hard_limit_rad, joint_pos_iu, lower_hard_limit_iu, upper_hard_limit_iu);
         return true;
     }
     return false;

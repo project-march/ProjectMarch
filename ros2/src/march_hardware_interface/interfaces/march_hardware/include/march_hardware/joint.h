@@ -79,13 +79,6 @@ public:
     bool isWithinSoftLimits() const;
 
     /**
-     * \brief Checks whether the joint is in its error soft limits.
-     * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
-     * @return True if it is in an 'oke' state.
-     */
-    bool isWithinSoftErrorLimits() const;
-
-    /**
      * \brief Checks whether the joint is in its hard limits.
      * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
      * @return True if it is in an 'oke' state.
@@ -93,8 +86,6 @@ public:
     bool isWithinHardLimits() const;
 
     bool hasMotorControllerError();
-
-    void logHardLimits();
 
     /** @brief Override comparison operator */
     friend bool operator==(const Joint& lhs, const Joint& rhs)

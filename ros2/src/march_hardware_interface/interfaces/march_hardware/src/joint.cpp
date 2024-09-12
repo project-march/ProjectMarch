@@ -66,7 +66,6 @@ void Joint::actuate(float target_position, float target_torque, float position_w
     motor_controller_->actuateRadians(target_position, position_weight);
 }
 
-// TODO: look if we want to use the operational check or get rid of it
 void Joint::readFirstEncoderValues(bool operational_check)
 {
     logger_->info(logger_->fstring("[%s] Reading first encoder values", this->name_.c_str()));
@@ -84,10 +83,17 @@ void Joint::readFirstEncoderValues(bool operational_check)
     position_ = motor_controller_-> useLowLevelForPosition() ? motor_controller_->getLowLevelPosition() : motor_controller_->getAbsolutePosition();
 
     if (operational_check && !isWithinHardLimits()) {
-        logHardLimits();
-
+    
         throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
-            "Joint %s is outside hard limits, value is %f, limits are [%d, %d]", name_.c_str(), position_,
+            "Joint %s is outside hard limits"
+            "\n\tPosition in radians: %g."
+            "\n\tHard limits: [%g, %g] radians."
+            "\n\tPosition in IU: %d."
+            "\n\tHard limits: [%d, %d] IU.",
+            this->name_.c_str(), position_,
+            motor_controller_->getAbsoluteEncoder()->positionIUToRadians(motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU()),
+            motor_controller_->getAbsoluteEncoder()->positionIUToRadians(motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU()),
+            motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_),
             motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU(),
             motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU());
     }
@@ -112,13 +118,6 @@ bool Joint::hasMotorControllerError() {
         return true;
     }
     return false;
-}
-
-void Joint::logHardLimits() {
-    logger_->warn(logger_->fstring("Lower limit is: %d", motor_controller_->getAbsoluteEncoder()->getLowerHardLimitIU()));
-    logger_->warn(logger_->fstring("Upper limit is: %d", motor_controller_->getAbsoluteEncoder()->getUpperHardLimitIU()));
-    logger_->warn(logger_->fstring("Current pos (rad) is: %f", position_));
-    logger_->warn(logger_->fstring("Current pos (iu) is: %d", motor_controller_->getAbsoluteEncoder()->positionRadiansToIU(position_)));
 }
 
 void Joint::readEncoders()
@@ -206,11 +205,6 @@ std::unique_ptr<MotorController>& Joint::getMotorController()
 bool Joint::isWithinSoftLimits() const
 {
     return motor_controller_->getAbsoluteEncoder()->isWithinSoftLimitsRadians(position_);
-}
-
-bool Joint::isWithinSoftErrorLimits() const
-{
-    return motor_controller_->getAbsoluteEncoder()->isWithinErrorSoftLimitsRadians(position_);
 }
 
 bool Joint::isWithinHardLimits() const

@@ -5,5 +5,3 @@ maxPositionIU: 1000
 zeroPositionIU: 400
 lowerSoftLimitMarginRad: 0
 upperSoftLimitMarginRad: 0
-lowerErrorSoftLimitMarginRad: 0
-upperErrorSoftLimitMarginRad: 0
