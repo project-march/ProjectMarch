@@ -132,7 +132,7 @@ void GaitPlanningAnglesNode::currentModeCallback(const march_shared_msgs::msg::E
         m_single_execution_done = false; 
     }
 
-    if ((ExoMode)msg->mode == ExoMode::Stand && m_gait_planning.getPrevGaitType() == ExoMode::Sit){
+    if ((ExoMode)msg->mode == ExoMode::Stand && (m_gait_planning.getPrevGaitType() == ExoMode::Sit || m_gait_planning.getPrevGaitType() == ExoMode::TrainSit)){
         // m_gait_planning.setCounter(0); 
         m_single_execution_done = false; 
     }
@@ -358,6 +358,25 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                             }
                         }
                         break; 
+                    
+                    case ExoMode::TrainSit :
+                        // if counter= size trajectory refill with sit to stand, otherwise finish gait and reset to 0 afterwards 
+                        if (count+1 < m_current_trajectory.size() && !m_single_execution_done){
+                            processMovingGaits(count);
+                            m_gait_planning.setCounter(count+1); 
+                        } else if (count+1 >= m_current_trajectory.size() && !m_single_execution_done){
+                            m_gait_planning.setCounter(0); 
+                            m_single_execution_done = true; 
+                            m_current_trajectory = m_gait_planning.getTrainSitToStandGait(); 
+                        } else {
+                            processMovingGaits(count);
+                            // // RCLCPP_INFO(this->get_logger(), "count: %d", count); 
+                            m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
+                            if (m_gait_planning.getCounter() >= (int)(m_current_trajectory.size()-1)){
+                                m_gait_planning.setPrevGaitType(ExoMode::Stand); 
+                            }
+                        }
+                        break; 
 
                     case ExoMode::Hinge :
                         
@@ -420,7 +439,13 @@ void GaitPlanningAnglesNode::publishJointTrajectoryPoints(){
                     // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
                     break;
                 }
-                
+
+            case ExoMode::TrainSit :
+                m_current_trajectory = m_gait_planning.getStandToTrainSitGait(); 
+                processMovingGaits(count);
+                m_gait_planning.setCounter((count >= (m_current_trajectory.size() - 1)) ? (m_current_trajectory.size() - 1) : (count + 1));
+                // RCLCPP_INFO(this->get_logger(), "count: %d", m_gait_planning.getCounter()); 
+                break;  
 
             case ExoMode::Hinge:
                 m_current_trajectory = m_gait_planning.getHingeGait(); 

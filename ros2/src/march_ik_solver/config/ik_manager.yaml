@@ -18,6 +18,7 @@ ik_manager:
     - HighStep2
     - HighStep3
     - Hinge
+    - TrainSit
     stack_of_tasks:
       Stand:
       - posture
@@ -57,5 +58,8 @@ ik_manager:
       - posture
       - motion
       HighStep3:
+      - posture
+      - motion
+      TrainSit:
       - posture
       - motion

@@ -24,7 +24,7 @@ def make_evenly_spaced_points(x, z, array_size):
     return x_new, z_new
 
 def create_bezier_csv(points, array_size, gait_type):
-    pause_time = int(array_size/6)
+    pause_time = int(array_size/4)
     step_length = points.max(axis=0)[0]
     ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
 
@@ -215,7 +215,7 @@ def descend_stairs(data_up):
 def high_step_up(bezier_points, array_size):
     # array_size is the time for one swing phase
 
-    pause_time = int(array_size/4) # make pause longer 
+    pause_time = int(array_size/3) # make pause longer 
     step_length = bezier_points.max(axis=0)[0]
     ending_angle = np.arcsin((step_length)/LEG_LENGTH)
     phi_first_step = np.linspace(0, ending_angle, int(array_size))
