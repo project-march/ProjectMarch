@@ -11,6 +11,10 @@
     {
       "name": "Sit",
       "ExoMode": 0
+    },
+    {
+      "name": "TrainSit",
+      "ExoMode": 17
     }
   ],
 

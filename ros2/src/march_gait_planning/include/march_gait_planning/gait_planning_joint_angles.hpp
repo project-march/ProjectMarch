@@ -46,6 +46,8 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> getSitToStandGait() const; 
     std::vector<std::vector<double>> getStepCloseGait() const; 
     std::vector<std::vector<double>> getHingeGait() const;
+    std::vector<std::vector<double>> getStandToTrainSitGait() const;
+    std::vector<std::vector<double>> getTrainSitToStandGait() const;
     std::vector<double> getHomeStand() const; 
     uint8_t getStanceFoot() const; 
     double getHipTilt() const; 
@@ -64,6 +66,8 @@ class GaitPlanningAngles{
     std::vector<std::vector<double>> m_sit_to_stand_trajectory; 
     std::vector<std::vector<double>> m_step_close_trajectory; 
     std::vector<std::vector<double>> m_hinge_trajectory; 
+    std::vector<std::vector<double>> m_stand_to_train_sit_trajectory;
+    std::vector<std::vector<double>> m_train_sit_to_stand_trajectory;
     std::vector<double> m_home_stand; 
     std::vector<double> m_prev_point; 
     double m_hip_tilt; 

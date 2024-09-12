@@ -49,6 +49,9 @@ GaitPlanningAngles::GaitPlanningAngles()
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
 
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_trainsit.csv", m_stand_to_train_sit_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/trainsit_to_stand.csv", m_train_sit_to_stand_trajectory);
+
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
 
@@ -181,6 +184,14 @@ std::vector<std::vector<double>> GaitPlanningAngles::getStepCloseGait() const{
 
 std::vector<std::vector<double>> GaitPlanningAngles::getHingeGait() const{
     return m_hinge_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getStandToTrainSitGait() const{
+    return m_stand_to_train_sit_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getTrainSitToStandGait() const{
+    return m_train_sit_to_stand_trajectory; 
 }
 
 uint8_t GaitPlanningAngles::getStanceFoot() const {

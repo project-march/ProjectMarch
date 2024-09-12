@@ -40,7 +40,8 @@ const std::unordered_map<ExoMode, std::string> modeNodeTypeMap = {
     {ExoMode::VariableWalk, "cartesian"},
     {ExoMode::HighStep1, "cartesian"},
     {ExoMode::HighStep2, "cartesian"},
-    {ExoMode::HighStep3, "cartesian"}
+    {ExoMode::HighStep3, "cartesian"},
+    {ExoMode::TrainSit, "joint_angles"}
 };
 
 class ModeMachineNode : public rclcpp::Node 

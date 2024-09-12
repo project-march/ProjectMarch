@@ -36,7 +36,7 @@ def plot_joints(dataset):
 def stand_to_sit(time_points):
 
     homestand = import_homestand()
-    end_points = [0.087, -0.065, 1.57, 1.57]
+    end_points = [0.087, -0.065, 1.75, 1.75]
 
     trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
@@ -51,7 +51,7 @@ def stand_to_sit(time_points):
 def sit_to_stand(time_points):
 
     homestand = import_homestand()
-    end_points = [0.087, -0.065, 1.57, 1.57]
+    end_points = [0.087, -0.065, 1.75, 1.75]
 
     trajectories = [np.linspace(end_points[i], homestand[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
