@@ -17,8 +17,6 @@ march9:
             zeroPositionIU: 6139
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
-            lowerErrorSoftLimitMarginRad: 0.00174533
-            upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 215.797
@@ -28,9 +26,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 140.0
+            p: 20.0
             i: 0.0
-            d: 0.2
+            d: 0.4
           torque:
             p: 0.0
             d: 0.0
@@ -61,8 +59,6 @@ march9:
             zeroPositionIU: 7948
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
-            lowerErrorSoftLimitMarginRad: 0.01308997
-            upperErrorSoftLimitMarginRad: 0.01308997
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 411.1
@@ -72,7 +68,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 200.0
+            p: 45.0
             i: 0.0
             d: 0.6
           torque:
@@ -87,13 +83,11 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 644096
-            maxPositionIU: 1036385
-            zeroPositionIU: 979058
+            minPositionIU: 643910
+            maxPositionIU: 1037316
+            zeroPositionIU: 979062
             lowerSoftLimitMarginRad: 0.11798426
             upperSoftLimitMarginRad: 0.11798426
-            lowerErrorSoftLimitMarginRad: 0.05899213
-            upperErrorSoftLimitMarginRad: 0.05899213
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -105,7 +99,7 @@ march9:
           position:
             p: 35.0
             i: 0.0
-            d: 0.6
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
@@ -123,8 +117,6 @@ march9:
             zeroPositionIU: 540225
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
-            lowerErrorSoftLimitMarginRad: 0.05454154
-            upperErrorSoftLimitMarginRad: 0.05454154
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -136,7 +128,7 @@ march9:
           position:
             p: 20.0
             i: 0.0
-            d: 0.6
+            d: 1.5
           torque:
             p: 0.1
             d: 0.0
@@ -154,8 +146,6 @@ march9:
             zeroPositionIU: 4995
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
-            lowerErrorSoftLimitMarginRad: 0.00174533
-            upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 215.797
@@ -165,9 +155,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 140
+            p: 20
             i: 0.0
-            d: 0.2
+            d: 0.4
           torque:
             p: 0.0
             d: 0.0
@@ -198,8 +188,6 @@ march9:
             zeroPositionIU: 15740
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
-            lowerErrorSoftLimitMarginRad: 0.01308997
-            upperErrorSoftLimitMarginRad: 0.01308997
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 411.1
@@ -209,7 +197,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 200.0
+            p: 45.0
             i: 0.0
             d: 0.6
           torque:
@@ -224,13 +212,11 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 176992
-            maxPositionIU: 568198
-            zeroPositionIU: 233236
+            minPositionIU: 264485
+            maxPositionIU: 658113
+            zeroPositionIU: 322739
             lowerSoftLimitMarginRad: 0.11798426
             upperSoftLimitMarginRad: 0.11798426
-            lowerErrorSoftLimitMarginRad: 0.05899213
-            upperErrorSoftLimitMarginRad: 0.05899213
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -242,7 +228,7 @@ march9:
           position:
             p: 35.0
             i: 0.0
-            d: 0.6
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
@@ -260,8 +246,6 @@ march9:
             zeroPositionIU: 673504
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
-            lowerErrorSoftLimitMarginRad: 0.05454154
-            upperErrorSoftLimitMarginRad: 0.05454154
           incrementalEncoder:
             direction: 1
             resolution: 12
@@ -273,7 +257,7 @@ march9:
           position:
             p: 20.0
             i: 0.0
-            d: 0.6
+            d: 1.5
           torque:
             p: 0.1
             d: 0.0

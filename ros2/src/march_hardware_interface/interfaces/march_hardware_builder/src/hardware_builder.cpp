@@ -4,8 +4,7 @@
 
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
-    = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
-        "lowerErrorSoftLimitMarginRad", "upperErrorSoftLimitMarginRad" };
+    = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad"};
 const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "transmission" };
 const std::vector<std::string> HardwareBuilder::TORQUE_SENSOR_REQUIRED_KEYS = { "maxTorque", "averageTorque" };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS = { "axis", "incrementalEncoder", "absoluteEncoder", "torqueSensor" };
@@ -168,8 +167,6 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(c
 
     const auto lower_soft_limit_margin = absolute_encoder_config["lowerSoftLimitMarginRad"].as<double>();
     const auto upper_soft_limit_margin = absolute_encoder_config["upperSoftLimitMarginRad"].as<double>();
-    const auto lower_error_soft_limit_margin = absolute_encoder_config["lowerErrorSoftLimitMarginRad"].as<double>();
-    const auto upper_error_soft_limit_margin = absolute_encoder_config["upperErrorSoftLimitMarginRad"].as<double>();
 
     return std::make_unique<march::AbsoluteEncoder>(
         /*counts_per_rotation=*/counts_per_rotation,
@@ -178,8 +175,6 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(c
         /*lower_limit_iu=*/min_position,
         /*upper_limit_iu=*/max_position,
         /*zero_position_iu=*/zero_position,
-        /*lower_error_soft_limit_rad_diff=*/lower_error_soft_limit_margin,
-        /*upper_error_soft_limit_rad_diff=*/upper_error_soft_limit_margin,
         /*lower_soft_limit_rad_diff=*/lower_soft_limit_margin,
         /*upper_soft_limit_rad_diff=*/upper_soft_limit_margin);
 }

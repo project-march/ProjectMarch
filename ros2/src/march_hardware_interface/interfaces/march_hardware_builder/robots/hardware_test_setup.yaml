@@ -1,5 +1,5 @@
 testsetup:
-  network_interface_name: enx00e04c360de2
+  network_interface_name: enp2s0
   ecatCycleTime: 8
   ecatSlaveTimeout: 250
   joints:
@@ -16,8 +16,6 @@ testsetup:
             zeroPositionIU: 13766
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
-            lowerErrorSoftLimitMarginRad: 0.00174533
-            upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 183.78
@@ -46,8 +44,6 @@ testsetup:
             zeroPositionIU: 406516
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
-            lowerErrorSoftLimitMarginRad: 0.05454154
-            upperErrorSoftLimitMarginRad: 0.05454154
           incrementalEncoder:
             direction: 1
             resolution: 12

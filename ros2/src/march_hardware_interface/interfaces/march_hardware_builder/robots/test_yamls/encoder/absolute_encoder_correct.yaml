@@ -5,5 +5,3 @@ maxPositionIU: 14999
 zeroPositionIU: 14141
 lowerSoftLimitMarginRad: 0.00349066
 upperSoftLimitMarginRad: 0.00349066
-lowerErrorSoftLimitMarginRad: 0.00174533
-upperErrorSoftLimitMarginRad: 0.00174533
