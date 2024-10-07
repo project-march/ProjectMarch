@@ -460,7 +460,7 @@ void SensorFusionNode::checkJointStateTimeout()
 void SensorFusionNode::checkImuTimeout()
 {
     if ((this->now() - m_imu_last_update) > rclcpp::Duration::from_seconds(m_imu_timeout)) {
-        RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu data received yet");
+        // RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "No imu data received yet");
     }
 }
 

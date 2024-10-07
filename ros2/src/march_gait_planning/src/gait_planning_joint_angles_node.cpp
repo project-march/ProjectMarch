@@ -257,7 +257,7 @@ void GaitPlanningAnglesNode::processBootUpToStandGait(){ //TODO: Rename this fun
             m_initial_point[i] += m_incremental_steps_to_home_stand[i];
             temp_moving_to_home_stand.push_back(m_initial_point[i]);
         }
-        RCLCPP_INFO(this->get_logger(), "Gradually adding hip tilt");
+        // RCLCPP_INFO(this->get_logger(), "Gradually adding hip tilt");
         temp_moving_to_home_stand[2] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
         temp_moving_to_home_stand[6] += m_gait_planning.getCounter() * (m_gait_planning.getHipTilt() / INTERPOLATING_TIMESTEPS);
     }
