@@ -45,7 +45,7 @@ class BLEInputDeviceNode(Node):
                                                 clock=self.get_clock())
         
         self.get_logger().info(f"{COLOR}Ready to connect to bluetooth device{RESET}")
-        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode), self)   
+        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode), self)  
 
 
     def publish_mode(self, mode: int) -> None:
@@ -64,7 +64,7 @@ class BLEInputDeviceNode(Node):
         available_modes = future.result().mode_array.modes
         mode_list = [exo_mode.mode for exo_mode in available_modes]
         self._current_mode = future.result().current_mode.mode
-    
+
     def check_connectivity(self) -> None:
         """Check whether a bluetooth device is still connected"""
         if self._connected == True:
