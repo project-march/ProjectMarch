@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the parent directory of utility_scripts to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 import numpy as np
 from utility_scripts.create_joint_angle_gaits import * 
 from utility_scripts.interactive_bezier import * 
@@ -22,7 +30,7 @@ class GUI:
         self.gait_type_combobox = ttk.Combobox(self.root, textvariable=self.gait_type_var)
         self.gait_type_combobox['width'] = 40
         self.gait_type_combobox['state'] = 'readonly'
-        self.gait_type_combobox['values'] = ("small_gait", "large_gait", "high_step_1", "high_step_2", "high_step_3", "sit_to_stand", "stand_to_sit", "hinge", "sideways")
+        self.gait_type_combobox['values'] = ("small_gait", "large_gait", "high_step_1", "high_step_2", "high_step_3", "ascending", "sit_to_stand", "stand_to_sit", "hinge", "sideways")
         self.gait_type_combobox.grid(row=0, column=1, padx=20, pady=20)
 
         # Create a label and entry for gait length in seconds

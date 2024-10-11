@@ -7,17 +7,15 @@ testsetup:
         motor_controller:
           slaveIndex: 1
           axis: 1
-          useIncrementalEncoderForPosition: false
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 13248
-            maxPositionIU: 14999
-            zeroPositionIU: 14141
+            minPositionIU: 12833
+            maxPositionIU: 14700
+            zeroPositionIU: 13766
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
-            lowerErrorSoftLimitMarginRad: 0.00174533
-            upperErrorSoftLimitMarginRad: 0.00174533
           incrementalEncoder:
             countsPerRotation: 6400
             transmission: 183.78
@@ -37,7 +35,7 @@ testsetup:
         motor_controller:
           slaveIndex: 1
           axis: 0
-          useIncrementalEncoderForPosition: true
+          useLowLevelForPosition: true
           absoluteEncoder:
             resolution: 20
             direction: 1
@@ -46,8 +44,6 @@ testsetup:
             zeroPositionIU: 406516
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
-            lowerErrorSoftLimitMarginRad: 0.05454154
-            upperErrorSoftLimitMarginRad: 0.05454154
           incrementalEncoder:
             direction: 1
             resolution: 12

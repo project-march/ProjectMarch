@@ -5,7 +5,7 @@ import yaml
 import os
 import tkinter as tk
 from tkinter import messagebox
-from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs, create_bezier_csv, create_high_step_csv
+from utility_scripts.convert_bezier_points_to_csv import stair_gaits, descend_stairs, create_bezier_csv, create_high_step_csv, high_step_up, high_step_down
 from scipy.interpolate import interp1d
 
 LEG_LENGTH = 0.912
@@ -164,8 +164,6 @@ class InteractiveBezier:
         if messagebox.askyesno('Save points', 'Do you want to save the points?'):
             if self.gait_type == "small_gait" or self.gait_type == "large_gait":
                 create_bezier_csv(self.points, self.array_size, self.gait_type)
-            elif self.gait_type == "high_step_1" or  self.gait_type == "high_step_2" or  self.gait_type == "high_step_3":
-                create_high_step_csv(self.points, self.gait_type, self.array_size)
             self.updated_points = self.points.tolist()
         else:
             self.updated_points = self.initial_points.tolist()
@@ -226,28 +224,36 @@ def interactive_bezier(gait_type: str, array_size: int):
             # Store the new points in the same spot in the data variable
             data[gait_type][i][step_type] = new_points
 
-    elif gait_type == "high_step_1" or  gait_type == "high_step_2" or  gait_type == "high_step_3":
+        
+    elif gait_type == "high_step_3" or gait_type == "high_step_2" or gait_type == "high_step_1":
         if os.path.exists('utility_scripts/points.yaml'):
             with open('utility_scripts/points.yaml', 'r') as f:
                 data = yaml.safe_load(f)
-                points = np.array(data[gait_type])
         else:
             print("No points file found")
 
-        interactive_bezier = InteractiveBezier(points, gait_type, array_size)
-        interactive_bezier.connect()
+        for i, step_type_dict in enumerate(data[gait_type]):
+            # Get the step type and the points
+            step_type = list(step_type_dict.keys())[0]
+            points = np.array(step_type_dict[step_type])
 
-        # Connect the on_close function to the close event
-        plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
-        plt.grid()
+            # Pass the points to the InteractiveBezier class
+            interactive_bezier = InteractiveBezier(points, gait_type, array_size)
+            interactive_bezier.connect()
 
-        # Start the matplotlib event loop
-        plt.show()
+            # Connect the on_close function to the close event
+            plt.gcf().canvas.mpl_connect('close_event', interactive_bezier.on_close)
+            plt.grid()
 
-        new_points = interactive_bezier.updated_points
-        data[gait_type] = new_points
-        
-            
+            plt.title(f'{gait_type} {step_type}')
+            # Start the matplotlib event loop
+            plt.show()
+
+            # Get the new points
+            new_points = interactive_bezier.updated_points
+
+            # Store the new points in the same spot in the data variable
+            data[gait_type][i][step_type] = new_points
 
     with open('utility_scripts/points.yaml', 'w') as f:
             yaml.dump(data, f)
@@ -257,8 +263,23 @@ def interactive_bezier(gait_type: str, array_size: int):
         descend_csv = descend_stairs(ascend_csv)
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/ascend_test.csv', ascend_csv, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/descend_test.csv', descend_csv, delimiter=',')
-
-step_time = 3.5 # seconds
+    elif gait_type == "high_step_3":
+        high_step_csv = high_step_up(np.array(data['high_step_3'][0]['up']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step3.csv', high_step_csv, delimiter=',')
+        high_step_down_csv = high_step_down(np.array(data['high_step_3'][1]['down']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step3_down.csv', high_step_down_csv, delimiter=',')
+    elif gait_type == "high_step_2":
+        high_step_csv = high_step_up(np.array(data['high_step_2'][0]['up']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step2.csv', high_step_csv, delimiter=',')
+        high_step_down_csv = high_step_down(np.array(data['high_step_2'][1]['down']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step2_down.csv', high_step_down_csv, delimiter=',')
+    elif gait_type == "high_step_1":
+        high_step_csv = high_step_up(np.array(data['high_step_1'][0]['up']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', high_step_csv, delimiter=',')
+        high_step_down_csv = high_step_down(np.array(data['high_step_1'][1]['down']), array_size)
+        np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1_down.csv', high_step_down_csv, delimiter=',')
+step_time = 3 # seconds
 
 # interactive_bezier("small_gait", 150)
-# interactive_bezier("high_step_3", step_time*HIGH_LEVEL_FREQUENCY)
+# interactive_bezier("small_gait", step_time*HIGH_LEVEL_FREQUENCY)
+# interactive_bezier("high_step_1", 500)

@@ -106,7 +106,7 @@ bool MarchRobot::hasValidSlaves()
     }
 
     if (hasPowerDistributionBoard()) {
-        int index = getPowerDistributionBoard().getSlaveIndex();
+        int index = getPowerDistributionBoard().value().getSlaveIndex();
         pdbSlaveIndices.push_back(index);
     }
 
@@ -219,9 +219,12 @@ bool MarchRobot::hasPowerDistributionBoard() const
     return power_distribution_board_.has_value();
 }
 
-PowerDistributionBoard MarchRobot::getPowerDistributionBoard() const
+std::optional<PowerDistributionBoard> MarchRobot::getPowerDistributionBoard() const
 {
-    return power_distribution_board_.value();
+    if (hasPowerDistributionBoard()) {
+        return power_distribution_board_;
+    }
+    return std::nullopt;
 }
 
 MarchRobot::~MarchRobot()

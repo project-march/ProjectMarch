@@ -27,30 +27,32 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_0 = {
     { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/44, /*length=*/32) },
     { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/48, /*length=*/32) },
     { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/52, /*length=*/32) },
-    { ODriveObjectName::Torque, ODriveObject(/*offset=*/56, /*length=*/32) } 
+    { ODriveObjectName::Torque, ODriveObject(/*offset=*/56, /*length=*/32) },
+    { ODriveObjectName::PosAbsRad, ODriveObject(/*offset=*/60, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = { 
-    { ODriveObjectName::AbsolutePosition, ODriveObject(/*offset=*/60, /*length=*/32) },
-    { ODriveObjectName::Current, ODriveObject(/*offset=*/64, /*length=*/32) },
-    { ODriveObjectName::MotorVelocity, ODriveObject(/*offset=*/68, /*length=*/32) },
-    { ODriveObjectName::ODriveError, ODriveObject(/*offset=*/72, /*length=*/32) },
-    { ODriveObjectName::AxisError, ODriveObject(/*offset=*/76, /*length=*/32) },
-    { ODriveObjectName::MotorError, ODriveObject(/*offset=*/80, /*length=*/64) },
-    { ODriveObjectName::EncoderError, ODriveObject(/*offset=*/88, /*length=*/32) },
-    { ODriveObjectName::TorqueSensorError, ODriveObject(/*offset=*/92, /*length=*/32) }, 
-    { ODriveObjectName::ControllerError, ODriveObject(/*offset=*/96, /*length=*/32) },
-    { ODriveObjectName::AxisState, ODriveObject(/*offset=*/100, /*length=*/32) },
-    { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/104, /*length=*/32) },
-    { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/108, /*length=*/32) },
-    { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/112, /*length=*/32) },
-    { ODriveObjectName::Torque, ODriveObject(/*offset=*/116, /*length=*/32) },
+    { ODriveObjectName::AbsolutePosition, ODriveObject(/*offset=*/64, /*length=*/32) },
+    { ODriveObjectName::Current, ODriveObject(/*offset=*/68, /*length=*/32) },
+    { ODriveObjectName::MotorVelocity, ODriveObject(/*offset=*/72, /*length=*/32) },
+    { ODriveObjectName::ODriveError, ODriveObject(/*offset=*/76, /*length=*/32) },
+    { ODriveObjectName::AxisError, ODriveObject(/*offset=*/80, /*length=*/32) },
+    { ODriveObjectName::MotorError, ODriveObject(/*offset=*/84, /*length=*/64) },
+    { ODriveObjectName::EncoderError, ODriveObject(/*offset=*/92, /*length=*/32) },
+    { ODriveObjectName::TorqueSensorError, ODriveObject(/*offset=*/96, /*length=*/32) },
+    { ODriveObjectName::ControllerError, ODriveObject(/*offset=*/100, /*length=*/32) },
+    { ODriveObjectName::AxisState, ODriveObject(/*offset=*/104, /*length=*/32) },
+    { ODriveObjectName::OdriveTemperature, ODriveObject(/*offset=*/108, /*length=*/32) },
+    { ODriveObjectName::MotorTemperature, ODriveObject(/*offset=*/112, /*length=*/32) },
+    { ODriveObjectName::ShadowCount, ODriveObject(/*offset=*/116, /*length=*/32) },
+    { ODriveObjectName::Torque, ODriveObject(/*offset=*/120, /*length=*/32) },
+    { ODriveObjectName::PosAbsRad, ODriveObject(/*offset=*/124, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none = { 
-    { ODriveObjectName::AIEAbsolutePosition, ODriveObject(/*offset=*/120, /*length=*/32) },
-    { ODriveObjectName::CheckSumMISO, ODriveObject(/*offset=*/124, /*length=*/32) },
-    { ODriveObjectName::CheckSumMOSIStatus, ODriveObject(/*offset=*/128, /*length=*/32) },
+    { ODriveObjectName::AIEAbsolutePosition, ODriveObject(/*offset=*/128, /*length=*/32) },
+    { ODriveObjectName::CheckSumMISO, ODriveObject(/*offset=*/132, /*length=*/32) },
+    { ODriveObjectName::CheckSumMOSIStatus, ODriveObject(/*offset=*/136, /*length=*/32) },
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
@@ -81,7 +83,7 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
 
 };
 
-int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:
@@ -95,7 +97,7 @@ int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis 
     }
 }
 
-int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
+uint8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
     switch (axis) {
         case ODriveAxis::Zero:

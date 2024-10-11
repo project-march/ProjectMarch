@@ -7,6 +7,7 @@
 #include "march_ik_solver/stability_task.hpp"
 #include "march_ik_solver/motion_task.hpp"
 #include "march_ik_solver/posture_task.hpp"
+#include "march_ik_solver/tilt_task.hpp"
 
 #include <algorithm>
 #include <boost/algorithm/clamp.hpp>
@@ -35,6 +36,7 @@ void IKSolver::createTask(
     // Create tasks
     m_task_map["motion"] = std::make_unique<MotionTask>();
     m_task_map["posture"] = std::make_unique<PostureTask>();
+    m_task_map["tilt"] = std::make_unique<TiltTask>();
 
     // Create and set stability task
     std::unique_ptr<StabilityTask> stability_task = std::make_unique<StabilityTask>();

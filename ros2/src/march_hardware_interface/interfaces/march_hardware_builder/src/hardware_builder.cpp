@@ -4,8 +4,7 @@
 
 
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS
-    = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad",
-        "lowerErrorSoftLimitMarginRad", "upperErrorSoftLimitMarginRad" };
+    = { "minPositionIU", "maxPositionIU", "zeroPositionIU", "lowerSoftLimitMarginRad", "upperSoftLimitMarginRad"};
 const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "transmission" };
 const std::vector<std::string> HardwareBuilder::TORQUE_SENSOR_REQUIRED_KEYS = { "maxTorque", "averageTorque" };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS = { "axis", "incrementalEncoder", "absoluteEncoder", "torqueSensor" };
@@ -132,7 +131,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const march_logger:
     const auto slave_index = odrive_config["slaveIndex"].as<int>();
     march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
     const auto& absolute_encoder_config = odrive_config["absoluteEncoder"];
-    const auto& use_inc_enc_for_position_config = odrive_config["useIncrementalEncoderForPosition"];
+    const auto& use_low_level_for_position_config = odrive_config["useLowLevelForPosition"];
     const auto& incremental_encoder_config = odrive_config["incrementalEncoder"];
     const auto& torque_sensor_config = odrive_config["torqueSensor"];
   
@@ -146,7 +145,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const march_logger:
         /*incremental_encoder=*/HardwareBuilder::createIncrementalEncoder(incremental_encoder_config, march::MotorControllerType::ODrive),
         /*torque_sensor=*/HardwareBuilder::createTorqueSensor(torque_sensor_config, march::MotorControllerType::ODrive),
         /*actuation_mode=*/mode,
-        /*use_inc_enc_for_position=*/use_inc_enc_for_position_config,
+        /*use_low_level_for_position=*/use_low_level_for_position_config,
         /*index_found=*/index_found,
         /*logger=*/loggerPtr);
 }
@@ -168,8 +167,6 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(c
 
     const auto lower_soft_limit_margin = absolute_encoder_config["lowerSoftLimitMarginRad"].as<double>();
     const auto upper_soft_limit_margin = absolute_encoder_config["upperSoftLimitMarginRad"].as<double>();
-    const auto lower_error_soft_limit_margin = absolute_encoder_config["lowerErrorSoftLimitMarginRad"].as<double>();
-    const auto upper_error_soft_limit_margin = absolute_encoder_config["upperErrorSoftLimitMarginRad"].as<double>();
 
     return std::make_unique<march::AbsoluteEncoder>(
         /*counts_per_rotation=*/counts_per_rotation,
@@ -178,8 +175,6 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(c
         /*lower_limit_iu=*/min_position,
         /*upper_limit_iu=*/max_position,
         /*zero_position_iu=*/zero_position,
-        /*lower_error_soft_limit_rad_diff=*/lower_error_soft_limit_margin,
-        /*upper_error_soft_limit_rad_diff=*/upper_error_soft_limit_margin,
         /*lower_soft_limit_rad_diff=*/lower_soft_limit_margin,
         /*upper_soft_limit_rad_diff=*/upper_soft_limit_margin);
 }
@@ -233,12 +228,12 @@ std::optional<march::PowerDistributionBoard> HardwareBuilder::createPowerDistrib
     if (!power_distribution_board_config) {
         return std::nullopt;
     }
-
+    
     HardwareBuilder::validateRequiredKeysExist(power_distribution_board_config,HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS, "power_distribution_board");
 
     const auto slave_index = power_distribution_board_config["slaveIndex"].as<int>();
     const auto byte_offset = power_distribution_board_config["byteOffset"].as<int>();
-
+   
     return std::make_optional<march::PowerDistributionBoard>(march::Slave(slave_index, pdo_interface_, sdo_interface_), byte_offset);
 }
 

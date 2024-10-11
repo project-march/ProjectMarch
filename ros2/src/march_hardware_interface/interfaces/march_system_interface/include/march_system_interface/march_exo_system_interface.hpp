@@ -42,13 +42,11 @@ using std::placeholders::_2;
 
 namespace march_system_interface {
 struct JointLimit {
-    int soft_limit_warning_throttle_msec;
-    std::chrono::time_point<std::chrono::steady_clock> last_time_not_in_soft_error_limit;
-    std::chrono::milliseconds msec_until_error_when_in_error_soft_limits;
-    int soft_error_limit_warning_throttle_msec;
-    double max_effort_differance; // Outdated?
+    int outside_soft_limits_warning_interval_ms; 
+    std::chrono::time_point<std::chrono::steady_clock> last_time_within_soft_limits; 
     bool stop_when_outside_hard_limits;
 };
+
 /// Contains all the needed information for the Hardware Interface for a Joint.
 struct JointInfo {
     const std::string name;
@@ -59,11 +57,6 @@ struct JointInfo {
     double velocity;
     double torque;
     double target_torque;
-
-    // TODO: outdated parameters that should be completely removed in the cleanup.
-    double effort_actual;
-    double effort_command;
-    double effort_command_converted;
 
     // Values for the fuzzy control on the ODrive
     double position_weight;

@@ -1,3 +1,4 @@
 std_msgs/Header header
 geometry_msgs/Point left_foot_position
 geometry_msgs/Point right_foot_position
+float64 backpack_tilt

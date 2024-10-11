@@ -36,7 +36,7 @@ def plot_joints(dataset):
 def stand_to_sit(time_points):
 
     homestand = import_homestand()
-    end_points = [0.087, -0.065, 1.57, 1.57]
+    end_points = [0.087, -0.065, 1.75, 1.75]
 
     trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
@@ -45,13 +45,13 @@ def stand_to_sit(time_points):
             adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory, adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory
         ])
 
-    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv', 
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/stand_to_sit.csv', 
                stand_to_sit, delimiter=',')
 
 def sit_to_stand(time_points):
 
     homestand = import_homestand()
-    end_points = [0.087, -0.065, 1.57, 1.57]
+    end_points = [0.087, -0.065, 1.75, 1.75]
 
     trajectories = [np.linspace(end_points[i], homestand[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
@@ -60,26 +60,22 @@ def sit_to_stand(time_points):
         adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory, adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory
     ])
 
-    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv', 
                sit_to_stand, delimiter=',')
     
 def hinge_gait(time_points):
     homestand = import_homestand()
-    lhaa = np.linspace(-0.03, -0.03, time_points)
-    lhfe = np.linspace(0.136, 1.5, time_points)
-    lkfe = np.linspace(0.385, 0.385, time_points)
-    ladpf = np.linspace(0.162, 0.162, time_points)
+    print(homestand)
+    end_points = [homestand[0], homestand[1], 1.5, homestand[3]]
 
-    rhaa = np.linspace(-0.013, -0.013, time_points)
-    rhfe = np.linspace(0.176, 1.5, time_points)
-    rkfe = np.linspace(0.468, 0.468, time_points)
-    radpf = np.linspace(0.162, 0.162, time_points)
+    trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
+    adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
 
     hinge_gait = np.column_stack([
-        ladpf, lhaa, lhfe, lkfe, radpf, rhaa, rhfe, rkfe
+        adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory, adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory
     ])
 
-    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv', 
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv', 
                hinge_gait, delimiter=',')
 
 # Side right
@@ -90,7 +86,7 @@ def sideways(time_points):
     ladpf_h, lhaa_h, lhfe_h, lkfe_h, radpf_h, rhaa_h, rhfe_h, rkfe_h = homestand
 
     ladpf1 = np.full(time_points, homestand[0])
-    lhaa1 = np.linspace(lhaa_h, -0.2, time_points)
+    lhaa1 = np.linspace(lhaa_h, -0.25, time_points)
     lhfe1 = np.full(time_points, lhfe_h)
     lkfe1 = np.linspace(lkfe_h, lkfe_h, time_points)
 
@@ -99,11 +95,14 @@ def sideways(time_points):
     adpf_swing_down = np.linspace(0.20, radpf_h, int(time_points/2))
     radpf1 = np.append(adpf_swing_up, adpf_swing_down)
     
-    rhaa1 = np.linspace(rhaa_h, -0.2, time_points)
-    rhfe1 = np.full(time_points, rhfe_h)
+    rhaa1 = np.linspace(rhaa_h, -0.25, time_points)
 
-    kfe_swing_up = np.linspace(rkfe_h, 0.3, int(time_points/2))
-    kfe_swing_down = np.linspace(0.3, rkfe_h, int(time_points/2)) 
+    hfe_swing_up = np.linspace(rhfe_h, 0.45, int(time_points/2))
+    hfe_swing_down = np.linspace(0.45, rhfe_h, int(time_points/2))
+    rhfe1 = np.append(hfe_swing_up, hfe_swing_down)
+
+    kfe_swing_up = np.linspace(rkfe_h, 0.9, int(time_points/2))
+    kfe_swing_down = np.linspace(0.9, rkfe_h, int(time_points/2)) 
     rkfe1 = np.append(kfe_swing_up, kfe_swing_down)
     
     right_open = np.column_stack([
@@ -115,14 +114,14 @@ def sideways(time_points):
 
     # Right stance leg
     radpf = np.full(time_points, radpf_h)
-    rhaa = np.linspace(-0.2, rhaa_h, time_points)
+    rhaa = np.linspace(-0.25, rhaa_h, time_points)
     rhfe = np.full(time_points, rhfe_h)
     rkfe = np.full(time_points, rkfe_h)
 
 
     ladpf = np.append(adpf_swing_up, adpf_swing_down)
-    lhaa =  np.linspace(-0.2, lhaa_h, time_points)
-    lhfe = np.full(time_points, lhfe_h)
+    lhaa =  np.linspace(-0.25, lhaa_h, time_points)
+    lhfe = np.append(hfe_swing_up, hfe_swing_down)
     lkfe = np.append(kfe_swing_up, kfe_swing_down)
 
     
@@ -133,18 +132,24 @@ def sideways(time_points):
     # Add pause to enable swapping of stance leg
     left_close = np.append(left_close, np.tile(left_close[-1, :], (pause_time, 1)), axis=0)
 
-    full_sidestep = np.vstack((right_open, left_close)) 
+    full_side_right = np.vstack((right_open, left_close)) 
 
     for i, label in enumerate(COLUMNS):
-        plt.plot(full_sidestep[:, i], label=label)
+        plt.plot(full_side_right[:, i], label=label)
     plt.legend()
     plt.show()
        
-    np.savetxt('./ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep.csv', 
-               full_sidestep, delimiter=',')
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep_right.csv', 
+               full_side_right, delimiter=',')
+    full_side_left = np.hstack((full_side_right[:, 4:8], full_side_right[:, 0:4]))
+    print(np.array_equal(full_side_left[:, 0:3], full_side_right[:, 4:7]))
 
-    
+    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep_left.csv'
+                , full_side_left, delimiter=',')
+
+HIGH_LEVEL_FREQUENCY = 200
+
 # hinge_gait(100)
-# stand_to_sit(125)
+# stand_to_sit(500)
 # sit_to_stand(125)
-# sideways(800)
+# sideways(HIGH_LEVEL_FREQUENCY * 3)

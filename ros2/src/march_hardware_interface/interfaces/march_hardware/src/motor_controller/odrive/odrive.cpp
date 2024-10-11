@@ -7,7 +7,6 @@
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
 #include <march_hardware/motor_controller/motor_controller_state.h>
-
 #include "march_hardware/motor_controller/actuation_mode.h"
 
 #include <rclcpp/rclcpp.hpp>
@@ -25,9 +24,9 @@
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
     std::unique_ptr<IncrementalEncoder> incremental_encoder, std::unique_ptr<TorqueSensor> torque_sensor,
-    ActuationMode actuation_mode, bool use_inc_enc_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
+    ActuationMode actuation_mode, bool use_low_level_for_position, bool index_found, std::shared_ptr<march_logger::BaseLogger> logger)
     : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), std::move(torque_sensor),
-        actuation_mode, std::move(use_inc_enc_for_position) , std::move(logger))
+        actuation_mode, std::move(use_low_level_for_position) , std::move(logger))
     , axis_(axis)
     , index_found_(index_found)
 {
@@ -118,12 +117,13 @@ void ODrive::sendTargetPosition(float target_position)
  */
 void ODrive::actuateRadians(float target_position, float fuzzy_weight)
 {
-    if (this->hasAbsoluteEncoder()
-        && !this->absolute_encoder_->isValidTargetIU(
-            this->getAbsolutePositionIU(), this->absolute_encoder_->positionRadiansToIU(target_position))) {
+    int32_t current_position_iu = this->getAbsolutePositionIU();
+    int32_t target_position_iu = this->absolute_encoder_->positionRadiansToIU(target_position);
+
+    if (!this->absolute_encoder_->isValidTargetIU(current_position_iu, target_position_iu)) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
-            "Error in Odrive %i \nThe requested position is outside the limits, for requested position %f: ",
-            this->getSlaveIndex(), target_position);
+            "Error in Slave %i \nThe requested position of %f for axis %d is outside the limits of this joint.",
+            this->getSlaveIndex(), target_position, axis_);
     }
 
     bit32 write_position {};
@@ -207,6 +207,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
         state->incremental_velocity_ = getIncrementalVelocityUnchecked();
     }
 
+    state->pos_abs_rad_ = getPosAbsRad();
     state->AIE_absolute_position_ = getAIEAbsolutePositionRad();
     state->check_sum_ = getCheckSum();
 
@@ -256,7 +257,7 @@ uint32_t ODrive::getAbsolutePositionIU()
         }
     }
 
-    uint32_t abs_pos_check = 1048576; // Better would be to differentiate between the different joints but this is a good start
+    uint32_t abs_pos_check = 1 << 20; // Better would be to differentiate between the different joints but this is a good start
     if (abs_pos_iu > abs_pos_check) {
         RCLCPP_ERROR(rclcpp::get_logger("getAbsolutePositionIU"), "Absolute encoder value is %u, the AbsolutePosition object's bits are probably scrambled like some tasty eggs.", abs_pos_iu);
     }
@@ -292,15 +293,14 @@ float ODrive::getAIEAbsolutePositionRad()
     float aie_pos = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AIEAbsolutePosition, ODriveAxis::None)).f;
     float aie_pos_check = 0.4;
     if (abs(aie_pos) > aie_pos_check) {
-        RCLCPP_ERROR(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
+        RCLCPP_ERROR_ONCE(rclcpp::get_logger("getAIEAbsolutePositionRad"), "AIEAbsolutePosition value is %f, the AIEAbsolutePosition object's bits are probably scrambled like some tasty eggs.", aie_pos);
     }
     return aie_pos; 
 }
 
 uint32_t ODrive::getCheckSum()
 {
-    uint32_t checksum = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
-    return checksum;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::CheckSumMISO, ODriveAxis::None)).ui;
 }
 
 float ODrive::getAbsolutePositionUnchecked()
@@ -326,8 +326,17 @@ float ODrive::getIncrementalVelocityUnchecked()
 
 float ODrive::getTorqueUnchecked()
 {
-    float measured_torque = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
-    return measured_torque;
+    return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::Torque, axis_)).f;
+}
+
+float ODrive::getPosAbsRad()
+{
+    float pos_abs_rad = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::PosAbsRad, axis_)).f;
+    float pos_abs_rad_check = 2;
+    if (abs(pos_abs_rad) > pos_abs_rad_check) {
+        RCLCPP_ERROR(rclcpp::get_logger("getPosAbsRad"), "PosAbsRad value is %f, the PosAbsRad object's bits are probably scrambled like some tasty eggs.", pos_abs_rad);
+    }
+    return pos_abs_rad;
 }
 
 float ODrive::getMotorCurrent()
@@ -338,11 +347,6 @@ float ODrive::getMotorCurrent()
         RCLCPP_ERROR(rclcpp::get_logger("getMotorCurrent"), "Motor current is %f, the Current object's bits are probably scrambled like some tasty eggs.", motor_current);
     }
     return motor_current * (float)getMotorDirection();
-}
-
-float ODrive::getActualEffort()
-{
-    return getMotorCurrent();
 }
 
 uint32_t ODrive::getODriveError()

@@ -33,6 +33,7 @@ GaitPlanningAngles::GaitPlanningAngles()
    m_step_close_trajectory(), 
    m_home_stand(),
    m_prev_point(), 
+   m_hip_tilt(), 
    m_counter()
    {
     std::cout << "Angle Gait Class created" << std::endl;
@@ -47,6 +48,9 @@ GaitPlanningAngles::GaitPlanningAngles()
 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/sit_to_stand.csv", m_sit_to_stand_trajectory); 
     processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/hinge_gait.csv", m_hinge_trajectory);
+
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/stand_to_trainsit.csv", m_stand_to_train_sit_trajectory);
+    processCSVFile("src/march_gait_planning/m9_gait_files/joint_angles/trainsit_to_stand.csv", m_train_sit_to_stand_trajectory);
 
     std::cout << "Angle trajectory CSVs created" << std::endl; 
    }
@@ -104,6 +108,10 @@ void GaitPlanningAngles::setHomeStand(const std::vector<double> &stand){
 
 void GaitPlanningAngles::setStanceFoot(const uint8_t &foot){
     m_stance_foot = foot; 
+}
+
+void GaitPlanningAngles::setHipTilt(const double &hip_tilt){
+    m_hip_tilt = hip_tilt; 
 }
 
 ExoMode GaitPlanningAngles::getGaitType() const {
@@ -178,6 +186,14 @@ std::vector<std::vector<double>> GaitPlanningAngles::getHingeGait() const{
     return m_hinge_trajectory; 
 }
 
+std::vector<std::vector<double>> GaitPlanningAngles::getStandToTrainSitGait() const{
+    return m_stand_to_train_sit_trajectory; 
+}
+
+std::vector<std::vector<double>> GaitPlanningAngles::getTrainSitToStandGait() const{
+    return m_train_sit_to_stand_trajectory; 
+}
+
 uint8_t GaitPlanningAngles::getStanceFoot() const {
     return m_stance_foot; 
 }
@@ -191,4 +207,8 @@ std::vector<std::vector<double>> GaitPlanningAngles::swapLeftAndRightColumns(con
         std::swap(row[3], row[7]);
     }
     return half_step_swapped; 
+}
+
+double GaitPlanningAngles::getHipTilt() const {
+    return m_hip_tilt; 
 }

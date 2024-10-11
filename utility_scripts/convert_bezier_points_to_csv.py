@@ -24,7 +24,7 @@ def make_evenly_spaced_points(x, z, array_size):
     return x_new, z_new
 
 def create_bezier_csv(points, array_size, gait_type):
-    pause_time = int(array_size/6)
+    pause_time = int(array_size/4)
     step_length = points.max(axis=0)[0]
     ending_angle = np.arcsin((step_length/2)/LEG_LENGTH)
 
@@ -104,6 +104,7 @@ def create_bezier_csv(points, array_size, gait_type):
     step_close_points = points.copy()
     step_close_points[:, 0] = step_close_points[:, 0]/-2
     step_close_points[1:, 1] = step_close_points[1:, 1] + vertical_offset
+    step_close_points[2, 0] = step_close_points[2, 0] * 0.3
     curvexz_step_close = bezier.Curve(step_close_points.T, degree=3)
     number_of_time_points_step_close = np.linspace(0, 1.0, int(array_size))
     points_step_close= curvexz_step_close.evaluate_multi(number_of_time_points_step_close)
@@ -118,10 +119,10 @@ def create_bezier_csv(points, array_size, gait_type):
     final_points_step_close = np.column_stack((x_swing_step_close, z_swing_step_close, x_stance_step_close, z_stance_step_close))
     final_points_step_close = np.flip(final_points_step_close, axis=0)
 
-    # plt.plot(x_swing_step_close, z_swing_step_close)
-    # plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
-    # plt.title("Step Close")
-    # plt.show()
+    plt.plot(x_swing_step_close, z_swing_step_close)
+    plt.plot(x_stance_step_close, z_stance_step_close, color="orange")
+    plt.title("Step Close")
+    plt.show()
 
     if gait_type == "large_gait":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/first_step_large.csv', final_points_first_step, delimiter=',')
@@ -132,8 +133,8 @@ def create_bezier_csv(points, array_size, gait_type):
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/normal_gait_small.csv', final_points_complete_step, delimiter=',')
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/small_step_close.csv', final_points_step_close, delimiter=',')
 
-
 def stair_gaits(set_of_points, array_size):
+    pause_time = int(array_size/6)
     first_step_points = np.array(set_of_points[0]["first_step"])
     full_step_points = np.array(set_of_points[1]["full_step"])
     step_close_points = np.array(set_of_points[2]["step_close"])
@@ -148,6 +149,11 @@ def stair_gaits(set_of_points, array_size):
     x_stance_stairs = np.linspace(first_step_points[0][0], -first_step_points[3][0], int(array_size/2))
     z_stance_stairs = [0]*int(array_size/2)
 
+    x_swing_stairs = np.append(x_swing_stairs, x_swing_stairs[-1]*np.ones(pause_time))
+    z_swing_stairs = np.append(z_swing_stairs, z_swing_stairs[-1]*np.ones(pause_time))
+    x_stance_stairs = np.append(x_stance_stairs, x_stance_stairs[-1]*np.ones(pause_time))
+    z_stance_stairs = np.append(z_stance_stairs, z_stance_stairs[-1]*np.ones(pause_time))
+
     first_points_stairs = np.column_stack((x_swing_stairs, z_swing_stairs, x_stance_stairs, z_stance_stairs))
 
     # Part 2: swing leg goes down two steps, stance leg stays still
@@ -158,6 +164,11 @@ def stair_gaits(set_of_points, array_size):
     z_swing_stair = points[1,:]
     x_stance_stair = np.linspace(full_step_points[3][0], full_step_points[0][0], int(array_size/2))
     z_stance_stair = np.linspace(full_step_points[3][1], full_step_points[0][1], int(array_size/2))
+
+    x_swing_stair = np.append(x_swing_stair, x_swing_stair[-1]*np.ones(pause_time))
+    z_swing_stair = np.append(z_swing_stair, z_swing_stair[-1]*np.ones(pause_time))
+    x_stance_stair = np.append(x_stance_stair, x_stance_stair[-1]*np.ones(pause_time))
+    z_stance_stair = np.append(z_stance_stair, z_stance_stair[-1]*np.ones(pause_time))
 
     # Part 3: swing leg closes to stance leg (top of the stairs)
     step_close_curve = bezier.Curve(step_close_points.T, degree=3)
@@ -204,7 +215,7 @@ def descend_stairs(data_up):
 def high_step_up(bezier_points, array_size):
     # array_size is the time for one swing phase
 
-    pause_time = int(array_size/6)
+    pause_time = int(array_size/3) # make pause longer 
     step_length = bezier_points.max(axis=0)[0]
     ending_angle = np.arcsin((step_length)/LEG_LENGTH)
     phi_first_step = np.linspace(0, ending_angle, int(array_size))
@@ -266,23 +277,25 @@ def high_step_up(bezier_points, array_size):
 
     return final_points_high_step_up
 
-def high_step_down(high_step_up_dataset):
-    x_stance = high_step_up_dataset[:,0][::-1]*-1
-    z_stance = high_step_up_dataset[:,1][::-1]
-    x_swing = high_step_up_dataset[:,2][::-1]*-1
-    z_swing = high_step_up_dataset[:,3][::-1]
+def high_step_down(bezier_points, array_size):
+    dataset = high_step_up(bezier_points, array_size)
+    x_stance = dataset[:,0][::-1]*-1
+    z_stance = dataset[:,1][::-1]
+    x_swing = dataset[:,2][::-1]*-1
+    z_swing = dataset[:,3][::-1]
 
-    step_down = np.column_stack((x_swing, z_swing, x_stance, z_stance))
+    down_step = np.column_stack((x_swing, z_swing, x_stance, z_stance))
 
-    # plt.plot(x_swing, z_swing)
-    # plt.plot(x_stance, z_stance, color="orange")
-    # plt.show()
+    plt.plot(x_swing, z_swing)
+    plt.plot(x_stance, z_stance, color="orange")
+    plt.show()
 
-    return step_down
+    return down_step
+
 
 def create_high_step_csv(bezier_points: np.array, gait_type: str, array_size: int):
     step_up = high_step_up(bezier_points, array_size)
-    step_down = high_step_down(step_up)
+    step_down = high_step_down(step_up) # make step down quicker 
 
     if gait_type == "high_step_1":
         np.savetxt('ros2/src/march_gait_planning/m9_gait_files/cartesian/high_step1.csv', step_up, delimiter=',')

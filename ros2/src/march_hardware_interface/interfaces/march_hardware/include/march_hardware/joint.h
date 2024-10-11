@@ -43,6 +43,9 @@ public:
     // Check whether the state of the MotorController has changed
     bool receivedDataUpdate();
 
+    // Handle the case where no data has been received from the MotorController
+    void handleNoDataUpdate(std::chrono::duration<double> time_between_last_update);
+
     // Prepare the joint for actuation
     // Returns an optional wait duration
     std::chrono::nanoseconds prepareActuation();
@@ -76,18 +79,13 @@ public:
     bool isWithinSoftLimits() const;
 
     /**
-     * \brief Checks whether the joint is in its error soft limits.
-     * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
-     * @return True if it is in an 'oke' state.
-     */
-    bool isWithinSoftErrorLimits() const;
-
-    /**
      * \brief Checks whether the joint is in its hard limits.
      * \note It uses old position data. Joint::readEncoders(...) must be called before hand.
      * @return True if it is in an 'oke' state.
      */
     bool isWithinHardLimits() const;
+
+    bool hasMotorControllerError();
 
     /** @brief Override comparison operator */
     friend bool operator==(const Joint& lhs, const Joint& rhs)
