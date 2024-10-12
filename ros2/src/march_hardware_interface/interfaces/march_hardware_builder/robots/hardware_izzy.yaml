@@ -54,9 +54,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 7056
-            maxPositionIU: 8364
-            zeroPositionIU: 7958
+            minPositionIU: 7424
+            maxPositionIU: 8722
+            zeroPositionIU: 8334
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -85,7 +85,7 @@ march9:
             direction: -1
             minPositionIU: 424000
             maxPositionIU: 816068
-            zeroPositionIU: 752677
+            zeroPositionIU: 757814
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.05899213
           incrementalEncoder:
@@ -183,9 +183,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 14763
-            maxPositionIU: 15975
-            zeroPositionIU: 15515
+            minPositionIU: 14690
+            maxPositionIU: 15995
+            zeroPositionIU: 15600
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -212,9 +212,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 265476
-            maxPositionIU: 651409
-            zeroPositionIU: 325158
+            minPositionIU: 222272
+            maxPositionIU: 613666
+            zeroPositionIU: 280526
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.04
           incrementalEncoder:
@@ -241,9 +241,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 177573
-            maxPositionIU: 541216
-            zeroPositionIU: 541216
+            minPositionIU: 263521
+            maxPositionIU: 628165
+            zeroPositionIU: 628165
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
