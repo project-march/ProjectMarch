@@ -148,6 +148,14 @@ void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pi
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionI, axis_), write_position_i);
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionD, axis_), write_position_d);
 
+    RCLCPP_DEBUG(rclcpp::get_logger("sendPID"),
+    "Wrote the following position gains for axis %d, with PositionP offset of %d:"
+    "\n\t Position: %f"
+    "\n\t Integral: %f"
+    "\n\t Derivative: %f",
+    axis_,ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::PositionP, axis_),pos_pid[0],pos_pid[1],pos_pid[2]
+    );
+
     bit32 write_torque_p {};
     bit32 write_torque_d {};
 
@@ -156,6 +164,13 @@ void ODrive::sendPID(std::array<double, 3> pos_pid, std::array<double, 2> tor_pi
 
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_), write_torque_p);
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueD, axis_), write_torque_d);
+
+    RCLCPP_DEBUG(rclcpp::get_logger("sendPID"),
+    "Wrote the following torque gains for axis %d, with TorqueP offset of %d:"
+    "\n\t Position: %f"
+    "\n\t Derivative: %f",
+    axis_,ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TorqueP, axis_),tor_pid[0],tor_pid[1]
+    );
 }
 
 

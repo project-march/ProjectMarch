@@ -82,11 +82,13 @@ def hinge_gait(time_points):
 def sideways(time_points):
     homestand = import_homestand()
     pause_time = int(time_points/2)
+    
+    sideways_step_size = 0.20
 
     ladpf_h, lhaa_h, lhfe_h, lkfe_h, radpf_h, rhaa_h, rhfe_h, rkfe_h = homestand
 
     ladpf1 = np.full(time_points, homestand[0])
-    lhaa1 = np.linspace(lhaa_h, -0.25, time_points)
+    lhaa1 = np.linspace(lhaa_h, -sideways_step_size, time_points)
     lhfe1 = np.full(time_points, lhfe_h)
     lkfe1 = np.linspace(lkfe_h, lkfe_h, time_points)
 
@@ -95,7 +97,7 @@ def sideways(time_points):
     adpf_swing_down = np.linspace(0.20, radpf_h, int(time_points/2))
     radpf1 = np.append(adpf_swing_up, adpf_swing_down)
     
-    rhaa1 = np.linspace(rhaa_h, -0.25, time_points)
+    rhaa1 = np.linspace(rhaa_h, -sideways_step_size, time_points)
 
     hfe_swing_up = np.linspace(rhfe_h, 0.45, int(time_points/2))
     hfe_swing_down = np.linspace(0.45, rhfe_h, int(time_points/2))
@@ -114,13 +116,13 @@ def sideways(time_points):
 
     # Right stance leg
     radpf = np.full(time_points, radpf_h)
-    rhaa = np.linspace(-0.25, rhaa_h, time_points)
+    rhaa = np.linspace(-sideways_step_size, rhaa_h, time_points)
     rhfe = np.full(time_points, rhfe_h)
     rkfe = np.full(time_points, rkfe_h)
 
 
     ladpf = np.append(adpf_swing_up, adpf_swing_down)
-    lhaa =  np.linspace(-0.25, lhaa_h, time_points)
+    lhaa =  np.linspace(-sideways_step_size, lhaa_h, time_points)
     lhfe = np.append(hfe_swing_up, hfe_swing_down)
     lkfe = np.append(kfe_swing_up, kfe_swing_down)
 
@@ -138,13 +140,21 @@ def sideways(time_points):
         plt.plot(full_side_right[:, i], label=label)
     plt.legend()
     plt.show()
+
+    # Construct absolute paths
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ros2', 'src', 'march_gait_planning', 'm9_gait_files', 'joint_angles'))
+    right_csv_path = os.path.join(base_dir, 'sidestep_right.csv')
+    left_csv_path = os.path.join(base_dir, 'sidestep_left.csv')
+
+    # Ensure the directory exists
+    os.makedirs(base_dir, exist_ok=True)
        
-    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep_right.csv', 
+    np.savetxt(right_csv_path, 
                full_side_right, delimiter=',')
     full_side_left = np.hstack((full_side_right[:, 4:8], full_side_right[:, 0:4]))
     print(np.array_equal(full_side_left[:, 0:3], full_side_right[:, 4:7]))
 
-    np.savetxt('ros2/src/march_gait_planning/m9_gait_files/joint_angles/sidestep_left.csv'
+    np.savetxt(left_csv_path
                 , full_side_left, delimiter=',')
 
 HIGH_LEVEL_FREQUENCY = 200
@@ -152,4 +162,4 @@ HIGH_LEVEL_FREQUENCY = 200
 # hinge_gait(100)
 # stand_to_sit(500)
 # sit_to_stand(125)
-# sideways(HIGH_LEVEL_FREQUENCY * 3)
+# sideways(HIGH_LEVEL_FREQUENCY * 2)

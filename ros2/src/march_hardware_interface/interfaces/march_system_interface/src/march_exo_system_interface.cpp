@@ -300,7 +300,7 @@ hardware_interface::return_type MarchExoSystemInterface::perform_command_mode_sw
             RCLCPP_INFO((*logger_), "%sAll joints ready for writing.", LColor::GREEN);
             
             for (JointInfo& jointInfo : joints_info_) {
-
+                jointInfo.joint.sendPID();  
                 jointInfo.joint.readEncoders();
                 jointInfo.position = jointInfo.joint.getPosition();
                 jointInfo.target_position = jointInfo.joint.getPosition();
