@@ -86,20 +86,13 @@ class ExoModeCharacteristic(bluetooth_gatt.Characteristic):
     def __init__(self, bus, index, service, callback=None):
         bluetooth_gatt.Characteristic.__init__(self, bus, index,
                                                 bluetooth_constants.EXOMODE_CHR_UUID,
-                                                ['write', 'read'],
+                                                ['write-without-response'],
                                                 service)
         self.notifying = True
         self.exoMode = 3 # Bootup
         print("Initial exoMode set to "+str(self.exoMode))
         self.callback = callback
 
-    def ReadValue(self, options):
-        print('ReadValue in ExoModeCharacteristic called')
-        print('Returning '+str(self.exoMode))
-        value = []
-        value.append(dbus.UInt16(self.exoMode))
-        return value
-    
     def WriteValue(self, value, options):
         print('WriteValue in ExoModeCharacteristic called')
         self.exoMode = int(value[0])  # interpret the first byte as an integer
@@ -109,19 +102,11 @@ class ExoModeCharacteristic(bluetooth_gatt.Characteristic):
 
         print("callback="+str(self.callback))
         if self.callback:
-            print("entering correct if statement")
             try:
                 self.callback(self.exoMode)
             except Exception as e:
                 print(f"Error occurred while calling callback: {e}")
 
-    def notify_exoMode(self):
-        value = []
-        value.append(dbus.Byte(self.exoMode))
-        print("notifying exoMode="+str(self.exoMode))
-        self.PropertiesChanged(bluetooth_constants.GATT_CHARACTERISTIC_INTERFACE, { 'Value': value }, [])
-        return self.notifying
-    
     def StartNotify(self):
         print("starting notifications")
         self.notifying = True

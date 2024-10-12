@@ -45,7 +45,7 @@ class BLEInputDeviceNode(Node):
                                                 clock=self.get_clock())
         
         self.get_logger().info(f"{COLOR}Ready to connect to bluetooth device{RESET}")
-        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode), self)   
+        self._bluetooth_server = BluetoothServer(lambda mode: self.publish_mode(mode), self)  
 
 
     def publish_mode(self, mode: int) -> None:
@@ -64,7 +64,7 @@ class BLEInputDeviceNode(Node):
         available_modes = future.result().mode_array.modes
         mode_list = [exo_mode.mode for exo_mode in available_modes]
         self._current_mode = future.result().current_mode.mode
-    
+
     def check_connectivity(self) -> None:
         """Check whether a bluetooth device is still connected"""
         if self._connected == True:
@@ -74,15 +74,9 @@ class BLEInputDeviceNode(Node):
                 self._disconnection_handled = False  # Reset disconnection handled flag for future disconnections
         elif self._connected == False and self._connected_first_time and not self._disconnection_handled:
             self.get_logger().warn("Device disconnected")
-            if self._current_mode == 3:  # Exo is in BootUp
-                self.publish_mode(3)
-                self.get_logger().warn("Device disconnected, sending BootUp mode")
-            elif self._current_mode == 0:  # Exo is in Sit
-                self.publish_mode(0)
-                self.get_logger().warn("Device disconnected, sending Sit mode")
-            else:
-                self.publish_mode(1)
-                self.get_logger().warn("Device disconnected, sending Stand mode")
+            if self._current_mode not in (0, 1, 3, 12, 13, 14, 17):  # Exo is not in Sit, Stand, or BootUp, High Step 1, High Step 2, High Step 3, Train Sit
+                self.get_logger().warn("Device disconnected during gait, sending Stand mode")
+                self.publish_mode(1)                
             self._disconnection_handled = True  # Mark disconnection message as printed
             self._connection_handled = False  # Reset connection handled flag for future connections
         else:
