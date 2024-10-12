@@ -10,6 +10,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ros2', 'src', 'march_gait_planning', 'm9_gait_files', 'joint_angles'))
 COLUMNS = ['LADPF', 'LHAA', 'LHFE', 'LKFE', 'RADPF', 'RHAA', 'RHFE', 'RKFE']
 HIGH_LEVEL_FREQUENCY = 200
+HOMESTAND_FILE = 'homestand.yaml'
 
 
 def ensure_directory_exists(path):
@@ -24,16 +25,14 @@ def save_to_csv(data, filename):
     print(f"Saved data to {file_path}")
 
 def import_homestand(): 
-    current_dir = os.path.dirname(__file__)
-    homestand_path = os.path.join(current_dir, '..', 'ros2', 'src', 'march_gait_planning', 'm9_gait_files', 'homestand.yaml')
+    homestand_path = os.path.joint(BASE_DIR, HOMESTAND_FILE)
     if os.path.exists(homestand_path):
         with open(homestand_path, 'r') as f:
             data = yaml.safe_load(f)
             homestand_joint_angles = np.array(data["joint_angles"])
+            return homestand_joint_angles
     else: 
         print(f"the file {homestand_path} does not exist")
-    
-    return homestand_joint_angles
     
 def plot_joints(dataset):
 
