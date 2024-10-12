@@ -48,19 +48,25 @@ def plot_joints(dataset):
     plt.legend()
     plt.show()
 
-def stand_to_sit(time_points):
-
+def stand_to_sit(time_points, train_sit=False):
     homestand = import_homestand()
-    end_points = [0.087, -0.065, 1.75, 1.75]
 
+    # Set end points based on train_sit
+    end_points = [0.087, -0.065, 1.75, 1.75] if train_sit else [0.087, -0.065, 1.57, 1.57]
+
+    # Generate trajectories
     trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
 
-    stand_to_sit = np.column_stack([
-            adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory, adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory
+    # Combine trajectories into a single array
+    stand_to_sit_data = np.column_stack([
+            adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory, 
+            adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory
         ])
 
-    save_to_csv(stand_to_sit, 'stand_to_sit.csv')
+    # Save to CSV file
+    filename = 'stand_to_trainsit.csv' if train_sit else 'stand_to_sit.csv'
+    save_to_csv(stand_to_sit_data, filename)
 
 def sit_to_stand(time_points, train_sit=False):
     homestand = import_homestand()
