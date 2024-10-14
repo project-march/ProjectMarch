@@ -50,8 +50,11 @@ def plot_joints(dataset):
 def stand_to_sit(time_points, train_sit=False):
     homestand = import_homestand()
 
-    # Set end points based on train_sit
+    # Set end points based on train_sit if True
     end_points = [0.087, -0.065, 1.75, 1.75] if train_sit else [0.087, -0.065, 1.57, 1.57]
+
+    # Ensure time_points is an integer
+    time_points = int(time_points)
 
     # Generate trajectories
     trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
@@ -70,8 +73,11 @@ def stand_to_sit(time_points, train_sit=False):
 def sit_to_stand(time_points, train_sit=False):
     homestand = import_homestand()
     
-    # Set starting points based on train_sit
+    # Set starting points based on train_sit if True
     starting_points = [0.087, -0.065, 1.75, 1.75] if train_sit else [0.087, -0.065, 1.57, 1.57]
+
+    # Ensure time_points is an integer
+    time_points = int(time_points)
 
     # Generate trajectories
     trajectories = [np.linspace(starting_points[i], homestand[i], time_points) for i in range(4)]
@@ -92,6 +98,9 @@ def hinge_gait(time_points):
     homestand = import_homestand()
     end_points = [homestand[0], homestand[1], 1.5, homestand[3]]
 
+    # Ensure time_points is an integer
+    time_points = int(time_points)
+
     trajectories = [np.linspace(homestand[i], end_points[i], time_points) for i in range(4)]
     adpf_trajectory, haa_trajectory, hfe_trajectory, kfe_trajectory = trajectories
 
@@ -109,6 +118,9 @@ def sideways(time_points):
     sideways_step_size = 0.20
 
     ladpf_h, lhaa_h, lhfe_h, lkfe_h, radpf_h, rhaa_h, rhfe_h, rkfe_h = homestand
+    
+    # Ensure time_points is an integer
+    time_points = int(time_points)
 
     ladpf1 = np.full(time_points, homestand[0])
     lhaa1 = np.linspace(lhaa_h, -sideways_step_size, time_points)
@@ -161,16 +173,19 @@ def sideways(time_points):
     plt.legend()
     plt.show()
 
-    save_to_csv(full_side_right, 'sidestep_right.csv')
-
     full_side_left = np.hstack((full_side_right[:, 4:8], full_side_right[:, 0:4]))
-    print(np.array_equal(full_side_left[:, 0:3], full_side_right[:, 4:7]))
+    are_arrays_equal = np.array_equal(full_side_left[:, 0:3], full_side_right[:, 4:7])
+    print(f"Are the left and right side arrays equal? {'Yes' if are_arrays_equal else 'No'}")
 
-    save_to_csv(full_side_left, 'sidestep_left.csv')
+    if are_arrays_equal:
+        save_to_csv(full_side_left, 'sidestep_left.csv')
+        save_to_csv(full_side_right, 'sidestep_right.csv')
+    else:
+        print("The arrays are not equal. Both sidestepping files will not be saved.")
 
 
 # Uncomment the gait you want to generate
-# hinge_gait(100)
-# stand_to_sit(500)
-# sit_to_stand(125)
-sideways(HIGH_LEVEL_FREQUENCY * 2)
+# hinge_gait(HIGH_LEVEL_FREQUENCY * 0.5)
+# stand_to_sit(HIGH_LEVEL_FREQUENCY * 2.5)
+# sit_to_stand(HIGH_LEVEL_FREQUENCY * 2, True)
+# sideways(HIGH_LEVEL_FREQUENCY * 2)
