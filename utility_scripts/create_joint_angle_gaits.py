@@ -25,14 +25,14 @@ def save_to_csv(data, filename):
     print(f"Saved data to {file_path}")
 
 def import_homestand(): 
-    homestand_path = os.path.joint(BASE_DIR, HOMESTAND_FILE)
+    homestand_path = os.path.abspath(os.path.join(BASE_DIR, '..', HOMESTAND_FILE))
     if os.path.exists(homestand_path):
         with open(homestand_path, 'r') as f:
             data = yaml.safe_load(f)
             homestand_joint_angles = np.array(data["joint_angles"])
             return homestand_joint_angles
     else: 
-        print(f"the file {homestand_path} does not exist")
+        raise FileNotFoundError(f"The file {homestand_path} does not exist")
     
 def plot_joints(dataset):
 
@@ -168,7 +168,9 @@ def sideways(time_points):
 
     save_to_csv(full_side_left, 'sidestep_left.csv')
 
+
+# Uncomment the gait you want to generate
 # hinge_gait(100)
 # stand_to_sit(500)
 # sit_to_stand(125)
-# sideways(HIGH_LEVEL_FREQUENCY * 2)
+sideways(HIGH_LEVEL_FREQUENCY * 2)
