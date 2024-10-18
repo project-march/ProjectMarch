@@ -212,9 +212,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 222272
-            maxPositionIU: 613666
-            zeroPositionIU: 280526
+            minPositionIU: 310021
+            maxPositionIU: 701698
+            zeroPositionIU: 368275
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.04
           incrementalEncoder:
