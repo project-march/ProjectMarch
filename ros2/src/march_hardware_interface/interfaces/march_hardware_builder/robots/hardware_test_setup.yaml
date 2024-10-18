@@ -11,9 +11,9 @@ testsetup:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 12833
-            maxPositionIU: 14700
-            zeroPositionIU: 13766
+            minPositionIU: 11909
+            maxPositionIU: 13756
+            zeroPositionIU: 12832
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
@@ -25,7 +25,7 @@ testsetup:
             averageTorque: 10
         gains:
           position:
-            p: 15.0
+            p: 140.0
             i: 0.0
             d: 0.2
           torque:
@@ -39,9 +39,9 @@ testsetup:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 270562
-            maxPositionIU: 542471
-            zeroPositionIU: 406516
+            minPositionIU: 546148
+            maxPositionIU: 814720
+            zeroPositionIU: 680434
             lowerSoftLimitMarginRad: 0.10908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
@@ -53,9 +53,9 @@ testsetup:
             averageTorque: 10
         gains:
           position:
-            p: 20.0
+            p: 22.0
             i: 0.0
-            d: 1.5
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0

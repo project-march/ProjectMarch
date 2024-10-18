@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-#define MAX_UPDATE_INTERVAL 6
+#define MAX_UPDATE_INTERVAL 9
 namespace march {
 Joint::Joint(
     std::string name,

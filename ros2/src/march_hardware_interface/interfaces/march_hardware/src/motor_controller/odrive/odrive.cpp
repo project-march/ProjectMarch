@@ -46,7 +46,7 @@ std::chrono::nanoseconds ODrive::prepareActuation()
         setAxisState(ODriveAxisState::ENCODER_INDEX_SEARCH);
         logger_->info("Initializing the encoder index search.");    
 
-        return std::chrono::seconds {20};
+        return std::chrono::seconds {15};
 
     } else {
         return std::chrono::nanoseconds(0);
@@ -129,6 +129,7 @@ void ODrive::actuateRadians(float target_position, float fuzzy_weight)
     bit32 write_position {};
     write_position.f = target_position;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetPosition, axis_), write_position);
+    RCLCPP_WARN_ONCE(rclcpp::get_logger("actuateRadians"), "Wrote first target position %f to MDrive", target_position);
     bit32 write_fuzzy {};
     write_fuzzy.f = fuzzy_weight;
     this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::FuzzyPosition, axis_), write_fuzzy);
