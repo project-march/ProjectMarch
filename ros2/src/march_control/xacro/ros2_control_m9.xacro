@@ -48,11 +48,11 @@
       </xacro:if>
     </hardware>
 
-    <xacro:march_joint name="left_ankle_dpf" type="${type}" stop_when_outside_hard_limits="True"/>
+    <xacro:march_joint name="left_ankle_dpf" type="${type}" stop_when_outside_hard_limits="False"/>
     <xacro:march_joint name="left_hip_aa" type="${type}" stop_when_outside_hard_limits="True"/>
     <xacro:march_joint name="left_hip_fe" type="${type}" stop_when_outside_hard_limits="True"/>
     <xacro:march_joint name="left_knee" type="${type}" stop_when_outside_hard_limits="True"/>
-    <xacro:march_joint name="right_ankle_dpf" type="${type}" stop_when_outside_hard_limits="True"/>
+    <xacro:march_joint name="right_ankle_dpf" type="${type}" stop_when_outside_hard_limits="False"/>
     <xacro:march_joint name="right_hip_aa" type="${type}" stop_when_outside_hard_limits="True"/>
     <xacro:march_joint name="right_hip_fe" type="${type}" stop_when_outside_hard_limits="True"/>
     <xacro:march_joint name="right_knee" type="${type}" stop_when_outside_hard_limits="True"/>
