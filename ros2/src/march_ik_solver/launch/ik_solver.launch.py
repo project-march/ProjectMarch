@@ -66,6 +66,11 @@ def generate_launch_description():
             'upper_soft_limit': np.rad2deg(joint_info['upperSoftLimitMarginRad']),
         }
     
+    # Additional check for 'ankle' joints
+    if 'ankle' in joint:
+        joints_info[joint]['min_position_iu'] = joint_info['zeroPositionIU']
+        joints_info[joint]['lower_soft_limit'] = 0.08
+    
     # Calculate min and max position degrees for each joint
     min_position_degrees = [
         360 * (info['min_position_iu'] - info['zero_position_iu']) / info['cpr_absolute']
