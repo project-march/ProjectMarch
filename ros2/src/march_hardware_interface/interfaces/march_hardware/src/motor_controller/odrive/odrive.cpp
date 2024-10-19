@@ -20,6 +20,8 @@
 // Allows easy debugging of all incoming errors
 // #define DEBUG_MODE
 
+#define USE_LOW_LEVEL_FOR_POSITION true
+
 
 namespace march {
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -400,6 +402,11 @@ uint64_t ODrive::getMotorError()
 uint32_t ODrive::getEncoderError()
 {
     uint32_t error = this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_)).ui;
+    if (getAxisState() == ODriveAxisState::CLOSED_LOOP_CONTROL && error == 400 && USE_LOW_LEVEL_FOR_POSITION) {
+        // If the joint is in closed loop control and we get the "Unconnected cable. " error, we can ignore it 
+        RCLCPP_WARN_ONCE(rclcpp::get_logger("getEncoderError"), "Unconnected cable, ignoring since joint is in closed loop control.");
+        error = 0;
+    }
 #ifdef DEBUG_MODE
     if (error != 0) {
         RCLCPP_ERROR(rclcpp::get_logger("ODrive"), "Encoder error: %u", error);
