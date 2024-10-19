@@ -10,6 +10,9 @@ from launch_ros.substitutions import FindPackageShare
 import yaml
 import numpy as np
 
+ANKLE_DPF_MIN_POSITION_RAD = 0.08
+SET_ANKLE_DPF_MIN_TO_ZERO = True
+
 def generate_launch_description():
     state_estimator_clock_period = LaunchConfiguration('state_estimator_timer_period', default='0.05')
     test = LaunchConfiguration('test', default='false')
@@ -65,7 +68,11 @@ def generate_launch_description():
             'lower_soft_limit': np.rad2deg(joint_info['lowerSoftLimitMarginRad']),
             'upper_soft_limit': np.rad2deg(joint_info['upperSoftLimitMarginRad']),
         }
-    
+        # Additional check for 'ankle_dpf' joints
+        if 'ankle_dpf' in joint and SET_ANKLE_DPF_MIN_TO_ZERO:
+            joints_info[joint]['min_position_iu'] = joint_info['zeroPositionIU']
+            joints_info[joint]['lower_soft_limit'] = np.rad2deg(ANKLE_DPF_MIN_POSITION_RAD)
+            
     # Calculate min and max position degrees for each joint
     min_position_degrees = [
         360 * (info['min_position_iu'] - info['zero_position_iu']) / info['cpr_absolute']
