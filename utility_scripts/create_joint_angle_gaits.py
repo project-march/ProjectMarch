@@ -114,7 +114,7 @@ def hinge_gait(time_points):
 # Side right
 def sideways(time_points):
     homestand = import_homestand()
-    pause_time_adjustment = 100
+    pause_time_adjustment = 50
     pause_time = int(time_points / 2 + pause_time_adjustment)
     sideways_step_size = 0.20
 
@@ -169,10 +169,10 @@ def sideways(time_points):
 
     full_side_right = np.vstack((right_open, left_close)) 
 
-    # for i, label in enumerate(COLUMNS):
-    #     plt.plot(full_side_right[:, i], label=label)
-    # plt.legend()
-    # plt.show()
+    for i, label in enumerate(COLUMNS):
+        plt.plot(full_side_right[:, i], label=label)
+    plt.legend()
+    plt.show()
 
     full_side_left = np.hstack((full_side_right[:, 4:8], full_side_right[:, 0:4]))
     are_arrays_equal = np.array_equal(full_side_left[:, 0:3], full_side_right[:, 4:7])
@@ -189,4 +189,4 @@ def sideways(time_points):
 # hinge_gait(HIGH_LEVEL_FREQUENCY * 0.5)
 # stand_to_sit(HIGH_LEVEL_FREQUENCY * 2.5)
 # sit_to_stand(HIGH_LEVEL_FREQUENCY * 1.5, False)
-sideways(HIGH_LEVEL_FREQUENCY * 2)
+# sideways(HIGH_LEVEL_FREQUENCY * 2)
