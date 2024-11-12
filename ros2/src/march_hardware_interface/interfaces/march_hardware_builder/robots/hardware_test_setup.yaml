@@ -11,9 +11,9 @@ testsetup:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 11909
-            maxPositionIU: 13756
-            zeroPositionIU: 12832
+            minPositionIU: 2223
+            maxPositionIU: 3792
+            zeroPositionIU: 3007
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
