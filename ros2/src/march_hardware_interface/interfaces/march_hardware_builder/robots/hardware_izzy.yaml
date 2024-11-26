@@ -12,9 +12,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 4968
-            maxPositionIU: 7049
-            zeroPositionIU: 6139
+            minPositionIU: 5188
+            maxPositionIU: 7052
+            zeroPositionIU: 6142
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
@@ -54,9 +54,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 7783
-            maxPositionIU: 9020
-            zeroPositionIU: 8693
+            minPositionIU: 7965
+            maxPositionIU: 9045
+            zeroPositionIU: 8875
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -83,9 +83,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 424000
-            maxPositionIU: 816068
-            zeroPositionIU: 757814
+            minPositionIU: 424005
+            maxPositionIU: 816708
+            zeroPositionIU: 758454
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.05899213
           incrementalEncoder:
@@ -112,9 +112,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 496550
-            maxPositionIU: 861122
-            zeroPositionIU: 496550
+            minPositionIU: 496643
+            maxPositionIU: 861156
+            zeroPositionIU: 496643
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
@@ -141,9 +141,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 3874
-            maxPositionIU: 5905
-            zeroPositionIU: 4995
+            minPositionIU: 3657
+            maxPositionIU: 5706
+            zeroPositionIU: 4796
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
@@ -183,9 +183,9 @@ march9:
           absoluteEncoder:
             resolution: 14
             direction: 1
-            minPositionIU: 14947
-            maxPositionIU: 16207
-            zeroPositionIU: 15857
+            minPositionIU: 14944
+            maxPositionIU: 16236
+            zeroPositionIU: 15854
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -212,9 +212,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: 1
-            minPositionIU: 310021
-            maxPositionIU: 701698
-            zeroPositionIU: 368275
+            minPositionIU: 309284
+            maxPositionIU: 701317
+            zeroPositionIU: 367538
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.04
           incrementalEncoder:
@@ -241,9 +241,9 @@ march9:
           absoluteEncoder:
             resolution: 20
             direction: -1
-            minPositionIU: 263521
-            maxPositionIU: 628165
-            zeroPositionIU: 628165
+            minPositionIU: 224903
+            maxPositionIU: 584326
+            zeroPositionIU: 584326
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
