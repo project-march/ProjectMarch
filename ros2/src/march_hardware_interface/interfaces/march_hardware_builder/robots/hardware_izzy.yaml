@@ -55,7 +55,7 @@ march9:
             resolution: 14
             direction: 1
             minPositionIU: 7965
-            maxPositionIU: 9045
+            maxPositionIU: 9258
             zeroPositionIU: 8875
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
