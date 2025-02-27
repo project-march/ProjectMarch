@@ -14,7 +14,7 @@ march9:
             direction: 1
             minPositionIU: 4968
             maxPositionIU: 7060
-            zeroPositionIU: 6142
+            zeroPositionIU: 6150
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
@@ -56,7 +56,7 @@ march9:
             direction: 1
             minPositionIU: 8046
             maxPositionIU: 9238
-            zeroPositionIU: 8875
+            zeroPositionIU: 8956
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -85,7 +85,7 @@ march9:
             direction: -1
             minPositionIU: 423910
             maxPositionIU: 815887
-            zeroPositionIU: 758454
+            zeroPositionIU: 757623
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.05899213
           incrementalEncoder:
@@ -114,7 +114,7 @@ march9:
             direction: 1
             minPositionIU: 496580
             maxPositionIU: 861125
-            zeroPositionIU: 496643
+            zeroPositionIU: 496580
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
@@ -143,7 +143,7 @@ march9:
             direction: 1
             minPositionIU: 3679
             maxPositionIU: 5713
-            zeroPositionIU: 4796
+            zeroPositionIU: 4803
             lowerSoftLimitMarginRad: 0.00349066
             upperSoftLimitMarginRad: 0.00349066
           incrementalEncoder:
@@ -185,7 +185,7 @@ march9:
             direction: 1
             minPositionIU: 14912
             maxPositionIU: 16209
-            zeroPositionIU: 15854
+            zeroPositionIU: 15822
             lowerSoftLimitMarginRad: 0.02617994
             upperSoftLimitMarginRad: 0.02617994
           incrementalEncoder:
@@ -214,7 +214,7 @@ march9:
             direction: 1
             minPositionIU: 309638
             maxPositionIU: 701538
-            zeroPositionIU: 367538
+            zeroPositionIU: 367892
             lowerSoftLimitMarginRad: 0.05899213
             upperSoftLimitMarginRad: 0.04
           incrementalEncoder:
@@ -243,7 +243,7 @@ march9:
             direction: -1
             minPositionIU: 443589
             maxPositionIU: 802946
-            zeroPositionIU: 584326
+            zeroPositionIU: 802946
             lowerSoftLimitMarginRad: 0.07908308
             upperSoftLimitMarginRad: 0.10908308
           incrementalEncoder:
