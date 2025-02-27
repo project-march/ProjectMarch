@@ -26,7 +26,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 140.0
+            p: 5.0
             i: 0.0
             d: 0.2
           torque:
@@ -68,9 +68,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 200.0
+            p: 22.5
             i: 0.0
-            d: 0.6
+            d: 0.3
           torque:
             p: 45.0
             d: 0.0004
@@ -97,9 +97,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 80.0
+            p: 17.5
             i: 0.0
-            d: 0.8
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
@@ -126,9 +126,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 50
+            p: 10
             i: 0.0
-            d: 0.6
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
@@ -155,7 +155,7 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 140
+            p: 5
             i: 0.0
             d: 0.2
           torque:
@@ -197,9 +197,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 200.0
+            p: 22.5
             i: 0.0
-            d: 0.6
+            d: 0.3
           torque:
             p: 15.0
             d: 0.0002
@@ -226,9 +226,9 @@ march9:
             averageTorque: 10
         gains:
           position:
-            p: 80.0
+            p: 17.5
             i: 0.0
-            d: 0.8
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
@@ -255,9 +255,9 @@ march9:
             averageTorque: 10.0
         gains:
           position:
-            p: 50
+            p: 10
             i: 0.0
-            d: 0.6
+            d: 0.4
           torque:
             p: 0.1
             d: 0.0
