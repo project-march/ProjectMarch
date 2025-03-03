@@ -73,8 +73,19 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
 
     const auto& pos_gains = joint_config["gains"]["position"];
     const auto& tor_gains = joint_config["gains"]["torque"];
-    std::array<double, 3> position_gains = {pos_gains["p"].as<double>(), pos_gains["i"].as<double>(), pos_gains["d"].as<double>()};
-    std::array<double, 2> torque_gains = {tor_gains["p"].as<double>(), tor_gains["d"].as<double>()};
+
+    // Safety multiplier for all gains
+    const double safety_factor = 0.3;
+
+    double pos_p_gain = pos_gains["p"].as<double>() * safety_factor;
+    double pos_i_gain = pos_gains["i"].as<double>() * safety_factor;
+    double pos_d_gain = pos_gains["d"].as<double>() * safety_factor;
+
+    double tor_p_gain = tor_gains["p"].as<double>() * safety_factor;
+    double tor_d_gain = tor_gains["d"].as<double>() * safety_factor;
+
+    std::array<double, 3> position_gains = {pos_p_gain, pos_i_gain, pos_d_gain};
+    std::array<double, 2> torque_gains = {tor_p_gain, tor_d_gain};
 
     return {joint_name, std::move(motor_controller), position_gains, torque_gains, logger};
 }
