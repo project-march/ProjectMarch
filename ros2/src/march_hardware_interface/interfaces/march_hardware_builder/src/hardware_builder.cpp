@@ -75,7 +75,7 @@ march::Joint HardwareBuilder::createJoint(const std::string& joint_name, const Y
     const auto& tor_gains = joint_config["gains"]["torque"];
 
     // Safety multiplier for all gains
-    const double safety_factor = 0.3;
+    const double safety_factor = 0.6;
 
     double pos_p_gain = pos_gains["p"].as<double>() * safety_factor;
     double pos_i_gain = pos_gains["i"].as<double>() * safety_factor;
