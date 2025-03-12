@@ -44,8 +44,10 @@ enum class ODriveObjectName {
     // Write objects
     TargetTorque,
     TargetPosition,
+    MPC_moment_setpoint, // Added for mpc test
     FuzzyTorque,
     FuzzyPosition,
+    FuzzyMPC, // Added for mpc test
     PositionP,
     PositionI,
     PositionD,

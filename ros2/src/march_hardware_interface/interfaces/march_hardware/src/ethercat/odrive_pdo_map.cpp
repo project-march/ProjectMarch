@@ -56,31 +56,34 @@ ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_none = {
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
-    { ODriveObjectName::TargetTorque, ODriveObject(/*offset=*/0, /*length=*/32) },
-    { ODriveObjectName::TargetPosition, ODriveObject(/*offset=*/4, /*length=*/32) },
-    { ODriveObjectName::FuzzyTorque, ODriveObject(/*offset=*/8, /*length=*/32) },
-    { ODriveObjectName::FuzzyPosition, ODriveObject(/*offset=*/12, /*length=*/32) },
-    { ODriveObjectName::PositionP, ODriveObject(/*offset=*/16, /*length=*/32) },
-    { ODriveObjectName::PositionI, ODriveObject(/*offset=*/20, /*length=*/32) },
-    { ODriveObjectName::PositionD, ODriveObject(/*offset=*/24, /*length=*/32) },
-    { ODriveObjectName::TorqueP, ODriveObject(/*offset=*/28, /*length=*/32) },
-    { ODriveObjectName::TorqueD, ODriveObject(/*offset=*/32, /*length=*/32) },
-    { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/36, /*length=*/32) },
+    { ODriveObjectName::TargetTorque,       ODriveObject(/*offset=*/0, /*length=*/32) },
+    { ODriveObjectName::TargetPosition,     ODriveObject(/*offset=*/4, /*length=*/32) },
+    { ODriveObjectName::MPC_moment_setpoint,ODriveObject(/*offset=*/8, /*length=*/32) },
+    { ODriveObjectName::FuzzyTorque,        ODriveObject(/*offset=*/12, /*length=*/32) },
+    { ODriveObjectName::FuzzyPosition,      ODriveObject(/*offset=*/16, /*length=*/32) },
+    { ODriveObjectName::FuzzyMPC,           ODriveObject(/*offset=*/20, /*length=*/32) },
+    { ODriveObjectName::PositionP,          ODriveObject(/*offset=*/24, /*length=*/32) },
+    { ODriveObjectName::PositionI,          ODriveObject(/*offset=*/28, /*length=*/32) },
+    { ODriveObjectName::PositionD,          ODriveObject(/*offset=*/32, /*length=*/32) },
+    { ODriveObjectName::TorqueP,            ODriveObject(/*offset=*/36, /*length=*/32) },
+    { ODriveObjectName::TorqueD,            ODriveObject(/*offset=*/40, /*length=*/32) },
+    { ODriveObjectName::RequestedState,     ODriveObject(/*offset=*/44, /*length=*/32) }
 };
 
 ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
-    { ODriveObjectName::TargetTorque, ODriveObject(/*offset=*/40, /*length=*/32) },
-    { ODriveObjectName::TargetPosition, ODriveObject(/*offset=*/44, /*length=*/32) },
-    { ODriveObjectName::FuzzyTorque, ODriveObject(/*offset=*/48, /*length=*/32) },
-    { ODriveObjectName::FuzzyPosition, ODriveObject(/*offset=*/52, /*length=*/32) },
-    { ODriveObjectName::PositionP, ODriveObject(/*offset=*/56, /*length=*/32) },
-    { ODriveObjectName::PositionI, ODriveObject(/*offset=*/60, /*length=*/32) },
-    { ODriveObjectName::PositionD, ODriveObject(/*offset=*/64, /*length=*/32) },
-    { ODriveObjectName::TorqueP, ODriveObject(/*offset=*/68, /*length=*/32) },
-    { ODriveObjectName::TorqueD, ODriveObject(/*offset=*/72, /*length=*/32) },
-    { ODriveObjectName::RequestedState, ODriveObject(/*offset=*/76, /*length=*/32) },
-    { ODriveObjectName::CheckSumMOSI, ODriveObject(/*offset=*/80, /*length=*/32) },
-
+    { ODriveObjectName::TargetTorque,       ODriveObject(/*offset=*/48, /*length=*/32) },
+    { ODriveObjectName::TargetPosition,     ODriveObject(/*offset=*/52, /*length=*/32) },
+    { ODriveObjectName::MPC_moment_setpoint,ODriveObject(/*offset=*/56, /*length=*/32) },
+    { ODriveObjectName::FuzzyTorque,        ODriveObject(/*offset=*/60, /*length=*/32) },
+    { ODriveObjectName::FuzzyPosition,      ODriveObject(/*offset=*/64, /*length=*/32) },
+    { ODriveObjectName::FuzzyMPC,           ODriveObject(/*offset=*/68, /*length=*/32) },
+    { ODriveObjectName::PositionP,          ODriveObject(/*offset=*/72, /*length=*/32) },
+    { ODriveObjectName::PositionI,          ODriveObject(/*offset=*/76, /*length=*/32) },
+    { ODriveObjectName::PositionD,          ODriveObject(/*offset=*/80, /*length=*/32) },
+    { ODriveObjectName::TorqueP,            ODriveObject(/*offset=*/84, /*length=*/32) },
+    { ODriveObjectName::TorqueD,            ODriveObject(/*offset=*/88, /*length=*/32) },
+    { ODriveObjectName::RequestedState,     ODriveObject(/*offset=*/92, /*length=*/32) },
+    { ODriveObjectName::CheckSumMOSI,       ODriveObject(/*offset=*/96, /*length=*/32) },
 };
 
 uint8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
